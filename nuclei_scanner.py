@@ -1,0 +1,159 @@
+#!/usr/bin/env python3
+"""Escaneo defensivo con Nuclei y seguimiento visible del progreso."""
+
+import json
+import shutil
+import subprocess
+import sys
+import threading
+import time
+from pathlib import Path
+from urllib.parse import urlparse
+
+
+def validate_target(target):
+    """Acepta únicamente URLs HTTP/HTTPS bien formadas."""
+    target = target.strip()
+    parsed = urlparse(target)
+
+    if (
+        parsed.scheme not in ("http", "https")
+        or not parsed.hostname
+        or parsed.username
+        or parsed.password
+    ):
+        raise ValueError(
+            "Usa una URL HTTP/HTTPS autorizada, por ejemplo "
+            "http://127.0.0.1:8765"
+        )
+
+    return target
+
+
+def scan_target(target, timeout=45):
+    """Ejecuta Nuclei y muestra la actividad sin inventar porcentajes."""
+    target = validate_target(target)
+    executable = shutil.which("nuclei")
+
+    if not executable:
+        return {
+            "target": target,
+            "status": "error",
+            "error": "Nuclei no se encuentra en el PATH.",
+            "findings": [],
+        }
+
+    output_dir = Path("reports")
+    output_dir.mkdir(parents=True, exist_ok=True)
+    output_file = output_dir / "nuclei_scan_results.jsonl"
+
+    # Evitamos mezclar hallazgos de escaneos anteriores.
+    output_file.write_text("", encoding="utf-8")
+
+    command = [
+        executable,
+        "-u", target,
+        "-t", str(Path.home() / "nuclei-templates/http/technologies/bulma-detect.yaml"),
+        "-t", str(Path.home() / "nuclei-templates/http/misconfiguration/http-missing-security-headers.yaml"),
+        "-jsonl",
+        "-stats",
+        "-stats-interval", "5",
+        "-no-interactsh",
+        "-disable-update-check",
+        "-rl", "2",
+        "-c", "2",
+        "-timeout", "5",
+        "-retries", "1",
+        "-o", str(output_file.resolve()),
+    ]
+
+    print("\n[1/4] Preparando escaneo", flush=True)
+    print(f"Objetivo: {target}", flush=True)
+    print("Límite de solicitudes: 2 por segundo; concurrencia: 2.", flush=True)
+    print("[2/4] Iniciando Nuclei. La salida aparecerá debajo.", flush=True)
+
+    started = time.monotonic()
+    messages = []
+
+    try:
+        process = subprocess.Popen(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1,
+        )
+
+        def show_output():
+            """Muestra cada mensaje de Nuclei conforme llega."""
+            if process.stdout is None:
+                return
+
+            for line in process.stdout:
+                line = line.rstrip()
+                if line:
+                    messages.append(line)
+                    print(f"[Nuclei] {line}", flush=True)
+
+        reader = threading.Thread(target=show_output, daemon=True)
+        reader.start()
+
+        while process.poll() is None:
+            elapsed = int(time.monotonic() - started)
+            print(
+                f"\r[En curso] Tiempo transcurrido: {elapsed}s",
+                end="",
+                flush=True,
+            )
+
+            if elapsed >= timeout:
+                process.kill()
+                process.wait()
+                print("\n[Tiempo agotado] Se detuvo el escaneo.", flush=True)
+                return {
+                    "target": target,
+                    "status": "timeout",
+                    "error": f"El escaneo superó {timeout} segundos.",
+                    "findings": [],
+                }
+
+            time.sleep(1)
+
+        reader.join(timeout=3)
+        elapsed = round(time.monotonic() - started, 1)
+        print(f"\n[3/4] Escaneo terminado en {elapsed} segundos.", flush=True)
+
+    except OSError as error:
+        return {
+            "target": target,
+            "status": "error",
+            "error": str(error),
+            "findings": [],
+        }
+
+    findings = []
+    if output_file.is_file():
+        for line in output_file.read_text(encoding="utf-8").splitlines():
+            try:
+                findings.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
+
+    status = "completed" if process.returncode == 0 else "scanner_error"
+
+    print(f"[4/4] Hallazgos registrados: {len(findings)}", flush=True)
+    print(f"Estado final: {status}", flush=True)
+
+    return {
+        "target": target,
+        "status": status,
+        "return_code": process.returncode,
+        "elapsed_seconds": elapsed,
+        "findings_count": len(findings),
+        "findings": findings,
+        "scanner_messages": messages[-100:],
+        "note": (
+            "Los hallazgos son indicios que requieren validación manual. "
+            "Cero hallazgos no demuestra que el objetivo sea seguro."
+        ),
+    }

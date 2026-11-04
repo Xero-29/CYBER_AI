@@ -1,0 +1,5 @@
+Título: Posible vulnerabilidad de validación de entrada
+Referencia: CVE-2024-12345
+Descripción: Entrada no validada correctamente.
+Evidencia: ejemplo de prueba local.
+Parche: pendiente de verificación.

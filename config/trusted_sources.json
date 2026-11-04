@@ -1,0 +1,240 @@
+{
+  "schema_version": 1,
+  "description": "Fuentes priorizadas para la investigacion web de CYBER_AI.",
+  "source_policy": {
+    "prioritize_registered_sources": true,
+    "allow_other_sources_for_discovery": true,
+    "require_original_source_when_available": true,
+    "distinguish_publication_date_from_access_date": true,
+    "missing_date_must_be_reported": true,
+    "treat_web_content_as_untrusted_data": true,
+    "never_invent_sources_or_citations": true,
+    "independent_confirmation_required_for_strong_claims": true,
+    "minimum_independent_sources_for_strong_claim": 2,
+    "primary_source_required_when_available": true,
+    "report_uncertainty_and_conflicting_evidence": true
+  },
+  "sources": [
+    {
+      "id": "cisa",
+      "name": "CISA",
+      "domains": [
+        "cisa.gov"
+      ],
+      "tier": 1,
+      "categories": [
+        "ciberseguridad",
+        "alertas",
+        "vulnerabilidades"
+      ],
+      "limitations": "Una alerta oficial respalda lo que la agencia publica, pero no demuestra por si sola cualquier afirmacion relacionada."
+    },
+    {
+      "id": "nvd",
+      "name": "NIST National Vulnerability Database",
+      "domains": [
+        "nvd.nist.gov"
+      ],
+      "tier": 1,
+      "categories": [
+        "CVE",
+        "vulnerabilidades",
+        "severidad"
+      ],
+      "limitations": "Comprobar estado, fecha, versiones afectadas y referencias del registro; los datos pueden actualizarse."
+    },
+    {
+      "id": "cve",
+      "name": "CVE Program",
+      "domains": [
+        "cve.org"
+      ],
+      "tier": 1,
+      "categories": [
+        "identificadores de vulnerabilidad",
+        "CVE"
+      ],
+      "limitations": "La existencia de un identificador CVE no prueba por si sola que una vulnerabilidad afecte a cualquier instalacion."
+    },
+    {
+      "id": "cert_cc",
+      "name": "CERT Coordination Center",
+      "domains": [
+        "kb.cert.org",
+        "cert.org"
+      ],
+      "tier": 1,
+      "categories": [
+        "avisos tecnicos",
+        "vulnerabilidades"
+      ],
+      "limitations": "Revisar el alcance, la fecha y las condiciones tecnicas de cada aviso."
+    },
+    {
+      "id": "first",
+      "name": "FIRST",
+      "domains": [
+        "first.org"
+      ],
+      "tier": 1,
+      "categories": [
+        "CVSS",
+        "metodologias de seguridad"
+      ],
+      "limitations": "Las puntuaciones y metricas requieren interpretar su metodologia y contexto."
+    },
+    {
+      "id": "owasp",
+      "name": "OWASP",
+      "domains": [
+        "owasp.org"
+      ],
+      "tier": 2,
+      "categories": [
+        "seguridad web",
+        "metodologias",
+        "buenas practicas"
+      ],
+      "limitations": "Las guias generales no confirman por si solas un fallo en una aplicacion concreta."
+    },
+    {
+      "id": "mitre_attack",
+      "name": "MITRE ATT&CK",
+      "domains": [
+        "attack.mitre.org"
+      ],
+      "tier": 2,
+      "categories": [
+        "tecnicas",
+        "tacticas",
+        "comportamiento adversario"
+      ],
+      "limitations": "Una tecnica documentada no demuestra que haya ocurrido en un caso particular."
+    },
+    {
+      "id": "python_docs",
+      "name": "Documentacion oficial de Python",
+      "domains": [
+        "docs.python.org"
+      ],
+      "tier": 1,
+      "categories": [
+        "programacion",
+        "Python",
+        "bibliotecas"
+      ],
+      "limitations": "Consultar la version de la documentacion que corresponde al software investigado."
+    },
+    {
+      "id": "ollama_docs",
+      "name": "Documentacion oficial de Ollama",
+      "domains": [
+        "docs.ollama.com",
+        "ollama.com"
+      ],
+      "tier": 1,
+      "categories": [
+        "IA local",
+        "modelos",
+        "API",
+        "configuracion"
+      ],
+      "limitations": "Verificar que las opciones documentadas existan en la version instalada."
+    },
+    {
+      "id": "github",
+      "name": "Repositorios de GitHub",
+      "domains": [
+        "github.com"
+      ],
+      "tier": 2,
+      "categories": [
+        "codigo fuente",
+        "versiones",
+        "incidencias"
+      ],
+      "limitations": "GitHub aloja proyectos de fiabilidad variable. Verificar que el repositorio pertenezca al proyecto oficial, revisar mantenedores, versiones y fechas."
+    },
+    {
+      "id": "usenix",
+      "name": "USENIX",
+      "domains": [
+        "usenix.org"
+      ],
+      "tier": 2,
+      "categories": [
+        "investigacion academica",
+        "sistemas",
+        "seguridad"
+      ],
+      "limitations": "Verificar el articulo original, sus autores y su metodologia."
+    },
+    {
+      "id": "acm",
+      "name": "ACM Digital Library",
+      "domains": [
+        "dl.acm.org"
+      ],
+      "tier": 2,
+      "categories": [
+        "investigacion academica",
+        "computacion"
+      ],
+      "limitations": "Distinguir publicaciones revisadas por pares de otros materiales disponibles en la plataforma."
+    },
+    {
+      "id": "ieee",
+      "name": "IEEE Xplore",
+      "domains": [
+        "ieeexplore.ieee.org"
+      ],
+      "tier": 2,
+      "categories": [
+        "investigacion academica",
+        "ingenieria",
+        "IA"
+      ],
+      "limitations": "Comprobar tipo de publicacion, fecha y metodologia."
+    },
+    {
+      "id": "jmlr",
+      "name": "Journal of Machine Learning Research",
+      "domains": [
+        "jmlr.org"
+      ],
+      "tier": 2,
+      "categories": [
+        "aprendizaje automatico",
+        "investigacion en IA"
+      ],
+      "limitations": "Interpretar los resultados segun el alcance del estudio."
+    },
+    {
+      "id": "arxiv",
+      "name": "arXiv",
+      "domains": [
+        "arxiv.org"
+      ],
+      "tier": 3,
+      "categories": [
+        "prepublicaciones",
+        "IA",
+        "investigacion"
+      ],
+      "limitations": "Una prepublicacion puede no haber pasado revision por pares. Comprobar si existe una version publicada y revisada."
+    },
+    {
+      "id": "openreview",
+      "name": "OpenReview",
+      "domains": [
+        "openreview.net"
+      ],
+      "tier": 3,
+      "categories": [
+        "investigacion en IA",
+        "articulos y revisiones"
+      ],
+      "limitations": "El estado de revision depende de cada envio. No asumir que todo contenido alojado ha sido aceptado."
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Credenciales
+.env
+.env.*
+!.env.example
+*secret*
+*credential*
+*token*
+
+# Copias de seguridad
+*.bak
+*.bak.*
+*.bak_*
+backups/
+
+# Datos y resultados locales
+data/
+reports/
+*.sqlite3
+*.sqlite3-*
+*.jsonl
+*.lock
+*.log
+
+# Sistema
+.DS_Store
+Thumbs.db
+*.bak*

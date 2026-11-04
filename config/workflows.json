@@ -1,0 +1,111 @@
+{
+  "version": 1,
+  "default_workflow": "investigacion",
+  "workflows": {
+    "investigacion": {
+      "description": "Investigar, cuestionar, corregir, verificar y supervisar",
+      "max_rounds": 5,
+      "max_context_chars": 6000,
+      "steps": [
+        {
+          "agent": "NEXO",
+          "objective": "Formula hasta tres hipotesis comprobables. Explica los mecanismos, las evidencias necesarias y las pruebas seguras que permitirian refutarlas.",
+          "use_knowledge": true,
+          "knowledge_top_k": 3,
+          "knowledge_min_score": 0.4
+        },
+        {
+          "agent": "FILTRO",
+          "objective": "Critica las hipotesis anteriores. Busca errores tecnicos, contraejemplos, supuestos ocultos y explicaciones alternativas. No inventes hechos."
+        },
+        {
+          "agent": "NEXO",
+          "objective": "Revisa las objeciones de FILTRO. Corrige, limita o descarta las hipotesis cuando corresponda. Explica que cambios se justifican y cuales siguen pendientes.",
+          "use_knowledge": true,
+          "knowledge_top_k": 3,
+          "knowledge_min_score": 0.4
+        },
+        {
+          "agent": "VERITAS",
+          "objective": "Clasifica las afirmaciones importantes como respaldadas, contradichas o pendientes. Utiliza solamente las evidencias disponibles y especifica que falta comprobar."
+        },
+        {
+          "agent": "FARO",
+          "objective": "Evalua la calidad del proceso completo. Identifica saltos logicos, repeticion de errores, falta de pruebas y mejoras concretas para la siguiente investigacion."
+        }
+      ]
+    },
+    "critica_corta": {
+      "description": "Hipotesis, critica independiente y revision",
+      "max_rounds": 3,
+      "max_context_chars": 3500,
+      "steps": [
+        {
+          "agent": "NEXO",
+          "think": false,
+          "num_predict": 300,
+          "objective": "Formula una hipotesis comprobable en un maximo de 100 palabras. Usa cuatro apartados: Hipotesis, Evidencia necesaria, Prueba segura y Resultado refutador. No afirmes que existe un fallo ni presupongas una causa tecnica. En un laboratorio autorizado, propone comprobar con dos cuentas y documentos de prueba si A puede leer un documento privado de B usando la interfaz normal de la aplicacion, cuando sea posible. No inventes APIs ni resultados. Si la prueba no detecta acceso, limita la conclusion a las condiciones examinadas.",
+          "max_retries": 1,
+          "max_num_predict": 450
+        },
+        {
+          "agent": "FILTRO",
+          "think": false,
+          "num_predict": 350,
+          "objective": "Critica la respuesta anterior de NEXO en un maximo de 120 palabras. Empieza con Veredicto: CONFIRMADA, REFUTADA o NO EVALUABLE. Usa CONFIRMADA o REFUTADA solo si hay resultados observados que lo justifiquen; si solo existe una hipotesis y una propuesta de prueba, el veredicto es NO EVALUABLE. No confundas ausencia de evidencia con evidencia de ausencia. Distingue hechos, inferencias y condiciones hipoteticas. Detecta causas tecnicas no respaldadas y defectos en la prueba. Indica la evidencia que falta. No inventes hechos.",
+          "max_retries": 1,
+          "max_num_predict": 500
+        },
+        {
+          "agent": "NEXO",
+          "think": false,
+          "num_predict": 350,
+          "objective": "Revisa la hipotesis en un maximo de 120 palabras, evaluando tambien si el razonamiento de FILTRO es correcto. Si FILTRO declara una hipotesis refutada sin resultados observados, senala y corrige ese error. No aceptes una critica solo por proceder de FILTRO. Distingue el comportamiento hipotetico de los resultados reales. No inventes causas ni resultados. Si no se ha probado la aplicacion, declara que el resultado y la causa tecnica siguen siendo desconocidos. Indica la evidencia pendiente.",
+          "max_retries": 1,
+          "max_num_predict": 550
+        }
+      ]
+    },
+    "revision_tecnica": {
+      "description": "Generación técnica, revisión independiente y corrección final",
+      "mode": "technical",
+      "max_rounds": 3,
+      "max_context_chars": 6000,
+      "steps": [
+        {
+          "agent": "NEXO",
+          "mode": "technical",
+          "think": false,
+          "num_predict": 650,
+          "max_retries": 0,
+          "max_num_predict": 650,
+          "objective": "Redacta una respuesta técnica que cumpla directamente la tarea principal. Respeta las cantidades solicitadas. Usa comandos precisos y explica cómo interpretar sus resultados. No inventes resultados ni afirmes haber inspeccionado sistemas reales. Evita analogías salvo que la tarea las solicite. Entrega solo el borrador."
+        },
+        {
+          "agent": "VERITAS",
+          "mode": "technical",
+          "think": false,
+          "num_predict": 650,
+          "max_retries": 1,
+          "max_num_predict": 900,
+          "objective": "Revisa el borrador de NEXO exclusivamente contra la TAREA PRINCIPAL. Primero determina si realmente responde a lo solicitado. Si está fuera de tema, identifícalo como hallazgo principal. No aceptes automáticamente las premisas, conclusiones ni propuestas de NEXO: examínalas de forma independiente. No introduzcas requisitos ajenos a la tarea; por ejemplo, no exijas logs HTTP ni pruebas de autorización si la tarea no trata de ello. Distingue hechos observados, inferencias e hipótesis. No afirmes haber inspeccionado archivos ni ejecutado pruebas. No inventes errores para completar la revisión. Responde estrictamente con estos cuatro apartados:\nVEREDICTO: REQUIERE_CORRECCION o SIN_ERRORES_IDENTIFICADOS\nHALLAZGOS: errores concretos, incluido el desvío de la tarea si existe; escribe 'Ninguno identificado' cuando corresponda.\nOMISIONES: requisitos reales de la tarea que el borrador no cumple.\nLIMITACIONES: lo que no puede verificarse con el texto disponible.",
+          "required_output_prefix": "VEREDICTO:",
+          "required_output_sections": [
+            "HALLAZGOS:",
+            "OMISIONES:",
+            "LIMITACIONES:"
+          ]
+        },
+        {
+          "agent": "NEXO",
+          "mode": "technical",
+          "think": false,
+          "num_predict": 650,
+          "max_retries": 0,
+          "max_num_predict": 650,
+          "objective": "Entrega la versión final de la tarea principal aplicando los hallazgos justificados de VERITAS. No aceptes una crítica incorrecta solo porque proceda del revisor. Corrige errores concretos, conserva los requisitos originales y elimina duplicaciones. Si una afirmación no puede verificarse con la información disponible, indícalo expresamente. Devuelve únicamente la respuesta final, sin narrar el proceso de revisión."
+        }
+      ]
+    }
+  }
+}
