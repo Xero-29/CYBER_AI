@@ -2,6 +2,8 @@
 
 import hashlib
 import json
+import os
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -18,14 +20,38 @@ def fingerprint(text):
 
 
 def load_index():
-    """Carga el índice local o crea uno vacío si aún no existe."""
+    """Carga el índice; ante corrupción falla de forma segura y no lo reinicia."""
     if not INDEX_FILE.exists():
         return {}
     try:
         data = json.loads(INDEX_FILE.read_text(encoding="utf-8"))
-        return data if isinstance(data, dict) else {}
-    except (OSError, json.JSONDecodeError):
-        return {}
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(
+            f"El índice de informes no se puede leer; se conserva sin modificar: {INDEX_FILE}"
+        ) from exc
+    if not isinstance(data, dict):
+        raise ValueError(f"Formato inválido en el índice de informes: {INDEX_FILE}")
+    return data
+
+
+def _write_index_atomic(index):
+    """Reemplaza el índice de forma atómica para evitar archivos parciales."""
+    serialized = json.dumps(index, ensure_ascii=False, indent=2) + "\n"
+    fd, temporary_name = tempfile.mkstemp(
+        prefix=f".{INDEX_FILE.name}.", suffix=".tmp", dir=INDEX_FILE.parent
+    )
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as temporary:
+            temporary.write(serialized)
+            temporary.flush()
+            os.fsync(temporary.fileno())
+        os.replace(temporary_name, INDEX_FILE)
+    except Exception:
+        try:
+            os.unlink(temporary_name)
+        except FileNotFoundError:
+            pass
+        raise
 
 
 def register_report(source_text, output_path):
@@ -46,9 +72,6 @@ def register_report(source_text, output_path):
 
     if previous is None:
         index[digest] = str(output_path)
-        INDEX_FILE.write_text(
-            json.dumps(index, ensure_ascii=False, indent=2) + "\n",
-            encoding="utf-8",
-        )
+        _write_index_atomic(index)
 
     return result
