@@ -2,6 +2,7 @@
 """Entrada principal de CYBER_AI."""
 
 import argparse
+import hashlib
 import json
 import sys
 import subprocess
@@ -27,7 +28,9 @@ def process_one(filename):
         result = enrich_analysis(analyze_report(text))
         output_dir = Path("reports")
         output_dir.mkdir(parents=True, exist_ok=True)
-        output = output_dir / f"{source.stem}_analysis.json"
+        source_identity = str(source.resolve()).encode("utf-8")
+        source_suffix = hashlib.sha256(source_identity).hexdigest()[:12]
+        output = output_dir / f"{source.stem}_{source_suffix}_analysis.json"
 
         duplicate = register_report(text, output)
         result["duplicate_check"] = duplicate
