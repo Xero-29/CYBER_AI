@@ -57,7 +57,7 @@ def generate_embeddings(texts, agent_name="ECO"):
 
             if len(raw_vectors) != len(texts):
                 raise RuntimeError(
-                    "Ollama devolvió una cantidad de embeddings distinta "
+                    "El proveedor devolvió una cantidad de embeddings distinta "
                     "de la cantidad de textos enviados."
                 )
 
@@ -66,13 +66,17 @@ def generate_embeddings(texts, agent_name="ECO"):
 
             if any(len(vector) != dimensions for vector in vectors):
                 raise RuntimeError(
-                    "Ollama devolvió embeddings con dimensiones diferentes."
+                    "El proveedor devolvió embeddings con dimensiones diferentes."
                 )
 
+            embedding_space = (
+                model if provider["protocol"] == "ollama"
+                else f"{provider['name']}::{model}"
+            )
             return {
                 "agent": name,
                 "model": model,
-                "embedding_space": f"{provider['name']}::{model}",
+                "embedding_space": embedding_space,
                 "provider": provider["name"],
                 "embeddings": vectors,
                 "dimensions": dimensions,
