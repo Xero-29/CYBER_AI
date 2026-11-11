@@ -6,6 +6,7 @@ import json
 import shutil
 import subprocess
 import time
+import uuid
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -60,8 +61,6 @@ def main():
         "http/misconfiguration/cookies-without-secure.yaml",
         "http/misconfiguration/cookies-without-httponly.yaml",
         "http/misconfiguration/missing-cookie-samesite-strict.yaml",
-        "http/miscellaneous/robots-txt.yaml",
-        "http/vulnerabilities/generic/cors-misconfig.yaml",
     ]
 
     by_relative_path = {}
@@ -105,8 +104,9 @@ def main():
 
     output_dir = Path("reports")
     output_dir.mkdir(parents=True, exist_ok=True)
-    results_file = output_dir / "task_scan_results.jsonl"
-    report_file = output_dir / "task_scan_report.json"
+    scan_id = uuid.uuid4().hex
+    results_file = output_dir / f"task_scan_{scan_id}.jsonl"
+    report_file = output_dir / f"task_scan_{scan_id}_report.json"
 
     command = [
         nuclei, "-u", args.target,
