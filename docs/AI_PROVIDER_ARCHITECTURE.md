@@ -13,8 +13,11 @@ directamente en las bases de datos de memoria ni cambiar las Skills.
 ## Estado de los adaptadores
 
 - `ollama`: proveedor local mediante su API HTTP.
-- `openai_compatible`: proveedores remotos que implementan la API compatible
-  de chat completions y embeddings.
+- `openai`: proveedores remotos que implementan la API compatible de Chat
+  Completions y Embeddings.
+- `anthropic`: API nativa Messages para chat. Anthropic no proporciona
+  embeddings nativos en este adaptador; ECO debe usar otro proveedor/modelo.
+- `gemini`: API nativa Gemini para generación de contenido y embeddings.
 - Un proveedor con API nativa incompatible necesita un adaptador nuevo dentro
   de `llm_providers.py` (o un módulo de adaptador registrado). No se debe
   fingir compatibilidad con solo cambiar una URL.
@@ -111,8 +114,11 @@ de modelos distintos en una misma búsqueda.
 
 ## Limitaciones actuales
 
-El adaptador remoto implementa el protocolo OpenAI-compatible. No significa que
-cualquier API nativa de cualquier fabricante funcione directamente. Para
-proveedores con protocolo propio se debe añadir y probar un adaptador, manteniendo
-el mismo contrato interno. Esta ampliación no requiere modificar el Skillbook,
+Los adaptadores nativos incluidos cubren Anthropic Messages y Gemini
+generateContent/embedContent. Anthropic no tiene embeddings nativos en este
+adaptador, por lo que se debe asignar ECO a Gemini, Ollama u otro proveedor
+compatible con embeddings. Las APIs, nombres de modelos, cuotas y disponibilidad
+pueden cambiar; hay que verificar la documentación del proveedor y ejecutar
+pruebas de conectividad antes de usarlo. Otros proveedores con protocolos propios
+requieren un adaptador nuevo, manteniendo el mismo contrato interno. Esta ampliación no requiere modificar el Skillbook,
 la biblioteca ni los módulos de ciberseguridad.
