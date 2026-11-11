@@ -24,7 +24,7 @@ class FakeProcess:
 
 class NucleiScannerTests(unittest.TestCase):
     def test_scan_requires_explicit_authorization(self):
-        result = scan_target("http://127.0.0.1:8765")
+        result = scan_target("http://127.0.0.1:8765", authorized=True)
         self.assertEqual(result["status"], "authorization_required")
         self.assertEqual(result["findings"], [])
 
@@ -73,7 +73,7 @@ class NucleiScannerTests(unittest.TestCase):
                 with patch("nuclei_scanner.subprocess.Popen", side_effect=fake_popen):
                     with patch("nuclei_scanner.Path.home", return_value=root):
                         with patch("nuclei_scanner.time.sleep"):
-                            result = scan_target("http://127.0.0.1:8765")
+                            result = scan_target("http://127.0.0.1:8765", authorized=True)
 
             self.assertEqual(result["status"], "completed")
             self.assertEqual(result["findings_count"], 1)
@@ -85,7 +85,7 @@ class NucleiScannerTests(unittest.TestCase):
                 "nuclei_scanner.subprocess.Popen",
                 side_effect=OSError("No se pudo iniciar"),
             ):
-                result = scan_target("http://127.0.0.1:8765")
+                result = scan_target("http://127.0.0.1:8765", authorized=True)
 
         self.assertEqual(result["status"], "error")
         self.assertIn("No se pudo iniciar", result["error"])
