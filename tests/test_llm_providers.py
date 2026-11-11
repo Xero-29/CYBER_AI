@@ -143,5 +143,27 @@ class NativeProtocolTests(unittest.TestCase):
                     "model": "m", "messages": [{"role": "user", "content": "x"}]})
 
 
+    def test_unknown_protocol_is_rejected_during_resolution(self):
+        config = {"llm_providers": {"custom": {
+            "enabled": True, "protocol": "unknown", "base_url": "https://example.test"
+        }}}
+        with self.assertRaisesRegex(ValueError, "no soportado"):
+            llm_providers.resolve_provider(config, {"provider": "custom"})
+
+    def test_invalid_provider_base_url_is_rejected(self):
+        config = {"llm_providers": {"cloud": {
+            "enabled": True, "protocol": "openai", "base_url": "file:///tmp"
+        }}}
+        with self.assertRaisesRegex(ValueError, "base_url inválida"):
+            llm_providers.resolve_provider(config, {"provider": "cloud"})
+
+    def test_required_api_key_without_environment_name_is_rejected(self):
+        provider = {"name": "cloud", "protocol": "openai",
+                    "base_url": "https://api.example/v1", "requires_api_key": True}
+        with patch.dict("os.environ", {}, clear=True):
+            with self.assertRaisesRegex(RuntimeError, "no declara api_key_env"):
+                llm_providers.request(provider, "api/chat", {
+                    "model": "m", "messages": [{"role": "user", "content": "x"}]})
+
 if __name__ == "__main__":
     unittest.main()
