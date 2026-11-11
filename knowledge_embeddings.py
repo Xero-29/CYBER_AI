@@ -3,12 +3,7 @@
 
 import fcntl
 
-from agent_runner import (
-    LOCK_FILE,
-    installed_models,
-    unload_other_models,
-    request_json,
-)
+from agent_runner import LOCK_FILE, unload_other_models
 from model_memory_manager import load_config, resolve_agent
 from llm_providers import resolve_provider, resolve_model, request as provider_request, installed_models as provider_models
 from knowledge_library import validate_vector
