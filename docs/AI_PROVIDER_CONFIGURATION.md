@@ -52,6 +52,29 @@ Se puede mantener Ollama para algunos especialistas y asignar un proveedor remot
 
 El fragmento ilustra los campos que se agregan; no reemplaza el resto de la definición del especialista.
 
+## Cambiar el modelo de embeddings sin mezclar vectores
+
+Los vectores se comparan únicamente dentro del mismo espacio proveedor/modelo.
+Al cambiar ECO a otro proveedor o modelo, los fragmentos antiguos no se mezclan
+con los nuevos: la búsqueda usa el identificador del espacio activo.
+
+Para migrar la biblioteca existente:
+
+```bash
+# 1. Inspeccionar el inventario y el destino, sin modificar datos
+python knowledge_reindex.py
+
+# 2. Reindexar todos los fragmentos que no pertenezcan al espacio activo
+python knowledge_reindex.py --apply --confirm --batch-size 8
+```
+
+La reindexación verifica el hash y tamaño de cada fragmento, genera los vectores
+en lotes, los prepara en una tabla de staging y publica el cambio en una única
+transacción. Antes de empezar crea una copia SQLite en
+`data/backups/`. Si falla la generación o validación, los vectores activos
+no se sustituyen. La copia de seguridad debe conservarse hasta verificar las
+búsquedas en el nuevo espacio.
+
 ## Límites y seguridad
 
 - No se debe escribir ninguna clave API en archivos versionados, argumentos de consola, logs o prompts.
