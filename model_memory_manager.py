@@ -149,17 +149,21 @@ def status():
     print(f"Registros de uso: {len(read_history())}")
 
 
-def record(target, task):
+def record(target, task, *, model=None, provider=None):
     """Registra el agente y conserva el historial anterior."""
     config = load_config()
     agent, info = resolve_agent(target, config)
-    model = info["model"]
+    model = model or info["model"]
+    provider = provider or "ollama"
 
-    installed = {
-        model_name(item) for item in api_get("api/tags").get("models", [])
-    }
-    if model not in installed:
-        raise ValueError(f"El modelo {model!r} no está instalado.")
+    # Solo los modelos locales de Ollama se validan contra el catálogo local.
+    # Los proveedores remotos no exponen necesariamente un catálogo público.
+    if provider == "ollama":
+        installed = {
+            model_name(item) for item in api_get("api/tags").get("models", [])
+        }
+        if model not in installed:
+            raise ValueError(f"El modelo {model!r} no está instalado en Ollama.")
 
     events = read_history()
     previous = events[-1] if events else {}
@@ -175,6 +179,7 @@ def record(target, task):
         "agent": agent,
         "agent_id": info.get("id", agent.lower()),
         "model": model,
+        "provider": provider,
         "task": task,
     }
 
@@ -183,6 +188,7 @@ def record(target, task):
         file.write(json.dumps(event, ensure_ascii=False) + "\n")
 
     print(f"Agente registrado: {agent}")
+    print(f"Proveedor: {provider}")
     print(f"Modelo: {model}")
     print(f"Tarea: {task}")
     print(f"Agente anterior: {previous_agent or 'ninguno'}")
