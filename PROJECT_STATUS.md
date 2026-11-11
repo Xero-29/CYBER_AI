@@ -26,7 +26,8 @@ Se creó una rama de trabajo independiente para aplicar correcciones de segurida
 - **Adaptadores de IA:** se integraron Ollama, OpenAI-compatible, Anthropic Messages (chat) y Google Gemini (chat y embeddings) detrás de un contrato normalizado.
 - **Selección de modelos:** se puede mapear cada especialista a un modelo remoto o usar un modelo predeterminado del proveedor. Las claves se leen de variables de entorno.
 - **Embeddings desacoplados:** ECO usa el proveedor seleccionado. Los vectores remotos se etiquetan como `proveedor::modelo` para no mezclar espacios; los vectores Ollama conservan su identificador histórico para compatibilidad.
-- **Pruebas de adaptadores:** se añadieron pruebas unitarias simuladas para selección de modelos, respuestas normalizadas de Anthropic/Gemini, credenciales, validación de configuración y enrutamiento de embeddings.
+- **Reindexación guiada:** `knowledge_reindex.py` ofrece inventario de solo lectura y migración explícita con `--apply --confirm`. Verifica integridad de cada fragmento, crea backup SQLite, genera en staging y publica los nuevos vectores en una transacción.
+- **Pruebas de adaptadores y reindexación:** se añadieron pruebas unitarias simuladas para selección de modelos, respuestas normalizadas de Anthropic/Gemini, credenciales, validación de configuración, enrutamiento de embeddings y validación del flujo de reindexación.
 - **CI:** el workflow cancela ejecuciones antiguas de la misma rama para evitar que cada commit deje una cola de pruebas obsoletas.
 - **Documentación:** `docs/AI_PROVIDER_ARCHITECTURE.md` y `docs/AI_PROVIDER_CONFIGURATION.md` describen configuración, protocolos, credenciales y límites.
 
@@ -54,7 +55,7 @@ No se debe ejecutar un escaneo contra sistemas de terceros sin permiso verificab
 3. Revisar concurrencia y recuperación del índice de informes.
 4. Completar auditoría de secretos, validación de entradas y manejo de errores en los módulos restantes.
 5. Añadir adaptadores nativos para otros proveedores y mejorar el descubrimiento/diagnóstico de capacidades.
-6. Implementar una migración/reindexación guiada cuando cambie el modelo de embeddings, con progreso, reanudación y verificación.
+6. Probar la reindexación completa con una base SQLite de laboratorio y validar recuperación ante interrupciones. La implementación tiene staging y publicación transaccional, pero aún requiere validación de extremo a extremo.
 7. Unificar la administración/descarga de modelos remotos y locales; hoy el flujo de inferencia está desacoplado, pero la administración de modelos sigue centrada en Ollama.
 8. Ejecutar el diff completo y abrir un Pull Request para revisión antes de integrar en `main`.
 
