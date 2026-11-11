@@ -991,7 +991,7 @@ def embed_text(agent_name, text):
     with LOCK_FILE.open("a+") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         try:
-            if provider["name"] == "ollama":
+            if provider["protocol"] == "ollama":
                 unload_other_models(model)
             result = request_json(
                 "api/embed",
