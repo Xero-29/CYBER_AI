@@ -60,6 +60,28 @@ class ResolveModelTests(unittest.TestCase):
             llm_providers.resolve_model({"name": "cloud"}, {"id": "nexo"}, "NEXO")
 
 
+    def test_provider_can_be_switched_by_configuration_only(self):
+        config = {
+            "default_provider": "ollama",
+            "llm_providers": {
+                "ollama": {"enabled": True, "protocol": "ollama",
+                           "base_url": "http://127.0.0.1:11434"},
+                "gemini": {"enabled": True, "protocol": "gemini",
+                           "base_url": "https://generativelanguage.googleapis.com/v1beta",
+                           "requires_api_key": False,
+                           "models": {"NEXO": "gemini-chat"}},
+            },
+        }
+        agent = {"id": "nexo", "model": "qwen-local", "type": "reasoning"}
+        local_provider = llm_providers.resolve_provider(config, agent)
+        local_model = llm_providers.resolve_model(local_provider, agent, "NEXO")
+        config["default_provider"] = "gemini"
+        remote_provider = llm_providers.resolve_provider(config, agent)
+        remote_model = llm_providers.resolve_model(remote_provider, agent, "NEXO")
+        self.assertEqual((local_provider["name"], local_model), ("ollama", "qwen-local"))
+        self.assertEqual((remote_provider["name"], remote_model), ("gemini", "gemini-chat"))
+        self.assertEqual(agent["model"], "qwen-local")
+
 class NativeProtocolTests(unittest.TestCase):
     def test_anthropic_chat_is_normalized(self):
         provider = {
