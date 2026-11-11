@@ -72,45 +72,134 @@ def _http_json(url, payload=None, headers=None, timeout=600):
         raise RuntimeError(f"No se pudo conectar con el proveedor IA: {exc}") from exc
 
 
-def request(provider, endpoint, payload=None, timeout=600):
-    name = provider["name"]
-    base = str(provider.get("base_url", "")).rstrip("/")
-    if name == "ollama":
-        return _http_json(base + "/" + endpoint, payload, timeout=timeout)
-    if provider.get("protocol") != "openai":
-        raise ValueError(f"Protocolo no compatible: {provider.get('protocol')}")
+def _credentials(provider):
     key_env = provider.get("api_key_env")
     key = os.environ.get(key_env, "") if key_env else ""
     if provider.get("requires_api_key", True) and not key:
         raise RuntimeError(f"Falta configurar la variable de entorno {key_env}.")
+    return key
+
+
+def _openai_request(provider, endpoint, payload, timeout):
+    base = str(provider.get("base_url", "")).rstrip("/")
+    key = _credentials(provider)
     headers = {"Authorization": "Bearer " + key} if key else {}
     if endpoint == "api/chat":
-        body = {"model": payload["model"], "messages": payload["messages"],
-                "stream": False}
+        body = {"model": payload["model"], "messages": payload["messages"], "stream": False}
         options = payload.get("options", {})
-        for source, target in (("temperature","temperature"),("top_p","top_p"),
-                               ("num_predict","max_tokens")):
-            if source in options: body[target] = options[source]
-        if "format" in payload: body["response_format"] = {"type":"json_object"}
+        for source, target in (("temperature", "temperature"), ("top_p", "top_p"),
+                               ("num_predict", "max_tokens")):
+            if source in options:
+                body[target] = options[source]
+        if "format" in payload:
+            body["response_format"] = {"type": "json_object"}
         result = _http_json(base + "/chat/completions", body, headers, timeout)
         choice = (result.get("choices") or [{}])[0]
         message = choice.get("message") or {}
-        return {"message":{"content":message.get("content") or "",
-                           "thinking":message.get("reasoning_content") or ""},
-                "done_reason":(choice.get("finish_reason") or "stop"),
-                "prompt_eval_count":(result.get("usage") or {}).get("prompt_tokens",0),
-                "eval_count":(result.get("usage") or {}).get("completion_tokens",0)}
+        return {"message": {"content": message.get("content") or "",
+                            "thinking": message.get("reasoning_content") or ""},
+                "done_reason": choice.get("finish_reason") or "stop",
+                "prompt_eval_count": (result.get("usage") or {}).get("prompt_tokens", 0),
+                "eval_count": (result.get("usage") or {}).get("completion_tokens", 0)}
     if endpoint == "api/embed":
         result = _http_json(base + "/embeddings",
-            {"model":payload["model"],"input":payload["input"]},headers,timeout)
-        vectors = [item.get("embedding") for item in result.get("data",[])]
-        return {"embeddings":vectors}
+            {"model": payload["model"], "input": payload["input"]}, headers, timeout)
+        data = sorted(result.get("data", []), key=lambda item: item.get("index", 0))
+        return {"embeddings": [item.get("embedding") for item in data]}
     if endpoint == "api/tags":
-        result = _http_json(base + "/models",None,headers,timeout)
-        return {"models":[{"name":item.get("id")} for item in result.get("data",[])]}
+        result = _http_json(base + "/models", None, headers, timeout)
+        return {"models": [{"name": item.get("id")} for item in result.get("data", [])]}
     if endpoint == "api/ps":
-        return {"models":[]}
+        return {"models": []}
     raise ValueError(f"Endpoint no disponible para proveedor remoto: {endpoint}")
+
+
+def _anthropic_request(provider, endpoint, payload, timeout):
+    if endpoint != "api/chat":
+        if endpoint == "api/ps":
+            return {"models": []}
+        raise ValueError("Anthropic no ofrece embeddings nativos en este adaptador.")
+    base = str(provider.get("base_url", "https://api.anthropic.com/v1")).rstrip("/")
+    key = _credentials(provider)
+    messages = payload.get("messages", [])
+    system = "\\n".join(m.get("content", "") for m in messages if m.get("role") == "system")
+    body_messages = [{"role": m.get("role"), "content": m.get("content", "")}
+                     for m in messages if m.get("role") in {"user", "assistant"}]
+    options = payload.get("options", {})
+    body = {"model": payload["model"], "messages": body_messages,
+            "max_tokens": int(options.get("num_predict", 1024))}
+    if system:
+        body["system"] = system
+    for key_name in ("temperature", "top_p"):
+        if key_name in options:
+            body[key_name] = options[key_name]
+    result = _http_json(base + "/messages", body,
+        {"x-api-key": key, "anthropic-version": provider.get("api_version", "2023-06-01")}, timeout)
+    content = "".join(block.get("text", "") for block in result.get("content", [])
+                      if block.get("type") == "text")
+    usage = result.get("usage", {})
+    return {"message": {"content": content, "thinking": ""},
+            "done_reason": result.get("stop_reason") or "stop",
+            "prompt_eval_count": usage.get("input_tokens", 0),
+            "eval_count": usage.get("output_tokens", 0)}
+
+
+def _gemini_request(provider, endpoint, payload, timeout):
+    base = str(provider.get("base_url", "https://generativelanguage.googleapis.com/v1beta")).rstrip("/")
+    key = _credentials(provider)
+    headers = {"x-goog-api-key": key}
+    model = payload.get("model", "")
+    if endpoint == "api/chat":
+        messages = payload.get("messages", [])
+        system_parts = [{"text": m.get("content", "")} for m in messages if m.get("role") == "system"]
+        contents = [{"role": "model" if m.get("role") == "assistant" else "user",
+                     "parts": [{"text": m.get("content", "")}]}
+                    for m in messages if m.get("role") in {"user", "assistant"}]
+        body = {"contents": contents}
+        if system_parts:
+            body["systemInstruction"] = {"parts": system_parts}
+        options = payload.get("options", {})
+        generation = {}
+        if "temperature" in options: generation["temperature"] = options["temperature"]
+        if "top_p" in options: generation["topP"] = options["top_p"]
+        if "num_predict" in options: generation["maxOutputTokens"] = options["num_predict"]
+        if generation: body["generationConfig"] = generation
+        result = _http_json(f"{base}/models/{model}:generateContent", body, headers, timeout)
+        candidates = result.get("candidates", [])
+        parts = (candidates[0].get("content", {}).get("parts", []) if candidates else [])
+        content = "".join(part.get("text", "") for part in parts)
+        usage = result.get("usageMetadata", {})
+        return {"message": {"content": content, "thinking": ""},
+                "done_reason": (candidates[0].get("finishReason", "STOP") if candidates else "STOP"),
+                "prompt_eval_count": usage.get("promptTokenCount", 0),
+                "eval_count": usage.get("candidatesTokenCount", 0)}
+    if endpoint == "api/embed":
+        vectors = []
+        for value in payload.get("input", []):
+            result = _http_json(f"{base}/models/{model}:embedContent",
+                {"content": {"parts": [{"text": value}]}}, headers, timeout)
+            vectors.append(result.get("embedding", {}).get("values"))
+        return {"embeddings": vectors}
+    if endpoint == "api/ps":
+        return {"models": []}
+    raise ValueError(f"Endpoint no disponible para Gemini: {endpoint}")
+
+
+def request(provider, endpoint, payload=None, timeout=600):
+    """Normaliza llamadas de chat y embeddings para los adaptadores disponibles."""
+    protocol = provider.get("protocol")
+    if protocol == "ollama":
+        base = str(provider.get("base_url", "")).rstrip("/")
+        if not base:
+            raise ValueError("base_url es obligatorio para Ollama.")
+        return _http_json(base + "/" + endpoint, payload, timeout=timeout)
+    if protocol == "openai":
+        return _openai_request(provider, endpoint, payload or {}, timeout)
+    if protocol == "anthropic":
+        return _anthropic_request(provider, endpoint, payload or {}, timeout)
+    if protocol == "gemini":
+        return _gemini_request(provider, endpoint, payload or {}, timeout)
+    raise ValueError(f"Protocolo no compatible: {protocol}")
 
 
 def installed_models(provider):
