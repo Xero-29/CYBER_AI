@@ -19,7 +19,7 @@ Se creó una rama de trabajo independiente para aplicar correcciones de segurida
 - **Motor de agentes:** el texto generado por el agente ya no dispara acciones HTTP o de archivos automáticamente. Las propuestas requieren aprobación; la inspección HTTP exige confirmación explícita y la inspección de archivos queda confinada al proyecto.
 - **Ejecutor de tareas:** se eliminan plantillas fuera de las familias previstas y cada escaneo conserva sus propios archivos de resultados.
 - **Dependencias:** se declara `requests`, utilizada por la utilidad de auditoría local.
-- **Pruebas:** se amplían las pruebas de autorización de Nuclei, corrupción del índice, validación CVE y acciones del motor de agentes.
+- **Pruebas:** se amplían las pruebas de autorización de Nuclei, corrupción del índice, validación CVE y acciones del motor de agentes. Se añadió un workflow de GitHub Actions para ejecutar la suite con Python 3.12.
 
 ## Cómo validar
 
@@ -48,4 +48,4 @@ No se debe ejecutar un escaneo contra sistemas de terceros sin permiso verificab
 
 ## Limitaciones de esta entrega
 
-Los archivos se modificaron mediante GitHub. No se dispuso de un entorno de ejecución del repositorio en esta sesión; por tanto, **las pruebas no se han ejecutado y no se afirma que estén pasando**. Los cambios deben considerarse una primera corrección revisable, no una auditoría completa ni una certificación de seguridad.
+Los archivos se modificaron mediante GitHub. No se dispuso de un entorno de ejecución del repositorio en esta sesión y el conector no devolvió ejecuciones de Actions para el último commit; por tanto, **las pruebas no se han ejecutado y no se afirma que estén pasando**. Los cambios deben considerarse una primera corrección revisable, no una auditoría completa ni una certificación de seguridad.
