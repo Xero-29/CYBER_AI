@@ -613,7 +613,7 @@ def run_agent(
     with LOCK_FILE.open("a+") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         try:
-            if provider["name"] == "ollama":
+            if provider["protocol"] == "ollama":
                 unload_other_models(model)
             print(f"Especialista: {name} | Modelo: {model}", flush=True)
 
@@ -954,7 +954,7 @@ def run_agent(
                     flush=True,
                 )
 
-            record(name, prompt[:300])
+            record(name, prompt[:300], model=model, provider=provider["name"])
 
             if thinking:
                 print("\n=== ANÁLISIS VISIBLE DEL MODELO ===\n")
@@ -995,22 +995,24 @@ def embed_text(agent_name, text):
                 unload_other_models(model)
             result = request_json(
                 "api/embed",
-                {"model": model, "input": text, "keep_alive": 0},
+                {"model": model, "input": [text], "keep_alive": 0},
                 provider=provider,
             )
             vectors = result.get("embeddings", [])
-            if not vectors:
-                raise RuntimeError("Ollama no devolvió ningún vector.")
+            if len(vectors) != 1:
+                raise RuntimeError("El proveedor no devolvió exactamente un embedding.")
 
             event = {
                 "timestamp": datetime.now(timezone.utc).isoformat(),
                 "agent": name,
                 "model": model,
+                "provider": provider["name"],
+                "embedding_space": (model if provider["protocol"] == "ollama" else f"{provider['name']}::{model}"),
                 "text": text,
                 "embedding": vectors[0],
             }
             save_jsonl(EMBED_LOG, event)
-            record(name, "crear embedding: " + text[:250])
+            record(name, "crear embedding: " + text[:250], model=model, provider=provider["name"])
 
             print(f"Especialista: {name}")
             print(f"Dimensiones del vector: {len(vectors[0])}")
