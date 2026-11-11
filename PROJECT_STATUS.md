@@ -23,8 +23,11 @@ Se creó una rama de trabajo independiente para aplicar correcciones de segurida
 
 - **IA desacoplada:** se añadió resolución de modelos por proveedor y por especialista en `llm_providers.py`. `agent_runner.py` usa esa resolución tanto para chat como para embeddings, sin cambiar el formato de memoria ni el Skillbook.
 - **Configuración de proveedores:** un proveedor puede definir `models` por rol, `default_model` y `embedding_model`; las credenciales siguen llegando por variables de entorno.
-- **Pruebas de adaptadores:** se ampliaron las pruebas para la selección de modelos remotos, modelos de embeddings y compatibilidad local.
-- **Documentación:** `docs/AI_PROVIDER_ARCHITECTURE.md` describe cómo conectar un endpoint OpenAI-compatible sin tocar módulos de negocio y qué limitaciones siguen existiendo.
+- **Adaptadores de IA:** se integraron Ollama, OpenAI-compatible, Anthropic Messages (chat) y Google Gemini (chat y embeddings) detrás de un contrato normalizado.
+- **Selección de modelos:** se puede mapear cada especialista a un modelo remoto o usar un modelo predeterminado del proveedor. Las claves se leen de variables de entorno.
+- **Embeddings desacoplados:** ECO usa el proveedor seleccionado. Los vectores remotos se etiquetan como `proveedor::modelo` para no mezclar espacios; los vectores Ollama conservan su identificador histórico para compatibilidad.
+- **Pruebas de adaptadores:** se añadieron pruebas unitarias simuladas para selección de modelos, respuestas normalizadas de Anthropic/Gemini, credenciales, validación de configuración y enrutamiento de embeddings. Estas pruebas están escritas, pero aún no se han ejecutado en un entorno Python.
+- **Documentación:** `docs/AI_PROVIDER_ARCHITECTURE.md` y `docs/AI_PROVIDER_CONFIGURATION.md` describen configuración, protocolos, credenciales y límites.
 
 ## Cómo validar
 
@@ -49,7 +52,10 @@ No se debe ejecutar un escaneo contra sistemas de terceros sin permiso verificab
 2. Revisar todas las rutas de ejecución de herramientas para aplicar un modelo uniforme de autorización y alcance.
 3. Revisar concurrencia y recuperación del índice de informes.
 4. Completar auditoría de secretos, validación de entradas y manejo de errores en los módulos restantes.
-5. Añadir adaptadores nativos para proveedores que no implementen OpenAI-compatible (por ejemplo, APIs con protocolo propio), conservando el mismo contrato interno.\n6. Revisar el diff y abrir un Pull Request para revisión antes de integrar en `main`.
+5. Añadir adaptadores nativos para otros proveedores y mejorar el descubrimiento/diagnóstico de capacidades.
+6. Implementar una migración/reindexación guiada cuando cambie el modelo de embeddings, con progreso, reanudación y verificación.
+7. Unificar la administración/descarga de modelos remotos y locales; hoy el flujo de inferencia está desacoplado, pero la administración de modelos sigue centrada en Ollama.
+8. Ejecutar el diff completo y abrir un Pull Request para revisión antes de integrar en `main`.
 
 ## Limitaciones de esta entrega
 
