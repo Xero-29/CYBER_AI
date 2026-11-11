@@ -17,7 +17,6 @@ class ProviderTests(unittest.TestCase):
   self.assertEqual(call.call_args.args[0],"https://api.example/v1/chat/completions")
   self.assertEqual(call.call_args.args[1]["max_tokens"],99)
 
-if __name__=="__main__": unittest.main()
 
 
 class ResolveModelTests(unittest.TestCase):
@@ -59,3 +58,7 @@ class ResolveModelTests(unittest.TestCase):
     def test_missing_model_is_rejected(self):
         with self.assertRaises(ValueError):
             llm_providers.resolve_model({"name": "cloud"}, {"id": "nexo"}, "NEXO")
+
+
+if __name__ == "__main__":
+    unittest.main()
