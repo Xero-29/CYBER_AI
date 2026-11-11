@@ -13,6 +13,7 @@ from urllib.error import HTTPError, URLError
 
 from model_memory_manager import load_config, resolve_agent, record
 from learning_memory import build_memory_context
+from skillbook import build_skill_context
 from compressed_checkpoint import (
     save_partial_chunk,
     restore_partial_tail,
@@ -577,6 +578,11 @@ def run_agent(
     # La recuperación se realiza antes del bloqueo de generación, porque
     # ECO también utiliza ese bloqueo para cargar su modelo.
     effective_prompt = build_execution_prompt(prompt, mode)
+    # Consultar primero el libro de metodologías ya verificadas.
+    skill_context, matched_skills = build_skill_context(original_task)
+    if matched_skills:
+        print(f"Skills verificadas recuperadas: {len(matched_skills)}", flush=True)
+        effective_prompt += "\\n\\n" + skill_context
     retrieved_knowledge = []
     if use_knowledge:
         knowledge_context, retrieved_knowledge = retrieve_knowledge_context(
