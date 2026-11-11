@@ -5,6 +5,12 @@ from nvd_client import enrich_analysis, verify_cve
 
 
 class NVDClientTests(unittest.TestCase):
+    def test_rejects_malformed_cve_without_network_request(self):
+        with patch("nvd_client.urllib.request.urlopen") as mock_urlopen:
+            result = verify_cve("CVE-../../invalid")
+        self.assertEqual(result["status"], "invalid_identifier")
+        mock_urlopen.assert_not_called()
+
     @patch("nvd_client.urllib.request.urlopen")
     def test_exact_cve_found(self, mock_urlopen):
         class FakeResponse:
