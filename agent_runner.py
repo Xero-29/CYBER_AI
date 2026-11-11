@@ -135,8 +135,10 @@ def contains_repeated_paragraph(
     )
 
 
-def request_json(endpoint, payload=None, timeout=600):
-    """Realiza peticiones a la API local de Ollama."""
+def request_json(endpoint, payload=None, timeout=600, provider=None):
+    """Realiza peticiones mediante el proveedor seleccionado."""
+    if provider is not None:
+        return provider_request(provider, endpoint, payload, timeout)
     data = None if payload is None else json.dumps(payload).encode("utf-8")
     request = Request(
         f"{API}/{endpoint}",
@@ -548,7 +550,9 @@ def run_agent(
         raise ValueError("Este agente es de embeddings. Utiliza el comando embed.")
 
     model = agent["model"]
-    if model not in installed_models():
+    provider = resolve_provider(config, agent)
+    available_models = provider_models(provider)
+    if available_models is not None and model not in available_models:
         raise ValueError(f"El modelo no está instalado: {model}")
 
     policy = config.get("resource_policy", {})
@@ -606,7 +610,8 @@ def run_agent(
     with LOCK_FILE.open("a+") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         try:
-            unload_other_models(model)
+            if provider["name"] == "ollama":
+                unload_other_models(model)
             print(f"Especialista: {name} | Modelo: {model}", flush=True)
 
             payload = {
@@ -974,17 +979,21 @@ def embed_text(agent_name, text):
         raise ValueError(f"{name} no es un especialista de embeddings.")
 
     model = agent["model"]
-    if model not in installed_models():
+    provider = resolve_provider(config, agent)
+    available_models = provider_models(provider)
+    if available_models is not None and model not in available_models:
         raise ValueError(f"El modelo no está instalado: {model}")
 
     LOCK_FILE.parent.mkdir(parents=True, exist_ok=True)
     with LOCK_FILE.open("a+") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         try:
-            unload_other_models(model)
+            if provider["name"] == "ollama":
+                unload_other_models(model)
             result = request_json(
                 "api/embed",
                 {"model": model, "input": text, "keep_alive": 0},
+                provider=provider,
             )
             vectors = result.get("embeddings", [])
             if not vectors:
