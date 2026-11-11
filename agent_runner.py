@@ -14,7 +14,10 @@ from urllib.error import HTTPError, URLError
 from model_memory_manager import load_config, resolve_agent, record
 from learning_memory import build_memory_context
 from skillbook import build_skill_context
-from llm_providers import resolve_provider, request as provider_request, installed_models as provider_models
+from llm_providers import (
+    resolve_provider, resolve_model,
+    request as provider_request, installed_models as provider_models,
+)
 from compressed_checkpoint import (
     save_partial_chunk,
     restore_partial_tail,
@@ -549,8 +552,8 @@ def run_agent(
     if agent.get("type") == "embeddings":
         raise ValueError("Este agente es de embeddings. Utiliza el comando embed.")
 
-    model = agent["model"]
     provider = resolve_provider(config, agent)
+    model = resolve_model(provider, agent, name)
     available_models = provider_models(provider)
     if available_models is not None and model not in available_models:
         raise ValueError(f"El modelo no está instalado: {model}")
@@ -978,8 +981,8 @@ def embed_text(agent_name, text):
     if agent.get("type") != "embeddings":
         raise ValueError(f"{name} no es un especialista de embeddings.")
 
-    model = agent["model"]
     provider = resolve_provider(config, agent)
+    model = resolve_model(provider, agent, name)
     available_models = provider_models(provider)
     if available_models is not None and model not in available_models:
         raise ValueError(f"El modelo no está instalado: {model}")
