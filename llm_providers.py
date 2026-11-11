@@ -17,6 +17,12 @@ def resolve_provider(config, agent):
         raise RuntimeError(f"Proveedor de IA no configurado o deshabilitado: {name}")
     result = dict(item)
     result["name"] = name
+    protocol = result.get("protocol")
+    if protocol not in {"ollama", "openai", "anthropic", "gemini"}:
+        raise ValueError(f"Protocolo de proveedor no soportado: {protocol}")
+    base_url = result.get("base_url", "")
+    if not isinstance(base_url, str) or not base_url.startswith(("http://", "https://")):
+        raise ValueError(f"base_url inválida para el proveedor {name}.")
     return result
 
 
@@ -76,6 +82,8 @@ def _credentials(provider):
     key_env = provider.get("api_key_env")
     key = os.environ.get(key_env, "") if key_env else ""
     if provider.get("requires_api_key", True) and not key:
+        if not key_env:
+            raise RuntimeError("El proveedor exige API key, pero no declara api_key_env.")
         raise RuntimeError(f"Falta configurar la variable de entorno {key_env}.")
     return key
 
@@ -203,7 +211,7 @@ def request(provider, endpoint, payload=None, timeout=600):
 
 
 def installed_models(provider):
-    if provider["name"] == "ollama":
+    if provider.get("protocol") == "ollama":
         return {item.get("name") or item.get("model")
                 for item in request(provider,"api/tags").get("models",[])}
     # Los proveedores remotos pueden ocultar o limitar su catálogo.
