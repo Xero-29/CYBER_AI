@@ -412,7 +412,7 @@ def retrieve_knowledge_context(
     vector = generate_embedding(query, agent_name="ECO")
     results = search_knowledge(
         query_embedding=vector["embedding"],
-        embedding_model=vector["model"],
+        embedding_model=vector.get("embedding_space", vector["model"]),
         top_k=top_k,
         min_score=min_score,
         categories=categories,
