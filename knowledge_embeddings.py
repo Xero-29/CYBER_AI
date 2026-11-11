@@ -10,6 +10,7 @@ from agent_runner import (
     request_json,
 )
 from model_memory_manager import load_config, resolve_agent
+from llm_providers import resolve_provider, resolve_model, request as provider_request, installed_models as provider_models
 from knowledge_library import validate_vector
 
 
@@ -31,9 +32,11 @@ def generate_embeddings(texts, agent_name="ECO"):
     if agent.get("type") != "embeddings":
         raise ValueError(f"{name} no es un especialista de embeddings.")
 
-    model = agent["model"]
+    provider = resolve_provider(config, agent)
+    model = resolve_model(provider, agent, name)
+    available_models = provider_models(provider)
 
-    if model not in installed_models():
+    if available_models is not None and model not in available_models:
         raise ValueError(f"El modelo de embeddings no está instalado: {model}")
 
     LOCK_FILE.parent.mkdir(parents=True, exist_ok=True)
@@ -42,9 +45,11 @@ def generate_embeddings(texts, agent_name="ECO"):
         fcntl.flock(lock, fcntl.LOCK_EX)
 
         try:
-            unload_other_models(model)
+            if provider["protocol"] == "ollama":
+                unload_other_models(model)
 
-            result = request_json(
+            result = provider_request(
+                provider,
                 "api/embed",
                 {
                     "model": model,
