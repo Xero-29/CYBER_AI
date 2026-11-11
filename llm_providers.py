@@ -20,6 +20,44 @@ def resolve_provider(config, agent):
     return result
 
 
+def resolve_model(provider, agent, agent_name=None):
+    """Resuelve el modelo del especialista sin acoplarlo al proveedor.
+
+    Precedencia: provider.models[agent_name], provider.models[agent.id],
+    provider.embedding_model (solo embeddings), provider.default_model y,
+    finalmente, el modelo local declarado en el agente.
+    """
+    models = provider.get("models", {})
+    if not isinstance(models, dict):
+        raise ValueError("provider.models debe ser un objeto.")
+
+    candidates = []
+    if agent_name:
+        candidates.append(agent_name)
+    if agent.get("id"):
+        candidates.append(agent["id"])
+    for key in candidates:
+        value = models.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+
+    if agent.get("type") == "embeddings":
+        value = provider.get("embedding_model")
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+
+    value = provider.get("default_model")
+    if isinstance(value, str) and value.strip():
+        return value.strip()
+
+    value = agent.get("model")
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(
+            f"No hay modelo configurado para el especialista {agent_name or agent.get('id') or 'desconocido'}."
+        )
+    return value.strip()
+
+
 def _http_json(url, payload=None, headers=None, timeout=600):
     data = None if payload is None else json.dumps(payload).encode("utf-8")
     request = Request(url, data=data, headers={"Content-Type": "application/json", **(headers or {})},
