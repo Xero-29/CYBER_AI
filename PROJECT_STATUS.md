@@ -21,6 +21,11 @@ Se creó una rama de trabajo independiente para aplicar correcciones de segurida
 - **Dependencias:** se declara `requests`, utilizada por la utilidad de auditoría local.
 - **Pruebas:** se amplían las pruebas de autorización de Nuclei, corrupción del índice, validación CVE y acciones del motor de agentes. Se añadió un workflow de GitHub Actions para ejecutar la suite con Python 3.12.
 
+- **IA desacoplada:** se añadió resolución de modelos por proveedor y por especialista en `llm_providers.py`. `agent_runner.py` usa esa resolución tanto para chat como para embeddings, sin cambiar el formato de memoria ni el Skillbook.
+- **Configuración de proveedores:** un proveedor puede definir `models` por rol, `default_model` y `embedding_model`; las credenciales siguen llegando por variables de entorno.
+- **Pruebas de adaptadores:** se ampliaron las pruebas para la selección de modelos remotos, modelos de embeddings y compatibilidad local.
+- **Documentación:** `docs/AI_PROVIDER_ARCHITECTURE.md` describe cómo conectar un endpoint OpenAI-compatible sin tocar módulos de negocio y qué limitaciones siguen existiendo.
+
 ## Cómo validar
 
 Desde la raíz del proyecto, con las dependencias instaladas:
@@ -40,11 +45,11 @@ No se debe ejecutar un escaneo contra sistemas de terceros sin permiso verificab
 
 ## Pendiente
 
-1. Ejecutar la suite completa en un entorno Python compatible con el proyecto y registrar los resultados reales.
+1. Ejecutar la suite completa en un entorno Python 3.12 y registrar los resultados reales, incluidas las nuevas pruebas de proveedores.
 2. Revisar todas las rutas de ejecución de herramientas para aplicar un modelo uniforme de autorización y alcance.
 3. Revisar concurrencia y recuperación del índice de informes.
 4. Completar auditoría de secretos, validación de entradas y manejo de errores en los módulos restantes.
-5. Revisar el diff y abrir un Pull Request para revisión antes de integrar en `main`.
+5. Añadir adaptadores nativos para proveedores que no implementen OpenAI-compatible (por ejemplo, APIs con protocolo propio), conservando el mismo contrato interno.\n6. Revisar el diff y abrir un Pull Request para revisión antes de integrar en `main`.
 
 ## Limitaciones de esta entrega
 
