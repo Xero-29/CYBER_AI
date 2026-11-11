@@ -1,0 +1,911 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "Mapa de conocimiento. Las referencias no implican que el contenido esté descargado, validado o autorizado para redistribución.",
+  "profiles": [
+    "minimal",
+    "standard",
+    "research"
+  ],
+  "areas": [
+    {
+      "id": "foundations",
+      "name": "Fundamentos",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "foundations-ref-1",
+          "url": "https://www.rfc-editor.org/",
+          "resource_type": "reference",
+          "publisher": "www.rfc-editor.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "foundations-ref-2",
+          "url": "https://csrc.nist.gov/publications/sp",
+          "resource_type": "reference",
+          "publisher": "csrc.nist.gov",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "appsec",
+      "name": "Seguridad web y aplicaciones",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "appsec-ref-1",
+          "url": "https://owasp.org/",
+          "resource_type": "reference",
+          "publisher": "owasp.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "appsec-ref-2",
+          "url": "https://owasp.org/www-project-application-security-verification-standard/",
+          "resource_type": "reference",
+          "publisher": "owasp.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "appsec-ref-3",
+          "url": "https://owasp.org/www-project-web-security-testing-guide/",
+          "resource_type": "reference",
+          "publisher": "owasp.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "api",
+      "name": "Seguridad de API",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "api-ref-1",
+          "url": "https://owasp.org/www-project-api-security/",
+          "resource_type": "reference",
+          "publisher": "owasp.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "api-ref-2",
+          "url": "https://openid.net/developers/",
+          "resource_type": "reference",
+          "publisher": "openid.net",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "network",
+      "name": "Redes",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "network-ref-1",
+          "url": "https://nmap.org/book/",
+          "resource_type": "reference",
+          "publisher": "nmap.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "network-ref-2",
+          "url": "https://www.wireshark.org/docs/",
+          "resource_type": "reference",
+          "publisher": "www.wireshark.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "network-ref-3",
+          "url": "https://docs.zeek.org/",
+          "resource_type": "reference",
+          "publisher": "docs.zeek.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "linux",
+      "name": "Linux y Unix",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "linux-ref-1",
+          "url": "https://docs.kernel.org/",
+          "resource_type": "reference",
+          "publisher": "docs.kernel.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "linux-ref-2",
+          "url": "https://www.cisecurity.org/cis-benchmarks",
+          "resource_type": "reference",
+          "publisher": "www.cisecurity.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "windows_ad",
+      "name": "Windows y Active Directory",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "windows_ad-ref-1",
+          "url": "https://learn.microsoft.com/security/",
+          "resource_type": "reference",
+          "publisher": "learn.microsoft.com",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "windows_ad-ref-2",
+          "url": "https://learn.microsoft.com/windows-server/identity/ad-ds/",
+          "resource_type": "reference",
+          "publisher": "learn.microsoft.com",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "cloud",
+      "name": "Seguridad cloud",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "cloud-ref-1",
+          "url": "https://docs.aws.amazon.com/security/",
+          "resource_type": "reference",
+          "publisher": "docs.aws.amazon.com",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "cloud-ref-2",
+          "url": "https://cloud.google.com/security",
+          "resource_type": "reference",
+          "publisher": "cloud.google.com",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "cloud-ref-3",
+          "url": "https://learn.microsoft.com/azure/security/",
+          "resource_type": "reference",
+          "publisher": "learn.microsoft.com",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "containers",
+      "name": "Contenedores y Kubernetes",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "containers-ref-1",
+          "url": "https://kubernetes.io/docs/",
+          "resource_type": "reference",
+          "publisher": "kubernetes.io",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "containers-ref-2",
+          "url": "https://docs.docker.com/",
+          "resource_type": "reference",
+          "publisher": "docs.docker.com",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "containers-ref-3",
+          "url": "https://trivy.dev/",
+          "resource_type": "reference",
+          "publisher": "trivy.dev",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "mobile",
+      "name": "Seguridad móvil",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "mobile-ref-1",
+          "url": "https://mas.owasp.org/",
+          "resource_type": "reference",
+          "publisher": "mas.owasp.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "mobile-ref-2",
+          "url": "https://source.android.com/docs/security",
+          "resource_type": "reference",
+          "publisher": "source.android.com",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "crypto",
+      "name": "Criptografía",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "crypto-ref-1",
+          "url": "https://csrc.nist.gov/projects/post-quantum-cryptography",
+          "resource_type": "reference",
+          "publisher": "csrc.nist.gov",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "crypto-ref-2",
+          "url": "https://www.rfc-editor.org/",
+          "resource_type": "reference",
+          "publisher": "www.rfc-editor.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "identity",
+      "name": "Identidad y acceso",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "identity-ref-1",
+          "url": "https://openid.net/developers/",
+          "resource_type": "reference",
+          "publisher": "openid.net",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "identity-ref-2",
+          "url": "https://fidoalliance.org/",
+          "resource_type": "reference",
+          "publisher": "fidoalliance.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "malware",
+      "name": "Análisis de malware",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "malware-ref-1",
+          "url": "https://yara.readthedocs.io/",
+          "resource_type": "reference",
+          "publisher": "yara.readthedocs.io",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "malware-ref-2",
+          "url": "https://attack.mitre.org/",
+          "resource_type": "reference",
+          "publisher": "attack.mitre.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "forensics",
+      "name": "Forense digital",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "forensics-ref-1",
+          "url": "https://www.nist.gov/digital-evidence",
+          "resource_type": "reference",
+          "publisher": "www.nist.gov",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "forensics-ref-2",
+          "url": "https://docs.velociraptor.app/",
+          "resource_type": "reference",
+          "publisher": "docs.velociraptor.app",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "incident_response",
+      "name": "Respuesta a incidentes",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "incident_response-ref-1",
+          "url": "https://www.cisa.gov/resources-tools",
+          "resource_type": "reference",
+          "publisher": "www.cisa.gov",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "incident_response-ref-2",
+          "url": "https://sigmahq.io/",
+          "resource_type": "reference",
+          "publisher": "sigmahq.io",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "threat_intel",
+      "name": "Inteligencia de amenazas",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "threat_intel-ref-1",
+          "url": "https://attack.mitre.org/",
+          "resource_type": "reference",
+          "publisher": "attack.mitre.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "threat_intel-ref-2",
+          "url": "https://oasis-open.github.io/cti-documentation/",
+          "resource_type": "reference",
+          "publisher": "oasis-open.github.io",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "reverse",
+      "name": "Ingeniería inversa",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "reverse-ref-1",
+          "url": "https://ghidra-sre.org/",
+          "resource_type": "reference",
+          "publisher": "ghidra-sre.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "reverse-ref-2",
+          "url": "https://sourceware.org/gdb/documentation/",
+          "resource_type": "reference",
+          "publisher": "sourceware.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "iot_hardware",
+      "name": "IoT y hardware",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "iot_hardware-ref-1",
+          "url": "https://www.nist.gov/cybersecurity",
+          "resource_type": "reference",
+          "publisher": "www.nist.gov",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "devsecops",
+      "name": "DevSecOps y supply chain",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "devsecops-ref-1",
+          "url": "https://docs.github.com/code-security",
+          "resource_type": "reference",
+          "publisher": "docs.github.com",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "devsecops-ref-2",
+          "url": "https://slsa.dev/",
+          "resource_type": "reference",
+          "publisher": "slsa.dev",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "ai_security",
+      "name": "Seguridad de IA",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "ai_security-ref-1",
+          "url": "https://atlas.mitre.org/",
+          "resource_type": "reference",
+          "publisher": "atlas.mitre.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "ai_security-ref-2",
+          "url": "https://owasp.org/www-project-top-10-for-large-language-model-applications/",
+          "resource_type": "reference",
+          "publisher": "owasp.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "ai_security-ref-3",
+          "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+          "resource_type": "reference",
+          "publisher": "www.nist.gov",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "governance",
+      "name": "GRC, privacidad y auditoría",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "governance-ref-1",
+          "url": "https://www.nist.gov/cyberframework",
+          "resource_type": "reference",
+          "publisher": "www.nist.gov",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "governance-ref-2",
+          "url": "https://www.cisecurity.org/controls",
+          "resource_type": "reference",
+          "publisher": "www.cisecurity.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "vuln_management",
+      "name": "Gestión de vulnerabilidades",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "vuln_management-ref-1",
+          "url": "https://nvd.nist.gov/",
+          "resource_type": "reference",
+          "publisher": "nvd.nist.gov",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "vuln_management-ref-2",
+          "url": "https://cwe.mitre.org/",
+          "resource_type": "reference",
+          "publisher": "cwe.mitre.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "vuln_management-ref-3",
+          "url": "https://www.first.org/cvss/",
+          "resource_type": "reference",
+          "publisher": "www.first.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "vuln_management-ref-4",
+          "url": "https://www.first.org/epss/",
+          "resource_type": "reference",
+          "publisher": "www.first.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "bug_bounty",
+      "name": "Bug bounty autorizado",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "bug_bounty-ref-1",
+          "url": "https://owasp.org/www-project-web-security-testing-guide/",
+          "resource_type": "reference",
+          "publisher": "owasp.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "bug_bounty-ref-2",
+          "url": "https://docs.projectdiscovery.io/tools/nuclei/overview",
+          "resource_type": "reference",
+          "publisher": "docs.projectdiscovery.io",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "secure_arch",
+      "name": "Arquitectura segura",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "secure_arch-ref-1",
+          "url": "https://www.cisa.gov/securebydesign",
+          "resource_type": "reference",
+          "publisher": "www.cisa.gov",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "secure_arch-ref-2",
+          "url": "https://www.nist.gov/cyberframework",
+          "resource_type": "reference",
+          "publisher": "www.nist.gov",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "data_security",
+      "name": "Seguridad de datos",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "data_security-ref-1",
+          "url": "https://www.nist.gov/privacy-framework",
+          "resource_type": "reference",
+          "publisher": "www.nist.gov",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "data_security-ref-2",
+          "url": "https://cheatsheetseries.owasp.org/",
+          "resource_type": "reference",
+          "publisher": "cheatsheetseries.owasp.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    }
+  ],
+  "safety": {
+    "authorized_targets_only": true,
+    "local_labs_only": true,
+    "no_destructive_actions": true,
+    "require_human_approval_for_active_testing": true
+  }
+}
