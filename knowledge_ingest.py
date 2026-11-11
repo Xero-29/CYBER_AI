@@ -151,7 +151,7 @@ def ingest_document(
                 category=category,
                 content=chunk,
                 embedding=vector,
-                embedding_model=result["model"],
+                embedding_model=result.get("embedding_space", result["model"]),
                 document_id=document_id,
                 chunk_index=index,
                 tags=tags,
