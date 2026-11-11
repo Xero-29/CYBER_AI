@@ -5,8 +5,10 @@ CYBER_AI conserva memoria, biblioteca, Skillbook, especialistas, permisos y herr
 ## Estado del adaptador
 
 - Ollama local: integrado como proveedor predeterminado.
-- APIs compatibles con OpenAI Chat Completions y Embeddings: adaptador genérico integrado.
-- Otros proveedores: requieren un endpoint compatible o un adaptador futuro; no se debe asumir compatibilidad solo por ser un proveedor de IA.
+- APIs compatibles con OpenAI Chat Completions y Embeddings: adaptador integrado.
+- Anthropic: API nativa Messages para chat. No ofrece embeddings en este adaptador; asigna ECO a otro proveedor.
+- Google Gemini: API nativa generateContent y embedContent.
+- Otros proveedores: requieren un adaptador adicional; no se debe asumir compatibilidad solo por ser un proveedor de IA.
 - Las claves API nunca se guardan en Git ni en este archivo.
 
 ## Activar un endpoint OpenAI-compatible
@@ -17,7 +19,7 @@ CYBER_AI conserva memoria, biblioteca, Skillbook, especialistas, permisos y herr
 4. En cada especialista que se quiera enrutar, añadir `"provider": "openai_compatible"` y cambiar `model` por el identificador que entrega el proveedor.
 5. Reiniciar el proceso de CYBER_AI. No hay que modificar Python ni migrar la biblioteca o las memorias.
 
-Se puede mantener Ollama para algunos especialistas y asignar un proveedor remoto a otros. Si se cambia de proveedor, las bases de datos, los documentos y las Skills permanecen en el mismo lugar.
+Se puede mantener Ollama para algunos especialistas y asignar un proveedor remoto a otros. Para evitar mezclar espacios vectoriales, los embeddings remotos se guardan bajo el identificador proveedor::modelo; Ollama conserva su identificador histórico para no invalidar los vectores ya almacenados. Si se cambia el modelo de embeddings, los documentos deben reindexarse con ese modelo antes de que puedan recuperarse semánticamente desde el nuevo espacio. Las bases de datos, los documentos y las Skills permanecen en el mismo lugar.
 
 ## Ejemplo de configuración
 
@@ -54,10 +56,10 @@ El fragmento ilustra los campos que se agregan; no reemplaza el resto de la defi
 
 - No se debe escribir ninguna clave API en archivos versionados, argumentos de consola, logs o prompts.
 - Una API remota puede recibir el contenido de las tareas y el contexto que se le envía. Antes de habilitarla, configurar qué información puede salir del equipo y aplicar redacción de secretos/datos sensibles.
-- La compatibilidad de chat y embeddings depende de que el endpoint implemente esas rutas y formatos.
+- La compatibilidad depende del protocolo declarado. Anthropic solo cubre chat; Gemini y OpenAI-compatible cubren chat y embeddings en estos adaptadores.
 - La configuración de proveedor no otorga permisos para ejecutar herramientas ni pruebas de seguridad.
 - El historial, los vectores locales y las Skills no se transfieren automáticamente al proveedor. Solo se envía el contexto que el ejecutor recupera para la tarea.
-- La CLI de administración de modelos conserva operaciones específicas de Ollama; la abstracción de proveedores se aplica al flujo de inferencia de agentes y embeddings. La administración unificada de proveedores queda pendiente.
+- La CLI de administración/descarga de modelos sigue siendo específica de Ollama; la abstracción cubre el flujo de inferencia de agentes y embeddings. No hay descubrimiento automático de modelos remotos: los nombres se configuran explícitamente.
 
 ## Pruebas
 
