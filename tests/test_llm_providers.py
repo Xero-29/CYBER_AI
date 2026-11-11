@@ -97,13 +97,14 @@ class NativeProtocolTests(unittest.TestCase):
             result = llm_providers.request(provider, "api/chat", {
                 "model": "claude-test",
                 "messages": [{"role": "system", "content": "Reglas"},
+                             {"role": "system", "content": "Segunda regla"},
                              {"role": "user", "content": "Hola"}],
                 "options": {"num_predict": 80},
             })
         self.assertEqual(result["message"]["content"], "respuesta")
         self.assertEqual(result["prompt_eval_count"], 7)
         self.assertEqual(call.call_args.args[0], "https://api.anthropic.com/v1/messages")
-        self.assertEqual(call.call_args.args[1]["system"], "Reglas")
+        self.assertEqual(call.call_args.args[1]["system"], "Reglas\\nSegunda regla")
         self.assertEqual(call.call_args.args[1]["max_tokens"], 80)
         self.assertEqual(call.call_args.args[2]["x-api-key"], "test-secret")
 
