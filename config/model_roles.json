@@ -289,5 +289,21 @@
         "recuerdo de investigaciones"
       ]
     }
+  },
+  "default_provider": "ollama",
+  "llm_providers": {
+    "ollama": {
+      "enabled": true,
+      "protocol": "ollama",
+      "base_url": "http://127.0.0.1:11434",
+      "requires_api_key": false
+    },
+    "openai_compatible": {
+      "enabled": false,
+      "protocol": "openai",
+      "base_url": "",
+      "api_key_env": "CYBER_AI_LLM_API_KEY",
+      "requires_api_key": true
+    }
   }
 }
