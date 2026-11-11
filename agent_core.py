@@ -1,71 +1,102 @@
-import urllib.request
+#!/usr/bin/env python3
+"""Motor de herramientas con aprobación explícita y alcance visible."""
+
 import json
-import os
+from pathlib import Path
+from urllib.error import URLError
+from urllib.parse import urlparse
+from urllib.request import Request, urlopen
+
+
+PROJECT = Path(__file__).resolve().parent
+
 
 class CyberAIEngine:
+    """Traduce propuestas del agente; nunca ejecuta acciones por inferencia."""
+
     def __init__(self):
-        print("[CYBER_AI] Motor de Agentes y Traductor de Acciones Inicializado.")
+        print("[CYBER_AI] Motor de herramientas en modo aprobación explícita.")
 
     def translate_and_execute(self, agent_thought):
-        """
-        Toma el pensamiento en lenguaje natural del agente, 
-        lo traduce y ejecuta la acción técnica correspondiente.
-        """
-        print(f"\n🤖 [Pensamiento del Agente]: \"{agent_thought}\"")
-        
-        thought_lower = agent_thought.lower()
-
-        if "cabeceras" in thought_lower or "servidor" in thought_lower or "http" in thought_lower:
-            return self.action_check_headers("https://example.com")
-        elif "archivo" in thought_lower or "configuración" in thought_lower or "local" in thought_lower:
-            return self.action_check_local_file("agent_core.py")
+        """Devuelve una propuesta; no realiza conexiones ni accede a archivos."""
+        thought = str(agent_thought).strip()
+        lowered = thought.casefold()
+        if any(word in lowered for word in ("cabeceras", "servidor", "http")):
+            action = "inspect_http_headers"
+        elif any(word in lowered for word in ("archivo", "configuración", "local")):
+            action = "inspect_project_file"
         else:
             return {
-                "status": "error", 
-                "message": "El agente generó un pensamiento que no tiene una herramienta asignada todavía."
+                "status": "unsupported",
+                "message": "No hay una herramienta asignada a esta propuesta.",
             }
+        return {
+            "status": "approval_required",
+            "proposed_action": action,
+            "target": None,
+            "message": (
+                "No se ejecutó ninguna acción. Un usuario debe proporcionar "
+                "el destino y aprobar explícitamente la operación."
+            ),
+        }
 
-    def action_check_headers(self, url):
-        print(f"⚙️ [Ejecutando Herramienta]: Consultando cabeceras HTTP de {url}...")
+    def action_check_headers(self, url, authorized=False):
+        """Consulta cabeceras únicamente con confirmación explícita."""
+        if authorized is not True:
+            return {"status": "authorization_required"}
+        parsed = urlparse(str(url))
+        if (
+            parsed.scheme not in ("http", "https")
+            or not parsed.hostname
+            or parsed.username
+            or parsed.password
+        ):
+            return {"status": "error", "error_msg": "URL HTTP/HTTPS no válida."}
         try:
-            req = urllib.request.Request(url, headers={'User-Agent': 'CyberAI-Framework/1.0'})
-            with urllib.request.urlopen(req, timeout=5) as response:
+            request = Request(
+                url, method="HEAD",
+                headers={"User-Agent": "CYBER_AI/1.0"},
+            )
+            with urlopen(request, timeout=5) as response:
                 headers = dict(response.headers)
-                server_type = headers.get("Server", "No especificado")
-                return {
-                    "status": "success", 
-                    "accion_realizada": "HTTP Header Inspection",
-                    "servidor_detectado": server_type,
-                    "total_cabeceras": len(headers)
-                }
-        except Exception as e:
-            return {"status": "error", "error_msg": str(e)}
+            return {
+                "status": "success",
+                "action": "HTTP Header Inspection",
+                "server": headers.get("Server", "No especificado"),
+                "header_count": len(headers),
+                "target": url,
+            }
+        except (URLError, TimeoutError, OSError, ValueError) as error:
+            return {"status": "error", "error_msg": str(error)}
 
     def action_check_local_file(self, filepath):
-        print(f"⚙️ [Ejecutando Herramienta]: Buscando archivo local '{filepath}'...")
-        if os.path.exists(filepath):
-            file_size = os.path.getsize(filepath)
+        """Inspecciona solo archivos dentro del directorio del proyecto."""
+        candidate = (PROJECT / filepath).resolve()
+        try:
+            candidate.relative_to(PROJECT)
+        except ValueError:
+            return {"status": "error", "error_msg": "Ruta fuera del proyecto."}
+        if not candidate.is_file():
             return {
-                "status": "success", 
-                "accion_realizada": "Local File Check",
-                "resultado": f"El archivo '{filepath}' existe y pesa {file_size} bytes."
+                "status": "not_found",
+                "action": "Local File Check",
+                "path": str(candidate.relative_to(PROJECT)),
             }
-        else:
-            return {
-                "status": "success", 
-                "accion_realizada": "Local File Check",
-                "resultado": f"El archivo '{filepath}' no se encuentra en el directorio."
-            }
+        return {
+            "status": "success",
+            "action": "Local File Check",
+            "path": str(candidate.relative_to(PROJECT)),
+            "size_bytes": candidate.stat().st_size,
+        }
+
 
 if __name__ == "__main__":
     engine = CyberAIEngine()
-    pensamientos_simulados = [
+    examples = [
         "Necesito indagar qué tipo de servidor web y cabeceras tiene el objetivo.",
-        "Quiero verificar si el archivo de configuración local está disponible en el entorno.",
-        "Voy a inventar algo que no tiene sentido para ver cómo reacciona el sistema."
+        "Quiero verificar si el archivo de configuración local está disponible.",
+        "Texto sin herramienta asignada.",
     ]
-
-    for pensamiento in pensamientos_simulados:
-        resultado = engine.translate_and_execute(pensamiento)
-        print(f"📊 [Resultado devuelto al Agente]: {json.dumps(resultado, indent=2, ensure_ascii=False)}")
-        print("-" * 60)
+    for thought in examples:
+        result = engine.translate_and_execute(thought)
+        print(json.dumps(result, indent=2, ensure_ascii=False))
