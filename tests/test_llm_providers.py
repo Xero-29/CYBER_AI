@@ -18,3 +18,44 @@ class ProviderTests(unittest.TestCase):
   self.assertEqual(call.call_args.args[1]["max_tokens"],99)
 
 if __name__=="__main__": unittest.main()
+
+
+class ResolveModelTests(unittest.TestCase):
+    def test_provider_role_mapping_wins(self):
+        provider = {"name": "cloud", "models": {"NEXO": "remote-reasoner"}}
+        agent = {"id": "nexo", "model": "local-model", "type": "reasoning"}
+        self.assertEqual(llm_providers.resolve_model(provider, agent, "NEXO"), "remote-reasoner")
+
+    def test_agent_id_mapping_is_supported(self):
+        provider = {"name": "cloud", "models": {"nexo": "remote-by-id"}}
+        agent = {"id": "nexo", "model": "local-model"}
+        self.assertEqual(llm_providers.resolve_model(provider, agent, "NEXO"), "remote-by-id")
+
+    def test_embedding_model_has_own_setting(self):
+        provider = {"name": "cloud", "embedding_model": "remote-embed"}
+        agent = {"id": "eco", "model": "local-embed", "type": "embeddings"}
+        self.assertEqual(llm_providers.resolve_model(provider, agent, "ECO"), "remote-embed")
+
+    def test_role_mapping_precedes_embedding_default(self):
+        provider = {"name": "cloud", "models": {"ECO": "role-embed"}, "embedding_model": "default-embed"}
+        agent = {"id": "eco", "model": "local-embed", "type": "embeddings"}
+        self.assertEqual(llm_providers.resolve_model(provider, agent, "ECO"), "role-embed")
+
+    def test_provider_default_model_is_used(self):
+        provider = {"name": "cloud", "default_model": "remote-default"}
+        agent = {"id": "nexo", "model": "local-model"}
+        self.assertEqual(llm_providers.resolve_model(provider, agent, "NEXO"), "remote-default")
+
+    def test_local_model_is_fallback(self):
+        provider = {"name": "ollama"}
+        agent = {"id": "nexo", "model": "qwen-local"}
+        self.assertEqual(llm_providers.resolve_model(provider, agent, "NEXO"), "qwen-local")
+
+    def test_invalid_mapping_is_rejected(self):
+        provider = {"name": "cloud", "models": []}
+        with self.assertRaises(ValueError):
+            llm_providers.resolve_model(provider, {"model": "local"}, "NEXO")
+
+    def test_missing_model_is_rejected(self):
+        with self.assertRaises(ValueError):
+            llm_providers.resolve_model({"name": "cloud"}, {"id": "nexo"}, "NEXO")
