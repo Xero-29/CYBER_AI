@@ -4,6 +4,8 @@
 import argparse
 import json
 import sys
+import subprocess
+import uuid
 from pathlib import Path
 
 from report_analyzer import analyze_report, analyze_scan
@@ -98,16 +100,18 @@ def main():
     group.add_argument("--batch", help="Analizar todos los TXT y Markdown de una carpeta.")
     group.add_argument("--self-test", action="store_true", help="Comprobar archivos básicos.")
     group.add_argument("--scan", help="Escanear una URL HTTP/HTTPS autorizada con Nuclei.")
+    parser.add_argument("--confirm-authorized", action="store_true", help="Confirmar que tienes autorización para analizar el objetivo indicado en --scan.")
     args = parser.parse_args()
 
     if args.scan:
         try:
-            result = scan_target(args.scan)
+            result = scan_target(args.scan, authorized=args.confirm_authorized)
             output_dir = Path("reports")
             output_dir.mkdir(parents=True, exist_ok=True)
 
             # Guardamos el resultado completo de Nuclei sin perder evidencias.
-            output = output_dir / "nuclei_scan_analysis.json"
+            scan_id = uuid.uuid4().hex
+            output = output_dir / f"nuclei_scan_{scan_id}_analysis.json"
             output.write_text(
                 json.dumps(result, ensure_ascii=False, indent=2) + "\n",
                 encoding="utf-8",
@@ -115,7 +119,7 @@ def main():
 
             # Generamos un segundo informe agrupado por plantilla y severidad.
             summary = analyze_scan(result)
-            summary_output = output_dir / "nuclei_scan_summary.json"
+            summary_output = output_dir / f"nuclei_scan_{scan_id}_summary.json"
             summary_output.write_text(
                 json.dumps(summary, ensure_ascii=False, indent=2) + "\n",
                 encoding="utf-8",
@@ -131,15 +135,22 @@ def main():
 
     if args.self_test:
         required = [
-            "verifier.py", "report_analyzer.py", "nvd_client.py",
-            "report_manager.py", "batch_analyzer.py", "nuclei_scanner.py", "CONTEXT.md",
+            "report_analyzer.py", "nvd_client.py", "report_manager.py",
+            "batch_analyzer.py", "nuclei_scanner.py", "CONTEXT.md",
         ]
         missing = [name for name in required if not Path(name).is_file()]
         if missing:
             print("Faltan archivos: " + ", ".join(missing))
             return 1
-        print("Comprobación básica correcta.")
-        return 0
+        tests_dir = Path("tests")
+        if not tests_dir.is_dir():
+            print("No existe el directorio tests/.")
+            return 1
+        print("Ejecutando pruebas unitarias...")
+        return subprocess.run(
+            [sys.executable, "-m", "unittest", "discover", "-s", str(tests_dir), "-v"],
+            check=False,
+        ).returncode
 
     if args.report:
         return process_one(args.report)
