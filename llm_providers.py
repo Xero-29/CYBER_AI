@@ -130,7 +130,7 @@ def _anthropic_request(provider, endpoint, payload, timeout):
     base = str(provider.get("base_url", "https://api.anthropic.com/v1")).rstrip("/")
     key = _credentials(provider)
     messages = payload.get("messages", [])
-    system = "\\n".join(m.get("content", "") for m in messages if m.get("role") == "system")
+    system = "\n".join(m.get("content", "") for m in messages if m.get("role") == "system")
     body_messages = [{"role": m.get("role"), "content": m.get("content", "")}
                      for m in messages if m.get("role") in {"user", "assistant"}]
     options = payload.get("options", {})
