@@ -27,7 +27,10 @@ Se creó una rama de trabajo independiente para aplicar correcciones de segurida
 - **Selección de modelos:** se puede mapear cada especialista a un modelo remoto o usar un modelo predeterminado del proveedor. Las claves se leen de variables de entorno.
 - **Embeddings desacoplados:** ECO usa el proveedor seleccionado. Los vectores remotos se etiquetan como `proveedor::modelo` para no mezclar espacios; los vectores Ollama conservan su identificador histórico para compatibilidad.
 - **Reindexación guiada:** `knowledge_reindex.py` ofrece inventario de solo lectura y migración explícita con `--apply --confirm`. Verifica integridad de cada fragmento, crea backup SQLite, genera en staging y publica los nuevos vectores en una transacción.
-- **Pruebas de adaptadores y reindexación:** se añadieron pruebas unitarias simuladas para selección de modelos, respuestas normalizadas de Anthropic/Gemini, credenciales, validación de configuración, enrutamiento de embeddings y validación del flujo de reindexación.
+- **Integración de historial:** el registro de uso conserva proveedor y modelo efectivos. Los proveedores remotos ya no intentan comprobar sus modelos contra el catálogo local de Ollama.
+- **Embeddings individuales:** la CLI envía una lista de un solo elemento al adaptador, registra el espacio vectorial y valida que el proveedor devuelva exactamente un vector.
+- **Normalización Anthropic:** los mensajes de sistema múltiples se concatenan con saltos de línea reales.
+- **Pruebas de adaptadores y reindexación:** se añadieron pruebas para selección y cambio de proveedor, respuestas normalizadas de Anthropic/Gemini, credenciales, historial local/remoto, embeddings individuales y reindexación SQLite de extremo a extremo con verificación de recuperación semántica.
 - **CI:** el workflow cancela ejecuciones antiguas de la misma rama para evitar que cada commit deje una cola de pruebas obsoletas.
 - **Documentación:** `docs/AI_PROVIDER_ARCHITECTURE.md` y `docs/AI_PROVIDER_CONFIGURATION.md` describen configuración, protocolos, credenciales y límites.
 
@@ -61,4 +64,4 @@ No se debe ejecutar un escaneo contra sistemas de terceros sin permiso verificab
 
 ## Limitaciones de esta entrega
 
-Los archivos se modificaron mediante GitHub. No se dispuso de un entorno de ejecución del repositorio en esta sesión y el conector no devolvió ejecuciones de Actions para el último commit; por tanto, **las pruebas no se han ejecutado y no se afirma que estén pasando**. Los cambios deben considerarse una primera corrección revisable, no una auditoría completa ni una certificación de seguridad.
+Los archivos se modificaron mediante GitHub. No se dispuso de un entorno de ejecución local del repositorio. GitHub Actions sí inició la suite de Python 3.12 para los commits recientes, pero la ejecución más nueva aún no ha publicado un resultado final; por tanto, **las pruebas siguen pendientes de confirmación y no se afirma que estén pasando**. Los cambios deben considerarse una primera corrección revisable, no una auditoría completa ni una certificación de seguridad.
