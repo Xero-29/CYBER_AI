@@ -2,6 +2,7 @@
 """Escaneo defensivo con Nuclei y seguimiento visible del progreso."""
 
 import json
+import uuid
 import shutil
 import subprocess
 import sys
@@ -30,9 +31,16 @@ def validate_target(target):
     return target
 
 
-def scan_target(target, timeout=45):
-    """Ejecuta Nuclei y muestra la actividad sin inventar porcentajes."""
+def scan_target(target, timeout=45, authorized=False):
+    """Ejecuta Nuclei solo tras confirmación explícita de autorización."""
     target = validate_target(target)
+    if authorized is not True:
+        return {
+            "target": target,
+            "status": "authorization_required",
+            "error": "Confirma autorización explícita antes de ejecutar el escaneo.",
+            "findings": [],
+        }
     executable = shutil.which("nuclei")
 
     if not executable:
@@ -45,10 +53,8 @@ def scan_target(target, timeout=45):
 
     output_dir = Path("reports")
     output_dir.mkdir(parents=True, exist_ok=True)
-    output_file = output_dir / "nuclei_scan_results.jsonl"
-
-    # Evitamos mezclar hallazgos de escaneos anteriores.
-    output_file.write_text("", encoding="utf-8")
+    scan_id = uuid.uuid4().hex
+    output_file = output_dir / f"nuclei_scan_{scan_id}.jsonl"
 
     command = [
         executable,
