@@ -10,6 +10,19 @@ class ReportManagerTests(unittest.TestCase):
     def test_normalized_text_has_same_fingerprint(self):
         self.assertEqual(fingerprint("Hola   mundo"), fingerprint(" hola mundo "))
 
+    def test_corrupt_index_fails_closed_without_overwriting(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            index = root / "data" / "index.json"
+            index.parent.mkdir()
+            index.write_text("{broken", encoding="utf-8")
+            with patch("report_manager.REPORTS_DIR", root / "reports"), \
+                 patch("report_manager.DATA_DIR", root / "data"), \
+                 patch("report_manager.INDEX_FILE", index):
+                with self.assertRaises(ValueError):
+                    register_report("prueba", root / "reports" / "uno.json")
+            self.assertEqual(index.read_text(encoding="utf-8"), "{broken")
+
     def test_registers_and_detects_exact_duplicate(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
