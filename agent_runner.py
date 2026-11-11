@@ -14,6 +14,7 @@ from urllib.error import HTTPError, URLError
 from model_memory_manager import load_config, resolve_agent, record
 from learning_memory import build_memory_context
 from skillbook import build_skill_context
+from llm_providers import resolve_provider, request as provider_request, installed_models as provider_models
 from compressed_checkpoint import (
     save_partial_chunk,
     restore_partial_tail,
@@ -704,7 +705,7 @@ def run_agent(
                 ]
 
             while True:
-                result = request_json("api/chat", chat_payload)
+                result = request_json("api/chat", chat_payload, provider=provider)
                 generation_requests += 1
 
                 message = result.get("message") or {}
