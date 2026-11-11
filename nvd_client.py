@@ -1,6 +1,7 @@
 """Consulta referencias CVE exactas en la base pública NVD."""
 
 import json
+import re
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -11,7 +12,9 @@ NVD_URL = "https://services.nvd.nist.gov/rest/json/cves/2.0"
 
 def verify_cve(cve_id):
     """Comprueba si NVD contiene el identificador CVE consultado."""
-    if not cve_id.startswith("CVE-"):
+    if not isinstance(cve_id, str) or not re.fullmatch(
+        r"CVE-[0-9]{4}-[0-9]{4,}", cve_id, flags=re.IGNORECASE
+    ):
         return {
             "cve_id": cve_id,
             "status": "invalid_identifier",
