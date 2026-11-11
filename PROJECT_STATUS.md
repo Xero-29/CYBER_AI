@@ -26,7 +26,8 @@ Se creó una rama de trabajo independiente para aplicar correcciones de segurida
 - **Adaptadores de IA:** se integraron Ollama, OpenAI-compatible, Anthropic Messages (chat) y Google Gemini (chat y embeddings) detrás de un contrato normalizado.
 - **Selección de modelos:** se puede mapear cada especialista a un modelo remoto o usar un modelo predeterminado del proveedor. Las claves se leen de variables de entorno.
 - **Embeddings desacoplados:** ECO usa el proveedor seleccionado. Los vectores remotos se etiquetan como `proveedor::modelo` para no mezclar espacios; los vectores Ollama conservan su identificador histórico para compatibilidad.
-- **Pruebas de adaptadores:** se añadieron pruebas unitarias simuladas para selección de modelos, respuestas normalizadas de Anthropic/Gemini, credenciales, validación de configuración y enrutamiento de embeddings. Estas pruebas están escritas, pero aún no se han ejecutado en un entorno Python.
+- **Pruebas de adaptadores:** se añadieron pruebas unitarias simuladas para selección de modelos, respuestas normalizadas de Anthropic/Gemini, credenciales, validación de configuración y enrutamiento de embeddings.
+- **CI:** el workflow cancela ejecuciones antiguas de la misma rama para evitar que cada commit deje una cola de pruebas obsoletas.
 - **Documentación:** `docs/AI_PROVIDER_ARCHITECTURE.md` y `docs/AI_PROVIDER_CONFIGURATION.md` describen configuración, protocolos, credenciales y límites.
 
 ## Cómo validar
