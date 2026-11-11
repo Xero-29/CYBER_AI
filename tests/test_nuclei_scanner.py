@@ -24,7 +24,7 @@ class FakeProcess:
 
 class NucleiScannerTests(unittest.TestCase):
     def test_scan_requires_explicit_authorization(self):
-        result = scan_target("http://127.0.0.1:8765", authorized=True)
+        result = scan_target("http://127.0.0.1:8765")
         self.assertEqual(result["status"], "authorization_required")
         self.assertEqual(result["findings"], [])
 
