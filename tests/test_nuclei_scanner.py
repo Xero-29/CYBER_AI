@@ -23,6 +23,11 @@ class FakeProcess:
 
 
 class NucleiScannerTests(unittest.TestCase):
+    def test_scan_requires_explicit_authorization(self):
+        result = scan_target("http://127.0.0.1:8765")
+        self.assertEqual(result["status"], "authorization_required")
+        self.assertEqual(result["findings"], [])
+
     def test_validate_target_accepts_local_http_url(self):
         self.assertEqual(
             validate_target("http://127.0.0.1:8765"),
@@ -39,7 +44,7 @@ class NucleiScannerTests(unittest.TestCase):
 
     def test_missing_nuclei_returns_error(self):
         with patch("nuclei_scanner.shutil.which", return_value=None):
-            result = scan_target("http://127.0.0.1:8765")
+            result = scan_target("http://127.0.0.1:8765", authorized=True)
 
         self.assertEqual(result["status"], "error")
         self.assertEqual(result["findings"], [])
