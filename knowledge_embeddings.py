@@ -77,6 +77,8 @@ def generate_embeddings(texts, agent_name="ECO"):
             return {
                 "agent": name,
                 "model": model,
+                "embedding_space": f"{provider['name']}::{model}",
+                "provider": provider["name"],
                 "embeddings": vectors,
                 "dimensions": dimensions,
             }
@@ -93,6 +95,8 @@ def generate_embedding(text, agent_name="ECO"):
     return {
         "agent": result["agent"],
         "model": result["model"],
+        "embedding_space": result["embedding_space"],
+        "provider": result["provider"],
         "embedding": result["embeddings"][0],
         "dimensions": result["dimensions"],
     }
