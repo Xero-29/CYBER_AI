@@ -44,12 +44,6 @@ class CyberAIEngine:
 
     def action_check_headers(self, url, authorized=False, authorization_id=None):
         """Consulta cabeceras solo con un permiso local, específico y vigente."""
-        if authorized is not True or not authorization_id:
-            return {"status": "authorization_required"}
-        try:
-            grant = authorize_target(url, "inspect_http_headers", authorization_id)
-        except AuthorizationError as error:
-            return {"status": "authorization_denied", "error_msg": str(error)}
         parsed = urlparse(str(url))
         if (
             parsed.scheme not in ("http", "https")
@@ -58,6 +52,12 @@ class CyberAIEngine:
             or parsed.password
         ):
             return {"status": "error", "error_msg": "URL HTTP/HTTPS no válida."}
+        if authorized is not True or not authorization_id:
+            return {"status": "authorization_required"}
+        try:
+            grant = authorize_target(url, "inspect_http_headers", authorization_id)
+        except AuthorizationError as error:
+            return {"status": "authorization_denied", "error_msg": str(error)}
         try:
             request = Request(
                 url, method="HEAD",
