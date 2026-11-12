@@ -102,12 +102,17 @@ def main():
     group.add_argument("--batch", help="Analizar todos los TXT y Markdown de una carpeta.")
     group.add_argument("--self-test", action="store_true", help="Comprobar archivos básicos.")
     group.add_argument("--scan", help="Escanear una URL HTTP/HTTPS autorizada con Nuclei.")
-    parser.add_argument("--confirm-authorized", action="store_true", help="Confirmar que tienes autorización para analizar el objetivo indicado en --scan.")
+    parser.add_argument("--confirm-authorized", action="store_true", help="Confirmación adicional del operador.")
+    parser.add_argument("--authorization-id", help="ID de autorización local, vigente y limitada al destino.")
     args = parser.parse_args()
 
     if args.scan:
         try:
-            result = scan_target(args.scan, authorized=args.confirm_authorized)
+            result = scan_target(
+                args.scan,
+                authorized=args.confirm_authorized,
+                authorization_id=args.authorization_id,
+            )
             output_dir = Path("reports")
             output_dir.mkdir(parents=True, exist_ok=True)
 
