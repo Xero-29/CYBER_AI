@@ -102,7 +102,7 @@ class NucleiScannerTests(unittest.TestCase):
                 "nuclei_scanner.subprocess.Popen",
                 side_effect=OSError("No se pudo iniciar"),
             ):
-                result = scan_target("http://127.0.0.1:8765", authorized=True)
+                result = scan_target("http://127.0.0.1:8765", authorized=True, authorization_id="test-grant")
 
         self.assertEqual(result["status"], "error")
         self.assertIn("No se pudo iniciar", result["error"])
