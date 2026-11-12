@@ -65,3 +65,16 @@ No se debe ejecutar un escaneo contra sistemas de terceros sin permiso verificab
 ## Limitaciones de esta entrega
 
 Los archivos se modificaron mediante GitHub. No se dispuso de un entorno de ejecución local del repositorio. GitHub Actions sí inició la suite de Python 3.12 para los commits recientes, pero la ejecución más nueva aún no ha publicado un resultado final; por tanto, **las pruebas siguen pendientes de confirmación y no se afirma que estén pasando**. Los cambios deben considerarse una primera corrección revisable, no una auditoría completa ni una certificación de seguridad.
+
+
+## Ampliación de herramientas y conocimientos (2026-11-12)
+
+- Catálogo declarativo ampliado a 20 herramientas: SAST, dependencias, SBOM/supply chain, IaC, secretos, contenedores, CI/CD, Kubernetes, malware, análisis forense y red.
+- Nuevo `tool_registry.py`: selección explicable de herramientas candidatas por tarea.
+- `task_planner.py` incorpora las herramientas candidatas al plan, sin ejecutarlas.
+- Atlas de conocimiento v1.1.0: 28 áreas y 98 referencias registradas; 44 referencias nuevas. Áreas nuevas: ingeniería de software, aprendizaje automático, hardware/firmware y matemáticas.
+- Las referencias permanecen pendientes de revisión de licencia y descarga; no se afirma que estén ingeridas.
+- Pruebas nuevas: integridad del catálogo, inventario de herramientas y selección segura.
+- Documentación: `docs/TOOL_ECOSYSTEM.md` y actualización de `docs/CYBERSECURITY_KNOWLEDGE_ATLAS.md`.
+
+Límite explícito: las herramientas nuevas se detectan y recomiendan; salvo los adaptadores que ya existían, todavía no se ejecutan desde CYBER_AI. La siguiente fase es implementar adaptadores seguros y tipados, uno por uno.
