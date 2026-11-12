@@ -90,7 +90,7 @@ class NucleiScannerTests(unittest.TestCase):
                 with patch("nuclei_scanner.subprocess.Popen", side_effect=fake_popen):
                     with patch("nuclei_scanner.Path.home", return_value=root):
                         with patch("nuclei_scanner.time.sleep"):
-                            result = scan_target("http://127.0.0.1:8765", authorized=True)
+                            result = scan_target("http://127.0.0.1:8765", authorized=True, authorization_id="test-grant")
 
             self.assertEqual(result["status"], "completed")
             self.assertEqual(result["findings_count"], 1)
