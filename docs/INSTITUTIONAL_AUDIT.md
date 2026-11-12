@@ -200,3 +200,38 @@ Cada riesgo nuevo debe incluir archivo/línea, escenario de fallo, severidad, pr
 4. Separar descubrimiento/selección de capacidades del motor de autorización.
 5. Formalizar contratos de plugin/proveedor y capacidades.
 6. Añadir pruebas de resiliencia, concurrencia, restauración y carga.
+
+
+## 10. Política central de ejecución de red (implementación inicial)
+
+### Cambio realizado
+Se añadió `execution_policy.py` con denegación por defecto y grants locales vinculados a:
+- destino exacto (URL/IP),
+- acción concreta (`nuclei_scan` o `inspect_http_headers`),
+- identificador de autorización,
+- responsable declarado,
+- ticket,
+- expiración con zona horaria.
+
+El archivo de grants debe estar fuera del repositorio, configurado mediante `CYBER_AI_AUTHORIZATIONS_FILE` y protegido con permisos POSIX `0600`. El archivo versionado `config/authorized_targets.json` permanece vacío.
+
+### Integraciones
+- `agent_core.py`: la inspección HTTP exige grant; deshabilita redirecciones y proxies ambientales.
+- `nuclei_scanner.py`: exige confirmación adicional e ID de grant; valida permiso antes de iniciar Nuclei; deshabilita redirecciones.
+- `task_runner.py`: aplica la misma política antes de iniciar el proceso Nuclei.
+- `cyber_ai.py`: transmite el ID de autorización al escáner.
+- `tests/test_execution_policy.py`: cubre destino/acción exactos, expiración, hostname, IP privada, ID ausente y permisos de archivo.
+
+### Restricciones deliberadas
+- Solo IP literales públicas globales; los dominios se rechazan hasta implementar transporte con DNS fijado.
+- No se permiten query strings ni fragmentos en el target autorizado.
+- La autorización no se deriva de la selección de capacidades.
+- No se ha ejecutado ningún escaneo externo.
+
+### Limitaciones que permanecen
+- `approved_by` y `ticket` son metadatos declarativos, no identidad autenticada ni aprobación firmada. Se necesita integrar un servicio de autorización corporativo o firmas verificables para un despliegue institucional.
+- La política de aplicación no reemplaza el aislamiento del proceso Nuclei ni las reglas de egreso de red del sistema operativo.
+- La revisión de seguridad del parser, de los flujos de herramientas y de todos los puntos de ejecución debe continuar; no se afirma que este sea el único camino de red del proyecto.
+
+### Estado de verificación
+Pendiente de ejecución CI sobre el último commit de esta serie. La implementación no se considera cerrada hasta que CI pase y se inspeccionen los logs.
