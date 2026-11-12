@@ -38,6 +38,7 @@ class ExecutionPolicyTests(unittest.TestCase):
             json.dumps({"authorizations": grants}),
             encoding="utf-8",
         )
+        self.policy.chmod(0o600)
 
     def test_exact_target_and_action_grant_is_accepted(self):
         result = authorize_target(
@@ -71,6 +72,11 @@ class ExecutionPolicyTests(unittest.TestCase):
     def test_private_address_is_denied(self):
         with self.assertRaisesRegex(AuthorizationError, "IP pública"):
             authorize_target("http://127.0.0.1", "nuclei_scan", "grant-001")
+
+    def test_grant_file_with_insecure_permissions_is_denied(self):
+        self.policy.chmod(0o644)
+        with self.assertRaisesRegex(AuthorizationError, "0600"):
+            authorize_target("https://8.8.8.8", "nuclei_scan", "grant-001")
 
     def test_missing_authorization_id_is_denied(self):
         with self.assertRaises(AuthorizationError):
