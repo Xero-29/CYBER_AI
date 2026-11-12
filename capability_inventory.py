@@ -74,7 +74,7 @@ if __name__ == "__main__":
     output = Path("reports/capability_inventory.json")
     output.parent.mkdir(parents=True, exist_ok=True)
     data = build_inventory()
-    output.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+    output.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print("Herramientas registradas:", data["summary"]["registered"])
     print("Herramientas disponibles:", data["summary"]["available"])
     print("Plantillas encontradas:", data["nuclei_templates"]["count"])
