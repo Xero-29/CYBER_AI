@@ -5,7 +5,9 @@ import json
 from pathlib import Path
 from urllib.error import URLError
 from urllib.parse import urlparse
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, Request, build_opener
+
+from execution_policy import AuthorizationError, authorize_target
 
 
 PROJECT = Path(__file__).resolve().parent
@@ -40,10 +42,14 @@ class CyberAIEngine:
             ),
         }
 
-    def action_check_headers(self, url, authorized=False):
-        """Consulta cabeceras únicamente con confirmación explícita."""
-        if authorized is not True:
+    def action_check_headers(self, url, authorized=False, authorization_id=None):
+        """Consulta cabeceras solo con un permiso local, específico y vigente."""
+        if authorized is not True or not authorization_id:
             return {"status": "authorization_required"}
+        try:
+            grant = authorize_target(url, "inspect_http_headers", authorization_id)
+        except AuthorizationError as error:
+            return {"status": "authorization_denied", "error_msg": str(error)}
         parsed = urlparse(str(url))
         if (
             parsed.scheme not in ("http", "https")
@@ -57,7 +63,12 @@ class CyberAIEngine:
                 url, method="HEAD",
                 headers={"User-Agent": "CYBER_AI/1.0"},
             )
-            with urlopen(request, timeout=5) as response:
+            class NoRedirect(HTTPRedirectHandler):
+                def redirect_request(self, req, fp, code, msg, headers, newurl):
+                    return None
+
+            opener = build_opener(NoRedirect)
+            with opener.open(request, timeout=5) as response:
                 headers = dict(response.headers)
             return {
                 "status": "success",
@@ -65,6 +76,7 @@ class CyberAIEngine:
                 "server": headers.get("Server", "No especificado"),
                 "header_count": len(headers),
                 "target": url,
+                "authorization": grant,
             }
         except (URLError, TimeoutError, OSError, ValueError) as error:
             return {"status": "error", "error_msg": str(error)}
