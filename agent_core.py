@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 from urllib.error import URLError
 from urllib.parse import urlparse
-from urllib.request import HTTPRedirectHandler, Request, build_opener
+from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_opener
 
 from execution_policy import AuthorizationError, authorize_target
 
@@ -67,7 +67,7 @@ class CyberAIEngine:
                 def redirect_request(self, req, fp, code, msg, headers, newurl):
                     return None
 
-            opener = build_opener(NoRedirect)
+            opener = build_opener(ProxyHandler({}), NoRedirect)
             with opener.open(request, timeout=5) as response:
                 headers = dict(response.headers)
             return {
