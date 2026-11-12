@@ -23,10 +23,27 @@ class FakeProcess:
 
 
 class NucleiScannerTests(unittest.TestCase):
+    def setUp(self):
+        self.authorization = patch(
+            "nuclei_scanner.authorize_target",
+            return_value={"authorization_id": "test-grant"},
+        )
+        self.authorization.start()
+
+    def tearDown(self):
+        self.authorization.stop()
+
     def test_scan_requires_explicit_authorization(self):
         result = scan_target("http://127.0.0.1:8765")
         self.assertEqual(result["status"], "authorization_required")
         self.assertEqual(result["findings"], [])
+
+    def test_confirmation_flag_without_grant_id_is_not_authorization(self):
+        result = scan_target(
+            "http://127.0.0.1:8765",
+            authorized=True,
+        )
+        self.assertEqual(result["status"], "authorization_required")
 
     def test_validate_target_accepts_local_http_url(self):
         self.assertEqual(
@@ -44,7 +61,7 @@ class NucleiScannerTests(unittest.TestCase):
 
     def test_missing_nuclei_returns_error(self):
         with patch("nuclei_scanner.shutil.which", return_value=None):
-            result = scan_target("http://127.0.0.1:8765", authorized=True)
+            result = scan_target("http://127.0.0.1:8765", authorized=True, authorization_id="test-grant")
 
         self.assertEqual(result["status"], "error")
         self.assertEqual(result["findings"], [])
