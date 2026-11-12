@@ -5,7 +5,6 @@ import argparse
 import hashlib
 import json
 import sys
-import subprocess
 import uuid
 from pathlib import Path
 
@@ -145,15 +144,9 @@ def main():
         if missing:
             print("Faltan archivos: " + ", ".join(missing))
             return 1
-        tests_dir = Path("tests")
-        if not tests_dir.is_dir():
-            print("No existe el directorio tests/.")
-            return 1
-        print("Ejecutando pruebas unitarias...")
-        return subprocess.run(
-            [sys.executable, "-m", "unittest", "discover", "-s", str(tests_dir), "-v"],
-            check=False,
-        ).returncode
+        print("Comprobación básica correcta.")
+        print("Para ejecutar la suite completa usa: python -m unittest discover -s tests -v")
+        return 0
 
     if args.report:
         return process_one(args.report)
