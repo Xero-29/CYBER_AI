@@ -6,6 +6,7 @@ Set CYBER_AI_AUTHORIZATIONS_FILE to an administrator-managed file outside Git.
 import ipaddress
 import json
 import os
+import stat
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
@@ -66,6 +67,10 @@ def _load_grants():
     grants = data.get("authorizations") if isinstance(data, dict) else None
     if not isinstance(grants, list):
         raise AuthorizationError("La política no contiene una lista de autorizaciones.")
+    if grants and stat.S_IMODE(path.stat().st_mode) & 0o077:
+        raise AuthorizationError(
+            "El archivo de autorizaciones debe ser privado (permisos 0600)."
+        )
     return grants
 
 
