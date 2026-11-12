@@ -126,3 +126,35 @@ La revisión distingue:
 ## 5. Limitaciones de esta revisión
 
 Esta primera pasada es estática y selectiva. No se ejecutó el repositorio localmente, no se inspeccionaron todavía todos los módulos ni todas las rutas de herramientas, no se hizo threat modeling completo y no se probaron fallos de almacenamiento, concurrencia, aislamiento ni restauración. Los hallazgos anteriores no equivalen a una certificación ni a una afirmación de que el sistema sea inseguro en todos esos aspectos.
+
+
+## 6. Verificación de la primera corrección (2026-11-12)
+
+### AUD-001 — Cerrado
+- Se modificó `cyber_ai.py`: `--self-test` realiza comprobaciones básicas de archivos y ya no ejecuta `unittest discover`.
+- La suite completa queda como responsabilidad directa del workflow CI.
+- Commit: `b9e7d03bd874be1373c32b60b9cc09c72277b9f4`.
+
+### AUD-002 — Causa de los dos errores identificada y corregida
+- Los tracebacks de la ejecución posterior mostraron que ambas pruebas fallaban en `resolve_provider()`: los tests simulaban el transporte HTTP pero no la resolución del proveedor, por lo que dependían de la configuración real de Ollama.
+- Se aislaron las pruebas de checkpoint simulando también la resolución del proveedor y su catálogo de modelos; los callbacks simulados aceptan el argumento `provider`.
+- Commit: `cc6b0a5ed6b9f459ee24bdde30b2d17760042824`.
+
+### Resultado CI
+- Ejecución: https://github.com/Xero-29/CYBER_AI/actions/runs/43276823660
+- Rama: `codex/security-integrity-audit`.
+- Commit probado: `cc6b0a5ed6b9f459ee24bdde30b2d17760042824`.
+- Resultado: **success**.
+- Suite: **169 pruebas, OK**.
+- Esto confirma la suite unitaria en ese commit y entorno de CI; no equivale a validación de producción, pruebas de carga ni certificación institucional.
+
+## 7. Próxima revisión técnica
+
+La siguiente pasada debe centrarse en:
+1. Contratos y límites de confianza de herramientas y ejecución de comandos.
+2. Aislamiento de sesiones, tareas, archivos y memoria.
+3. Ciclo de vida y procedencia verificable de memorias y skills.
+4. Consistencia e integridad de biblioteca, índices y checkpoints.
+5. Adaptadores de proveedores, manejo de errores y compatibilidad de capacidades.
+
+Cada riesgo nuevo debe incluir archivo/línea, escenario de fallo, severidad, prueba que lo reproduce y criterio de cierre.
