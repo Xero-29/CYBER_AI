@@ -15,6 +15,15 @@ class SkillbookTests(unittest.TestCase):
  def test_requires_two_successes_and_zero_failures(self):
   with self.assertRaises(ValueError): self.add(success_runs=1)
   with self.assertRaises(ValueError): self.add(failure_runs=1)
+ def test_accepts_valid_host_containing_letter_s(self):
+  result=self.add(source_urls=["https://security.example.com/"])
+  self.assertEqual(result["status"],"active")
+
+ def test_rejects_invalid_source_urls(self):
+  for url in ("https:///missing-host", "https://user:pass@example.com/", "https://bad host.example/"):
+   with self.subTest(url=url), self.assertRaises(ValueError):
+    self.add(source_urls=[url])
+
  def test_no_match(self):
   self.add(); self.assertEqual(skillbook.build_skill_context("analisis forense RAM"),("",[]))
 if __name__=="__main__": unittest.main()
