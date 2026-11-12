@@ -158,3 +158,45 @@ La siguiente pasada debe centrarse en:
 5. Adaptadores de proveedores, manejo de errores y compatibilidad de capacidades.
 
 Cada riesgo nuevo debe incluir archivo/línea, escenario de fallo, severidad, prueba que lo reproduce y criterio de cierre.
+
+
+## 8. Segunda pasada: hallazgos de ejecución, red y reutilización
+
+### AUD-008 — La inspección HTTP permite destinos internos y redirecciones
+**Severidad:** alta; potencialmente crítica según el entorno donde se ejecute.  
+**Evidencia:** `agent_core.py::action_check_headers` valida el esquema HTTP/HTTPS y exige `authorized=True`, pero después entrega la URL directamente a `urllib.request.urlopen`. No hay validación de direcciones IP privadas, loopback, link-local o metadatos; tampoco se deshabilitan ni revalidan redirecciones.  
+**Escenario:** un usuario o agente con capacidad de solicitar una inspección puede apuntar a un servicio interno; una redirección o resolución DNS cambiante también puede llevar la petición a otro destino. La confirmación booleana no impone un alcance de red.  
+**Impacto:** posible SSRF y acceso indirecto a servicios internos desde el host de CYBER_AI. No se ha ejecutado ninguna petición de prueba.  
+**Corrección propuesta:** política centralizada de destinos permitidos; resolver y validar todas las IP antes de conectar; bloquear rangos no públicos por defecto; fijar la IP validada durante la conexión; controlar cada redirección y volver a validar destino, puerto y esquema; límites de respuesta y auditoría de autorización. Añadir pruebas unitarias con DNS/HTTP simulados.  
+**Estado:** riesgo de diseño confirmado por inspección; explotabilidad concreta pendiente.
+
+### AUD-009 — El consentimiento de escaneo no equivale a un alcance autorizado verificable
+**Severidad:** alta.  
+**Evidencia:** `nuclei_scanner.py::scan_target` y `task_runner.py` aceptan una confirmación booleana/flag (`authorized=True` o `--confirm-authorized`) y ejecutan Nuclei sobre el objetivo suministrado. La validación comprueba principalmente formato URL; no consulta una lista de activos autorizados ni una política de alcance, exclusiones, expiración o identidad del aprobador.  
+**Impacto:** una confirmación accidental o una llamada automatizada mal configurada puede habilitar pruebas fuera del alcance previsto. El flag deja la prueba de autorización en manos del mismo invocador que solicita la acción.  
+**Corrección propuesta:** autorización con contexto: identidad, activo/hostname, resolución/IP permitida, puerto, tipo de prueba, ventana temporal, ticket/propietario y límites de tasa. Aplicar deny-by-default y revalidar alcance inmediatamente antes de ejecutar. Registrar decisión y evidencia.  
+**Estado:** brecha de control de alcance confirmada por inspección; no se ejecutaron escaneos.
+
+### AUD-010 — El validador de URL del Skillbook rechazaba hosts válidos
+**Severidad:** media, defecto funcional.  
+**Evidencia:** la expresión regular anterior usaba `[^\\\\s/]` dentro de una cadena raw, que excluía la letra `s` además de la barra y la barra inversa, en vez de excluir espacios en blanco.  
+**Impacto:** URLs con nombres de host que contienen `s` podían rechazarse; la validación también era menos clara que el análisis estructurado de URL.  
+**Corrección:** se sustituyó por validación con `urllib.parse.urlparse`, comprobación de esquema, hostname, credenciales, espacios y puerto. Se añadieron pruebas para `https://security.example.com/`, host ausente, credenciales y espacios.  
+**Commits:** `8062669` (corrección), `f3cec02` (pruebas).  
+**Estado:** corregido en código; pendiente de CI verde en el commit más reciente.
+
+### AUD-011 — El selector de capacidades no representa una política de autorización
+**Severidad:** media-alta.  
+**Evidencia:** `capability_selector.py` puntúa coincidencias textuales y devuelve plantillas candidatas. `task_runner.py` filtra por algunas carpetas y nombres preferidos, pero esa selección no prueba que la plantilla sea segura, pertinente ni permitida para el activo concreto.  
+**Impacto:** una selección semánticamente incorrecta puede traducirse en comprobaciones no deseadas si se combina con una autorización genérica.  
+**Corrección propuesta:** separar selección de capacidad de autorización; cada capacidad debe declarar tipo de impacto, red/archivos requeridos, alcance, prerequisitos, riesgo, timeout y política de aprobación. Un motor de políticas independiente debe decidir si se permite.  
+**Estado:** limitación arquitectónica observada.
+
+## 9. Orden actualizado de prioridades
+
+1. Resolver AUD-008 y AUD-009 antes de habilitar ejecución de red en entornos institucionales.
+2. Mantener las pruebas aisladas de proveedores y checkpoint; CI debe permanecer verde.
+3. Corregir el ciclo de confianza de VERITAS, memoria y Skillbook con evidencias autenticables.
+4. Separar descubrimiento/selección de capacidades del motor de autorización.
+5. Formalizar contratos de plugin/proveedor y capacidades.
+6. Añadir pruebas de resiliencia, concurrencia, restauración y carga.
