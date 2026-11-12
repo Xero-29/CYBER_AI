@@ -11,6 +11,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from capability_selector import select_capabilities
+from execution_policy import AuthorizationError, authorize_target
 
 
 def main():
@@ -21,7 +22,11 @@ def main():
     parser.add_argument(
         "--confirm-authorized",
         action="store_true",
-        help="Confirmar autorización para analizar el objetivo",
+        help="Confirmación interactiva adicional del operador",
+    )
+    parser.add_argument(
+        "--authorization-id",
+        help="ID de una autorización local vigente y limitada al destino",
     )
     args = parser.parse_args()
 
@@ -93,8 +98,14 @@ def main():
         print("Revisa las plantillas antes de autorizar su ejecución.")
         return 0
 
-    if not args.confirm_authorized:
-        print("ERROR: confirma que tienes autorización con --confirm-authorized.")
+    if not args.confirm_authorized or not args.authorization_id:
+        print("ERROR: se requiere --confirm-authorized y --authorization-id.")
+        return 2
+
+    try:
+        grant = authorize_target(args.target, "nuclei_scan", args.authorization_id)
+    except AuthorizationError as error:
+        print("ERROR: autorización denegada:", error)
         return 2
 
     nuclei = shutil.which("nuclei")
@@ -111,7 +122,7 @@ def main():
     command = [
         nuclei, "-u", args.target,
         "-jsonl", "-o", str(results_file.resolve()),
-        "-no-interactsh", "-disable-update-check",
+        "-no-interactsh", "-disable-update-check", "-disable-redirects",
         "-rl", "2", "-c", "2", "-timeout", "5", "-retries", "0",
     ]
     for item in selected:
@@ -148,6 +159,7 @@ def main():
     report = {
         "task": args.task,
         "target": args.target,
+        "authorization": grant,
         "status": "completed" if process.returncode == 0 else "scanner_error",
         "elapsed_seconds": elapsed,
         "templates_used": [item["path"] for item in selected],
