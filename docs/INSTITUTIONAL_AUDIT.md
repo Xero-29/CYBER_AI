@@ -235,3 +235,12 @@ El archivo de grants debe estar fuera del repositorio, configurado mediante `CYB
 
 ### Estado de verificación
 Pendiente de ejecución CI sobre el último commit de esta serie. La implementación no se considera cerrada hasta que CI pase y se inspeccionen los logs.
+
+
+### Verificación CI de la política inicial
+- Ejecución: https://github.com/Xero-29/CYBER_AI/actions/runs/43279142402
+- Commit probado: `80da9ff06042d3dd0ffae8c15440a45c86191fc5`.
+- Resultado: **success**.
+- Suite: **180 pruebas, OK**.
+- La ejecución valida lógica de autorización y llamadas simuladas; no ejecuta Nuclei real ni demuestra aislamiento de red del sistema operativo.
+- El workflow emitió una advertencia de mantenimiento: `actions/checkout@v4` y `actions/setup-python@v5` usan Node.js 20, cuya compatibilidad está en retirada en los runners. Debe planificarse la actualización de Actions a versiones compatibles con Node.js 24 y volver a validar.
