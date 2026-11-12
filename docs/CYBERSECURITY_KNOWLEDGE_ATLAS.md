@@ -37,6 +37,11 @@ Los niveles describen profundidad editorial, no certifican competencia automáti
 - **secure_arch — Arquitectura segura:** fundamentos, arquitectura, amenazas, mitigaciones, metodología, herramientas, casos, laboratorios locales, evaluación y referencias versionadas.
 - **data_security — Seguridad de datos:** fundamentos, arquitectura, amenazas, mitigaciones, metodología, herramientas, casos, laboratorios locales, evaluación y referencias versionadas.
 
+- **software_engineering — Ingeniería de software y calidad:** Python, packaging, pruebas, CI/CD, análisis estático y calidad de código.
+- **machine_learning — Aprendizaje automático e ingeniería de IA:** PyTorch, scikit-learn, NumPy, SciPy, gestión de riesgo de IA y MITRE ATLAS.
+- **hardware_security — Hardware, firmware y sistemas embebidos:** resiliencia de firmware, Linux kernel, Zephyr e IoT.
+- **mathematics — Matemáticas, estadística y métodos numéricos:** álgebra lineal, estadística, probabilidad y métodos numéricos.
+
 ## Fuentes de referencia iniciales
 - NIST CSF y publicaciones: https://www.nist.gov/cyberframework y https://csrc.nist.gov/publications/sp
 - OWASP, ASVS, WSTG y Cheat Sheets: https://owasp.org/ y https://cheatsheetseries.owasp.org/
@@ -62,3 +67,9 @@ Solo sistemas propios, locales o expresamente autorizados. No ejecutar acciones 
 
 ## Métricas de madurez
 Publicar por separado recursos catalogados, descargados, verificados, ingeridos, indexados y recuperables. Marcar contenido obsoleto y revisar fuentes de vulnerabilidades mensualmente y documentación estable trimestralmente. No afirmar cobertura o conocimiento que no se haya validado.
+
+
+## Estado del catálogo versionado (v1.1.0)
+El catálogo contiene 28 áreas y 98 referencias. Se añadieron 44 referencias en ingeniería de software, aprendizaje automático, hardware/firmware, matemáticas y especialidades de seguridad (ASVS, WSTG, seguridad de API, SLSA, OpenSSF, SBOM, respuesta a incidentes, D3FEND y otras fuentes primarias).
+
+**Importante:** son referencias catalogadas, no conocimiento descargado ni ingerido. Las licencias permanecen como pendientes; no se ha marcado ningún recurso como descargado o verificado. El flujo de adquisición debe comprobar licencia, procedencia, fecha, hash, tamaño y formato antes de ingestión.
