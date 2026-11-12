@@ -11,6 +11,8 @@ import time
 from pathlib import Path
 from urllib.parse import urlparse
 
+from execution_policy import AuthorizationError, authorize_target
+
 
 def validate_target(target):
     """Acepta únicamente URLs HTTP/HTTPS bien formadas."""
@@ -31,14 +33,23 @@ def validate_target(target):
     return target
 
 
-def scan_target(target, timeout=45, authorized=False):
-    """Ejecuta Nuclei solo tras confirmación explícita de autorización."""
+def scan_target(target, timeout=45, authorized=False, authorization_id=None):
+    """Ejecuta Nuclei solo con un permiso local, específico y vigente."""
     target = validate_target(target)
-    if authorized is not True:
+    if authorized is not True or not authorization_id:
         return {
             "target": target,
             "status": "authorization_required",
-            "error": "Confirma autorización explícita antes de ejecutar el escaneo.",
+            "error": "Se requiere confirmación e identificador de autorización.",
+            "findings": [],
+        }
+    try:
+        grant = authorize_target(target, "nuclei_scan", authorization_id)
+    except AuthorizationError as error:
+        return {
+            "target": target,
+            "status": "authorization_denied",
+            "error": str(error),
             "findings": [],
         }
     executable = shutil.which("nuclei")
@@ -66,6 +77,7 @@ def scan_target(target, timeout=45, authorized=False):
         "-stats-interval", "5",
         "-no-interactsh",
         "-disable-update-check",
+        "-disable-redirects",
         "-rl", "2",
         "-c", "2",
         "-timeout", "5",
@@ -152,6 +164,7 @@ def scan_target(target, timeout=45, authorized=False):
 
     return {
         "target": target,
+        "authorization": grant,
         "status": status,
         "return_code": process.returncode,
         "elapsed_seconds": elapsed,
