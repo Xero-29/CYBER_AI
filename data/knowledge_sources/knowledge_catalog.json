@@ -1,6 +1,6 @@
 {
-  "schema_version": "1.0.0",
-  "purpose": "Mapa de conocimiento. Las referencias no implican que el contenido esté descargado, validado o autorizado para redistribución.",
+  "schema_version": "1.1.0",
+  "purpose": "Mapa de conocimiento. Las referencias no implican que el contenido esté descargado, validado o autorizado para redistribución. Las áreas ampliadas incluyen ingeniería de software, aprendizaje automático, hardware/firmware y matemáticas; las nuevas referencias siguen pendientes de revisión de licencia y verificación de descarga.",
   "profiles": [
     "minimal",
     "standard",
@@ -83,6 +83,33 @@
           "license_status": "pending",
           "verified_for_download": false,
           "download": false
+        },
+        {
+          "id": "appsec-owasp-asvs",
+          "url": "https://owasp.org/www-project-application-security-verification-standard/",
+          "resource_type": "reference",
+          "publisher": "owasp.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "appsec-owasp-cheatsheets",
+          "url": "https://cheatsheetseries.owasp.org/",
+          "resource_type": "reference",
+          "publisher": "cheatsheetseries.owasp.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "appsec-owasp-wstg",
+          "url": "https://owasp.org/www-project-web-security-testing-guide/",
+          "resource_type": "reference",
+          "publisher": "owasp.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
         }
       ]
     },
@@ -115,6 +142,24 @@
           "url": "https://openid.net/developers/",
           "resource_type": "reference",
           "publisher": "openid.net",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "api-owasp-api-top10",
+          "url": "https://owasp.org/www-project-api-security/",
+          "resource_type": "reference",
+          "publisher": "owasp.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "api-oauth-security-bcp",
+          "url": "https://www.rfc-editor.org/rfc/rfc9700",
+          "resource_type": "reference",
+          "publisher": "www.rfc-editor.org",
           "license_status": "pending",
           "verified_for_download": false,
           "download": false
@@ -320,6 +365,33 @@
           "license_status": "pending",
           "verified_for_download": false,
           "download": false
+        },
+        {
+          "id": "containers-kubernetes-security",
+          "url": "https://kubernetes.io/docs/concepts/security/",
+          "resource_type": "reference",
+          "publisher": "kubernetes.io",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "containers-docker-security",
+          "url": "https://docs.docker.com/engine/security/",
+          "resource_type": "reference",
+          "publisher": "docs.docker.com",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "containers-trivy-docs",
+          "url": "https://trivy.dev/latest/",
+          "resource_type": "reference",
+          "publisher": "trivy.dev",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
         }
       ]
     },
@@ -460,6 +532,15 @@
           "license_status": "pending",
           "verified_for_download": false,
           "download": false
+        },
+        {
+          "id": "malware-yara-docs",
+          "url": "https://yara.readthedocs.io/en/stable/",
+          "resource_type": "reference",
+          "publisher": "yara.readthedocs.io",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
         }
       ]
     },
@@ -530,6 +611,24 @@
           "license_status": "pending",
           "verified_for_download": false,
           "download": false
+        },
+        {
+          "id": "incident_response-nist-incident-response",
+          "url": "https://csrc.nist.gov/pubs/sp/800/61/r3/final",
+          "resource_type": "reference",
+          "publisher": "csrc.nist.gov",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "incident_response-cisa-incident-response",
+          "url": "https://www.cisa.gov/stopransomware",
+          "resource_type": "reference",
+          "publisher": "www.cisa.gov",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
         }
       ]
     },
@@ -559,6 +658,24 @@
         },
         {
           "id": "threat_intel-ref-2",
+          "url": "https://oasis-open.github.io/cti-documentation/",
+          "resource_type": "reference",
+          "publisher": "oasis-open.github.io",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "threat_intel-mitre-d3fend",
+          "url": "https://d3fend.mitre.org/",
+          "resource_type": "reference",
+          "publisher": "d3fend.mitre.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "threat_intel-stix-taxii",
           "url": "https://oasis-open.github.io/cti-documentation/",
           "resource_type": "reference",
           "publisher": "oasis-open.github.io",
@@ -661,6 +778,42 @@
           "license_status": "pending",
           "verified_for_download": false,
           "download": false
+        },
+        {
+          "id": "devsecops-slsa-spec",
+          "url": "https://slsa.dev/spec/v1.0/",
+          "resource_type": "reference",
+          "publisher": "slsa.dev",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "devsecops-openssf-scorecard",
+          "url": "https://scorecard.dev/",
+          "resource_type": "reference",
+          "publisher": "scorecard.dev",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "devsecops-cyclonedx-spec",
+          "url": "https://cyclonedx.org/specification/overview/",
+          "resource_type": "reference",
+          "publisher": "cyclonedx.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "devsecops-spdx-spec",
+          "url": "https://spdx.dev/specifications/",
+          "resource_type": "reference",
+          "publisher": "spdx.dev",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
         }
       ]
     },
@@ -705,6 +858,24 @@
           "license_status": "pending",
           "verified_for_download": false,
           "download": false
+        },
+        {
+          "id": "ai_security-owasp-llm-top10",
+          "url": "https://owasp.org/www-project-top-10-for-large-language-model-applications/",
+          "resource_type": "reference",
+          "publisher": "owasp.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "ai_security-nist-ai-rmf-playbook",
+          "url": "https://airc.nist.gov/AI_RMF_Knowledge_Base/Playbook",
+          "resource_type": "reference",
+          "publisher": "airc.nist.gov",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
         }
       ]
     },
@@ -737,6 +908,24 @@
           "url": "https://www.cisecurity.org/controls",
           "resource_type": "reference",
           "publisher": "www.cisecurity.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "governance-nist-csf2",
+          "url": "https://www.nist.gov/cyberframework",
+          "resource_type": "reference",
+          "publisher": "www.nist.gov",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "governance-nist-ssdf",
+          "url": "https://csrc.nist.gov/pubs/sp/800/218/final",
+          "resource_type": "reference",
+          "publisher": "csrc.nist.gov",
           "license_status": "pending",
           "verified_for_download": false,
           "download": false
@@ -788,6 +977,33 @@
         {
           "id": "vuln_management-ref-4",
           "url": "https://www.first.org/epss/",
+          "resource_type": "reference",
+          "publisher": "www.first.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "vuln_management-cwe-top25",
+          "url": "https://cwe.mitre.org/top25/",
+          "resource_type": "reference",
+          "publisher": "cwe.mitre.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "vuln_management-epss",
+          "url": "https://www.first.org/epss/",
+          "resource_type": "reference",
+          "publisher": "www.first.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "vuln_management-cvss-v4",
+          "url": "https://www.first.org/cvss/v4.0/",
           "resource_type": "reference",
           "publisher": "www.first.org",
           "license_status": "pending",
@@ -895,6 +1111,254 @@
           "url": "https://cheatsheetseries.owasp.org/",
           "resource_type": "reference",
           "publisher": "cheatsheetseries.owasp.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "software_engineering",
+      "name": "Ingeniería de software y calidad",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "software_engineering-python-library",
+          "url": "https://docs.python.org/3/library/",
+          "resource_type": "reference",
+          "publisher": "docs.python.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "software_engineering-python-packaging",
+          "url": "https://packaging.python.org/en/latest/",
+          "resource_type": "reference",
+          "publisher": "packaging.python.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "software_engineering-pytest-docs",
+          "url": "https://docs.pytest.org/en/stable/",
+          "resource_type": "reference",
+          "publisher": "docs.pytest.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "software_engineering-github-actions-security",
+          "url": "https://docs.github.com/en/actions/security-for-github-actions",
+          "resource_type": "reference",
+          "publisher": "docs.github.com",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "software_engineering-semgrep-docs",
+          "url": "https://semgrep.dev/docs/",
+          "resource_type": "reference",
+          "publisher": "semgrep.dev",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "software_engineering-bandit-docs",
+          "url": "https://bandit.readthedocs.io/en/latest/",
+          "resource_type": "reference",
+          "publisher": "bandit.readthedocs.io",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "machine_learning",
+      "name": "Aprendizaje automático e ingeniería de IA",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "machine_learning-pytorch-docs",
+          "url": "https://docs.pytorch.org/docs/stable/",
+          "resource_type": "reference",
+          "publisher": "docs.pytorch.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "machine_learning-scikit-learn-guide",
+          "url": "https://scikit-learn.org/stable/user_guide.html",
+          "resource_type": "reference",
+          "publisher": "scikit-learn.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "machine_learning-numpy-docs",
+          "url": "https://numpy.org/doc/stable/",
+          "resource_type": "reference",
+          "publisher": "numpy.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "machine_learning-scipy-docs",
+          "url": "https://docs.scipy.org/doc/scipy/",
+          "resource_type": "reference",
+          "publisher": "docs.scipy.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "machine_learning-nist-ai-rmf",
+          "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+          "resource_type": "reference",
+          "publisher": "www.nist.gov",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "machine_learning-mitre-atlas",
+          "url": "https://atlas.mitre.org/",
+          "resource_type": "reference",
+          "publisher": "atlas.mitre.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "hardware_security",
+      "name": "Hardware, firmware y sistemas embebidos",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "hardware_security-nist-platform-firmware",
+          "url": "https://csrc.nist.gov/pubs/sp/800/193/final",
+          "resource_type": "reference",
+          "publisher": "csrc.nist.gov",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "hardware_security-zephyr-docs",
+          "url": "https://docs.zephyrproject.org/latest/",
+          "resource_type": "reference",
+          "publisher": "docs.zephyrproject.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "hardware_security-kernel-docs",
+          "url": "https://docs.kernel.org/",
+          "resource_type": "reference",
+          "publisher": "docs.kernel.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "hardware_security-owasp-istg",
+          "url": "https://owasp.org/www-project-internet-of-things/",
+          "resource_type": "reference",
+          "publisher": "owasp.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "mathematics",
+      "name": "Matemáticas, estadística y métodos numéricos",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "mathematics-mit-linear-algebra",
+          "url": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/",
+          "resource_type": "reference",
+          "publisher": "ocw.mit.edu",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "mathematics-openstax-statistics",
+          "url": "https://openstax.org/details/books/introductory-statistics",
+          "resource_type": "reference",
+          "publisher": "openstax.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "mathematics-scipy-reference",
+          "url": "https://docs.scipy.org/doc/scipy/reference/",
+          "resource_type": "reference",
+          "publisher": "docs.scipy.org",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "mathematics-nist-statistical-handbook",
+          "url": "https://www.itl.nist.gov/div898/handbook/",
+          "resource_type": "reference",
+          "publisher": "www.itl.nist.gov",
           "license_status": "pending",
           "verified_for_download": false,
           "download": false
@@ -1609,6 +2073,578 @@
       "area_id": "data_security",
       "folder": "data_security",
       "filename": "data_security-ref-2.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "software_engineering-python-library",
+      "url": "https://docs.python.org/3/library/",
+      "resource_type": "reference",
+      "publisher": "docs.python.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "software_engineering",
+      "folder": "software_engineering",
+      "filename": "software_engineering-python-library.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "software_engineering-python-packaging",
+      "url": "https://packaging.python.org/en/latest/",
+      "resource_type": "reference",
+      "publisher": "packaging.python.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "software_engineering",
+      "folder": "software_engineering",
+      "filename": "software_engineering-python-packaging.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "software_engineering-pytest-docs",
+      "url": "https://docs.pytest.org/en/stable/",
+      "resource_type": "reference",
+      "publisher": "docs.pytest.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "software_engineering",
+      "folder": "software_engineering",
+      "filename": "software_engineering-pytest-docs.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "software_engineering-github-actions-security",
+      "url": "https://docs.github.com/en/actions/security-for-github-actions",
+      "resource_type": "reference",
+      "publisher": "docs.github.com",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "software_engineering",
+      "folder": "software_engineering",
+      "filename": "software_engineering-github-actions-security.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "software_engineering-semgrep-docs",
+      "url": "https://semgrep.dev/docs/",
+      "resource_type": "reference",
+      "publisher": "semgrep.dev",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "software_engineering",
+      "folder": "software_engineering",
+      "filename": "software_engineering-semgrep-docs.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "software_engineering-bandit-docs",
+      "url": "https://bandit.readthedocs.io/en/latest/",
+      "resource_type": "reference",
+      "publisher": "bandit.readthedocs.io",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "software_engineering",
+      "folder": "software_engineering",
+      "filename": "software_engineering-bandit-docs.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "machine_learning-pytorch-docs",
+      "url": "https://docs.pytorch.org/docs/stable/",
+      "resource_type": "reference",
+      "publisher": "docs.pytorch.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "machine_learning",
+      "folder": "machine_learning",
+      "filename": "machine_learning-pytorch-docs.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "machine_learning-scikit-learn-guide",
+      "url": "https://scikit-learn.org/stable/user_guide.html",
+      "resource_type": "reference",
+      "publisher": "scikit-learn.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "machine_learning",
+      "folder": "machine_learning",
+      "filename": "machine_learning-scikit-learn-guide.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "machine_learning-numpy-docs",
+      "url": "https://numpy.org/doc/stable/",
+      "resource_type": "reference",
+      "publisher": "numpy.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "machine_learning",
+      "folder": "machine_learning",
+      "filename": "machine_learning-numpy-docs.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "machine_learning-scipy-docs",
+      "url": "https://docs.scipy.org/doc/scipy/",
+      "resource_type": "reference",
+      "publisher": "docs.scipy.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "machine_learning",
+      "folder": "machine_learning",
+      "filename": "machine_learning-scipy-docs.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "machine_learning-nist-ai-rmf",
+      "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+      "resource_type": "reference",
+      "publisher": "www.nist.gov",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "machine_learning",
+      "folder": "machine_learning",
+      "filename": "machine_learning-nist-ai-rmf.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "machine_learning-mitre-atlas",
+      "url": "https://atlas.mitre.org/",
+      "resource_type": "reference",
+      "publisher": "atlas.mitre.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "machine_learning",
+      "folder": "machine_learning",
+      "filename": "machine_learning-mitre-atlas.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "hardware_security-nist-platform-firmware",
+      "url": "https://csrc.nist.gov/pubs/sp/800/193/final",
+      "resource_type": "reference",
+      "publisher": "csrc.nist.gov",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "hardware_security",
+      "folder": "hardware_security",
+      "filename": "hardware_security-nist-platform-firmware.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "hardware_security-zephyr-docs",
+      "url": "https://docs.zephyrproject.org/latest/",
+      "resource_type": "reference",
+      "publisher": "docs.zephyrproject.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "hardware_security",
+      "folder": "hardware_security",
+      "filename": "hardware_security-zephyr-docs.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "hardware_security-kernel-docs",
+      "url": "https://docs.kernel.org/",
+      "resource_type": "reference",
+      "publisher": "docs.kernel.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "hardware_security",
+      "folder": "hardware_security",
+      "filename": "hardware_security-kernel-docs.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "hardware_security-owasp-istg",
+      "url": "https://owasp.org/www-project-internet-of-things/",
+      "resource_type": "reference",
+      "publisher": "owasp.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "hardware_security",
+      "folder": "hardware_security",
+      "filename": "hardware_security-owasp-istg.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "mathematics-mit-linear-algebra",
+      "url": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/",
+      "resource_type": "reference",
+      "publisher": "ocw.mit.edu",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "mathematics",
+      "folder": "mathematics",
+      "filename": "mathematics-mit-linear-algebra.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "mathematics-openstax-statistics",
+      "url": "https://openstax.org/details/books/introductory-statistics",
+      "resource_type": "reference",
+      "publisher": "openstax.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "mathematics",
+      "folder": "mathematics",
+      "filename": "mathematics-openstax-statistics.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "mathematics-scipy-reference",
+      "url": "https://docs.scipy.org/doc/scipy/reference/",
+      "resource_type": "reference",
+      "publisher": "docs.scipy.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "mathematics",
+      "folder": "mathematics",
+      "filename": "mathematics-scipy-reference.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "mathematics-nist-statistical-handbook",
+      "url": "https://www.itl.nist.gov/div898/handbook/",
+      "resource_type": "reference",
+      "publisher": "www.itl.nist.gov",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "mathematics",
+      "folder": "mathematics",
+      "filename": "mathematics-nist-statistical-handbook.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "appsec-owasp-asvs",
+      "url": "https://owasp.org/www-project-application-security-verification-standard/",
+      "resource_type": "reference",
+      "publisher": "owasp.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "appsec",
+      "folder": "appsec",
+      "filename": "appsec-owasp-asvs.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "appsec-owasp-cheatsheets",
+      "url": "https://cheatsheetseries.owasp.org/",
+      "resource_type": "reference",
+      "publisher": "cheatsheetseries.owasp.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "appsec",
+      "folder": "appsec",
+      "filename": "appsec-owasp-cheatsheets.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "appsec-owasp-wstg",
+      "url": "https://owasp.org/www-project-web-security-testing-guide/",
+      "resource_type": "reference",
+      "publisher": "owasp.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "appsec",
+      "folder": "appsec",
+      "filename": "appsec-owasp-wstg.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "api-owasp-api-top10",
+      "url": "https://owasp.org/www-project-api-security/",
+      "resource_type": "reference",
+      "publisher": "owasp.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "api",
+      "folder": "api",
+      "filename": "api-owasp-api-top10.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "api-oauth-security-bcp",
+      "url": "https://www.rfc-editor.org/rfc/rfc9700",
+      "resource_type": "reference",
+      "publisher": "www.rfc-editor.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "api",
+      "folder": "api",
+      "filename": "api-oauth-security-bcp.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "containers-kubernetes-security",
+      "url": "https://kubernetes.io/docs/concepts/security/",
+      "resource_type": "reference",
+      "publisher": "kubernetes.io",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "containers",
+      "folder": "containers",
+      "filename": "containers-kubernetes-security.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "containers-docker-security",
+      "url": "https://docs.docker.com/engine/security/",
+      "resource_type": "reference",
+      "publisher": "docs.docker.com",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "containers",
+      "folder": "containers",
+      "filename": "containers-docker-security.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "containers-trivy-docs",
+      "url": "https://trivy.dev/latest/",
+      "resource_type": "reference",
+      "publisher": "trivy.dev",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "containers",
+      "folder": "containers",
+      "filename": "containers-trivy-docs.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "devsecops-slsa-spec",
+      "url": "https://slsa.dev/spec/v1.0/",
+      "resource_type": "reference",
+      "publisher": "slsa.dev",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "devsecops",
+      "folder": "devsecops",
+      "filename": "devsecops-slsa-spec.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "devsecops-openssf-scorecard",
+      "url": "https://scorecard.dev/",
+      "resource_type": "reference",
+      "publisher": "scorecard.dev",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "devsecops",
+      "folder": "devsecops",
+      "filename": "devsecops-openssf-scorecard.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "devsecops-cyclonedx-spec",
+      "url": "https://cyclonedx.org/specification/overview/",
+      "resource_type": "reference",
+      "publisher": "cyclonedx.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "devsecops",
+      "folder": "devsecops",
+      "filename": "devsecops-cyclonedx-spec.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "devsecops-spdx-spec",
+      "url": "https://spdx.dev/specifications/",
+      "resource_type": "reference",
+      "publisher": "spdx.dev",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "devsecops",
+      "folder": "devsecops",
+      "filename": "devsecops-spdx-spec.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "malware-yara-docs",
+      "url": "https://yara.readthedocs.io/en/stable/",
+      "resource_type": "reference",
+      "publisher": "yara.readthedocs.io",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "malware",
+      "folder": "malware",
+      "filename": "malware-yara-docs.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "incident_response-nist-incident-response",
+      "url": "https://csrc.nist.gov/pubs/sp/800/61/r3/final",
+      "resource_type": "reference",
+      "publisher": "csrc.nist.gov",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "incident_response",
+      "folder": "incident_response",
+      "filename": "incident_response-nist-incident-response.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "incident_response-cisa-incident-response",
+      "url": "https://www.cisa.gov/stopransomware",
+      "resource_type": "reference",
+      "publisher": "www.cisa.gov",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "incident_response",
+      "folder": "incident_response",
+      "filename": "incident_response-cisa-incident-response.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "threat_intel-mitre-d3fend",
+      "url": "https://d3fend.mitre.org/",
+      "resource_type": "reference",
+      "publisher": "d3fend.mitre.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "threat_intel",
+      "folder": "threat_intel",
+      "filename": "threat_intel-mitre-d3fend.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "threat_intel-stix-taxii",
+      "url": "https://oasis-open.github.io/cti-documentation/",
+      "resource_type": "reference",
+      "publisher": "oasis-open.github.io",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "threat_intel",
+      "folder": "threat_intel",
+      "filename": "threat_intel-stix-taxii.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "ai_security-owasp-llm-top10",
+      "url": "https://owasp.org/www-project-top-10-for-large-language-model-applications/",
+      "resource_type": "reference",
+      "publisher": "owasp.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "ai_security",
+      "folder": "ai_security",
+      "filename": "ai_security-owasp-llm-top10.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "ai_security-nist-ai-rmf-playbook",
+      "url": "https://airc.nist.gov/AI_RMF_Knowledge_Base/Playbook",
+      "resource_type": "reference",
+      "publisher": "airc.nist.gov",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "ai_security",
+      "folder": "ai_security",
+      "filename": "ai_security-nist-ai-rmf-playbook.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "governance-nist-csf2",
+      "url": "https://www.nist.gov/cyberframework",
+      "resource_type": "reference",
+      "publisher": "www.nist.gov",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "governance",
+      "folder": "governance",
+      "filename": "governance-nist-csf2.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "governance-nist-ssdf",
+      "url": "https://csrc.nist.gov/pubs/sp/800/218/final",
+      "resource_type": "reference",
+      "publisher": "csrc.nist.gov",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "governance",
+      "folder": "governance",
+      "filename": "governance-nist-ssdf.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "vuln_management-cwe-top25",
+      "url": "https://cwe.mitre.org/top25/",
+      "resource_type": "reference",
+      "publisher": "cwe.mitre.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "vuln_management",
+      "folder": "vuln_management",
+      "filename": "vuln_management-cwe-top25.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "vuln_management-epss",
+      "url": "https://www.first.org/epss/",
+      "resource_type": "reference",
+      "publisher": "www.first.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "vuln_management",
+      "folder": "vuln_management",
+      "filename": "vuln_management-epss.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "vuln_management-cvss-v4",
+      "url": "https://www.first.org/cvss/v4.0/",
+      "resource_type": "reference",
+      "publisher": "www.first.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "vuln_management",
+      "folder": "vuln_management",
+      "filename": "vuln_management-cvss-v4.txt",
       "max_bytes": 10485760
     }
   ]
