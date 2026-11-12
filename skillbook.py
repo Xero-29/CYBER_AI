@@ -3,6 +3,7 @@
 import json, re, sqlite3, uuid
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import urlparse
 PROJECT=Path(__file__).resolve().parent
 DB_PATH=PROJECT/"data"/"skillbook.sqlite3"
 def now(): return datetime.now(timezone.utc).isoformat()
@@ -34,7 +35,21 @@ def register_verified_skill(*,name,task_pattern,description,prerequisites,method
     prerequisites=_list(prerequisites,"prerequisites",0); methodology=_list(methodology,"methodology",2)
     validation=_list(validation,"validation"); tools=_list(tools,"tools",0); tags=_list(tags,"tags")
     evidence=_list(evidence,"evidence"); source_urls=_list(source_urls,"source_urls")
-    if any(not re.match(r"^https?://[^\\s/]+",u) for u in source_urls): raise ValueError("URL de fuente inválida.")
+    for source_url in source_urls:
+        parsed = urlparse(source_url)
+        try:
+            valid_port = parsed.port is None or 1 <= parsed.port <= 65535
+        except ValueError:
+            valid_port = False
+        if (
+            parsed.scheme not in {"http", "https"}
+            or not parsed.hostname
+            or parsed.username
+            or parsed.password
+            or any(character.isspace() for character in source_url)
+            or not valid_port
+        ):
+            raise ValueError("URL de fuente inválida.")
     if isinstance(success_runs,bool) or not isinstance(success_runs,int) or success_runs<2: raise ValueError("Se requieren dos ejecuciones exitosas independientes.")
     if isinstance(failure_runs,bool) or not isinstance(failure_runs,int) or failure_runs!=0: raise ValueError("No debe haber fallos sin resolver.")
     initialize(); stamp=now(); sid=uuid.uuid4().hex
