@@ -2,6 +2,7 @@
 
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 import knowledge_library as library
@@ -150,6 +151,36 @@ class TestKnowledgeLibrary(unittest.TestCase):
             top_k=10,
         )
         self.assertEqual(results, [])
+
+    def test_oversized_fragment_is_rejected_before_storage(self):
+        with patch.object(library, "MAX_CHUNK_BYTES", 3):
+            with self.assertRaisesRegex(ValueError, "2 MiB"):
+                self.store("Grande", "cuatro", [1.0, 0.0])
+
+    def test_read_rejects_oversized_declared_content_before_decompression(self):
+        saved = self.store("Documento", "contenido válido", [1.0, 0.0])
+        library.initialize()
+        with library.database() as db:
+            db.execute(
+                "UPDATE knowledge_chunks SET original_bytes = ? WHERE id = ?",
+                (library.MAX_CHUNK_BYTES + 1, saved["id"]),
+            )
+        with self.assertRaisesRegex(ValueError, "tamaño declarado"):
+            library.read_chunk(saved["id"])
+
+    def test_search_rejects_malformed_filters(self):
+        with self.assertRaisesRegex(ValueError, "categories"):
+            library.search_knowledge(
+                query_embedding=[1.0, 0.0],
+                embedding_model="test-embeddings",
+                categories="linux",
+            )
+        with self.assertRaisesRegex(ValueError, "min_score"):
+            library.search_knowledge(
+                query_embedding=[1.0, 0.0],
+                embedding_model="test-embeddings",
+                min_score="invalid",
+            )
 
     def test_invalid_embedding_is_rejected(self):
         with self.assertRaises(ValueError):

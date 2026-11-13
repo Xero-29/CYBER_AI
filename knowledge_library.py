@@ -19,6 +19,7 @@ from pathlib import Path
 
 PROJECT = Path(__file__).resolve().parent
 DB_PATH = PROJECT / "data" / "knowledge_library.sqlite3"
+MAX_CHUNK_BYTES = 2 * 1024 * 1024
 
 
 def utc_now():
@@ -200,6 +201,8 @@ def _prepare_chunk(chunk):
 
     vector = validate_vector(chunk.get("embedding"))
     original = content.encode("utf-8")
+    if len(original) > MAX_CHUNK_BYTES:
+        raise ValueError("El fragmento supera el límite de 2 MiB.")
     compressed = zlib.compress(original, level=9)
     digest = hashlib.sha256(original).hexdigest()
     chunk_id = uuid.uuid4().hex
@@ -267,10 +270,26 @@ def read_chunk(chunk_id, tenant_id=None):
     if row is None:
         raise KeyError("Fragmento inexistente o no autorizado.")
 
+    if (
+        row["original_bytes"] < 0
+        or row["original_bytes"] > MAX_CHUNK_BYTES
+        or row["compressed_bytes"] < 0
+        or len(row["content_z"]) != row["compressed_bytes"]
+    ):
+        raise ValueError("El tamaño declarado del fragmento no es válido.")
+
     try:
-        original = zlib.decompress(row["content_z"])
+        decompressor = zlib.decompressobj()
+        original = decompressor.decompress(row["content_z"], MAX_CHUNK_BYTES + 1)
     except zlib.error as error:
         raise ValueError("El fragmento comprimido está dañado.") from error
+    if (
+        len(original) > MAX_CHUNK_BYTES
+        or decompressor.unconsumed_tail
+        or decompressor.unused_data
+        or not decompressor.eof
+    ):
+        raise ValueError("El fragmento comprimido excede los límites o está incompleto.")
 
     if hashlib.sha256(original).hexdigest() != row["content_sha256"]:
         raise ValueError("La comprobación SHA-256 del fragmento ha fallado.")
@@ -320,10 +339,24 @@ def search_knowledge(
 
     if not isinstance(embedding_model, str) or not embedding_model.strip():
         raise ValueError("embedding_model es obligatorio.")
+    embedding_model = embedding_model.strip()
 
-    top_k = max(1, min(int(top_k), 50))
-    if not math.isfinite(float(min_score)) or min_score < -1 or min_score > 1:
-        raise ValueError("min_score debe estar entre -1 y 1.")
+    if isinstance(top_k, bool) or not isinstance(top_k, int):
+        raise ValueError("top_k debe ser un entero.")
+    top_k = max(1, min(top_k, 50))
+    if (
+        isinstance(min_score, bool)
+        or not isinstance(min_score, (int, float))
+        or not math.isfinite(float(min_score))
+        or min_score < -1
+        or min_score > 1
+    ):
+        raise ValueError("min_score debe ser un número entre -1 y 1.")
+    min_score = float(min_score)
+    if tenant_id is not None and (
+        not isinstance(tenant_id, str) or not tenant_id.strip()
+    ):
+        raise ValueError("tenant_id debe ser texto no vacío.")
 
     query = """
         SELECT id, embedding_json, embedding_dimensions, tags_json
@@ -345,7 +378,13 @@ def search_knowledge(
         """
         parameters = [embedding_model]
 
-    categories = list(dict.fromkeys(categories or []))
+    if categories is None:
+        categories = []
+    elif isinstance(categories, str) or not isinstance(categories, (list, tuple)):
+        raise ValueError("categories debe ser una lista de categorías.")
+    if any(not isinstance(category, str) or not category.strip() for category in categories):
+        raise ValueError("Cada categoría debe ser texto no vacío.")
+    categories = list(dict.fromkeys(category.strip() for category in categories))
     if categories:
         placeholders = ",".join("?" for _ in categories)
         query += f" AND category IN ({placeholders})"
@@ -357,7 +396,7 @@ def search_knowledge(
         raise ValueError("tags debe ser una lista de etiquetas.")
     if any(not isinstance(tag, str) or not tag.strip() for tag in tags):
         raise ValueError("Cada etiqueta debe ser texto no vacío.")
-    tags = list(dict.fromkeys(tags))
+    tags = list(dict.fromkeys(tag.strip() for tag in tags))
 
     initialize()
     with database() as db:

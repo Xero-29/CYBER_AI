@@ -10,7 +10,7 @@ Instala los extras documentales con:
 pip install -r requirements-documents.txt
 ```
 
-El extractor aplica límites de 100 MiB por archivo, 256 MiB de expansión para paquetes Office, 10.000 entradas ZIP, ratio de compresión máximo de 500, 200.000 filas para CSV/XLSX, 5.000 páginas/diapositivas y 10 millones de caracteres extraídos.
+Cada fragmento almacenado está limitado a 2 MiB y la lectura de datos comprimidos está acotada para evitar expansiones descontroladas. El extractor aplica límites de 100 MiB por archivo, 256 MiB de expansión para paquetes Office, 10.000 entradas ZIP, ratio de compresión máximo de 500, 200.000 filas para CSV/XLSX, 5.000 páginas/diapositivas y 10 millones de caracteres extraídos.
 
 La generación de embeddings se completa por lotes antes de publicar los fragmentos. Si un lote falla, el documento no deja una importación parcial visible en la biblioteca; el guardado final de los fragmentos es una sola transacción SQLite.
 

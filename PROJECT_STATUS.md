@@ -16,7 +16,7 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 - Sandbox Docker endurecido; comparte kernel y no es aislamiento para malware hostil.
 - Atlas de 28 áreas y 98 referencias catalogadas, no corpus completo ingerido.
 - Biblioteca SQLite con fragmentos comprimidos, SHA-256, metadatos, separación shared/tenant y búsqueda semántica.
-- Ingestión transaccional (publicación de todos los fragmentos en una única transacción) de TXT/Markdown, HTML, CSV, JSON/JSONL y código; extractores opcionales PDF/DOCX/XLSX/PPTX con límites de tamaño y expansión ZIP. OCR de PDF escaneado y ejecución aislada de extractores siguen pendientes. Catálogo, descubrimiento y downloader con controles.
+- Ingestión transaccional (publicación de todos los fragmentos en una única transacción), límite de 2 MiB por fragmento y descompresión acotada de TXT/Markdown, HTML, CSV, JSON/JSONL y código; extractores opcionales PDF/DOCX/XLSX/PPTX con límites de tamaño y expansión ZIP. OCR de PDF escaneado y ejecución aislada de extractores siguen pendientes. Catálogo, descubrimiento y downloader con controles.
 - Reindexación con staging, backup y publicación transaccional.
 - Proveedores Ollama, OpenAI-compatible, Anthropic chat y Gemini chat/embeddings.
 - Skillbook con búsqueda y metodologías; se añade promoción basada en dos eventos independientes del ledger íntegro y firma HMAC VERITAS. La clave sigue siendo un secreto operativo externo, no una identidad de modelo.

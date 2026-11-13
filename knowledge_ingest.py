@@ -317,18 +317,18 @@ def ingest_document(
             index = start + offset
 
             pending_chunks.append({
-                title=title,
-                source=source,
-                license=license,
-                category=category,
-                content=chunk,
-                embedding=vector,
-                embedding_model=result.get("embedding_space", result["model"]),
-                document_id=document_id,
-                chunk_index=index,
-                tags=tags,
-                visibility=visibility,
-                tenant_id=tenant_id,
+                "title": title,
+                "source": source,
+                "license": license,
+                "category": category,
+                "content": chunk,
+                "embedding": vector,
+                "embedding_model": result.get("embedding_space", result["model"]),
+                "document_id": document_id,
+                "chunk_index": index,
+                "tags": tags,
+                "visibility": visibility,
+                "tenant_id": tenant_id,
             })
 
         print(
@@ -351,7 +351,7 @@ def ingest_document(
         "visibility": visibility,
         "tenant_id": tenant_id,
         "chunks": len(stored),
-        "chunk_ids": [item["id"] for item in stored],
+        "chunk_ids": stored,
     }
 
 
