@@ -73,4 +73,25 @@ python tool_executor.py --tool semgrep --target . --config config/semgrep.yml
 
 ## Límites de seguridad pendientes
 
-Estos adaptadores evitan invocación por shell y acotan tiempo/salida/rutas, pero **todavía no ejecutan los binarios dentro de un sandbox del sistema operativo**. No deben procesar repositorios hostiles o muestras de malware en una máquina con privilegios. Antes de uso institucional se requiere contenedor/namespace sin privilegios, filesystem de solo lectura, red deshabilitada por defecto, límites CPU/RAM/PID, firma/verificación de binarios y registro inmutable. La versión de cada binario aún debe incorporarse al manifiesto de evidencia.
+Los adaptadores locales por sí solos no constituyen un sandbox del sistema operativo. Para ejecuciones aisladas se añadió `sandbox_runner.py` y `sandbox/Dockerfile`; no se debe usar el modo local directo con repositorios hostiles o muestras de malware.
+
+
+## Sandbox Docker en GitHub Actions
+
+**Implementado en la rama `codex/security-integrity-audit`:**
+
+- `sandbox_runner.py` invoca Docker con argumentos separados, sin shell.
+- El contenedor usa `--network=none`, `--read-only`, `--cap-drop=ALL`, `no-new-privileges`, usuario UID/GID 65532, límites de 1 GiB RAM, 2 CPU y 128 procesos, y `/tmp` como tmpfs pequeño sin ejecución.
+- El repositorio se monta en `/workspace` en solo lectura. La única ruta escribible montada es el directorio externo de evidencias en `/evidence`.
+- No se monta el socket Docker, no se usa `--privileged`, no se pasan secretos al contenedor y las herramientas con política de red quedan denegadas.
+- `.github/workflows/docker-sandbox.yml` construye la imagen y ejecuta pruebas unitarias más un smoke test de Ruff en GitHub-hosted runner efímero. El workflow tiene `contents: read`, checkout sin persistir credenciales y timeout de job.
+- La imagen contiene versiones fijadas de Ruff y Bandit. Semgrep, Syft y Trivy aún no están incluidos en esta imagen; sus adaptadores locales existentes no se vuelven automáticamente ejecutables dentro del contenedor.
+
+Ejemplo:
+
+```bash
+docker build -t cyber-ai-tool-sandbox:local -f sandbox/Dockerfile .
+python sandbox_runner.py --tool ruff --target tests/fixtures/sandbox_sample.py --execute
+```
+
+**Límites importantes:** Docker reduce la exposición, pero comparte el kernel del runner y no equivale a una microVM. GitHub-hosted runner efímero es una frontera razonable para pruebas y análisis benignos, no una garantía contra exploits del kernel o muestras deliberadamente hostiles. Para malware o entradas adversariales se requiere una VM/microVM desechable, con destrucción posterior y sin credenciales. La imagen base usa actualmente una etiqueta de versión, no un digest; antes de uso institucional hay que fijar digest y verificar procedencia/checksums de la cadena de herramientas. No se afirma aislamiento fuerte ni ejecución de todos los adaptadores.
