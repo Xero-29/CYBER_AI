@@ -44,7 +44,7 @@ python tool_registry.py "descubrimiento de red y puertos"
 
 **Implementado:** inventario declarativo de 20 herramientas, detección de disponibilidad, selección explicable de candidatos y pruebas unitarias.
 
-**No implementado todavía:** adaptadores de ejecución para Semgrep, Bandit, Ruff, pip-audit, OSV-Scanner, Trivy, Grype, Syft, Checkov, Gitleaks, detect-secrets, Hadolint, ShellCheck, actionlint, kube-linter, YARA, TShark, Zeek y Volatility. Su presencia en el catálogo no implica que estén instaladas ni que CYBER_AI ya pueda ejecutarlas.
+**Adaptadores locales implementados:** Semgrep, Bandit, Ruff, Syft y Trivy. **Pendientes:** pip-audit, OSV-Scanner, Grype, Checkov, Gitleaks, detect-secrets, Hadolint, ShellCheck, actionlint, kube-linter, YARA, TShark, Zeek y Volatility. Que estén catalogadas no implica que estén instaladas ni que puedan ejecutarse.
 
 **Próximo paso:** adaptadores pequeños y tipados, cada uno con esquema de entrada/salida, timeout, límites de salida, allowlist de rutas, versión, registro de evidencia y pruebas con binarios simulados. Integrarlos al motor de autorización sin permitir que el modelo construya comandos shell arbitrarios.
 
@@ -81,7 +81,7 @@ Los adaptadores locales por sí solos no constituyen un sandbox del sistema oper
 **Implementado en la rama `codex/security-integrity-audit`:**
 
 - `sandbox_runner.py` invoca Docker con argumentos separados, sin shell.
-- El contenedor usa `--network=none`, `--read-only`, `--cap-drop=ALL`, `no-new-privileges`, usuario UID/GID 65532, límites de 1 GiB RAM, 2 CPU y 128 procesos, y `/tmp` como tmpfs pequeño sin ejecución.
+- El contenedor usa `--network=none`, `--read-only`, `--cap-drop=ALL`, `no-new-privileges`, usuario no root con el UID/GID del operador (la imagen tiene UID/GID predeterminado 65532), límites de 1 GiB RAM, 2 CPU y 128 procesos, y `/tmp` como tmpfs pequeño sin ejecución.
 - El repositorio se monta en `/workspace` en solo lectura. La única ruta escribible montada es el directorio externo de evidencias en `/evidence`.
 - No se monta el socket Docker, no se usa `--privileged`, no se pasan secretos al contenedor y las herramientas con política de red quedan denegadas.
 - `.github/workflows/docker-sandbox.yml` construye la imagen y ejecuta pruebas unitarias más un smoke test de Ruff en GitHub-hosted runner efímero. El workflow tiene `contents: read`, checkout sin persistir credenciales y timeout de job.
