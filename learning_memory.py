@@ -150,7 +150,7 @@ def _verified_ledger_evidence(namespace, event_ids, ledger=None):
         if not validators or any(not isinstance(value, dict) for value in validators):
             raise ValueError("Cada ejecución debe incluir validadores estructurados.")
         if not _has_independent_review(item):
-            raise ValueError("Cada ejecución debe proceder de team_orchestrator con una revisión independiente aprobada.")
+            raise ValueError("Cada ejecución requiere un validador independiente aprobado emitido por team_orchestrator.")
         if not re.fullmatch(r"[a-f0-9]{64}", str(item.get("evidence_sha256", ""))):
             raise ValueError("Evento sin hash de evidencia válido.")
 

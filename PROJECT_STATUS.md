@@ -1,7 +1,8 @@
 # Estado real y plan de cierre de CYBER_AI
 
 **Actualizado:** 2026-11-13  
-**Rama:** codex/security-integrity-audit  
+**Rama:** codex/security-integrity-audit
+**CI:** Actions fijadas por SHA, checkout v5/setup-python v6/upload-artifact v5 (Node 24)  
 **Base:** main (sin merge ni despliegue)
 
 ## Avance de esta iteración
@@ -24,7 +25,7 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 - Dependencias base fijadas en `requirements.lock` para instalaciones repetibles (sin hashes de artefactos; la verificación de procedencia/hash queda pendiente).
 - `preflight.py` para revisar dependencias, configuración, herramientas opcionales y ledger local sin iniciar servicios ni usar red.
 - CLI `ledger_cli.py` para verificar integridad, listar namespaces y consultar historial.
-- Ledger de ejecuciones: integrado con `agent_runner.py`, `tool_executor.py`, `nuclei_scanner.py` y `task_runner.py` para registrar respuestas, ejecuciones locales, timeouts y denegaciones. La escritura del ledger emite una advertencia si falla y no oculta el resultado original. El ciclo de Skills autónomas y el almacenamiento externo WORM siguen pendientes.
+- Ledger de ejecuciones: integrado con `agent_runner.py`, `tool_executor.py`, `nuclei_scanner.py`, `task_runner.py` y `team_orchestrator.py` para registrar respuestas, ejecuciones locales, timeouts, denegaciones y revisiones objetivas independientes. `agent_runner` marca la autocompletitud como no independiente. La escritura del ledger emite una advertencia si falla y no oculta el resultado original. El ciclo de Skills autónomas y el almacenamiento externo WORM siguen pendientes.
 
 ## Pendientes de cierre
 
