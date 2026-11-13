@@ -46,6 +46,8 @@ python cyber_ai.py --self-test
 python -m compileall -q .
 python -m unittest discover -s tests -v
 python preflight.py
+# O, en una sola ejecución local:
+bash verify.sh
 ```
 
 El preflight revisa Python, archivos, dependencias, herramientas opcionales y la integridad del ledger existente; no inicia servicios ni realiza llamadas de red. Las advertencias de Docker/Ollama/escáneres son opcionales según las funciones que quieras probar.
