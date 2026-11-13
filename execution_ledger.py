@@ -11,8 +11,24 @@ from pathlib import Path
 PROJECT = Path(__file__).resolve().parent
 DEFAULT_DB = PROJECT / "data" / "execution_ledger.sqlite3"
 GENESIS = "0" * 64
-SECRET_KEY = re.compile(r"(?:api[_-]?key|authorization|password|secret|token|credential)", re.I)
 MAX_FIELD = 16384
+SECRET_KEY = re.compile(r"(?:api[_-]?key|authorization|password|secret|token|credential)", re.I)
+SECRET_ASSIGNMENT = re.compile(
+    r"""(?i)\b(api[_-]?key|access[_-]?token|refresh[_-]?token|password|passwd|secret|client[_-]?secret)\b\s*([:=])\s*("[^"]*"|'[^']*'|[^\s,;]+)"""
+)
+BEARER_TOKEN = re.compile(r"(?i)\bBearer\s+[A-Za-z0-9._~+/=-]+")
+PRIVATE_KEY = re.compile(
+    r"-----BEGIN [^-]*PRIVATE KEY-----.*?-----END [^-]*PRIVATE KEY-----", re.S
+)
+URL_CREDENTIALS = re.compile(r"(?i)(https?://)[^/@\s:]+:[^/@\s]+@")
+
+
+def _redact_text(value):
+    value = PRIVATE_KEY.sub("[REDACTED PRIVATE KEY]", str(value))
+    value = BEARER_TOKEN.sub("Bearer [REDACTED]", value)
+    value = SECRET_ASSIGNMENT.sub(r"\1\2[REDACTED]", value)
+    return URL_CREDENTIALS.sub(r"\1[REDACTED]@", value)
+
 
 
 class LedgerError(ValueError):
@@ -29,7 +45,7 @@ def _clean(value, key=""):
     if value is None or isinstance(value, (bool, int, float)):
         return value
     if isinstance(value, str):
-        return value[:MAX_FIELD]
+        return _redact_text(value[:MAX_FIELD])
     if isinstance(value, list):
         return [_clean(item) for item in value[:500]]
     if isinstance(value, dict):
@@ -106,7 +122,7 @@ class ExecutionLedger:
         evidence_hash = hashlib.sha256(_canonical(_clean(evidence)).encode()).hexdigest()
         validators = _clean(validator_results or [])
         safe_metadata = _clean(metadata or {})
-        task = task.strip()[:MAX_FIELD]
+        task = _redact_text(task.strip()[:MAX_FIELD])
         fingerprint = hashlib.sha256(task.casefold().encode()).hexdigest()
         event_id = event_id or uuid.uuid4().hex
         created_at = datetime.now(timezone.utc).isoformat()
@@ -121,8 +137,8 @@ class ExecutionLedger:
                 "event_id": event_id, "created_at": created_at,
                 "namespace": namespace.strip(), "task_fingerprint": fingerprint,
                 "task": task, "status": status, "tool": tool.strip(),
-                "tool_version": str(tool_version)[:256], "model": str(model)[:256],
-                "environment": str(environment)[:512], "duration_ms": duration_ms,
+                "tool_version": _redact_text(str(tool_version)[:256]), "model": _redact_text(str(model)[:256]),
+                "environment": _redact_text(str(environment)[:512]), "duration_ms": duration_ms,
                 "cost_microunits": cost_microunits, "evidence_sha256": evidence_hash,
                 "validator_results": validators, "metadata": safe_metadata,
                 "previous_hash": previous_hash,

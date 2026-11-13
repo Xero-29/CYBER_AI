@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from execution_ledger import ExecutionLedger, LedgerError
+from execution_ledger import ExecutionLedger, LedgerError, _redact_text
 
 
 class ExecutionLedgerTests(unittest.TestCase):
@@ -47,6 +47,15 @@ class ExecutionLedgerTests(unittest.TestCase):
         result = self.ledger.verify()
         self.assertFalse(result["valid"])
         self.assertEqual(result["failed_sequence"], 1)
+
+    def test_secrets_are_redacted_from_free_text(self):
+        value = _redact_text(
+            "Authorization: Bearer abc123 api_key='super secret' "
+            "https://alice:password@example.com/private"
+        )
+        for secret in ("abc123", "super secret", "alice:password"):
+            self.assertNotIn(secret, value)
+        self.assertIn("[REDACTED]", value)
 
     def test_validation(self):
         with self.assertRaises(LedgerError):
