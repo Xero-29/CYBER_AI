@@ -209,14 +209,21 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
     return evidence
 
 
-def write_evidence(evidence, output_dir="reports/tool_evidence"):
+def write_evidence(evidence, output_dir="reports/tool_evidence", *, allow_external=False):
     raw = Path(output_dir)
     if not raw.is_absolute():
         raw = PROJECT_ROOT / raw
     raw.mkdir(parents=True, exist_ok=True)
-    destination = _confined_path(raw)
-    if not destination.is_dir():
-        raise ToolExecutionError("El destino de evidencias debe ser un directorio.")
+    if allow_external:
+        if raw.is_symlink():
+            raise ToolExecutionError("El destino externo de evidencias no puede ser un enlace simbólico.")
+        destination = raw.resolve(strict=True)
+        if not destination.is_dir():
+            raise ToolExecutionError("El destino de evidencias debe ser un directorio.")
+    else:
+        destination = _confined_path(raw)
+        if not destination.is_dir():
+            raise ToolExecutionError("El destino de evidencias debe ser un directorio.")
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     path = destination / (evidence["tool"] + "_" + stamp + ".json")
     path.write_text(json.dumps(evidence, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
