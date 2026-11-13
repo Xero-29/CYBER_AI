@@ -6,6 +6,8 @@ propietarios; los proveedores OpenAI-compatible usan la API HTTP estándar.
 import ipaddress
 import json
 import os
+from functools import lru_cache
+from importlib.metadata import entry_points
 from urllib.parse import urlsplit
 from urllib.request import HTTPRedirectHandler, build_opener
 from urllib.request import Request
@@ -22,6 +24,23 @@ class _NoRedirect(HTTPRedirectHandler):
 _HTTP_OPENER = build_opener(_NoRedirect)
 
 
+@lru_cache(maxsize=32)
+def _load_provider_plugin(protocol):
+    """Carga solo plugins instalados y declarados en cyber_ai.providers."""
+    matches = [item for item in entry_points(group="cyber_ai.providers")
+               if item.name == protocol]
+    if not matches:
+        return None
+    if len(matches) != 1:
+        raise RuntimeError(f"Hay varios plugins instalados para el protocolo {protocol}.")
+    adapter = matches[0].load()
+    if not callable(getattr(adapter, "request", None)):
+        raise RuntimeError(
+            f"El plugin {protocol} debe exponer request(provider, endpoint, payload, timeout)."
+        )
+    return adapter
+
+
 def resolve_provider(config, agent):
     registry = config.get("llm_providers", {})
     name = agent.get("provider") or config.get("default_provider") or "ollama"
@@ -31,9 +50,12 @@ def resolve_provider(config, agent):
     result = dict(item)
     result["name"] = name
     protocol = result.get("protocol")
-    if protocol not in {"ollama", "openai", "anthropic", "gemini"}:
+    builtin = protocol in {"ollama", "openai", "anthropic", "gemini"}
+    if not builtin and _load_provider_plugin(protocol) is None:
         raise ValueError(f"Protocolo de proveedor no soportado: {protocol}")
     base_url = result.get("base_url", "")
+    if not base_url and not builtin:
+        return result
     if not isinstance(base_url, str):
         raise ValueError(f"base_url inválida para el proveedor {name}.")
     try:
@@ -245,12 +267,42 @@ def request(provider, endpoint, payload=None, timeout=600):
         return _anthropic_request(provider, endpoint, payload or {}, timeout)
     if protocol == "gemini":
         return _gemini_request(provider, endpoint, payload or {}, timeout)
+    adapter = _load_provider_plugin(protocol)
+    if adapter is not None:
+        return adapter.request(provider, endpoint, payload or {}, timeout)
     raise ValueError(f"Protocolo no compatible: {protocol}")
 
 
+def provider_capabilities(provider):
+    """Devuelve capacidades declaradas por el adaptador del proveedor."""
+    protocol = provider.get("protocol")
+    builtins = {
+        "ollama": {"chat", "embeddings", "model_listing"},
+        "openai": {"chat", "embeddings", "model_listing"},
+        "anthropic": {"chat"},
+        "gemini": {"chat", "embeddings"},
+    }
+    if protocol in builtins:
+        return sorted(builtins[protocol])
+    adapter = _load_provider_plugin(protocol)
+    if adapter is None or not callable(getattr(adapter, "capabilities", None)):
+        return []
+    values = adapter.capabilities(provider)
+    if not isinstance(values, (list, tuple, set)) or any(
+        not isinstance(value, str) or not value.strip() for value in values
+    ):
+        raise RuntimeError(f"El plugin {protocol} devolvió capacidades inválidas.")
+    return sorted(set(values))
+
+
 def installed_models(provider):
-    if provider.get("protocol") == "ollama":
+    protocol = provider.get("protocol")
+    if protocol == "ollama":
         return {item.get("name") or item.get("model")
                 for item in request(provider,"api/tags").get("models",[])}
-    # Los proveedores remotos pueden ocultar o limitar su catálogo.
+    if protocol in {"openai", "anthropic", "gemini"}:
+        return None
+    adapter = _load_provider_plugin(protocol)
+    if adapter is not None and callable(getattr(adapter, "installed_models", None)):
+        return adapter.installed_models(provider)
     return None

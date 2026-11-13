@@ -75,6 +75,10 @@ transacción. Antes de empezar crea una copia SQLite en
 no se sustituyen. La copia de seguridad debe conservarse hasta verificar las
 búsquedas en el nuevo espacio.
 
+## Plugins externos
+
+Los proveedores no incluidos pueden añadirse como paquetes Python con un entry point en `cyber_ai.providers`; consulta `AI_PROVIDER_ARCHITECTURE.md` para el contrato. El plugin debe ser confiable y responsable de su transporte, credenciales, timeouts y seguridad de red.
+
 ## Límites y seguridad
 
 - Los endpoints HTTP sin TLS solo se aceptan en loopback (`localhost`, `127.0.0.1` o `::1`); los proveedores remotos deben usar HTTPS.

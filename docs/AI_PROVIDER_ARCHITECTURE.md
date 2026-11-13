@@ -18,9 +18,37 @@ directamente en las bases de datos de memoria ni cambiar las Skills.
 - `anthropic`: API nativa Messages para chat. Anthropic no proporciona
   embeddings nativos en este adaptador; ECO debe usar otro proveedor/modelo.
 - `gemini`: API nativa Gemini para generación de contenido y embeddings.
-- Un proveedor con API nativa incompatible necesita un adaptador nuevo dentro
-  de `llm_providers.py` (o un módulo de adaptador registrado). No se debe
+- Un proveedor con API nativa incompatible puede añadirse como plugin instalado mediante el entry point `cyber_ai.providers`; no requiere modificar el núcleo. No se debe
   fingir compatibilidad con solo cambiar una URL.
+
+## Plugins de proveedores sin modificar el núcleo
+
+Los proveedores adicionales pueden instalarse como paquetes Python que publiquen
+un entry point en el grupo `cyber_ai.providers`. El nombre del entry point es
+el valor de `protocol` en `config/model_roles.json`; su objeto exportado debe
+implementar:
+
+- `request(provider, endpoint, payload, timeout)`: devuelve el contrato normalizado de chat/embeddings.
+- `capabilities(provider)`: opcional; devuelve capacidades como `chat` y `embeddings`.
+- `installed_models(provider)`: opcional; devuelve un conjunto de modelos o `None`.
+
+Ejemplo de registro en el `pyproject.toml` del paquete externo:
+
+```toml
+[project.entry-points."cyber_ai.providers"]
+mi_proveedor = "mi_paquete.cyber_ai:adapter"
+```
+
+El objeto `adapter` exportado debe exponer los métodos descritos. En la
+configuración local se usa `"protocol": "mi_proveedor"`; no se modifica
+`llm_providers.py` ni los módulos de negocio.
+
+Instala únicamente plugins confiables: el código del plugin se ejecuta con los
+permisos del proceso CYBER_AI y puede acceder a su entorno. Si gestiona
+credenciales o conexiones HTTP, debe aplicar TLS, timeouts, no seguir
+redirecciones hacia otros hosts, no registrar secretos y probar su contrato.
+El núcleo exige HTTPS para endpoints remotos y limita HTTP a loopback cuando
+se declara `base_url`.
 
 ## Configuración sin tocar código
 
@@ -119,6 +147,5 @@ generateContent/embedContent. Anthropic no tiene embeddings nativos en este
 adaptador, por lo que se debe asignar ECO a Gemini, Ollama u otro proveedor
 compatible con embeddings. Las APIs, nombres de modelos, cuotas y disponibilidad
 pueden cambiar; hay que verificar la documentación del proveedor y ejecutar
-pruebas de conectividad antes de usarlo. Otros proveedores con protocolos propios
-requieren un adaptador nuevo, manteniendo el mismo contrato interno. Esta ampliación no requiere modificar el Skillbook,
+pruebas de conectividad antes de usarlo. Otros proveedores con protocolos propios pueden añadirse mediante plugins instalables que mantengan el mismo contrato interno. Esta ampliación no requiere modificar el Skillbook,
 la biblioteca ni los módulos de ciberseguridad.

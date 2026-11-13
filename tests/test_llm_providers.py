@@ -166,6 +166,30 @@ class NativeProtocolTests(unittest.TestCase):
                     "model": "m", "messages": [{"role": "user", "content": "x"}]})
 
 
+    def test_installed_provider_plugin_can_be_selected_without_core_changes(self):
+        class Plugin:
+            def request(self, provider, endpoint, payload, timeout):
+                return {"plugin": provider["name"], "endpoint": endpoint}
+            def capabilities(self, provider):
+                return ["chat", "embeddings"]
+            def installed_models(self, provider):
+                return {"remote-model"}
+
+        config = {"llm_providers": {"custom": {
+            "enabled": True, "protocol": "test_plugin",
+            "requires_api_key": False,
+        }}}
+        with patch.object(llm_providers, "_load_provider_plugin", return_value=Plugin()):
+            provider = llm_providers.resolve_provider(config, {"provider": "custom"})
+            self.assertEqual(
+                llm_providers.request(provider, "api/chat", {"model": "m"}),
+                {"plugin": "custom", "endpoint": "api/chat"},
+            )
+            self.assertEqual(
+                llm_providers.provider_capabilities(provider), ["chat", "embeddings"]
+            )
+            self.assertEqual(llm_providers.installed_models(provider), {"remote-model"})
+
     def test_unknown_protocol_is_rejected_during_resolution(self):
         config = {"llm_providers": {"custom": {
             "enabled": True, "protocol": "unknown", "base_url": "https://example.test"
