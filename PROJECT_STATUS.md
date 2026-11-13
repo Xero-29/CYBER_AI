@@ -21,7 +21,9 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 - Proveedores Ollama, OpenAI-compatible, Anthropic chat y Gemini chat/embeddings, con extensiones instalables mediante entry points `cyber_ai.providers`; HTTP solo en loopback, HTTPS remoto y redirecciones bloqueadas para proteger credenciales.
 - Skillbook con propuestas candidatas desde dos eventos independientes, activación solo con firma HMAC VERITAS, versiones inmutables y exclusión de candidatas de la búsqueda ejecutable. La clave sigue siendo un secreto operativo externo, no una identidad de modelo.
 - Memoria de lecciones verificadas con aislamiento por namespace e inyección contextual.
-- `preflight.py` para revisar dependencias, configuración, herramientas opcionales y ledger local sin iniciar servicios ni usar red.\n- CLI `ledger_cli.py` para verificar integridad, listar namespaces y consultar historial.
+- Dependencias base fijadas en `requirements.lock` para instalaciones repetibles (sin hashes de artefactos; la verificación de procedencia/hash queda pendiente).
+- `preflight.py` para revisar dependencias, configuración, herramientas opcionales y ledger local sin iniciar servicios ni usar red.
+- CLI `ledger_cli.py` para verificar integridad, listar namespaces y consultar historial.
 - Ledger de ejecuciones: integrado con `agent_runner.py`, `tool_executor.py`, `nuclei_scanner.py` y `task_runner.py` para registrar respuestas, ejecuciones locales, timeouts y denegaciones. La escritura del ledger emite una advertencia si falla y no oculta el resultado original. El ciclo de Skills autónomas y el almacenamiento externo WORM siguen pendientes.
 
 ## Pendientes de cierre

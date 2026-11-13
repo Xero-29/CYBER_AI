@@ -1,4 +1,4 @@
-import hashlib, hmac, os, tempfile, unittest
+import hashlib, hmac, os, sqlite3, tempfile, unittest
 from pathlib import Path
 from unittest.mock import patch
 import skillbook
@@ -82,7 +82,7 @@ class SkillbookTests(unittest.TestCase):
   skill=self.add()
   skillbook.initialize()
   with skillbook.connect() as db:
-   with self.assertRaises(Exception):
+   with self.assertRaises(sqlite3.IntegrityError):
     db.execute("DELETE FROM skill_versions WHERE skill_id=?",(skill["skill_id"],))
 
  def test_no_match(self):

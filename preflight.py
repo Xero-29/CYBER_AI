@@ -14,6 +14,7 @@ PROJECT = Path(__file__).resolve().parent
 REQUIRED_FILES = (
     "cyber_ai.py",
     "requirements.txt",
+    "requirements.lock",
     "config/model_roles.json",
     "tests",
 )

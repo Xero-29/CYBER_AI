@@ -69,7 +69,31 @@ def initialize():
         );
         CREATE INDEX IF NOT EXISTS idx_skill_versions_skill
         ON skill_versions(skill_id, version);
+        CREATE TRIGGER IF NOT EXISTS skill_versions_no_update
+        BEFORE UPDATE ON skill_versions
+        BEGIN SELECT RAISE(ABORT, 'skill version history is append-only'); END;
+        CREATE TRIGGER IF NOT EXISTS skill_versions_no_delete
+        BEFORE DELETE ON skill_versions
+        BEGIN SELECT RAISE(ABORT, 'skill version history is append-only'); END;
         """)
+        # Snapshot inicial para Skills creadas antes de la migración.
+        for row in db.execute("SELECT * FROM skills").fetchall():
+            exists = db.execute(
+                "SELECT 1 FROM skill_versions WHERE skill_id=? AND version=?",
+                (row["skill_id"], row["version"]),
+            ).fetchone()
+            if not exists:
+                db.execute(
+                    """INSERT INTO skill_versions
+                       (skill_id,version,change_type,actor,snapshot_json,created_at)
+                       VALUES(?,?,?,?,?,?)""",
+                    (
+                        row["skill_id"], row["version"], "legacy_import",
+                        row["verified_by"] or "MIGRATION",
+                        json.dumps(dict(row), ensure_ascii=False, sort_keys=True),
+                        row["updated_at"],
+                    ),
+                )
 
 
 def _list(value, name, minimum=1):

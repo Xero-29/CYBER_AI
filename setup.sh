@@ -21,8 +21,7 @@ if [[ ! -d .venv ]]; then
   "$PYTHON_BIN" -m venv .venv
 fi
 
-.venv/bin/python -m pip install --upgrade pip
-.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python -m pip install -r requirements.lock
 
 echo
 echo "Entorno preparado."
