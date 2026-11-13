@@ -3,10 +3,15 @@
 
 import argparse
 import json
+import os
+import platform
 import subprocess
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
+
+from execution_ledger import ExecutionLedger
 
 from model_memory_manager import load_config
 import experiment_engine
@@ -620,11 +625,70 @@ def supervise_step(
         correction_count += 1
 
 
+def _objective_validator_results(report):
+    """Extrae únicamente revisiones independientes conformes y fundamentadas."""
+    validators = []
+    for step in report.get("steps", []):
+        supervision = step.get("objective_supervision")
+        if not isinstance(supervision, dict) or supervision.get("status") != "compliant":
+            continue
+        reviews = [
+            item for item in supervision.get("reviews", [])
+            if isinstance(item, dict) and isinstance(item.get("review"), dict)
+        ]
+        if not reviews:
+            continue
+        final = reviews[-1]
+        reviewer = final.get("reviewer")
+        review = final["review"]
+        passed = (
+            reviewer in {"VERITAS", "FILTRO"}
+            and reviewer != step.get("agent")
+            and review.get("status") == "compliant"
+            and review.get("deviations") == []
+            and review.get("corrections") == []
+            and isinstance(review.get("evidence"), list)
+            and bool(review["evidence"])
+        )
+        validators.append({
+            "name": f"objective_review:{reviewer}",
+            "passed": passed,
+            "independent": reviewer in {"VERITAS", "FILTRO"} and reviewer != step.get("agent"),
+            "reviewer": reviewer,
+            "evidence": review.get("evidence", []),
+        })
+    return validators
+
+
+def _record_workflow_ledger(report, task, duration_ms):
+    """Registra el flujo y sus revisiones separadas en el ledger de ejecución."""
+    namespace = os.environ.get("CYBER_AI_NAMESPACE", "shared").strip() or "shared"
+    validators = _objective_validator_results(report)
+    status = "completed" if report.get("status") == "completed" else "failed"
+    return ExecutionLedger().append(
+        namespace=namespace,
+        task=task,
+        status=status,
+        tool="team_orchestrator",
+        tool_version="1",
+        model="multi-agent",
+        environment=f"python-{platform.python_version()}",
+        evidence=report,
+        duration_ms=max(0, int(duration_ms)),
+        validator_results=validators,
+        metadata={
+            "workflow": report.get("workflow"),
+            "objective_supervision": bool(report.get("objective_contract")),
+        },
+    )
+
+
 def execute_workflow(
     task, workflow_name, dry_run=False, *,
     supervise_objectives=False, acceptance_criteria=None, review_rounds=2
 ):
     """Ejecuta el flujo de forma secuencial y registra cada respuesta."""
+    workflow_started = time.monotonic()
     workflow = load_workflow(workflow_name)
     steps = workflow["steps"]
     limit = int(workflow.get("max_steps", workflow.get("max_rounds", len(steps))))
@@ -935,6 +999,21 @@ def execute_workflow(
         report["status"] = "completed"
 
     report["finished_at"] = datetime.now(timezone.utc).isoformat()
+    save_report(report_path, report)
+
+    try:
+        ledger_event = _record_workflow_ledger(
+            report, task, (time.monotonic() - workflow_started) * 1000
+        )
+        report["ledger_event_id"] = ledger_event["event_id"]
+    except Exception as error:
+        report["ledger_error"] = str(error)
+        save_report(report_path, report)
+        print(
+            f"ERROR: no se pudo registrar el flujo en el ledger: {error}",
+            file=sys.stderr,
+        )
+        return 3
     save_report(report_path, report)
 
     print(f"\nEstado del flujo: {report['status']}")

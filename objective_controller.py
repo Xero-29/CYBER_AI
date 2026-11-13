@@ -340,6 +340,10 @@ def parse_review(review_text):
         raise ValueError(
             "Una revisión compliant no puede contener desviaciones."
         )
+    if status == "compliant" and corrections:
+        raise ValueError(
+            "Una revisión compliant no puede solicitar correcciones."
+        )
 
     if status == "requires_correction":
         if not deviations or not corrections:
@@ -448,7 +452,7 @@ def decide_next_action(
     corrections = review.get("corrections")
 
     if status == "compliant":
-        if deviations == []:
+        if deviations == [] and corrections == []:
             return "continue"
         return "blocked"
 

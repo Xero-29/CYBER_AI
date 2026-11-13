@@ -943,7 +943,7 @@ def run_agent(
                     evidence={"task_id": task_id, "session_id": session_id,
                               "response": answer, "response_this_run": generated_this_run,
                               "done_reason": done_reason, "generation_status": status},
-                    validator_results=[{"name": "generation_completion", "passed": finished}],
+                    validator_results=[{"name": "generation_completion", "passed": finished, "independent": False}],
                     metadata={"task_id": task_id, "session_id": session_id,
                               "provider": provider["name"], "mode": mode,
                               "prompt_tokens": usage_totals["prompt_eval_count"],

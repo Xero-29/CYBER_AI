@@ -89,6 +89,29 @@ def _validate_lesson_fields(
     }
 
 
+def _has_independent_review(event):
+    if event.get("tool") != "team_orchestrator":
+        return False
+    metadata = event.get("metadata") or {}
+    if metadata.get("objective_supervision") is not True:
+        return False
+    validators = event.get("validator_results") or []
+    for validator in validators:
+        if not isinstance(validator, dict):
+            continue
+        reviewer = validator.get("reviewer")
+        if (
+            reviewer in {"VERITAS", "FILTRO"}
+            and validator.get("name") == f"objective_review:{reviewer}"
+            and validator.get("passed") is True
+            and validator.get("independent") is True
+            and isinstance(validator.get("evidence"), list)
+            and bool(validator["evidence"])
+        ):
+            return True
+    return False
+
+
 def _verified_ledger_evidence(namespace, event_ids, ledger=None):
     if not isinstance(namespace, str) or not namespace.strip():
         raise ValueError("namespace es obligatorio.")
@@ -126,8 +149,8 @@ def _verified_ledger_evidence(namespace, event_ids, ledger=None):
         validators = item.get("validator_results") or []
         if not validators or any(not isinstance(value, dict) for value in validators):
             raise ValueError("Cada ejecución debe incluir validadores estructurados.")
-        if not all(value.get("passed") is True for value in validators):
-            raise ValueError("Cada ejecución debe tener validadores aprobados.")
+        if not _has_independent_review(item):
+            raise ValueError("Cada ejecución debe proceder de team_orchestrator con una revisión independiente aprobada.")
         if not re.fullmatch(r"[a-f0-9]{64}", str(item.get("evidence_sha256", ""))):
             raise ValueError("Evento sin hash de evidencia válido.")
 

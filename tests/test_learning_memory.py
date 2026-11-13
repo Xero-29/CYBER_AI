@@ -43,16 +43,20 @@ class LearningMemoryTests(unittest.TestCase):
                 "event_id": "memory-run-1",
                 "task_fingerprint": "a" * 64,
                 "status": "completed",
+                "tool": "team_orchestrator",
+                "metadata": {"objective_supervision": True},
                 "created_at": "2026-01-01T00:00:00Z",
-                "validator_results": [{"passed": True}],
+                "validator_results": [{"name": "objective_review:VERITAS", "reviewer": "VERITAS", "passed": True, "independent": True, "evidence": ["review"]}],
                 "evidence_sha256": "1" * 64,
             },
             {
                 "event_id": "memory-run-2",
                 "task_fingerprint": "a" * 64,
                 "status": "completed",
+                "tool": "team_orchestrator",
+                "metadata": {"objective_supervision": True},
                 "created_at": "2026-01-02T00:00:00Z",
-                "validator_results": [{"passed": True}],
+                "validator_results": [{"name": "objective_review:VERITAS", "reviewer": "VERITAS", "passed": True, "independent": True, "evidence": ["review"]}],
                 "evidence_sha256": "2" * 64,
             },
         ]
@@ -149,6 +153,17 @@ class LearningMemoryTests(unittest.TestCase):
         ):
             with self.assertRaisesRegex(ValueError, "fallidas"):
                 learning_memory.build_lesson_approval_payload(**args)
+
+    def test_self_reported_validation_cannot_approve_lesson(self):
+        events = [
+            dict(self.events[0], validator_results=[{"name": "objective_review:VERITAS", "reviewer": "VERITAS", "passed": True, "independent": False, "evidence": ["review"]}]),
+            dict(self.events[1], validator_results=[{"name": "objective_review:VERITAS", "reviewer": "VERITAS", "passed": True, "independent": False, "evidence": ["review"]}]),
+        ]
+        with patch.object(
+            learning_memory, "ExecutionLedger", return_value=FakeLedger(events)
+        ):
+            with self.assertRaisesRegex(ValueError, "validador independiente"):
+                learning_memory.build_lesson_approval_payload(**self.args)
 
     def test_corrupted_signed_record_is_not_taught(self):
         self.save_lesson()

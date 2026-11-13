@@ -28,8 +28,8 @@ class SkillbookTests(unittest.TestCase):
  def test_ledger_promotion_requires_signed_independent_evidence(self):
   key="test-veritas-approval-key-with-32-bytes-minimum"
   events=[
-   {"event_id":"run-1","task_fingerprint":"f"*64,"status":"completed","created_at":"2026-01-01T00:00:00Z","validator_results":[{"passed":True}],"evidence_sha256":"a"*64},
-   {"event_id":"run-2","task_fingerprint":"f"*64,"status":"completed","created_at":"2026-01-02T00:00:00Z","validator_results":[{"passed":True}],"evidence_sha256":"b"*64},
+   {"event_id":"run-1","task_fingerprint":"f"*64,"status":"completed","tool":"team_orchestrator","metadata":{"objective_supervision":True},"created_at":"2026-01-01T00:00:00Z","validator_results":[{"name":"objective_review:VERITAS","reviewer":"VERITAS","passed":True,"independent":True,"evidence":["review"]}],"evidence_sha256":"a"*64},
+   {"event_id":"run-2","task_fingerprint":"f"*64,"status":"completed","tool":"team_orchestrator","metadata":{"objective_supervision":True},"created_at":"2026-01-02T00:00:00Z","validator_results":[{"name":"objective_review:VERITAS","reviewer":"VERITAS","passed":True,"independent":True,"evidence":["review"]}],"evidence_sha256":"b"*64},
   ]
   class FakeLedger:
    def verify(self): return {"valid":True}
@@ -43,7 +43,7 @@ class SkillbookTests(unittest.TestCase):
   with patch.dict(os.environ,{"CYBER_AI_VERITAS_APPROVAL_KEY":key}), patch.object(skillbook,"ExecutionLedger",return_value=FakeLedger()):
    with self.assertRaisesRegex(ValueError,"Firma VERITAS inválida"):
     skillbook.register_skill_from_ledger(**args,approval_signature="0"*64)
-  events.append({"event_id":"run-3","task_fingerprint":"f"*64,"status":"failed","created_at":"2026-01-03T00:00:00Z","validator_results":[{"passed":False}],"evidence_sha256":"c"*64})
+  events.append({"event_id":"run-3","task_fingerprint":"f"*64,"status":"failed","created_at":"2026-01-03T00:00:00Z","validator_results":[{"name":"objective_review:VERITAS","reviewer":"VERITAS","passed":False,"independent":True,"evidence":["review"]}],"evidence_sha256":"c"*64})
   with patch.dict(os.environ,{"CYBER_AI_VERITAS_APPROVAL_KEY":key}), patch.object(skillbook,"ExecutionLedger",return_value=FakeLedger()):
    with self.assertRaisesRegex(ValueError,"Hay ejecuciones fallidas"):
     skillbook.register_skill_from_ledger(**args,approval_signature=signature)
@@ -51,8 +51,8 @@ class SkillbookTests(unittest.TestCase):
  def test_candidate_is_not_searchable_until_signed_promotion(self):
   key="test-veritas-approval-key-with-32-bytes-minimum"
   events=[
-   {"event_id":"candidate-run-1","task_fingerprint":"d"*64,"status":"completed","created_at":"2026-02-01T00:00:00Z","validator_results":[{"passed":True}],"evidence_sha256":"1"*64},
-   {"event_id":"candidate-run-2","task_fingerprint":"d"*64,"status":"completed","created_at":"2026-02-02T00:00:00Z","validator_results":[{"passed":True}],"evidence_sha256":"2"*64},
+   {"event_id":"candidate-run-1","task_fingerprint":"d"*64,"status":"completed","tool":"team_orchestrator","metadata":{"objective_supervision":True},"created_at":"2026-02-01T00:00:00Z","validator_results":[{"name":"objective_review:VERITAS","reviewer":"VERITAS","passed":True,"independent":True,"evidence":["review"]}],"evidence_sha256":"1"*64},
+   {"event_id":"candidate-run-2","task_fingerprint":"d"*64,"status":"completed","tool":"team_orchestrator","metadata":{"objective_supervision":True},"created_at":"2026-02-02T00:00:00Z","validator_results":[{"name":"objective_review:VERITAS","reviewer":"VERITAS","passed":True,"independent":True,"evidence":["review"]}],"evidence_sha256":"2"*64},
   ]
   class FakeLedger:
    def verify(self): return {"valid":True}
@@ -84,6 +84,19 @@ class SkillbookTests(unittest.TestCase):
   with skillbook.connect() as db:
    with self.assertRaises(sqlite3.IntegrityError):
     db.execute("DELETE FROM skill_versions WHERE skill_id=?",(skill["skill_id"],))
+
+ def test_self_reported_validator_cannot_promote_skill(self):
+  events=[
+   {"event_id":"self-run-1","task_fingerprint":"e"*64,"status":"completed","tool":"team_orchestrator","metadata":{"objective_supervision":True},"created_at":"2026-03-01T00:00:00Z","validator_results":[{"name":"objective_review:VERITAS","reviewer":"VERITAS","passed":True,"independent":False,"evidence":["review"]}],"evidence_sha256":"1"*64},
+   {"event_id":"self-run-2","task_fingerprint":"e"*64,"status":"completed","tool":"team_orchestrator","metadata":{"objective_supervision":True},"created_at":"2026-03-02T00:00:00Z","validator_results":[{"name":"objective_review:VERITAS","reviewer":"VERITAS","passed":True,"independent":False,"evidence":["review"]}],"evidence_sha256":"2"*64},
+  ]
+  class FakeLedger:
+   def verify(self): return {"valid":True}
+   def history(self,**kwargs): return events
+  args=dict(name="No independiente",task_pattern="validacion propia",description="No debe aprobarse",prerequisites=[],methodology=["paso uno","paso dos"],validation=["comprobar"],tools=[],tags=["test"],source_urls=["https://example.org/"],namespace="forja",event_ids=["self-run-1","self-run-2"])
+  with patch.object(skillbook,"ExecutionLedger",return_value=FakeLedger()):
+   with self.assertRaisesRegex(ValueError,"validador independiente"):
+    skillbook.propose_skill_from_ledger(**args)
 
  def test_no_match(self):
   self.add(); self.assertEqual(skillbook.build_skill_context("analisis forense RAM"),("",[]))

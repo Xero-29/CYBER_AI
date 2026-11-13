@@ -8,7 +8,7 @@ CYBER_AI separa la propuesta de una Skill de su activación. `propose_skill_from
 2. Se exigen al menos dos eventos distintos en el mismo namespace.
 3. Ambos eventos deben tener la misma huella de tarea y marcas temporales distintas.
 4. Todas las ejecuciones registradas para esa huella, dentro del historial consultado, deben estar completadas.
-5. Cada ejecución seleccionada debe incluir al menos un validador con `passed=true`.
+5. Cada ejecución seleccionada debe proceder de `team_orchestrator`, declarar `objective_supervision=true` y contener una revisión conforme, fundamentada y emitida por un rol distinto (`VERITAS`/`FILTRO`). El propio `agent_runner` marca su finalización como `independent=false`.
 6. Cada evento debe incluir un SHA-256 de evidencia válido.
 7. El documento canónico que contiene la Skill y los IDs de evidencia debe tener una firma HMAC válida.
 

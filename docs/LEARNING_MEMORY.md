@@ -7,7 +7,7 @@ El registro directo `save_verified_lesson` está deshabilitado. Una lección sol
 1. Ledger con cadena hash íntegra.
 2. Dos ejecuciones distintas del mismo fingerprint y namespace.
 3. Todas las ejecuciones conocidas para ese fingerprint completadas.
-4. Cada ejecución con validadores estructurados aprobados y SHA-256 de evidencia.
+4. Cada ejecución debe proceder de `team_orchestrator`, declarar `objective_supervision=true` y contener al menos una revisión conforme y fundamentada de un rol distinto (`VERITAS`/`FILTRO`). La finalización autodeclarada por `agent_runner` no cuenta como validación independiente.
 5. Firma HMAC-SHA256 de VERITAS sobre el contenido de la lección y las referencias de evidencia.
 
 ## Firma
