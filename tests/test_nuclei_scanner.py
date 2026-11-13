@@ -5,6 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from nuclei_scanner import scan_target, validate_target
+from execution_ledger import ExecutionLedger
 
 
 class FakeProcess:
