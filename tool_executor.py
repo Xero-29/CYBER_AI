@@ -31,7 +31,12 @@ def main(argv=None):
         evidence = run_local_tool(
             args.tool, args.target, config_path=args.config, timeout=args.timeout
         )
-        evidence_path = write_evidence(evidence, output_dir=os.environ.get("CYBER_AI_EVIDENCE_DIR", "reports/tool_evidence"))
+        evidence_dir = os.environ.get("CYBER_AI_EVIDENCE_DIR")
+        evidence_path = write_evidence(
+            evidence,
+            output_dir=evidence_dir or "reports/tool_evidence",
+            allow_external=bool(evidence_dir),
+        )
     except ToolExecutionError as exc:
         print(json.dumps({"status": "denied", "reason": str(exc)}, ensure_ascii=False), file=sys.stderr)
         return 2
