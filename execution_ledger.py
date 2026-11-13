@@ -187,6 +187,14 @@ class ExecutionLedger:
             previous = item["event_hash"]
         return {"valid": True, "checked": len(rows), "head_hash": previous}
 
+    def namespaces(self):
+        """Lista namespaces que ya tienen eventos."""
+        with self.connect() as db:
+            rows = db.execute(
+                "SELECT DISTINCT namespace FROM execution_events ORDER BY namespace"
+            ).fetchall()
+        return [row["namespace"] for row in rows]
+
     def history(self, *, namespace, limit=100):
         if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= 1000:
             raise LedgerError("limit debe estar entre 1 y 1000.")

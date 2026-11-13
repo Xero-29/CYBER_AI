@@ -120,6 +120,14 @@ Los extractores de Office validan el tamaño de los paquetes comprimidos, pero s
 
 ## Evidencia y diagnóstico
 
+Consulta la integridad del ledger y el historial registrado:
+
+```bash
+python ledger_cli.py verify
+python ledger_cli.py namespaces
+python ledger_cli.py history --namespace local-tools
+```
+
 - `PROJECT_STATUS.md`: capacidades, limitaciones y brechas conocidas.
 - `docs/EXECUTION_LEDGER.md`: modelo de evidencia y límites del ledger.
 - `docs/CYBERSECURITY_KNOWLEDGE_ATLAS.md`: mapa de áreas y referencias catalogadas.
