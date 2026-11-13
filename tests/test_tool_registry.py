@@ -28,6 +28,14 @@ class ToolRegistryTests(unittest.TestCase):
         self.assertFalse(nmap["execution_permitted"])
         self.assertEqual(nmap["status"], "candidate_only")
 
+
+    def test_registry_reports_adapter_coverage_without_granting_execution(self):
+        result = select_tools("analisis estatico de codigo Python", inventory=self.inventory)
+        semgrep = next(item for item in result["candidates"] if item["id"] == "semgrep")
+        self.assertTrue(semgrep["adapter_supported"])
+        self.assertEqual(semgrep["adapter_status"], "local_adapter_available")
+        self.assertFalse(semgrep["execution_permitted"])
+
     def test_empty_task_and_invalid_limit_are_rejected(self):
         with self.assertRaises(ValueError):
             select_tools(" ")
