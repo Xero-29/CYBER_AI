@@ -184,14 +184,15 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
         parsed = json.loads(out_text) if out_text.strip() else None
     except json.JSONDecodeError:
         parsed = None
+    target_hash_after = _hash_target(path)
     evidence = {
         "schema_version": "1.0",
         "tool": tool_id,
         "tool_version": "not_probed",
         "target": str(path.relative_to(PROJECT_ROOT)),
         "target_sha256": target_hash_before,
-        "target_sha256_after": _hash_target(path),
-        "target_modified": target_hash_before != _hash_target(path),
+        "target_sha256_after": target_hash_after,
+        "target_modified": target_hash_before != target_hash_after,
         "started_at": timestamp,
         "elapsed_seconds": round(time.monotonic() - started, 3),
         "status": status,
