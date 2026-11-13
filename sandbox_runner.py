@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+"""Ejecuta adaptadores CYBER_AI dentro de un contenedor Docker endurecido."""
+import argparse
+import os
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+from tool_adapters import TOOL_SPECS, ToolExecutionError, _confined_path, PROJECT_ROOT
+
+
+DEFAULT_IMAGE = "cyber-ai-tool-sandbox:local"
+
+
+def build_docker_command(tool_id, target, evidence_dir, image=DEFAULT_IMAGE, timeout=None, config=None):
+    if tool_id not in TOOL_SPECS:
+        raise ToolExecutionError("Herramienta no registrada.")
+    if TOOL_SPECS[tool_id]["network"]:
+        raise ToolExecutionError("La herramienta requiere red y está bloqueada por política.")
+    if not isinstance(image, str) or not image or image.startswith("-"):
+        raise ToolExecutionError("Nombre de imagen Docker inválido.")
+    target_path = _confined_path(target)
+    relative_target = target_path.relative_to(PROJECT_ROOT).as_posix()
+    evidence = Path(evidence_dir).resolve()
+    evidence.mkdir(parents=True, exist_ok=True)
+    try:
+        evidence.relative_to(PROJECT_ROOT.resolve())
+        raise ToolExecutionError("La carpeta de evidencias debe estar fuera del repositorio.")
+    except ValueError:
+        pass
+
+    command = [
+        "docker", "run", "--rm",
+        "--network=none",
+        "--read-only",
+        "--cap-drop=ALL",
+        "--security-opt=no-new-privileges:true",
+        "--pids-limit=128",
+        "--memory=1g",
+        "--cpus=2",
+        "--user=65532:65532",
+        "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=64m",
+        "--mount", f"type=bind,src={PROJECT_ROOT.resolve()},dst=/workspace,readonly",
+        "--mount", f"type=bind,src={evidence},dst=/evidence",
+        "--workdir=/workspace",
+        "--env", "CYBER_AI_EVIDENCE_DIR=/evidence",
+        image,
+        "/workspace/tool_executor.py",
+        "--tool", tool_id,
+        "--target", relative_target,
+        "--execute",
+    ]
+    if timeout is not None:
+        if not isinstance(timeout, int) or not 1 <= timeout <= 600:
+            raise ToolExecutionError("El timeout debe estar entre 1 y 600 segundos.")
+        command.extend(["--timeout", str(timeout)])
+    if config:
+        config_path = _confined_path(config)
+        command.extend(["--config", config_path.relative_to(PROJECT_ROOT).as_posix()])
+    return command
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--tool", required=True, choices=sorted(TOOL_SPECS))
+    parser.add_argument("--target", required=True)
+    parser.add_argument("--evidence-dir", default="../cyber-ai-evidence")
+    parser.add_argument("--image", default=DEFAULT_IMAGE)
+    parser.add_argument("--timeout", type=int)
+    parser.add_argument("--config")
+    parser.add_argument("--execute", action="store_true", help="Confirma la ejecución Docker")
+    args = parser.parse_args(argv)
+    if not args.execute:
+        print("Dry-run: añade --execute para ejecutar dentro del contenedor.")
+        return 0
+    if not shutil.which("docker"):
+        print("Docker CLI no está disponible.", file=sys.stderr)
+        return 2
+    try:
+        command = build_docker_command(
+            args.tool, args.target, args.evidence_dir, args.image,
+            timeout=args.timeout, config=args.config,
+        )
+        result = subprocess.run(command, cwd=PROJECT_ROOT, check=False)
+    except (ToolExecutionError, OSError) as exc:
+        print(f"Ejecución denegada: {exc}", file=sys.stderr)
+        return 2
+    return result.returncode
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
