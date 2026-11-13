@@ -73,6 +73,26 @@ class TestKnowledgeIngest(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "100 MiB"):
                     ingest.extract_document_text(oversized)
 
+    def test_extraction_character_limit_is_enforced_incrementally(self):
+        with tempfile.TemporaryDirectory() as temp:
+            html = Path(temp) / "large.html"
+            html.write_text("<p>12345678901</p>", encoding="utf-8")
+            with patch.object(ingest, "MAX_EXTRACTED_CHARS", 10):
+                with self.assertRaisesRegex(ValueError, "límite de extracción"):
+                    ingest.extract_document_text(html)
+
+            csv_file = Path(temp) / "large.csv"
+            csv_file.write_text("a,b\\n123456,7890\\n", encoding="utf-8")
+            with patch.object(ingest, "MAX_EXTRACTED_CHARS", 10):
+                with self.assertRaisesRegex(ValueError, "límite de 10 millones"):
+                    ingest.extract_document_text(csv_file)
+
+            jsonl_file = Path(temp) / "large.jsonl"
+            jsonl_file.write_text('{"a":1}\\n{"a":1}\\n', encoding="utf-8")
+            with patch.object(ingest, "MAX_EXTRACTED_CHARS", 10):
+                with self.assertRaisesRegex(ValueError, "límite de 10 millones"):
+                    ingest.extract_document_text(jsonl_file)
+
     def test_embedding_failure_does_not_publish_partial_document(self):
         with tempfile.TemporaryDirectory() as temp:
             document = Path(temp) / "partial.md"

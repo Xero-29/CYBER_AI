@@ -17,6 +17,7 @@ PROJECT = Path(__file__).resolve().parent
 MAX_INPUT_BYTES = 100 * 1024 * 1024
 MAX_ARCHIVE_UNCOMPRESSED_BYTES = 256 * 1024 * 1024
 MAX_EXTRACTED_CHARS = 10_000_000
+MAX_JSON_INPUT_BYTES = 20 * 1024 * 1024
 TEXT_EXTENSIONS = {
     ".txt", ".md", ".rst", ".py", ".js", ".ts", ".tsx", ".jsx",
     ".java", ".go", ".rs", ".c", ".h", ".cpp", ".hpp", ".sh",
@@ -30,23 +31,39 @@ class _VisibleHTMLText(HTMLParser):
         super().__init__(convert_charrefs=True)
         self.parts = []
         self.hidden_depth = 0
+        self.total_chars = 0
+
+    def _append(self, value):
+        if self.total_chars + len(value) > MAX_EXTRACTED_CHARS:
+            raise ValueError("El texto HTML supera el límite de extracción.")
+        self.parts.append(value)
+        self.total_chars += len(value)
 
     def handle_starttag(self, tag, attrs):
         if tag.lower() in {"script", "style", "noscript", "template"}:
             self.hidden_depth += 1
         elif tag.lower() in {"p", "div", "br", "li", "tr", "h1", "h2", "h3", "section"}:
-            self.parts.append("\n")
+            self._append("\n")
 
     def handle_endtag(self, tag):
         if tag.lower() in {"script", "style", "noscript", "template"} and self.hidden_depth:
             self.hidden_depth -= 1
         elif tag.lower() in {"p", "div", "li", "tr", "h1", "h2", "h3", "section"}:
-            self.parts.append("\n")
+            self._append("\n")
 
     def handle_data(self, data):
         if not self.hidden_depth and data.strip():
-            self.parts.append(data.strip())
-            self.parts.append(" ")
+            self._append(data.strip())
+            self._append(" ")
+
+
+def _append_bounded(parts, value, total_chars):
+    value = str(value)
+    next_total = total_chars + len(value) + 1
+    if next_total > MAX_EXTRACTED_CHARS:
+        raise ValueError("El texto extraído supera el límite de 10 millones de caracteres.")
+    parts.append(value)
+    return next_total
 
 
 def _validate_office_archive(path):
@@ -83,25 +100,48 @@ def extract_document_text(file_path):
 
     if suffix in TEXT_EXTENSIONS:
         try:
-            text = path.read_text(encoding="utf-8-sig")
+            with path.open(encoding="utf-8-sig") as stream:
+                text = stream.read(MAX_EXTRACTED_CHARS + 1)
+                if len(text) > MAX_EXTRACTED_CHARS or stream.read(1):
+                    raise ValueError("El documento de texto supera el límite de extracción.")
         except UnicodeDecodeError as error:
             raise ValueError("El documento de texto debe estar codificado en UTF-8.") from error
     elif suffix == ".json":
         try:
+            if path.stat().st_size > MAX_JSON_INPUT_BYTES:
+                raise ValueError("El JSON supera el límite de 20 MiB de entrada.")
             data = json.loads(path.read_text(encoding="utf-8-sig"))
         except (UnicodeDecodeError, json.JSONDecodeError) as error:
             raise ValueError("El JSON no es válido o no está codificado en UTF-8.") from error
         text = json.dumps(data, ensure_ascii=False, indent=2)
+        if len(text) > MAX_EXTRACTED_CHARS:
+            raise ValueError("El JSON extraído supera el límite de 10 millones de caracteres.")
     elif suffix == ".jsonl":
         try:
-            records = [json.loads(line) for line in path.read_text(encoding="utf-8-sig").splitlines() if line.strip()]
+            parts = []
+            total = 0
+            with path.open(encoding="utf-8-sig") as stream:
+                for index in range(1, 200_002):
+                    line = stream.readline(MAX_EXTRACTED_CHARS + 1)
+                    if not line:
+                        break
+                    if index > 200_000 or len(line) > MAX_EXTRACTED_CHARS:
+                        raise ValueError("El JSONL supera el límite de registros o caracteres.")
+                    if line.strip():
+                        record = json.loads(line)
+                        total = _append_bounded(
+                            parts, json.dumps(record, ensure_ascii=False, sort_keys=True), total
+                        )
         except (UnicodeDecodeError, json.JSONDecodeError) as error:
             raise ValueError("El JSONL contiene una línea inválida o no está codificado en UTF-8.") from error
-        text = "\n".join(json.dumps(item, ensure_ascii=False, sort_keys=True) for item in records)
+        text = "\n".join(parts)
     elif suffix in {".html", ".htm"}:
         try:
             parser = _VisibleHTMLText()
-            parser.feed(path.read_text(encoding="utf-8-sig"))
+            with path.open(encoding="utf-8-sig") as stream:
+                for chunk in iter(lambda: stream.read(64 * 1024), ""):
+                    parser.feed(chunk)
+            parser.close()
             text = "".join(parser.parts)
         except UnicodeDecodeError as error:
             raise ValueError("El HTML debe estar codificado en UTF-8.") from error
@@ -109,10 +149,12 @@ def extract_document_text(file_path):
         try:
             with path.open("r", encoding="utf-8-sig", newline="") as stream:
                 rows = []
+                total = 0
+                csv.field_size_limit(MAX_EXTRACTED_CHARS)
                 for index, row in enumerate(csv.reader(stream), 1):
                     if index > 200_000:
                         raise ValueError("El CSV supera el límite de 200.000 filas.")
-                    rows.append("\t".join(cell for cell in row))
+                    total = _append_bounded(rows, "\t".join(cell for cell in row), total)
             text = "\n".join(rows)
         except UnicodeDecodeError as error:
             raise ValueError("El CSV debe estar codificado en UTF-8.") from error
@@ -126,7 +168,11 @@ def extract_document_text(file_path):
             raise ValueError("No se ingieren PDF cifrados.")
         if len(reader.pages) > 5000:
             raise ValueError("El PDF supera el límite de 5.000 páginas.")
-        text = "\n\n".join(page.extract_text() or "" for page in reader.pages)
+        parts = []
+        total = 0
+        for page in reader.pages:
+            total = _append_bounded(parts, page.extract_text() or "", total)
+        text = "\n\n".join(parts)
         if not text.strip():
             raise ValueError("El PDF no contiene texto extraíble; requiere OCR externo.")
     elif suffix == ".docx":
@@ -136,10 +182,14 @@ def extract_document_text(file_path):
         except ImportError as error:
             raise RuntimeError("Para DOCX instala requirements-documents.txt.") from error
         document = Document(str(path))
-        parts = [paragraph.text for paragraph in document.paragraphs if paragraph.text.strip()]
+        parts = []
+        total = 0
+        for paragraph in document.paragraphs:
+            if paragraph.text.strip():
+                total = _append_bounded(parts, paragraph.text, total)
         for table in document.tables:
             for row in table.rows:
-                parts.append(" | ".join(cell.text for cell in row.cells))
+                total = _append_bounded(parts, " | ".join(cell.text for cell in row.cells), total)
         text = "\n".join(parts)
     elif suffix == ".xlsx":
         _validate_office_archive(path)
@@ -149,15 +199,16 @@ def extract_document_text(file_path):
             raise RuntimeError("Para XLSX instala requirements-documents.txt.") from error
         workbook = load_workbook(path, read_only=True, data_only=True)
         parts = []
+        total = 0
         count = 0
         try:
             for sheet in workbook.worksheets:
-                parts.append(f"[Hoja: {sheet.title}]")
+                total = _append_bounded(parts, f"[Hoja: {sheet.title}]", total)
                 for row in sheet.iter_rows(values_only=True):
                     count += 1
                     if count > 200_000:
                         raise ValueError("El XLSX supera el límite de 200.000 filas.")
-                    parts.append(" | ".join("" if value is None else str(value) for value in row))
+                    total = _append_bounded(parts, " | ".join("" if value is None else str(value) for value in row), total)
         finally:
             workbook.close()
         text = "\n".join(parts)
@@ -171,14 +222,15 @@ def extract_document_text(file_path):
         if len(presentation.slides) > 5000:
             raise ValueError("La presentación supera el límite de 5.000 diapositivas.")
         parts = []
+        total = 0
         for index, slide in enumerate(presentation.slides, 1):
-            parts.append(f"[Diapositiva {index}]")
+            total = _append_bounded(parts, f"[Diapositiva {index}]", total)
             for shape in slide.shapes:
                 if getattr(shape, "has_text_frame", False) and shape.text.strip():
-                    parts.append(shape.text)
+                    total = _append_bounded(parts, shape.text, total)
                 if getattr(shape, "has_table", False):
                     for row in shape.table.rows:
-                        parts.append(" | ".join(cell.text for cell in row.cells))
+                        total = _append_bounded(parts, " | ".join(cell.text for cell in row.cells), total)
         text = "\n".join(parts)
     else:
         raise ValueError(f"Formato no soportado: {suffix or '(sin extensión)'}.")
