@@ -1,4 +1,4 @@
-import tempfile,unittest
+import hashlib, hmac, os, tempfile, unittest
 from pathlib import Path
 from unittest.mock import patch
 import skillbook
@@ -23,6 +23,29 @@ class SkillbookTests(unittest.TestCase):
   for url in ("https:///missing-host", "https://user:pass@example.com/", "https://bad host.example/"):
    with self.subTest(url=url), self.assertRaises(ValueError):
     self.add(source_urls=[url])
+
+ def test_ledger_promotion_requires_signed_independent_evidence(self):
+  key="test-veritas-approval-key-with-32-bytes-minimum"
+  events=[
+   {"event_id":"run-1","task_fingerprint":"f"*64,"status":"completed","created_at":"2026-01-01T00:00:00Z","validator_results":[{"passed":True}],"evidence_sha256":"a"*64},
+   {"event_id":"run-2","task_fingerprint":"f"*64,"status":"completed","created_at":"2026-01-02T00:00:00Z","validator_results":[{"passed":True}],"evidence_sha256":"b"*64},
+  ]
+  class FakeLedger:
+   def verify(self): return {"valid":True}
+   def history(self,**kwargs): return events
+  args=dict(name="Skill firmada",task_pattern="misma tarea de prueba",description="Procedimiento respaldado",prerequisites=["entorno de prueba"],methodology=["preparar entorno","ejecutar comprobación"],validation=["verificar resultado"],tools=["ruff"],tags=["test","quality"],source_urls=["https://example.org/"],namespace="nexo",event_ids=["run-1","run-2"])
+  payload=skillbook.skill_approval_payload(**args)
+  signature=hmac.new(key.encode(),payload.encode(),hashlib.sha256).hexdigest()
+  with patch.dict(os.environ,{"CYBER_AI_VERITAS_APPROVAL_KEY":key}), patch.object(skillbook,"ExecutionLedger",return_value=FakeLedger()):
+   result=skillbook.register_skill_from_ledger(**args,approval_signature=signature)
+  self.assertEqual(result["status"],"active")
+  with patch.dict(os.environ,{"CYBER_AI_VERITAS_APPROVAL_KEY":key}), patch.object(skillbook,"ExecutionLedger",return_value=FakeLedger()):
+   with self.assertRaisesRegex(ValueError,"Firma VERITAS inválida"):
+    skillbook.register_skill_from_ledger(**args,approval_signature="0"*64)
+  events.append({"event_id":"run-3","task_fingerprint":"f"*64,"status":"failed","created_at":"2026-01-03T00:00:00Z","validator_results":[{"passed":False}],"evidence_sha256":"c"*64})
+  with patch.dict(os.environ,{"CYBER_AI_VERITAS_APPROVAL_KEY":key}), patch.object(skillbook,"ExecutionLedger",return_value=FakeLedger()):
+   with self.assertRaisesRegex(ValueError,"Hay ejecuciones fallidas"):
+    skillbook.register_skill_from_ledger(**args,approval_signature=signature)
 
  def test_no_match(self):
   self.add(); self.assertEqual(skillbook.build_skill_context("analisis forense RAM"),("",[]))

@@ -19,14 +19,14 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 - Ingestión directa TXT/Markdown; catálogo, descubrimiento y downloader con controles.
 - Reindexación con staging, backup y publicación transaccional.
 - Proveedores Ollama, OpenAI-compatible, Anthropic chat y Gemini chat/embeddings.
-- Skillbook con aprobación VERITAS, metodología, prerrequisitos, validación, evidencias y búsqueda.
+- Skillbook con búsqueda y metodologías; se añade promoción basada en dos eventos independientes del ledger íntegro y firma HMAC VERITAS. La clave sigue siendo un secreto operativo externo, no una identidad de modelo.
 - Memoria de lecciones verificadas con aislamiento por namespace e inyección contextual.
 - Ledger de ejecuciones: integrado con `agent_runner.py` y `tool_executor.py` para registrar respuestas, ejecuciones locales, timeouts y denegaciones. La escritura del ledger emite una advertencia si falla y no oculta el resultado original. La integración con `task_runner.py`, el ciclo de Skills y el almacenamiento externo de artefactos siguen pendientes.
 
 ## Pendientes de cierre
 
 1. **Ejecución y aprendizaje:** integrar ledger en agente, ejecutores y adaptadores; almacenar artefactos en repositorio controlado; checkpoints firmados externos; costes reales por proveedor; retención y privacidad.
-2. **Skills verificadas:** vincular promoción a eventos del ledger y evidencia independiente; corridas independientes; validadores deterministas; aprobación VERITAS autenticada; versionado, rollback, regresión y detección de obsolescencia.
+2. **Skills verificadas:** conectar el ciclo automático de propuestas con la API de promoción firmada; provisionar firma desde KMS/HSM o servicio independiente; versionado, rollback, regresión y detección de obsolescencia.
 3. **Biblioteca documental:** extractores probados para PDF, HTML, Office, código y datasets; OCR cuando aplique; normalización; deduplicación/versionado; índice híbrido FTS + vector/ANN; evaluación de recuperación; citas por fragmento; revisión de licencias/procedencia.
 4. **Herramientas:** completar adaptadores según utilidad y riesgo, fijar versiones e imágenes por digest, SBOM/procedencia, hashes y pruebas; no habilitar herramientas de red sin política explícita.
 5. **Sandbox:** Docker solo para código confiable/acotado; microVM/VM desechable requiere infraestructura externa y pruebas de aislamiento; gestión de secretos y permisos.

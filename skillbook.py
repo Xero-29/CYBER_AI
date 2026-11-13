@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Libro persistente de metodologías reutilizables, aprobadas por VERITAS."""
-import json, re, sqlite3, uuid
+import hashlib, hmac, json, os, re, sqlite3, uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlparse
+from execution_ledger import ExecutionLedger
 PROJECT=Path(__file__).resolve().parent
 DB_PATH=PROJECT/"data"/"skillbook.sqlite3"
 def now(): return datetime.now(timezone.utc).isoformat()
@@ -58,6 +59,96 @@ def register_verified_skill(*,name,task_pattern,description,prerequisites,method
         VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,'active',1,?,?,?,?)""",
         (sid,name.strip(),task_pattern.strip(),description.strip(),json.dumps(prerequisites),json.dumps(methodology),json.dumps(validation),json.dumps(tools),json.dumps(tags),json.dumps(evidence),json.dumps(source_urls),success_runs,failure_runs,verified_by,verifier_verdict,stamp,stamp))
     return {"skill_id":sid,"status":"active","version":1}
+
+def skill_approval_payload(*, name, task_pattern, description, prerequisites,
+                           methodology, validation, tools, tags, source_urls,
+                           namespace, event_ids):
+    """Canonical document to be signed by an authorized VERITAS approver."""
+    document = {
+        "schema": "cyber-ai-skill-approval-v1",
+        "name": name.strip(), "task_pattern": task_pattern.strip(),
+        "description": description.strip(),
+        "prerequisites": _list(prerequisites, "prerequisites", 0),
+        "methodology": _list(methodology, "methodology", 2),
+        "validation": _list(validation, "validation"),
+        "tools": _list(tools, "tools", 0),
+        "tags": _list(tags, "tags"),
+        "source_urls": _list(source_urls, "source_urls"),
+        "namespace": namespace,
+        "event_ids": list(event_ids),
+    }
+    return json.dumps(document, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def register_skill_from_ledger(*, name, task_pattern, description, prerequisites,
+                               methodology, validation, tools, tags, source_urls,
+                               namespace, event_ids, approval_signature):
+    """Promote a Skill only from two independent ledger runs and signed approval.
+
+    CYBER_AI_VERITAS_APPROVAL_KEY must be provisioned outside the repository.
+    This local HMAC gate is not a substitute for an external KMS/HSM signer.
+    """
+    key = os.environ.get("CYBER_AI_VERITAS_APPROVAL_KEY", "")
+    if len(key.encode("utf-8")) < 32:
+        raise ValueError("Falta una clave VERITAS de al menos 32 bytes en el entorno.")
+    if not isinstance(namespace, str) or not namespace.strip():
+        raise ValueError("namespace es obligatorio.")
+    if not isinstance(event_ids, list) or len(event_ids) < 2 or len(set(event_ids)) != len(event_ids):
+        raise ValueError("Se requieren al menos dos IDs de eventos distintos.")
+
+    payload = skill_approval_payload(
+        name=name, task_pattern=task_pattern, description=description,
+        prerequisites=prerequisites, methodology=methodology,
+        validation=validation, tools=tools, tags=tags,
+        source_urls=source_urls, namespace=namespace.strip(), event_ids=event_ids,
+    )
+    expected = hmac.new(key.encode("utf-8"), payload.encode("utf-8"), hashlib.sha256).hexdigest()
+    if not isinstance(approval_signature, str) or not hmac.compare_digest(expected, approval_signature.lower()):
+        raise ValueError("Firma VERITAS inválida; no se promueve la Skill.")
+
+    ledger = ExecutionLedger()
+    integrity = ledger.verify()
+    if not integrity.get("valid"):
+        raise ValueError("El ledger no supera la verificación de integridad.")
+    history = ledger.history(namespace=namespace.strip(), limit=1000)
+    if len(history) >= 1000:
+        raise ValueError("Historial demasiado grande; no se puede verificar exhaustivamente.")
+    by_id = {item["event_id"]: item for item in history}
+    if any(event_id not in by_id for event_id in event_ids):
+        raise ValueError("Uno o más eventos no existen en el namespace indicado.")
+    selected = [by_id[event_id] for event_id in event_ids]
+    fingerprints = {item.get("task_fingerprint") for item in selected}
+    if len(fingerprints) != 1 or None in fingerprints:
+        raise ValueError("Las ejecuciones no corresponden a la misma huella de tarea.")
+    fingerprint = next(iter(fingerprints))
+    if len({item.get("created_at") for item in selected}) != len(selected):
+        raise ValueError("Las ejecuciones no son independientes en el tiempo.")
+    related = [item for item in history if item.get("task_fingerprint") == fingerprint]
+    if any(item.get("status") != "completed" for item in related):
+        raise ValueError("Hay ejecuciones fallidas o no completadas para esta tarea.")
+    for item in selected:
+        validators = item.get("validator_results") or []
+        if not validators or not all(v.get("passed") is True for v in validators if isinstance(v, dict)):
+            raise ValueError("Cada ejecución debe tener validadores independientes aprobados.")
+        if any(not isinstance(v, dict) for v in validators):
+            raise ValueError("Resultado de validador inválido.")
+        if not re.fullmatch(r"[a-f0-9]{64}", str(item.get("evidence_sha256", ""))):
+            raise ValueError("Evento sin hash de evidencia válido.")
+
+    evidence_refs = [
+        f"ledger_event:{item['event_id']}:sha256:{item['evidence_sha256']}"
+        for item in selected
+    ]
+    evidence_refs.append("veritas_hmac_sha256:" + hashlib.sha256(approval_signature.encode()).hexdigest())
+    return register_verified_skill(
+        name=name, task_pattern=task_pattern, description=description,
+        prerequisites=prerequisites, methodology=methodology,
+        validation=validation, tools=tools, tags=tags,
+        evidence=evidence_refs, source_urls=source_urls,
+        success_runs=len(selected), failure_runs=0,
+        verified_by="VERITAS", verifier_verdict="CONFIRMADA",
+    )
+
 def _words(s):
     return {w for w in re.findall(r"[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ_-]+",str(s).lower()) if len(w)>2}
 def search_skills(task,limit=3):

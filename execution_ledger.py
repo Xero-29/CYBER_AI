@@ -192,7 +192,7 @@ class ExecutionLedger:
             raise LedgerError("limit debe estar entre 1 y 1000.")
         with self.connect() as db:
             rows = db.execute(
-                "SELECT sequence,event_id,created_at,task,status,tool,tool_version,model,"
+                "SELECT sequence,event_id,created_at,task,task_fingerprint,status,tool,tool_version,model,"
                 "environment,duration_ms,cost_microunits,evidence_sha256,validator_results,"
                 "metadata,event_hash FROM execution_events WHERE namespace=? "
                 "ORDER BY sequence DESC LIMIT ?", (namespace, limit)).fetchall()
