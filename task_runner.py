@@ -124,6 +124,13 @@ def main():
 
     if not args.confirm_authorized or not args.authorization_id:
         print("ERROR: se requiere --confirm-authorized y --authorization-id.")
+        _record_task_scan(
+            args.task, args.target,
+            {"task": args.task, "target": args.target,
+             "status": "authorization_denied",
+             "reason": "missing_operator_confirmation_or_authorization_id"},
+            task_started, args.authorization_id,
+        )
         return 2
 
     try:

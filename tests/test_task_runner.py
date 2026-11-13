@@ -15,6 +15,12 @@ class TaskRunnerLedgerTests(unittest.TestCase):
         self.assertEqual(args["tool"], "nuclei_task_runner")
         self.assertEqual(args["namespace"], "security-scans")
 
+    def test_missing_confirmation_is_classified_as_denied(self):
+        report = {"status": "authorization_denied", "reason": "missing_operator_confirmation"}
+        with patch.object(task_runner, "ExecutionLedger") as ledger:
+            task_runner._record_task_scan("web headers", "http://127.0.0.1", report, 0.0)
+        self.assertEqual(ledger.return_value.append.call_args.kwargs["status"], "denied")
+
     def test_authorization_denial_is_recorded(self):
         report = {"status": "authorization_denied", "findings": []}
         with patch.object(task_runner, "ExecutionLedger") as ledger:

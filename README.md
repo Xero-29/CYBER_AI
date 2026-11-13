@@ -48,7 +48,9 @@ python -m unittest discover -s tests -v
 python preflight.py
 ```
 
-El preflight revisa Python, archivos, dependencias, herramientas opcionales y la integridad del ledger existente; no inicia servicios ni realiza llamadas de red. Las advertencias de Docker/Ollama/escáneres son opcionales según las funciones que quieras probar.\n\nLa suite automatizada no requiere conectar un modelo real; los tests de red y proveedores deben usar dobles/simulaciones salvo que un test indique expresamente lo contrario.
+El preflight revisa Python, archivos, dependencias, herramientas opcionales y la integridad del ledger existente; no inicia servicios ni realiza llamadas de red. Las advertencias de Docker/Ollama/escáneres son opcionales según las funciones que quieras probar.
+
+La suite automatizada no requiere conectar un modelo real; los tests de red y proveedores deben usar dobles/simulaciones salvo que un test indique expresamente lo contrario.
 
 ## Ejecutar el análisis de informes
 
