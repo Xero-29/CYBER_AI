@@ -12,7 +12,7 @@ class SandboxRunnerTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.root = Path(self.temp.name)
-        (self.root / "sample.py").write_text("print('safe')\\n", encoding="utf-8")
+        (self.root / "sample.py").write_text("print('safe')", encoding="utf-8")
         self.root_patch = patch.object(sandbox_runner, "PROJECT_ROOT", self.root)
         self.root_patch.start()
         self.adapter_root_patch = patch.object(tool_adapters, "PROJECT_ROOT", self.root)
