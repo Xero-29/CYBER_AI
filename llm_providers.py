@@ -5,6 +5,7 @@ propietarios; los proveedores OpenAI-compatible usan la API HTTP estándar.
 """
 import ipaddress
 import json
+import math
 import os
 from functools import lru_cache
 from importlib.metadata import entry_points
@@ -253,6 +254,45 @@ def _gemini_request(provider, endpoint, payload, timeout):
     raise ValueError(f"Endpoint no disponible para Gemini: {endpoint}")
 
 
+def _finite_number(value):
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return False
+    try:
+        return math.isfinite(float(value))
+    except (OverflowError, ValueError):
+        return False
+
+
+def _validate_plugin_response(endpoint, result, protocol):
+    """Valida el contrato interno antes de aceptar datos de un proveedor externo."""
+    if not isinstance(result, dict):
+        raise RuntimeError(f"El plugin {protocol} devolvió una respuesta no estructurada.")
+    if endpoint == "api/chat":
+        message = result.get("message")
+        if not isinstance(message, dict) or not isinstance(message.get("content"), str):
+            raise RuntimeError(f"El plugin {protocol} no cumple el contrato de chat.")
+    elif endpoint == "api/embed":
+        vectors = result.get("embeddings")
+        if not isinstance(vectors, list) or not vectors:
+            raise RuntimeError(f"El plugin {protocol} no cumple el contrato de embeddings.")
+        dimensions = set()
+        for vector in vectors:
+            if (
+                not isinstance(vector, list) or not vector
+                or any(not _finite_number(value) for value in vector)
+            ):
+                raise RuntimeError(f"El plugin {protocol} devolvió un vector inválido.")
+            dimensions.add(len(vector))
+        if len(dimensions) != 1:
+            raise RuntimeError(f"El plugin {protocol} devolvió dimensiones inconsistentes.")
+    elif endpoint == "api/ps":
+        if not isinstance(result.get("models"), list):
+            raise RuntimeError(f"El plugin {protocol} no cumple el contrato de catálogo.")
+    else:
+        raise ValueError(f"Endpoint no admitido para plugins: {endpoint}")
+    return result
+
+
 def request(provider, endpoint, payload=None, timeout=600):
     """Normaliza llamadas de chat y embeddings para los adaptadores disponibles."""
     protocol = provider.get("protocol")
@@ -269,7 +309,8 @@ def request(provider, endpoint, payload=None, timeout=600):
         return _gemini_request(provider, endpoint, payload or {}, timeout)
     adapter = _load_provider_plugin(protocol)
     if adapter is not None:
-        return adapter.request(provider, endpoint, payload or {}, timeout)
+        result = adapter.request(provider, endpoint, payload or {}, timeout)
+        return _validate_plugin_response(endpoint, result, protocol)
     raise ValueError(f"Protocolo no compatible: {protocol}")
 
 

@@ -28,7 +28,11 @@ un entry point en el grupo `cyber_ai.providers`. El nombre del entry point es
 el valor de `protocol` en `config/model_roles.json`; su objeto exportado debe
 implementar:
 
-- `request(provider, endpoint, payload, timeout)`: devuelve el contrato normalizado de chat/embeddings.
+- `request(provider, endpoint, payload, timeout)`: devuelve el contrato interno normalizado:
+  - `api/chat`: `{"message":{"content":"...","thinking":""},"done_reason":"stop"}`.
+  - `api/embed`: `{"embeddings":[[0.1,0.2,...]]}`; vectores numéricos, finitos y de dimensiones consistentes.
+  - `api/ps`: `{"models":[]}`.
+  Las respuestas se validan antes de llegar a los agentes.
 - `capabilities(provider)`: opcional; devuelve capacidades como `chat` y `embeddings`.
 - `installed_models(provider)`: opcional; devuelve un conjunto de modelos o `None`.
 

@@ -64,7 +64,10 @@ class SandboxRunnerTests(unittest.TestCase):
 
     def test_host_timeout_bounds_docker_process(self):
         with patch.object(sandbox_runner.shutil, "which", return_value="/usr/bin/docker"), \
-             patch.object(sandbox_runner, "build_docker_command", return_value=["docker", "run"]), \
+             patch.object(
+                 sandbox_runner, "build_docker_command",
+                 return_value=["docker", "run", "--name", "cyber-ai-sandbox-" + "a" * 32],
+             ), \
              patch.object(
                  sandbox_runner.subprocess, "run",
                  side_effect=[

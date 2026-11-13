@@ -169,7 +169,13 @@ class NativeProtocolTests(unittest.TestCase):
     def test_installed_provider_plugin_can_be_selected_without_core_changes(self):
         class Plugin:
             def request(self, provider, endpoint, payload, timeout):
-                return {"plugin": provider["name"], "endpoint": endpoint}
+                if endpoint == "api/chat":
+                    return {"message": {"content": "respuesta del plugin", "thinking": ""}}
+                if endpoint == "api/embed":
+                    return {"embeddings": [[1.0, 0.0] for _ in payload.get("input", [])]}
+                if endpoint == "api/ps":
+                    return {"models": []}
+                raise ValueError("endpoint no soportado")
             def capabilities(self, provider):
                 return ["chat", "embeddings"]
             def installed_models(self, provider):
@@ -183,12 +189,25 @@ class NativeProtocolTests(unittest.TestCase):
             provider = llm_providers.resolve_provider(config, {"provider": "custom"})
             self.assertEqual(
                 llm_providers.request(provider, "api/chat", {"model": "m"}),
-                {"plugin": "custom", "endpoint": "api/chat"},
+                {"message": {"content": "respuesta del plugin", "thinking": ""}},
             )
             self.assertEqual(
                 llm_providers.provider_capabilities(provider), ["chat", "embeddings"]
             )
+            self.assertEqual(
+                llm_providers.request(provider, "api/embed", {"input": ["a"]}),
+                {"embeddings": [[1.0, 0.0]]},
+            )
             self.assertEqual(llm_providers.installed_models(provider), {"remote-model"})
+
+    def test_plugin_invalid_embedding_contract_is_rejected(self):
+        class Plugin:
+            def request(self, provider, endpoint, payload, timeout):
+                return {"embeddings": [[1.0, float("nan")]]}
+        provider = {"name": "custom", "protocol": "test_plugin"}
+        with patch.object(llm_providers, "_load_provider_plugin", return_value=Plugin()):
+            with self.assertRaisesRegex(RuntimeError, "vector inválido"):
+                llm_providers.request(provider, "api/embed", {"input": ["x"]})
 
     def test_unknown_protocol_is_rejected_during_resolution(self):
         config = {"llm_providers": {"custom": {

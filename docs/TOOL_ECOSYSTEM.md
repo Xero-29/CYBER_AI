@@ -54,7 +54,7 @@ python tool_registry.py "descubrimiento de red y puertos"
 - `tool_executor.py`: CLI explícita; sin `--execute` solo presenta un dry-run.
 - `tool_registry.py`: distingue adaptadores disponibles, herramientas pendientes y capacidades bloqueadas por red.
 - Cada ejecución exige una ruta existente dentro del repositorio, rechaza enlaces simbólicos, limita el objetivo a 10.000 archivos y 100 MB, fija timeout (máximo 600 s), limita la salida capturada a 2 MB, evita shell y mata el grupo de procesos al agotar el tiempo.
-- Se registra JSON de evidencia con hash SHA-256 antes/después, código de salida, tiempo, comando, salida y estado. La salida no se convierte automáticamente en hallazgos confirmados ni Skills.
+- Se registra JSON de evidencia con hash SHA-256 antes/después, código de salida, tiempo, comando, salida y estado. El proceso Docker del host tiene timeout propio; al vencer, se solicita matar y eliminar el contenedor nombrado. La salida no se convierte automáticamente en hallazgos confirmados ni Skills.
 - Semgrep exige configuración local explícita; no descarga reglas.
 - Trivy se ejecuta en modo offline y no actualiza bases. Si la base local no existe, la herramienta puede fallar; no se descarga automáticamente.
 - **pip-audit permanece bloqueado**: su consulta de vulnerabilidades requiere red. No se ha habilitado acceso remoto implícito.

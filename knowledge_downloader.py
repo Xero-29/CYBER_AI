@@ -100,8 +100,9 @@ def _safe_destination(item, *, create=True):
         target_dir = target_dir / part
         if target_dir.is_symlink():
             raise ValueError("No se permiten enlaces simbólicos en el destino.")
-    target_dir.mkdir(parents=True, exist_ok=True)
-    resolved_dir = target_dir.resolve(strict=True)
+    if create:
+        target_dir.mkdir(parents=True, exist_ok=True)
+    resolved_dir = target_dir.resolve(strict=create)
     if not resolved_dir.is_relative_to(base):
         raise ValueError("El destino escapa de la biblioteca.")
     destination = resolved_dir / filename
