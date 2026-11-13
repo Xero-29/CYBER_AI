@@ -57,6 +57,7 @@ class SandboxRunnerTests(unittest.TestCase):
         content = dockerfile.read_text(encoding="utf-8")
         self.assertIn('ruff==0.14.5', content)
         self.assertIn('bandit==1.8.6', content)
+        self.assertIn('python:3.12-slim-bookworm@sha256:0f086103b026048cc50cb5da25ec435c023c5241a83fc44daea593377abc61c4', content)
         self.assertEqual(SANDBOX_TOOLS, frozenset({"ruff", "bandit"}))
 
     def test_network_tool_is_denied(self):
