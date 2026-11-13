@@ -9,11 +9,14 @@ import knowledge_downloader as downloader
 class KnowledgeDownloaderSecurityTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
+        self.root_patch = patch.object(downloader, "ROOT", Path(self.temp.name))
+        self.root_patch.start()
         self.base_patch = patch.object(downloader, "BASE", Path(self.temp.name) / "base")
         self.base_patch.start()
 
     def tearDown(self):
         self.base_patch.stop()
+        self.root_patch.stop()
         self.temp.cleanup()
 
     def item(self, **overrides):

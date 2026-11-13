@@ -276,6 +276,7 @@ def _run(args):
     if not isinstance(resources, list):
         raise ValueError("El catálogo debe contener una lista de recursos.")
     invalid_resources = sum(not isinstance(item, dict) for item in resources)
+    errors = invalid_resources
     if invalid_resources:
         print(f"Recursos inválidos omitidos: {invalid_resources}")
     resources = [item for item in resources if isinstance(item, dict)]
@@ -306,6 +307,7 @@ def _run(args):
             result = download(item, manifest, args.dry_run)
             print(f"[{result.upper()}] {item['id']}")
         except Exception as error:
+            errors += 1
             if not args.dry_run:
                 manifest["resources"].setdefault(item.get("id", "invalid"), {}).update({
                     "status": "failed", "error": str(error), "updated_at": now(),
@@ -317,8 +319,11 @@ def _run(args):
                 save_json(MANIFEST, manifest)
             time.sleep(0.3)
 
-    print(f"\nRegistro actualizado: {MANIFEST}")
-    return 0
+    if args.dry_run:
+        print("\nSimulación finalizada; no se modificó el manifiesto.")
+    else:
+        print(f"\nRegistro actualizado: {MANIFEST}")
+    return 1 if errors else 0
 
 
 def main(argv=None):
