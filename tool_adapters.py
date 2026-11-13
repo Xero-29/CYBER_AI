@@ -88,7 +88,7 @@ def _build_command(tool_id, binary, target, config_path=None):
     if tool_id == "bandit":
         return [binary, "-r", str(target), "-f", "json", "-q"]
     if tool_id == "ruff":
-        return [binary, "check", "--output-format=json", str(target)]
+        return [binary, "check", "--no-cache", "--output-format=json", str(target)]
     if tool_id == "syft":
         return [binary, "scan", "dir:" + str(target), "-o", "json"]
     if tool_id == "trivy":
