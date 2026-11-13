@@ -12,7 +12,7 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 
 ## Capacidades existentes (no equivalen a cierre institucional)
 
-- Inventario de 20 herramientas, selección explicable y adaptadores parciales.
+- Inventario de 20 herramientas, selección explicable y adaptadores parciales; los adaptadores locales registran la versión instalada cuando puede consultarse sin red.
 - Sandbox Docker endurecido; comparte kernel y no es aislamiento para malware hostil.
 - Atlas de 28 áreas y 98 referencias catalogadas, no corpus completo ingerido.
 - Biblioteca SQLite con fragmentos comprimidos, SHA-256, metadatos, separación shared/tenant y búsqueda semántica.

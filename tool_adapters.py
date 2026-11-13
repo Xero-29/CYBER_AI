@@ -22,11 +22,11 @@ MAX_TARGET_BYTES = 100_000_000
 MAX_TARGET_FILES = 10_000
 DEFAULT_TIMEOUT = 180
 TOOL_SPECS = {
-    "semgrep": {"binary": "semgrep", "network": False, "timeout": 180},
-    "bandit": {"binary": "bandit", "network": False, "timeout": 180},
-    "ruff": {"binary": "ruff", "network": False, "timeout": 120},
-    "syft": {"binary": "syft", "network": False, "timeout": 180},
-    "trivy": {"binary": "trivy", "network": False, "timeout": 240},
+    "semgrep": {"binary": "semgrep", "network": False, "timeout": 180, "version_args": ["--version"]},
+    "bandit": {"binary": "bandit", "network": False, "timeout": 180, "version_args": ["--version"]},
+    "ruff": {"binary": "ruff", "network": False, "timeout": 120, "version_args": ["--version"]},
+    "syft": {"binary": "syft", "network": False, "timeout": 180, "version_args": ["version"]},
+    "trivy": {"binary": "trivy", "network": False, "timeout": 240, "version_args": ["--version"]},
     "pip_audit": {"binary": "pip-audit", "network": True, "timeout": 180},
 }
 
@@ -101,6 +101,23 @@ def _build_command(tool_id, binary, target, config_path=None):
     raise ToolExecutionError("Herramienta sin adaptador ejecutable.")
 
 
+def _probe_tool_version(binary, tool_id, env):
+    """Obtiene la versión instalada sin shell ni acceso de red intencional."""
+    arguments = TOOL_SPECS[tool_id].get("version_args", ["--version"])
+    try:
+        result = subprocess.run(
+            [binary, *arguments], cwd=str(PROJECT_ROOT), env=env,
+            stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT, text=True, timeout=5,
+            shell=False, check=False,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return "unknown"
+    if result.returncode != 0 or not result.stdout.strip():
+        return "unknown"
+    return result.stdout.strip().splitlines()[0][:256]
+
+
 def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
     """Ejecuta un adaptador local; pip-audit se deniega por requerir red."""
     if tool_id not in TOOL_SPECS:
@@ -126,6 +143,7 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
         "LC_ALL": "C.UTF-8",
         "NO_COLOR": "1",
     }
+    tool_version = _probe_tool_version(binary, tool_id, env)
     target_hash_before = _hash_target(path)
     started = time.monotonic()
     timestamp = datetime.now(timezone.utc).isoformat()
@@ -188,7 +206,7 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
     evidence = {
         "schema_version": "1.0",
         "tool": tool_id,
-        "tool_version": "not_probed",
+        "tool_version": tool_version,
         "target": str(path.relative_to(PROJECT_ROOT)),
         "target_sha256": target_hash_before,
         "target_sha256_after": target_hash_after,

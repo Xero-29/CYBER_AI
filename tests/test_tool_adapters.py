@@ -43,7 +43,9 @@ class ToolAdapterTests(unittest.TestCase):
 
     @patch("tool_adapters.subprocess.Popen")
     @patch("tool_adapters.shutil.which", return_value="/usr/bin/ruff")
-    def test_ruff_uses_argument_vector_and_returns_structured_evidence(self, which, popen):
+    @patch("tool_adapters.subprocess.run")
+    def test_ruff_uses_argument_vector_and_returns_structured_evidence(self, version_run, which, popen):
+        version_run.return_value = subprocess.CompletedProcess(["ruff", "--version"], 0, stdout="ruff 0.14.5\n", stderr="")
         process = FakeProcess()
         popen.return_value = process
         evidence = run_local_tool("ruff", "sample.py")
@@ -52,6 +54,7 @@ class ToolAdapterTests(unittest.TestCase):
         self.assertIn("--output-format=json", command)
         self.assertFalse(popen.call_args.kwargs["shell"])
         self.assertEqual(evidence["status"], "completed")
+        self.assertEqual(evidence["tool_version"], "ruff 0.14.5")
         self.assertEqual(evidence["parsed_json"], [])
         self.assertFalse(evidence["network_access"])
         self.assertEqual(len(evidence["target_sha256"]), 64)
