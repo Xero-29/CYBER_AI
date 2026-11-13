@@ -35,7 +35,8 @@ class SkillbookTests(unittest.TestCase):
    def verify(self): return {"valid":True}
    def history(self,**kwargs): return events
   args=dict(name="Skill firmada",task_pattern="misma tarea de prueba",description="Procedimiento respaldado",prerequisites=["entorno de prueba"],methodology=["preparar entorno","ejecutar comprobación"],validation=["verificar resultado"],tools=["ruff"],tags=["test","quality"],source_urls=["https://example.org/"],namespace="nexo",event_ids=["run-1","run-2"])
-  payload=skillbook.skill_approval_payload(**args)
+  with patch.object(skillbook,"ExecutionLedger",return_value=FakeLedger()):
+   payload=skillbook.skill_approval_payload(**args)
   signature=hmac.new(key.encode(),payload.encode(),hashlib.sha256).hexdigest()
   with patch.dict(os.environ,{"CYBER_AI_VERITAS_APPROVAL_KEY":key}), patch.object(skillbook,"ExecutionLedger",return_value=FakeLedger()):
    result=skillbook.register_skill_from_ledger(**args,approval_signature=signature)
@@ -66,7 +67,8 @@ class SkillbookTests(unittest.TestCase):
   self.assertEqual(skillbook.search_skills("tarea repetible"),[])
   versions=skillbook.list_skill_versions(candidate["skill_id"])
   self.assertEqual([v["change_type"] for v in versions],["proposed"])
-  payload=skillbook.skill_approval_payload(**args)
+  with patch.object(skillbook,"ExecutionLedger",return_value=FakeLedger()):
+   payload=skillbook.skill_approval_payload(**args)
   signature=hmac.new(key.encode(),payload.encode(),hashlib.sha256).hexdigest()
   with patch.dict(os.environ,{"CYBER_AI_VERITAS_APPROVAL_KEY":key}), patch.object(skillbook,"ExecutionLedger",return_value=FakeLedger()):
    promoted=skillbook.register_skill_from_ledger(**args,approval_signature=signature)
