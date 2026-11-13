@@ -1,4 +1,5 @@
 import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -25,6 +26,10 @@ class FakeProcess:
 
 class NucleiScannerTests(unittest.TestCase):
     def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.ledger_path = Path(self.temp.name) / "ledger.sqlite3"
+        self.ledger_env = patch.dict(os.environ, {"CYBER_AI_LEDGER_PATH": str(self.ledger_path)})
+        self.ledger_env.start()
         self.authorization = patch(
             "nuclei_scanner.authorize_target",
             return_value={"authorization_id": "test-grant"},
@@ -33,6 +38,8 @@ class NucleiScannerTests(unittest.TestCase):
 
     def tearDown(self):
         self.authorization.stop()
+        self.ledger_env.stop()
+        self.temp.cleanup()
 
     def test_scan_requires_explicit_authorization(self):
         result = scan_target("http://127.0.0.1:8765")
