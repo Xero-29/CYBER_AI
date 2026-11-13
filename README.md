@@ -101,12 +101,12 @@ La imagen Docker actual solo incluye Ruff y Bandit. Semgrep, Syft y Trivy están
 
 ## Conocimiento y Skills
 
-- Ingesta TXT/Markdown: consulta `knowledge_ingest.py --help`.
+- Ingesta TXT, Markdown, HTML, CSV, JSON/JSONL y código: disponible con las dependencias base. PDF, DOCX, XLSX y PPTX requieren `pip install -r requirements-documents.txt`. Los PDF escaneados necesitan OCR externo; el importador no ejecuta OCR.
 - Recuperación e indexación: revisa `knowledge_library.py`, `knowledge_embeddings.py` y `knowledge_reindex.py`.
 - Fuentes externas: el catálogo requiere revisión de licencia y verificación antes de habilitar descargas.
 - Skills: `skillbook.py` solo debe contener procedimientos respaldados por evidencia y validación independiente. Una coincidencia recuperada no concede permisos de ejecución.
 
-Los datos locales, bases SQLite, historiales y reportes se guardan fuera del control de versiones mediante `.gitignore`. Haz copias de seguridad antes de borrar o recrear `data/`.
+Los extractores de Office validan el tamaño de los paquetes comprimidos, pero siguen procesando archivos en el proceso local; importa solo documentos confiables hasta que se ejecute la extracción en una sandbox dedicada.\n\nLos datos locales, bases SQLite, historiales y reportes se guardan fuera del control de versiones mediante `.gitignore`. Haz copias de seguridad antes de borrar o recrear `data/`.
 
 ## Seguridad operativa
 

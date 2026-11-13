@@ -42,6 +42,37 @@ class TestKnowledgeIngest(unittest.TestCase):
         self.assertIn("Primer párrafo.", chunks[0])
         self.assertIn("Segundo párrafo.", chunks[0])
 
+
+    def test_extracts_html_without_active_content(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "page.html"
+            path.write_text("<h1>Manual</h1><script>secret()</script><p>Texto visible</p>", encoding="utf-8")
+            text = ingest.extract_document_text(path)
+        self.assertIn("Manual", text)
+        self.assertIn("Texto visible", text)
+        self.assertNotIn("secret()", text)
+
+    def test_extracts_csv_and_json_as_text(self):
+        with tempfile.TemporaryDirectory() as temp:
+            csv_path = Path(temp) / "data.csv"
+            csv_path.write_text("name,value\nalpha,1\n", encoding="utf-8")
+            json_path = Path(temp) / "data.json"
+            json_path.write_text('{"name":"alpha","value":1}', encoding="utf-8")
+            self.assertIn("alpha", ingest.extract_document_text(csv_path))
+            self.assertIn('"value": 1', ingest.extract_document_text(json_path))
+
+    def test_rejects_unsupported_and_oversized_documents(self):
+        with tempfile.TemporaryDirectory() as temp:
+            unsupported = Path(temp) / "archive.bin"
+            unsupported.write_bytes(b"data")
+            with self.assertRaisesRegex(ValueError, "Formato no soportado"):
+                ingest.extract_document_text(unsupported)
+            oversized = Path(temp) / "large.txt"
+            oversized.write_bytes(b"xxxx")
+            with patch.object(ingest, "MAX_INPUT_BYTES", 3):
+                with self.assertRaisesRegex(ValueError, "100 MiB"):
+                    ingest.extract_document_text(oversized)
+
     def test_ingest_batches_embeddings_and_stores_chunks(self):
         with tempfile.TemporaryDirectory() as temp:
             document = Path(temp) / "guia.md"

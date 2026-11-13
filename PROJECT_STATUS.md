@@ -16,7 +16,7 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 - Sandbox Docker endurecido; comparte kernel y no es aislamiento para malware hostil.
 - Atlas de 28 áreas y 98 referencias catalogadas, no corpus completo ingerido.
 - Biblioteca SQLite con fragmentos comprimidos, SHA-256, metadatos, separación shared/tenant y búsqueda semántica.
-- Ingestión directa TXT/Markdown; catálogo, descubrimiento y downloader con controles.
+- Ingestión de TXT/Markdown, HTML, CSV, JSON/JSONL y código; extractores opcionales PDF/DOCX/XLSX/PPTX con límites de tamaño y expansión ZIP. OCR de PDF escaneado y ejecución aislada de extractores siguen pendientes. Catálogo, descubrimiento y downloader con controles.
 - Reindexación con staging, backup y publicación transaccional.
 - Proveedores Ollama, OpenAI-compatible, Anthropic chat y Gemini chat/embeddings.
 - Skillbook con búsqueda y metodologías; se añade promoción basada en dos eventos independientes del ledger íntegro y firma HMAC VERITAS. La clave sigue siendo un secreto operativo externo, no una identidad de modelo.
@@ -27,7 +27,7 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 
 1. **Ejecución y aprendizaje:** integrar ledger en agente, ejecutores y adaptadores; almacenar artefactos en repositorio controlado; checkpoints firmados externos; costes reales por proveedor; retención y privacidad.
 2. **Skills verificadas:** conectar el ciclo automático de propuestas con la API de promoción firmada; provisionar firma desde KMS/HSM o servicio independiente; versionado, rollback, regresión y detección de obsolescencia.
-3. **Biblioteca documental:** extractores probados para PDF, HTML, Office, código y datasets; OCR cuando aplique; normalización; deduplicación/versionado; índice híbrido FTS + vector/ANN; evaluación de recuperación; citas por fragmento; revisión de licencias/procedencia.
+3. **Biblioteca documental:** validar extractores PDF/Office en fixtures adversariales y sandbox; OCR cuando aplique; deduplicación/versionado; índice híbrido FTS + vector/ANN; evaluación de recuperación; citas por fragmento; revisión de licencias/procedencia.
 4. **Herramientas:** completar adaptadores según utilidad y riesgo, fijar versiones e imágenes por digest, SBOM/procedencia, hashes y pruebas; no habilitar herramientas de red sin política explícita.
 5. **Sandbox:** Docker solo para código confiable/acotado; microVM/VM desechable requiere infraestructura externa y pruebas de aislamiento; gestión de secretos y permisos.
 6. **IA:** contrato de capacidades común, embeddings equivalentes, detección de capacidades, selección/fallback de modelos, pruebas de compatibilidad y gestión segura de credenciales.
