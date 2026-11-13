@@ -5,6 +5,7 @@ import argparse
 import json
 import shutil
 import subprocess
+import sys
 import time
 import uuid
 from pathlib import Path
@@ -12,6 +13,28 @@ from urllib.parse import urlparse
 
 from capability_selector import select_capabilities
 from execution_policy import AuthorizationError, authorize_target
+from execution_ledger import ExecutionLedger
+
+
+def _record_task_scan(task, target, report, started, authorization_id=None):
+    """Registra ejecuciones del runner de plantillas Nuclei."""
+    status = report.get("status")
+    ledger_status = (
+        "denied" if status == "authorization_denied"
+        else "timeout" if status == "timeout"
+        else "completed" if status == "completed"
+        else "failed"
+    )
+    try:
+        ExecutionLedger().append(
+            namespace="security-scans", task=f"{task} :: {target}",
+            status=ledger_status, tool="nuclei_task_runner",
+            evidence=report,
+            duration_ms=max(0, int((time.monotonic() - started) * 1000)),
+            metadata={"authorization_id": authorization_id, "scanner_status": status},
+        )
+    except Exception as error:
+        print(f"AVISO: no se pudo registrar el escaneo en el ledger: {error}", file=sys.stderr)
 
 
 def main():
@@ -31,6 +54,7 @@ def main():
     args = parser.parse_args()
 
     parsed = urlparse(args.target)
+    task_started = time.monotonic()
     if (
         parsed.scheme not in ("http", "https")
         or not parsed.hostname
@@ -106,11 +130,19 @@ def main():
         grant = authorize_target(args.target, "nuclei_scan", args.authorization_id)
     except AuthorizationError as error:
         print("ERROR: autorización denegada:", error)
+        _record_task_scan(args.task, args.target,
+                          {"task": args.task, "target": args.target,
+                           "status": "authorization_denied", "error": str(error)},
+                          task_started, args.authorization_id)
         return 2
 
     nuclei = shutil.which("nuclei")
     if not nuclei:
         print("ERROR: Nuclei no está instalado o no está en PATH.")
+        _record_task_scan(args.task, args.target,
+                          {"task": args.task, "target": args.target,
+                           "status": "scanner_missing", "findings": []},
+                          task_started, args.authorization_id)
         return 1
 
     output_dir = Path("reports")
@@ -145,6 +177,7 @@ def main():
             json.dumps(report, indent=2, ensure_ascii=False) + "\n",
             encoding="utf-8",
         )
+        _record_task_scan(args.task, args.target, report, task_started, args.authorization_id)
         print("Tiempo agotado. Informe:", report_file)
         return 1
 
@@ -172,6 +205,7 @@ def main():
         json.dumps(report, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
+    _record_task_scan(args.task, args.target, report, task_started, args.authorization_id)
     print("\nEstado:", report["status"])
     print("Tiempo:", elapsed, "segundos")
     print("Hallazgos:", len(findings))
