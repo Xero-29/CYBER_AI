@@ -5,6 +5,8 @@ from collections import deque
 import argparse
 import fcntl
 import json
+import time
+import sys
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -12,6 +14,7 @@ from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
 
 from model_memory_manager import load_config, resolve_agent, record
+from execution_ledger import ExecutionLedger
 from learning_memory import build_memory_context
 from skillbook import build_skill_context
 from llm_providers import (
@@ -462,6 +465,7 @@ def run_agent(
     knowledge_tags=None, structured_output=False,
 ):
     """Ejecuta un especialista conversacional y libera el modelo al terminar."""
+    execution_started = time.monotonic()
     explicit_task_id = bool(task_id and str(task_id).strip())
     task_id = str(task_id).strip() if explicit_task_id else uuid.uuid4().hex
 
@@ -925,6 +929,32 @@ def run_agent(
                 "response_chars_this_run": len(generated_this_run),
             }
             save_jsonl(TASK_LOG, event)
+            # Registrar el resultado del agente como evidencia auditable.
+            try:
+                memory_config = agent.get("memory") or {}
+                namespace = memory_config.get("namespace") or name
+                ledger_status = "completed" if finished else "failed"
+                ledger_result = ExecutionLedger().append(
+                    namespace=str(namespace), task=original_task,
+                    status=ledger_status, tool="agent_runner",
+                    tool_version="1", model=f"{provider['name']}::{model}",
+                    environment=f"python:{sys.version_info.major}.{sys.version_info.minor}",
+                    duration_ms=max(0, int((time.monotonic() - execution_started) * 1000)),
+                    evidence={"task_id": task_id, "session_id": session_id,
+                              "response": answer, "response_this_run": generated_this_run,
+                              "done_reason": done_reason, "generation_status": status},
+                    validator_results=[{"name": "generation_completion", "passed": finished}],
+                    metadata={"task_id": task_id, "session_id": session_id,
+                              "provider": provider["name"], "mode": mode,
+                              "prompt_tokens": usage_totals["prompt_eval_count"],
+                              "completion_tokens": usage_totals["eval_count"],
+                              "generation_requests": generation_requests,
+                              "matched_skills": matched_skills,
+                              "retrieved_knowledge": retrieved_knowledge},
+                )
+                print(f"Ledger: evento {ledger_result['sequence']} registrado", flush=True)
+            except Exception as ledger_error:
+                print(f"AVISO: no se pudo registrar la ejecución en el ledger: {ledger_error}", flush=True)
             try:
                 save_checkpoint(
                     task_id=task_id,

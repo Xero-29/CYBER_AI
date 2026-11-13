@@ -6,6 +6,8 @@ import os
 import sys
 
 from tool_adapters import TOOL_SPECS, ToolExecutionError, run_local_tool, write_evidence
+from execution_ledger import ExecutionLedger
+import time
 
 
 def main(argv=None):
@@ -27,6 +29,7 @@ def main(argv=None):
         }, ensure_ascii=False, indent=2))
         return 0
 
+    started = time.monotonic()
     try:
         evidence = run_local_tool(
             args.tool, args.target, config_path=args.config, timeout=args.timeout
@@ -38,8 +41,34 @@ def main(argv=None):
             allow_external=bool(evidence_dir),
         )
     except ToolExecutionError as exc:
+        try:
+            ExecutionLedger().append(
+                namespace="local-tools", task=args.target, status="denied",
+                tool=args.tool, evidence={"reason": str(exc)},
+                duration_ms=max(0, int((time.monotonic() - started) * 1000)),
+            )
+        except Exception as ledger_error:
+            print(f"AVISO: ledger no disponible: {ledger_error}", file=sys.stderr)
         print(json.dumps({"status": "denied", "reason": str(exc)}, ensure_ascii=False), file=sys.stderr)
         return 2
+
+    try:
+        ledger_status = evidence.get("status")
+        if ledger_status not in {"completed", "timeout"}:
+            ledger_status = "failed"
+        ledger_event = ExecutionLedger().append(
+            namespace="local-tools", task=args.target, status=ledger_status,
+            tool=args.tool, tool_version=evidence.get("tool_version", "unknown"),
+            evidence=evidence,
+            duration_ms=max(0, int(float(evidence.get("elapsed_seconds", 0)) * 1000)),
+            validator_results=[{"name": "process_exit", "passed": evidence.get("return_code") == 0}],
+            metadata={"target": evidence.get("target"),
+                      "target_sha256": evidence.get("target_sha256"),
+                      "target_modified": evidence.get("target_modified")},
+        )
+        evidence["ledger_event"] = ledger_event
+    except Exception as ledger_error:
+        evidence["ledger_error"] = str(ledger_error)
 
     evidence["evidence_file"] = str(evidence_path)
     print(json.dumps(evidence, ensure_ascii=False, indent=2))

@@ -21,7 +21,7 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 - Proveedores Ollama, OpenAI-compatible, Anthropic chat y Gemini chat/embeddings.
 - Skillbook con aprobación VERITAS, metodología, prerrequisitos, validación, evidencias y búsqueda.
 - Memoria de lecciones verificadas con aislamiento por namespace e inyección contextual.
-- Nuevo ledger de ejecuciones: módulo y pruebas añadidos; integración end-to-end pendiente.
+- Ledger de ejecuciones: integrado con `agent_runner.py` y `tool_executor.py` para registrar respuestas, ejecuciones locales, timeouts y denegaciones. La escritura del ledger emite una advertencia si falla y no oculta el resultado original. La integración con `task_runner.py`, el ciclo de Skills y el almacenamiento externo de artefactos siguen pendientes.
 
 ## Pendientes de cierre
 
