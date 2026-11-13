@@ -20,6 +20,7 @@ class ToolExecutorLedgerIntegrationTests(unittest.TestCase):
                  patch.object(tool_executor, "write_evidence", return_value=output), \
                  patch.object(tool_executor, "ExecutionLedger") as ledger, \
                  patch("builtins.print"):
+                ledger.return_value.append.return_value = {"sequence": 1, "event_id": "test", "status": "completed"}
                 result = tool_executor.main(["--tool", "ruff", "--target", "sample.py", "--execute"])
         self.assertEqual(result, 0)
         ledger.return_value.append.assert_called_once()
