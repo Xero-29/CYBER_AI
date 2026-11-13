@@ -8,6 +8,7 @@ import argparse
 import json
 
 from capability_inventory import TOOL_CATALOG, build_inventory
+from tool_adapters import TOOL_SPECS
 
 
 TASK_TERMS = {
@@ -52,6 +53,13 @@ def select_tools(task, *, inventory=None, limit=10):
             "matched_terms": matched,
             "authorization_required": active,
             "execution_permitted": False,
+            "adapter_supported": item["id"] in TOOL_SPECS,
+            "adapter_status": (
+                "blocked_network_policy" if item["id"] in TOOL_SPECS and TOOL_SPECS[item["id"]]["network"]
+                else "local_adapter_available" if item["id"] in TOOL_SPECS
+                else "separate_runner" if item["id"] == "nuclei"
+                else "not_implemented"
+            ),
             "status": "candidate_only",
         })
     ranked.sort(key=lambda item: (
