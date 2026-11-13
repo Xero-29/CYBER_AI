@@ -47,3 +47,30 @@ python tool_registry.py "descubrimiento de red y puertos"
 **No implementado todavía:** adaptadores de ejecución para Semgrep, Bandit, Ruff, pip-audit, OSV-Scanner, Trivy, Grype, Syft, Checkov, Gitleaks, detect-secrets, Hadolint, ShellCheck, actionlint, kube-linter, YARA, TShark, Zeek y Volatility. Su presencia en el catálogo no implica que estén instaladas ni que CYBER_AI ya pueda ejecutarlas.
 
 **Próximo paso:** adaptadores pequeños y tipados, cada uno con esquema de entrada/salida, timeout, límites de salida, allowlist de rutas, versión, registro de evidencia y pruebas con binarios simulados. Integrarlos al motor de autorización sin permitir que el modelo construya comandos shell arbitrarios.
+
+## Adaptadores locales implementados
+
+- `tool_adapters.py`: adaptadores para **Semgrep, Bandit, Ruff, Syft y Trivy**.
+- `tool_executor.py`: CLI explícita; sin `--execute` solo presenta un dry-run.
+- `tool_registry.py`: distingue adaptadores disponibles, herramientas pendientes y capacidades bloqueadas por red.
+- Cada ejecución exige una ruta existente dentro del repositorio, rechaza enlaces simbólicos, limita el objetivo a 10.000 archivos y 100 MB, fija timeout (máximo 600 s), limita la salida capturada a 2 MB, evita shell y mata el grupo de procesos al agotar el tiempo.
+- Se registra JSON de evidencia con hash SHA-256 antes/después, código de salida, tiempo, comando, salida y estado. La salida no se convierte automáticamente en hallazgos confirmados ni Skills.
+- Semgrep exige configuración local explícita; no descarga reglas.
+- Trivy se ejecuta en modo offline y no actualiza bases. Si la base local no existe, la herramienta puede fallar; no se descarga automáticamente.
+- **pip-audit permanece bloqueado**: su consulta de vulnerabilidades requiere red. No se ha habilitado acceso remoto implícito.
+- Nmap y Nuclei mantienen su ruta de autorización de red separada; este conjunto de adaptadores no les concede permisos.
+
+Ejemplos (desde la raíz del repositorio):
+
+```bash
+python tool_executor.py --tool ruff --target .
+python tool_executor.py --tool ruff --target . --execute
+python tool_executor.py --tool bandit --target .
+python tool_executor.py --tool syft --target .
+python tool_executor.py --tool trivy --target .
+python tool_executor.py --tool semgrep --target . --config config/semgrep.yml
+```
+
+## Límites de seguridad pendientes
+
+Estos adaptadores evitan invocación por shell y acotan tiempo/salida/rutas, pero **todavía no ejecutan los binarios dentro de un sandbox del sistema operativo**. No deben procesar repositorios hostiles o muestras de malware en una máquina con privilegios. Antes de uso institucional se requiere contenedor/namespace sin privilegios, filesystem de solo lectura, red deshabilitada por defecto, límites CPU/RAM/PID, firma/verificación de binarios y registro inmutable. La versión de cada binario aún debe incorporarse al manifiesto de evidencia.
