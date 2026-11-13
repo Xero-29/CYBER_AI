@@ -21,7 +21,7 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 - Proveedores Ollama, OpenAI-compatible, Anthropic chat y Gemini chat/embeddings.
 - Skillbook con búsqueda y metodologías; se añade promoción basada en dos eventos independientes del ledger íntegro y firma HMAC VERITAS. La clave sigue siendo un secreto operativo externo, no una identidad de modelo.
 - Memoria de lecciones verificadas con aislamiento por namespace e inyección contextual.
-- Ledger de ejecuciones: integrado con `agent_runner.py` y `tool_executor.py` para registrar respuestas, ejecuciones locales, timeouts y denegaciones. La escritura del ledger emite una advertencia si falla y no oculta el resultado original. La integración con `task_runner.py`, el ciclo de Skills y el almacenamiento externo de artefactos siguen pendientes.
+- Ledger de ejecuciones: integrado con `agent_runner.py`, `tool_executor.py` y `nuclei_scanner.py` para registrar respuestas, ejecuciones locales, timeouts y denegaciones. La escritura del ledger emite una advertencia si falla y no oculta el resultado original. La integración con `task_runner.py`, el ciclo de Skills autónomas y el almacenamiento externo WORM siguen pendientes.
 
 ## Pendientes de cierre
 

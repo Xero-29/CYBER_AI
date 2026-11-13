@@ -80,7 +80,9 @@ class ToolAdapterTests(unittest.TestCase):
 
     @patch("tool_adapters.subprocess.Popen")
     @patch("tool_adapters.shutil.which", return_value="/usr/bin/bandit")
-    def test_timeout_is_recorded(self, which, popen):
+    @patch("tool_adapters.subprocess.run")
+    def test_timeout_is_recorded(self, version_run, which, popen):
+        version_run.return_value = subprocess.CompletedProcess(["bandit", "--version"], 0, stdout="Bandit 1.8.6", stderr="")
         popen.return_value = FakeProcess(timeout=True)
         evidence = run_local_tool("bandit", "sample.py", timeout=1)
         self.assertEqual(evidence["status"], "timeout")

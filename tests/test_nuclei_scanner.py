@@ -95,6 +95,8 @@ class NucleiScannerTests(unittest.TestCase):
             self.assertEqual(result["status"], "completed")
             self.assertEqual(result["findings_count"], 1)
             self.assertEqual(result["findings"][0]["template-id"], "test-template")
+            events = ExecutionLedger(self.ledger_path).history(namespace="security-scans")
+            self.assertEqual(events[0]["status"], "completed")
 
     def test_process_start_error_is_reported(self):
         with patch("nuclei_scanner.shutil.which", return_value="/usr/bin/nuclei"):

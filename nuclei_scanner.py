@@ -12,6 +12,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from execution_policy import AuthorizationError, authorize_target
+from execution_ledger import ExecutionLedger
 
 
 def validate_target(target):
@@ -33,34 +34,61 @@ def validate_target(target):
     return target
 
 
+def _record_scan_event(target, result, started, *, authorization_id=None):
+    """Registra intentos, denegaciones y resultados de Nuclei sin ocultar errores."""
+    status = result.get("status")
+    ledger_status = (
+        "denied" if status in {"authorization_required", "authorization_denied"}
+        else "timeout" if status == "timeout"
+        else "completed" if status == "completed"
+        else "failed"
+    )
+    try:
+        ExecutionLedger().append(
+            namespace="security-scans", task=target, status=ledger_status,
+            tool="nuclei", evidence=result,
+            duration_ms=max(0, int((time.monotonic() - started) * 1000)),
+            metadata={"authorization_id": authorization_id, "scanner_status": status},
+        )
+    except Exception as error:
+        print(f"AVISO: no se pudo registrar el escaneo en el ledger: {error}", file=sys.stderr)
+
+
 def scan_target(target, timeout=45, authorized=False, authorization_id=None):
     """Ejecuta Nuclei solo con un permiso local, específico y vigente."""
     target = validate_target(target)
+    started = time.monotonic()
     if authorized is not True or not authorization_id:
-        return {
+        result = {
             "target": target,
             "status": "authorization_required",
             "error": "Se requiere confirmación e identificador de autorización.",
             "findings": [],
         }
+        _record_scan_event(target, result, started, authorization_id=authorization_id)
+        return result
     try:
         grant = authorize_target(target, "nuclei_scan", authorization_id)
     except AuthorizationError as error:
-        return {
+        result = {
             "target": target,
             "status": "authorization_denied",
             "error": str(error),
             "findings": [],
         }
+        _record_scan_event(target, result, started, authorization_id=authorization_id)
+        return result
     executable = shutil.which("nuclei")
 
     if not executable:
-        return {
+        result = {
             "target": target,
             "status": "error",
             "error": "Nuclei no se encuentra en el PATH.",
             "findings": [],
         }
+        _record_scan_event(target, result, started, authorization_id=authorization_id)
+        return result
 
     output_dir = Path("reports")
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -90,7 +118,6 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None):
     print("Límite de solicitudes: 2 por segundo; concurrencia: 2.", flush=True)
     print("[2/4] Iniciando Nuclei. La salida aparecerá debajo.", flush=True)
 
-    started = time.monotonic()
     messages = []
 
     try:
@@ -128,12 +155,14 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None):
                 process.kill()
                 process.wait()
                 print("\n[Tiempo agotado] Se detuvo el escaneo.", flush=True)
-                return {
+                result = {
                     "target": target,
                     "status": "timeout",
                     "error": f"El escaneo superó {timeout} segundos.",
                     "findings": [],
                 }
+                _record_scan_event(target, result, started, authorization_id=authorization_id)
+                return result
 
             time.sleep(1)
 
@@ -142,12 +171,14 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None):
         print(f"\n[3/4] Escaneo terminado en {elapsed} segundos.", flush=True)
 
     except OSError as error:
-        return {
+        result = {
             "target": target,
             "status": "error",
             "error": str(error),
             "findings": [],
         }
+        _record_scan_event(target, result, started, authorization_id=authorization_id)
+        return result
 
     findings = []
     if output_file.is_file():
@@ -162,7 +193,7 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None):
     print(f"[4/4] Hallazgos registrados: {len(findings)}", flush=True)
     print(f"Estado final: {status}", flush=True)
 
-    return {
+    result = {
         "target": target,
         "authorization": grant,
         "status": status,
@@ -176,3 +207,5 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None):
             "Cero hallazgos no demuestra que el objetivo sea seguro."
         ),
     }
+    _record_scan_event(target, result, started, authorization_id=authorization_id)
+    return result
