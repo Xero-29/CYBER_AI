@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Interfaz CLI explícita para los adaptadores locales de CYBER_AI."""
 import argparse
+import hashlib
 import json
 import os
 import sys
+import time
 
 from tool_adapters import TOOL_SPECS, ToolExecutionError, run_local_tool, write_evidence
 from execution_ledger import ExecutionLedger
-import time
 
 
 def main(argv=None):
@@ -46,6 +47,20 @@ def main(argv=None):
         print(json.dumps({"status": "denied", "reason": str(exc)}, ensure_ascii=False), file=sys.stderr)
         return 2
 
+    evidence_dir = os.environ.get("CYBER_AI_EVIDENCE_DIR")
+    evidence_path = None
+    artifact_sha256 = None
+    try:
+        evidence_path = write_evidence(
+            evidence,
+            output_dir=evidence_dir or "reports/tool_evidence",
+            allow_external=bool(evidence_dir),
+        )
+        artifact_sha256 = hashlib.sha256(Path(evidence_path).read_bytes()).hexdigest()
+        evidence["evidence_file"] = str(evidence_path)
+    except (ToolExecutionError, OSError) as evidence_error:
+        evidence["evidence_write_error"] = str(evidence_error)
+
     try:
         ledger_status = evidence.get("status")
         if ledger_status not in {"completed", "timeout"}:
@@ -58,22 +73,12 @@ def main(argv=None):
             validator_results=[{"name": "process_exit", "passed": evidence.get("return_code") == 0}],
             metadata={"target": evidence.get("target"),
                       "target_sha256": evidence.get("target_sha256"),
-                      "target_modified": evidence.get("target_modified")},
+                      "target_modified": evidence.get("target_modified"),
+                      "evidence_artifact_sha256": artifact_sha256},
         )
         evidence["ledger_event"] = ledger_event
     except Exception as ledger_error:
         evidence["ledger_error"] = str(ledger_error)
-
-    evidence_dir = os.environ.get("CYBER_AI_EVIDENCE_DIR")
-    try:
-        evidence_path = write_evidence(
-            evidence,
-            output_dir=evidence_dir or "reports/tool_evidence",
-            allow_external=bool(evidence_dir),
-        )
-        evidence["evidence_file"] = str(evidence_path)
-    except ToolExecutionError as evidence_error:
-        evidence["evidence_write_error"] = str(evidence_error)
     print(json.dumps(evidence, ensure_ascii=False, indent=2))
     return 0 if evidence["status"] == "completed" and evidence["return_code"] == 0 else 1
 
