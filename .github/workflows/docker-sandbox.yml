@@ -1,0 +1,51 @@
+name: Docker sandbox
+
+on:
+  push:
+    branches:
+      - codex/security-integrity-audit
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docker-sandbox-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sandbox-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Build sandbox image
+        run: docker build --pull -t cyber-ai-tool-sandbox:ci -f sandbox/Dockerfile .
+
+      - name: Run unit tests
+        run: python3 -m unittest discover -s tests -v
+
+      - name: Run Ruff inside hardened sandbox
+        run: |
+          python3 sandbox_runner.py \
+            --tool ruff \
+            --target tests/fixtures/sandbox_sample.py \
+            --image cyber-ai-tool-sandbox:ci \
+            --evidence-dir "$RUNNER_TEMP/cyber-ai-evidence" \
+            --execute
+
+      - name: Upload sandbox evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cyber-ai-sandbox-evidence
+          path: ${{ runner.temp }}/cyber-ai-evidence/
+          if-no-files-found: ignore
+          retention-days: 7
