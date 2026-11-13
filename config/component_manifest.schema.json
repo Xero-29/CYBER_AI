@@ -1,0 +1,24 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://cyber-ai.invalid/schemas/component-manifest-v1.json",
+  "title":"CYBER_AI Component Manifest",
+  "type":"object",
+  "required":["manifest_version","id","name","version","kind","capabilities","permissions"],
+  "properties":{
+    "manifest_version":{"const":1},
+    "id":{"type":"string","pattern":"^[a-z0-9][a-z0-9._-]{1,79}$"},
+    "name":{"type":"string","minLength":1},
+    "version":{"type":"string","minLength":1},
+    "kind":{"enum":["agent","scanner","analyzer","verifier","patcher","stress_tester","collector","knowledge_provider","integration","orchestrator","other"]},
+    "entrypoint":{"type":["string","null"]},
+    "capabilities":{"type":"array","items":{"type":"string"}},
+    "dependencies":{"type":"array","items":{"type":"string"}},
+    "enabled":{"type":"boolean"},
+    "permissions":{"type":"object","required":["risk"],"properties":{
+      "risk":{"enum":["read_only","low","moderate","high","critical"]},
+      "requested":{"type":"array","items":{"type":"string"}},
+      "requires_approval":{"type":"boolean"},
+      "scope_required":{"type":"boolean"}
+    }}
+  }
+}
