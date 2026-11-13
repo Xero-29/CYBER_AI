@@ -2,9 +2,11 @@
 """Ejecuta adaptadores CYBER_AI dentro de un contenedor Docker endurecido."""
 import argparse
 import os
+import re
 import shutil
 import subprocess
 import sys
+import uuid
 from pathlib import Path
 
 from tool_adapters import TOOL_SPECS, ToolExecutionError, _confined_path, PROJECT_ROOT
@@ -24,11 +26,13 @@ def build_docker_command(tool_id, target, evidence_dir, image=DEFAULT_IMAGE, tim
         )
     if TOOL_SPECS[tool_id]["network"]:
         raise ToolExecutionError("La herramienta requiere red y está bloqueada por política.")
-    if not isinstance(image, str) or not image or image.startswith("-"):
+    if not isinstance(image, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:/@-]{0,254}", image):
         raise ToolExecutionError("Nombre de imagen Docker inválido.")
     target_path = _confined_path(target)
     relative_target = target_path.relative_to(PROJECT_ROOT).as_posix()
     evidence = Path(evidence_dir)
+    if any(character in str(evidence) for character in (",", "\\n", "\\r")):
+        raise ToolExecutionError("La ruta de evidencias contiene caracteres no permitidos para Docker --mount.")
     if evidence.is_symlink():
         raise ToolExecutionError("La carpeta de evidencias no puede ser un enlace simbólico.")
     evidence.mkdir(parents=True, exist_ok=True)
@@ -42,6 +46,7 @@ def build_docker_command(tool_id, target, evidence_dir, image=DEFAULT_IMAGE, tim
 
     command = [
         "docker", "run", "--rm",
+        "--name", "cyber-ai-sandbox-" + uuid.uuid4().hex,
         "--network=none",
         "--read-only",
         "--cap-drop=ALL",
@@ -65,7 +70,7 @@ def build_docker_command(tool_id, target, evidence_dir, image=DEFAULT_IMAGE, tim
         "--execute",
     ]
     if timeout is not None:
-        if not isinstance(timeout, int) or not 1 <= timeout <= 600:
+        if isinstance(timeout, bool) or not isinstance(timeout, int) or not 1 <= timeout <= 600:
             raise ToolExecutionError("El timeout debe estar entre 1 y 600 segundos.")
         command.extend(["--timeout", str(timeout)])
     if config:
@@ -90,12 +95,30 @@ def main(argv=None):
     if not shutil.which("docker"):
         print("Docker CLI no está disponible.", file=sys.stderr)
         return 2
+    container_name = None
     try:
         command = build_docker_command(
             args.tool, args.target, args.evidence_dir, args.image,
             timeout=args.timeout, config=args.config,
         )
-        result = subprocess.run(command, cwd=PROJECT_ROOT, check=False)
+        container_name = command[command.index("--name") + 1]
+        effective_timeout = args.timeout or TOOL_SPECS[args.tool]["timeout"]
+        result = subprocess.run(
+            command, cwd=PROJECT_ROOT, check=False,
+            timeout=effective_timeout + 60,
+        )
+    except subprocess.TimeoutExpired:
+        if container_name:
+            for cleanup in (
+                ["docker", "kill", container_name],
+                ["docker", "rm", "--force", container_name],
+            ):
+                try:
+                    subprocess.run(cleanup, check=False, timeout=10)
+                except (OSError, subprocess.TimeoutExpired):
+                    pass
+        print("El proceso Docker superó el límite de tiempo del host; se solicitó eliminar el contenedor.", file=sys.stderr)
+        return 124
     except (ToolExecutionError, OSError) as exc:
         print(f"Ejecución denegada: {exc}", file=sys.stderr)
         return 2

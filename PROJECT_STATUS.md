@@ -13,7 +13,7 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 ## Capacidades existentes (no equivalen a cierre institucional)
 
 - Inventario de 20 herramientas, selección explicable y adaptadores parciales; los adaptadores locales registran la versión instalada cuando puede consultarse sin red.
-- Sandbox Docker endurecido; comparte kernel y no es aislamiento para malware hostil.
+- Sandbox Docker endurecido con timeout del cliente y limpieza forzada del contenedor ante timeout; comparte kernel y no es aislamiento para malware hostil.
 - Atlas de 28 áreas y 98 referencias catalogadas, no corpus completo ingerido.
 - Biblioteca SQLite con fragmentos comprimidos, SHA-256, metadatos, separación shared/tenant y búsqueda semántica.
 - Ingestión transaccional (publicación de todos los fragmentos en una única transacción), límite de 2 MiB por fragmento y descompresión acotada de TXT/Markdown, HTML, CSV, JSON/JSONL y código; extractores opcionales PDF/DOCX/XLSX/PPTX con límites de tamaño y expansión ZIP. OCR de PDF escaneado y ejecución aislada de extractores siguen pendientes. Catálogo, descubrimiento y downloader con manifiesto serializado por lock; dry-run sin DNS ni escrituras. Sigue pendiente resolver DNS rebinding/TOCTOU mediante proxy de salida o pinning de IP.
