@@ -11,24 +11,34 @@ from tool_adapters import TOOL_SPECS, ToolExecutionError, _confined_path, PROJEC
 
 
 DEFAULT_IMAGE = "cyber-ai-tool-sandbox:local"
+# Debe coincidir con los binarios realmente instalados en sandbox/Dockerfile.
+SANDBOX_TOOLS = frozenset({"ruff", "bandit"})
 
 
 def build_docker_command(tool_id, target, evidence_dir, image=DEFAULT_IMAGE, timeout=None, config=None):
     if tool_id not in TOOL_SPECS:
         raise ToolExecutionError("Herramienta no registrada.")
+    if tool_id not in SANDBOX_TOOLS:
+        raise ToolExecutionError(
+            "La herramienta está registrada, pero no está instalada en la imagen sandbox."
+        )
     if TOOL_SPECS[tool_id]["network"]:
         raise ToolExecutionError("La herramienta requiere red y está bloqueada por política.")
     if not isinstance(image, str) or not image or image.startswith("-"):
         raise ToolExecutionError("Nombre de imagen Docker inválido.")
     target_path = _confined_path(target)
     relative_target = target_path.relative_to(PROJECT_ROOT).as_posix()
-    evidence = Path(evidence_dir).resolve()
+    evidence = Path(evidence_dir)
+    if evidence.is_symlink():
+        raise ToolExecutionError("La carpeta de evidencias no puede ser un enlace simbólico.")
     evidence.mkdir(parents=True, exist_ok=True)
+    evidence = evidence.resolve(strict=True)
     try:
         evidence.relative_to(PROJECT_ROOT.resolve())
-        raise ToolExecutionError("La carpeta de evidencias debe estar fuera del repositorio.")
     except ValueError:
         pass
+    else:
+        raise ToolExecutionError("La carpeta de evidencias debe estar fuera del repositorio.")
 
     command = [
         "docker", "run", "--rm",
