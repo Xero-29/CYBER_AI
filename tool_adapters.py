@@ -16,6 +16,8 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 MAX_OUTPUT_BYTES = 2_000_000
+MAX_TARGET_BYTES = 100_000_000
+MAX_TARGET_FILES = 10_000
 DEFAULT_TIMEOUT = 180
 TOOL_SPECS = {
     "semgrep": {"binary": "semgrep", "network": False, "timeout": 180},
@@ -33,6 +35,8 @@ class ToolExecutionError(RuntimeError):
 
 def _confined_path(target):
     candidate = Path(target)
+    if candidate.is_symlink():
+        raise ToolExecutionError("No se permiten enlaces simbólicos como objetivo.")
     if not candidate.is_absolute():
         candidate = PROJECT_ROOT / candidate
     try:
@@ -40,8 +44,6 @@ def _confined_path(target):
         resolved.relative_to(PROJECT_ROOT.resolve())
     except (OSError, ValueError) as exc:
         raise ToolExecutionError("La ruta debe existir y permanecer dentro del repositorio.") from exc
-    if resolved.is_symlink():
-        raise ToolExecutionError("No se permiten enlaces simbólicos como objetivo.")
     if not (resolved.is_file() or resolved.is_dir()):
         raise ToolExecutionError("El objetivo debe ser un archivo o directorio.")
     return resolved
@@ -53,6 +55,11 @@ def _hash_target(path):
         item for item in path.rglob("*")
         if item.is_file() and not item.is_symlink()
     )
+    if len(files) > MAX_TARGET_FILES:
+        raise ToolExecutionError("El objetivo supera el límite de archivos.")
+    total_bytes = sum(item.stat().st_size for item in files)
+    if total_bytes > MAX_TARGET_BYTES:
+        raise ToolExecutionError("El objetivo supera el límite de tamaño de análisis.")
     for item in files:
         try:
             digest.update(item.relative_to(path if path.is_dir() else path.parent).as_posix().encode())
@@ -119,7 +126,8 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
         result = subprocess.run(
             command, cwd=str(PROJECT_ROOT), env=env,
             stdin=subprocess.DEVNULL, capture_output=True,
-            text=True, timeout=limit, check=False, shell=False,
+            text=True, encoding="utf-8", errors="replace",
+            timeout=limit, check=False, shell=False,
         )
         status = "completed" if result.returncode == 0 else "findings_or_tool_error"
         stdout, stderr = result.stdout, result.stderr
@@ -162,11 +170,11 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
 
 
 def write_evidence(evidence, output_dir="reports/tool_evidence"):
-    destination = _confined_path(output_dir) if Path(output_dir).exists() else None
-    if destination is None:
-        raw = PROJECT_ROOT / output_dir
-        raw.mkdir(parents=True, exist_ok=True)
-        destination = _confined_path(raw)
+    raw = Path(output_dir)
+    if not raw.is_absolute():
+        raw = PROJECT_ROOT / raw
+    raw.mkdir(parents=True, exist_ok=True)
+    destination = _confined_path(raw)
     if not destination.is_dir():
         raise ToolExecutionError("El destino de evidencias debe ser un directorio.")
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
