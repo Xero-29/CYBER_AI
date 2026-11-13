@@ -4,6 +4,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import sandbox_runner
+import tool_adapters
 from tool_adapters import ToolExecutionError
 
 
@@ -14,8 +15,11 @@ class SandboxRunnerTests(unittest.TestCase):
         (self.root / "sample.py").write_text("print('safe')\\n", encoding="utf-8")
         self.root_patch = patch.object(sandbox_runner, "PROJECT_ROOT", self.root)
         self.root_patch.start()
+        self.adapter_root_patch = patch.object(tool_adapters, "PROJECT_ROOT", self.root)
+        self.adapter_root_patch.start()
 
     def tearDown(self):
+        self.adapter_root_patch.stop()
         self.root_patch.stop()
         self.temp.cleanup()
 
