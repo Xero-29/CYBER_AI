@@ -34,12 +34,6 @@ def main(argv=None):
         evidence = run_local_tool(
             args.tool, args.target, config_path=args.config, timeout=args.timeout
         )
-        evidence_dir = os.environ.get("CYBER_AI_EVIDENCE_DIR")
-        evidence_path = write_evidence(
-            evidence,
-            output_dir=evidence_dir or "reports/tool_evidence",
-            allow_external=bool(evidence_dir),
-        )
     except ToolExecutionError as exc:
         try:
             ExecutionLedger().append(
@@ -70,7 +64,16 @@ def main(argv=None):
     except Exception as ledger_error:
         evidence["ledger_error"] = str(ledger_error)
 
-    evidence["evidence_file"] = str(evidence_path)
+    evidence_dir = os.environ.get("CYBER_AI_EVIDENCE_DIR")
+    try:
+        evidence_path = write_evidence(
+            evidence,
+            output_dir=evidence_dir or "reports/tool_evidence",
+            allow_external=bool(evidence_dir),
+        )
+        evidence["evidence_file"] = str(evidence_path)
+    except ToolExecutionError as evidence_error:
+        evidence["evidence_write_error"] = str(evidence_error)
     print(json.dumps(evidence, ensure_ascii=False, indent=2))
     return 0 if evidence["status"] == "completed" and evidence["return_code"] == 0 else 1
 

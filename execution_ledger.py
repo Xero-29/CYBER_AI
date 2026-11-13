@@ -1,6 +1,7 @@
 """Transactional append-only execution evidence ledger for CYBER_AI."""
 import hashlib
 import json
+import os
 import re
 import sqlite3
 import uuid
@@ -43,8 +44,9 @@ def _digest(previous, payload):
 class ExecutionLedger:
     """SQLite hash chain. Tamper-evident, not tamper-proof."""
 
-    def __init__(self, path=DEFAULT_DB):
-        self.path = Path(path)
+    def __init__(self, path=None):
+        configured_path = path if path is not None else os.environ.get("CYBER_AI_LEDGER_PATH", DEFAULT_DB)
+        self.path = Path(configured_path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.initialize()
 

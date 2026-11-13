@@ -1,7 +1,9 @@
+import os
 import sqlite3
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from execution_ledger import ExecutionLedger, LedgerError
 
@@ -51,6 +53,14 @@ class ExecutionLedgerTests(unittest.TestCase):
             self.append(status="success")
         with self.assertRaises(LedgerError):
             self.append(duration_ms=-1)
+
+    def test_environment_path_is_used_when_no_path_is_passed(self):
+        configured = Path(self.tmp.name) / "external" / "ledger.sqlite3"
+        with patch.dict(os.environ, {"CYBER_AI_LEDGER_PATH": str(configured)}):
+            ledger = ExecutionLedger()
+            ledger.append(namespace="test", task="env path", status="completed",
+                          tool="unit-test", evidence={"ok": True}, duration_ms=1)
+        self.assertTrue(configured.is_file())
 
     def test_namespace_isolation(self):
         self.append(namespace="alpha")

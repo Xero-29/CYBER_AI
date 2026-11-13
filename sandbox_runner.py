@@ -55,6 +55,7 @@ def build_docker_command(tool_id, target, evidence_dir, image=DEFAULT_IMAGE, tim
         "--mount", f"type=bind,src={evidence},dst=/evidence",
         "--workdir=/workspace",
         "--env", "CYBER_AI_EVIDENCE_DIR=/evidence",
+        "--env", "CYBER_AI_LEDGER_PATH=/evidence/execution_ledger.sqlite3",
         "--env", "HOME=/tmp",
         "--env", "RUFF_NO_CACHE=1",
         image,

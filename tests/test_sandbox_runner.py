@@ -41,6 +41,7 @@ class SandboxRunnerTests(unittest.TestCase):
         self.assertTrue(user_flag.startswith("--user="))
         self.assertIn("readonly", joined)
         self.assertIn("dst=/evidence", joined)
+        self.assertIn("CYBER_AI_LEDGER_PATH=/evidence/execution_ledger.sqlite3", command)
         self.assertNotIn("--privileged", command)
         self.assertNotIn("/var/run/docker.sock", joined)
 
