@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
-"""Descargador verificable y reanudable de conocimientos para CYBER_AI."""
+"""Descargador verificable y reanudable de conocimientos para CYBER_AI.
 
+La descarga está deshabilitada por defecto en el catálogo. Las fuentes
+habilitadas solo pueden usar HTTPS público, sin proxies del entorno ni
+redirecciones a otros hosts.
+"""
 import argparse
 import hashlib
+import ipaddress
 import json
-import os
-import shutil
+import re
+import socket
 import time
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import urljoin, urlparse
 
 import requests
 
@@ -18,7 +24,12 @@ MANIFEST = ROOT / "data/knowledge_sources/download_manifest.json"
 BASE = ROOT / "data/knowledge_base"
 MAX_BYTES = 2 * 1024**3
 HEADERS = {"User-Agent": "CYBER_AI-Knowledge-Downloader/1.0"}
-TIMEOUT = 30
+TIMEOUT = (5, 30)
+MAX_REDIRECTS = 3
+ALLOWED_CONTENT_TYPES = (
+    "text/html", "text/plain", "application/pdf",
+    "application/x-pdf", "application/octet-stream",
+)
 
 
 def now():
@@ -28,16 +39,16 @@ def now():
 def load_json(path, default):
     if not path.exists():
         return default
-    return json.loads(path.read_text(encoding="utf-8"))
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError(f"El archivo JSON debe contener un objeto: {path}")
+    return data
 
 
 def save_json(path, data):
     path.parent.mkdir(parents=True, exist_ok=True)
     temp = path.with_suffix(path.suffix + ".tmp")
-    temp.write_text(
-        json.dumps(data, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
+    temp.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     temp.replace(path)
 
 
@@ -50,24 +61,114 @@ def sha256(path):
 
 
 def used_bytes():
+    if not BASE.exists():
+        return 0
     total = 0
     for path in BASE.rglob("*"):
+        if path.is_symlink():
+            raise ValueError("La biblioteca contiene enlaces simbólicos; descarga bloqueada.")
         if path.is_file():
             total += path.stat().st_size
     return total
 
 
+def _safe_destination(item):
+    item_id = item.get("id")
+    folder = item.get("folder")
+    filename = item.get("filename")
+    if not isinstance(item_id, str) or not re.fullmatch(r"[A-Za-z0-9_.-]{1,100}", item_id):
+        raise ValueError("ID de recurso inválido.")
+    if not isinstance(folder, str) or not folder or Path(folder).is_absolute():
+        raise ValueError("Carpeta de destino inválida.")
+    folder_parts = Path(folder).parts
+    if any(part in {"", ".", ".."} for part in folder_parts):
+        raise ValueError("La carpeta no puede salir de la biblioteca.")
+    if not isinstance(filename, str) or filename in {"", ".", ".."} or Path(filename).name != filename:
+        raise ValueError("Nombre de archivo inválido.")
+    if "/" in filename or "\\" in filename:
+        raise ValueError("El nombre de archivo no puede contener rutas.")
+    BASE.mkdir(parents=True, exist_ok=True)
+    base = BASE.resolve(strict=True)
+    target_dir = base
+    for part in folder_parts:
+        target_dir = target_dir / part
+        if target_dir.is_symlink():
+            raise ValueError("No se permiten enlaces simbólicos en el destino.")
+    target_dir.mkdir(parents=True, exist_ok=True)
+    resolved_dir = target_dir.resolve(strict=True)
+    if not resolved_dir.is_relative_to(base):
+        raise ValueError("El destino escapa de la biblioteca.")
+    destination = resolved_dir / filename
+    if destination.is_symlink():
+        raise ValueError("El archivo de destino no puede ser un enlace simbólico.")
+    return destination
+
+
+def _validate_public_https(url, expected_host=None):
+    if not isinstance(url, str) or any(ch.isspace() for ch in url):
+        raise ValueError("URL de descarga inválida.")
+    parsed = urlparse(url)
+    try:
+        port = parsed.port
+    except ValueError as error:
+        raise ValueError("Puerto URL inválido.") from error
+    host = (parsed.hostname or "").rstrip(".").lower()
+    if (
+        parsed.scheme != "https" or not host or parsed.username or parsed.password
+        or port not in (None, 443) or not parsed.path.startswith("/")
+    ):
+        raise ValueError("Solo se permiten URLs HTTPS públicas en el puerto 443.")
+    if expected_host is not None and host != expected_host:
+        raise ValueError("La redirección a otro host está bloqueada.")
+    try:
+        literal = ipaddress.ip_address(host)
+    except ValueError:
+        literal = None
+    if literal is not None:
+        raise ValueError("No se permiten direcciones IP literales.")
+    try:
+        addresses = {entry[4][0] for entry in socket.getaddrinfo(host, 443, type=socket.SOCK_STREAM)}
+    except OSError as error:
+        raise ValueError("No se pudo resolver el host de la fuente.") from error
+    if not addresses:
+        raise ValueError("El host no tiene direcciones resolubles.")
+    for address in addresses:
+        ip = ipaddress.ip_address(address.split("%", 1)[0])
+        if not ip.is_global:
+            raise ValueError("La fuente resuelve a una dirección no pública.")
+    return host
+
+
+def _request_public_resource(session, url):
+    original_host = _validate_public_https(url)
+    current = url
+    for redirect_count in range(MAX_REDIRECTS + 1):
+        _validate_public_https(current, expected_host=original_host)
+        response = session.get(
+            current, headers=HEADERS, stream=True, timeout=TIMEOUT,
+            allow_redirects=False,
+        )
+        if response.status_code in {301, 302, 303, 307, 308}:
+            location = response.headers.get("Location")
+            response.close()
+            if not location or redirect_count >= MAX_REDIRECTS:
+                raise ValueError("Redirección ausente o límite de redirecciones excedido.")
+            current = urljoin(current, location)
+            continue
+        response.raise_for_status()
+        return response
+    raise ValueError("No se pudo completar la descarga.")
+
+
 def download(item, manifest, dry_run=False):
     if item.get("verified_for_download") is not True:
         return "not_verified"
+    destination = _safe_destination(item)
+    url = item.get("url")
+    host = _validate_public_https(url)
     item_id = item["id"]
-    target_dir = BASE / item["folder"]
-    target_dir.mkdir(parents=True, exist_ok=True)
-    destination = target_dir / item["filename"]
     state = manifest["resources"].setdefault(item_id, {
-        "status": "pending",
-        "url": item["url"],
-        "updated_at": now(),
+        "status": "pending", "url": url, "updated_at": now(),
     })
 
     if destination.exists() and state.get("sha256"):
@@ -76,36 +177,34 @@ def download(item, manifest, dry_run=False):
             return "already_verified"
 
     if dry_run:
-        print(f"[SIMULACIÓN] {item_id}: {item['url']}")
+        print(f"[SIMULACIÓN] {item_id}: {url}")
         return "dry_run"
 
-    response = requests.get(
-        item["url"], headers=HEADERS, stream=True, timeout=TIMEOUT
-    )
-    response.raise_for_status()
-
-    content_type = response.headers.get("Content-Type", "").lower()
-    allowed_types = (
-        "text/html",
-        "text/plain",
-        "application/pdf",
-        "application/x-pdf",
-        "application/octet-stream",
-    )
-    if not any(value in content_type for value in allowed_types):
-        raise ValueError(f"Tipo de contenido no permitido: {content_type}")
-
-    declared = int(response.headers.get("Content-Length", "0") or 0)
-    if declared and declared > item.get("max_bytes", 20 * 1024**2):
-        raise ValueError("El archivo supera el tamaño máximo permitido.")
-
-    temp = destination.with_suffix(destination.suffix + ".part")
-    received = 0
     limit = item.get("max_bytes", 20 * 1024**2)
-    initial_used = used_bytes()
+    if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= MAX_BYTES:
+        raise ValueError("max_bytes debe estar entre 1 byte y 2 GiB.")
 
+    session = requests.Session()
+    session.trust_env = False
+    response = None
+    temp = destination.with_name(destination.name + ".part")
     try:
-        with temp.open("wb") as stream:
+        response = _request_public_resource(session, url)
+        content_type = response.headers.get("Content-Type", "").split(";", 1)[0].strip().lower()
+        if not any(value == content_type for value in ALLOWED_CONTENT_TYPES):
+            raise ValueError(f"Tipo de contenido no permitido: {content_type}")
+        raw_length = response.headers.get("Content-Length")
+        if raw_length:
+            try:
+                declared = int(raw_length)
+            except ValueError as error:
+                raise ValueError("Content-Length inválido.") from error
+            if declared < 0 or declared > limit:
+                raise ValueError("El archivo supera el tamaño máximo permitido.")
+
+        initial_used = used_bytes()
+        received = 0
+        with temp.open("xb") as stream:
             for block in response.iter_content(64 * 1024):
                 if not block:
                     continue
@@ -115,35 +214,37 @@ def download(item, manifest, dry_run=False):
                 if initial_used + received > MAX_BYTES:
                     raise ValueError("Se alcanzó el límite global de 2 GB.")
                 stream.write(block)
+
         if received < 100:
             raise ValueError("Respuesta demasiado pequeña para ser un recurso.")
-
-        if destination.suffix.lower() == ".pdf":
+        if destination.suffix.lower() == ".pdf" or content_type in {"application/pdf", "application/x-pdf"}:
             with temp.open("rb") as check:
-                header = check.read(1024)
-            if b"%PDF-" not in header:
-                raise ValueError("El archivo tiene extensión PDF, pero no contiene una cabecera PDF válida.")
-        elif "application/pdf" in content_type or "application/x-pdf" in content_type:
-            with temp.open("rb") as check:
-                header = check.read(1024)
-            if b"%PDF-" not in header:
-                raise ValueError("El servidor indicó PDF, pero el contenido no es un PDF válido.")
+                if b"%PDF-" not in check.read(1024):
+                    raise ValueError("El contenido no tiene una cabecera PDF válida.")
 
+        digest = sha256(temp)
+        expected = item.get("expected_sha256")
+        if expected is not None and (
+            not isinstance(expected, str) or not re.fullmatch(r"[a-fA-F0-9]{64}", expected)
+            or digest.lower() != expected.lower()
+        ):
+            raise ValueError("El SHA-256 descargado no coincide con el esperado.")
         temp.replace(destination)
     except Exception:
         temp.unlink(missing_ok=True)
         raise
+    finally:
+        if response is not None:
+            response.close()
+        session.close()
 
     state.update({
-        "status": "downloaded",
-        "url": item["url"],
+        "status": "downloaded", "url": url,
+        "final_host": host,
         "file": str(destination.relative_to(ROOT)),
-        "bytes": received,
-        "sha256": sha256(destination),
-        "content_type": content_type,
-        "downloaded_at": now(),
-        "updated_at": now(),
-        "license": item.get("license", "REVISAR"),
+        "bytes": received, "sha256": sha256(destination),
+        "content_type": content_type, "downloaded_at": now(),
+        "updated_at": now(), "license": item.get("license", "REVISAR"),
     })
     return "downloaded"
 
@@ -157,31 +258,32 @@ def main():
 
     catalog = load_json(CATALOG, {"areas": [], "resources": []})
     manifest = load_json(MANIFEST, {
-        "version": 1,
-        "created_at": now(),
-        "updated_at": now(),
-        "global_limit_bytes": MAX_BYTES,
-        "resources": {},
+        "version": 1, "created_at": now(), "updated_at": now(),
+        "global_limit_bytes": MAX_BYTES, "resources": {},
     })
+    if not isinstance(manifest.get("resources"), dict):
+        raise ValueError("El manifiesto no contiene un mapa de recursos válido.")
 
     resources = catalog.get("resources", [])
+    if not isinstance(resources, list):
+        raise ValueError("El catálogo debe contener una lista de recursos.")
     if args.area:
-        resources = [r for r in resources if r["area_id"] == args.area]
+        resources = [item for item in resources if item.get("area_id") == args.area]
 
-    verified_count = sum(
-        1 for item in resources
-        if item.get("verified_for_download") is True
-    )
+    verified_count = sum(1 for item in resources if item.get("verified_for_download") is True)
     print(f"Recursos en catálogo: {len(resources)}")
     print(f"Fuentes verificadas: {verified_count}")
     print(f"Espacio usado por la biblioteca: {used_bytes() / 1024**2:.1f} MB")
     print(f"Límite de descarga: {MAX_BYTES / 1024**3:.1f} GB")
 
     for item in resources:
-        if item.get("verified_for_download") is not True:
-            print(f"[NO VERIFICADO] {item['id']}: se omite")
+        if not isinstance(item, dict):
+            print("[ERROR] Recurso inválido en catálogo")
             continue
-        state = manifest["resources"].get(item["id"], {})
+        if item.get("verified_for_download") is not True:
+            print(f"[NO VERIFICADO] {item.get('id', 'sin-id')}: se omite")
+            continue
+        state = manifest["resources"].get(item.get("id"), {})
         if state.get("status") == "downloaded":
             print(f"[OMITIDO] {item['id']}: ya descargado")
             continue
@@ -192,12 +294,10 @@ def main():
             result = download(item, manifest, args.dry_run)
             print(f"[{result.upper()}] {item['id']}")
         except Exception as error:
-            manifest["resources"].setdefault(item["id"], {}).update({
-                "status": "failed",
-                "error": str(error),
-                "updated_at": now(),
+            manifest["resources"].setdefault(item.get("id", "invalid"), {}).update({
+                "status": "failed", "error": str(error), "updated_at": now(),
             })
-            print(f"[ERROR] {item['id']}: {error}")
+            print(f"[ERROR] {item.get('id', 'sin-id')}: {error}")
         finally:
             manifest["updated_at"] = now()
             save_json(MANIFEST, manifest)
