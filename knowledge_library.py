@@ -137,64 +137,97 @@ def cosine_similarity(left, right):
     return dot / (norm_left * norm_right)
 
 
-def store_chunk(
-    *,
-    title,
-    source,
-    category,
-    content,
-    embedding,
-    embedding_model,
-    license="UNSPECIFIED",
-    document_id=None,
-    chunk_index=0,
-    tags=None,
-    visibility="shared",
-    tenant_id=None,
-):
-    """Comprime y registra un fragmento de conocimiento con su embedding."""
+def _prepare_chunk(chunk):
+    """Valida y prepara un fragmento sin escribirlo en la base de datos."""
+    if not isinstance(chunk, dict):
+        raise ValueError("Cada fragmento debe ser un objeto.")
+    allowed = {
+        "title", "source", "category", "content", "embedding",
+        "embedding_model", "license", "document_id", "chunk_index",
+        "tags", "visibility", "tenant_id",
+    }
+    unknown = set(chunk) - allowed
+    if unknown:
+        raise ValueError(f"Campos de fragmento no reconocidos: {sorted(unknown)}")
+
+    title = chunk.get("title")
+    source = chunk.get("source")
+    category = chunk.get("category")
+    content = chunk.get("content")
+    embedding_model = chunk.get("embedding_model")
+    license_name = chunk.get("license", "UNSPECIFIED")
     for field, value in (
-        ("title", title),
-        ("source", source),
-        ("license", license),
-        ("category", category),
-        ("content", content),
+        ("title", title), ("source", source), ("license", license_name),
+        ("category", category), ("content", content),
         ("embedding_model", embedding_model),
     ):
         if not isinstance(value, str) or not value.strip():
             raise ValueError(f"{field} es obligatorio y debe ser texto.")
 
-    if visibility not in {"shared", "tenant"}:
+    visibility = chunk.get("visibility", "shared")
+    tenant_id = chunk.get("tenant_id")
+    if not isinstance(visibility, str) or visibility not in {"shared", "tenant"}:
         raise ValueError("visibility debe ser 'shared' o 'tenant'.")
-
     if visibility == "tenant" and (
         not isinstance(tenant_id, str) or not tenant_id.strip()
     ):
         raise ValueError("Los conocimientos privados requieren tenant_id.")
-
     if visibility == "shared" and tenant_id is not None:
-        raise ValueError(
-            "Los conocimientos compartidos no deben tener tenant_id."
-        )
+        raise ValueError("Los conocimientos compartidos no deben tener tenant_id.")
+    if tenant_id is not None:
+        tenant_id = tenant_id.strip()
 
-    if not isinstance(chunk_index, int) or chunk_index < 0:
+    chunk_index = chunk.get("chunk_index", 0)
+    if isinstance(chunk_index, bool) or not isinstance(chunk_index, int) or chunk_index < 0:
         raise ValueError("chunk_index debe ser un entero no negativo.")
 
-    vector = validate_vector(embedding)
+    tags = chunk.get("tags")
+    if tags is None:
+        tags = []
+    if not isinstance(tags, (list, tuple)):
+        raise ValueError("tags debe ser una lista de textos.")
+    if not all(isinstance(tag, str) and tag.strip() for tag in tags):
+        raise ValueError("Cada etiqueta debe ser texto no vacío.")
+    tags = list(dict.fromkeys(tag.strip() for tag in tags))
+
+    document_id = chunk.get("document_id")
+    if document_id is None:
+        document_id = uuid.uuid4().hex
+    elif not isinstance(document_id, str) or not document_id.strip():
+        raise ValueError("document_id debe ser texto no vacío.")
+    else:
+        document_id = document_id.strip()
+
+    vector = validate_vector(chunk.get("embedding"))
     original = content.encode("utf-8")
     compressed = zlib.compress(original, level=9)
     digest = hashlib.sha256(original).hexdigest()
     chunk_id = uuid.uuid4().hex
-    document_id = document_id or uuid.uuid4().hex
-    tags = list(dict.fromkeys(tags or []))
+    stamp = utc_now()
+    values = (
+        chunk_id, document_id, chunk_index, title.strip(), source.strip(),
+        license_name.strip(), category.strip(), json.dumps(tags, ensure_ascii=False),
+        visibility, tenant_id, sqlite3.Binary(compressed), digest,
+        len(original), len(compressed), json.dumps(vector),
+        embedding_model.strip(), len(vector), stamp,
+    )
+    result = {
+        "id": chunk_id, "document_id": document_id,
+        "chunk_index": chunk_index, "license": license_name.strip(),
+        "original_bytes": len(original), "compressed_bytes": len(compressed),
+        "sha256": digest,
+    }
+    return values, result
 
-    if not all(isinstance(tag, str) and tag.strip() for tag in tags):
-        raise ValueError("Cada etiqueta debe ser texto no vacío.")
 
+def store_chunks(chunks):
+    """Valida todos los fragmentos y los publica en una única transacción."""
+    if not isinstance(chunks, (list, tuple)) or not chunks:
+        raise ValueError("chunks debe ser una lista no vacía.")
+    prepared = [_prepare_chunk(chunk) for chunk in chunks]
     initialize()
-
     with database() as db:
-        db.execute("""
+        db.executemany("""
             INSERT INTO knowledge_chunks (
                 id, document_id, chunk_index, title, source, license,
                 category, tags_json, visibility, tenant_id, content_z,
@@ -202,25 +235,13 @@ def store_chunk(
                 embedding_json, embedding_model, embedding_dimensions,
                 created_at
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            chunk_id, document_id, chunk_index, title.strip(),
-            source.strip(), license.strip(), category.strip(),
-            json.dumps(tags, ensure_ascii=False),
-            visibility, tenant_id, sqlite3.Binary(compressed),
-            digest, len(original), len(compressed),
-            json.dumps(vector), embedding_model.strip(), len(vector),
-            utc_now(),
-        ))
+        """, [item[0] for item in prepared])
+    return [item[1] for item in prepared]
 
-    return {
-        "id": chunk_id,
-        "document_id": document_id,
-        "chunk_index": chunk_index,
-        "license": license.strip(),
-        "original_bytes": len(original),
-        "compressed_bytes": len(compressed),
-        "sha256": digest,
-    }
+
+def store_chunk(**kwargs):
+    """Compatibilidad: almacena un único fragmento en una transacción."""
+    return store_chunks([kwargs])[0]
 
 
 def read_chunk(chunk_id, tenant_id=None):

@@ -73,6 +73,33 @@ class TestKnowledgeIngest(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "100 MiB"):
                     ingest.extract_document_text(oversized)
 
+    def test_embedding_failure_does_not_publish_partial_document(self):
+        with tempfile.TemporaryDirectory() as temp:
+            document = Path(temp) / "partial.md"
+            document.write_text(("A" * 250) + "\n\n" + ("B" * 250), encoding="utf-8")
+            calls = 0
+
+            def fail_second_batch(texts, agent_name="ECO"):
+                nonlocal calls
+                calls += 1
+                if calls == 2:
+                    raise RuntimeError("embedding provider unavailable")
+                return {
+                    "agent": "ECO", "model": "test-embeddings",
+                    "embedding_space": "test-embeddings",
+                    "embeddings": [[1.0, 0.0] for _ in texts],
+                    "dimensions": 2,
+                }
+
+            with patch.object(ingest, "generate_embeddings", side_effect=fail_second_batch), \
+                 patch.object(ingest, "store_chunks") as store:
+                with self.assertRaisesRegex(RuntimeError, "unavailable"):
+                    ingest.ingest_document(
+                        document, title="Parcial", category="test",
+                        batch_size=1, max_chars=300,
+                    )
+            store.assert_not_called()
+
     def test_ingest_batches_embeddings_and_stores_chunks(self):
         with tempfile.TemporaryDirectory() as temp:
             document = Path(temp) / "guia.md"
@@ -93,13 +120,16 @@ class TestKnowledgeIngest(unittest.TestCase):
                     "dimensions": 2,
                 }
 
-            def fake_store_chunk(**kwargs):
-                stored_chunks.append(kwargs)
-                return {
-                    "id": f"chunk-{len(stored_chunks)}",
-                    "document_id": kwargs["document_id"],
-                    "chunk_index": kwargs["chunk_index"],
-                }
+            def fake_store_chunks(chunks):
+                stored_chunks.extend(chunks)
+                return [
+                    {
+                        "id": f"chunk-{index + 1}",
+                        "document_id": item["document_id"],
+                        "chunk_index": item["chunk_index"],
+                    }
+                    for index, item in enumerate(chunks)
+                ]
 
             with (
                 patch.object(
@@ -109,8 +139,8 @@ class TestKnowledgeIngest(unittest.TestCase):
                 ),
                 patch.object(
                     ingest,
-                    "store_chunk",
-                    side_effect=fake_store_chunk,
+                    "store_chunks",
+                    side_effect=fake_store_chunks,
                 ),
             ):
                 result = ingest.ingest_document(

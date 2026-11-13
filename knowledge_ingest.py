@@ -11,7 +11,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 from knowledge_embeddings import generate_embeddings
-from knowledge_library import store_chunk
+from knowledge_library import store_chunks
 
 PROJECT = Path(__file__).resolve().parent
 MAX_INPUT_BYTES = 100 * 1024 * 1024
@@ -297,7 +297,7 @@ def ingest_document(
         text.encode("utf-8")
     ).hexdigest()
 
-    stored = []
+    pending_chunks = []
     total = len(chunks)
 
     for start in range(0, total, batch_size):
@@ -316,7 +316,7 @@ def ingest_document(
         ):
             index = start + offset
 
-            item = store_chunk(
+            pending_chunks.append({
                 title=title,
                 source=source,
                 license=license,
@@ -329,14 +329,17 @@ def ingest_document(
                 tags=tags,
                 visibility=visibility,
                 tenant_id=tenant_id,
-            )
-            stored.append(item["id"])
+            })
 
         print(
-            f"Procesados {min(start + len(batch), total)}/{total} "
+            f"Generados embeddings {min(start + len(batch), total)}/{total} "
             "fragmentos.",
             flush=True,
         )
+
+    # Publica todos los fragmentos juntos: si falla cualquier lote de embeddings,
+    # la biblioteca no queda con una versión parcial del documento.
+    stored = store_chunks(pending_chunks)
 
     return {
         "document_id": document_id,
@@ -348,7 +351,7 @@ def ingest_document(
         "visibility": visibility,
         "tenant_id": tenant_id,
         "chunks": len(stored),
-        "chunk_ids": stored,
+        "chunk_ids": [item["id"] for item in stored],
     }
 
 

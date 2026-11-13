@@ -134,6 +134,23 @@ class TestKnowledgeLibrary(unittest.TestCase):
                 [1.0, 0.0], visibility="tenant",
             )
 
+    def test_bulk_store_validates_all_chunks_before_publishing(self):
+        valid = {
+            "title": "Documento", "source": "fixture", "category": "test",
+            "content": "contenido", "embedding": [1.0, 0.0],
+            "embedding_model": "test-embeddings", "document_id": "bulk-doc",
+            "chunk_index": 0,
+        }
+        invalid = dict(valid, chunk_index=1, content="")
+        with self.assertRaises(ValueError):
+            library.store_chunks([valid, invalid])
+        results = library.search_knowledge(
+            query_embedding=[1.0, 0.0],
+            embedding_model="test-embeddings",
+            top_k=10,
+        )
+        self.assertEqual(results, [])
+
     def test_invalid_embedding_is_rejected(self):
         with self.assertRaises(ValueError):
             self.store(
