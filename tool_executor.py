@@ -2,6 +2,7 @@
 """Interfaz CLI explícita para los adaptadores locales de CYBER_AI."""
 import argparse
 import json
+import os
 import sys
 
 from tool_adapters import TOOL_SPECS, ToolExecutionError, run_local_tool, write_evidence
@@ -30,7 +31,7 @@ def main(argv=None):
         evidence = run_local_tool(
             args.tool, args.target, config_path=args.config, timeout=args.timeout
         )
-        evidence_path = write_evidence(evidence)
+        evidence_path = write_evidence(evidence, output_dir=os.environ.get("CYBER_AI_EVIDENCE_DIR", "reports/tool_evidence"))
     except ToolExecutionError as exc:
         print(json.dumps({"status": "denied", "reason": str(exc)}, ensure_ascii=False), file=sys.stderr)
         return 2
