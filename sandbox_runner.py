@@ -6,6 +6,7 @@ import re
 import shutil
 import subprocess
 import sys
+import uuid
 from pathlib import Path
 
 from tool_adapters import TOOL_SPECS, ToolExecutionError, _confined_path, PROJECT_ROOT
@@ -45,6 +46,7 @@ def build_docker_command(tool_id, target, evidence_dir, image=DEFAULT_IMAGE, tim
 
     command = [
         "docker", "run", "--rm",
+        "--name", "cyber-ai-sandbox-" + uuid.uuid4().hex,
         "--network=none",
         "--read-only",
         "--cap-drop=ALL",
@@ -93,18 +95,29 @@ def main(argv=None):
     if not shutil.which("docker"):
         print("Docker CLI no está disponible.", file=sys.stderr)
         return 2
+    container_name = None
     try:
         command = build_docker_command(
             args.tool, args.target, args.evidence_dir, args.image,
             timeout=args.timeout, config=args.config,
         )
+        container_name = command[command.index("--name") + 1]
         effective_timeout = args.timeout or TOOL_SPECS[args.tool]["timeout"]
         result = subprocess.run(
             command, cwd=PROJECT_ROOT, check=False,
             timeout=effective_timeout + 60,
         )
     except subprocess.TimeoutExpired:
-        print("El proceso Docker superó el límite de tiempo del host.", file=sys.stderr)
+        if container_name:
+            for cleanup in (
+                ["docker", "kill", container_name],
+                ["docker", "rm", "--force", container_name],
+            ):
+                try:
+                    subprocess.run(cleanup, check=False, timeout=10)
+                except (OSError, subprocess.TimeoutExpired):
+                    pass
+        print("El proceso Docker superó el límite de tiempo del host; se solicitó eliminar el contenedor.", file=sys.stderr)
         return 124
     except (ToolExecutionError, OSError) as exc:
         print(f"Ejecución denegada: {exc}", file=sys.stderr)
