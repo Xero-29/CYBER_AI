@@ -48,7 +48,8 @@ class ToolAdapterTests(unittest.TestCase):
         popen.return_value = process
         evidence = run_local_tool("ruff", "sample.py")
         command = popen.call_args.args[0]
-        self.assertEqual(command[:3], ["/usr/bin/ruff", "check", "--output-format=json"])
+        self.assertEqual(command[:3], ["/usr/bin/ruff", "check", "--no-cache"])
+        self.assertIn("--output-format=json", command)
         self.assertFalse(popen.call_args.kwargs["shell"])
         self.assertEqual(evidence["status"], "completed")
         self.assertEqual(evidence["parsed_json"], [])
