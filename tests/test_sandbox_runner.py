@@ -33,13 +33,11 @@ class SandboxRunnerTests(unittest.TestCase):
             "--network=none", "--read-only", "--cap-drop=ALL",
             "--security-opt=no-new-privileges:true", "--pids-limit=128",
             "--memory=1g", "--cpus=2",
-        )
+        ):
+            self.assertIn(flag, command)
         user_flag = next(item for item in command if item.startswith("--user="))
         self.assertNotEqual(user_flag, "--user=0:0")
         self.assertTrue(user_flag.startswith("--user="))
-        for flag in (
-        ):
-            self.assertIn(flag, command)
         self.assertIn("readonly", joined)
         self.assertIn("dst=/evidence", joined)
         self.assertNotIn("--privileged", command)
