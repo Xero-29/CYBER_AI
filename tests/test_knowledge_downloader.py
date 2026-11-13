@@ -85,9 +85,12 @@ class KnowledgeDownloaderSecurityTests(unittest.TestCase):
     @patch.object(downloader.socket, "getaddrinfo")
     def test_dry_run_does_not_create_file(self, resolver):
         resolver.return_value = [(None, None, None, None, ("93.184.216.34", 443))]
-        result = downloader.download(self.item(), {"resources": {}}, dry_run=True)
+        manifest = {"resources": {}}
+        result = downloader.download(self.item(), manifest, dry_run=True)
         self.assertEqual(result, "dry_run")
-        self.assertFalse((downloader.BASE / "docs" / "file.txt").exists())
+        self.assertFalse((downloader.BASE / "docs").exists())
+        self.assertEqual(manifest["resources"], {})
+        resolver.assert_not_called()
 
 
 if __name__ == "__main__":

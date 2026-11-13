@@ -6,6 +6,7 @@ habilitadas solo pueden usar HTTPS público, sin proxies del entorno ni
 redirecciones a otros hosts.
 """
 import argparse
+import fcntl
 import hashlib
 import ipaddress
 import json
@@ -72,7 +73,7 @@ def used_bytes():
     return total
 
 
-def _safe_destination(item):
+def _safe_destination(item, *, create=True):
     item_id = item.get("id")
     folder = item.get("folder")
     filename = item.get("filename")
@@ -87,8 +88,13 @@ def _safe_destination(item):
         raise ValueError("Nombre de archivo inválido.")
     if "/" in filename or "\\" in filename:
         raise ValueError("El nombre de archivo no puede contener rutas.")
-    BASE.mkdir(parents=True, exist_ok=True)
-    base = BASE.resolve(strict=True)
+    if BASE.is_symlink():
+        raise ValueError("La biblioteca base no puede ser un enlace simbólico.")
+    if create:
+        BASE.mkdir(parents=True, exist_ok=True)
+    base = BASE.resolve(strict=create)
+    if not base.is_relative_to(ROOT.resolve()):
+        raise ValueError("La biblioteca base escapa del repositorio.")
     target_dir = base
     for part in folder_parts:
         target_dir = target_dir / part
@@ -104,7 +110,7 @@ def _safe_destination(item):
     return destination
 
 
-def _validate_public_https(url, expected_host=None):
+def _validate_public_https(url, expected_host=None, *, resolve=True):
     if not isinstance(url, str) or any(ch.isspace() for ch in url):
         raise ValueError("URL de descarga inválida.")
     parsed = urlparse(url)
@@ -126,6 +132,8 @@ def _validate_public_https(url, expected_host=None):
         literal = None
     if literal is not None:
         raise ValueError("No se permiten direcciones IP literales.")
+    if not resolve:
+        return host
     try:
         addresses = {entry[4][0] for entry in socket.getaddrinfo(host, 443, type=socket.SOCK_STREAM)}
     except OSError as error:
@@ -163,26 +171,33 @@ def _request_public_resource(session, url):
 def download(item, manifest, dry_run=False):
     if item.get("verified_for_download") is not True:
         return "not_verified"
-    destination = _safe_destination(item)
+    destination = _safe_destination(item, create=not dry_run)
     url = item.get("url")
-    host = _validate_public_https(url)
+    host = _validate_public_https(url, resolve=not dry_run)
     item_id = item["id"]
-    state = manifest["resources"].setdefault(item_id, {
-        "status": "pending", "url": url, "updated_at": now(),
-    })
+    state = manifest["resources"].get(item_id)
+    if state is None:
+        state = {} if dry_run else manifest["resources"].setdefault(item_id, {
+            "status": "pending", "url": url, "updated_at": now(),
+        })
 
     if destination.exists() and state.get("sha256"):
         if sha256(destination) == state["sha256"]:
             state.update(status="downloaded", updated_at=now())
             return "already_verified"
 
-    if dry_run:
-        print(f"[SIMULACIÓN] {item_id}: {url}")
-        return "dry_run"
-
     limit = item.get("max_bytes", 20 * 1024**2)
     if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= MAX_BYTES:
         raise ValueError("max_bytes debe estar entre 1 byte y 2 GiB.")
+    expected = item.get("expected_sha256")
+    if expected is not None and (
+        not isinstance(expected, str) or not re.fullmatch(r"[a-fA-F0-9]{64}", expected)
+    ):
+        raise ValueError("expected_sha256 debe contener 64 caracteres hexadecimales.")
+
+    if dry_run:
+        print(f"[SIMULACIÓN] {item_id}: {url}")
+        return "dry_run"
 
     session = requests.Session()
     session.trust_env = False
@@ -223,11 +238,7 @@ def download(item, manifest, dry_run=False):
                     raise ValueError("El contenido no tiene una cabecera PDF válida.")
 
         digest = sha256(temp)
-        expected = item.get("expected_sha256")
-        if expected is not None and (
-            not isinstance(expected, str) or not re.fullmatch(r"[a-fA-F0-9]{64}", expected)
-            or digest.lower() != expected.lower()
-        ):
+        if expected is not None and digest.lower() != expected.lower():
             raise ValueError("El SHA-256 descargado no coincide con el esperado.")
         temp.replace(destination)
     except Exception:
@@ -249,24 +260,25 @@ def download(item, manifest, dry_run=False):
     return "downloaded"
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument("--area", help="Descargar solo un identificador de área")
-    parser.add_argument("--retry-failed", action="store_true")
-    args = parser.parse_args()
+def _run(args):
 
     catalog = load_json(CATALOG, {"areas": [], "resources": []})
     manifest = load_json(MANIFEST, {
         "version": 1, "created_at": now(), "updated_at": now(),
         "global_limit_bytes": MAX_BYTES, "resources": {},
     })
-    if not isinstance(manifest.get("resources"), dict):
+    if not isinstance(manifest.get("resources"), dict) or any(
+        not isinstance(value, dict) for value in manifest["resources"].values()
+    ):
         raise ValueError("El manifiesto no contiene un mapa de recursos válido.")
 
     resources = catalog.get("resources", [])
     if not isinstance(resources, list):
         raise ValueError("El catálogo debe contener una lista de recursos.")
+    invalid_resources = sum(not isinstance(item, dict) for item in resources)
+    if invalid_resources:
+        print(f"Recursos inválidos omitidos: {invalid_resources}")
+    resources = [item for item in resources if isinstance(item, dict)]
     if args.area:
         resources = [item for item in resources if item.get("area_id") == args.area]
 
@@ -294,16 +306,36 @@ def main():
             result = download(item, manifest, args.dry_run)
             print(f"[{result.upper()}] {item['id']}")
         except Exception as error:
-            manifest["resources"].setdefault(item.get("id", "invalid"), {}).update({
-                "status": "failed", "error": str(error), "updated_at": now(),
-            })
+            if not args.dry_run:
+                manifest["resources"].setdefault(item.get("id", "invalid"), {}).update({
+                    "status": "failed", "error": str(error), "updated_at": now(),
+                })
             print(f"[ERROR] {item.get('id', 'sin-id')}: {error}")
         finally:
-            manifest["updated_at"] = now()
-            save_json(MANIFEST, manifest)
+            if not args.dry_run:
+                manifest["updated_at"] = now()
+                save_json(MANIFEST, manifest)
             time.sleep(0.3)
 
     print(f"\nRegistro actualizado: {MANIFEST}")
+    return 0
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--area", help="Descargar solo un identificador de área")
+    parser.add_argument("--retry-failed", action="store_true")
+    args = parser.parse_args(argv)
+
+    lock_path = MANIFEST.with_suffix(MANIFEST.suffix + ".lock")
+    lock_path.parent.mkdir(parents=True, exist_ok=True)
+    with lock_path.open("a+") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        try:
+            return _run(args)
+        finally:
+            fcntl.flock(lock, fcntl.LOCK_UN)
 
 
 if __name__ == "__main__":
