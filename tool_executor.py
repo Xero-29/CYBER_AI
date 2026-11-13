@@ -43,7 +43,7 @@ def main(argv=None):
 
     evidence["evidence_file"] = str(evidence_path)
     print(json.dumps(evidence, ensure_ascii=False, indent=2))
-    return 0 if evidence["status"] == "completed" else 1
+    return 0 if evidence["status"] == "completed" and evidence["return_code"] == 0 else 1
 
 
 if __name__ == "__main__":
