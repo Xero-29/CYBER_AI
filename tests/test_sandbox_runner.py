@@ -52,6 +52,13 @@ class SandboxRunnerTests(unittest.TestCase):
                 with self.assertRaises(ToolExecutionError):
                     sandbox_runner.build_docker_command(tool, "sample.py", evidence)
 
+    def test_allowlist_matches_tools_installed_in_image(self):
+        dockerfile = Path(sandbox_runner.__file__).parent / "sandbox" / "Dockerfile"
+        content = dockerfile.read_text(encoding="utf-8")
+        self.assertIn('ruff==0.14.5', content)
+        self.assertIn('bandit==1.8.6', content)
+        self.assertEqual(SANDBOX_TOOLS, frozenset({"ruff", "bandit"}))
+
     def test_network_tool_is_denied(self):
         evidence = self.root.parent / (self.root.name + "-evidence")
         with self.assertRaises(ToolExecutionError):
