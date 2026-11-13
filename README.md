@@ -106,7 +106,9 @@ La imagen Docker actual solo incluye Ruff y Bandit. Semgrep, Syft y Trivy están
 - Fuentes externas: el catálogo requiere revisión de licencia y verificación antes de habilitar descargas.
 - Skills: `skillbook.py` solo debe contener procedimientos respaldados por evidencia y validación independiente. Una coincidencia recuperada no concede permisos de ejecución.
 
-Los extractores de Office validan el tamaño de los paquetes comprimidos, pero siguen procesando archivos en el proceso local; importa solo documentos confiables hasta que se ejecute la extracción en una sandbox dedicada.\n\nLos datos locales, bases SQLite, historiales y reportes se guardan fuera del control de versiones mediante `.gitignore`. Haz copias de seguridad antes de borrar o recrear `data/`.
+Los extractores de Office validan el tamaño de los paquetes comprimidos, pero siguen procesando archivos en el proceso local; importa solo documentos confiables hasta que se ejecute la extracción en una sandbox dedicada.
+
+Los datos locales, bases SQLite, historiales y reportes se guardan fuera del control de versiones mediante `.gitignore`. Haz copias de seguridad antes de borrar o recrear `data/`.
 
 ## Seguridad operativa
 

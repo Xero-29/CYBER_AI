@@ -29,7 +29,7 @@ def _list(v,n,minimum=1):
     if not isinstance(v,list) or len(v)<minimum or any(not isinstance(x,str) or not x.strip() for x in v):
         raise ValueError(f"{n} debe ser una lista de textos (mínimo {minimum}).")
     return list(dict.fromkeys(x.strip() for x in v))
-def register_verified_skill(*,name,task_pattern,description,prerequisites,methodology,validation,tools,tags,evidence,source_urls,success_runs,failure_runs,verified_by,verifier_verdict):
+def _insert_verified_skill(*,name,task_pattern,description,prerequisites,methodology,validation,tools,tags,evidence,source_urls,success_runs,failure_runs,verified_by,verifier_verdict):
     if verified_by!="VERITAS" or verifier_verdict not in {"RESPALDADA","CONFIRMADA"}: raise ValueError("Solo VERITAS puede aprobar una Skill.")
     for n,v in (("name",name),("task_pattern",task_pattern),("description",description)):
         if not isinstance(v,str) or not v.strip(): raise ValueError(f"{n} obligatorio.")
@@ -59,6 +59,14 @@ def register_verified_skill(*,name,task_pattern,description,prerequisites,method
         VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,'active',1,?,?,?,?)""",
         (sid,name.strip(),task_pattern.strip(),description.strip(),json.dumps(prerequisites),json.dumps(methodology),json.dumps(validation),json.dumps(tools),json.dumps(tags),json.dumps(evidence),json.dumps(source_urls),success_runs,failure_runs,verified_by,verifier_verdict,stamp,stamp))
     return {"skill_id":sid,"status":"active","version":1}
+
+
+def register_verified_skill(**kwargs):
+    """La promoción pública exige evidencia del ledger y aprobación firmada."""
+    raise ValueError(
+        "Registro directo deshabilitado: usa register_skill_from_ledger con "
+        "dos ejecuciones verificadas y aprobación VERITAS firmada."
+    )
 
 def skill_approval_payload(*, name, task_pattern, description, prerequisites,
                            methodology, validation, tools, tags, source_urls,
@@ -140,7 +148,7 @@ def register_skill_from_ledger(*, name, task_pattern, description, prerequisites
         for item in selected
     ]
     evidence_refs.append("veritas_hmac_sha256:" + hashlib.sha256(approval_signature.encode()).hexdigest())
-    return register_verified_skill(
+    return _insert_verified_skill(
         name=name, task_pattern=task_pattern, description=description,
         prerequisites=prerequisites, methodology=methodology,
         validation=validation, tools=tools, tags=tags,

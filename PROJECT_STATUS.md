@@ -8,7 +8,7 @@
 
 Se incorpora execution_ledger.py: registro SQLite transaccional append-only de ejecuciones con namespace, huella de tarea, estado, herramienta/versión, modelo, entorno, duración, coste opcional, resultados de validadores y hash SHA-256 de evidencia. Incluye cadena hash verificable, redacción de campos con nombres sensibles y bloqueo ordinario de UPDATE/DELETE. Se añaden pruebas específicas.
 
-Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptográfica de identidad. Requiere checkpoints firmados fuera del host, KMS/HSM y pruebas operativas de restauración. La integración automática con todos los ejecutores y la promoción de Skills siguen pendientes.
+Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptográfica de identidad. Requiere checkpoints firmados fuera del host, KMS/HSM y pruebas operativas de restauración. La integración automática con todos los ejecutores y la promoción autónoma de Skills siguen pendientes.
 
 ## Capacidades existentes (no equivalen a cierre institucional)
 
@@ -22,7 +22,7 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 - Skillbook con búsqueda y metodologías; se añade promoción basada en dos eventos independientes del ledger íntegro y firma HMAC VERITAS. La clave sigue siendo un secreto operativo externo, no una identidad de modelo.
 - Memoria de lecciones verificadas con aislamiento por namespace e inyección contextual.
 - CLI `ledger_cli.py` para verificar integridad, listar namespaces y consultar historial.
-- Ledger de ejecuciones: integrado con `agent_runner.py`, `tool_executor.py` y `nuclei_scanner.py` para registrar respuestas, ejecuciones locales, timeouts y denegaciones. La escritura del ledger emite una advertencia si falla y no oculta el resultado original. El ciclo de Skills autónomas y el almacenamiento externo WORM siguen pendientes.
+- Ledger de ejecuciones: integrado con `agent_runner.py`, `tool_executor.py`, `nuclei_scanner.py` y `task_runner.py` para registrar respuestas, ejecuciones locales, timeouts y denegaciones. La escritura del ledger emite una advertencia si falla y no oculta el resultado original. El ciclo de Skills autónomas y el almacenamiento externo WORM siguen pendientes.
 
 ## Pendientes de cierre
 
