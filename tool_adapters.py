@@ -126,6 +126,7 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
         "LC_ALL": "C.UTF-8",
         "NO_COLOR": "1",
     }
+    target_hash_before = _hash_target(path)
     started = time.monotonic()
     timestamp = datetime.now(timezone.utc).isoformat()
     captured = {"stdout": bytearray(), "stderr": bytearray()}
@@ -172,9 +173,7 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
             returncode = None
         for reader in readers:
             reader.join(timeout=5)
-        status = "timeout" if timed_out else (
-            "completed" if returncode == 0 else "findings_or_tool_error"
-        )
+        status = "timeout" if timed_out else "completed"
     except OSError as exc:
         raise ToolExecutionError("No se pudo iniciar el ejecutable.") from exc
 
@@ -190,18 +189,21 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
         "tool": tool_id,
         "tool_version": "not_probed",
         "target": str(path.relative_to(PROJECT_ROOT)),
-        "target_sha256": _hash_target(path),
+        "target_sha256": target_hash_before,
+        "target_sha256_after": _hash_target(path),
+        "target_modified": target_hash_before != _hash_target(path),
         "started_at": timestamp,
         "elapsed_seconds": round(time.monotonic() - started, 3),
         "status": status,
         "return_code": returncode,
+        "tool_reported_success": returncode == 0,
         "output_truncated": truncated,
         "stdout": out_text,
         "stderr": err_text,
         "parsed_json": parsed,
         "command": command[1:],
         "network_access": False,
-        "note": "Salida de herramienta no confiable; requiere validación antes de generar hallazgos o Skills.",
+        "note": "Salida de herramienta no confiable; requiere validación antes de generar hallazgos o Skills. La ejecución no sustituye aislamiento del sistema operativo.",
     }
     return evidence
 
