@@ -98,6 +98,26 @@ class SkillbookTests(unittest.TestCase):
    with self.assertRaisesRegex(ValueError,"validador independiente"):
     skillbook.propose_skill_from_ledger(**args)
 
+ def test_skill_signature_is_bound_to_evidence_hashes(self):
+  key="test-veritas-approval-key-with-32-bytes-minimum"
+  events=[
+   {"event_id":"hash-run-1","task_fingerprint":"c"*64,"status":"completed","tool":"team_orchestrator","metadata":{"objective_supervision":True},"created_at":"2026-04-01T00:00:00Z","validator_results":[{"name":"objective_review:VERITAS","reviewer":"VERITAS","passed":True,"independent":True,"evidence":["review"]}],"evidence_sha256":"1"*64},
+   {"event_id":"hash-run-2","task_fingerprint":"c"*64,"status":"completed","tool":"team_orchestrator","metadata":{"objective_supervision":True},"created_at":"2026-04-02T00:00:00Z","validator_results":[{"name":"objective_review:VERITAS","reviewer":"VERITAS","passed":True,"independent":True,"evidence":["review"]}],"evidence_sha256":"2"*64},
+  ]
+  class FakeLedger:
+   def __init__(self,events): self.events=events
+   def verify(self): return {"valid":True}
+   def history(self,**kwargs): return self.events
+  args=dict(name="Firma ligada",task_pattern="evidencia integra",description="Debe detectar cambios",prerequisites=[],methodology=["capturar evidencia","validar firma"],validation=["comparar hashes"],tools=[],tags=["integrity"],source_urls=["https://example.org/"],namespace="forja",event_ids=["hash-run-1","hash-run-2"])
+  with patch.dict(os.environ,{"CYBER_AI_VERITAS_APPROVAL_KEY":key}), patch.object(skillbook,"ExecutionLedger",return_value=FakeLedger(events)):
+   payload=skillbook.skill_approval_payload(**args)
+  signature=hmac.new(key.encode(),payload.encode(),hashlib.sha256).hexdigest()
+  changed=[dict(item) for item in events]
+  changed[0]["evidence_sha256"]="9"*64
+  with patch.dict(os.environ,{"CYBER_AI_VERITAS_APPROVAL_KEY":key}), patch.object(skillbook,"ExecutionLedger",return_value=FakeLedger(changed)):
+   with self.assertRaisesRegex(ValueError,"Firma VERITAS inválida"):
+    skillbook.register_skill_from_ledger(**args,approval_signature=signature)
+
  def test_no_match(self):
   self.add(); self.assertEqual(skillbook.build_skill_context("analisis forense RAM"),("",[]))
 if __name__=="__main__": unittest.main()

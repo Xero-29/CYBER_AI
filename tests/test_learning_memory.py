@@ -165,6 +165,24 @@ class LearningMemoryTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "validador independiente"):
                 learning_memory.build_lesson_approval_payload(**self.args)
 
+    def test_memory_signature_is_bound_to_ledger_evidence_hashes(self):
+        with patch.object(
+            learning_memory, "ExecutionLedger", return_value=FakeLedger(self.events)
+        ):
+            payload = learning_memory.build_lesson_approval_payload(**self.args)
+        signature = hmac.new(
+            self.key.encode("utf-8"), payload.encode("utf-8"), hashlib.sha256
+        ).hexdigest()
+        changed = [dict(item) for item in self.events]
+        changed[0]["evidence_sha256"] = "9" * 64
+        with patch.object(
+            learning_memory, "ExecutionLedger", return_value=FakeLedger(changed)
+        ):
+            with self.assertRaisesRegex(ValueError, "Firma VERITAS inválida"):
+                learning_memory.save_verified_lesson_from_ledger(
+                    **self.args, approval_signature=signature
+                )
+
     def test_corrupted_signed_record_is_not_taught(self):
         self.save_lesson()
         record = json.loads(self.memory_path.read_text(encoding="utf-8"))

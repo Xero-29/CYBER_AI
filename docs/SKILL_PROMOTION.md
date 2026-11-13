@@ -10,7 +10,7 @@ CYBER_AI separa la propuesta de una Skill de su activación. `propose_skill_from
 4. Todas las ejecuciones registradas para esa huella, dentro del historial consultado, deben estar completadas.
 5. Cada ejecución seleccionada debe proceder de `team_orchestrator`, declarar `objective_supervision=true` y contener una revisión conforme, fundamentada y emitida por un rol distinto (`VERITAS`/`FILTRO`). El propio `agent_runner` marca su finalización como `independent=false`.
 6. Cada evento debe incluir un SHA-256 de evidencia válido.
-7. El documento canónico que contiene la Skill y los IDs de evidencia debe tener una firma HMAC válida.
+7. El documento canónico de aprobación v2 contiene la Skill, los IDs de eventos y los hashes SHA-256 de evidencia del ledger. Debe tener una firma HMAC válida; si cambia cualquier hash entre la firma y la promoción, la firma deja de ser válida.
 
 Si el historial alcanza el límite de 1.000 eventos, la promoción se bloquea porque no puede garantizarse una revisión exhaustiva.
 

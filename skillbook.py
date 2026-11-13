@@ -231,11 +231,11 @@ def register_verified_skill(**kwargs):
     )
 
 
-def skill_approval_payload(
+def _canonical_skill_approval_payload(
     *, name, task_pattern, description, prerequisites, methodology,
-    validation, tools, tags, source_urls, namespace, event_ids,
+    validation, tools, tags, source_urls, namespace, event_ids, ledger_event_refs,
 ):
-    """Documento canónico que firma el aprobador VERITAS."""
+    """Serializa metadatos y hashes de evidencia en el mismo documento firmado."""
     if not isinstance(namespace, str) or not namespace.strip():
         raise ValueError("namespace es obligatorio.")
     if (
@@ -245,6 +245,12 @@ def skill_approval_payload(
         or len(set(event_ids)) != len(event_ids)
     ):
         raise ValueError("Se requieren al menos dos IDs de eventos distintos.")
+    if (
+        not isinstance(ledger_event_refs, list)
+        or len(ledger_event_refs) != len(event_ids)
+        or any(not isinstance(item, str) or not item.strip() for item in ledger_event_refs)
+    ):
+        raise ValueError("Las referencias del ledger no coinciden con los eventos.")
 
     for field, value in (
         ("name", name), ("task_pattern", task_pattern), ("description", description)
@@ -252,7 +258,7 @@ def skill_approval_payload(
         if not isinstance(value, str) or not value.strip():
             raise ValueError(f"{field} obligatorio.")
     document = {
-        "schema": "cyber-ai-skill-approval-v1",
+        "schema": "cyber-ai-skill-approval-v2",
         "name": name.strip(),
         "task_pattern": task_pattern.strip(),
         "description": description.strip(),
@@ -263,9 +269,25 @@ def skill_approval_payload(
         "tags": _list(tags, "tags"),
         "source_urls": _validate_source_urls(source_urls),
         "namespace": namespace.strip(),
-        "event_ids": event_ids,
+        "event_ids": list(event_ids),
+        "ledger_event_refs": list(ledger_event_refs),
     }
     return json.dumps(document, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def skill_approval_payload(
+    *, name, task_pattern, description, prerequisites, methodology,
+    validation, tools, tags, source_urls, namespace, event_ids,
+):
+    """Documento canónico que firma el aprobador VERITAS, incluida la evidencia."""
+    _, evidence_refs = _verified_ledger_evidence(namespace, event_ids)
+    return _canonical_skill_approval_payload(
+        name=name, task_pattern=task_pattern, description=description,
+        prerequisites=prerequisites, methodology=methodology,
+        validation=validation, tools=tools, tags=tags, source_urls=source_urls,
+        namespace=namespace, event_ids=event_ids,
+        ledger_event_refs=evidence_refs,
+    )
 
 
 def _has_independent_review(event):
@@ -346,13 +368,14 @@ def propose_skill_from_ledger(
     validation, tools, tags, source_urls, namespace, event_ids,
 ):
     """Crea una candidata no ejecutable a partir de dos ejecuciones verificadas."""
-    payload = skill_approval_payload(
+    selected, evidence_refs = _verified_ledger_evidence(namespace, event_ids)
+    payload = _canonical_skill_approval_payload(
         name=name, task_pattern=task_pattern, description=description,
         prerequisites=prerequisites, methodology=methodology,
         validation=validation, tools=tools, tags=tags, source_urls=source_urls,
         namespace=namespace, event_ids=event_ids,
+        ledger_event_refs=evidence_refs,
     )
-    selected, evidence_refs = _verified_ledger_evidence(namespace, event_ids)
     candidate_evidence = evidence_refs + [
         "candidate_payload_sha256:" + hashlib.sha256(payload.encode("utf-8")).hexdigest()
     ]
@@ -394,11 +417,13 @@ def register_skill_from_ledger(
     if len(key.encode("utf-8")) < 32:
         raise ValueError("Falta una clave VERITAS de al menos 32 bytes en el entorno.")
 
-    payload = skill_approval_payload(
+    selected, evidence_refs = _verified_ledger_evidence(namespace, event_ids)
+    payload = _canonical_skill_approval_payload(
         name=name, task_pattern=task_pattern, description=description,
         prerequisites=prerequisites, methodology=methodology,
         validation=validation, tools=tools, tags=tags, source_urls=source_urls,
         namespace=namespace, event_ids=event_ids,
+        ledger_event_refs=evidence_refs,
     )
     expected = hmac.new(key.encode("utf-8"), payload.encode("utf-8"), hashlib.sha256).hexdigest()
     if not isinstance(approval_signature, str) or not hmac.compare_digest(
@@ -406,7 +431,6 @@ def register_skill_from_ledger(
     ):
         raise ValueError("Firma VERITAS inválida; no se promueve la Skill.")
 
-    selected, evidence_refs = _verified_ledger_evidence(namespace, event_ids)
     evidence_refs.append(
         "veritas_hmac_sha256:" + hashlib.sha256(approval_signature.encode()).hexdigest()
     )
