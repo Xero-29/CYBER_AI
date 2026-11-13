@@ -8,7 +8,9 @@ import hashlib
 import json
 import os
 import shutil
+import signal
 import subprocess
+import threading
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -55,6 +57,10 @@ def _hash_target(path):
         item for item in path.rglob("*")
         if item.is_file() and not item.is_symlink()
     )
+    if path.is_dir():
+        for item in path.rglob("*"):
+            if item.is_symlink():
+                raise ToolExecutionError("El objetivo contiene enlaces simbólicos; análisis bloqueado.")
     if len(files) > MAX_TARGET_FILES:
         raise ToolExecutionError("El objetivo supera el límite de archivos.")
     total_bytes = sum(item.stat().st_size for item in files)
@@ -122,28 +128,59 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
     }
     started = time.monotonic()
     timestamp = datetime.now(timezone.utc).isoformat()
+    captured = {"stdout": bytearray(), "stderr": bytearray()}
+    stream_truncated = {"value": False}
+
+    def drain(stream, key):
+        cap = MAX_OUTPUT_BYTES // 2
+        while True:
+            chunk = stream.read(65536)
+            if not chunk:
+                break
+            remaining = cap - len(captured[key])
+            if remaining > 0:
+                captured[key].extend(chunk[:remaining])
+            if len(chunk) > remaining:
+                stream_truncated["value"] = True
+
     try:
-        result = subprocess.run(
+        process = subprocess.Popen(
             command, cwd=str(PROJECT_ROOT), env=env,
-            stdin=subprocess.DEVNULL, capture_output=True,
-            text=True, encoding="utf-8", errors="replace",
-            timeout=limit, check=False, shell=False,
+            stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE, shell=False,
+            start_new_session=(os.name == "posix"),
         )
-        status = "completed" if result.returncode == 0 else "findings_or_tool_error"
-        stdout, stderr = result.stdout, result.stderr
-        returncode = result.returncode
-    except subprocess.TimeoutExpired as exc:
-        status, stdout, stderr, returncode = "timeout", "", str(exc), None
+        readers = [
+            threading.Thread(target=drain, args=(process.stdout, "stdout"), daemon=True),
+            threading.Thread(target=drain, args=(process.stderr, "stderr"), daemon=True),
+        ]
+        for reader in readers:
+            reader.start()
+        timed_out = False
+        try:
+            returncode = process.wait(timeout=limit)
+        except subprocess.TimeoutExpired:
+            timed_out = True
+            if os.name == "posix":
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+            else:
+                process.kill()
+            process.wait()
+            returncode = None
+        for reader in readers:
+            reader.join(timeout=5)
+        status = "timeout" if timed_out else (
+            "completed" if returncode == 0 else "findings_or_tool_error"
+        )
     except OSError as exc:
         raise ToolExecutionError("No se pudo iniciar el ejecutable.") from exc
 
-    encoded_out = stdout.encode("utf-8", errors="replace")
-    encoded_err = stderr.encode("utf-8", errors="replace")
-    truncated = len(encoded_out) + len(encoded_err) > MAX_OUTPUT_BYTES
-    remaining = MAX_OUTPUT_BYTES
-    out_text = encoded_out[:remaining].decode("utf-8", errors="replace")
-    remaining -= len(out_text.encode("utf-8"))
-    err_text = encoded_err[:max(0, remaining)].decode("utf-8", errors="replace")
+    out_text = captured["stdout"].decode("utf-8", errors="replace")
+    err_text = captured["stderr"].decode("utf-8", errors="replace")
+    truncated = stream_truncated["value"]
     try:
         parsed = json.loads(out_text) if out_text.strip() else None
     except json.JSONDecodeError:
