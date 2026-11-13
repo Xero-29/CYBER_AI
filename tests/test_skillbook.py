@@ -11,7 +11,7 @@ class SkillbookTests(unittest.TestCase):
  def test_retrieval(self):
   x=self.add(); ctx,m=skillbook.build_skill_context("auditoria web revisar cabeceras HTTP"); self.assertIn(x["skill_id"],ctx); self.assertEqual(m[0]["skill_id"],x["skill_id"])
  def test_public_registration_cannot_self_assert_veritas(self):
-  with self.assertRaisesRegex(ValueError,"registro directo deshabilitado"):
+  with self.assertRaisesRegex(ValueError,"(?i)registro directo deshabilitado"):
    skillbook.register_verified_skill(verified_by="VERITAS",verifier_verdict="CONFIRMADA")
  def test_requires_two_successes_and_zero_failures(self):
   with self.assertRaises(ValueError): self.add(success_runs=1)
