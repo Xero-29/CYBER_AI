@@ -6,6 +6,7 @@ from unittest.mock import patch
 import sandbox_runner
 import tool_adapters
 from tool_adapters import ToolExecutionError
+from sandbox_runner import SANDBOX_TOOLS
 
 
 class SandboxRunnerTests(unittest.TestCase):
@@ -42,6 +43,14 @@ class SandboxRunnerTests(unittest.TestCase):
         self.assertIn("dst=/evidence", joined)
         self.assertNotIn("--privileged", command)
         self.assertNotIn("/var/run/docker.sock", joined)
+
+    def test_only_tools_bundled_in_image_are_allowed(self):
+        self.assertEqual(SANDBOX_TOOLS, frozenset({"ruff", "bandit"}))
+        evidence = self.root.parent / (self.root.name + "-evidence")
+        for tool in ("semgrep", "syft", "trivy"):
+            with self.subTest(tool=tool):
+                with self.assertRaises(ToolExecutionError):
+                    sandbox_runner.build_docker_command(tool, "sample.py", evidence)
 
     def test_network_tool_is_denied(self):
         evidence = self.root.parent / (self.root.name + "-evidence")
