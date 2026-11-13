@@ -77,6 +77,10 @@ búsquedas en el nuevo espacio.
 
 ## Límites y seguridad
 
+- Los endpoints HTTP sin TLS solo se aceptan en loopback (`localhost`, `127.0.0.1` o `::1`); los proveedores remotos deben usar HTTPS.
+- No se siguen redirecciones HTTP para impedir que un endpoint reenvíe cabeceras de credenciales a otro host.
+- No se aceptan credenciales embebidas, query strings ni fragmentos en `base_url`.
+
 - No se debe escribir ninguna clave API en archivos versionados, argumentos de consola, logs o prompts.
 - Una API remota puede recibir el contenido de las tareas y el contexto que se le envía. Antes de habilitarla, configurar qué información puede salir del equipo y aplicar redacción de secretos/datos sensibles.
 - La compatibilidad depende del protocolo declarado. Anthropic solo cubre chat; Gemini y OpenAI-compatible cubren chat y embeddings en estos adaptadores.

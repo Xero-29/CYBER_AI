@@ -3,10 +3,23 @@
 Credenciales únicamente desde variables de entorno. El núcleo no depende de SDKs
 propietarios; los proveedores OpenAI-compatible usan la API HTTP estándar.
 """
+import ipaddress
 import json
 import os
-from urllib.request import Request, urlopen
+from urllib.parse import urlsplit
+from urllib.request import HTTPRedirectHandler, build_opener
+from urllib.request import Request
 from urllib.error import HTTPError, URLError
+
+
+class _NoRedirect(HTTPRedirectHandler):
+    """No reenvía credenciales de proveedor a destinos de redirección."""
+
+    def redirect_request(self, request, fp, code, message, headers, new_url):
+        return None
+
+
+_HTTP_OPENER = build_opener(_NoRedirect)
 
 
 def resolve_provider(config, agent):
@@ -21,8 +34,33 @@ def resolve_provider(config, agent):
     if protocol not in {"ollama", "openai", "anthropic", "gemini"}:
         raise ValueError(f"Protocolo de proveedor no soportado: {protocol}")
     base_url = result.get("base_url", "")
-    if not isinstance(base_url, str) or not base_url.startswith(("http://", "https://")):
+    if not isinstance(base_url, str):
         raise ValueError(f"base_url inválida para el proveedor {name}.")
+    try:
+        parsed = urlsplit(base_url)
+        hostname = (parsed.hostname or "").lower().rstrip(".")
+        port = parsed.port
+    except ValueError as error:
+        raise ValueError(f"base_url inválida para el proveedor {name}.") from error
+    if (
+        parsed.scheme not in {"http", "https"}
+        or not hostname
+        or parsed.username is not None
+        or parsed.password is not None
+        or parsed.query
+        or parsed.fragment
+        or (port is not None and not 1 <= port <= 65535)
+    ):
+        raise ValueError(f"base_url inválida para el proveedor {name}.")
+    try:
+        loopback = ipaddress.ip_address(hostname).is_loopback
+    except ValueError:
+        loopback = hostname == "localhost"
+    if parsed.scheme == "http" and not loopback:
+        raise ValueError(
+            "base_url HTTP solo se permite en loopback; usa HTTPS para proveedores remotos."
+        )
+    result["base_url"] = base_url.rstrip("/")
     return result
 
 
@@ -69,7 +107,7 @@ def _http_json(url, payload=None, headers=None, timeout=600):
     request = Request(url, data=data, headers={"Content-Type": "application/json", **(headers or {})},
                       method="GET" if payload is None else "POST")
     try:
-        with urlopen(request, timeout=timeout) as response:
+        with _HTTP_OPENER.open(request, timeout=timeout) as response:
             return json.load(response)
     except HTTPError as exc:
         detail = exc.read().decode("utf-8", errors="replace")[:2000]
