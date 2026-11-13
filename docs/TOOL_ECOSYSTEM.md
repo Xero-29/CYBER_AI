@@ -80,12 +80,12 @@ Los adaptadores locales por sí solos no constituyen un sandbox del sistema oper
 
 **Implementado en la rama `codex/security-integrity-audit`:**
 
-- `sandbox_runner.py` invoca Docker con argumentos separados, sin shell.
+- `sandbox_runner.py` invoca Docker con argumentos separados, sin shell, y mantiene una allowlist explícita que coincide con los binarios instalados en la imagen (actualmente Ruff y Bandit). Semgrep, Syft y Trivy se rechazan en el runner hasta que se incorporen y prueben en la imagen.
 - El contenedor usa `--network=none`, `--read-only`, `--cap-drop=ALL`, `no-new-privileges`, usuario no root con el UID/GID del operador (la imagen tiene UID/GID predeterminado 65532), límites de 1 GiB RAM, 2 CPU y 128 procesos, y `/tmp` como tmpfs pequeño sin ejecución.
 - El repositorio se monta en `/workspace` en solo lectura. La única ruta escribible montada es el directorio externo de evidencias en `/evidence`.
 - No se monta el socket Docker, no se usa `--privileged`, no se pasan secretos al contenedor y las herramientas con política de red quedan denegadas.
 - `.github/workflows/docker-sandbox.yml` construye la imagen y ejecuta pruebas unitarias más un smoke test de Ruff en GitHub-hosted runner efímero. El workflow tiene `contents: read`, checkout sin persistir credenciales y timeout de job.
-- La imagen contiene versiones fijadas de Ruff y Bandit. Semgrep, Syft y Trivy aún no están incluidos en esta imagen; sus adaptadores locales existentes no se vuelven automáticamente ejecutables dentro del contenedor.
+- La imagen contiene versiones fijadas de Ruff y Bandit. Las pruebas verifican que el runner rechaza Semgrep, Syft y Trivy mientras no estén instalados. `.dockerignore` excluye metadatos Git, artefactos, entornos virtuales y patrones comunes de secretos del contexto de build.
 
 Ejemplo:
 
