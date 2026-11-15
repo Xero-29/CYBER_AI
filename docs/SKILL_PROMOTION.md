@@ -41,3 +41,22 @@ Después llama a `register_skill_from_ledger(..., approval_signature=signature)`
 HMAC autentica posesión de la clave, no demuestra por sí mismo que un modelo VERITAS haya revisado el contenido. La clave debe estar bajo control de un proceso aprobador separado. Para nivel institucional se debe reemplazar o complementar esta clave local por un servicio de firma independiente, KMS/HSM, identidad del aprobador, política de doble control y registro externo inmutable.
 
 El endpoint público `register_verified_skill` está deshabilitado para impedir que un caller se autodeclare VERITAS. Las candidatas no aparecen en `search_skills` ni se inyectan al contexto del agente. El historial de versiones bloquea UPDATE/DELETE ordinarios; aún faltan rollback, regresión automática y firma independiente KMS/HSM.
+
+
+## Rollback firmado de Skills
+
+Una versión activa anterior puede restaurarse sin reescribir el historial. Primero se obtiene el documento canónico que vincula la versión actual, la versión objetivo y los hashes de ambos snapshots:
+
+```python
+payload = skillbook.skill_rollback_payload(skill_id, target_version=1)
+signature = hmac.new(
+    os.environ["CYBER_AI_VERITAS_APPROVAL_KEY"].encode("utf-8"),
+    payload.encode("utf-8"),
+    hashlib.sha256,
+).hexdigest()
+result = skillbook.rollback_skill_version(
+    skill_id, target_version=1, approval_signature=signature
+)
+```
+
+El rollback exige una versión objetivo que estuvo activa, con dos ejecuciones exitosas y cero fallos sin resolver. La firma queda invalidada si cambia la versión actual o cualquiera de los snapshots. La restauración crea una versión nueva con `change_type=rollback`; nunca modifica ni elimina versiones anteriores. La clave sigue siendo HMAC local y no sustituye una firma independiente KMS/HSM.
