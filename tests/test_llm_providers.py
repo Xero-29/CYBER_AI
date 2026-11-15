@@ -303,5 +303,17 @@ class NativeProtocolTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "no hay proveedor habilitado"):
             llm_providers.resolve_provider(config, {"type": "embeddings"}, capability="embeddings")
 
+
+    def test_builtin_provider_uses_safe_default_base_url(self):
+        provider = llm_providers.resolve_provider(
+            {"llm_providers": {"gemini": {"enabled": True, "protocol": "gemini"}}},
+            {"provider": "gemini"},
+            capability="embeddings",
+        )
+        self.assertEqual(
+            provider["base_url"],
+            "https://generativelanguage.googleapis.com/v1beta",
+        )
+
 if __name__ == "__main__":
     unittest.main()

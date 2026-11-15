@@ -85,7 +85,13 @@ def resolve_provider(config, agent, capability=None):
         builtin = protocol in {"ollama", "openai", "anthropic", "gemini"}
         if not builtin and _load_provider_plugin(protocol) is None:
             raise ValueError(f"Protocolo de proveedor no soportado: {protocol}")
-        base_url = result.get("base_url", "")
+        defaults = {
+            "ollama": "http://127.0.0.1:11434",
+            "openai": "https://api.openai.com/v1",
+            "anthropic": "https://api.anthropic.com/v1",
+            "gemini": "https://generativelanguage.googleapis.com/v1beta",
+        }
+        base_url = result.get("base_url") or defaults.get(protocol, "")
         if not base_url and not builtin:
             if capability and capability not in provider_capabilities(result):
                 last_reason = f"{name} no ofrece {capability}"
