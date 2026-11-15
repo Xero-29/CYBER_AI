@@ -190,5 +190,35 @@ class TestKnowledgeLibrary(unittest.TestCase):
             )
 
 
+
+    def test_document_chunk_count_can_filter_embedding_space(self):
+        library.store_chunks([
+            {
+                "title": "Paquete", "source": "offline", "category": "test",
+                "content": "contenido v1", "embedding": [1.0, 0.0],
+                "embedding_model": "provider-a::model-a",
+                "document_id": "stable-doc", "chunk_index": 0,
+            },
+            {
+                "title": "Paquete", "source": "offline", "category": "test",
+                "content": "contenido v2", "embedding": [0.0, 1.0],
+                "embedding_model": "provider-b::model-b",
+                "document_id": "stable-doc", "chunk_index": 0,
+            },
+        ])
+        self.assertEqual(library.document_chunk_count("stable-doc"), 2)
+        self.assertEqual(
+            library.document_chunk_count("stable-doc", "provider-a::model-a"),
+            1,
+        )
+        self.assertEqual(
+            library.document_chunk_count("stable-doc", "provider-b::model-b"),
+            1,
+        )
+
+    def test_document_chunk_count_rejects_empty_model_filter(self):
+        with self.assertRaisesRegex(ValueError, "embedding_model"):
+            library.document_chunk_count("stable-doc", " ")
+
 if __name__ == "__main__":
     unittest.main()
