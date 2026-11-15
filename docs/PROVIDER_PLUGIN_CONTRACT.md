@@ -50,7 +50,7 @@ Ejemplo conceptual en `config/model_roles.json`:
 }
 ```
 
-Asigna `provider: "custom"` al agente que deba usarlo. Los proveedores remotos deben usar HTTPS. Las credenciales se leen desde variables de entorno; nunca las guardes en configuración versionada, Skills, memoria ni reportes.
+Asigna `provider: "custom"` al agente que deba usarlo o configura `capability_providers` para seleccionar este proveedor por capacidad. `fallback_providers` acepta una lista explícita de alternativas por capacidad. Los proveedores remotos deben usar HTTPS. Las credenciales se leen desde variables de entorno; nunca las guardes en configuración versionada, Skills, memoria ni reportes.
 
 ## Reglas de interoperabilidad
 

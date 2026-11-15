@@ -26,6 +26,14 @@ Se puede mantener Ollama para algunos especialistas y asignar un proveedor remot
 ```json
 {
   "default_provider": "ollama",
+  "capability_providers": {
+    "chat": "ollama",
+    "embeddings": "openai_compatible"
+  },
+  "fallback_providers": {
+    "chat": ["openai_compatible"],
+    "embeddings": ["gemini"]
+  },
   "llm_providers": {
     "ollama": {
       "enabled": true,
@@ -50,7 +58,7 @@ Se puede mantener Ollama para algunos especialistas y asignar un proveedor remot
 }
 ```
 
-El fragmento ilustra los campos que se agregan; no reemplaza el resto de la definición del especialista.
+El fragmento ilustra los campos que se agregan; no reemplaza el resto de la definición del especialista. `agent.provider` explícito tiene prioridad; en su ausencia se usa `capability_providers` y luego `default_provider`. Si el proveedor preferido está deshabilitado o no declara la capacidad, se prueban los nombres de `fallback_providers` en orden. Este fallback cubre selección por capacidad/configuración, no reintentos automáticos ante caídas o límites de cuota durante una petición.
 
 ## Cambiar el modelo de embeddings sin mezclar vectores
 
@@ -90,7 +98,7 @@ Los proveedores no incluidos pueden añadirse como paquetes Python con un entry 
 - La compatibilidad depende del protocolo declarado. Anthropic solo cubre chat; Gemini y OpenAI-compatible cubren chat y embeddings en estos adaptadores.
 - La configuración de proveedor no otorga permisos para ejecutar herramientas ni pruebas de seguridad.
 - El historial, los vectores locales y las Skills no se transfieren automáticamente al proveedor. Solo se envía el contexto que el ejecutor recupera para la tarea.
-- La CLI de administración/descarga de modelos sigue siendo específica de Ollama; la abstracción cubre el flujo de inferencia de agentes y embeddings. No hay descubrimiento automático de modelos remotos: los nombres se configuran explícitamente.
+- La CLI de administración/descarga de modelos sigue siendo específica de Ollama; la abstracción cubre el flujo de inferencia de agentes y embeddings. No hay descubrimiento automático de modelos remotos: los nombres se configuran explícitamente. La selección por capacidad y los fallbacks configurados evitan asignar un proveedor solo-chat a ECO, pero no implementan failover dinámico ante errores de red.
 
 ## Pruebas
 
