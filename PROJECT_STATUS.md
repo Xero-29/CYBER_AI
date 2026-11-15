@@ -7,6 +7,8 @@
 
 ## Avance de esta iteración
 
+Se añadió `knowledge_eval.py` con un conjunto inicial de 12 consultas y métricas Recall@K, Precision@K y MRR@K. El arnés y los datos están versionados; aún falta ejecutar el benchmark con modelos reales, fijar umbrales por dominio y ampliar el conjunto con evaluaciones revisadas por expertos.
+
 Se reforzó el bootstrap de la biblioteca offline: IDs deterministas por ruta y SHA-256, bloqueo entre procesos, rechazo de rutas absolutas/traversal/symlinks, estados `processing/completed/failed`, reanudación tras fallos y prevención de duplicados. La indexación identifica el espacio vectorial del proveedor ECO y reindexa el contenido cuando cambia el modelo/proveedor, evitando mezclar vectores incompatibles en las búsquedas. Se añadieron pruebas de reintento, rutas, fallos y espacios de embeddings.
 
 El descargador ahora exige `CYBER_AI_KNOWLEDGE_EGRESS_PROXY` para cualquier descarga real; sin gateway configurado falla antes de resolver el destino o abrir conexiones. El gateway debe imponer allowlist de hosts, pinning DNS y bloqueo de redes privadas. Esto no sustituye la validación de seguridad del proxy externo.

@@ -116,7 +116,15 @@ python knowledge_bootstrap.py --dry-run
 python knowledge_bootstrap.py
 ```
 
-La primera orden valida rutas y hashes sin IA ni escrituras. La segunda genera embeddings con ECO, ingiere paquetes nuevos/modificados y registra hash y clasificación. El bootstrap es reanudable e idempotente; si cambia el proveedor/modelo de embeddings, vuelve a indexar los paquetes en el nuevo espacio vectorial. Anthropic está integrado para chat, no para embeddings; si lo usas, configura además un proveedor compatible de embeddings.
+La primera orden valida rutas y hashes sin IA ni escrituras. La segunda genera embeddings con ECO, ingiere paquetes nuevos/modificados y registra hash y clasificación. El bootstrap es reanudable e idempotente; si cambia el proveedor/modelo de embeddings, vuelve a indexar los paquetes en el nuevo espacio vectorial.
+
+Para medir la calidad de recuperación tras indexar, ejecuta el benchmark inicial de 12 consultas:
+
+```bash
+python knowledge_eval.py --top-k 5 --output reports/knowledge-eval.json
+```
+
+El informe calcula Recall@K, Precision@K y MRR@K. Los resultados dependen del modelo de embeddings y del contenido indexado; el benchmark no presupone que la calidad sea aceptable. Anthropic está integrado para chat, no para embeddings; si lo usas, configura además un proveedor compatible de embeddings.
 
 ## Conocimiento y Skills
 
