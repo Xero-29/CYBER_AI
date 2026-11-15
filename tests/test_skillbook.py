@@ -122,4 +122,39 @@ class SkillbookTests(unittest.TestCase):
 
  def test_no_match(self):
   self.add(); self.assertEqual(skillbook.build_skill_context("analisis forense RAM"),("",[]))
+
+ def test_signed_rollback_restores_prior_snapshot_and_appends_version(self):
+  key="test-veritas-approval-key-with-32-bytes-minimum"
+  skill=self.add()
+  with skillbook.connect() as db:
+   db.execute("UPDATE skills SET name=?,methodology_json=?,version=2,updated_at=? WHERE skill_id=?",("Mutada",'["paso alterado","paso roto"]',skillbook.now(),skill["skill_id"]))
+   skillbook._save_version(db,skill["skill_id"],2,"updated","VERITAS")
+  payload=skillbook.skill_rollback_payload(skill["skill_id"],1)
+  signature=hmac.new(key.encode(),payload.encode(),hashlib.sha256).hexdigest()
+  with patch.dict(os.environ,{"CYBER_AI_VERITAS_APPROVAL_KEY":key}):
+   result=skillbook.rollback_skill_version(skill["skill_id"],1,signature)
+  self.assertEqual(result["version"],3)
+  with skillbook.connect() as db:
+   row=db.execute("SELECT * FROM skills WHERE skill_id=?",(skill["skill_id"],)).fetchone()
+  self.assertEqual(row["name"],"Auditoria cabeceras HTTP")
+  self.assertEqual(json.loads(row["methodology_json"]),["solicitar raíz con timeout","comparar cabeceras con OWASP","documentar evidencia"])
+  self.assertEqual(row["verifier_verdict"],"ROLLBACK_APPROVED")
+  self.assertEqual([v["change_type"] for v in skillbook.list_skill_versions(skill["skill_id"])],["created","updated","rollback"])
+
+ def test_rollback_rejects_invalid_signature_and_stale_payload(self):
+  key="test-veritas-approval-key-with-32-bytes-minimum"
+  skill=self.add()
+  with skillbook.connect() as db:
+   db.execute("UPDATE skills SET name=?,version=2 WHERE skill_id=?",("Mutada",skill["skill_id"]))
+   skillbook._save_version(db,skill["skill_id"],2,"updated","VERITAS")
+  payload=skillbook.skill_rollback_payload(skill["skill_id"],1)
+  signature=hmac.new(key.encode(),payload.encode(),hashlib.sha256).hexdigest()
+  with patch.dict(os.environ,{"CYBER_AI_VERITAS_APPROVAL_KEY":key}):
+   with self.assertRaisesRegex(ValueError,"Firma VERITAS"):
+    skillbook.rollback_skill_version(skill["skill_id"],1,"0"*64)
+   with skillbook.connect() as db:
+    db.execute("UPDATE skills SET name=? WHERE skill_id=?",("Cambio posterior",skill["skill_id"]))
+   with self.assertRaisesRegex(ValueError,"Firma VERITAS"):
+    skillbook.rollback_skill_version(skill["skill_id"],1,signature)
+
 if __name__=="__main__": unittest.main()
