@@ -204,6 +204,8 @@ class NativeProtocolTests(unittest.TestCase):
         class Plugin:
             def request(self, provider, endpoint, payload, timeout):
                 return {"embeddings": [[1.0, float("nan")]]}
+            def capabilities(self, provider):
+                return ["embeddings"]
         provider = {"name": "custom", "protocol": "test_plugin"}
         with patch.object(llm_providers, "_load_provider_plugin", return_value=Plugin()):
             with self.assertRaisesRegex(RuntimeError, "vector inválido"):
@@ -230,6 +232,31 @@ class NativeProtocolTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "no declara api_key_env"):
                 llm_providers.request(provider, "api/chat", {
                     "model": "m", "messages": [{"role": "user", "content": "x"}]})
+
+
+    def test_plugin_must_declare_capabilities(self):
+        class Plugin:
+            def request(self, provider, endpoint, payload, timeout):
+                return {"message": {"content": "ok"}}
+        with patch.object(llm_providers, "_load_provider_plugin", return_value=Plugin()):
+            with self.assertRaisesRegex(RuntimeError, "capabilities"):
+                llm_providers.provider_capabilities({"name": "custom", "protocol": "custom"})
+
+    def test_plugin_cannot_claim_unknown_capability(self):
+        class Plugin:
+            def request(self, provider, endpoint, payload, timeout):
+                return {}
+            def capabilities(self, provider):
+                return ["shell_access"]
+        with patch.object(llm_providers, "_load_provider_plugin", return_value=Plugin()):
+            with self.assertRaisesRegex(RuntimeError, "capacidades inválidas"):
+                llm_providers.provider_capabilities({"name": "custom", "protocol": "custom"})
+
+    def test_openai_compatible_does_not_claim_model_listing_without_adapter(self):
+        self.assertEqual(
+            llm_providers.provider_capabilities({"name": "openai", "protocol": "openai"}),
+            ["chat", "embeddings"],
+        )
 
 if __name__ == "__main__":
     unittest.main()

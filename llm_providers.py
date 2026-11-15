@@ -39,6 +39,10 @@ def _load_provider_plugin(protocol):
         raise RuntimeError(
             f"El plugin {protocol} debe exponer request(provider, endpoint, payload, timeout)."
         )
+    if not callable(getattr(adapter, "capabilities", None)):
+        raise RuntimeError(
+            f"El plugin {protocol} debe declarar capabilities(provider)."
+        )
     return adapter
 
 
@@ -294,8 +298,11 @@ def _validate_plugin_response(endpoint, result, protocol):
 
 
 def request(provider, endpoint, payload=None, timeout=600):
-    """Normaliza llamadas de chat y embeddings para los adaptadores disponibles."""
+    """Normaliza llamadas y deniega endpoints no declarados por capacidades."""
     protocol = provider.get("protocol")
+    required = {"api/chat": "chat", "api/embed": "embeddings", "api/ps": "model_listing"}.get(endpoint)
+    if required and required not in provider_capabilities(provider):
+        raise ValueError(f"El proveedor {provider.get('name', protocol)} no ofrece {required}.")
     if protocol == "ollama":
         base = str(provider.get("base_url", "")).rstrip("/")
         if not base:
@@ -319,7 +326,7 @@ def provider_capabilities(provider):
     protocol = provider.get("protocol")
     builtins = {
         "ollama": {"chat", "embeddings", "model_listing"},
-        "openai": {"chat", "embeddings", "model_listing"},
+        "openai": {"chat", "embeddings"},
         "anthropic": {"chat"},
         "gemini": {"chat", "embeddings"},
     }
@@ -329,11 +336,16 @@ def provider_capabilities(provider):
     if adapter is None or not callable(getattr(adapter, "capabilities", None)):
         return []
     values = adapter.capabilities(provider)
-    if not isinstance(values, (list, tuple, set)) or any(
-        not isinstance(value, str) or not value.strip() for value in values
+    allowed = {"chat", "embeddings", "model_listing"}
+    if (
+        not isinstance(values, (list, tuple, set))
+        or any(not isinstance(value, str) or value not in allowed for value in values)
     ):
         raise RuntimeError(f"El plugin {protocol} devolvió capacidades inválidas.")
-    return sorted(set(values))
+    capabilities = set(values)
+    if "model_listing" in capabilities and not callable(getattr(adapter, "installed_models", None)):
+        raise RuntimeError(f"El plugin {protocol} declara model_listing sin installed_models(provider).")
+    return sorted(capabilities)
 
 
 def installed_models(provider):

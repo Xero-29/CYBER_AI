@@ -33,7 +33,7 @@ implementar:
   - `api/embed`: `{"embeddings":[[0.1,0.2,...]]}`; vectores numéricos, finitos y de dimensiones consistentes.
   - `api/ps`: `{"models":[]}`.
   Las respuestas se validan antes de llegar a los agentes.
-- `capabilities(provider)`: opcional; devuelve capacidades como `chat` y `embeddings`.
+- `capabilities(provider)`: obligatorio; devuelve únicamente capacidades reales entre `chat`, `embeddings` y `model_listing`.
 - `installed_models(provider)`: opcional; devuelve un conjunto de modelos o `None`.
 
 Ejemplo de registro en el `pyproject.toml` del paquete externo:
