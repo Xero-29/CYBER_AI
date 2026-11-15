@@ -79,9 +79,13 @@ class KnowledgeDownloaderSecurityTests(unittest.TestCase):
         session.get.return_value = response
         session_factory.return_value = session
 
-        with self.assertRaises(ValueError):
-            downloader.download(self.item(), {"resources": {}})
+        with patch.dict(downloader.os.environ, {
+            "CYBER_AI_KNOWLEDGE_EGRESS_PROXY": "http://127.0.0.1:8080"
+        }):
+            with self.assertRaises(ValueError):
+                downloader.download(self.item(), {"resources": {}})
         self.assertFalse(session.trust_env)
+        self.assertEqual(session.proxies, {"https": "http://127.0.0.1:8080"})
         session.get.assert_called_once()
         self.assertFalse(session.get.call_args.kwargs["allow_redirects"])
 
@@ -95,6 +99,30 @@ class KnowledgeDownloaderSecurityTests(unittest.TestCase):
         self.assertEqual(manifest["resources"], {})
         resolver.assert_not_called()
 
+
+
+    @patch.object(downloader.requests, "Session")
+    def test_real_download_fails_closed_without_explicit_egress_proxy(self, session_factory):
+        with patch.dict(downloader.os.environ, {}, clear=True):
+            with self.assertRaisesRegex(ValueError, "CYBER_AI_KNOWLEDGE_EGRESS_PROXY"):
+                downloader.download(self.item(), {"resources": {}})
+        session_factory.assert_not_called()
+
+    def test_non_loopback_plain_http_proxy_is_rejected(self):
+        with patch.dict(downloader.os.environ, {
+            "CYBER_AI_KNOWLEDGE_EGRESS_PROXY": "http://proxy.example.org:8080"
+        }):
+            with self.assertRaisesRegex(ValueError, "solo se permite en loopback"):
+                downloader._validated_egress_proxy()
+
+    def test_https_egress_proxy_is_accepted(self):
+        with patch.dict(downloader.os.environ, {
+            "CYBER_AI_KNOWLEDGE_EGRESS_PROXY": "https://egress.example.org:8443"
+        }):
+            self.assertEqual(
+                downloader._validated_egress_proxy(),
+                "https://egress.example.org:8443",
+            )
 
 if __name__ == "__main__":
     unittest.main()

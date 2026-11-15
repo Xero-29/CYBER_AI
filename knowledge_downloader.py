@@ -2,14 +2,17 @@
 """Descargador verificable y reanudable de conocimientos para CYBER_AI.
 
 La descarga está deshabilitada por defecto en el catálogo. Las fuentes
-habilitadas solo pueden usar HTTPS público, sin proxies del entorno ni
-redirecciones a otros hosts.
+habilitadas solo pueden usar HTTPS público, sin proxies implícitos del entorno
+ni redirecciones a otros hosts. Toda descarga real exige un gateway de salida
+explícito que aplique allowlist, resolución DNS segura y bloqueo de redes privadas;
+el cliente valida DNS, pero no puede eliminar por sí solo la ventana TOCTOU.
 """
 import argparse
 import fcntl
 import hashlib
 import ipaddress
 import json
+import os
 import re
 import socket
 import time
@@ -169,6 +172,36 @@ def _request_public_resource(session, url):
     raise ValueError("No se pudo completar la descarga.")
 
 
+def _validated_egress_proxy():
+    """Exige un gateway que aplique allowlist y protección contra DNS rebinding."""
+    value = os.environ.get("CYBER_AI_KNOWLEDGE_EGRESS_PROXY", "").strip()
+    if not value:
+        raise ValueError(
+            "Descarga bloqueada: configura CYBER_AI_KNOWLEDGE_EGRESS_PROXY "
+            "con un proxy de salida que aplique allowlist y pinning DNS."
+        )
+    parsed = urlparse(value)
+    try:
+        port = parsed.port
+    except ValueError as error:
+        raise ValueError("Proxy de salida inválido.") from error
+    if (
+        parsed.scheme not in {"https", "http"} or not parsed.hostname
+        or parsed.username or parsed.password or parsed.query or parsed.fragment
+        or (port is not None and not 1 <= port <= 65535)
+    ):
+        raise ValueError("Proxy de salida inválido.")
+    if parsed.scheme == "http":
+        host = parsed.hostname.lower().rstrip(".")
+        try:
+            loopback = ipaddress.ip_address(host).is_loopback
+        except ValueError:
+            loopback = host == "localhost"
+        if not loopback:
+            raise ValueError("Un proxy HTTP sin TLS solo se permite en loopback.")
+    return value
+
+
 def download(item, manifest, dry_run=False):
     if item.get("verified_for_download") is not True:
         return "not_verified"
@@ -200,8 +233,10 @@ def download(item, manifest, dry_run=False):
         print(f"[SIMULACIÓN] {item_id}: {url}")
         return "dry_run"
 
+    proxy = _validated_egress_proxy()
     session = requests.Session()
     session.trust_env = False
+    session.proxies = {"https": proxy}
     response = None
     temp = destination.with_name(destination.name + ".part")
     try:
