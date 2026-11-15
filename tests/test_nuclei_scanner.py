@@ -3,9 +3,10 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
+import signal
 from unittest.mock import patch
 
-from nuclei_scanner import scan_target, validate_target
+from nuclei_scanner import scan_target, validate_target, _terminate_process_tree
 from execution_ledger import ExecutionLedger
 
 
@@ -105,6 +106,21 @@ class NucleiScannerTests(unittest.TestCase):
             self.assertEqual(result["findings"][0]["template-id"], "test-template")
             events = ExecutionLedger(self.ledger_path).history(namespace="security-scans")
             self.assertEqual(events[0]["status"], "completed")
+
+    def test_timeout_termination_kills_process_group_on_posix(self):
+        process = FakeProcess()
+        process.pid = 4321
+        with patch("nuclei_scanner.os.name", "posix"), patch(
+            "nuclei_scanner.os.killpg"
+        ) as killpg:
+            _terminate_process_tree(process)
+        killpg.assert_called_once_with(4321, signal.SIGKILL)
+
+    def test_timeout_termination_falls_back_to_process_kill(self):
+        process = FakeProcess()
+        with patch("nuclei_scanner.os.name", "nt"):
+            _terminate_process_tree(process)
+        self.assertEqual(process.returncode, -9)
 
     def test_process_start_error_is_reported(self):
         with patch("nuclei_scanner.shutil.which", return_value="/usr/bin/nuclei"):

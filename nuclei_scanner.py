@@ -2,6 +2,8 @@
 """Escaneo defensivo con Nuclei y seguimiento visible del progreso."""
 
 import json
+import os
+import signal
 import uuid
 import shutil
 import subprocess
@@ -32,6 +34,18 @@ def validate_target(target):
         )
 
     return target
+
+
+def _terminate_process_tree(process):
+    """Detiene el grupo completo del escáner para no dejar procesos huérfanos."""
+    if os.name == "posix":
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+    else:
+        process.kill()
+    process.wait()
 
 
 def _record_scan_event(target, result, started, *, authorization_id=None):
@@ -127,6 +141,7 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None):
             stderr=subprocess.STDOUT,
             text=True,
             bufsize=1,
+            start_new_session=(os.name == "posix"),
         )
 
         def show_output():
@@ -152,8 +167,7 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None):
             )
 
             if elapsed >= timeout:
-                process.kill()
-                process.wait()
+                _terminate_process_tree(process)
                 print("\n[Tiempo agotado] Se detuvo el escaneo.", flush=True)
                 result = {
                     "target": target,
