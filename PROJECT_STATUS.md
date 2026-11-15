@@ -23,6 +23,9 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 
 ## Validación más reciente
 
+- Commit `5a04d73d7ad1a684972dbeddc88ab7217091ecb5`: Python tests **success**, 303 pruebas; Docker sandbox **en curso** en la última consulta.
+- Commit `23a7c0c72ee75a2f3fdcfa962446b3a351abf1f0`: Python tests **success**, 301 pruebas.
+
 - Commit `aa9b58cd125c18975a66430c00ce3c7a0714f3ff`: Python tests **success**, 301 pruebas; Docker sandbox **success**.
 - Commit `df589f7ac23d8ac5fbef175a6fd99f23009c8a9a`: Python tests **success**, 288 pruebas; Docker sandbox **success**.
 
