@@ -77,7 +77,7 @@ python agent_runner.py ask NEXO "Analiza este problema y propone una metodologí
 
 Si Ollama ya se ejecuta como servicio, no inicies una segunda instancia con `ollama serve`.
 
-Para usar otro proveedor, configura su bloque en `config/model_roles.json`, activa `enabled` y proporciona la credencial mediante la variable de entorno declarada. No guardes claves en Git. Para cualquier API no incluida de forma nativa, instala un adaptador como entry point `cyber_ai.providers`; el contrato está documentado en [docs/PROVIDER_PLUGIN_CONTRACT.md](docs/PROVIDER_PLUGIN_CONTRACT.md). Esto requiere un plugin compatible, no cambios en el núcleo.
+Para usar otro proveedor, configura su bloque en `config/model_roles.json`, activa `enabled` y proporciona la credencial mediante la variable de entorno declarada. Puedes enrutar por capacidad con `capability_providers` y configurar alternativas explícitas en `fallback_providers`; este fallback resuelve incompatibilidades de capacidad, no fallos transitorios de red. No guardes claves en Git. Para cualquier API no incluida de forma nativa, instala un adaptador como entry point `cyber_ai.providers`; el contrato está documentado en [docs/PROVIDER_PLUGIN_CONTRACT.md](docs/PROVIDER_PLUGIN_CONTRACT.md). Esto requiere un plugin compatible, no cambios en el núcleo.
 
 ```bash
 export CYBER_AI_LLM_API_KEY="..."

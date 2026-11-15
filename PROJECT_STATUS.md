@@ -9,6 +9,8 @@
 
 Se añadió `knowledge_eval.py` con un conjunto inicial de 12 consultas y métricas Recall@K, Precision@K y MRR@K. La biblioteca incorpora recuperación híbrida FTS5 + vectores con Reciprocal Rank Fusion (RRF), filtro de namespace/tenant y reconstrucción verificable del índice textual. Si SQLite no tiene FTS5, se conserva la recuperación semántica. La calidad aún debe medirse con embeddings reales y conjuntos revisados por expertos. El arnés y los datos están versionados; aún falta ejecutar el benchmark con modelos reales, fijar umbrales por dominio y ampliar el conjunto con evaluaciones revisadas por expertos.
 
+La integración de proveedores ahora exige declarar capacidades reales para plugins; valida chat/embeddings/model_listing, selecciona proveedores por capacidad y permite fallbacks configurados cuando un proveedor no tiene la capacidad solicitada. Se añadieron endpoints por defecto seguros para proveedores nativos. El fallback de configuración no cubre fallos de red, cuotas o errores durante una petición.
+
 Se reforzó el bootstrap de la biblioteca offline: IDs deterministas por ruta y SHA-256, bloqueo entre procesos, rechazo de rutas absolutas/traversal/symlinks, estados `processing/completed/failed`, reanudación tras fallos y prevención de duplicados. La indexación identifica el espacio vectorial del proveedor ECO y reindexa el contenido cuando cambia el modelo/proveedor, evitando mezclar vectores incompatibles en las búsquedas. Se añadieron pruebas de reintento, rutas, fallos y espacios de embeddings.
 
 El descargador ahora exige `CYBER_AI_KNOWLEDGE_EGRESS_PROXY` para cualquier descarga real; sin gateway configurado falla antes de resolver el destino o abrir conexiones. El gateway debe imponer allowlist de hosts, pinning DNS y bloqueo de redes privadas. Esto no sustituye la validación de seguridad del proxy externo.
@@ -20,6 +22,9 @@ Se incorpora execution_ledger.py: registro SQLite transaccional append-only de e
 Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptográfica de identidad. Requiere checkpoints firmados fuera del host, KMS/HSM y pruebas operativas de restauración. La captura previa al inicio, la cobertura de todas las rutas de error y el comportamiento fail-closed ante caída del ledger siguen pendientes; también la promoción autónoma de Skills.
 
 ## Validación más reciente
+
+- Commit `aa9b58cd125c18975a66430c00ce3c7a0714f3ff`: Python tests **success**, 301 pruebas; Docker sandbox **success**.
+- Commit `df589f7ac23d8ac5fbef175a6fd99f23009c8a9a`: Python tests **success**, 288 pruebas; Docker sandbox **success**.
 
 - Commit `df589f7ac23d8ac5fbef175a6fd99f23009c8a9a`: Python tests **success**, 288 pruebas; Docker sandbox **success**. Incluye FTS5, recuperación híbrida y conexión de recuperación al contexto de agentes.
 
