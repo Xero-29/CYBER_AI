@@ -118,6 +118,14 @@ python knowledge_bootstrap.py
 
 La primera orden valida rutas y hashes sin IA ni escrituras. La segunda genera embeddings con ECO, ingiere paquetes nuevos/modificados y registra hash y clasificación. El bootstrap es reanudable e idempotente; si cambia el proveedor/modelo de embeddings, vuelve a indexar los paquetes en el nuevo espacio vectorial.
 
+Para reconstruir el índice textual FTS5 de una biblioteca existente sin generar embeddings:
+
+```bash
+python knowledge_bootstrap.py --rebuild-text-index
+```
+
+La recuperación combina búsqueda semántica y texto completo mediante Reciprocal Rank Fusion (RRF). Si SQLite no incluye FTS5, el sistema conserva el modo semántico.
+
 Para medir la calidad de recuperación tras indexar, ejecuta el benchmark inicial de 12 consultas:
 
 ```bash

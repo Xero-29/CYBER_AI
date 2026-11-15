@@ -7,7 +7,7 @@ from agent_runner import retrieve_knowledge_context
 
 
 class TestKnowledgeRetrievalContext(unittest.TestCase):
-    @patch("knowledge_library.search_knowledge")
+    @patch("knowledge_library.search_knowledge_hybrid")
     @patch("knowledge_embeddings.generate_embedding")
     def test_passes_requested_category_to_semantic_search(
         self, mock_embedding, mock_search
@@ -41,6 +41,7 @@ class TestKnowledgeRetrievalContext(unittest.TestCase):
         )
 
         mock_search.assert_called_once()
+        self.assertEqual(mock_search.call_args.kwargs['query_text'], 'Evitar que un usuario acceda a datos de otro usuario')
         self.assertEqual(
             mock_search.call_args.kwargs["categories"],
             categories,
@@ -52,7 +53,7 @@ class TestKnowledgeRetrievalContext(unittest.TestCase):
             "application-security",
         )
 
-    @patch("knowledge_library.search_knowledge")
+    @patch("knowledge_library.search_knowledge_hybrid")
     @patch("knowledge_embeddings.generate_embedding")
     def test_preserves_top_k_and_similarity_threshold(
         self, mock_embedding, mock_search
@@ -79,7 +80,7 @@ class TestKnowledgeRetrievalContext(unittest.TestCase):
         self.assertEqual(context, "")
         self.assertEqual(retrieved, [])
 
-    @patch("knowledge_library.search_knowledge")
+    @patch("knowledge_library.search_knowledge_hybrid")
     @patch("knowledge_embeddings.generate_embedding")
     def test_returns_only_metadata_for_selected_fragments(
         self, mock_embedding, mock_search
@@ -96,6 +97,8 @@ class TestKnowledgeRetrievalContext(unittest.TestCase):
             "source": "OWASP",
             "category": "application-security",
             "similarity": 0.62,
+            "hybrid_score": 0.031,
+            "text_rank": 1,
             "content": "Contenido de referencia.",
         }]
 
@@ -107,7 +110,7 @@ class TestKnowledgeRetrievalContext(unittest.TestCase):
         self.assertIn("Contenido de referencia.", context)
         self.assertEqual(
             set(retrieved[0]),
-            {"id", "title", "source", "category", "similarity"},
+            {"id", "title", "source", "category", "similarity", "hybrid_score", "text_rank"},
         )
         self.assertEqual(retrieved[0]["id"], "chunk-1")
 

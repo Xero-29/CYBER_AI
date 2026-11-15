@@ -150,7 +150,14 @@ def main():
     parser.add_argument("--area", help="Indexar una sola especialidad.")
     parser.add_argument("--dry-run", action="store_true",
                         help="Validar rutas y hashes sin IA ni escrituras.")
+    parser.add_argument("--rebuild-text-index", action="store_true",
+                        help="Reconstruir el índice FTS5 sin generar embeddings.")
     args = parser.parse_args()
+    if args.rebuild_text_index:
+        from knowledge_library import rebuild_text_index
+        result = rebuild_text_index()
+        print(f"Índice textual disponible: {result['available']}; fragmentos: {result['indexed']}.")
+        return
     result = bootstrap(args.area, args.dry_run)
     if args.dry_run:
         print(f"Validación: {result['selected']} paquetes; sin IA ni escrituras.")

@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from knowledge_embeddings import generate_embedding
-from knowledge_library import search_knowledge
+from knowledge_library import search_knowledge_hybrid
 
 ROOT = Path(__file__).resolve().parent
 DEFAULT_DATASET = ROOT / "knowledge" / "evaluation" / "smoke_queries.jsonl"
@@ -41,7 +41,7 @@ def load_dataset(path):
     return cases
 
 
-def evaluate(dataset, top_k=5, *, embed=generate_embedding, search=search_knowledge):
+def evaluate(dataset, top_k=5, *, embed=generate_embedding, search=search_knowledge_hybrid):
     if isinstance(top_k, bool) or not isinstance(top_k, int) or not 1 <= top_k <= 50:
         raise ValueError("top_k debe estar entre 1 y 50.")
     cases = load_dataset(dataset) if isinstance(dataset, (str, Path)) else dataset
@@ -52,6 +52,7 @@ def evaluate(dataset, top_k=5, *, embed=generate_embedding, search=search_knowle
     for case in cases:
         vector = embed(case["query"], agent_name="ECO")
         results = search(
+            query_text=case["query"],
             query_embedding=vector["embedding"],
             embedding_model=vector["embedding_space"],
             top_k=top_k,

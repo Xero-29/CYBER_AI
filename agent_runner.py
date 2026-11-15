@@ -407,13 +407,14 @@ def retrieve_knowledge_context(
 ):
     """Recupera fragmentos compartidos relevantes para una tarea."""
     from knowledge_embeddings import generate_embedding
-    from knowledge_library import search_knowledge
+    from knowledge_library import search_knowledge_hybrid
 
     if not 1 <= int(top_k) <= 5:
         raise ValueError("knowledge_top_k debe estar entre 1 y 5.")
 
     vector = generate_embedding(query, agent_name="ECO")
-    results = search_knowledge(
+    results = search_knowledge_hybrid(
+        query_text=query,
         query_embedding=vector["embedding"],
         embedding_model=vector.get("embedding_space", vector["model"]),
         top_k=top_k,
@@ -431,13 +432,16 @@ def retrieve_knowledge_context(
             "title": item["title"],
             "source": item["source"],
             "category": item["category"],
-            "similarity": item["similarity"],
+            "similarity": item.get("similarity", 0.0),
+            "hybrid_score": item.get("hybrid_score", 0.0),
+            "text_rank": item.get("text_rank"),
         })
         sections.append(
             f"[K{number}] {item['title']}\\n"
             f"Fuente: {item['source']} | "
             f"Categoría: {item['category']} | "
-            f"Similitud: {item['similarity']:.4f}\\n"
+            f"Similitud vectorial: {item.get('similarity', 0.0):.4f} | "
+            f"RRF híbrido: {item.get('hybrid_score', 0.0):.4f}\\n"
             f"{item['content']}"
         )
 

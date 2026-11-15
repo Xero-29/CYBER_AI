@@ -34,6 +34,7 @@ class KnowledgeEvaluationTests(unittest.TestCase):
         ])
         result = knowledge_eval.evaluate(cases, 2, embed=embed, search=search)
         self.assertEqual(result["queries"], 2)
+        self.assertEqual(search.call_args.kwargs["query_text"], "soc")
         self.assertEqual(result["recall_at_k"], 0.5)
         self.assertEqual(result["precision_at_k"], 0.25)
         self.assertEqual(result["mrr_at_k"], 0.25)
