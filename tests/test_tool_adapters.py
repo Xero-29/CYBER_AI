@@ -96,5 +96,50 @@ class ToolAdapterTests(unittest.TestCase):
         self.assertTrue(path.resolve().is_relative_to(self.root))
 
 
+
+    def test_checkov_builds_local_json_command(self):
+        target = self.root / "iac"
+        target.mkdir()
+        command = tool_adapters._build_command("checkov", "/usr/bin/checkov", target)
+        self.assertEqual(command, ["/usr/bin/checkov", "-d", str(target), "--output", "json", "--quiet"])
+
+    def test_detect_secrets_requires_repository_directory(self):
+        with self.assertRaisesRegex(ToolExecutionError, "directorio"):
+            tool_adapters._build_command("detect_secrets", "/usr/bin/detect-secrets", self.root / "sample.py")
+
+    def test_shellcheck_selects_only_shell_files(self):
+        target = self.root / "scripts"
+        target.mkdir()
+        shell = target / "check.sh"
+        shell.write_text("echo ok\n", encoding="utf-8")
+        (target / "ignore.py").write_text("print('x')\n", encoding="utf-8")
+        command = tool_adapters._build_command("shellcheck", "/usr/bin/shellcheck", target)
+        self.assertIn(str(shell), command)
+        self.assertNotIn(str(target / "ignore.py"), command)
+
+    def test_actionlint_selects_workflow_files(self):
+        target = self.root / "workflows"
+        target.mkdir()
+        workflow = target / "ci.yml"
+        workflow.write_text("name: ci\n", encoding="utf-8")
+        command = tool_adapters._build_command("actionlint", "/usr/bin/actionlint", target)
+        self.assertEqual(command, ["/usr/bin/actionlint", "-oneline", str(workflow)])
+
+    def test_yara_requires_local_rules(self):
+        with self.assertRaisesRegex(ToolExecutionError, "reglas local"):
+            tool_adapters._build_command("yara", "/usr/bin/yara", self.root / "sample.py")
+        rules = self.root / "rules.yar"
+        rules.write_text("rule test { condition: true }\n", encoding="utf-8")
+        command = tool_adapters._build_command("yara", "/usr/bin/yara", self.root / "sample.py", config_path=rules)
+        self.assertEqual(command, ["/usr/bin/yara", "-r", str(rules), str(self.root / "sample.py")])
+
+    def test_tshark_requires_pcap_file(self):
+        with self.assertRaisesRegex(ToolExecutionError, "PCAP"):
+            tool_adapters._build_command("tshark", "/usr/bin/tshark", self.root / "sample.py")
+        capture = self.root / "trace.pcap"
+        capture.write_bytes(b"pcap")
+        command = tool_adapters._build_command("tshark", "/usr/bin/tshark", capture)
+        self.assertEqual(command, ["/usr/bin/tshark", "-r", str(capture), "-T", "json"])
+
 if __name__ == "__main__":
     unittest.main()
