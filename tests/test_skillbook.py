@@ -1,4 +1,4 @@
-import hashlib, hmac, os, sqlite3, tempfile, unittest
+import hashlib, hmac, json, os, sqlite3, tempfile, unittest
 from pathlib import Path
 from unittest.mock import patch
 import skillbook
