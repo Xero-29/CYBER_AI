@@ -7,20 +7,26 @@
 
 ## Avance de esta iteración
 
+Se reforzó el bootstrap de la biblioteca offline: IDs deterministas por ruta y SHA-256, bloqueo entre procesos, rechazo de rutas absolutas/traversal/symlinks, estados `processing/completed/failed`, reanudación tras fallos y prevención de duplicados. La indexación identifica el espacio vectorial del proveedor ECO y reindexa el contenido cuando cambia el modelo/proveedor, evitando mezclar vectores incompatibles en las búsquedas. Se añadieron pruebas de reintento, rutas, fallos y espacios de embeddings.
+
+Se amplió `tool_adapters.py` con comandos locales acotados para Checkov, detect-secrets, Hadolint, ShellCheck, actionlint, kube-linter, YARA (requiere reglas locales) y TShark (solo PCAP/PCAPNG). El inventario distingue herramientas catalogadas, adaptadores registrados y binarios realmente disponibles. La presencia de un adaptador no implica que el binario esté instalado; las herramientas activas de red siguen fuera de esta ejecución local.
+
 Se incorpora execution_ledger.py: registro SQLite transaccional append-only de ejecuciones con namespace, huella de tarea, estado, herramienta/versión, modelo, entorno, duración, coste opcional, resultados de validadores y hash SHA-256 de evidencia. Incluye cadena hash verificable, redacción de campos con nombres sensibles y bloqueo ordinario de UPDATE/DELETE. Se añaden pruebas específicas.
 
 Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptográfica de identidad. Requiere checkpoints firmados fuera del host, KMS/HSM y pruebas operativas de restauración. La captura previa al inicio, la cobertura de todas las rutas de error y el comportamiento fail-closed ante caída del ledger siguen pendientes; también la promoción autónoma de Skills.
 
 ## Validación más reciente
 
-- Commit `819645225ba47549e90e5d6092f388594241b739`: el timeout del escáner Nuclei termina el grupo completo de procesos en POSIX y usa terminación del proceso en plataformas no POSIX; se añadieron pruebas para ambas rutas.
+- Commit `3032550a2a9a6e8e40ffd355e89d0dddb3af2904`: CI Python **success**, 278 pruebas. La ejecución Docker de ese commit se encontraba en curso en la última consulta.
+- Commit `eded0518354b191ecf649c3f6e895819b6200ed9`: CI Python **success**, 267 pruebas. La ejecución Docker de ese commit se encontraba en curso en la última consulta.
+- Commit `819645225ba47549e90e5d6092f388594241b739`: timeout Nuclei con terminación del grupo de procesos y pruebas para ambas rutas.
 - GitHub Actions Python tests: **success**, 257 pruebas, incluyendo compilación, autopruebas y suite completa.
 - Docker sandbox: **success** también en el commit `819645225ba47549e90e5d6092f388594241b739`; ambos workflows (Python y Docker) pasaron en esa revisión.
 - La validación CI no equivale a pruebas con Ollama, proveedores remotos, objetivos reales autorizados, cargas adversariales ni aislamiento microVM.
 
 ## Capacidades existentes (no equivalen a cierre institucional)
 
-- Inventario de 21 herramientas, selección explicable y adaptadores parciales; los adaptadores locales registran la versión instalada cuando puede consultarse sin red.
+- Inventario de 21 herramientas, selección explicable y 14 especificaciones de adaptador; 13 tienen rutas de ejecución local y pip-audit permanece bloqueado por red. El inventario separa registro, disponibilidad del binario y cobertura de adaptador.
 - Sandbox Docker endurecido con timeout del cliente y limpieza forzada del contenedor ante timeout; comparte kernel y no es aislamiento para malware hostil.
 - Atlas de 48 áreas y 138 referencias externas catalogadas; además, 48 paquetes metodológicos propios incluidos offline. Las referencias externas no están descargadas ni ingeridas.
 - Biblioteca SQLite con fragmentos comprimidos, SHA-256, metadatos, separación shared/tenant y búsqueda semántica.
@@ -40,7 +46,7 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 - 48 paquetes base propios en español incluidos en `knowledge/packs/`, con competencias, metodología, controles, laboratorio y evaluación.
 - Las referencias externas siguen pendientes de licencia/procedencia y no se declaran descargadas ni ingeridas.
 
-- `knowledge_bootstrap.py` permite validar e indexar los paquetes offline con ECO; el dry-run no requiere IA y la ingestión real necesita proveedor de embeddings configurado. Se debe ejecutar una vez tras configurarlo; no se indexa automáticamente solo por conectar un chat.
+- `knowledge_bootstrap.py` valida e indexa paquetes offline con ECO. El dry-run no requiere IA. La ingestión real requiere un proveedor con embeddings configurado. El proceso es reanudable, idempotente y detecta cambios de espacio vectorial para reindexar. No se inicia automáticamente por conectar un chat.
 
 ## Pendientes de cierre
 

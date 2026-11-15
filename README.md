@@ -87,6 +87,8 @@ Los proveedores remotos están deshabilitados por defecto. Anthropic no ofrece e
 
 ## Herramientas locales y sandbox
 
+El inventario de 21 herramientas distingue disponibilidad del binario y adaptadores realmente registrados. Hay adaptadores locales para Ruff, Bandit, Semgrep, Syft, Trivy, Checkov, detect-secrets, Hadolint, ShellCheck, actionlint, kube-linter, YARA y TShark; pip-audit permanece bloqueado por requerir red. La presencia en el catálogo no significa que la herramienta esté instalada. Genera el informe con `python capability_inventory.py`.
+
 El registro de herramientas se encuentra en `tool_adapters.py`. Para ejecutar directamente un adaptador local:
 
 ```bash
@@ -114,7 +116,7 @@ python knowledge_bootstrap.py --dry-run
 python knowledge_bootstrap.py
 ```
 
-La primera orden valida rutas y hashes sin IA ni escrituras. La segunda genera embeddings con ECO, ingiere paquetes nuevos/modificados y registra hash y clasificación. Anthropic está integrado para chat, no para embeddings; si lo usas, configura además un proveedor compatible de embeddings.
+La primera orden valida rutas y hashes sin IA ni escrituras. La segunda genera embeddings con ECO, ingiere paquetes nuevos/modificados y registra hash y clasificación. El bootstrap es reanudable e idempotente; si cambia el proveedor/modelo de embeddings, vuelve a indexar los paquetes en el nuevo espacio vectorial. Anthropic está integrado para chat, no para embeddings; si lo usas, configura además un proveedor compatible de embeddings.
 
 ## Conocimiento y Skills
 
