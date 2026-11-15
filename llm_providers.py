@@ -368,8 +368,10 @@ def provider_capabilities(provider):
     if protocol in builtins:
         return sorted(builtins[protocol])
     adapter = _load_provider_plugin(protocol)
-    if adapter is None or not callable(getattr(adapter, "capabilities", None)):
+    if adapter is None:
         return []
+    if not callable(getattr(adapter, "capabilities", None)):
+        raise RuntimeError(f"El plugin {protocol} debe declarar capabilities(provider).")
     values = adapter.capabilities(provider)
     allowed = {"chat", "embeddings", "model_listing"}
     if (

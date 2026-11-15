@@ -276,8 +276,8 @@ class NativeProtocolTests(unittest.TestCase):
             "default_provider": "anthropic",
             "capability_providers": {"chat": "gemini"},
             "llm_providers": {
-                "anthropic": {"enabled": True, "protocol": "anthropic"},
-                "gemini": {"enabled": True, "protocol": "gemini"},
+                "anthropic": {"enabled": True, "protocol": "anthropic", "base_url": "https://api.anthropic.com"},
+                "gemini": {"enabled": True, "protocol": "gemini", "base_url": "https://generativelanguage.googleapis.com"},
             },
         }
         provider = llm_providers.resolve_provider(config, {"provider": "anthropic"}, capability="chat")
