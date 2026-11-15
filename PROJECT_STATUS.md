@@ -1,6 +1,6 @@
 # Estado real y plan de cierre de CYBER_AI
 
-**Actualizado:** 2026-11-13  
+**Actualizado:** 2026-11-15  
 **Rama:** codex/security-integrity-audit
 **CI:** Actions fijadas por SHA, checkout v5/setup-python v6/upload-artifact v5 (Node 24)  
 **Base:** main (sin merge ni despliegue)
@@ -10,6 +10,13 @@
 Se incorpora execution_ledger.py: registro SQLite transaccional append-only de ejecuciones con namespace, huella de tarea, estado, herramienta/versión, modelo, entorno, duración, coste opcional, resultados de validadores y hash SHA-256 de evidencia. Incluye cadena hash verificable, redacción de campos con nombres sensibles y bloqueo ordinario de UPDATE/DELETE. Se añaden pruebas específicas.
 
 Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptográfica de identidad. Requiere checkpoints firmados fuera del host, KMS/HSM y pruebas operativas de restauración. La captura previa al inicio, la cobertura de todas las rutas de error y el comportamiento fail-closed ante caída del ledger siguen pendientes; también la promoción autónoma de Skills.
+
+## Validación más reciente
+
+- Commit `819645225ba47549e90e5d6092f388594241b739`: el timeout del escáner Nuclei termina el grupo completo de procesos en POSIX y usa terminación del proceso en plataformas no POSIX; se añadieron pruebas para ambas rutas.
+- GitHub Actions Python tests: **success**, 257 pruebas, incluyendo compilación, autopruebas y suite completa.
+- Docker sandbox: última ejecución satisfactoria en el commit `26bc1f32c5788117a3be59b5be9f46e04f76ece1`; no se volvió a ejecutar para el commit de Nuclei porque el workflow de Docker no se activó con esos cambios.
+- La validación CI no equivale a pruebas con Ollama, proveedores remotos, objetivos reales autorizados, cargas adversariales ni aislamiento microVM.
 
 ## Capacidades existentes (no equivalen a cierre institucional)
 
