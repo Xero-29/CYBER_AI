@@ -220,5 +220,38 @@ class TestKnowledgeLibrary(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "embedding_model"):
             library.document_chunk_count("stable-doc", " ")
 
+
+    def test_text_index_and_hybrid_search_retrieve_lexical_hit(self):
+        if not library.text_index_available():
+            self.skipTest("SQLite FTS5 no está disponible.")
+        library.store_chunks([{
+            "title": "Control de acceso API", "source": "offline-pack",
+            "category": "cybersecurity:api",
+            "content": "La autorización evita acceso cruzado entre usuarios.",
+            "embedding": [1.0, 0.0], "embedding_model": "test-space",
+            "document_id": "api-doc", "chunk_index": 0,
+        }])
+        result = library.search_knowledge_hybrid(
+            query_text="autorización acceso cruzado usuarios",
+            query_embedding=[0.0, 1.0], embedding_model="test-space", top_k=3,
+        )
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["category"], "cybersecurity:api")
+        self.assertIsNotNone(result[0]["text_rank"])
+        self.assertGreater(result[0]["hybrid_score"], 0)
+
+    def test_rebuild_text_index_reindexes_and_verifies_existing_chunks(self):
+        if not library.text_index_available():
+            self.skipTest("SQLite FTS5 no está disponible.")
+        library.store_chunks([{
+            "title": "Documento previo", "source": "fixture", "category": "test",
+            "content": "texto de referencia", "embedding": [1.0, 0.0],
+            "embedding_model": "test-space", "document_id": "prior-doc",
+            "chunk_index": 0,
+        }])
+        result = library.rebuild_text_index()
+        self.assertTrue(result["available"])
+        self.assertEqual(result["indexed"], 1)
+
 if __name__ == "__main__":
     unittest.main()

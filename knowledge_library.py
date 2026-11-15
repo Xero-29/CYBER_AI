@@ -12,6 +12,7 @@ import math
 import sqlite3
 import uuid
 import zlib
+import re
 
 from contextlib import contextmanager
 from datetime import datetime, timezone
@@ -88,6 +89,15 @@ def initialize():
             CREATE INDEX IF NOT EXISTS idx_knowledge_embedding_model
             ON knowledge_chunks(embedding_model);
         """)
+        try:
+            db.execute(
+                "CREATE VIRTUAL TABLE IF NOT EXISTS knowledge_chunks_fts "
+                "USING fts5(chunk_id UNINDEXED, title, source, "
+                "category UNINDEXED, content, tokenize='unicode61')"
+            )
+        except sqlite3.OperationalError:
+            # SQLite compilado sin FTS5 conserva la búsqueda semántica existente.
+            pass
 
         # Migración compatible: conservar todos los fragmentos existentes.
         columns = {
@@ -239,7 +249,158 @@ def store_chunks(chunks):
                 created_at
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, [item[0] for item in prepared])
+        if _text_index_available(db):
+            db.executemany(
+                "INSERT INTO knowledge_chunks_fts "
+                "(chunk_id,title,source,category,content) VALUES (?,?,?,?,?)",
+                [(item["id"], chunk["title"], chunk["source"],
+                  chunk["category"], chunk["content"])
+                 for chunk, item in zip(chunks, (entry[1] for entry in prepared))],
+            )
     return [item[1] for item in prepared]
+
+
+def _text_index_available(db):
+    return db.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='knowledge_chunks_fts'"
+    ).fetchone() is not None
+
+
+def text_index_available():
+    initialize()
+    with database() as db:
+        return _text_index_available(db)
+
+
+def rebuild_text_index(batch_size=128):
+    """Reconstruye FTS5 verificando SHA-256 y límites de cada fragmento."""
+    if isinstance(batch_size, bool) or not isinstance(batch_size, int) or not 1 <= batch_size <= 1000:
+        raise ValueError("batch_size debe estar entre 1 y 1000.")
+    initialize()
+    with database() as db:
+        if not _text_index_available(db):
+            return {"available": False, "indexed": 0}
+        db.execute("DELETE FROM knowledge_chunks_fts")
+        cursor = db.execute(
+            "SELECT id,title,source,category,content_z,content_sha256,"
+            "original_bytes,compressed_bytes FROM knowledge_chunks ORDER BY id"
+        )
+        indexed = 0
+        while True:
+            rows = cursor.fetchmany(batch_size)
+            if not rows:
+                break
+            entries = []
+            for row in rows:
+                if (row["original_bytes"] < 0 or row["original_bytes"] > MAX_CHUNK_BYTES
+                        or row["compressed_bytes"] < 0 or len(row["content_z"]) != row["compressed_bytes"]):
+                    raise ValueError("Metadatos de fragmento inválidos durante rebuild FTS.")
+                decoder = zlib.decompressobj()
+                raw = decoder.decompress(row["content_z"], MAX_CHUNK_BYTES + 1)
+                if (len(raw) > MAX_CHUNK_BYTES or decoder.unconsumed_tail
+                        or decoder.unused_data or not decoder.eof
+                        or len(raw) != row["original_bytes"]
+                        or hashlib.sha256(raw).hexdigest() != row["content_sha256"]):
+                    raise ValueError("Fragmento corrupto durante rebuild FTS.")
+                try:
+                    content = raw.decode("utf-8")
+                except UnicodeDecodeError as error:
+                    raise ValueError("Fragmento no UTF-8 durante rebuild FTS.") from error
+                entries.append((row["id"], row["title"], row["source"], row["category"], content))
+            db.executemany(
+                "INSERT INTO knowledge_chunks_fts "
+                "(chunk_id,title,source,category,content) VALUES (?,?,?,?,?)",
+                entries,
+            )
+            indexed += len(entries)
+    return {"available": True, "indexed": indexed}
+
+
+def _fts_terms(query):
+    tokens = re.findall(r"[a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ_-]+", str(query).casefold())
+    return list(dict.fromkeys(token for token in tokens if len(token) > 1))[:32]
+
+
+def search_knowledge_hybrid(
+    *, query_text, query_embedding, embedding_model, top_k=5,
+    tenant_id=None, categories=None, tags=None, min_score=-1.0,
+    rrf_constant=60,
+):
+    """Combina similitud vectorial y FTS5 mediante Reciprocal Rank Fusion."""
+    if not isinstance(query_text, str) or not query_text.strip():
+        raise ValueError("query_text es obligatorio.")
+    if isinstance(top_k, bool) or not isinstance(top_k, int) or not 1 <= top_k <= 50:
+        raise ValueError("top_k debe estar entre 1 y 50.")
+    if isinstance(rrf_constant, bool) or not isinstance(rrf_constant, int) or not 1 <= rrf_constant <= 1000:
+        raise ValueError("rrf_constant debe estar entre 1 y 1000.")
+    if categories is not None and (
+        isinstance(categories, str) or not isinstance(categories, (list, tuple))
+        or any(not isinstance(value, str) or not value.strip() for value in categories)
+    ):
+        raise ValueError("categories debe ser una lista de textos.")
+    if tags is not None and (
+        isinstance(tags, str) or not isinstance(tags, (list, tuple))
+        or any(not isinstance(value, str) or not value.strip() for value in tags)
+    ):
+        raise ValueError("tags debe ser una lista de textos.")
+    semantic = search_knowledge(
+        query_embedding=query_embedding, embedding_model=embedding_model,
+        top_k=min(50, top_k * 3), tenant_id=tenant_id, categories=categories,
+        tags=tags, min_score=min_score,
+    )
+    scores, items = {}, {}
+    for rank, item in enumerate(semantic, 1):
+        items[item["id"]] = dict(item)
+        scores[item["id"]] = scores.get(item["id"], 0.0) + 1.0 / (rrf_constant + rank)
+
+    terms = _fts_terms(query_text)
+    text_ids = []
+    with database() as db:
+        if _text_index_available(db) and terms:
+            match = " OR ".join('"' + term.replace('"', '""') + '"' for term in terms)
+            sql = (
+                "SELECT f.chunk_id FROM knowledge_chunks_fts AS f "
+                "JOIN knowledge_chunks AS k ON k.id=f.chunk_id "
+                "WHERE knowledge_chunks_fts MATCH ? AND k.embedding_model = ? "
+                "AND (k.visibility='shared'"
+            )
+            params = [match, embedding_model]
+            if tenant_id is not None:
+                sql += " OR (k.visibility='tenant' AND k.tenant_id = ?)"
+                params.append(tenant_id)
+            sql += ")"
+            if categories:
+                sql += " AND k.category IN (" + ",".join("?" for _ in categories) + ")"
+                params.extend(categories)
+            sql += " ORDER BY bm25(knowledge_chunks_fts) LIMIT ?"
+            params.append(min(150, top_k * 10))
+            rows = db.execute(sql, params).fetchall()
+            for row in rows:
+                chunk_id = row["chunk_id"]
+                if tags:
+                    tag_row = db.execute(
+                        "SELECT tags_json FROM knowledge_chunks WHERE id=?",
+                        (chunk_id,),
+                    ).fetchone()
+                    if tag_row is None or not set(tags).intersection(json.loads(tag_row["tags_json"])):
+                        continue
+                text_ids.append(chunk_id)
+
+    for rank, chunk_id in enumerate(text_ids, 1):
+        if chunk_id not in items:
+            items[chunk_id] = read_chunk(chunk_id, tenant_id=tenant_id)
+            items[chunk_id]["similarity"] = 0.0
+        items[chunk_id]["text_rank"] = rank
+        scores[chunk_id] = scores.get(chunk_id, 0.0) + 1.0 / (rrf_constant + rank)
+
+    ranked = sorted(scores, key=lambda key: scores[key], reverse=True)[:top_k]
+    output = []
+    for chunk_id in ranked:
+        item = items[chunk_id]
+        item["hybrid_score"] = scores[chunk_id]
+        item.setdefault("text_rank", None)
+        output.append(item)
+    return output
 
 
 def document_chunk_count(document_id, embedding_model=None):
