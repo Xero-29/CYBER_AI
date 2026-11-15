@@ -223,6 +223,99 @@ def _insert_verified_skill(
     return {"skill_id": skill_id, "status": status, "version": 1}
 
 
+def _rollback_payload_from_rows(current, target):
+    snapshot = json.loads(target["snapshot_json"])
+    target_hash = hashlib.sha256(target["snapshot_json"].encode("utf-8")).hexdigest()
+    current_json = json.dumps(dict(current), ensure_ascii=False, sort_keys=True)
+    current_hash = hashlib.sha256(current_json.encode("utf-8")).hexdigest()
+    document = {
+        "schema": "cyber-ai-skill-rollback-v1",
+        "skill_id": current["skill_id"],
+        "current_version": current["version"],
+        "target_version": target["version"],
+        "current_snapshot_sha256": current_hash,
+        "target_snapshot_sha256": target_hash,
+    }
+    return json.dumps(document, sort_keys=True, separators=(",", ":")), snapshot
+
+
+def skill_rollback_payload(skill_id, target_version):
+    """Documento canónico que debe firmar el aprobador para un rollback."""
+    if not isinstance(skill_id, str) or not skill_id.strip():
+        raise ValueError("skill_id es obligatorio.")
+    if isinstance(target_version, bool) or not isinstance(target_version, int) or target_version < 1:
+        raise ValueError("target_version debe ser un entero positivo.")
+    initialize()
+    with connect() as db:
+        current = db.execute("SELECT * FROM skills WHERE skill_id=?", (skill_id.strip(),)).fetchone()
+        target = db.execute(
+            "SELECT version,snapshot_json FROM skill_versions WHERE skill_id=? AND version=?",
+            (skill_id.strip(), target_version),
+        ).fetchone()
+    if current is None or target is None:
+        raise ValueError("No existe la Skill o versión solicitada.")
+    if target_version >= current["version"]:
+        raise ValueError("El rollback debe apuntar a una versión anterior.")
+    payload, snapshot = _rollback_payload_from_rows(current, target)
+    if snapshot.get("status") != "active":
+        raise ValueError("Solo se puede restaurar una versión que estuvo activa.")
+    return payload
+
+
+def rollback_skill_version(skill_id, target_version, approval_signature):
+    """Restaura una versión activa con HMAC VERITAS y conserva historial append-only."""
+    key = os.environ.get("CYBER_AI_VERITAS_APPROVAL_KEY", "")
+    if len(key.encode("utf-8")) < 32:
+        raise ValueError("CYBER_AI_VERITAS_APPROVAL_KEY debe tener al menos 32 bytes.")
+    if not isinstance(approval_signature, str) or not re.fullmatch(r"[a-f0-9]{64}", approval_signature):
+        raise ValueError("Firma de rollback inválida.")
+    initialize()
+    with connect() as db:
+        db.execute("BEGIN IMMEDIATE")
+        current = db.execute("SELECT * FROM skills WHERE skill_id=?", (skill_id,)).fetchone()
+        target = db.execute(
+            "SELECT version,snapshot_json FROM skill_versions WHERE skill_id=? AND version=?",
+            (skill_id, target_version),
+        ).fetchone()
+        if current is None or target is None:
+            raise ValueError("No existe la Skill o versión solicitada.")
+        if target_version >= current["version"]:
+            raise ValueError("El rollback debe apuntar a una versión anterior.")
+        payload, snapshot = _rollback_payload_from_rows(current, target)
+        expected = hmac.new(key.encode("utf-8"), payload.encode("utf-8"), hashlib.sha256).hexdigest()
+        if not hmac.compare_digest(expected, approval_signature):
+            raise ValueError("Firma VERITAS de rollback inválida.")
+        if (
+            snapshot.get("status") != "active"
+            or snapshot.get("verified_by") != "VERITAS"
+            or snapshot.get("verifier_verdict") not in {"RESPALDADA", "CONFIRMADA", "ROLLBACK_APPROVED"}
+            or snapshot.get("failure_runs") != 0
+            or snapshot.get("success_runs", 0) < 2
+        ):
+            raise ValueError("La versión objetivo no cumple criterios de Skill activa verificada.")
+        version = current["version"] + 1
+        db.execute(
+            """UPDATE skills SET
+                name=?,task_pattern=?,description=?,prerequisites_json=?,
+                methodology_json=?,validation_json=?,tools_json=?,tags_json=?,
+                evidence_json=?,source_urls_json=?,success_runs=?,failure_runs=?,
+                status='active',version=?,verified_by='VERITAS',
+                verifier_verdict='ROLLBACK_APPROVED',updated_at=?
+                WHERE skill_id=?""",
+            (
+                snapshot["name"], snapshot["task_pattern"], snapshot["description"],
+                snapshot["prerequisites_json"], snapshot["methodology_json"],
+                snapshot["validation_json"], snapshot["tools_json"],
+                snapshot["tags_json"], snapshot["evidence_json"],
+                snapshot["source_urls_json"], snapshot["success_runs"],
+                snapshot["failure_runs"], version, now(), skill_id,
+            ),
+        )
+        _save_version(db, skill_id, version, "rollback", "VERITAS")
+    return {"skill_id": skill_id, "status": "active", "version": version,
+            "rolled_back_to": target_version}
+
+
 def register_verified_skill(**kwargs):
     """Bloquea el registro directo basado en campos autoafirmados."""
     raise ValueError(
