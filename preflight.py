@@ -8,6 +8,7 @@ import os
 import shutil
 import sys
 from pathlib import Path
+from importlib.metadata import entry_points
 
 
 PROJECT = Path(__file__).resolve().parent
@@ -29,6 +30,88 @@ OPTIONAL_EXECUTABLES = (
     "docker", "ollama", "nuclei", "ruff", "bandit",
     "semgrep", "syft", "trivy",
 )
+
+
+BUILTIN_PROVIDER_CAPABILITIES = {
+    "ollama": {"chat", "embeddings", "model_listing"},
+    "openai": {"chat", "embeddings"},
+    "anthropic": {"chat"},
+    "gemini": {"chat", "embeddings"},
+}
+
+
+def validate_provider_routes(config, environ=None, plugin_protocols=None):
+    """Comprueba rutas y capacidades sin importar plugins ni hacer llamadas de red."""
+    environ = os.environ if environ is None else environ
+    providers = config.get("llm_providers", {})
+    agents = config.get("agents", {})
+    capability_map = config.get("capability_providers", {})
+    fallback_map = config.get("fallback_providers", {})
+    if not isinstance(providers, dict) or not isinstance(agents, dict):
+        return [{"name": "provider_config", "status": "error",
+                 "detail": "llm_providers y agents deben ser objetos."}]
+    if not isinstance(capability_map, dict) or not isinstance(fallback_map, dict):
+        return [{"name": "provider_routing", "status": "error",
+                 "detail": "capability_providers y fallback_providers deben ser objetos."}]
+    if plugin_protocols is None:
+        plugin_protocols = {item.name for item in entry_points(group="cyber_ai.providers")}
+    results = []
+    default = config.get("default_provider", "ollama")
+    for role, agent in agents.items():
+        if not isinstance(agent, dict):
+            results.append({"name": f"provider:{role}", "status": "error",
+                            "detail": "Definición de agente inválida."})
+            continue
+        capability = "embeddings" if agent.get("type") == "embeddings" else "chat"
+        preferred = agent.get("provider") or capability_map.get(capability) or default
+        fallbacks = fallback_map.get(capability, [])
+        if isinstance(fallbacks, str) or not isinstance(fallbacks, (list, tuple)):
+            results.append({"name": f"provider:{role}", "status": "error",
+                            "detail": f"fallback_providers.{capability} debe ser una lista."})
+            continue
+        candidates = list(dict.fromkeys([preferred, *fallbacks]))
+        selected = None
+        plugin_pending = False
+        for name in candidates:
+            item = providers.get(name)
+            if not isinstance(name, str) or not isinstance(item, dict) or not item.get("enabled"):
+                continue
+            protocol = item.get("protocol")
+            if protocol in BUILTIN_PROVIDER_CAPABILITIES:
+                if capability in BUILTIN_PROVIDER_CAPABILITIES[protocol]:
+                    selected = (name, item)
+                    break
+            elif protocol in plugin_protocols:
+                selected = (name, item)
+                plugin_pending = True
+                break
+        if selected is None:
+            results.append({
+                "name": f"provider:{role}", "status": "error",
+                "detail": f"No hay proveedor habilitado con capacidad {capability}.",
+            })
+            continue
+        name, item = selected
+        missing_key = (
+            item.get("requires_api_key") is True
+            and (not item.get("api_key_env") or not environ.get(item.get("api_key_env"), "").strip())
+        )
+        if missing_key:
+            results.append({
+                "name": f"provider:{role}", "status": "warning",
+                "detail": f"Ruta {name} seleccionada, pero falta la variable de credencial.",
+            })
+        elif plugin_pending:
+            results.append({
+                "name": f"provider:{role}", "status": "warning",
+                "detail": f"Plugin {item.get('protocol')} instalado; sus capacidades se validan al cargarlo.",
+            })
+        else:
+            results.append({
+                "name": f"provider:{role}", "status": "ok",
+                "detail": f"{name} ofrece {capability}.",
+            })
+    return results
 
 
 def collect_checks(root=PROJECT, python_version=None, module_lookup=None,
@@ -60,6 +143,9 @@ def collect_checks(root=PROJECT, python_version=None, module_lookup=None,
             valid = isinstance(parsed, dict)
             add("model_config", "ok" if valid else "error",
                 "JSON válido." if valid else "La raíz de configuración debe ser un objeto JSON.")
+            if valid:
+                for route in validate_provider_routes(parsed, environ=environ):
+                    add(route["name"], route["status"], route["detail"])
         except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
             add("model_config", "error", f"Configuración ilegible: {error}")
 

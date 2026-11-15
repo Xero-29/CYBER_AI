@@ -50,5 +50,58 @@ class PreflightTests(unittest.TestCase):
         self.assertGreater(report["errors"], 0)
 
 
+
+    def test_provider_routing_uses_explicit_embedding_capability_without_network(self):
+        config = {
+            "default_provider": "anthropic",
+            "capability_providers": {"embeddings": "gemini"},
+            "llm_providers": {
+                "anthropic": {"enabled": True, "protocol": "anthropic"},
+                "gemini": {"enabled": True, "protocol": "gemini"},
+            },
+            "agents": {"ECO": {"type": "embeddings"}},
+        }
+        checks = preflight.validate_provider_routes(config, environ={})
+        self.assertEqual(checks[0]["status"], "ok")
+        self.assertIn("gemini ofrece embeddings", checks[0]["detail"])
+
+    def test_provider_routing_warns_when_remote_key_is_missing(self):
+        config = {
+            "default_provider": "openai",
+            "llm_providers": {"openai": {
+                "enabled": True, "protocol": "openai",
+                "requires_api_key": True, "api_key_env": "CYBER_AI_TEST_KEY",
+            }},
+            "agents": {"NEXO": {"type": "chat"}},
+        }
+        checks = preflight.validate_provider_routes(config, environ={})
+        self.assertEqual(checks[0]["status"], "warning")
+        self.assertIn("falta la variable", checks[0]["detail"])
+
+    def test_provider_routing_blocks_chat_only_provider_for_embeddings(self):
+        config = {
+            "default_provider": "anthropic",
+            "llm_providers": {"anthropic": {
+                "enabled": True, "protocol": "anthropic",
+            }},
+            "agents": {"ECO": {"type": "embeddings"}},
+        }
+        checks = preflight.validate_provider_routes(config, environ={})
+        self.assertEqual(checks[0]["status"], "error")
+
+    def test_custom_provider_is_reported_without_importing_plugin(self):
+        config = {
+            "default_provider": "custom",
+            "llm_providers": {"custom": {
+                "enabled": True, "protocol": "custom_protocol",
+            }},
+            "agents": {"NEXO": {"type": "chat"}},
+        }
+        checks = preflight.validate_provider_routes(
+            config, environ={}, plugin_protocols={"custom_protocol"}
+        )
+        self.assertEqual(checks[0]["status"], "warning")
+        self.assertIn("se validan al cargarlo", checks[0]["detail"])
+
 if __name__ == "__main__":
     unittest.main()
