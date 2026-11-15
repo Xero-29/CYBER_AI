@@ -64,10 +64,15 @@ def validate_provider_routes(config, environ=None, plugin_protocols=None):
             continue
         capability = "embeddings" if agent.get("type") == "embeddings" else "chat"
         preferred = agent.get("provider") or capability_map.get(capability) or default
-        fallbacks = fallback_map.get(capability, [])
-        if isinstance(fallbacks, str) or not isinstance(fallbacks, (list, tuple)):
+        if not isinstance(preferred, str) or not preferred.strip():
             results.append({"name": f"provider:{role}", "status": "error",
-                            "detail": f"fallback_providers.{capability} debe ser una lista."})
+                            "detail": "Proveedor preferido inválido."})
+            continue
+        fallbacks = fallback_map.get(capability, [])
+        if (isinstance(fallbacks, str) or not isinstance(fallbacks, (list, tuple))
+                or any(not isinstance(value, str) or not value.strip() for value in fallbacks)):
+            results.append({"name": f"provider:{role}", "status": "error",
+                            "detail": f"fallback_providers.{capability} debe ser una lista de nombres."})
             continue
         candidates = list(dict.fromkeys([preferred, *fallbacks]))
         selected = None

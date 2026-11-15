@@ -63,6 +63,8 @@ def resolve_provider(config, agent, capability=None):
     preferred = explicit or (
         capability_map.get(capability) if capability else None
     ) or config.get("default_provider") or "ollama"
+    if not isinstance(preferred, str) or not preferred.strip():
+        raise ValueError("Proveedor preferido inválido.")
     candidates = [preferred]
     if capability:
         fallbacks = fallback_map.get(capability, [])
