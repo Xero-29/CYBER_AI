@@ -95,9 +95,10 @@ def initialize():
                 "USING fts5(chunk_id UNINDEXED, title, source, "
                 "category UNINDEXED, content, tokenize='unicode61')"
             )
-        except sqlite3.OperationalError:
+        except sqlite3.OperationalError as error:
+            if "no such module: fts5" not in str(error).lower():
+                raise
             # SQLite compilado sin FTS5 conserva la búsqueda semántica existente.
-            pass
 
         # Migración compatible: conservar todos los fragmentos existentes.
         columns = {

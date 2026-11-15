@@ -253,5 +253,42 @@ class TestKnowledgeLibrary(unittest.TestCase):
         self.assertTrue(result["available"])
         self.assertEqual(result["indexed"], 1)
 
+
+    def test_hybrid_text_search_respects_tenant_isolation(self):
+        if not library.text_index_available():
+            self.skipTest("SQLite FTS5 no está disponible.")
+        library.store_chunks([
+            {
+                "title": "Compartido", "source": "shared",
+                "category": "security", "content": "manual de acceso compartido",
+                "embedding": [1.0, 0.0], "embedding_model": "test-space",
+                "document_id": "shared-doc", "chunk_index": 0,
+                "visibility": "shared",
+            },
+            {
+                "title": "Privado A", "source": "tenant-a",
+                "category": "security", "content": "informe reservado alpha",
+                "embedding": [1.0, 0.0], "embedding_model": "test-space",
+                "document_id": "tenant-a-doc", "chunk_index": 0,
+                "visibility": "tenant", "tenant_id": "tenant-a",
+            },
+            {
+                "title": "Privado B", "source": "tenant-b",
+                "category": "security", "content": "informe reservado beta",
+                "embedding": [1.0, 0.0], "embedding_model": "test-space",
+                "document_id": "tenant-b-doc", "chunk_index": 0,
+                "visibility": "tenant", "tenant_id": "tenant-b",
+            },
+        ])
+        result = library.search_knowledge_hybrid(
+            query_text="informe reservado beta",
+            query_embedding=[1.0, 0.0], embedding_model="test-space",
+            tenant_id="tenant-a", top_k=10,
+        )
+        sources = {item["source"] for item in result}
+        self.assertIn("shared", sources)
+        self.assertIn("tenant-a", sources)
+        self.assertNotIn("tenant-b", sources)
+
 if __name__ == "__main__":
     unittest.main()
