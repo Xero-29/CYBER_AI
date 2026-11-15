@@ -129,7 +129,7 @@ class KnowledgeBootstrapTests(unittest.TestCase):
                  patch("knowledge_registry.register_resource", return_value={"resource_id": "resource"}), \
                  patch("knowledge_registry.update_resource_classification"), \
                  patch("knowledge_registry.update_resource_processing_status"), \
-                 patch("knowledge_library.document_chunk_count", return_value=0), \
+                 patch("knowledge_library.document_chunk_count", side_effect=[0, 2]), \
                  patch("knowledge_ingest.ingest_document", return_value={
                      "document_id": "offline-id", "chunks": 2,
                  }) as ingest:
