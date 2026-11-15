@@ -258,5 +258,50 @@ class NativeProtocolTests(unittest.TestCase):
             ["chat", "embeddings"],
         )
 
+
+    def test_capability_provider_is_selected_for_embeddings(self):
+        config = {
+            "default_provider": "anthropic",
+            "capability_providers": {"embeddings": "gemini"},
+            "llm_providers": {
+                "anthropic": {"enabled": True, "protocol": "anthropic"},
+                "gemini": {"enabled": True, "protocol": "gemini"},
+            },
+        }
+        provider = llm_providers.resolve_provider(config, {"type": "embeddings"}, capability="embeddings")
+        self.assertEqual(provider["name"], "gemini")
+
+    def test_explicit_agent_provider_has_priority_over_capability_mapping(self):
+        config = {
+            "default_provider": "anthropic",
+            "capability_providers": {"chat": "gemini"},
+            "llm_providers": {
+                "anthropic": {"enabled": True, "protocol": "anthropic"},
+                "gemini": {"enabled": True, "protocol": "gemini"},
+            },
+        }
+        provider = llm_providers.resolve_provider(config, {"provider": "anthropic"}, capability="chat")
+        self.assertEqual(provider["name"], "anthropic")
+
+    def test_explicit_fallback_provider_is_used_when_default_lacks_capability(self):
+        config = {
+            "default_provider": "anthropic",
+            "fallback_providers": {"embeddings": ["gemini"]},
+            "llm_providers": {
+                "anthropic": {"enabled": True, "protocol": "anthropic"},
+                "gemini": {"enabled": True, "protocol": "gemini"},
+            },
+        }
+        provider = llm_providers.resolve_provider(config, {"type": "embeddings"}, capability="embeddings")
+        self.assertEqual(provider["name"], "gemini")
+
+    def test_missing_capability_provider_fails_explicitly(self):
+        config = {
+            "default_provider": "anthropic",
+            "llm_providers": {"anthropic": {"enabled": True, "protocol": "anthropic"}},
+        }
+        with self.assertRaisesRegex(RuntimeError, "no hay proveedor habilitado"):
+            llm_providers.resolve_provider(config, {"type": "embeddings"}, capability="embeddings")
+
 if __name__ == "__main__":
     unittest.main()

@@ -15,7 +15,7 @@ def expected_embedding_space(agent_name="ECO"):
     name, agent = resolve_agent(agent_name, config)
     if agent.get("type") != "embeddings":
         raise ValueError(f"{name} no es un especialista de embeddings.")
-    provider = resolve_provider(config, agent)
+    provider = resolve_provider(config, agent, capability="embeddings")
     if "embeddings" not in provider_capabilities(provider):
         raise ValueError(f"El proveedor {provider.get('name')} no ofrece embeddings.")
     model = resolve_model(provider, agent, name)

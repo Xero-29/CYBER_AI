@@ -46,49 +46,84 @@ def _load_provider_plugin(protocol):
     return adapter
 
 
-def resolve_provider(config, agent):
+def resolve_provider(config, agent, capability=None):
+    """Resuelve un proveedor habilitado y, si se solicita, compatible con una capacidad."""
     registry = config.get("llm_providers", {})
-    name = agent.get("provider") or config.get("default_provider") or "ollama"
-    item = registry.get(name)
-    if not isinstance(item, dict) or not item.get("enabled", False):
-        raise RuntimeError(f"Proveedor de IA no configurado o deshabilitado: {name}")
-    result = dict(item)
-    result["name"] = name
-    protocol = result.get("protocol")
-    builtin = protocol in {"ollama", "openai", "anthropic", "gemini"}
-    if not builtin and _load_provider_plugin(protocol) is None:
-        raise ValueError(f"Protocolo de proveedor no soportado: {protocol}")
-    base_url = result.get("base_url", "")
-    if not base_url and not builtin:
+    if not isinstance(registry, dict):
+        raise ValueError("llm_providers debe ser un objeto.")
+    if capability is not None and capability not in {"chat", "embeddings", "model_listing"}:
+        raise ValueError("Capacidad de proveedor no reconocida.")
+
+    capability_map = config.get("capability_providers", {})
+    fallback_map = config.get("fallback_providers", {})
+    if not isinstance(capability_map, dict) or not isinstance(fallback_map, dict):
+        raise ValueError("capability_providers y fallback_providers deben ser objetos.")
+
+    explicit = agent.get("provider")
+    preferred = explicit or (
+        capability_map.get(capability) if capability else None
+    ) or config.get("default_provider") or "ollama"
+    candidates = [preferred]
+    if capability:
+        fallbacks = fallback_map.get(capability, [])
+        if isinstance(fallbacks, str) or not isinstance(fallbacks, (list, tuple)):
+            raise ValueError(f"fallback_providers.{capability} debe ser una lista.")
+        if any(not isinstance(name, str) or not name.strip() for name in fallbacks):
+            raise ValueError(f"fallback_providers.{capability} contiene nombres inválidos.")
+        candidates.extend(fallbacks)
+    candidates = list(dict.fromkeys(candidates))
+    last_reason = None
+
+    for name in candidates:
+        item = registry.get(name)
+        if not isinstance(item, dict) or not item.get("enabled", False):
+            last_reason = f"Proveedor no configurado o deshabilitado: {name}"
+            continue
+        result = dict(item)
+        result["name"] = name
+        protocol = result.get("protocol")
+        builtin = protocol in {"ollama", "openai", "anthropic", "gemini"}
+        if not builtin and _load_provider_plugin(protocol) is None:
+            raise ValueError(f"Protocolo de proveedor no soportado: {protocol}")
+        base_url = result.get("base_url", "")
+        if not base_url and not builtin:
+            if capability and capability not in provider_capabilities(result):
+                last_reason = f"{name} no ofrece {capability}"
+                continue
+            return result
+        if not isinstance(base_url, str):
+            raise ValueError(f"base_url inválida para el proveedor {name}.")
+        try:
+            parsed = urlsplit(base_url)
+            hostname = (parsed.hostname or "").lower().rstrip(".")
+            port = parsed.port
+        except ValueError as error:
+            raise ValueError(f"base_url inválida para el proveedor {name}.") from error
+        if (
+            parsed.scheme not in {"http", "https"} or not hostname
+            or parsed.username is not None or parsed.password is not None
+            or parsed.query or parsed.fragment
+            or (port is not None and not 1 <= port <= 65535)
+        ):
+            raise ValueError(f"base_url inválida para el proveedor {name}.")
+        try:
+            loopback = ipaddress.ip_address(hostname).is_loopback
+        except ValueError:
+            loopback = hostname == "localhost"
+        if parsed.scheme == "http" and not loopback:
+            raise ValueError(
+                "base_url HTTP solo se permite en loopback; usa HTTPS para proveedores remotos."
+            )
+        result["base_url"] = base_url.rstrip("/")
+        if capability and capability not in provider_capabilities(result):
+            last_reason = f"{name} no ofrece {capability}"
+            continue
         return result
-    if not isinstance(base_url, str):
-        raise ValueError(f"base_url inválida para el proveedor {name}.")
-    try:
-        parsed = urlsplit(base_url)
-        hostname = (parsed.hostname or "").lower().rstrip(".")
-        port = parsed.port
-    except ValueError as error:
-        raise ValueError(f"base_url inválida para el proveedor {name}.") from error
-    if (
-        parsed.scheme not in {"http", "https"}
-        or not hostname
-        or parsed.username is not None
-        or parsed.password is not None
-        or parsed.query
-        or parsed.fragment
-        or (port is not None and not 1 <= port <= 65535)
-    ):
-        raise ValueError(f"base_url inválida para el proveedor {name}.")
-    try:
-        loopback = ipaddress.ip_address(hostname).is_loopback
-    except ValueError:
-        loopback = hostname == "localhost"
-    if parsed.scheme == "http" and not loopback:
-        raise ValueError(
-            "base_url HTTP solo se permite en loopback; usa HTTPS para proveedores remotos."
-        )
-    result["base_url"] = base_url.rstrip("/")
-    return result
+
+    raise RuntimeError(
+        f"No hay proveedor habilitado con capacidad {capability or 'solicitada'}: "
+        f"{last_reason or 'ninguna alternativa configurada'}."
+    )
 
 
 def resolve_model(provider, agent, agent_name=None):

@@ -560,7 +560,7 @@ def run_agent(
     if agent.get("type") == "embeddings":
         raise ValueError("Este agente es de embeddings. Utiliza el comando embed.")
 
-    provider = resolve_provider(config, agent)
+    provider = resolve_provider(config, agent, capability="chat")
     model = resolve_model(provider, agent, name)
     available_models = provider_models(provider)
     if available_models is not None and model not in available_models:
@@ -1015,7 +1015,7 @@ def embed_text(agent_name, text):
     if agent.get("type") != "embeddings":
         raise ValueError(f"{name} no es un especialista de embeddings.")
 
-    provider = resolve_provider(config, agent)
+    provider = resolve_provider(config, agent, capability="embeddings")
     model = resolve_model(provider, agent, name)
     available_models = provider_models(provider)
     if available_models is not None and model not in available_models:
