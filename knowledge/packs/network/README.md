@@ -1,48 +1,51 @@
-# Redes — Paquete base
+# Seguridad de redes — Guía de dominio
 
-**ID:** `network` · **Versión:** 1.0.0 · **Idioma:** español · **Estado:** contenido propio inicial, incluido offline.
+**ID:** `network` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio incluido offline.
 
 ## Propósito y límites
-Redes: Redes y su arquitectura, amenazas, controles, metodología y validación. Esta guía es base metodológica, no certificación ni enciclopedia. No concede permisos. Toda actividad activa requiere autorización explícita, alcance, ventana y criterios de parada.
+Diseña y verifica redes empresariales, centros de datos, campus, WAN y segmentos cloud. La seguridad depende de identidad, segmentación, rutas, resolución de nombres, cifrado, administración y visibilidad. El escaneo activo, captura de tráfico y pruebas de disponibilidad requieren alcance autorizado y ventanas acordadas.
 
-## Competencias
-- Explicar arquitectura, componentes, flujos y límites de confianza.
-- Identificar activos, amenazas, vulnerabilidades, controles e impactos.
-- Diseñar prevención, detección, respuesta, recuperación y validación.
-- Seleccionar herramientas por riesgo, evidencia, coste y mantenimiento.
-- Documentar procedencia, versiones, incertidumbre y reproducibilidad.
+## Arquitectura y riesgos
+Inventariar zonas de usuario, servidor, administración, producción, invitados, terceros, DMZ y OT. Mapear switching L2, routing L3, VPN, DNS, DHCP, NTP, proxies, firewalls, balanceadores, Wi-Fi, SD-WAN y enlaces externos. Riesgos prioritarios: redes planas, ACL permisivas, servicios de gestión expuestos, DNS inseguro, protocolos obsoletos, credenciales compartidas, rutas asimétricas y falta de telemetría.
 
-## Metodología reproducible
-1. Definir propietario, autorización, alcance y exclusiones.
-2. Inventariar activos, datos, dependencias y límites de confianza.
-3. Formular hipótesis, amenazas, controles y criterios de parada.
-4. Recopilar evidencia permitida con procedencia, fecha y hash.
-5. Elegir métodos de menor riesgo y registrar versiones/configuración.
-6. Comenzar en modo pasivo/local; pruebas activas solo con autorización explícita.
-7. Validar hallazgos de forma reproducible e independiente.
-8. Priorizar impacto, exposición, explotabilidad e incertidumbre.
-9. Recomendar controles verificables y retest.
-10. Registrar evidencias, limitaciones y riesgo residual.
+## Competencias específicas
+- Interpretar VLAN, VRF, routing, ACL, NAT, VPN y controles de salida.
+- Diseñar segmentación basada en criticidad y Zero Trust.
+- Evaluar TLS, IPsec, SSH, SNMPv3, DNSSEC y autenticación de red.
+- Analizar PCAP y logs para detectar escaneo, beaconing, exfiltración y anomalías.
+- Revisar reglas firewall por propietario, justificación, caducidad y flujo.
+- Diseñar redundancia, gestión fuera de banda y recuperación de configuración.
+- Distinguir detección de prevención y medir cobertura de sensores.
 
-## Controles mínimos
-- Mínimo privilegio y separación análisis/ejecución.
-- Versiones exactas de herramientas, reglas, modelos y datasets.
-- Secretos fuera de código, prompts y logs; redacción antes de IA remota.
-- No confiar en una herramienta o modelo como prueba concluyente.
-- Preservar originales y registrar SHA-256.
-- Revisión humana antes de cambios o acciones activas.
+## Controles prioritarios
+- Denegar por defecto entre zonas y permitir flujos mínimos documentados.
+- Separar plano de administración, plano de datos y redes de usuarios.
+- Exigir MFA y bastión para administración; limitar SSH/RDP/SNMP a redes de gestión.
+- Usar DNS resolvers controlados, filtrado de salida y registros con retención.
+- Retirar Telnet, FTP y protocolos criptográficos débiles; usar versiones TLS soportadas.
+- Autenticar dispositivos y puertos donde corresponda; proteger Wi-Fi con WPA3-Enterprise/802.1X.
+- Registrar cambios de reglas y revisar reglas huérfanas.
+- Sincronizar relojes y conservar logs de firewall, DNS, VPN, DHCP y proxy.
+
+## Metodología
+1. Obtener diagramas, inventario, rutas y responsables.
+2. Construir matriz origen-destino-protocolo-puerto-justificación.
+3. Revisar reglas, servicios de gestión y exposición externa.
+4. Comprobar segmentación mediante pruebas de conectividad no destructivas.
+5. Analizar PCAP sintéticos o capturas autorizadas con filtros documentados.
+6. Validar resolución DNS, certificados, VPN y rutas.
+7. Revisar telemetría, tiempos, zonas horarias y alertas.
+8. Probar failover y recuperación en laboratorio.
+9. Entregar cambios de firewall como diff revisable con rollback.
 
 ## Laboratorio seguro
-Usar datos sintéticos, fixtures, aplicaciones deliberadamente vulnerables o máquinas virtuales aisladas. Sin credenciales reales. Debe ser reiniciable y reproducible. No ejecutar pruebas destructivas fuera de laboratorio desechable autorizado.
+Topología local con router virtual, firewall, dos VLAN y servicios ficticios. Verificar que usuario no alcanza administración ni OT, analizar un PCAP sintético y ensayar pérdida de enlace. No ejecutar Nmap, Masscan ni pruebas de flooding fuera de un laboratorio propio.
 
 ## Evaluación
-5 preguntas de fundamentos, 3 escenarios sintéticos, 2 ejercicios de evidencia/falsos positivos, 1 diseño de controles y 1 informe reproducible. Aprobación sugerida: ≥80%, sin errores críticos de alcance y con evidencia verificable.
+Flujos autorizados tienen dueño y justificación; administración está segmentada; logs permiten reconstruir actividad; pruebas de conectividad negativa confirman aislamiento; configuración puede restaurarse.
 
-## Entregables
-Alcance y autorización; activos; método y versiones; evidencias con hashes; hallazgos con severidad/confianza; mitigaciones; retest y riesgo residual.
-
-## Fuentes externas
-Consultar `data/knowledge_sources/knowledge_catalog.json`. Las URLs catalogadas no implican descarga, licencia o ingestión. Verificar derechos, procedencia, versión, fecha, tamaño, hash y seguridad del extractor.
+## Referencias y herramientas
+NIST SP 800-41, CIS Benchmarks, MITRE ATT&CK, RFC 8446, Wireshark/TShark, Zeek, Suricata, Nmap y firewall vendor guides.
 
 ## Instrucciones para agentes IA
-Lee este paquete antes de planificar tareas de esta especialidad. Reutiliza Skills verificadas con alcance coincidente. No inventes capacidades ni resultados. Si falta evidencia, dilo. No ejecutes acciones activas sin autorización. Cita fragmentos recuperados; no afirmes haber consultado contenido ausente.
+Empieza con revisión pasiva. No inventes topología ni afirmes que un puerto está abierto sin evidencia. Toda prueba activa debe comprobar autorización, rango y tasa; no realices DoS ni interceptación de terceros.

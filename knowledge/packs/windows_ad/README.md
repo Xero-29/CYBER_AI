@@ -1,48 +1,52 @@
-# Windows y Active Directory — Paquete base
+# Seguridad Windows y Active Directory — Guía de dominio
 
-**ID:** `windows_ad` · **Versión:** 1.0.0 · **Idioma:** español · **Estado:** contenido propio inicial, incluido offline.
+**ID:** `windows_ad` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio incluido offline.
 
 ## Propósito y límites
-Windows y Active Directory: Windows y Active Directory y su arquitectura, amenazas, controles, metodología y validación. Esta guía es base metodológica, no certificación ni enciclopedia. No concede permisos. Toda actividad activa requiere autorización explícita, alcance, ventana y criterios de parada.
+Protege endpoints Windows, servidores, identidades de dominio y servicios de directorio. El dominio AD debe tratarse como plano de control de la organización: comprometer identidades privilegiadas puede afectar estaciones, servidores, políticas y copias de seguridad. La enumeración y simulación de técnicas adversarias se limita a dominios de laboratorio o autorizados.
 
-## Competencias
-- Explicar arquitectura, componentes, flujos y límites de confianza.
-- Identificar activos, amenazas, vulnerabilidades, controles e impactos.
-- Diseñar prevención, detección, respuesta, recuperación y validación.
-- Seleccionar herramientas por riesgo, evidencia, coste y mantenimiento.
-- Documentar procedencia, versiones, incertidumbre y reproducibilidad.
+## Arquitectura y amenazas
+Inventariar bosques, dominios, controladores, trusts, OUs, GPO, DNS, LDAP, Kerberos, AD CS, Entra ID/identidad híbrida, cuentas de servicio y estaciones privilegiadas. Amenazas: Kerberoasting, AS-REP roasting, abuso de delegación, ACLs peligrosas, DCSync, pass-the-ticket, password spraying, abuso de certificados, GPO débil, cuentas huérfanas y movimiento lateral.
 
-## Metodología reproducible
-1. Definir propietario, autorización, alcance y exclusiones.
-2. Inventariar activos, datos, dependencias y límites de confianza.
-3. Formular hipótesis, amenazas, controles y criterios de parada.
-4. Recopilar evidencia permitida con procedencia, fecha y hash.
-5. Elegir métodos de menor riesgo y registrar versiones/configuración.
-6. Comenzar en modo pasivo/local; pruebas activas solo con autorización explícita.
-7. Validar hallazgos de forma reproducible e independiente.
-8. Priorizar impacto, exposición, explotabilidad e incertidumbre.
-9. Recomendar controles verificables y retest.
-10. Registrar evidencias, limitaciones y riesgo residual.
+## Competencias específicas
+- Comprender Kerberos, NTLM, LDAP, DNS y replicación de directorio.
+- Revisar privilegios de Domain Admin, Enterprise Admin y grupos delegados.
+- Analizar ACLs, delegación, SPN, trusts y rutas de escalada.
+- Endurecer controladores de dominio, AD CS y políticas de autenticación.
+- Aplicar Windows LAPS, tiering administrativo y estaciones PAW.
+- Revisar GPO, scripts de inicio, tareas programadas y servicios.
+- Correlacionar eventos Windows y telemetría EDR.
 
-## Controles mínimos
-- Mínimo privilegio y separación análisis/ejecución.
-- Versiones exactas de herramientas, reglas, modelos y datasets.
-- Secretos fuera de código, prompts y logs; redacción antes de IA remota.
-- No confiar en una herramienta o modelo como prueba concluyente.
-- Preservar originales y registrar SHA-256.
-- Revisión humana antes de cambios o acciones activas.
+## Controles prioritarios
+- Reducir miembros de grupos privilegiados y usar cuentas separadas de administración.
+- Evitar inicio de sesión de cuentas Tier 0 en estaciones de usuario.
+- Desplegar Windows LAPS y rotar secretos de cuentas locales/servicio.
+- Eliminar protocolos heredados cuando sea viable y exigir SMB signing donde corresponda.
+- Revisar delegación Kerberos y deshabilitar configuraciones inseguras.
+- Proteger AD CS: plantillas, permisos de inscripción, EKU y claves privadas.
+- Auditar cambios de grupos, GPO, trusts, cuentas, SPN y políticas de autenticación.
+- Mantener controladores parcheados, respaldos de System State y recuperación ensayada.
+- Usar MFA y acceso condicional para identidad híbrida.
+
+## Metodología
+1. Obtener inventario de bosque, dominios, DCs, OUs y cuentas privilegiadas.
+2. Revisar baseline y eventos de seguridad relevantes.
+3. Analizar relaciones de privilegio y rutas de ataque con datos autorizados.
+4. Revisar ACLs, GPO, delegación, SPN, AD CS y cuentas de servicio.
+5. Verificar MFA, LAPS, tiering, PAW y políticas de acceso.
+6. Correlacionar hallazgos con MITRE ATT&CK.
+7. Priorizar rutas que alcanzan Tier 0 y cerrar primero las de mayor impacto.
+8. Probar cambios en laboratorio, respaldar y validar replicación.
+9. Repetir análisis para comprobar que las rutas se cerraron.
 
 ## Laboratorio seguro
-Usar datos sintéticos, fixtures, aplicaciones deliberadamente vulnerables o máquinas virtuales aisladas. Sin credenciales reales. Debe ser reiniciable y reproducible. No ejecutar pruebas destructivas fuera de laboratorio desechable autorizado.
+Bosque AD desechable con un DC y dos clientes, usuarios ficticios y cuentas de prueba. Usar Purple Knight/BloodHound Community solo para análisis del laboratorio y documentar rutas de privilegio. No ejecutar técnicas de extracción de credenciales ni pruebas de contraseña contra dominios reales.
 
 ## Evaluación
-5 preguntas de fundamentos, 3 escenarios sintéticos, 2 ejercicios de evidencia/falsos positivos, 1 diseño de controles y 1 informe reproducible. Aprobación sugerida: ≥80%, sin errores críticos de alcance y con evidencia verificable.
+Privilegios Tier 0 mínimos, delegaciones justificadas, cuentas de servicio controladas, GPO verificadas, telemetría activa y recuperación de AD ensayada.
 
-## Entregables
-Alcance y autorización; activos; método y versiones; evidencias con hashes; hallazgos con severidad/confianza; mitigaciones; retest y riesgo residual.
-
-## Fuentes externas
-Consultar `data/knowledge_sources/knowledge_catalog.json`. Las URLs catalogadas no implican descarga, licencia o ingestión. Verificar derechos, procedencia, versión, fecha, tamaño, hash y seguridad del extractor.
+## Referencias
+Microsoft Security Baselines, Microsoft AD DS/AD CS guidance, MITRE ATT&CK Enterprise, CIS Microsoft Windows Server Benchmark y NIST SP 800-53.
 
 ## Instrucciones para agentes IA
-Lee este paquete antes de planificar tareas de esta especialidad. Reutiliza Skills verificadas con alcance coincidente. No inventes capacidades ni resultados. Si falta evidencia, dilo. No ejecutes acciones activas sin autorización. Cita fragmentos recuperados; no afirmes haber consultado contenido ausente.
+No generes comandos de dumping de credenciales ni persistencia. Prioriza consultas de solo lectura y configuración defensiva. Señala si una prueba puede bloquear cuentas o afectar replicación.

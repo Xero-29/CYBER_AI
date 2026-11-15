@@ -1,48 +1,50 @@
-# Seguridad web y aplicaciones — Paquete base
+# Seguridad de aplicaciones — Guía de dominio
 
-**ID:** `appsec` · **Versión:** 1.0.0 · **Idioma:** español · **Estado:** contenido propio inicial, incluido offline.
+**ID:** `appsec` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio incluido offline.
 
 ## Propósito y límites
-Seguridad web y aplicaciones: Seguridad web y aplicaciones y su arquitectura, amenazas, controles, metodología y validación. Esta guía es base metodológica, no certificación ni enciclopedia. No concede permisos. Toda actividad activa requiere autorización explícita, alcance, ventana y criterios de parada.
+Asegura el ciclo de vida de aplicaciones web y servicios, desde requisitos y diseño hasta despliegue y operación. Cubre errores de lógica, validación, sesiones, autorización, dependencias, configuración y exposición de datos. Las pruebas dinámicas deben ejecutarse en entornos autorizados, con datos sintéticos y límites de carga.
 
-## Competencias
-- Explicar arquitectura, componentes, flujos y límites de confianza.
-- Identificar activos, amenazas, vulnerabilidades, controles e impactos.
-- Diseñar prevención, detección, respuesta, recuperación y validación.
-- Seleccionar herramientas por riesgo, evidencia, coste y mantenimiento.
-- Documentar procedencia, versiones, incertidumbre y reproducibilidad.
+## Arquitectura y superficies críticas
+Revisar navegador, frontend, API, middleware, sesiones, base de datos, caché, almacenamiento de objetos, colas, servicios externos y pipeline CI/CD. Marcar límites entre usuario anónimo, usuario autenticado, roles, administradores y servicios máquina-a-máquina. Los principales fallos aparecen en validación de entrada, codificación de salida, control de acceso, confianza en cabeceras, serialización y manejo de errores.
 
-## Metodología reproducible
-1. Definir propietario, autorización, alcance y exclusiones.
-2. Inventariar activos, datos, dependencias y límites de confianza.
-3. Formular hipótesis, amenazas, controles y criterios de parada.
-4. Recopilar evidencia permitida con procedencia, fecha y hash.
-5. Elegir métodos de menor riesgo y registrar versiones/configuración.
-6. Comenzar en modo pasivo/local; pruebas activas solo con autorización explícita.
-7. Validar hallazgos de forma reproducible e independiente.
-8. Priorizar impacto, exposición, explotabilidad e incertidumbre.
-9. Recomendar controles verificables y retest.
-10. Registrar evidencias, limitaciones y riesgo residual.
+## Competencias específicas
+- Aplicar OWASP ASVS como catálogo verificable de requisitos.
+- Revisar XSS reflejado/almacenado/DOM, inyección SQL/NoSQL/command, CSRF, SSRF, traversal y deserialización insegura.
+- Evaluar autenticación, recuperación de cuenta, sesiones, MFA, cookies y expiración.
+- Detectar IDOR/BOLA, escalada horizontal/vertical y fallos de autorización por función.
+- Integrar SAST, DAST, SCA, análisis de secretos y revisión manual.
+- Diseñar controles de seguridad para cabeceras, CORS, CSP, TLS y errores.
 
-## Controles mínimos
-- Mínimo privilegio y separación análisis/ejecución.
-- Versiones exactas de herramientas, reglas, modelos y datasets.
-- Secretos fuera de código, prompts y logs; redacción antes de IA remota.
-- No confiar en una herramienta o modelo como prueba concluyente.
-- Preservar originales y registrar SHA-256.
-- Revisión humana antes de cambios o acciones activas.
+## Controles de diseño
+- Validación positiva del lado servidor con esquemas explícitos; la validación cliente solo mejora UX.
+- Consultas parametrizadas y APIs de acceso a datos con privilegios mínimos.
+- Codificación contextual de salida y plantillas con autoescape.
+- Protección CSRF para operaciones basadas en cookies; CORS no es control de autenticación.
+- Sesiones con cookies Secure, HttpOnly y SameSite, rotación tras login y revocación.
+- Autorización centralizada por recurso y acción, no solo por ruta o interfaz.
+- Límites por usuario, IP, cuenta y operación; protección contra abuso y enumeración.
+- Gestión central de secretos, dependencias fijadas y artefactos verificables.
+
+## Metodología
+1. Obtener diagrama, rutas, roles, modelos de datos y requisitos de seguridad.
+2. Enumerar endpoints y operaciones sensibles; construir matriz rol-recurso-acción.
+3. Revisar autenticación y autorización antes de buscar fallos de entrada.
+4. Analizar código y dependencias; validar hallazgos con pruebas unitarias.
+5. Ejecutar DAST en staging con cuentas de prueba y límites de tasa.
+6. Correlacionar hallazgos entre SAST/DAST/SCA para reducir duplicados.
+7. Demostrar impacto mínimo, sin extraer datos ni persistir acceso.
+8. Proponer mitigación, prueba de regresión y responsable.
+9. Repetir prueba después del cambio y conservar evidencia.
 
 ## Laboratorio seguro
-Usar datos sintéticos, fixtures, aplicaciones deliberadamente vulnerables o máquinas virtuales aisladas. Sin credenciales reales. Debe ser reiniciable y reproducible. No ejecutar pruebas destructivas fuera de laboratorio desechable autorizado.
+Usar una aplicación deliberadamente vulnerable local, con dos usuarios ficticios y datos sintéticos. Crear pruebas de regresión para XSS, SQLi, CSRF, SSRF simulada y autorización horizontal. El ejercicio no debe apuntar a dominios externos ni exfiltrar información.
 
-## Evaluación
-5 preguntas de fundamentos, 3 escenarios sintéticos, 2 ejercicios de evidencia/falsos positivos, 1 diseño de controles y 1 informe reproducible. Aprobación sugerida: ≥80%, sin errores críticos de alcance y con evidencia verificable.
+## Criterios de evaluación
+Cobertura de rutas y roles, evidencia reproducible, ausencia de datos reales, falsos positivos documentados, prueba de regresión por hallazgo y riesgo residual aceptado por propietario.
 
-## Entregables
-Alcance y autorización; activos; método y versiones; evidencias con hashes; hallazgos con severidad/confianza; mitigaciones; retest y riesgo residual.
-
-## Fuentes externas
-Consultar `data/knowledge_sources/knowledge_catalog.json`. Las URLs catalogadas no implican descarga, licencia o ingestión. Verificar derechos, procedencia, versión, fecha, tamaño, hash y seguridad del extractor.
+## Marcos y herramientas
+OWASP Top 10, OWASP ASVS, OWASP Testing Guide, CWE, Semgrep, Bandit, Ruff, ZAP y Burp Suite en laboratorio autorizado.
 
 ## Instrucciones para agentes IA
-Lee este paquete antes de planificar tareas de esta especialidad. Reutiliza Skills verificadas con alcance coincidente. No inventes capacidades ni resultados. Si falta evidencia, dilo. No ejecutes acciones activas sin autorización. Cita fragmentos recuperados; no afirmes haber consultado contenido ausente.
+Prioriza revisión de código y pruebas locales. No propongas explotación destructiva, persistencia, evasión ni extracción de datos. Para cada hallazgo incluye precondición, componente, impacto, evidencia mínima, mitigación y test de regresión.

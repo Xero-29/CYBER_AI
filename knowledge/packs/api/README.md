@@ -1,48 +1,51 @@
-# Seguridad de API — Paquete base
+# Seguridad de API — Guía de dominio
 
-**ID:** `api` · **Versión:** 1.0.0 · **Idioma:** español · **Estado:** contenido propio inicial, incluido offline.
+**ID:** `api` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio incluido offline.
 
 ## Propósito y límites
-Seguridad de API: Seguridad de API y su arquitectura, amenazas, controles, metodología y validación. Esta guía es base metodológica, no certificación ni enciclopedia. No concede permisos. Toda actividad activa requiere autorización explícita, alcance, ventana y criterios de parada.
+Define controles para APIs REST, GraphQL, gRPC y eventos. El riesgo dominante suele estar en autorización por objeto/función, identidad máquina-a-máquina, exposición excesiva de datos, abuso de recursos y confianza incorrecta entre servicios. Las pruebas activas solo se ejecutan sobre APIs propias o autorizadas.
 
-## Competencias
-- Explicar arquitectura, componentes, flujos y límites de confianza.
-- Identificar activos, amenazas, vulnerabilidades, controles e impactos.
-- Diseñar prevención, detección, respuesta, recuperación y validación.
-- Seleccionar herramientas por riesgo, evidencia, coste y mantenimiento.
-- Documentar procedencia, versiones, incertidumbre y reproducibilidad.
+## Modelo de amenazas
+Identificar consumidor, gateway, servicio, identidad, recurso, tenant, datos, cola y proveedor. Analizar BOLA/IDOR, BFLA, mass assignment, autenticación rota, consumo ilimitado, SSRF, inventario incompleto, versiones abandonadas, configuración insegura y abuso de lógica de negocio. Para GraphQL revisar introspección expuesta, profundidad/coste de consultas y autorización por resolver. Para gRPC revisar mTLS, identidad de servicio, reflection y límites de mensajes.
 
-## Metodología reproducible
-1. Definir propietario, autorización, alcance y exclusiones.
-2. Inventariar activos, datos, dependencias y límites de confianza.
-3. Formular hipótesis, amenazas, controles y criterios de parada.
-4. Recopilar evidencia permitida con procedencia, fecha y hash.
-5. Elegir métodos de menor riesgo y registrar versiones/configuración.
-6. Comenzar en modo pasivo/local; pruebas activas solo con autorización explícita.
-7. Validar hallazgos de forma reproducible e independiente.
-8. Priorizar impacto, exposición, explotabilidad e incertidumbre.
-9. Recomendar controles verificables y retest.
-10. Registrar evidencias, limitaciones y riesgo residual.
+## Competencias específicas
+- Diseñar autenticación con OAuth 2.1/OIDC, mTLS o credenciales de workload según caso.
+- Validar tokens: issuer, audience, firma, expiración, algoritmo permitido, scopes y rotación.
+- Aplicar autorización por objeto, función, tenant y contexto de negocio.
+- Definir esquemas estrictos, límites de tamaño, paginación y tipos.
+- Prevenir replay, enumeración, abuso de endpoints y agotamiento de recursos.
+- Versionar, inventariar y retirar APIs con control de compatibilidad.
+- Proteger secretos, webhooks, callbacks y comunicación servicio-a-servicio.
 
-## Controles mínimos
-- Mínimo privilegio y separación análisis/ejecución.
-- Versiones exactas de herramientas, reglas, modelos y datasets.
-- Secretos fuera de código, prompts y logs; redacción antes de IA remota.
-- No confiar en una herramienta o modelo como prueba concluyente.
-- Preservar originales y registrar SHA-256.
-- Revisión humana antes de cambios o acciones activas.
+## Controles esenciales
+- Nunca confiar en IDs enviados por el cliente: comprobar propiedad y permiso en el servidor.
+- Evitar confiar únicamente en scopes generales; comprobar autorización en cada operación y objeto.
+- Validar firmas y claims del token; no aceptar algoritmos elegidos por el cliente ni tokens sin audience.
+- Separar autenticación de autorización y no confundir CORS con control de acceso.
+- Usar idempotency keys para operaciones reintentables y controles anti-replay en webhooks.
+- Aplicar rate limiting y cuotas por identidad, tenant, IP y coste de operación.
+- Redactar PII y secretos en logs; registrar actor, recurso, acción y resultado.
+- Evitar respuestas excesivas; aplicar allowlists de campos y filtrado por rol.
+
+## Metodología
+1. Exportar OpenAPI/GraphQL schema y validar que refleje la implementación.
+2. Crear inventario de endpoints, métodos, roles, scopes y recursos.
+3. Construir matriz de autorización con casos permitidos y denegados.
+4. Revisar tokens, mTLS, gestión de claves, rotación y expiración.
+5. Probar casos negativos con dos tenants sintéticos y usuarios de roles distintos.
+6. Verificar límites de tasa, paginación, tamaños y consultas costosas.
+7. Inspeccionar logs para asegurar trazabilidad y redacción.
+8. Documentar compatibilidad, versiones obsoletas y plan de retirada.
+9. Añadir pruebas de regresión de autorización y abuso.
 
 ## Laboratorio seguro
-Usar datos sintéticos, fixtures, aplicaciones deliberadamente vulnerables o máquinas virtuales aisladas. Sin credenciales reales. Debe ser reiniciable y reproducible. No ejecutar pruebas destructivas fuera de laboratorio desechable autorizado.
+API local con dos organizaciones ficticias, dos usuarios por organización, roles lector/escritor y recursos separados. Ejecutar pruebas de acceso cruzado, escalada de función, token expirado, replay de webhook y consultas excesivas. Las pruebas deben confirmar denegación y no recuperar datos ajenos.
 
 ## Evaluación
-5 preguntas de fundamentos, 3 escenarios sintéticos, 2 ejercicios de evidencia/falsos positivos, 1 diseño de controles y 1 informe reproducible. Aprobación sugerida: ≥80%, sin errores críticos de alcance y con evidencia verificable.
+Cada endpoint tiene autenticación, autorización, esquema, límites, logging y propietario definidos. La matriz de permisos tiene pruebas positivas y negativas. Los cambios de API incluyen versionado y regresión.
 
-## Entregables
-Alcance y autorización; activos; método y versiones; evidencias con hashes; hallazgos con severidad/confianza; mitigaciones; retest y riesgo residual.
-
-## Fuentes externas
-Consultar `data/knowledge_sources/knowledge_catalog.json`. Las URLs catalogadas no implican descarga, licencia o ingestión. Verificar derechos, procedencia, versión, fecha, tamaño, hash y seguridad del extractor.
+## Referencias
+OWASP API Security Top 10, OAuth 2.1, OpenID Connect, RFC 9700, OpenAPI, GraphQL Security, gRPC Security y CWE.
 
 ## Instrucciones para agentes IA
-Lee este paquete antes de planificar tareas de esta especialidad. Reutiliza Skills verificadas con alcance coincidente. No inventes capacidades ni resultados. Si falta evidencia, dilo. No ejecutes acciones activas sin autorización. Cita fragmentos recuperados; no afirmes haber consultado contenido ausente.
+No generes tokens reales ni envíes solicitudes a servicios productivos. Usa fixtures locales. No marques una API como segura por tener gateway o JWT: verifica autorización por objeto, tenant y operación.

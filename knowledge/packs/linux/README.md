@@ -1,48 +1,53 @@
-# Linux y Unix — Paquete base
+# Seguridad Linux y Unix — Guía de dominio
 
-**ID:** `linux` · **Versión:** 1.0.0 · **Idioma:** español · **Estado:** contenido propio inicial, incluido offline.
+**ID:** `linux` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio incluido offline.
 
 ## Propósito y límites
-Linux y Unix: Linux y Unix y su arquitectura, amenazas, controles, metodología y validación. Esta guía es base metodológica, no certificación ni enciclopedia. No concede permisos. Toda actividad activa requiere autorización explícita, alcance, ventana y criterios de parada.
+Endurece sistemas Linux/Unix, servicios, hosts de contenedores y estaciones de administración. Considera kernel, paquetes, usuarios, privilegios, servicios, red, almacenamiento, arranque y telemetría. No ejecutes cambios sobre hosts productivos sin ventana, respaldo, revisión y plan de reversión.
 
-## Competencias
-- Explicar arquitectura, componentes, flujos y límites de confianza.
-- Identificar activos, amenazas, vulnerabilidades, controles e impactos.
-- Diseñar prevención, detección, respuesta, recuperación y validación.
-- Seleccionar herramientas por riesgo, evidencia, coste y mantenimiento.
-- Documentar procedencia, versiones, incertidumbre y reproducibilidad.
+## Superficie y amenazas
+Revisar cuentas locales, SSH, sudo, PAM, capabilities, namespaces, systemd, cron, sockets, módulos de kernel, paquetes, repositorios, filesystem, logs, firewall y procesos. Riesgos: root remoto, sudoers excesivo, claves SSH sin rotación, servicios innecesarios, binarios SUID/SGID, capabilities peligrosas, permisos débiles, secretos en archivos, persistencia en systemd/cron y kernel sin parches.
 
-## Metodología reproducible
-1. Definir propietario, autorización, alcance y exclusiones.
-2. Inventariar activos, datos, dependencias y límites de confianza.
-3. Formular hipótesis, amenazas, controles y criterios de parada.
-4. Recopilar evidencia permitida con procedencia, fecha y hash.
-5. Elegir métodos de menor riesgo y registrar versiones/configuración.
-6. Comenzar en modo pasivo/local; pruebas activas solo con autorización explícita.
-7. Validar hallazgos de forma reproducible e independiente.
-8. Priorizar impacto, exposición, explotabilidad e incertidumbre.
-9. Recomendar controles verificables y retest.
-10. Registrar evidencias, limitaciones y riesgo residual.
+## Competencias específicas
+- Analizar autenticación local, PAM, SSH y políticas sudo.
+- Aplicar least privilege con usuarios de servicio y Linux capabilities.
+- Revisar systemd, cron, sockets y unidades privilegiadas.
+- Evaluar kernel, módulos, sysctl, namespaces, seccomp y LSM.
+- Auditar permisos, ACL, SUID/SGID, montajes y cifrado de disco.
+- Centralizar auditd, journald, syslog y telemetría de procesos.
+- Gestionar paquetes, repositorios firmados y actualizaciones reproducibles.
+- Preparar hardening y baseline para imágenes inmutables.
 
-## Controles mínimos
-- Mínimo privilegio y separación análisis/ejecución.
-- Versiones exactas de herramientas, reglas, modelos y datasets.
-- Secretos fuera de código, prompts y logs; redacción antes de IA remota.
-- No confiar en una herramienta o modelo como prueba concluyente.
-- Preservar originales y registrar SHA-256.
-- Revisión humana antes de cambios o acciones activas.
+## Controles prioritarios
+- Deshabilitar login SSH root y autenticación por contraseña cuando la operación lo permita; usar claves protegidas y MFA en bastión.
+- Revisar sudoers con validación sintáctica y comandos mínimos.
+- Quitar servicios, puertos y paquetes no requeridos.
+- Aplicar actualizaciones de seguridad y verificar origen/firma de paquetes.
+- Configurar umask, permisos y propietarios; proteger archivos de credenciales.
+- Limitar capabilities y evitar contenedores privilegiados.
+- Activar auditd y logs persistentes con tiempo sincronizado.
+- Aplicar SELinux/AppArmor en modo enforcing tras validar políticas.
+- Proteger arranque, Secure Boot cuando aplique y recuperación de claves.
+
+## Metodología
+1. Identificar distribución, versión, kernel, rol y criticidad.
+2. Capturar baseline de paquetes, servicios, usuarios, puertos y permisos.
+3. Comparar configuración con CIS Benchmark correspondiente.
+4. Revisar accesos privilegiados, sudo, SSH, cron y systemd.
+5. Analizar logs de autenticación, kernel y auditoría.
+6. Proponer cambios en modo diff; probar en clon o VM.
+7. Medir impacto en disponibilidad y compatibilidad.
+8. Aplicar con rollback y verificar el estado posterior.
+9. Automatizar controles de regresión con Ansible, OpenSCAP o scripts idempotentes.
 
 ## Laboratorio seguro
-Usar datos sintéticos, fixtures, aplicaciones deliberadamente vulnerables o máquinas virtuales aisladas. Sin credenciales reales. Debe ser reiniciable y reproducible. No ejecutar pruebas destructivas fuera de laboratorio desechable autorizado.
+VM desechable con distribución soportada, usuario normal, cuenta de servicio y servicio HTTP de prueba. Generar baseline, corregir permisos, endurecer SSH, auditar sudo y comparar logs. No usar malware real ni ejecutar payloads con privilegios.
 
-## Evaluación
-5 preguntas de fundamentos, 3 escenarios sintéticos, 2 ejercicios de evidencia/falsos positivos, 1 diseño de controles y 1 informe reproducible. Aprobación sugerida: ≥80%, sin errores críticos de alcance y con evidencia verificable.
+## Criterios de evaluación
+Se conoce versión y propietario; privilegios mínimos; servicios necesarios; parches y repositorios confiables; logs útiles; hardening probado; rollback disponible.
 
-## Entregables
-Alcance y autorización; activos; método y versiones; evidencias con hashes; hallazgos con severidad/confianza; mitigaciones; retest y riesgo residual.
-
-## Fuentes externas
-Consultar `data/knowledge_sources/knowledge_catalog.json`. Las URLs catalogadas no implican descarga, licencia o ingestión. Verificar derechos, procedencia, versión, fecha, tamaño, hash y seguridad del extractor.
+## Marcos y herramientas
+CIS Linux Benchmarks, DISA STIG cuando aplique, NIST SP 800-123, OpenSCAP, Lynis, auditd, osquery, Ruff/ShellCheck para automatización.
 
 ## Instrucciones para agentes IA
-Lee este paquete antes de planificar tareas de esta especialidad. Reutiliza Skills verificadas con alcance coincidente. No inventes capacidades ni resultados. Si falta evidencia, dilo. No ejecutes acciones activas sin autorización. Cita fragmentos recuperados; no afirmes haber consultado contenido ausente.
+No sugieras comandos destructivos ni cambios directos de firewall/SSH sin mostrar impacto y rollback. Diferencia comandos de inspección de comandos de modificación. No expongas hashes de contraseñas ni secretos en salidas.
