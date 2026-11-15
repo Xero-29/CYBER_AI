@@ -264,6 +264,10 @@ def skill_rollback_payload(skill_id, target_version):
 
 def rollback_skill_version(skill_id, target_version, approval_signature):
     """Restaura una versión activa con HMAC VERITAS y conserva historial append-only."""
+    if not isinstance(skill_id, str) or not skill_id.strip():
+        raise ValueError("skill_id es obligatorio.")
+    if isinstance(target_version, bool) or not isinstance(target_version, int) or target_version < 1:
+        raise ValueError("target_version debe ser un entero positivo.")
     key = os.environ.get("CYBER_AI_VERITAS_APPROVAL_KEY", "")
     if len(key.encode("utf-8")) < 32:
         raise ValueError("CYBER_AI_VERITAS_APPROVAL_KEY debe tener al menos 32 bytes.")
