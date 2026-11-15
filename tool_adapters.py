@@ -28,6 +28,14 @@ TOOL_SPECS = {
     "syft": {"binary": "syft", "network": False, "timeout": 180, "version_args": ["version"]},
     "trivy": {"binary": "trivy", "network": False, "timeout": 240, "version_args": ["--version"]},
     "pip_audit": {"binary": "pip-audit", "network": True, "timeout": 180},
+    "checkov": {"binary": "checkov", "network": False, "timeout": 180, "version_args": ["--version"]},
+    "detect_secrets": {"binary": "detect-secrets", "network": False, "timeout": 120, "version_args": ["--version"]},
+    "hadolint": {"binary": "hadolint", "network": False, "timeout": 60, "version_args": ["--version"]},
+    "shellcheck": {"binary": "shellcheck", "network": False, "timeout": 120, "version_args": ["--version"]},
+    "actionlint": {"binary": "actionlint", "network": False, "timeout": 60, "version_args": ["-version"]},
+    "kube_linter": {"binary": "kube-linter", "network": False, "timeout": 120, "version_args": ["version"]},
+    "yara": {"binary": "yara", "network": False, "timeout": 180, "version_args": ["--version"]},
+    "tshark": {"binary": "tshark", "network": False, "timeout": 180, "version_args": ["--version"]},
 }
 
 
@@ -98,6 +106,42 @@ def _build_command(tool_id, binary, target, config_path=None):
             "--offline-scan", "--skip-db-update", "--skip-java-db-update",
             "--skip-check-update", "--no-progress", str(target),
         ]
+    if tool_id == "checkov":
+        mode = ["-d", str(target)] if target.is_dir() else ["-f", str(target)]
+        return [binary, *mode, "--output", "json", "--quiet"]
+    if tool_id == "detect_secrets":
+        if not target.is_dir():
+            raise ToolExecutionError("detect-secrets requiere un directorio de repositorio.")
+        return [binary, "scan", "--all-files", str(target)]
+    if tool_id in {"hadolint", "shellcheck", "actionlint"}:
+        if target.is_file():
+            files = [target]
+        elif tool_id == "hadolint":
+            files = sorted(p for p in target.rglob("Dockerfile") if p.is_file() and not p.is_symlink())
+        elif tool_id == "shellcheck":
+            files = sorted(p for p in target.rglob("*") if p.is_file() and not p.is_symlink() and p.suffix.lower() in {".sh", ".bash"})
+        else:
+            files = sorted(p for p in target.rglob("*") if p.is_file() and not p.is_symlink() and p.suffix.lower() in {".yml", ".yaml"})
+        if not files:
+            raise ToolExecutionError("No se encontraron archivos compatibles con la herramienta.")
+        if tool_id == "hadolint":
+            return [binary, "--format", "json", *map(str, files)]
+        if tool_id == "shellcheck":
+            return [binary, "--format=json", *map(str, files)]
+        return [binary, "-oneline", *map(str, files)]
+    if tool_id == "kube_linter":
+        return [binary, "lint", str(target), "--format", "json"]
+    if tool_id == "yara":
+        if not config_path:
+            raise ToolExecutionError("YARA requiere un archivo de reglas local explícito.")
+        rules = _confined_path(config_path)
+        if not rules.is_file():
+            raise ToolExecutionError("Las reglas YARA deben ser un archivo local.")
+        return [binary, "-r", str(rules), str(target)]
+    if tool_id == "tshark":
+        if not target.is_file() or target.suffix.lower() not in {".pcap", ".pcapng", ".cap"}:
+            raise ToolExecutionError("tshark requiere un archivo PCAP/PCAPNG local.")
+        return [binary, "-r", str(target), "-T", "json"]
     raise ToolExecutionError("Herramienta sin adaptador ejecutable.")
 
 
