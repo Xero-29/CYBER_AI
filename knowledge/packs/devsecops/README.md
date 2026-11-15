@@ -1,48 +1,53 @@
-# DevSecOps y supply chain — Paquete base
+# DevSecOps y seguridad de cadena de suministro — Guía de dominio
 
-**ID:** `devsecops` · **Versión:** 1.0.0 · **Idioma:** español · **Estado:** contenido propio inicial, incluido offline.
+**ID:** `devsecops` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio incluido offline.
 
 ## Propósito y límites
-DevSecOps y supply chain: DevSecOps y supply chain y su arquitectura, amenazas, controles, metodología y validación. Esta guía es base metodológica, no certificación ni enciclopedia. No concede permisos. Toda actividad activa requiere autorización explícita, alcance, ventana y criterios de parada.
+Integra seguridad verificable en diseño, código, dependencias, build, artefactos, despliegue y operación. El pipeline es un activo privilegiado: una modificación puede publicar código, firmar releases o acceder a secretos. La meta es evidencia reproducible, no acumular escáneres.
 
-## Competencias
-- Explicar arquitectura, componentes, flujos y límites de confianza.
-- Identificar activos, amenazas, vulnerabilidades, controles e impactos.
-- Diseñar prevención, detección, respuesta, recuperación y validación.
-- Seleccionar herramientas por riesgo, evidencia, coste y mantenimiento.
-- Documentar procedencia, versiones, incertidumbre y reproducibilidad.
+## Superficie y amenazas
+Revisar repositorios, ramas, CI runners, workflows, paquetes, registries, imágenes, artefactos, firmas, secretos, tokens OIDC, deploy keys y entornos. Riesgos: dependency confusion, typosquatting, acciones CI comprometidas, runner persistente, secretos expuestos, build no reproducible, artefactos sin procedencia y permisos excesivos.
 
-## Metodología reproducible
-1. Definir propietario, autorización, alcance y exclusiones.
-2. Inventariar activos, datos, dependencias y límites de confianza.
-3. Formular hipótesis, amenazas, controles y criterios de parada.
-4. Recopilar evidencia permitida con procedencia, fecha y hash.
-5. Elegir métodos de menor riesgo y registrar versiones/configuración.
-6. Comenzar en modo pasivo/local; pruebas activas solo con autorización explícita.
-7. Validar hallazgos de forma reproducible e independiente.
-8. Priorizar impacto, exposición, explotabilidad e incertidumbre.
-9. Recomendar controles verificables y retest.
-10. Registrar evidencias, limitaciones y riesgo residual.
+## Competencias específicas
+- Diseñar pipeline con identidad mínima y separación de entornos.
+- Integrar SAST, SCA, secret scanning, IaC scanning y container scanning.
+- Generar SBOM CycloneDX/SPDX y validar dependencias.
+- Firmar artefactos y generar attestations/provenance.
+- Usar dependencias fijadas, hashes y repositorios aprobados.
+- Proteger runners efímeros, OIDC y tokens de corta duración.
+- Aplicar policy-as-code y quality gates con excepciones.
+- Medir cobertura y falsos positivos.
 
-## Controles mínimos
-- Mínimo privilegio y separación análisis/ejecución.
-- Versiones exactas de herramientas, reglas, modelos y datasets.
-- Secretos fuera de código, prompts y logs; redacción antes de IA remota.
-- No confiar en una herramienta o modelo como prueba concluyente.
-- Preservar originales y registrar SHA-256.
-- Revisión humana antes de cambios o acciones activas.
+## Controles prioritarios
+- Permisos mínimos por job y workflow; evitar write-all.
+- Fijar acciones CI por commit SHA y dependencias por versión/hash.
+- Usar runners efímeros y aislar jobs no confiables.
+- No ejecutar código de PR no confiable con secretos de release.
+- Proteger secretos con OIDC/secret manager y rotación.
+- Generar SBOM, firmar artefactos y validar provenance.
+- Bloquear publicación si falla verificación de firma o política crítica.
+- Mantener logs de build, commit, runner y artefacto.
+- Aplicar branch protection y revisión independiente.
+
+## Metodología
+1. Modelar pipeline como sistema de producción con activos y privilegios.
+2. Inventariar workflows, permisos, dependencias y secretos.
+3. Analizar código, IaC, imágenes y dependencias.
+4. Revisar origen y pinning de acciones y paquetes.
+5. Generar SBOM y attestations de build.
+6. Definir gates según severidad y contexto.
+7. Probar en fork/laboratorio sin secretos productivos.
+8. Verificar artefacto publicado contra commit y provenance.
+9. Revisar excepciones, caducidad y drift.
 
 ## Laboratorio seguro
-Usar datos sintéticos, fixtures, aplicaciones deliberadamente vulnerables o máquinas virtuales aisladas. Sin credenciales reales. Debe ser reiniciable y reproducible. No ejecutar pruebas destructivas fuera de laboratorio desechable autorizado.
+Repositorio de prueba con workflow de lint, test, SCA, secret scan y SBOM. Generar artefacto firmado y comprobar que un cambio no aprobado falla el gate. No usar secretos de producción ni desplegar a entornos reales.
 
 ## Evaluación
-5 preguntas de fundamentos, 3 escenarios sintéticos, 2 ejercicios de evidencia/falsos positivos, 1 diseño de controles y 1 informe reproducible. Aprobación sugerida: ≥80%, sin errores críticos de alcance y con evidencia verificable.
+Cada release está ligado a commit, dependencias, runner y artefacto; SBOM disponible; firma verificable; permisos mínimos; excepciones justificadas.
 
-## Entregables
-Alcance y autorización; activos; método y versiones; evidencias con hashes; hallazgos con severidad/confianza; mitigaciones; retest y riesgo residual.
-
-## Fuentes externas
-Consultar `data/knowledge_sources/knowledge_catalog.json`. Las URLs catalogadas no implican descarga, licencia o ingestión. Verificar derechos, procedencia, versión, fecha, tamaño, hash y seguridad del extractor.
+## Referencias y herramientas
+SLSA, NIST SSDF, OpenSSF Scorecard, Sigstore, in-toto, SPDX, CycloneDX, Semgrep, Gitleaks, Syft, Grype, Trivy y Checkov.
 
 ## Instrucciones para agentes IA
-Lee este paquete antes de planificar tareas de esta especialidad. Reutiliza Skills verificadas con alcance coincidente. No inventes capacidades ni resultados. Si falta evidencia, dilo. No ejecutes acciones activas sin autorización. Cita fragmentos recuperados; no afirmes haber consultado contenido ausente.
+No ejecutes workflows ni publiques releases. Revisa permisos y procedencia antes de proponer automatización. Trata scripts de CI y acciones de terceros como código ejecutable.

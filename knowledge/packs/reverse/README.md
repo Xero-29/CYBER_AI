@@ -1,48 +1,52 @@
-# Ingeniería inversa — Paquete base
+# Ingeniería inversa — Guía de dominio
 
-**ID:** `reverse` · **Versión:** 1.0.0 · **Idioma:** español · **Estado:** contenido propio inicial, incluido offline.
+**ID:** `reverse` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio incluido offline.
 
 ## Propósito y límites
-Ingeniería inversa: Ingeniería inversa y su arquitectura, amenazas, controles, metodología y validación. Esta guía es base metodológica, no certificación ni enciclopedia. No concede permisos. Toda actividad activa requiere autorización explícita, alcance, ventana y criterios de parada.
+Analiza software compilado, firmware y protocolos para comprender comportamiento, compatibilidad, vulnerabilidades y procedencia. La ingeniería inversa puede ser legítima para defensa, interoperabilidad o investigación, pero requiere autorización y respeto a licencias, propiedad intelectual y privacidad.
 
-## Competencias
-- Explicar arquitectura, componentes, flujos y límites de confianza.
-- Identificar activos, amenazas, vulnerabilidades, controles e impactos.
-- Diseñar prevención, detección, respuesta, recuperación y validación.
-- Seleccionar herramientas por riesgo, evidencia, coste y mantenimiento.
-- Documentar procedencia, versiones, incertidumbre y reproducibilidad.
+## Superficie y artefactos
+Cubrir PE, ELF, Mach-O, bytecode, firmware, librerías, símbolos, tablas de importación, strings, recursos, formatos y protocolos. Distinguir análisis estático, dinámico, emulación y depuración. Los binarios desconocidos se tratan como hostiles y no se ejecutan en el host.
 
-## Metodología reproducible
-1. Definir propietario, autorización, alcance y exclusiones.
-2. Inventariar activos, datos, dependencias y límites de confianza.
-3. Formular hipótesis, amenazas, controles y criterios de parada.
-4. Recopilar evidencia permitida con procedencia, fecha y hash.
-5. Elegir métodos de menor riesgo y registrar versiones/configuración.
-6. Comenzar en modo pasivo/local; pruebas activas solo con autorización explícita.
-7. Validar hallazgos de forma reproducible e independiente.
-8. Priorizar impacto, exposición, explotabilidad e incertidumbre.
-9. Recomendar controles verificables y retest.
-10. Registrar evidencias, limitaciones y riesgo residual.
+## Competencias específicas
+- Identificar arquitectura, formato, ABI y dependencias.
+- Analizar headers, secciones, imports, símbolos y strings.
+- Reconstruir flujo de control, funciones y estructuras.
+- Usar desensamblado/decompilación sin asumir que el pseudocódigo es fuente original.
+- Reconocer packing, ofuscación, anti-debugging y checks de integridad.
+- Analizar firmware, particiones, boot chain y actualizaciones.
+- Crear pruebas de comportamiento en emulador o sandbox.
+- Documentar hallazgos con offsets, hashes y evidencia reproducible.
 
-## Controles mínimos
-- Mínimo privilegio y separación análisis/ejecución.
-- Versiones exactas de herramientas, reglas, modelos y datasets.
-- Secretos fuera de código, prompts y logs; redacción antes de IA remota.
-- No confiar en una herramienta o modelo como prueba concluyente.
-- Preservar originales y registrar SHA-256.
-- Revisión humana antes de cambios o acciones activas.
+## Controles y límites
+- Confirmar propiedad/autorización y objetivo de análisis.
+- Preservar hash del binario y copia original inmutable.
+- No ejecutar muestras desconocidas fuera de VM desechable.
+- No conectar muestras a Internet real; simular DNS/HTTP cuando sea necesario.
+- Limitar CPU, memoria, disco y tiempo.
+- Separar herramientas de análisis del entorno productivo.
+- No publicar claves, secretos ni datos personales hallados en binarios.
+- Respetar licencias y no redistribuir código propietario.
+
+## Metodología
+1. Registrar autorización, origen, hash y contexto.
+2. Identificar formato y arquitectura.
+3. Realizar triage estático y extraer metadatos.
+4. Construir hipótesis sobre funciones y flujo.
+5. Seleccionar emulación/depuración aislada si es imprescindible.
+6. Comparar comportamiento observado con hipótesis.
+7. Validar hallazgos en fixture mínimo.
+8. Preparar informe con offsets, referencias y limitaciones.
+9. Preservar artefactos y limpiar entorno.
 
 ## Laboratorio seguro
-Usar datos sintéticos, fixtures, aplicaciones deliberadamente vulnerables o máquinas virtuales aisladas. Sin credenciales reales. Debe ser reiniciable y reproducible. No ejecutar pruebas destructivas fuera de laboratorio desechable autorizado.
+Usar binarios de código abierto compilados localmente, crackmes educativos y firmware de demostración. Analizar funciones y formatos sin evadir licencias ni modificar dispositivos reales.
 
 ## Evaluación
-5 preguntas de fundamentos, 3 escenarios sintéticos, 2 ejercicios de evidencia/falsos positivos, 1 diseño de controles y 1 informe reproducible. Aprobación sugerida: ≥80%, sin errores críticos de alcance y con evidencia verificable.
+Hashes y cadena de custodia, hipótesis comprobables, evidencia por offset, reproducción controlada y separación entre observación e inferencia.
 
-## Entregables
-Alcance y autorización; activos; método y versiones; evidencias con hashes; hallazgos con severidad/confianza; mitigaciones; retest y riesgo residual.
-
-## Fuentes externas
-Consultar `data/knowledge_sources/knowledge_catalog.json`. Las URLs catalogadas no implican descarga, licencia o ingestión. Verificar derechos, procedencia, versión, fecha, tamaño, hash y seguridad del extractor.
+## Referencias y herramientas
+Ghidra, radare2, Binary Ninja, Capstone, QEMU, Binwalk, LLVM docs y formatos PE/ELF/Mach-O.
 
 ## Instrucciones para agentes IA
-Lee este paquete antes de planificar tareas de esta especialidad. Reutiliza Skills verificadas con alcance coincidente. No inventes capacidades ni resultados. Si falta evidencia, dilo. No ejecutes acciones activas sin autorización. Cita fragmentos recuperados; no afirmes haber consultado contenido ausente.
+No ejecutes binarios desconocidos. No generes instrucciones de explotación de dispositivos ajenos. Usa muestras sintéticas o código abierto y explica límites de la decompilación.

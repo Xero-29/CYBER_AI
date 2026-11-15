@@ -1,48 +1,52 @@
-# GRC, privacidad y auditoría — Paquete base
+# Gobierno, riesgo y cumplimiento — Guía de dominio
 
-**ID:** `governance` · **Versión:** 1.0.0 · **Idioma:** español · **Estado:** contenido propio inicial, incluido offline.
+**ID:** `governance` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio incluido offline.
 
 ## Propósito y límites
-GRC, privacidad y auditoría: GRC, privacidad y auditoría y su arquitectura, amenazas, controles, metodología y validación. Esta guía es base metodológica, no certificación ni enciclopedia. No concede permisos. Toda actividad activa requiere autorización explícita, alcance, ventana y criterios de parada.
+Conecta controles técnicos con responsabilidades, apetito de riesgo, obligaciones legales, auditoría y objetivos de negocio. El cumplimiento no demuestra por sí mismo seguridad; los controles deben ser efectivos, medibles y adecuados al contexto. La interpretación legal y regulatoria corresponde a especialistas competentes.
 
-## Competencias
-- Explicar arquitectura, componentes, flujos y límites de confianza.
-- Identificar activos, amenazas, vulnerabilidades, controles e impactos.
-- Diseñar prevención, detección, respuesta, recuperación y validación.
-- Seleccionar herramientas por riesgo, evidencia, coste y mantenimiento.
-- Documentar procedencia, versiones, incertidumbre y reproducibilidad.
+## Componentes de gobierno
+Inventariar políticas, estándares, procesos, activos, propietarios, terceros, riesgos, excepciones, auditorías, evidencias, métricas y planes de tratamiento. Mantener separación entre dueño del riesgo, implementador del control, auditor y aprobador. Registrar jurisdicción, alcance, versión del marco y fecha de evaluación.
 
-## Metodología reproducible
-1. Definir propietario, autorización, alcance y exclusiones.
-2. Inventariar activos, datos, dependencias y límites de confianza.
-3. Formular hipótesis, amenazas, controles y criterios de parada.
-4. Recopilar evidencia permitida con procedencia, fecha y hash.
-5. Elegir métodos de menor riesgo y registrar versiones/configuración.
-6. Comenzar en modo pasivo/local; pruebas activas solo con autorización explícita.
-7. Validar hallazgos de forma reproducible e independiente.
-8. Priorizar impacto, exposición, explotabilidad e incertidumbre.
-9. Recomendar controles verificables y retest.
-10. Registrar evidencias, limitaciones y riesgo residual.
+## Competencias específicas
+- Construir registro de riesgos con impacto, probabilidad, controles y residual.
+- Mapear controles a NIST CSF, ISO 27001, CIS y marcos sectoriales.
+- Definir políticas, estándares y procedimientos medibles.
+- Gestionar excepciones con compensaciones, dueño y vencimiento.
+- Evaluar proveedores, contratos, acceso y cadena de suministro.
+- Preparar evidencias de auditoría con trazabilidad y minimización.
+- Definir KPIs/KRIs y revisar eficacia de controles.
+- Integrar privacidad, continuidad, incidentes y gestión de cambios.
 
-## Controles mínimos
-- Mínimo privilegio y separación análisis/ejecución.
-- Versiones exactas de herramientas, reglas, modelos y datasets.
-- Secretos fuera de código, prompts y logs; redacción antes de IA remota.
-- No confiar en una herramienta o modelo como prueba concluyente.
-- Preservar originales y registrar SHA-256.
-- Revisión humana antes de cambios o acciones activas.
+## Controles de gobierno
+- Cada control tiene propietario, objetivo, evidencia, frecuencia y criterio de eficacia.
+- Los riesgos aceptados requieren autoridad, fecha de caducidad y revisión.
+- Los hallazgos se priorizan por riesgo, no solo por severidad técnica.
+- La evidencia debe ser íntegra, fechada, atribuible y protegida.
+- Separar funciones de desarrollo, operación, aprobación y auditoría.
+- Aplicar clasificación de información y retención.
+- Revisar contratos, subprocesadores, localización y notificación de incidentes.
+- Mantener plan de auditoría y seguimiento de acciones.
+
+## Metodología
+1. Definir contexto, alcance, jurisdicción y partes interesadas.
+2. Identificar activos, procesos y obligaciones aplicables.
+3. Evaluar riesgos y controles existentes con evidencia.
+4. Mapear requisitos y detectar brechas.
+5. Diseñar tratamiento con responsable, presupuesto y plazo.
+6. Aprobar excepciones y riesgo residual.
+7. Medir eficacia con indicadores y pruebas.
+8. Preparar auditoría con evidencias trazables.
+9. Revisar ante cambios de negocio, tecnología o regulación.
 
 ## Laboratorio seguro
-Usar datos sintéticos, fixtures, aplicaciones deliberadamente vulnerables o máquinas virtuales aisladas. Sin credenciales reales. Debe ser reiniciable y reproducible. No ejecutar pruebas destructivas fuera de laboratorio desechable autorizado.
+Organización ficticia con activos, riesgos y controles. Crear matriz de riesgos, declaración de aplicabilidad y plan de tratamiento. Simular auditoría interna con evidencia sintética y registrar no conformidades sin datos reales.
 
 ## Evaluación
-5 preguntas de fundamentos, 3 escenarios sintéticos, 2 ejercicios de evidencia/falsos positivos, 1 diseño de controles y 1 informe reproducible. Aprobación sugerida: ≥80%, sin errores críticos de alcance y con evidencia verificable.
+Riesgos tienen dueño; controles tienen evidencia; excepciones caducan; hallazgos cierran con retest; métricas muestran eficacia y la dirección revisa riesgo residual.
 
-## Entregables
-Alcance y autorización; activos; método y versiones; evidencias con hashes; hallazgos con severidad/confianza; mitigaciones; retest y riesgo residual.
-
-## Fuentes externas
-Consultar `data/knowledge_sources/knowledge_catalog.json`. Las URLs catalogadas no implican descarga, licencia o ingestión. Verificar derechos, procedencia, versión, fecha, tamaño, hash y seguridad del extractor.
+## Referencias
+ISO/IEC 27001/27002, NIST CSF 2.0, CIS Controls, COBIT, NIST Privacy Framework, ISO 22301 y CSA CCM.
 
 ## Instrucciones para agentes IA
-Lee este paquete antes de planificar tareas de esta especialidad. Reutiliza Skills verificadas con alcance coincidente. No inventes capacidades ni resultados. Si falta evidencia, dilo. No ejecutes acciones activas sin autorización. Cita fragmentos recuperados; no afirmes haber consultado contenido ausente.
+No declares cumplimiento o certificación. Cita versión y alcance del marco. Diferencia evidencia, autoevaluación y auditoría independiente. No inventes obligaciones legales ni fechas regulatorias.

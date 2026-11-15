@@ -1,48 +1,52 @@
-# Gestión de vulnerabilidades — Paquete base
+# Gestión de vulnerabilidades — Guía de dominio
 
-**ID:** `vuln_management` · **Versión:** 1.0.0 · **Idioma:** español · **Estado:** contenido propio inicial, incluido offline.
+**ID:** `vuln_management` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio incluido offline.
 
 ## Propósito y límites
-Gestión de vulnerabilidades: Gestión de vulnerabilidades y su arquitectura, amenazas, controles, metodología y validación. Esta guía es base metodológica, no certificación ni enciclopedia. No concede permisos. Toda actividad activa requiere autorización explícita, alcance, ventana y criterios de parada.
+Gestiona exposición técnica desde descubrimiento hasta remediación y verificación. Un hallazgo no es automáticamente un riesgo crítico: considerar activo, exposición, explotabilidad, impacto, controles compensatorios y contexto de negocio. Escaneos activos requieren alcance autorizado y límites.
 
-## Competencias
-- Explicar arquitectura, componentes, flujos y límites de confianza.
-- Identificar activos, amenazas, vulnerabilidades, controles e impactos.
-- Diseñar prevención, detección, respuesta, recuperación y validación.
-- Seleccionar herramientas por riesgo, evidencia, coste y mantenimiento.
-- Documentar procedencia, versiones, incertidumbre y reproducibilidad.
+## Ciclo de vida
+Inventario de activos, descubrimiento, identificación, validación, priorización, asignación, remediación, retest, excepción y cierre. Correlacionar CVE, CWE, CVSS, EPSS, CISA KEV, SBOM, versión instalada y exposición real. Evitar duplicados por producto, ruta, paquete o causa raíz.
 
-## Metodología reproducible
-1. Definir propietario, autorización, alcance y exclusiones.
-2. Inventariar activos, datos, dependencias y límites de confianza.
-3. Formular hipótesis, amenazas, controles y criterios de parada.
-4. Recopilar evidencia permitida con procedencia, fecha y hash.
-5. Elegir métodos de menor riesgo y registrar versiones/configuración.
-6. Comenzar en modo pasivo/local; pruebas activas solo con autorización explícita.
-7. Validar hallazgos de forma reproducible e independiente.
-8. Priorizar impacto, exposición, explotabilidad e incertidumbre.
-9. Recomendar controles verificables y retest.
-10. Registrar evidencias, limitaciones y riesgo residual.
+## Competencias específicas
+- Normalizar hallazgos de SAST, DAST, SCA, IaC, cloud y pentest.
+- Validar falsos positivos y reproducir sin impacto.
+- Priorizar por KEV, EPSS, CVSS, exposición y criticidad del activo.
+- Definir SLA por riesgo y excepciones aprobadas.
+- Relacionar vulnerabilidad con SBOM y dependencias transitivas.
+- Gestionar vulnerabilidades de terceros y end-of-life.
+- Medir tiempo de remediación, recurrencia y backlog.
+- Verificar cierre mediante retest y evidencia.
 
-## Controles mínimos
-- Mínimo privilegio y separación análisis/ejecución.
-- Versiones exactas de herramientas, reglas, modelos y datasets.
-- Secretos fuera de código, prompts y logs; redacción antes de IA remota.
-- No confiar en una herramienta o modelo como prueba concluyente.
-- Preservar originales y registrar SHA-256.
-- Revisión humana antes de cambios o acciones activas.
+## Controles prioritarios
+- Inventario continuo con dueño y criticidad.
+- Escaneo autenticado cuando esté autorizado y sea seguro.
+- Priorización contextual y fecha límite según riesgo.
+- Parches probados en staging y plan de rollback.
+- Mitigación temporal cuando el parche no sea viable.
+- Excepciones con aprobador, compensación y expiración.
+- Retest independiente y cierre con evidencia.
+- Alertas para activos expuestos con CVE explotada activamente.
+
+## Metodología
+1. Importar hallazgos y normalizar identificadores.
+2. Deduplicar por causa raíz y activo.
+3. Verificar versión, configuración y exposición.
+4. Enriquecer con CVSS, EPSS, KEV y criticidad.
+5. Priorizar y asignar propietario.
+6. Definir remediación o mitigación temporal.
+7. Probar cambio y rollback.
+8. Retest con mismo criterio de detección.
+9. Cerrar o renovar excepción con justificación.
 
 ## Laboratorio seguro
-Usar datos sintéticos, fixtures, aplicaciones deliberadamente vulnerables o máquinas virtuales aisladas. Sin credenciales reales. Debe ser reiniciable y reproducible. No ejecutar pruebas destructivas fuera de laboratorio desechable autorizado.
+Repositorio de prueba con dependencias vulnerables conocidas y fixtures locales. Ejecutar SCA/SAST, priorizar usando datos de vulnerabilidad sintéticos y corregir versión. No escanear rangos externos ni explotar CVEs en producción.
 
 ## Evaluación
-5 preguntas de fundamentos, 3 escenarios sintéticos, 2 ejercicios de evidencia/falsos positivos, 1 diseño de controles y 1 informe reproducible. Aprobación sugerida: ≥80%, sin errores críticos de alcance y con evidencia verificable.
+Hallazgos tienen propietario, prioridad contextual, SLA, evidencia, retest y cierre. Métricas distinguen tiempo de detección, remediación y exposición real.
 
-## Entregables
-Alcance y autorización; activos; método y versiones; evidencias con hashes; hallazgos con severidad/confianza; mitigaciones; retest y riesgo residual.
-
-## Fuentes externas
-Consultar `data/knowledge_sources/knowledge_catalog.json`. Las URLs catalogadas no implican descarga, licencia o ingestión. Verificar derechos, procedencia, versión, fecha, tamaño, hash y seguridad del extractor.
+## Referencias y herramientas
+FIRST CVSS, EPSS, CISA KEV, NVD, CWE, OSV, OWASP, DefectDojo, Trivy, Grype, pip-audit y Semgrep.
 
 ## Instrucciones para agentes IA
-Lee este paquete antes de planificar tareas de esta especialidad. Reutiliza Skills verificadas con alcance coincidente. No inventes capacidades ni resultados. Si falta evidencia, dilo. No ejecutes acciones activas sin autorización. Cita fragmentos recuperados; no afirmes haber consultado contenido ausente.
+No uses CVSS como única prioridad. No ejecutes PoC contra producción. Distingue hallazgo confirmado, potencial y falso positivo; documenta la evidencia que falta.
