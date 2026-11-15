@@ -40,6 +40,8 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 - 48 paquetes base propios en español incluidos en `knowledge/packs/`, con competencias, metodología, controles, laboratorio y evaluación.
 - Las referencias externas siguen pendientes de licencia/procedencia y no se declaran descargadas ni ingeridas.
 
+- `knowledge_bootstrap.py` permite validar e indexar los paquetes offline con ECO; el dry-run no requiere IA y la ingestión real necesita proveedor de embeddings configurado. Se debe ejecutar una vez tras configurarlo; no se indexa automáticamente solo por conectar un chat.
+
 ## Pendientes de cierre
 
 1. **Ejecución y aprendizaje:** completar captura de inicio/fin y cobertura de fallos en todos los ejecutores; almacenar artefactos en repositorio controlado; checkpoints firmados externos; costes reales por proveedor; retención y privacidad.
