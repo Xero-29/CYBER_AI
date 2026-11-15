@@ -242,6 +242,19 @@ def store_chunks(chunks):
     return [item[1] for item in prepared]
 
 
+def document_chunk_count(document_id):
+    """Cuenta fragmentos publicados para reconocer reintentos idempotentes."""
+    if not isinstance(document_id, str) or not document_id.strip():
+        raise ValueError("document_id es obligatorio.")
+    initialize()
+    with database() as db:
+        row = db.execute(
+            "SELECT COUNT(*) AS total FROM knowledge_chunks WHERE document_id = ?",
+            (document_id.strip(),),
+        ).fetchone()
+    return int(row["total"])
+
+
 def store_chunk(**kwargs):
     """Compatibilidad: almacena un único fragmento en una transacción."""
     return store_chunks([kwargs])[0]

@@ -11,7 +11,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 from knowledge_embeddings import generate_embeddings
-from knowledge_library import store_chunks
+from knowledge_library import store_chunks, document_chunk_count
 
 PROJECT = Path(__file__).resolve().parent
 MAX_INPUT_BYTES = 100 * 1024 * 1024
@@ -327,8 +327,9 @@ def ingest_document(
     tags=None,
     batch_size=8,
     max_chars=1200,
+    document_id=None,
 ):
-    """Lee un documento, genera sus embeddings y almacena los fragmentos."""
+    """Lee e indexa un documento con soporte para reintentos idempotentes."""
     raw_file_path = Path(file_path).expanduser()
     if raw_file_path.is_symlink():
         raise ValueError("No se permiten enlaces simbólicos como documentos de entrada.")
@@ -343,13 +344,27 @@ def ingest_document(
     text = extract_document_text(file_path)
 
     chunks = split_text(text, max_chars=max_chars)
-    document_id = uuid.uuid4().hex
+    if document_id is None:
+        document_id = uuid.uuid4().hex
+    elif not isinstance(document_id, str) or not document_id.strip() or len(document_id) > 128:
+        raise ValueError("document_id debe ser texto no vacío de hasta 128 caracteres.")
+    else:
+        document_id = document_id.strip()
     source = source or file_path.name
 
     # La huella permite identificar el documento importado en el informe.
-    document_sha256 = hashlib.sha256(
-        text.encode("utf-8")
-    ).hexdigest()
+    document_sha256 = hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+    # Un reintento tras un corte reconoce el documento ya publicado.
+    existing_chunks = document_chunk_count(document_id)
+    if existing_chunks:
+        return {
+            "document_id": document_id, "document_sha256": document_sha256,
+            "title": title, "source": source, "license": license,
+            "category": category, "visibility": visibility,
+            "tenant_id": tenant_id, "chunks": existing_chunks,
+            "chunk_ids": [], "already_present": True,
+        }
 
     pending_chunks = []
     total = len(chunks)

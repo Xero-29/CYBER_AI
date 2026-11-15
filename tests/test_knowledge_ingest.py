@@ -187,5 +187,31 @@ class TestKnowledgeIngest(unittest.TestCase):
             )
 
 
+
+    def test_deterministic_document_id_skips_existing_chunks(self):
+        with tempfile.TemporaryDirectory() as temp:
+            document = Path(temp) / "existing.md"
+            document.write_text("# Existing\nContenido", encoding="utf-8")
+            with patch.object(ingest, "document_chunk_count", return_value=3), \
+                 patch.object(ingest, "generate_embeddings") as embeddings, \
+                 patch.object(ingest, "store_chunks") as store:
+                result = ingest.ingest_document(
+                    document, title="Existente", category="test",
+                    document_id="stable-document-id",
+                )
+            self.assertTrue(result["already_present"])
+            self.assertEqual(result["chunks"], 3)
+            embeddings.assert_not_called()
+            store.assert_not_called()
+
+    def test_invalid_deterministic_document_id_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temp:
+            document = Path(temp) / "input.md"
+            document.write_text("contenido", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "document_id"):
+                ingest.ingest_document(
+                    document, title="x", category="test", document_id="  "
+                )
+
 if __name__ == "__main__":
     unittest.main()

@@ -335,6 +335,27 @@ def resource_inventory():
 
     return [dict(row) for row in rows]
 
+PROCESSING_STATUSES = {"discovered", "processing", "completed", "failed"}
+
+
+def update_resource_processing_status(resource_id, status):
+    """Actualiza el estado de ingestión de un recurso registrado."""
+    if not isinstance(resource_id, str) or not resource_id.strip():
+        raise ValueError("resource_id es obligatorio.")
+    if status not in PROCESSING_STATUSES:
+        raise ValueError("Estado de procesamiento inválido.")
+    initialize()
+    with connect() as db:
+        cursor = db.execute(
+            "UPDATE knowledge_resources SET processing_status = ?, updated_at = ? "
+            "WHERE resource_id = ?",
+            (status, utc_now(), resource_id.strip()),
+        )
+        if cursor.rowcount != 1:
+            raise ValueError("El recurso indicado no existe.")
+    return True
+
+
 CLASSIFICATION_STATUSES = {
     "pending", "provisional", "verified", "rejected"
 }
