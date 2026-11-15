@@ -126,7 +126,7 @@ def extract_document_text(file_path):
                     if not line:
                         break
                     if index > 200_000 or len(line) > MAX_EXTRACTED_CHARS:
-                        raise ValueError("El JSONL supera el límite de registros o caracteres.")
+                        raise ValueError("El JSONL supera el límite de 200.000 registros o 10 millones de caracteres.")
                     if line.strip():
                         record = json.loads(line)
                         total = _append_bounded(
