@@ -15,7 +15,7 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 
 - Commit `819645225ba47549e90e5d6092f388594241b739`: el timeout del escáner Nuclei termina el grupo completo de procesos en POSIX y usa terminación del proceso en plataformas no POSIX; se añadieron pruebas para ambas rutas.
 - GitHub Actions Python tests: **success**, 257 pruebas, incluyendo compilación, autopruebas y suite completa.
-- Docker sandbox: última ejecución satisfactoria en el commit `26bc1f32c5788117a3be59b5be9f46e04f76ece1`; no se volvió a ejecutar para el commit de Nuclei porque el workflow de Docker no se activó con esos cambios.
+- Docker sandbox: **success** también en el commit `819645225ba47549e90e5d6092f388594241b739`; ambos workflows (Python y Docker) pasaron en esa revisión.
 - La validación CI no equivale a pruebas con Ollama, proveedores remotos, objetivos reales autorizados, cargas adversariales ni aislamiento microVM.
 
 ## Capacidades existentes (no equivalen a cierre institucional)
