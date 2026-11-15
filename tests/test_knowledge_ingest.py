@@ -213,5 +213,38 @@ class TestKnowledgeIngest(unittest.TestCase):
                     document, title="x", category="test", document_id="  "
                 )
 
+
+    def test_ingest_reindexes_when_embedding_space_changes(self):
+        with tempfile.TemporaryDirectory() as temp:
+            document = Path(temp) / "changed-model.md"
+            document.write_text("# Reindexar\nTexto de prueba", encoding="utf-8")
+            with patch.object(ingest, "document_chunk_count", return_value=0), \
+                 patch.object(ingest, "generate_embeddings", return_value={
+                     "model": "model-v2", "embedding_space": "provider::model-v2",
+                     "embeddings": [[1.0, 0.0]],
+                 }), patch.object(ingest, "store_chunks", return_value=[{"id": "chunk"}]) as store:
+                result = ingest.ingest_document(
+                    document, title="Modelo nuevo", category="test",
+                    document_id="stable-id", expected_embedding_model="provider::model-v2",
+                )
+            self.assertEqual(result["chunks"], 1)
+            self.assertEqual(store.call_args.args[0][0]["embedding_model"], "provider::model-v2")
+
+    def test_ingest_rejects_unexpected_embedding_space(self):
+        with tempfile.TemporaryDirectory() as temp:
+            document = Path(temp) / "wrong-model.md"
+            document.write_text("# Wrong\nTexto de prueba", encoding="utf-8")
+            with patch.object(ingest, "document_chunk_count", return_value=0), \
+                 patch.object(ingest, "generate_embeddings", return_value={
+                     "model": "model-v1", "embedding_space": "provider::model-v1",
+                     "embeddings": [[1.0, 0.0]],
+                 }), patch.object(ingest, "store_chunks") as store:
+                with self.assertRaisesRegex(RuntimeError, "cambió de espacio"):
+                    ingest.ingest_document(
+                        document, title="Modelo incorrecto", category="test",
+                        expected_embedding_model="provider::model-v2",
+                    )
+            store.assert_not_called()
+
 if __name__ == "__main__":
     unittest.main()

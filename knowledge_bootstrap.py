@@ -65,6 +65,8 @@ def _bootstrap_locked(packs, dry_run=False):
     if dry_run:
         return {"dry_run": True, "selected": len(packs), "items": packs,
                 "ingested": [], "skipped": [], "failed": []}
+    from knowledge_embeddings import expected_embedding_space
+    embedding_model = expected_embedding_space("ECO")
     from knowledge_ingest import ingest_document
     from knowledge_library import document_chunk_count
     from knowledge_registry import (
@@ -82,7 +84,7 @@ def _bootstrap_locked(packs, dry_run=False):
             previous = existing.get(str(pack["path"]))
             if (previous and previous.get("current_sha256") == pack["sha256"]
                     and previous.get("processing_status") == "completed"
-                    and document_chunk_count(pack["document_id"]) > 0):
+                    and document_chunk_count(pack["document_id"], embedding_model) > 0):
                 skipped.append(pack["id"])
                 continue
             registered = register_resource(
@@ -104,8 +106,9 @@ def _bootstrap_locked(packs, dry_run=False):
                 license="UNSPECIFIED", visibility="shared",
                 tags=["cyber_ai", "offline_pack", pack["id"]],
                 document_id=pack["document_id"],
+                expected_embedding_model=embedding_model,
             )
-            if result["chunks"] < 1 or document_chunk_count(pack["document_id"]) < 1:
+            if result["chunks"] < 1 or document_chunk_count(pack["document_id"], embedding_model) < 1:
                 raise RuntimeError("La ingestión no publicó fragmentos verificables.")
             update_resource_processing_status(resource_id, "completed")
             ingested.append({

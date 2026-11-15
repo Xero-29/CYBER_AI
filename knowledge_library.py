@@ -242,16 +242,21 @@ def store_chunks(chunks):
     return [item[1] for item in prepared]
 
 
-def document_chunk_count(document_id):
+def document_chunk_count(document_id, embedding_model=None):
     """Cuenta fragmentos publicados para reconocer reintentos idempotentes."""
     if not isinstance(document_id, str) or not document_id.strip():
         raise ValueError("document_id es obligatorio.")
     initialize()
+    if embedding_model is not None:
+        if not isinstance(embedding_model, str) or not embedding_model.strip():
+            raise ValueError("embedding_model debe ser texto no vacío.")
+        query = "SELECT COUNT(*) AS total FROM knowledge_chunks WHERE document_id = ? AND embedding_model = ?"
+        parameters = (document_id.strip(), embedding_model.strip())
+    else:
+        query = "SELECT COUNT(*) AS total FROM knowledge_chunks WHERE document_id = ?"
+        parameters = (document_id.strip(),)
     with database() as db:
-        row = db.execute(
-            "SELECT COUNT(*) AS total FROM knowledge_chunks WHERE document_id = ?",
-            (document_id.strip(),),
-        ).fetchone()
+        row = db.execute(query, parameters).fetchone()
     return int(row["total"])
 
 

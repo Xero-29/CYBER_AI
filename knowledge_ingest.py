@@ -328,6 +328,7 @@ def ingest_document(
     batch_size=8,
     max_chars=1200,
     document_id=None,
+    expected_embedding_model=None,
 ):
     """Lee e indexa un documento con soporte para reintentos idempotentes."""
     raw_file_path = Path(file_path).expanduser()
@@ -356,7 +357,9 @@ def ingest_document(
     document_sha256 = hashlib.sha256(text.encode("utf-8")).hexdigest()
 
     # Un reintento tras un corte reconoce el documento ya publicado.
-    existing_chunks = document_chunk_count(document_id)
+    if expected_embedding_model is not None and (not isinstance(expected_embedding_model, str) or not expected_embedding_model.strip()):
+        raise ValueError("expected_embedding_model debe ser texto no vacío.")
+    existing_chunks = document_chunk_count(document_id, expected_embedding_model)
     if existing_chunks:
         return {
             "document_id": document_id, "document_sha256": document_sha256,
@@ -375,6 +378,10 @@ def ingest_document(
         # ECO genera un vector por fragmento en una petición por lote.
         result = generate_embeddings(batch, agent_name="ECO")
 
+        actual_embedding_model = result.get("embedding_space", result["model"])
+        if expected_embedding_model is not None and actual_embedding_model != expected_embedding_model:
+            raise RuntimeError("El proveedor de embeddings cambió de espacio vectorial durante la ingestión.")
+
         if len(result["embeddings"]) != len(batch):
             raise RuntimeError(
                 "La cantidad de embeddings no coincide con los fragmentos."
@@ -392,7 +399,7 @@ def ingest_document(
                 "category": category,
                 "content": chunk,
                 "embedding": vector,
-                "embedding_model": result.get("embedding_space", result["model"]),
+                "embedding_model": actual_embedding_model,
                 "document_id": document_id,
                 "chunk_index": index,
                 "tags": tags,

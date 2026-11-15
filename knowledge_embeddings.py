@@ -5,8 +5,21 @@ import fcntl
 
 from agent_runner import LOCK_FILE, unload_other_models
 from model_memory_manager import load_config, resolve_agent
-from llm_providers import resolve_provider, resolve_model, request as provider_request, installed_models as provider_models
+from llm_providers import resolve_provider, resolve_model, request as provider_request, installed_models as provider_models, provider_capabilities
 from knowledge_library import validate_vector
+
+
+def expected_embedding_space(agent_name="ECO"):
+    """Resuelve el espacio vectorial configurado sin iniciar llamadas de red."""
+    config = load_config()
+    name, agent = resolve_agent(agent_name, config)
+    if agent.get("type") != "embeddings":
+        raise ValueError(f"{name} no es un especialista de embeddings.")
+    provider = resolve_provider(config, agent)
+    if "embeddings" not in provider_capabilities(provider):
+        raise ValueError(f"El proveedor {provider.get('name')} no ofrece embeddings.")
+    model = resolve_model(provider, agent, name)
+    return model if provider["protocol"] == "ollama" else f"{provider['name']}::{model}"
 
 
 def generate_embeddings(texts, agent_name="ECO"):

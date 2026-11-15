@@ -43,5 +43,28 @@ class KnowledgeEmbeddingProviderTests(unittest.TestCase):
         self._run("ollama", "ollama", "selected-embedding-model")
 
 
+
+    def test_expected_embedding_space_is_resolved_without_provider_network_call(self):
+        provider = {"name": "openai", "protocol": "openai"}
+        agent = {"type": "embeddings"}
+        with patch.object(knowledge_embeddings, "load_config", return_value={}), \
+             patch.object(knowledge_embeddings, "resolve_agent", return_value=("ECO", agent)), \
+             patch.object(knowledge_embeddings, "resolve_provider", return_value=provider), \
+             patch.object(knowledge_embeddings, "provider_capabilities", return_value=["chat", "embeddings"]), \
+             patch.object(knowledge_embeddings, "resolve_model", return_value="embed-v2"):
+            self.assertEqual(
+                knowledge_embeddings.expected_embedding_space(),
+                "openai::embed-v2",
+            )
+
+    def test_expected_embedding_space_rejects_chat_only_provider(self):
+        provider = {"name": "anthropic", "protocol": "anthropic"}
+        with patch.object(knowledge_embeddings, "load_config", return_value={}), \
+             patch.object(knowledge_embeddings, "resolve_agent", return_value=("ECO", {"type": "embeddings"})), \
+             patch.object(knowledge_embeddings, "resolve_provider", return_value=provider), \
+             patch.object(knowledge_embeddings, "provider_capabilities", return_value=["chat"]):
+            with self.assertRaisesRegex(ValueError, "no ofrece embeddings"):
+                knowledge_embeddings.expected_embedding_space()
+
 if __name__ == "__main__":
     unittest.main()
