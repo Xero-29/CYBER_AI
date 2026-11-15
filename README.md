@@ -107,6 +107,15 @@ La imagen Docker actual solo incluye Ruff y Bandit. Semgrep, Syft y Trivy están
 
 El repositorio incluye paquetes metodológicos propios en español para todas las especialidades del catálogo. Consulta `knowledge/packs/manifest.json` y `knowledge/packs/<area>/README.md`. Son una base inicial, no una enciclopedia ni sustituyen corpus especializados. Las referencias externas solo se descargan tras validar licencia, procedencia e integridad.
 
+Después de configurar un proveedor con embeddings, valida e indexa la biblioteca offline:
+
+```bash
+python knowledge_bootstrap.py --dry-run
+python knowledge_bootstrap.py
+```
+
+La primera orden valida rutas y hashes sin IA ni escrituras. La segunda genera embeddings con ECO, ingiere paquetes nuevos/modificados y registra hash y clasificación. Anthropic está integrado para chat, no para embeddings; si lo usas, configura además un proveedor compatible de embeddings.
+
 ## Conocimiento y Skills
 
 - Ingesta TXT, Markdown, HTML, CSV, JSON/JSONL y código: disponible con las dependencias base. PDF, DOCX, XLSX y PPTX requieren `pip install -r requirements-documents.txt`. Los PDF escaneados necesitan OCR externo; el importador no ejecuta OCR.
