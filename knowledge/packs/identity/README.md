@@ -1,48 +1,54 @@
-# Identidad y acceso — Paquete base
+# Gestión de identidad y acceso — Guía de dominio
 
-**ID:** `identity` · **Versión:** 1.0.0 · **Idioma:** español · **Estado:** contenido propio inicial, incluido offline.
+**ID:** `identity` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio incluido offline.
 
 ## Propósito y límites
-Identidad y acceso: Identidad y acceso y su arquitectura, amenazas, controles, metodología y validación. Esta guía es base metodológica, no certificación ni enciclopedia. No concede permisos. Toda actividad activa requiere autorización explícita, alcance, ventana y criterios de parada.
+Protege identidades humanas, de servicio, workloads, dispositivos y terceros a lo largo de su ciclo de vida. IAM es plano de control: errores en autenticación, autorización, federación, aprovisionamiento o recuperación pueden comprometer todo el entorno.
 
-## Competencias
-- Explicar arquitectura, componentes, flujos y límites de confianza.
-- Identificar activos, amenazas, vulnerabilidades, controles e impactos.
-- Diseñar prevención, detección, respuesta, recuperación y validación.
-- Seleccionar herramientas por riesgo, evidencia, coste y mantenimiento.
-- Documentar procedencia, versiones, incertidumbre y reproducibilidad.
+## Modelo y amenazas
+Inventariar IdP, directorios, MFA, SSO, OAuth/OIDC, SAML, SCIM, PAM, cuentas de servicio, secretos, roles, grupos, dispositivos y accesos de terceros. Amenazas: robo de sesión, phishing, MFA fatigue, token replay, consent phishing, privilegios persistentes, cuentas huérfanas, secretos estáticos, abuso de federación y recuperación de cuenta débil.
 
-## Metodología reproducible
-1. Definir propietario, autorización, alcance y exclusiones.
-2. Inventariar activos, datos, dependencias y límites de confianza.
-3. Formular hipótesis, amenazas, controles y criterios de parada.
-4. Recopilar evidencia permitida con procedencia, fecha y hash.
-5. Elegir métodos de menor riesgo y registrar versiones/configuración.
-6. Comenzar en modo pasivo/local; pruebas activas solo con autorización explícita.
-7. Validar hallazgos de forma reproducible e independiente.
-8. Priorizar impacto, exposición, explotabilidad e incertidumbre.
-9. Recomendar controles verificables y retest.
-10. Registrar evidencias, limitaciones y riesgo residual.
+## Competencias específicas
+- Diseñar autenticación adaptativa y MFA resistente a phishing.
+- Diferenciar autenticación, autorización, federación y aprovisionamiento.
+- Configurar OAuth/OIDC con PKCE, redirect URI estricta y scopes mínimos.
+- Aplicar RBAC/ABAC y revisión periódica de privilegios.
+- Gestionar ciclo Joiner-Mover-Leaver y acceso temporal.
+- Proteger identidades de servicio y workload con credenciales efímeras.
+- Diseñar PAM, break-glass y doble control.
+- Monitorizar eventos de login, cambios de rol, tokens y sesiones.
 
-## Controles mínimos
-- Mínimo privilegio y separación análisis/ejecución.
-- Versiones exactas de herramientas, reglas, modelos y datasets.
-- Secretos fuera de código, prompts y logs; redacción antes de IA remota.
-- No confiar en una herramienta o modelo como prueba concluyente.
-- Preservar originales y registrar SHA-256.
-- Revisión humana antes de cambios o acciones activas.
+## Controles prioritarios
+- Preferir passkeys/FIDO2 y MFA resistente a phishing para cuentas privilegiadas.
+- Deshabilitar autenticación heredada y revisar excepciones.
+- Aplicar acceso condicional por riesgo, dispositivo y contexto.
+- Exigir consentimiento mínimo y revisar aplicaciones OAuth.
+- Usar tokens de corta duración, rotación y revocación.
+- Eliminar cuentas huérfanas y cuentas compartidas.
+- Separar cuentas de administración y uso diario.
+- Gestionar secretos de servicio en vault y rotar automáticamente.
+- Revisar permisos y membresías con recertificación periódica.
+- Mantener cuentas break-glass controladas, alertadas y probadas.
+
+## Metodología
+1. Inventariar identidades, roles, grupos, aplicaciones y proveedores.
+2. Mapear flujos de autenticación, autorización y aprovisionamiento.
+3. Revisar MFA, políticas de sesión, recuperación y federación.
+4. Detectar privilegios excesivos y cuentas sin propietario.
+5. Revisar OAuth apps, secretos, certificados y tokens.
+6. Validar Joiner-Mover-Leaver y revocación de acceso.
+7. Simular escenarios de compromiso con identidades ficticias.
+8. Medir cobertura MFA, cuentas privilegiadas y tiempo de revocación.
+9. Documentar excepciones con vencimiento y dueño.
 
 ## Laboratorio seguro
-Usar datos sintéticos, fixtures, aplicaciones deliberadamente vulnerables o máquinas virtuales aisladas. Sin credenciales reales. Debe ser reiniciable y reproducible. No ejecutar pruebas destructivas fuera de laboratorio desechable autorizado.
+IdP de prueba con dos aplicaciones, roles de lector/admin, cuenta de servicio y usuarios sintéticos. Probar PKCE, redirect URI incorrecta, expiración de sesión, revocación, MFA y baja de usuario. No usar cuentas corporativas reales.
 
 ## Evaluación
-5 preguntas de fundamentos, 3 escenarios sintéticos, 2 ejercicios de evidencia/falsos positivos, 1 diseño de controles y 1 informe reproducible. Aprobación sugerida: ≥80%, sin errores críticos de alcance y con evidencia verificable.
+100% de identidades críticas con propietario; privilegios revisados; MFA adecuado; credenciales temporales; baja de acceso medible; eventos auditables.
 
-## Entregables
-Alcance y autorización; activos; método y versiones; evidencias con hashes; hallazgos con severidad/confianza; mitigaciones; retest y riesgo residual.
-
-## Fuentes externas
-Consultar `data/knowledge_sources/knowledge_catalog.json`. Las URLs catalogadas no implican descarga, licencia o ingestión. Verificar derechos, procedencia, versión, fecha, tamaño, hash y seguridad del extractor.
+## Referencias y herramientas
+NIST SP 800-63, NIST SP 800-207, OAuth 2.1, OpenID Connect, SAML, SCIM, FIDO Alliance, CIS Controls y MITRE ATT&CK.
 
 ## Instrucciones para agentes IA
-Lee este paquete antes de planificar tareas de esta especialidad. Reutiliza Skills verificadas con alcance coincidente. No inventes capacidades ni resultados. Si falta evidencia, dilo. No ejecutes acciones activas sin autorización. Cita fragmentos recuperados; no afirmes haber consultado contenido ausente.
+No solicites contraseñas ni códigos MFA. No desactives controles de autenticación para “probar”. Utiliza identidades sintéticas y explica los efectos de cada cambio.

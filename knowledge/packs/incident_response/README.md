@@ -1,48 +1,53 @@
-# Respuesta a incidentes — Paquete base
+# Respuesta a incidentes — Guía de dominio
 
-**ID:** `incident_response` · **Versión:** 1.0.0 · **Idioma:** español · **Estado:** contenido propio inicial, incluido offline.
+**ID:** `incident_response` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio incluido offline.
 
 ## Propósito y límites
-Respuesta a incidentes: Respuesta a incidentes y su arquitectura, amenazas, controles, metodología y validación. Esta guía es base metodológica, no certificación ni enciclopedia. No concede permisos. Toda actividad activa requiere autorización explícita, alcance, ventana y criterios de parada.
+Coordina preparación, detección, análisis, contención, erradicación, recuperación y aprendizaje. El objetivo es limitar daño y restaurar operaciones con seguridad, no ejecutar acciones impulsivas. La respuesta debe integrar SOC, TI, legal, privacidad, negocio, comunicaciones y proveedores.
 
-## Competencias
-- Explicar arquitectura, componentes, flujos y límites de confianza.
-- Identificar activos, amenazas, vulnerabilidades, controles e impactos.
-- Diseñar prevención, detección, respuesta, recuperación y validación.
-- Seleccionar herramientas por riesgo, evidencia, coste y mantenimiento.
-- Documentar procedencia, versiones, incertidumbre y reproducibilidad.
+## Tipos de incidente
+Preparar escenarios de ransomware, compromiso de identidad, fuga de datos, malware, abuso cloud, compromiso de proveedor, DDoS, insider, pérdida de dispositivo y vulnerabilidad explotada. Clasificar por impacto en confidencialidad, integridad, disponibilidad, seguridad física, privacidad y obligaciones regulatorias.
 
-## Metodología reproducible
-1. Definir propietario, autorización, alcance y exclusiones.
-2. Inventariar activos, datos, dependencias y límites de confianza.
-3. Formular hipótesis, amenazas, controles y criterios de parada.
-4. Recopilar evidencia permitida con procedencia, fecha y hash.
-5. Elegir métodos de menor riesgo y registrar versiones/configuración.
-6. Comenzar en modo pasivo/local; pruebas activas solo con autorización explícita.
-7. Validar hallazgos de forma reproducible e independiente.
-8. Priorizar impacto, exposición, explotabilidad e incertidumbre.
-9. Recomendar controles verificables y retest.
-10. Registrar evidencias, limitaciones y riesgo residual.
+## Competencias específicas
+- Definir severidad, roles, escalamiento y autoridad de decisión.
+- Construir línea temporal y alcance con evidencia.
+- Preservar logs y sistemas críticos antes de cambios irreversibles.
+- Elegir contención proporcional y reversible.
+- Erradicar persistencia, credenciales comprometidas y rutas de acceso.
+- Recuperar desde fuentes verificadas y monitorizar reinfección.
+- Gestionar comunicación, notificación y cadena de custodia.
+- Ejecutar postmortem sin culpa y convertir hallazgos en controles.
 
-## Controles mínimos
-- Mínimo privilegio y separación análisis/ejecución.
-- Versiones exactas de herramientas, reglas, modelos y datasets.
-- Secretos fuera de código, prompts y logs; redacción antes de IA remota.
-- No confiar en una herramienta o modelo como prueba concluyente.
-- Preservar originales y registrar SHA-256.
-- Revisión humana antes de cambios o acciones activas.
+## Preparación y controles
+- Playbooks por escenario, contactos y suplencias.
+- Inventario de activos críticos, dependencias y propietarios.
+- Logging centralizado con retención y acceso protegido.
+- Backups aislados, inmutables cuando sea viable y restauraciones probadas.
+- Cuentas break-glass controladas y MFA.
+- Canales de comunicación alternos y plantillas de crisis.
+- Reglas de preservación de evidencia y contacto legal.
+- Métricas: MTTD, MTTA, MTTC, MTTR, alcance, impacto y recurrencia.
+
+## Metodología operativa
+1. Detectar, validar y registrar el incidente con identificador único.
+2. Asignar incident commander y equipo según severidad.
+3. Establecer hechos confirmados, hipótesis y lagunas.
+4. Preservar evidencia volátil y establecer línea temporal.
+5. Determinar alcance: identidades, sistemas, datos, proveedores y regiones.
+6. Seleccionar contención con impacto y reversibilidad documentados.
+7. Erradicar causa raíz y cerrar rutas de acceso.
+8. Recuperar por fases, validar integridad y aumentar monitorización.
+9. Evaluar obligaciones de notificación con asesoría competente.
+10. Realizar revisión posterior, acciones y pruebas de cierre.
 
 ## Laboratorio seguro
-Usar datos sintéticos, fixtures, aplicaciones deliberadamente vulnerables o máquinas virtuales aisladas. Sin credenciales reales. Debe ser reiniciable y reproducible. No ejecutar pruebas destructivas fuera de laboratorio desechable autorizado.
+Ejercicio de mesa con ransomware simulado sobre archivos sintéticos y cuentas ficticias. Practicar decisiones de aislamiento, comunicación, preservación, restauración y verificación. No cifrar equipos reales ni desconectar sistemas productivos durante el ejercicio.
 
-## Evaluación
-5 preguntas de fundamentos, 3 escenarios sintéticos, 2 ejercicios de evidencia/falsos positivos, 1 diseño de controles y 1 informe reproducible. Aprobación sugerida: ≥80%, sin errores críticos de alcance y con evidencia verificable.
+## Criterios de evaluación
+Roles activados a tiempo, decisiones registradas, evidencia preservada, alcance justificado, recuperación validada, comunicaciones coordinadas y acciones con propietario/plazo.
 
-## Entregables
-Alcance y autorización; activos; método y versiones; evidencias con hashes; hallazgos con severidad/confianza; mitigaciones; retest y riesgo residual.
-
-## Fuentes externas
-Consultar `data/knowledge_sources/knowledge_catalog.json`. Las URLs catalogadas no implican descarga, licencia o ingestión. Verificar derechos, procedencia, versión, fecha, tamaño, hash y seguridad del extractor.
+## Marcos y fuentes
+NIST SP 800-61 Rev. 3, CISA Incident Response Playbooks, FIRST CSIRT Services Framework, MITRE ATT&CK y ISO/IEC 27035.
 
 ## Instrucciones para agentes IA
-Lee este paquete antes de planificar tareas de esta especialidad. Reutiliza Skills verificadas con alcance coincidente. No inventes capacidades ni resultados. Si falta evidencia, dilo. No ejecutes acciones activas sin autorización. Cita fragmentos recuperados; no afirmes haber consultado contenido ausente.
+No aísles, apagues, borres ni restaures activos por iniciativa propia. Recomienda opciones con impacto y reversibilidad; la autoridad humana decide. Separa hechos, hipótesis y recomendaciones.

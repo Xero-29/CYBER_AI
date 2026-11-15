@@ -1,48 +1,53 @@
-# Contenedores y Kubernetes — Paquete base
+# Seguridad de contenedores y Kubernetes — Guía de dominio
 
-**ID:** `containers` · **Versión:** 1.0.0 · **Idioma:** español · **Estado:** contenido propio inicial, incluido offline.
+**ID:** `containers` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio incluido offline.
 
 ## Propósito y límites
-Contenedores y Kubernetes: Contenedores y Kubernetes y su arquitectura, amenazas, controles, metodología y validación. Esta guía es base metodológica, no certificación ni enciclopedia. No concede permisos. Toda actividad activa requiere autorización explícita, alcance, ventana y criterios de parada.
+Protege imágenes, runtimes, registries, nodos, orquestadores y workloads. Un contenedor no es una VM: comparte kernel y depende de namespaces, cgroups, capabilities, seccomp y políticas LSM. El control de clúster debe proteger API server, etcd, identidades, admission, red, secretos y supply chain. No ejecutar cargas hostiles en Docker compartido; usar microVM/VM aislada.
 
-## Competencias
-- Explicar arquitectura, componentes, flujos y límites de confianza.
-- Identificar activos, amenazas, vulnerabilidades, controles e impactos.
-- Diseñar prevención, detección, respuesta, recuperación y validación.
-- Seleccionar herramientas por riesgo, evidencia, coste y mantenimiento.
-- Documentar procedencia, versiones, incertidumbre y reproducibilidad.
+## Superficie y amenazas
+Analizar Docker/Containerd/CRI-O, imágenes base, Dockerfile, registry, kubelet, API server, etcd, RBAC, admission controllers, CNI, CSI, service accounts, secrets, ingress y nodes. Riesgos: contenedor privilegiado, root, hostPath, socket Docker montado, capabilities excesivas, escape por kernel, imágenes con secretos, tag mutable, registry público, RBAC wildcard, service account token expuesto y network policy ausente.
 
-## Metodología reproducible
-1. Definir propietario, autorización, alcance y exclusiones.
-2. Inventariar activos, datos, dependencias y límites de confianza.
-3. Formular hipótesis, amenazas, controles y criterios de parada.
-4. Recopilar evidencia permitida con procedencia, fecha y hash.
-5. Elegir métodos de menor riesgo y registrar versiones/configuración.
-6. Comenzar en modo pasivo/local; pruebas activas solo con autorización explícita.
-7. Validar hallazgos de forma reproducible e independiente.
-8. Priorizar impacto, exposición, explotabilidad e incertidumbre.
-9. Recomendar controles verificables y retest.
-10. Registrar evidencias, limitaciones y riesgo residual.
+## Competencias específicas
+- Construir imágenes mínimas, reproducibles y sin herramientas innecesarias.
+- Aplicar usuario no root, read-only rootfs, seccomp y capabilities mínimas.
+- Gestionar SBOM, firmas, procedencia y escaneo de vulnerabilidades.
+- Configurar RBAC por namespace y recurso, evitando ClusterRole amplio.
+- Proteger secretos con KMS/CSI y rotación, no ConfigMaps.
+- Aplicar Pod Security Standards, admission policy y NetworkPolicy.
+- Endurecer nodos, kubelet, etcd, API server y registry.
+- Monitorizar runtime y detectar procesos, montajes y conexiones anómalas.
 
-## Controles mínimos
-- Mínimo privilegio y separación análisis/ejecución.
-- Versiones exactas de herramientas, reglas, modelos y datasets.
-- Secretos fuera de código, prompts y logs; redacción antes de IA remota.
-- No confiar en una herramienta o modelo como prueba concluyente.
-- Preservar originales y registrar SHA-256.
-- Revisión humana antes de cambios o acciones activas.
+## Controles prioritarios
+- Prohibir privileged, hostPID/hostNetwork/hostIPC y hostPath salvo excepción revisada.
+- Bloquear escalada de privilegios y eliminar capabilities no requeridas.
+- Exigir imágenes firmadas, digest fijado y registry aprobado.
+- Separar namespaces y limitar service accounts.
+- Activar Pod Security Admission, seccomp RuntimeDefault y políticas de admisión.
+- Aplicar network policies deny-by-default.
+- Cifrar secretos en reposo, limitar acceso a etcd y auditar lectura de secretos.
+- Parchar nodos y runtime; usar nodos inmutables y reemplazo controlado.
+- Definir quotas, limits y probes para limitar DoS accidental.
+
+## Metodología
+1. Inventariar clúster, versión, namespaces, nodos, registries y workloads.
+2. Revisar manifiestos, Helm charts, Kustomize e IaC antes de desplegar.
+3. Analizar imágenes con SBOM y escáner; comprobar firma y procedencia.
+4. Revisar RBAC, service accounts, secrets, admission y políticas de red.
+5. Evaluar runtime y configuración del host con checks de solo lectura.
+6. Probar políticas en clúster desechable con workloads sintéticos.
+7. Medir impacto de restricciones y excepciones.
+8. Publicar remediaciones declarativas y plan de rollback.
+9. Verificar drift y repetir el análisis en cada release.
 
 ## Laboratorio seguro
-Usar datos sintéticos, fixtures, aplicaciones deliberadamente vulnerables o máquinas virtuales aisladas. Sin credenciales reales. Debe ser reiniciable y reproducible. No ejecutar pruebas destructivas fuera de laboratorio desechable autorizado.
+Clúster local kind/k3d con dos namespaces y workloads ficticios. Desplegar una imagen no root, RBAC mínimo, network policy y Pod Security. Introducir manifiestos inseguros y detectarlos con kube-linter/kube-bench/Checkov. No usar host mounts ni cargas de escape.
 
 ## Evaluación
-5 preguntas de fundamentos, 3 escenarios sintéticos, 2 ejercicios de evidencia/falsos positivos, 1 diseño de controles y 1 informe reproducible. Aprobación sugerida: ≥80%, sin errores críticos de alcance y con evidencia verificable.
+Ningún workload privilegiado sin excepción, imágenes fijadas y firmadas, RBAC mínimo, secretos protegidos, network policies probadas y nodos parcheados.
 
-## Entregables
-Alcance y autorización; activos; método y versiones; evidencias con hashes; hallazgos con severidad/confianza; mitigaciones; retest y riesgo residual.
-
-## Fuentes externas
-Consultar `data/knowledge_sources/knowledge_catalog.json`. Las URLs catalogadas no implican descarga, licencia o ingestión. Verificar derechos, procedencia, versión, fecha, tamaño, hash y seguridad del extractor.
+## Referencias y herramientas
+CIS Kubernetes Benchmark, NSA/CISA Kubernetes Hardening Guidance, Kubernetes Pod Security Standards, OCI Image Spec, Syft, Grype, Trivy, kube-linter y Kubescape.
 
 ## Instrucciones para agentes IA
-Lee este paquete antes de planificar tareas de esta especialidad. Reutiliza Skills verificadas con alcance coincidente. No inventes capacidades ni resultados. Si falta evidencia, dilo. No ejecutes acciones activas sin autorización. Cita fragmentos recuperados; no afirmes haber consultado contenido ausente.
+No afirmes que Docker aísla malware. No sugieras montar socket Docker o host filesystem para resolver tareas. Usa manifiestos sintéticos y bloquea cualquier prueba de escape fuera de VM desechable.

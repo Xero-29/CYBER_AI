@@ -1,48 +1,53 @@
-# Forense digital — Paquete base
+# Forense digital — Guía de dominio
 
-**ID:** `forensics` · **Versión:** 1.0.0 · **Idioma:** español · **Estado:** contenido propio inicial, incluido offline.
+**ID:** `forensics` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio incluido offline.
 
 ## Propósito y límites
-Forense digital: Forense digital y su arquitectura, amenazas, controles, metodología y validación. Esta guía es base metodológica, no certificación ni enciclopedia. No concede permisos. Toda actividad activa requiere autorización explícita, alcance, ventana y criterios de parada.
+Preserva, adquiere, analiza y comunica evidencia digital de forma reproducible y proporcional. La evidencia puede proceder de endpoints, memoria, discos, móviles, red, cloud, aplicaciones y SaaS. La validez depende de autorización, cadena de custodia, integridad, sincronización temporal y documentación.
 
-## Competencias
-- Explicar arquitectura, componentes, flujos y límites de confianza.
-- Identificar activos, amenazas, vulnerabilidades, controles e impactos.
-- Diseñar prevención, detección, respuesta, recuperación y validación.
-- Seleccionar herramientas por riesgo, evidencia, coste y mantenimiento.
-- Documentar procedencia, versiones, incertidumbre y reproducibilidad.
+## Fuentes y riesgos
+Identificar discos, RAM, logs, eventos, artefactos de navegador, registro, filesystem, correo, nube, contenedores, snapshots, backups y capturas de red. Riesgos: modificar evidencia al adquirirla, perder volatilidad, relojes desincronizados, logs rotados, herramientas no validadas, datos personales excesivos y acceso fuera de jurisdicción.
 
-## Metodología reproducible
-1. Definir propietario, autorización, alcance y exclusiones.
-2. Inventariar activos, datos, dependencias y límites de confianza.
-3. Formular hipótesis, amenazas, controles y criterios de parada.
-4. Recopilar evidencia permitida con procedencia, fecha y hash.
-5. Elegir métodos de menor riesgo y registrar versiones/configuración.
-6. Comenzar en modo pasivo/local; pruebas activas solo con autorización explícita.
-7. Validar hallazgos de forma reproducible e independiente.
-8. Priorizar impacto, exposición, explotabilidad e incertidumbre.
-9. Recomendar controles verificables y retest.
-10. Registrar evidencias, limitaciones y riesgo residual.
+## Competencias específicas
+- Definir alcance, autoridad legal, custodio y objetivo probatorio.
+- Adquirir imágenes bit a bit cuando proceda y verificar hashes.
+- Preservar memoria y artefactos volátiles con prioridad temporal.
+- Analizar sistemas de archivos, logs, timelines y metadatos.
+- Normalizar zona horaria, drift y fuentes de tiempo.
+- Correlacionar endpoint, red, identidad y cloud.
+- Separar hechos, inferencias, hipótesis y opinión.
+- Redactar informes reproducibles con limitaciones y cadena de custodia.
 
-## Controles mínimos
-- Mínimo privilegio y separación análisis/ejecución.
-- Versiones exactas de herramientas, reglas, modelos y datasets.
-- Secretos fuera de código, prompts y logs; redacción antes de IA remota.
-- No confiar en una herramienta o modelo como prueba concluyente.
-- Preservar originales y registrar SHA-256.
-- Revisión humana antes de cambios o acciones activas.
+## Controles de evidencia
+- Registrar quién, cuándo, cómo, dónde y bajo qué autoridad.
+- Usar bloqueadores de escritura para medios físicos cuando aplique.
+- Crear copia maestra y trabajar sobre copias verificadas.
+- Calcular SHA-256 en adquisición y cada transferencia.
+- Mantener logs de herramientas, versiones y parámetros.
+- Limitar acceso y cifrar repositorios de evidencia.
+- Documentar relojes, zona horaria, formato y desfase.
+- Aplicar retención y minimización de datos personales.
+- No alterar originales; preservar exportaciones nativas y metadatos.
+
+## Metodología
+1. Activar plan de preservación y definir alcance.
+2. Priorizar evidencia volátil antes de apagar o aislar equipos.
+3. Capturar datos con herramientas aprobadas y registrar parámetros.
+4. Verificar integridad y cadena de custodia.
+5. Analizar copias, construir timeline y correlacionar fuentes.
+6. Validar hipótesis con artefactos independientes.
+7. Documentar lagunas, limitaciones y posibles explicaciones alternativas.
+8. Revisar el informe por un analista independiente.
+9. Conservar evidencias conforme a retención y jurisdicción.
 
 ## Laboratorio seguro
-Usar datos sintéticos, fixtures, aplicaciones deliberadamente vulnerables o máquinas virtuales aisladas. Sin credenciales reales. Debe ser reiniciable y reproducible. No ejecutar pruebas destructivas fuera de laboratorio desechable autorizado.
+Crear una VM con logs sintéticos, archivos de prueba y una línea temporal conocida. Practicar adquisición de imagen virtual, hash, extracción de logs y reconstrucción de eventos. No usar dispositivos de terceros ni datos personales reales.
 
 ## Evaluación
-5 preguntas de fundamentos, 3 escenarios sintéticos, 2 ejercicios de evidencia/falsos positivos, 1 diseño de controles y 1 informe reproducible. Aprobación sugerida: ≥80%, sin errores críticos de alcance y con evidencia verificable.
+Integridad verificada, cadena de custodia completa, timeline trazable, conclusiones respaldadas, limitaciones explícitas y reproducibilidad independiente.
 
-## Entregables
-Alcance y autorización; activos; método y versiones; evidencias con hashes; hallazgos con severidad/confianza; mitigaciones; retest y riesgo residual.
-
-## Fuentes externas
-Consultar `data/knowledge_sources/knowledge_catalog.json`. Las URLs catalogadas no implican descarga, licencia o ingestión. Verificar derechos, procedencia, versión, fecha, tamaño, hash y seguridad del extractor.
+## Referencias y herramientas
+NIST SP 800-86, ISO/IEC 27037, RFC 3227, SWGDE Best Practices, Autopsy, Sleuth Kit, Volatility 3, Plaso y Timesketch.
 
 ## Instrucciones para agentes IA
-Lee este paquete antes de planificar tareas de esta especialidad. Reutiliza Skills verificadas con alcance coincidente. No inventes capacidades ni resultados. Si falta evidencia, dilo. No ejecutes acciones activas sin autorización. Cita fragmentos recuperados; no afirmes haber consultado contenido ausente.
+No afirmes causalidad a partir de un único artefacto. No modifiques evidencia original. Señala incertidumbre y preserva datos sensibles; no conviertas hipótesis en hechos.
