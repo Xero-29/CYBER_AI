@@ -85,5 +85,60 @@ class KnowledgeBootstrapTests(unittest.TestCase):
             self.assertEqual([x.args[1] for x in status.call_args_list], ["processing", "failed"])
 
 
+
+    def test_successful_bootstrap_is_idempotent(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            pack, manifest = self._setup(root)
+            digest = __import__("hashlib").sha256(pack.read_bytes()).hexdigest()
+            previous = {
+                "source_path": str(pack.resolve()), "current_sha256": digest,
+                "processing_status": "completed",
+            }
+            with patch.object(bootstrap, "PROJECT", root), \
+                 patch.object(bootstrap, "MANIFEST", manifest), \
+                 patch("knowledge_embeddings.expected_embedding_space", return_value="provider::embed-v1"), \
+                 patch("knowledge_registry.resource_inventory", side_effect=[[], [previous]]), \
+                 patch("knowledge_registry.register_resource", return_value={"resource_id": "resource"}), \
+                 patch("knowledge_registry.update_resource_classification"), \
+                 patch("knowledge_registry.update_resource_processing_status") as status, \
+                 patch("knowledge_library.document_chunk_count", return_value=2), \
+                 patch("knowledge_ingest.ingest_document", return_value={
+                     "document_id": "offline-id", "chunks": 2,
+                 }) as ingest:
+                first = bootstrap.bootstrap()
+                second = bootstrap.bootstrap()
+            self.assertEqual(first["ingested_count"], 1)
+            self.assertEqual(second["skipped"], ["x"])
+            self.assertEqual(ingest.call_count, 1)
+            self.assertEqual([call.args[1] for call in status.call_args_list], ["processing", "completed"])
+
+    def test_changed_embedding_space_triggers_reindex(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            pack, manifest = self._setup(root)
+            digest = __import__("hashlib").sha256(pack.read_bytes()).hexdigest()
+            previous = {
+                "source_path": str(pack.resolve()), "current_sha256": digest,
+                "processing_status": "completed",
+            }
+            with patch.object(bootstrap, "PROJECT", root), \
+                 patch.object(bootstrap, "MANIFEST", manifest), \
+                 patch("knowledge_embeddings.expected_embedding_space", return_value="new-provider::embed-v2"), \
+                 patch("knowledge_registry.resource_inventory", return_value=[previous]), \
+                 patch("knowledge_registry.register_resource", return_value={"resource_id": "resource"}), \
+                 patch("knowledge_registry.update_resource_classification"), \
+                 patch("knowledge_registry.update_resource_processing_status"), \
+                 patch("knowledge_library.document_chunk_count", return_value=0), \
+                 patch("knowledge_ingest.ingest_document", return_value={
+                     "document_id": "offline-id", "chunks": 2,
+                 }) as ingest:
+                result = bootstrap.bootstrap()
+            self.assertEqual(result["ingested_count"], 1)
+            self.assertEqual(
+                ingest.call_args.kwargs["expected_embedding_model"],
+                "new-provider::embed-v2",
+            )
+
 if __name__ == "__main__":
     unittest.main()
