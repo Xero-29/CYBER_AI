@@ -34,8 +34,8 @@ TOOL_SPECS = {
     "shellcheck": {"binary": "shellcheck", "network": False, "timeout": 120, "version_args": ["--version"]},
     "actionlint": {"binary": "actionlint", "network": False, "timeout": 60, "version_args": ["-version"]},
     "kube_linter": {"binary": "kube-linter", "network": False, "timeout": 120, "version_args": ["version"]},
-    "yara": {"binary": "yara", "network": False, "timeout": 180, "version_args": ["--version"]},
-    "tshark": {"binary": "tshark", "network": False, "timeout": 180, "version_args": ["--version"]},
+    "yara": {"binary": "yara", "network": False, "requires_isolation": True, "timeout": 180, "version_args": ["--version"]},
+    "tshark": {"binary": "tshark", "network": False, "requires_isolation": True, "timeout": 180, "version_args": ["--version"]},
 }
 
 
@@ -167,6 +167,11 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
     if tool_id not in TOOL_SPECS:
         raise ToolExecutionError("Herramienta no registrada.")
     spec = TOOL_SPECS[tool_id]
+    if spec.get("requires_isolation"):
+        raise ToolExecutionError(
+            "La herramienta analiza muestras o capturas y requiere un sandbox aislado; "
+            "la ejecución directa en el host está bloqueada."
+        )
     if spec["network"]:
         raise ToolExecutionError(
             "pip-audit requiere consultar un servicio remoto; ejecución bloqueada "

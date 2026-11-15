@@ -141,5 +141,20 @@ class ToolAdapterTests(unittest.TestCase):
         command = tool_adapters._build_command("tshark", "/usr/bin/tshark", capture)
         self.assertEqual(command, ["/usr/bin/tshark", "-r", str(capture), "-T", "json"])
 
+
+    @patch("tool_adapters.shutil.which")
+    def test_yara_requires_isolation_before_host_execution(self, which):
+        with self.assertRaisesRegex(ToolExecutionError, "sandbox aislado"):
+            run_local_tool("yara", "sample.py", config_path="sample.py")
+        which.assert_not_called()
+
+    @patch("tool_adapters.shutil.which")
+    def test_tshark_requires_isolation_before_host_execution(self, which):
+        capture = self.root / "sample.pcap"
+        capture.write_bytes(b"pcap")
+        with self.assertRaisesRegex(ToolExecutionError, "sandbox aislado"):
+            run_local_tool("tshark", "sample.pcap")
+        which.assert_not_called()
+
 if __name__ == "__main__":
     unittest.main()

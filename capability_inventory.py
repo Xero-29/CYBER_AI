@@ -40,6 +40,8 @@ def build_inventory():
             "path": shutil.which(item["binary"]),
             "binary": item["binary"],
             "adapter_registered": item["id"] in TOOL_SPECS,
+            "execution_ready": item["id"] in TOOL_SPECS and not TOOL_SPECS[item["id"]].get("network") and not TOOL_SPECS[item["id"]].get("requires_isolation", False),
+            "requires_isolation": bool(TOOL_SPECS.get(item["id"], {}).get("requires_isolation", False)),
         }
         for item in TOOL_CATALOG
     }
@@ -56,12 +58,13 @@ def build_inventory():
     available = sum(item["available"] for item in tools.values())
     adapted = sum(item["adapter_registered"] for item in tools.values())
     available_and_adapted = sum(item["available"] and item["adapter_registered"] for item in tools.values())
+    execution_ready = sum(item["execution_ready"] for item in tools.values())
     return {
         "schema_version": "2.0.0",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "tools": tools,
         "tool_catalog": TOOL_CATALOG,
-        "summary": {"registered": len(TOOL_CATALOG), "available": available, "unavailable": len(TOOL_CATALOG)-available, "adapter_registered": adapted, "catalog_only": len(TOOL_CATALOG)-adapted, "available_and_adapted": available_and_adapted},
+        "summary": {"registered": len(TOOL_CATALOG), "available": available, "unavailable": len(TOOL_CATALOG)-available, "adapter_registered": adapted, "catalog_only": len(TOOL_CATALOG)-adapted, "available_and_adapted": available_and_adapted, "execution_ready": execution_ready},
         "nuclei_templates": {
             "root": str(root), "available": root.is_dir(), "count": len(items),
             "categories": dict(sorted(categories.items())),
