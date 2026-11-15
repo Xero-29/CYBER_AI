@@ -103,10 +103,12 @@ class KnowledgeDownloaderSecurityTests(unittest.TestCase):
 
     @patch.object(downloader.requests, "Session")
     def test_real_download_fails_closed_without_explicit_egress_proxy(self, session_factory):
-        with patch.dict(downloader.os.environ, {}, clear=True):
+        with patch.dict(downloader.os.environ, {}, clear=True), \
+             patch.object(downloader.socket, "getaddrinfo") as resolver:
             with self.assertRaisesRegex(ValueError, "CYBER_AI_KNOWLEDGE_EGRESS_PROXY"):
                 downloader.download(self.item(), {"resources": {}})
         session_factory.assert_not_called()
+        resolver.assert_not_called()
 
     def test_non_loopback_plain_http_proxy_is_rejected(self):
         with patch.dict(downloader.os.environ, {

@@ -205,6 +205,7 @@ def _validated_egress_proxy():
 def download(item, manifest, dry_run=False):
     if item.get("verified_for_download") is not True:
         return "not_verified"
+    proxy = None if dry_run else _validated_egress_proxy()
     destination = _safe_destination(item, create=not dry_run)
     url = item.get("url")
     host = _validate_public_https(url, resolve=not dry_run)
@@ -233,7 +234,6 @@ def download(item, manifest, dry_run=False):
         print(f"[SIMULACIÓN] {item_id}: {url}")
         return "dry_run"
 
-    proxy = _validated_egress_proxy()
     session = requests.Session()
     session.trust_env = False
     session.proxies = {"https": proxy}

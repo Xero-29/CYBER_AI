@@ -107,7 +107,7 @@ La imagen Docker actual solo incluye Ruff y Bandit. Semgrep, Syft y Trivy están
 
 ## Biblioteca de conocimiento offline y Skills
 
-El repositorio incluye paquetes metodológicos propios en español para todas las especialidades del catálogo. Consulta `knowledge/packs/manifest.json` y `knowledge/packs/<area>/README.md`. Son una base inicial, no una enciclopedia ni sustituyen corpus especializados. Las referencias externas solo se descargan tras validar licencia, procedencia e integridad.
+El repositorio incluye paquetes metodológicos propios en español para todas las especialidades del catálogo. Consulta `knowledge/packs/manifest.json` y `knowledge/packs/<area>/README.md`. Son una base inicial, no una enciclopedia ni sustituyen corpus especializados. Las referencias externas solo se descargan tras validar licencia, procedencia e integridad. Además, toda descarga real exige `CYBER_AI_KNOWLEDGE_EGRESS_PROXY` apuntando a un gateway de salida que aplique allowlist de hosts, pinning DNS y bloqueo de redes privadas; el descargador falla cerrado si no está configurado.
 
 Después de configurar un proveedor con embeddings, valida e indexa la biblioteca offline:
 
