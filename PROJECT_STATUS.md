@@ -7,7 +7,7 @@
 
 ## Avance de esta iteración
 
-Se añadió `knowledge_eval.py` con un conjunto inicial de 12 consultas y métricas Recall@K, Precision@K y MRR@K. El arnés y los datos están versionados; aún falta ejecutar el benchmark con modelos reales, fijar umbrales por dominio y ampliar el conjunto con evaluaciones revisadas por expertos.
+Se añadió `knowledge_eval.py` con un conjunto inicial de 12 consultas y métricas Recall@K, Precision@K y MRR@K. La biblioteca incorpora recuperación híbrida FTS5 + vectores con Reciprocal Rank Fusion (RRF), filtro de namespace/tenant y reconstrucción verificable del índice textual. Si SQLite no tiene FTS5, se conserva la recuperación semántica. La calidad aún debe medirse con embeddings reales y conjuntos revisados por expertos. El arnés y los datos están versionados; aún falta ejecutar el benchmark con modelos reales, fijar umbrales por dominio y ampliar el conjunto con evaluaciones revisadas por expertos.
 
 Se reforzó el bootstrap de la biblioteca offline: IDs deterministas por ruta y SHA-256, bloqueo entre procesos, rechazo de rutas absolutas/traversal/symlinks, estados `processing/completed/failed`, reanudación tras fallos y prevención de duplicados. La indexación identifica el espacio vectorial del proveedor ECO y reindexa el contenido cuando cambia el modelo/proveedor, evitando mezclar vectores incompatibles en las búsquedas. Se añadieron pruebas de reintento, rutas, fallos y espacios de embeddings.
 
@@ -20,6 +20,8 @@ Se incorpora execution_ledger.py: registro SQLite transaccional append-only de e
 Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptográfica de identidad. Requiere checkpoints firmados fuera del host, KMS/HSM y pruebas operativas de restauración. La captura previa al inicio, la cobertura de todas las rutas de error y el comportamiento fail-closed ante caída del ledger siguen pendientes; también la promoción autónoma de Skills.
 
 ## Validación más reciente
+
+- Commit `df589f7ac23d8ac5fbef175a6fd99f23009c8a9a`: Python tests **success**, 288 pruebas; Docker sandbox **success**. Incluye FTS5, recuperación híbrida y conexión de recuperación al contexto de agentes.
 
 - Commit `3032550a2a9a6e8e40ffd355e89d0dddb3af2904`: CI Python **success**, 278 pruebas. La ejecución Docker de ese commit se encontraba en curso en la última consulta.
 - Commit `eded0518354b191ecf649c3f6e895819b6200ed9`: CI Python **success**, 267 pruebas. La ejecución Docker de ese commit se encontraba en curso en la última consulta.
@@ -34,7 +36,7 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 - Sandbox Docker endurecido con timeout del cliente y limpieza forzada del contenedor ante timeout; comparte kernel y no es aislamiento para malware hostil.
 - Atlas de 48 áreas y 138 referencias externas catalogadas; además, 48 paquetes metodológicos propios incluidos offline. Las referencias externas no están descargadas ni ingeridas.
 - Biblioteca SQLite con fragmentos comprimidos, SHA-256, metadatos, separación shared/tenant y búsqueda semántica.
-- Ingestión transaccional (publicación de todos los fragmentos en una única transacción), límite de 2 MiB por fragmento y descompresión acotada de TXT/Markdown, HTML, CSV, JSON/JSONL y código; extractores opcionales PDF/DOCX/XLSX/PPTX con límites de tamaño, expansión ZIP y extracción incremental acotada para evitar acumulación descontrolada de texto. OCR de PDF escaneado y ejecución aislada de extractores siguen pendientes. Catálogo, descubrimiento y downloader con manifiesto serializado por lock; dry-run sin DNS ni escrituras. La descarga ahora falla cerrada sin proxy de salida explícito; la garantía contra DNS rebinding depende de que el gateway configurado implemente allowlist, pinning DNS y bloqueo de redes privadas.
+- Ingestión transaccional (publicación de todos los fragmentos en una única transacción), límite de 2 MiB por fragmento y descompresión acotada de TXT/Markdown, HTML, CSV, JSON/JSONL y código; extractores opcionales PDF/DOCX/XLSX/PPTX con límites de tamaño, expansión ZIP y extracción incremental acotada para evitar acumulación descontrolada de texto. OCR de PDF escaneado y ejecución aislada de extractores siguen pendientes. Catálogo, descubrimiento y downloader con manifiesto serializado por lock; dry-run sin DNS ni escrituras. La descarga ahora falla cerrada antes de resolver DNS si no hay proxy de salida explícito; la garantía contra DNS rebinding depende de que el gateway configurado implemente allowlist, pinning DNS y bloqueo de redes privadas.
 - Reindexación con staging, backup y publicación transaccional.
 - Proveedores Ollama, OpenAI-compatible, Anthropic chat y Gemini chat/embeddings, con extensiones instalables mediante entry points `cyber_ai.providers`; HTTP solo en loopback, HTTPS remoto y redirecciones bloqueadas para proteger credenciales.
 - Skillbook con propuestas candidatas desde dos eventos independientes, activación solo con firma HMAC VERITAS, versiones inmutables y exclusión de candidatas de la búsqueda ejecutable. La clave sigue siendo un secreto operativo externo, no una identidad de modelo.

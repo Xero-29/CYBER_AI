@@ -124,7 +124,7 @@ Para reconstruir el índice textual FTS5 de una biblioteca existente sin generar
 python knowledge_bootstrap.py --rebuild-text-index
 ```
 
-La recuperación combina búsqueda semántica y texto completo mediante Reciprocal Rank Fusion (RRF). Si SQLite no incluye FTS5, el sistema conserva el modo semántico.
+La recuperación combina búsqueda semántica y texto completo mediante Reciprocal Rank Fusion (RRF), respetando el aislamiento por tenant. Si SQLite no incluye FTS5, el sistema conserva el modo semántico. Para bibliotecas existentes, `--rebuild-text-index` reconstruye FTS5 verificando SHA-256 de cada fragmento.
 
 Para medir la calidad de recuperación tras indexar, ejecuta el benchmark inicial de 12 consultas:
 
