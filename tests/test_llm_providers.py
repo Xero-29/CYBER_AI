@@ -300,7 +300,7 @@ class NativeProtocolTests(unittest.TestCase):
             "default_provider": "anthropic",
             "llm_providers": {"anthropic": {"enabled": True, "protocol": "anthropic"}},
         }
-        with self.assertRaisesRegex(RuntimeError, "no hay proveedor habilitado"):
+        with self.assertRaisesRegex(RuntimeError, "(?i)no hay proveedor habilitado"):
             llm_providers.resolve_provider(config, {"type": "embeddings"}, capability="embeddings")
 
 
