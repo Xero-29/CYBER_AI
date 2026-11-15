@@ -1,0 +1,12 @@
+{"id":"api-auth","query":"Cómo revisar autenticación autorización y límites de tasa en una API REST","relevant_categories":["cybersecurity:api"]}
+{"id":"soc-alerts","query":"Correlacionar eventos de seguridad y hacer triage de alertas en un SOC SIEM","relevant_categories":["cybersecurity:soc_siem"]}
+{"id":"ot-plc","query":"Evaluar segmentación de redes industriales PLC SCADA sin interrumpir procesos","relevant_categories":["cybersecurity:ot_ics"]}
+{"id":"ai-injection","query":"Probar prompt injection y abuso de herramientas en agentes con RAG","relevant_categories":["cybersecurity:ai_red_team"]}
+{"id":"cloud-forensics","query":"Preservar logs y evidencias para investigar un incidente en infraestructura cloud","relevant_categories":["cybersecurity:cloud_forensics"]}
+{"id":"wireless","query":"Auditar seguridad Wi-Fi WPA3 Bluetooth LE y emparejamiento NFC","relevant_categories":["cybersecurity:wireless_security"]}
+{"id":"pki","query":"Gestionar autoridades certificadoras PKI rotación revocación de claves y HSM","relevant_categories":["cybersecurity:pki_hsm"]}
+{"id":"pqc","query":"Plan de migración criptográfica poscuántica y criptoagilidad","relevant_categories":["cybersecurity:post_quantum_crypto"]}
+{"id":"incident","query":"Contención erradicación recuperación y lecciones aprendidas en respuesta a incidentes","relevant_categories":["cybersecurity:incident_response"]}
+{"id":"malware","query":"Análisis estático y dinámico de malware y extracción de indicadores","relevant_categories":["cybersecurity:malware"]}
+{"id":"privacy","query":"Minimización retención y evaluación de impacto de datos personales","relevant_categories":["cybersecurity:privacy_engineering"]}
+{"id":"supply","query":"Generar SBOM verificar dependencias y detectar vulnerabilidades de cadena de suministro","relevant_categories":["cybersecurity:devsecops","cybersecurity:vuln_management"]}
