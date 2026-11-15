@@ -87,7 +87,7 @@ Los proveedores remotos están deshabilitados por defecto. Anthropic no ofrece e
 
 ## Herramientas locales y sandbox
 
-El inventario de 21 herramientas distingue disponibilidad del binario y adaptadores realmente registrados. Hay adaptadores locales para Ruff, Bandit, Semgrep, Syft, Trivy, Checkov, detect-secrets, Hadolint, ShellCheck, actionlint, kube-linter, YARA y TShark; pip-audit permanece bloqueado por requerir red. La presencia en el catálogo no significa que la herramienta esté instalada. Genera el informe con `python capability_inventory.py`.
+El inventario de 21 herramientas distingue disponibilidad del binario y adaptadores realmente registrados. Hay 14 especificaciones de adaptador: 11 herramientas de ejecución local acotada; YARA y TShark quedan bloqueadas en el host hasta disponer de sandbox aislado; pip-audit queda bloqueado por requerir red. El informe separa adaptador registrado de ejecución realmente habilitada. La presencia en el catálogo no significa que la herramienta esté instalada. Genera el informe con `python capability_inventory.py`.
 
 El registro de herramientas se encuentra en `tool_adapters.py`. Para ejecutar directamente un adaptador local:
 
