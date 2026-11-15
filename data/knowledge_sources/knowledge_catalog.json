@@ -1,6 +1,6 @@
 {
-  "schema_version": "1.1.0",
-  "purpose": "Mapa de conocimiento. Las referencias no implican que el contenido esté descargado, validado o autorizado para redistribución. Las áreas ampliadas incluyen ingeniería de software, aprendizaje automático, hardware/firmware y matemáticas; las nuevas referencias siguen pendientes de revisión de licencia y verificación de descarga.",
+  "schema_version": "1.2.0",
+  "purpose": "Catálogo de especialidades y referencias externas. Paquetes propios offline en knowledge/packs/. Las referencias externas no se descargan ni se consideran verificadas hasta superar controles de licencia, procedencia e integridad.",
   "profiles": [
     "minimal",
     "standard",
@@ -1364,13 +1364,717 @@
           "download": false
         }
       ]
+    },
+    {
+      "id": "soc_siem",
+      "name": "SOC, SIEM y SOAR",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "soc_siem-ref-1",
+          "url": "https://documentation.wazuh.com/",
+          "publisher": "documentation.wazuh.com",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "soc_siem-ref-2",
+          "url": "https://sigmahq.io/",
+          "publisher": "sigmahq.io",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "edr_xdr",
+      "name": "EDR, XDR y endpoints",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "edr_xdr-ref-1",
+          "url": "https://osquery.io/",
+          "publisher": "osquery.io",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "edr_xdr-ref-2",
+          "url": "https://docs.velociraptor.app/",
+          "publisher": "docs.velociraptor.app",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "threat_hunting",
+      "name": "Threat hunting",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "threat_hunting-ref-1",
+          "url": "https://attack.mitre.org/",
+          "publisher": "attack.mitre.org",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "threat_hunting-ref-2",
+          "url": "https://d3fend.mitre.org/",
+          "publisher": "d3fend.mitre.org",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "red_team",
+      "name": "Red Team autorizado",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "red_team-ref-1",
+          "url": "https://attack.mitre.org/",
+          "publisher": "attack.mitre.org",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "red_team-ref-2",
+          "url": "https://atomicredteam.io/",
+          "publisher": "atomicredteam.io",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "wireless_security",
+      "name": "Wireless, Bluetooth y NFC",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "wireless_security-ref-1",
+          "url": "https://www.aircrack-ng.org/",
+          "publisher": "www.aircrack-ng.org",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "wireless_security-ref-2",
+          "url": "https://www.kismetwireless.net/",
+          "publisher": "www.kismetwireless.net",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "ot_ics",
+      "name": "OT, ICS y SCADA",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "ot_ics-ref-1",
+          "url": "https://www.cisa.gov/ics",
+          "publisher": "www.cisa.gov",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "ot_ics-ref-2",
+          "url": "https://www.iec.ch/",
+          "publisher": "www.iec.ch",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "telecom_5g",
+      "name": "Telecomunicaciones y 5G",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "telecom_5g-ref-1",
+          "url": "https://www.3gpp.org/",
+          "publisher": "www.3gpp.org",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "telecom_5g-ref-2",
+          "url": "https://www.etsi.org/",
+          "publisher": "www.etsi.org",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "automotive_security",
+      "name": "Ciberseguridad automotriz y CAN",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "automotive_security-ref-1",
+          "url": "https://uptane.org/",
+          "publisher": "uptane.org",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "automotive_security-ref-2",
+          "url": "https://www.autosar.org/",
+          "publisher": "www.autosar.org",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "satellite_security",
+      "name": "Satélites y sistemas espaciales",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "satellite_security-ref-1",
+          "url": "https://public.ccsds.org/",
+          "publisher": "public.ccsds.org",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "satellite_security-ref-2",
+          "url": "https://www.cisa.gov/",
+          "publisher": "www.cisa.gov",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "physical_security",
+      "name": "Seguridad física ciberfísica",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "physical_security-ref-1",
+          "url": "https://www.cisa.gov/physical-security",
+          "publisher": "www.cisa.gov",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "physical_security-ref-2",
+          "url": "https://www.nist.gov/",
+          "publisher": "www.nist.gov",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "email_dns_security",
+      "name": "Correo, DNS y dominios",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "email_dns_security-ref-1",
+          "url": "https://dmarc.org/",
+          "publisher": "dmarc.org",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "email_dns_security-ref-2",
+          "url": "https://www.rfc-editor.org/",
+          "publisher": "www.rfc-editor.org",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "fraud_abuse",
+      "name": "Fraude digital y abuso",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "fraud_abuse-ref-1",
+          "url": "https://owasp.org/www-project-automated-threats-to-web-applications/",
+          "publisher": "owasp.org",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "fraud_abuse-ref-2",
+          "url": "https://www.nist.gov/",
+          "publisher": "www.nist.gov",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "privacy_engineering",
+      "name": "Ingeniería de privacidad",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "privacy_engineering-ref-1",
+          "url": "https://www.nist.gov/privacy-framework",
+          "publisher": "www.nist.gov",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "privacy_engineering-ref-2",
+          "url": "https://www.iso.org/standard/71670.html",
+          "publisher": "www.iso.org",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "cloud_forensics",
+      "name": "Forense cloud",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "cloud_forensics-ref-1",
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/incident-response/",
+          "publisher": "docs.aws.amazon.com",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "cloud_forensics-ref-2",
+          "url": "https://learn.microsoft.com/security/",
+          "publisher": "learn.microsoft.com",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "ai_red_team",
+      "name": "Red teaming de IA y agentes",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "ai_red_team-ref-1",
+          "url": "https://atlas.mitre.org/",
+          "publisher": "atlas.mitre.org",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "ai_red_team-ref-2",
+          "url": "https://garak.ai/",
+          "publisher": "garak.ai",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "pki_hsm",
+      "name": "PKI, certificados y HSM",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "pki_hsm-ref-1",
+          "url": "https://csrc.nist.gov/projects/pki-testing",
+          "publisher": "csrc.nist.gov",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "pki_hsm-ref-2",
+          "url": "https://cabforum.org/",
+          "publisher": "cabforum.org",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "post_quantum_crypto",
+      "name": "Criptografía poscuántica",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "post_quantum_crypto-ref-1",
+          "url": "https://csrc.nist.gov/projects/post-quantum-cryptography",
+          "publisher": "csrc.nist.gov",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "post_quantum_crypto-ref-2",
+          "url": "https://www.rfc-editor.org/",
+          "publisher": "www.rfc-editor.org",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "business_continuity",
+      "name": "Continuidad y recuperación",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "business_continuity-ref-1",
+          "url": "https://www.ready.gov/business",
+          "publisher": "www.ready.gov",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "business_continuity-ref-2",
+          "url": "https://www.nist.gov/cyberframework",
+          "publisher": "www.nist.gov",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "database_security",
+      "name": "Seguridad de bases de datos",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "database_security-ref-1",
+          "url": "https://cheatsheetseries.owasp.org/",
+          "publisher": "cheatsheetseries.owasp.org",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "database_security-ref-2",
+          "url": "https://www.postgresql.org/docs/current/security.html",
+          "publisher": "www.postgresql.org",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
+    },
+    {
+      "id": "vulnerability_research",
+      "name": "Investigación de vulnerabilidades",
+      "levels": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "resources": [
+        {
+          "id": "vulnerability_research-ref-1",
+          "url": "https://www.cve.org/",
+          "publisher": "www.cve.org",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        },
+        {
+          "id": "vulnerability_research-ref-2",
+          "url": "https://www.first.org/cvss/",
+          "publisher": "www.first.org",
+          "resource_type": "reference",
+          "license_status": "pending",
+          "verified_for_download": false,
+          "download": false
+        }
+      ]
     }
   ],
   "safety": {
     "authorized_targets_only": true,
     "local_labs_only": true,
     "no_destructive_actions": true,
-    "require_human_approval_for_active_testing": true
+    "require_human_approval_for_active_testing": true,
+    "first_party_offline_packs": true,
+    "external_resources_default_download": false,
+    "external_download_requires_verified_license_and_provenance": true,
+    "active_security_testing_requires_explicit_authorization": true
   },
   "resources": [
     {
@@ -2645,6 +3349,526 @@
       "area_id": "vuln_management",
       "folder": "vuln_management",
       "filename": "vuln_management-cvss-v4.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "soc_siem-ref-1",
+      "url": "https://documentation.wazuh.com/",
+      "resource_type": "reference",
+      "publisher": "documentation.wazuh.com",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "soc_siem",
+      "folder": "soc_siem",
+      "filename": "soc_siem-ref-1.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "soc_siem-ref-2",
+      "url": "https://sigmahq.io/",
+      "resource_type": "reference",
+      "publisher": "sigmahq.io",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "soc_siem",
+      "folder": "soc_siem",
+      "filename": "soc_siem-ref-2.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "edr_xdr-ref-1",
+      "url": "https://osquery.io/",
+      "resource_type": "reference",
+      "publisher": "osquery.io",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "edr_xdr",
+      "folder": "edr_xdr",
+      "filename": "edr_xdr-ref-1.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "edr_xdr-ref-2",
+      "url": "https://docs.velociraptor.app/",
+      "resource_type": "reference",
+      "publisher": "docs.velociraptor.app",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "edr_xdr",
+      "folder": "edr_xdr",
+      "filename": "edr_xdr-ref-2.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "threat_hunting-ref-1",
+      "url": "https://attack.mitre.org/",
+      "resource_type": "reference",
+      "publisher": "attack.mitre.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "threat_hunting",
+      "folder": "threat_hunting",
+      "filename": "threat_hunting-ref-1.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "threat_hunting-ref-2",
+      "url": "https://d3fend.mitre.org/",
+      "resource_type": "reference",
+      "publisher": "d3fend.mitre.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "threat_hunting",
+      "folder": "threat_hunting",
+      "filename": "threat_hunting-ref-2.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "red_team-ref-1",
+      "url": "https://attack.mitre.org/",
+      "resource_type": "reference",
+      "publisher": "attack.mitre.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "red_team",
+      "folder": "red_team",
+      "filename": "red_team-ref-1.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "red_team-ref-2",
+      "url": "https://atomicredteam.io/",
+      "resource_type": "reference",
+      "publisher": "atomicredteam.io",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "red_team",
+      "folder": "red_team",
+      "filename": "red_team-ref-2.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "wireless_security-ref-1",
+      "url": "https://www.aircrack-ng.org/",
+      "resource_type": "reference",
+      "publisher": "www.aircrack-ng.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "wireless_security",
+      "folder": "wireless_security",
+      "filename": "wireless_security-ref-1.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "wireless_security-ref-2",
+      "url": "https://www.kismetwireless.net/",
+      "resource_type": "reference",
+      "publisher": "www.kismetwireless.net",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "wireless_security",
+      "folder": "wireless_security",
+      "filename": "wireless_security-ref-2.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "ot_ics-ref-1",
+      "url": "https://www.cisa.gov/ics",
+      "resource_type": "reference",
+      "publisher": "www.cisa.gov",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "ot_ics",
+      "folder": "ot_ics",
+      "filename": "ot_ics-ref-1.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "ot_ics-ref-2",
+      "url": "https://www.iec.ch/",
+      "resource_type": "reference",
+      "publisher": "www.iec.ch",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "ot_ics",
+      "folder": "ot_ics",
+      "filename": "ot_ics-ref-2.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "telecom_5g-ref-1",
+      "url": "https://www.3gpp.org/",
+      "resource_type": "reference",
+      "publisher": "www.3gpp.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "telecom_5g",
+      "folder": "telecom_5g",
+      "filename": "telecom_5g-ref-1.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "telecom_5g-ref-2",
+      "url": "https://www.etsi.org/",
+      "resource_type": "reference",
+      "publisher": "www.etsi.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "telecom_5g",
+      "folder": "telecom_5g",
+      "filename": "telecom_5g-ref-2.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "automotive_security-ref-1",
+      "url": "https://uptane.org/",
+      "resource_type": "reference",
+      "publisher": "uptane.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "automotive_security",
+      "folder": "automotive_security",
+      "filename": "automotive_security-ref-1.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "automotive_security-ref-2",
+      "url": "https://www.autosar.org/",
+      "resource_type": "reference",
+      "publisher": "www.autosar.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "automotive_security",
+      "folder": "automotive_security",
+      "filename": "automotive_security-ref-2.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "satellite_security-ref-1",
+      "url": "https://public.ccsds.org/",
+      "resource_type": "reference",
+      "publisher": "public.ccsds.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "satellite_security",
+      "folder": "satellite_security",
+      "filename": "satellite_security-ref-1.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "satellite_security-ref-2",
+      "url": "https://www.cisa.gov/",
+      "resource_type": "reference",
+      "publisher": "www.cisa.gov",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "satellite_security",
+      "folder": "satellite_security",
+      "filename": "satellite_security-ref-2.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "physical_security-ref-1",
+      "url": "https://www.cisa.gov/physical-security",
+      "resource_type": "reference",
+      "publisher": "www.cisa.gov",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "physical_security",
+      "folder": "physical_security",
+      "filename": "physical_security-ref-1.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "physical_security-ref-2",
+      "url": "https://www.nist.gov/",
+      "resource_type": "reference",
+      "publisher": "www.nist.gov",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "physical_security",
+      "folder": "physical_security",
+      "filename": "physical_security-ref-2.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "email_dns_security-ref-1",
+      "url": "https://dmarc.org/",
+      "resource_type": "reference",
+      "publisher": "dmarc.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "email_dns_security",
+      "folder": "email_dns_security",
+      "filename": "email_dns_security-ref-1.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "email_dns_security-ref-2",
+      "url": "https://www.rfc-editor.org/",
+      "resource_type": "reference",
+      "publisher": "www.rfc-editor.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "email_dns_security",
+      "folder": "email_dns_security",
+      "filename": "email_dns_security-ref-2.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "fraud_abuse-ref-1",
+      "url": "https://owasp.org/www-project-automated-threats-to-web-applications/",
+      "resource_type": "reference",
+      "publisher": "owasp.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "fraud_abuse",
+      "folder": "fraud_abuse",
+      "filename": "fraud_abuse-ref-1.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "fraud_abuse-ref-2",
+      "url": "https://www.nist.gov/",
+      "resource_type": "reference",
+      "publisher": "www.nist.gov",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "fraud_abuse",
+      "folder": "fraud_abuse",
+      "filename": "fraud_abuse-ref-2.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "privacy_engineering-ref-1",
+      "url": "https://www.nist.gov/privacy-framework",
+      "resource_type": "reference",
+      "publisher": "www.nist.gov",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "privacy_engineering",
+      "folder": "privacy_engineering",
+      "filename": "privacy_engineering-ref-1.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "privacy_engineering-ref-2",
+      "url": "https://www.iso.org/standard/71670.html",
+      "resource_type": "reference",
+      "publisher": "www.iso.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "privacy_engineering",
+      "folder": "privacy_engineering",
+      "filename": "privacy_engineering-ref-2.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "cloud_forensics-ref-1",
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/incident-response/",
+      "resource_type": "reference",
+      "publisher": "docs.aws.amazon.com",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "cloud_forensics",
+      "folder": "cloud_forensics",
+      "filename": "cloud_forensics-ref-1.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "cloud_forensics-ref-2",
+      "url": "https://learn.microsoft.com/security/",
+      "resource_type": "reference",
+      "publisher": "learn.microsoft.com",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "cloud_forensics",
+      "folder": "cloud_forensics",
+      "filename": "cloud_forensics-ref-2.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "ai_red_team-ref-1",
+      "url": "https://atlas.mitre.org/",
+      "resource_type": "reference",
+      "publisher": "atlas.mitre.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "ai_red_team",
+      "folder": "ai_red_team",
+      "filename": "ai_red_team-ref-1.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "ai_red_team-ref-2",
+      "url": "https://garak.ai/",
+      "resource_type": "reference",
+      "publisher": "garak.ai",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "ai_red_team",
+      "folder": "ai_red_team",
+      "filename": "ai_red_team-ref-2.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "pki_hsm-ref-1",
+      "url": "https://csrc.nist.gov/projects/pki-testing",
+      "resource_type": "reference",
+      "publisher": "csrc.nist.gov",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "pki_hsm",
+      "folder": "pki_hsm",
+      "filename": "pki_hsm-ref-1.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "pki_hsm-ref-2",
+      "url": "https://cabforum.org/",
+      "resource_type": "reference",
+      "publisher": "cabforum.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "pki_hsm",
+      "folder": "pki_hsm",
+      "filename": "pki_hsm-ref-2.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "post_quantum_crypto-ref-1",
+      "url": "https://csrc.nist.gov/projects/post-quantum-cryptography",
+      "resource_type": "reference",
+      "publisher": "csrc.nist.gov",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "post_quantum_crypto",
+      "folder": "post_quantum_crypto",
+      "filename": "post_quantum_crypto-ref-1.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "post_quantum_crypto-ref-2",
+      "url": "https://www.rfc-editor.org/",
+      "resource_type": "reference",
+      "publisher": "www.rfc-editor.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "post_quantum_crypto",
+      "folder": "post_quantum_crypto",
+      "filename": "post_quantum_crypto-ref-2.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "business_continuity-ref-1",
+      "url": "https://www.ready.gov/business",
+      "resource_type": "reference",
+      "publisher": "www.ready.gov",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "business_continuity",
+      "folder": "business_continuity",
+      "filename": "business_continuity-ref-1.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "business_continuity-ref-2",
+      "url": "https://www.nist.gov/cyberframework",
+      "resource_type": "reference",
+      "publisher": "www.nist.gov",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "business_continuity",
+      "folder": "business_continuity",
+      "filename": "business_continuity-ref-2.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "database_security-ref-1",
+      "url": "https://cheatsheetseries.owasp.org/",
+      "resource_type": "reference",
+      "publisher": "cheatsheetseries.owasp.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "database_security",
+      "folder": "database_security",
+      "filename": "database_security-ref-1.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "database_security-ref-2",
+      "url": "https://www.postgresql.org/docs/current/security.html",
+      "resource_type": "reference",
+      "publisher": "www.postgresql.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "database_security",
+      "folder": "database_security",
+      "filename": "database_security-ref-2.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "vulnerability_research-ref-1",
+      "url": "https://www.cve.org/",
+      "resource_type": "reference",
+      "publisher": "www.cve.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "vulnerability_research",
+      "folder": "vulnerability_research",
+      "filename": "vulnerability_research-ref-1.txt",
+      "max_bytes": 10485760
+    },
+    {
+      "id": "vulnerability_research-ref-2",
+      "url": "https://www.first.org/cvss/",
+      "resource_type": "reference",
+      "publisher": "www.first.org",
+      "license_status": "pending",
+      "verified_for_download": false,
+      "download": false,
+      "area_id": "vulnerability_research",
+      "folder": "vulnerability_research",
+      "filename": "vulnerability_research-ref-2.txt",
       "max_bytes": 10485760
     }
   ]

@@ -12,6 +12,8 @@ Construir una biblioteca técnica modular, profunda, trazable y utilizable offli
 Los niveles describen profundidad editorial, no certifican competencia automática.
 
 ## Especialidades que debe cubrir el repositorio
+
+El catálogo vive en `data/knowledge_sources/knowledge_catalog.json`; los paquetes propios offline en `knowledge/packs/`, indexados por `knowledge/packs/manifest.json`. Cada paquete define propósito, competencias, metodología, controles, laboratorio y evaluación.
 - **foundations — Fundamentos:** fundamentos, arquitectura, amenazas, mitigaciones, metodología, herramientas, casos, laboratorios locales, evaluación y referencias versionadas.
 - **appsec — Seguridad web y aplicaciones:** fundamentos, arquitectura, amenazas, mitigaciones, metodología, herramientas, casos, laboratorios locales, evaluación y referencias versionadas.
 - **api — Seguridad de API:** fundamentos, arquitectura, amenazas, mitigaciones, metodología, herramientas, casos, laboratorios locales, evaluación y referencias versionadas.
@@ -42,6 +44,28 @@ Los niveles describen profundidad editorial, no certifican competencia automáti
 - **hardware_security — Hardware, firmware y sistemas embebidos:** resiliencia de firmware, Linux kernel, Zephyr e IoT.
 - **mathematics — Matemáticas, estadística y métodos numéricos:** álgebra lineal, estadística, probabilidad y métodos numéricos.
 
+## Especialidades ampliadas
+- SOC, SIEM y SOAR
+- EDR, XDR y endpoints
+- Threat hunting
+- Red Team autorizado
+- Wireless, Bluetooth y NFC
+- OT, ICS y SCADA
+- Telecomunicaciones y 5G
+- Ciberseguridad automotriz y CAN
+- Satélites y sistemas espaciales
+- Seguridad física ciberfísica
+- Correo, DNS y dominios
+- Fraude digital y abuso
+- Ingeniería de privacidad
+- Forense cloud
+- Red teaming de IA y agentes
+- PKI, certificados y HSM
+- Criptografía poscuántica
+- Continuidad y recuperación
+- Seguridad de bases de datos
+- Investigación de vulnerabilidades
+
 ## Fuentes de referencia iniciales
 - NIST CSF y publicaciones: https://www.nist.gov/cyberframework y https://csrc.nist.gov/publications/sp
 - OWASP, ASVS, WSTG y Cheat Sheets: https://owasp.org/ y https://cheatsheetseries.owasp.org/
@@ -70,6 +94,6 @@ Publicar por separado recursos catalogados, descargados, verificados, ingeridos,
 
 
 ## Estado del catálogo versionado (v1.1.0)
-El catálogo contiene 28 áreas y 98 referencias. Se añadieron 44 referencias en ingeniería de software, aprendizaje automático, hardware/firmware, matemáticas y especialidades de seguridad (ASVS, WSTG, seguridad de API, SLSA, OpenSSF, SBOM, respuesta a incidentes, D3FEND y otras fuentes primarias).
+El catálogo ampliado contiene 48 áreas y 138 referencias. Se añadieron 44 referencias en ingeniería de software, aprendizaje automático, hardware/firmware, matemáticas y especialidades de seguridad (ASVS, WSTG, seguridad de API, SLSA, OpenSSF, SBOM, respuesta a incidentes, D3FEND y otras fuentes primarias).
 
-**Importante:** son referencias catalogadas, no conocimiento descargado ni ingerido. Las licencias permanecen como pendientes; no se ha marcado ningún recurso como descargado o verificado. El flujo de adquisición debe comprobar licencia, procedencia, fecha, hash, tamaño y formato antes de ingestión.
+**Importante:** son referencias catalogadas, no conocimiento externo descargado ni ingerido. Los paquetes propios iniciales de `knowledge/packs/` sí se distribuyen offline. Las licencias permanecen como pendientes; no se ha marcado ningún recurso como descargado o verificado. El flujo de adquisición debe comprobar licencia, procedencia, fecha, hash, tamaño y formato antes de ingestión.

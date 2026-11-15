@@ -103,6 +103,10 @@ python sandbox_runner.py --tool ruff --target tests/fixtures/sandbox_sample.py -
 
 La imagen Docker actual solo incluye Ruff y Bandit. Semgrep, Syft y Trivy están registrados, pero no disponibles dentro de esa imagen. Docker comparte el kernel del host y no equivale a una microVM; no ejecutes código hostil confiando únicamente en este aislamiento.
 
+## Biblioteca de conocimiento offline y Skills
+
+El repositorio incluye paquetes metodológicos propios en español para todas las especialidades del catálogo. Consulta `knowledge/packs/manifest.json` y `knowledge/packs/<area>/README.md`. Son una base inicial, no una enciclopedia ni sustituyen corpus especializados. Las referencias externas solo se descargan tras validar licencia, procedencia e integridad.
+
 ## Conocimiento y Skills
 
 - Ingesta TXT, Markdown, HTML, CSV, JSON/JSONL y código: disponible con las dependencias base. PDF, DOCX, XLSX y PPTX requieren `pip install -r requirements-documents.txt`. Los PDF escaneados necesitan OCR externo; el importador no ejecuta OCR.

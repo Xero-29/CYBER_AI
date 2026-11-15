@@ -25,6 +25,10 @@ class KnowledgeCatalogTests(unittest.TestCase):
         area_ids = {item["id"] for item in self.data["areas"]}
         self.assertTrue({"software_engineering", "machine_learning", "hardware_security", "mathematics"} <= area_ids)
 
+    def test_expanded_security_specialties_exist(self):
+        ids = {item["id"] for item in self.data["areas"]}
+        self.assertTrue({"soc_siem", "edr_xdr", "threat_hunting", "red_team", "wireless_security", "ot_ics", "telecom_5g", "automotive_security", "satellite_security", "physical_security", "email_dns_security", "fraud_abuse", "privacy_engineering", "cloud_forensics", "ai_red_team", "pki_hsm", "post_quantum_crypto", "business_continuity", "database_security", "vulnerability_research"} <= ids)
+
     def test_catalog_references_are_not_misrepresented_as_downloaded(self):
         for item in self.data["resources"]:
             self.assertFalse(item["download"])

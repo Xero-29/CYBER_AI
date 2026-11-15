@@ -20,9 +20,9 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 
 ## Capacidades existentes (no equivalen a cierre institucional)
 
-- Inventario de 20 herramientas, selección explicable y adaptadores parciales; los adaptadores locales registran la versión instalada cuando puede consultarse sin red.
+- Inventario de 21 herramientas, selección explicable y adaptadores parciales; los adaptadores locales registran la versión instalada cuando puede consultarse sin red.
 - Sandbox Docker endurecido con timeout del cliente y limpieza forzada del contenedor ante timeout; comparte kernel y no es aislamiento para malware hostil.
-- Atlas de 28 áreas y 98 referencias catalogadas, no corpus completo ingerido.
+- Atlas de 48 áreas y 138 referencias externas catalogadas; además, 48 paquetes metodológicos propios incluidos offline. Las referencias externas no están descargadas ni ingeridas.
 - Biblioteca SQLite con fragmentos comprimidos, SHA-256, metadatos, separación shared/tenant y búsqueda semántica.
 - Ingestión transaccional (publicación de todos los fragmentos en una única transacción), límite de 2 MiB por fragmento y descompresión acotada de TXT/Markdown, HTML, CSV, JSON/JSONL y código; extractores opcionales PDF/DOCX/XLSX/PPTX con límites de tamaño, expansión ZIP y extracción incremental acotada para evitar acumulación descontrolada de texto. OCR de PDF escaneado y ejecución aislada de extractores siguen pendientes. Catálogo, descubrimiento y downloader con manifiesto serializado por lock; dry-run sin DNS ni escrituras. Sigue pendiente resolver DNS rebinding/TOCTOU mediante proxy de salida o pinning de IP.
 - Reindexación con staging, backup y publicación transaccional.
@@ -33,6 +33,12 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 - `preflight.py` para revisar dependencias, configuración, herramientas opcionales y ledger local sin iniciar servicios ni usar red.
 - CLI `ledger_cli.py` para verificar integridad, listar namespaces y consultar historial.
 - Ledger de ejecuciones: integrado con `agent_runner.py`, `tool_executor.py`, `nuclei_scanner.py`, `task_runner.py` y `team_orchestrator.py` para registrar respuestas, ejecuciones locales, timeouts, denegaciones y revisiones objetivas independientes. `agent_runner` marca la autocompletitud como no independiente. La escritura del ledger emite una advertencia si falla y no oculta el resultado original. El ciclo de Skills autónomas y el almacenamiento externo WORM siguen pendientes.
+
+## Avance de biblioteca offline
+
+- Catálogo ampliado a 48 especialidades.
+- 48 paquetes base propios en español incluidos en `knowledge/packs/`, con competencias, metodología, controles, laboratorio y evaluación.
+- Las referencias externas siguen pendientes de licencia/procedencia y no se declaran descargadas ni ingeridas.
 
 ## Pendientes de cierre
 
