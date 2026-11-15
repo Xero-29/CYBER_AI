@@ -6,6 +6,8 @@ from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
+from tool_adapters import TOOL_SPECS
+
 TOOL_CATALOG = [
  {"id":"semgrep","binary":"semgrep","category":"sast","purpose":"Análisis estático multi-lenguaje","risk":"local_read_only","execution_policy":"local_code_review"},
  {"id":"bandit","binary":"bandit","category":"sast","purpose":"Análisis estático de seguridad Python","risk":"local_read_only","execution_policy":"local_code_review"},
@@ -37,6 +39,7 @@ def build_inventory():
             "available": bool(shutil.which(item["binary"])),
             "path": shutil.which(item["binary"]),
             "binary": item["binary"],
+            "adapter_registered": item["id"] in TOOL_SPECS,
         }
         for item in TOOL_CATALOG
     }
@@ -51,12 +54,14 @@ def build_inventory():
             categories[category] += 1
             items.append({"name": path.stem, "path": str(path), "category": category})
     available = sum(item["available"] for item in tools.values())
+    adapted = sum(item["adapter_registered"] for item in tools.values())
+    available_and_adapted = sum(item["available"] and item["adapter_registered"] for item in tools.values())
     return {
         "schema_version": "2.0.0",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "tools": tools,
         "tool_catalog": TOOL_CATALOG,
-        "summary": {"registered": len(TOOL_CATALOG), "available": available, "unavailable": len(TOOL_CATALOG)-available},
+        "summary": {"registered": len(TOOL_CATALOG), "available": available, "unavailable": len(TOOL_CATALOG)-available, "adapter_registered": adapted, "catalog_only": len(TOOL_CATALOG)-adapted, "available_and_adapted": available_and_adapted},
         "nuclei_templates": {
             "root": str(root), "available": root.is_dir(), "count": len(items),
             "categories": dict(sorted(categories.items())),

@@ -32,5 +32,18 @@ class CapabilityInventoryTests(unittest.TestCase):
         ))
 
 
+
+    def test_inventory_reports_adapter_coverage_separately_from_installation(self):
+        result = capability_inventory.build_inventory()
+        self.assertEqual(
+            result["summary"]["adapter_registered"],
+            sum(item["id"] in capability_inventory.TOOL_SPECS for item in capability_inventory.TOOL_CATALOG),
+        )
+        self.assertEqual(
+            result["summary"]["catalog_only"],
+            result["summary"]["registered"] - result["summary"]["adapter_registered"],
+        )
+        self.assertIn("adapter_registered", result["tools"]["ruff"])
+
 if __name__ == "__main__":
     unittest.main()
