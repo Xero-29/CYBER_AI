@@ -39,7 +39,7 @@ class SbomGeneratorTests(unittest.TestCase):
 
     def test_rejects_conflicting_versions_across_included_files(self):
         (self.root / "requirements.lock").write_text(
-            "-r requirements.txt\\nrequests==2.33.0\\n", encoding="utf-8"
+            "-r requirements.txt\nrequests==2.33.0\n", encoding="utf-8"
         )
         with self.assertRaises(LockfileError):
             build_sbom(self.root)
