@@ -89,3 +89,11 @@ No declarar el sistema completo ni certificado hasta que cada brecha tenga códi
 - Revisión del flujo de excepciones: la firma de `_run_agent_impl` coloca `task_id` en el quinto argumento posicional; el wrapper lo propaga en esa posición o como keyword, y la correlación se realiza por `metadata.task_id`, no por el prompt redactado.
 - **CI de la rama durante esta revisión: no verificado** (las consultas de ejecuciones asociadas a PR y estados combinados devolvieron listas vacías para los commits consultados). Los resultados CI históricos indicados arriba no deben interpretarse como validación del HEAD actual.
 
+## Verificación de cierre — 2026-11-16 (actualización)
+
+- Se verificó que el commit `d325796f2732a5a6fb7bb34d39f8b7a2cb494e0c` existe en GitHub y añade pruebas para validar la duración reportada por adaptadores y el fallback monotónico.
+- Se inspeccionó `tool_executor.py`: `_duration_ms` acepta únicamente números finitos no booleanos y no negativos; ante evidencia inválida usa el reloj monotónico local.
+- **CI de ese commit: no verificado.** Las consultas de ejecuciones asociadas al commit y de estados combinados no devolvieron ejecuciones ni estados. Esto no demuestra éxito ni fallo; no se debe marcar como verde.
+- La rama sigue divergida respecto de `main`: 301 commits por delante y 1 por detrás según la comparación consultada. No se hizo merge ni force-push.
+- La ejecución de la suite completa, Docker, proveedores externos, restauración y pruebas de aislamiento deben confirmarse mediante ejecuciones reproducibles. Los resultados históricos no sustituyen la validación del HEAD actual.
+- No se declara cierre institucional: permanecen las dependencias de infraestructura y validación externa enumeradas en este documento.
