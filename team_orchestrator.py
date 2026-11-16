@@ -679,6 +679,7 @@ def _record_workflow_ledger(report, task, duration_ms):
         metadata={
             "workflow": report.get("workflow"),
             "objective_supervision": bool(report.get("objective_contract")),
+            "start_event_id": report.get("ledger_start_event_id"),
         },
     )
 
@@ -732,6 +733,19 @@ def execute_workflow(
         print("\nSimulación completada: no se cargó ningún modelo.")
         return 0
 
+    namespace = os.environ.get("CYBER_AI_NAMESPACE", "shared").strip() or "shared"
+    try:
+        start_event = ExecutionLedger().append(
+            namespace=namespace, task=task, status="started",
+            tool="team_orchestrator", tool_version="1", model="multi-agent",
+            environment=f"python-{platform.python_version()}",
+            evidence={"phase": "workflow_start", "workflow": workflow_name},
+            duration_ms=0, metadata={"workflow": workflow_name},
+        )
+    except Exception as error:
+        print(f"ERROR: no se pudo registrar el inicio del flujo: {error}", file=sys.stderr)
+        return 3
+
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     report_path = REPORT_DIR / f"team_{timestamp}.json"
     history = []
@@ -741,6 +755,7 @@ def execute_workflow(
         "started_at": datetime.now(timezone.utc).isoformat(),
         "status": "running",
         "steps": [],
+        "ledger_start_event_id": start_event["event_id"],
     }
     if objective_contract is not None:
         report["objective_contract"] = objective_contract.to_dict()

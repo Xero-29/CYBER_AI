@@ -475,6 +475,22 @@ def run_agent(
 
     config = load_config()
     name, agent = resolve_agent(agent_name, config)
+    memory_config = agent.get("memory") or {}
+    ledger_namespace = str(memory_config.get("namespace") or name)
+    ledger_required = os.environ.get("CYBER_AI_LEDGER_REQUIRED") == "1"
+    ledger_start_event = None
+    try:
+        ledger_start_event = ExecutionLedger().append(
+            namespace=ledger_namespace, task=str(prompt), status="started",
+            tool="agent_runner", tool_version="1", model="pending",
+            environment=f"python:{sys.version_info.major}.{sys.version_info.minor}",
+            evidence={"phase": "agent_start", "task_id": task_id},
+            duration_ms=0, metadata={"task_id": task_id, "session_id": session_id},
+        )
+    except Exception as ledger_error:
+        print(f"AVISO: no se pudo registrar el inicio del agente en el ledger: {ledger_error}", flush=True)
+        if ledger_required:
+            raise RuntimeError("Ejecución bloqueada: no se pudo registrar el inicio en el ledger.") from ledger_error
 
     # Recuperar la sesión anterior al reanudar una tarea existente.
     existing_checkpoint = get_checkpoint(task_id) if explicit_task_id else None
@@ -935,11 +951,9 @@ def run_agent(
             save_jsonl(TASK_LOG, event)
             # Registrar el resultado del agente como evidencia auditable.
             try:
-                memory_config = agent.get("memory") or {}
-                namespace = memory_config.get("namespace") or name
                 ledger_status = "completed" if finished else "failed"
                 ledger_result = ExecutionLedger().append(
-                    namespace=str(namespace), task=original_task,
+                    namespace=ledger_namespace, task=original_task,
                     status=ledger_status, tool="agent_runner",
                     tool_version="1", model=f"{provider['name']}::{model}",
                     environment=f"python:{sys.version_info.major}.{sys.version_info.minor}",
@@ -954,11 +968,14 @@ def run_agent(
                               "completion_tokens": usage_totals["eval_count"],
                               "generation_requests": generation_requests,
                               "matched_skills": matched_skills,
-                              "retrieved_knowledge": retrieved_knowledge},
+                              "retrieved_knowledge": retrieved_knowledge,
+                              "start_event_id": ledger_start_event["event_id"] if ledger_start_event else None},
                 )
                 print(f"Ledger: evento {ledger_result['sequence']} registrado", flush=True)
             except Exception as ledger_error:
                 print(f"AVISO: no se pudo registrar la ejecución en el ledger: {ledger_error}", flush=True)
+                if ledger_required:
+                    raise RuntimeError("Ejecución no aceptada: no se pudo registrar el resultado en el ledger.") from ledger_error
             try:
                 save_checkpoint(
                     task_id=task_id,
