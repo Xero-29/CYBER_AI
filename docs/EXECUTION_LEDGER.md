@@ -13,6 +13,10 @@ execution_ledger.py adds a transactional SQLite event log for observed task runs
 - Secret-like metadata keys are redacted before persistence.
 - History queries are namespace-scoped.
 
+## Signed external checkpoints
+
+`ledger_checkpoint.py` creates a canonical HMAC-SHA256 anchor containing the ledger sequence and event hash. Verification checks the signature, full local hash chain, and that the current ledger still contains the anchored row. Store checkpoint files outside the ledger host/volume and keep `CYBER_AI_LEDGER_CHECKPOINT_KEY` in an external secret manager. This detects rollback/replacement only when the checkpoint and key remain independently protected; it is not WORM storage or operator identity proof.
+
 ## Limitations
 Tamper-evident is not tamper-proof. A privileged actor can replace the database
 and recompute the chain. Production requires signed checkpoints exported to
