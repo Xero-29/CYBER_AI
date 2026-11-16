@@ -1,46 +1,50 @@
-# Telecomunicaciones/5G — Paquete especializado
+# Telecomunicaciones y 5G — Guía de dominio
 
-**ID:** `telecom_5g` · **Versión:** 1.1.0 · **Idioma:** español · **Estado:** contenido editorial propio, offline.
+**ID:** `telecom_5g` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
-## Propósito y límites
-RAN, núcleo 5G, SBA, slicing, SIM/eSIM, señalización e interfaces de gestión.
+## Propósito y alcance
+Protege redes móviles y telecom: RAN, core, transporte, OSS/BSS, SIM/eSIM, roaming, interconexión, slicing, edge y virtualización de funciones. La disponibilidad y seguridad de emergencia son críticas. No realizar pruebas radioeléctricas, interferencia ni escaneos sobre redes comerciales.
 
-Este módulo ofrece orientación y ejercicios sintéticos. No implica que CYBER_AI disponga de una plataforma especializada instalada ni concede permisos. Toda actividad activa requiere propietario, autorización, alcance, ventana y plan de parada.
+## Arquitectura y amenazas
+Revisar gNodeB, AMF, SMF, UPF, AUSF, UDM, NRF, PCF, NEF, SEPP, IMS, MEC, NFV, SDN, O-RAN, interfaces de gestión y supply chain. Riesgos: exposición de interfaces de gestión, abuso API SBA, configuración de slice, identidad SIM, roaming, signaling, virtualización y cadena de suministro.
 
-## Competencias específicas
-- Comprender arquitectura, actores, protocolos, flujos y límites de confianza.
-- Inventariar activos, superficies, dependencias y datos sensibles.
-- Mapear amenazas, debilidades y controles preventivos, detectivos y correctivos.
-- Definir telemetría y evidencia adecuada al contexto.
-- Evaluar disponibilidad, seguridad, privacidad y efectos operativos.
-- Convertir hallazgos en mitigaciones, pruebas de regresión y riesgo residual.
+## Competencias
+- Entender 5G SBA, service-based interfaces y autenticación mutua.
+- Revisar segmentación, slicing y aislamiento de tenants.
+- Proteger SIM/eSIM, aprovisionamiento y credenciales.
+- Analizar señalización SS7/Diameter/5G sin afectar redes reales.
+- Evaluar NFV/CNF, Kubernetes y cloud-native core.
+- Revisar seguridad O-RAN y cadena de suministro.
+- Diseñar resiliencia, logging y detección de fraude.
 
-## Amenazas y fallos prioritarios
-Exposición de interfaces, identidad de abonado, roaming, slicing y disponibilidad.
+## Controles
+- mTLS y OAuth2 para interfaces SBA según especificación.
+- Exposición mínima de NRF/NEF y APIs de gestión.
+- Segmentación de planos control, usuario y operación.
+- Gestión de certificados, secretos y ciclo de vida de SIM.
+- Aislamiento de slices y límites de recursos.
+- Hardening de CNF, nodos y pipelines.
+- Telemetría de signaling y anomalías con privacidad.
+- Redundancia y pruebas de recuperación sin afectar servicio.
 
 ## Metodología
-1. Documentar propietario, criticidad, contexto y autorización.
-2. Crear diagrama de arquitectura, inventario y flujos de datos.
-3. Definir escenarios de amenaza y criterios de éxito/fracaso.
-4. Revisar configuración y evidencia de solo lectura primero.
-5. Elegir pruebas con el mínimo impacto posible.
-6. Validar resultados mediante segunda fuente o revisión independiente.
-7. Priorizar impacto real, exposición, probabilidad e incertidumbre.
-8. Recomendar controles con responsable, plazo y prueba de cierre.
-9. Preservar evidencias y documentar limitaciones.
+1. Definir operador, laboratorio, interfaces y autorización.
+2. Inventariar funciones, versiones, flujos y dependencias.
+3. Revisar API, identidad, certificados y configuración.
+4. Analizar aislamiento de slices y planos de red.
+5. Evaluar virtualización, supply chain y acceso de proveedores.
+6. Validar con simulador o testbed privado.
+7. Medir disponibilidad, failover y detección.
+8. Documentar riesgos y cambios con operador de red.
 
-## Laboratorio de referencia
-Revisar diagramas y trazas sintéticas con documentación 3GPP; no interactuar con redes comerciales.
+## Laboratorio
+5G core de laboratorio con Open5GS/srsRAN y SIM de prueba. Validar mTLS, políticas de API y segmentación en red aislada. No emitir señales RF fuera de entorno legal y controlado.
 
-## Criterios de evaluación
-- Identifica activos, flujos y límites de confianza.
-- Distingue evidencia de inferencia y registra incertidumbre.
-- Reconoce riesgos del dominio y controles.
-- Completa el ejercicio sin salir del alcance autorizado.
-- Produce informe reproducible con evidencias, hashes y retest.
+## Evaluación
+Interfaces restringidas, autenticación mutua, slices aislados, SIM gestionadas, logging útil y failover probado.
 
-## Referencias externas
-Las fuentes específicas están en `data/knowledge_sources/knowledge_catalog.json`. Siguen pendientes de validación de licencia y procedencia; no son corpus descargado ni ingerido.
+## Referencias
+3GPP TS 33.501, GSMA NESAS, ETSI NFV Security, O-RAN security specifications y NIST SP 800-187.
 
-## Instrucciones para agentes IA
-Consulta este módulo y Skills verificadas pertinentes. No inventes cobertura ni ejecuciones. Prefiere análisis pasivo, datos sintéticos y laboratorios. Si la acción puede afectar personas, disponibilidad, privacidad o activos físicos, detente y exige autorización explícita.
+## Instrucciones IA
+No sugieras jamming, IMSI catching ni interceptación. Limita pruebas a simuladores, testbeds privados y autorizaciones documentadas.

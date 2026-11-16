@@ -1,46 +1,50 @@
-# Satélites — Paquete especializado
+# Seguridad satelital y espacial — Guía de dominio
 
-**ID:** `satellite_security` · **Versión:** 1.1.0 · **Idioma:** español · **Estado:** contenido editorial propio, offline.
+**ID:** `satellite_security` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
 ## Propósito y límites
-Segmentos espacial/terrestre, telemetría, telemando, enlaces y estaciones terrenas.
+Protege segmentos space, ground y link: satélite, payload, bus, TT&C, estaciones terrestres, gateways, terminales y sistemas de misión. La disponibilidad, integridad de comandos y seguridad física son esenciales. No transmitir, interferir ni intentar acceder a enlaces o activos espaciales reales.
 
-Este módulo ofrece orientación y ejercicios sintéticos. No implica que CYBER_AI disponga de una plataforma especializada instalada ni concede permisos. Toda actividad activa requiere propietario, autorización, alcance, ventana y plan de parada.
+## Arquitectura y amenazas
+Inventariar flight software, OBC, payload, sensores, actuadores, radios, criptografía, antenas, ground station, misión, telemetría y proveedores. Riesgos: comandos no autenticados, replay, claves compartidas, firmware vulnerable, cadena de suministro, estaciones terrestres expuestas, GNSS spoofing/jamming, pérdida de sincronía y degradación orbital.
 
-## Competencias específicas
-- Comprender arquitectura, actores, protocolos, flujos y límites de confianza.
-- Inventariar activos, superficies, dependencias y datos sensibles.
-- Mapear amenazas, debilidades y controles preventivos, detectivos y correctivos.
-- Definir telemetría y evidencia adecuada al contexto.
-- Evaluar disponibilidad, seguridad, privacidad y efectos operativos.
-- Convertir hallazgos en mitigaciones, pruebas de regresión y riesgo residual.
+## Competencias
+- Modelar trust boundaries entre segmento espacial y terrestre.
+- Proteger TT&C, autenticación, cifrado y anti-replay.
+- Evaluar boot chain, firmware, telemetría y comandos.
+- Diseñar key management, rotación y recuperación.
+- Analizar GNSS, enlaces RF y protocolos en simulador.
+- Proteger estaciones terrestres, redes y consolas.
+- Preparar contingencias de pérdida de enlace y recuperación segura.
 
-## Amenazas y fallos prioritarios
-Disponibilidad de enlace, suplantación, supply chain y dependencia GNSS.
+## Controles
+- Autenticación fuerte de comandos y protección anti-replay.
+- Claves únicas por misión/vehículo y almacenamiento protegido.
+- Segmentación de TT&C y redes corporativas.
+- Control de acceso a estaciones y consolas.
+- Firmware firmado, rollback controlado y recuperación.
+- Telemetría con integridad, secuencia y sincronización.
+- Procedimientos de safe mode y recuperación aprobados.
+- Inventario de componentes y revisión de proveedores.
 
 ## Metodología
-1. Documentar propietario, criticidad, contexto y autorización.
-2. Crear diagrama de arquitectura, inventario y flujos de datos.
-3. Definir escenarios de amenaza y criterios de éxito/fracaso.
-4. Revisar configuración y evidencia de solo lectura primero.
-5. Elegir pruebas con el mínimo impacto posible.
-6. Validar resultados mediante segunda fuente o revisión independiente.
-7. Priorizar impacto real, exposición, probabilidad e incertidumbre.
-8. Recomendar controles con responsable, plazo y prueba de cierre.
-9. Preservar evidencias y documentar limitaciones.
+1. Definir misión, activos, interfaces y autoridad.
+2. Modelar amenazas y consecuencias de comandos erróneos.
+3. Revisar protocolo, claves y arquitectura pasivamente.
+4. Probar software y simuladores de enlace aislados.
+5. Validar anti-replay, autenticación y recuperación.
+6. Revisar estaciones terrestres, supply chain y accesos.
+7. Coordinar pruebas con ingeniería de misión y safety.
+8. Documentar degradación segura y respuesta a incidentes.
 
-## Laboratorio de referencia
-Revisar arquitecturas y datasets sintéticos; probar únicamente simuladores o bancos propios.
+## Laboratorio
+Emulador de telemetría/telecomando con mensajes sintéticos, claves de prueba y red aislada. Probar secuencias, integridad y replay sin radiar ni conectar a sistemas espaciales reales.
 
-## Criterios de evaluación
-- Identifica activos, flujos y límites de confianza.
-- Distingue evidencia de inferencia y registra incertidumbre.
-- Reconoce riesgos del dominio y controles.
-- Completa el ejercicio sin salir del alcance autorizado.
-- Produce informe reproducible con evidencias, hashes y retest.
+## Evaluación
+Comandos autenticados, claves protegidas, estaciones segmentadas, recuperación validada y procedimientos de contingencia ensayados.
 
-## Referencias externas
-Las fuentes específicas están en `data/knowledge_sources/knowledge_catalog.json`. Siguen pendientes de validación de licencia y procedencia; no son corpus descargado ni ingerido.
+## Referencias
+CCSDS security architecture, NIST SP 800-53, NASA cybersecurity guidance, ECSS standards y MITRE ATT&CK como referencia complementaria.
 
-## Instrucciones para agentes IA
-Consulta este módulo y Skills verificadas pertinentes. No inventes cobertura ni ejecuciones. Prefiere análisis pasivo, datos sintéticos y laboratorios. Si la acción puede afectar personas, disponibilidad, privacidad o activos físicos, detente y exige autorización explícita.
+## Instrucciones IA
+No generes frecuencias, payloads de transmisión ni procedimientos para interferir enlaces. Mantén los ejercicios en simuladores y datos sintéticos.

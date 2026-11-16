@@ -1,46 +1,52 @@
-# Automoción/CAN — Paquete especializado
+# Ciberseguridad automotriz y CAN — Guía de dominio
 
-**ID:** `automotive_security` · **Versión:** 1.1.0 · **Idioma:** español · **Estado:** contenido editorial propio, offline.
+**ID:** `automotive_security` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
 ## Propósito y límites
-ECU, CAN/CAN-FD, gateways, diagnóstico, firmware y actualizaciones OTA.
+Evalúa ECU, redes internas, conectividad, telemática, infotainment, actualizaciones y backend. Los sistemas vehiculares pueden afectar seguridad física; no transmitir tramas, modificar ECU ni conectar herramientas de prueba a vehículos en circulación.
 
-Este módulo ofrece orientación y ejercicios sintéticos. No implica que CYBER_AI disponga de una plataforma especializada instalada ni concede permisos. Toda actividad activa requiere propietario, autorización, alcance, ventana y plan de parada.
+## Arquitectura y superficies
+Inventariar ECU, CAN/CAN FD, LIN, FlexRay, Automotive Ethernet, gateway, OBD-II, TCU, infotainment, ADAS, sensores, secure element, OTA y backend. Analizar dominios de seguridad, separación safety/security, buses, diagnóstico UDS, boot chain, firmware y credenciales de fábrica.
 
-## Competencias específicas
-- Comprender arquitectura, actores, protocolos, flujos y límites de confianza.
-- Inventariar activos, superficies, dependencias y datos sensibles.
-- Mapear amenazas, debilidades y controles preventivos, detectivos y correctivos.
-- Definir telemetría y evidencia adecuada al contexto.
-- Evaluar disponibilidad, seguridad, privacidad y efectos operativos.
-- Convertir hallazgos en mitigaciones, pruebas de regresión y riesgo residual.
+## Competencias
+- Comprender CAN IDs, arbitraje, frames, gateway y segmentación.
+- Revisar autenticación de diagnóstico y controles UDS.
+- Evaluar secure boot, firmware signing y anti-rollback.
+- Proteger telemática, APIs móviles y backend.
+- Analizar mensajes y señales con datasets sintéticos.
+- Diseñar threat analysis and risk assessment (TARA).
+- Coordinar ciberseguridad y seguridad funcional.
+- Gestionar vulnerabilidades y actualizaciones durante vida útil.
 
-## Amenazas y fallos prioritarios
-Mensajes no autenticados, abuso diagnóstico, firmware comprometido y seguridad funcional.
+## Controles
+- Separar infotainment/telemática de dominios safety-critical.
+- Autenticar diagnósticos y limitar funciones por estado del vehículo.
+- Firmar actualizaciones y verificar integridad antes de instalar.
+- Gestionar claves únicas y protección hardware.
+- Registrar versiones y procedencia de firmware.
+- Controlar interfaces OBD y acceso de talleres.
+- Aplicar gateway filtering y detección de anomalías.
+- Definir proceso de divulgación y respuesta de fabricante.
 
 ## Metodología
-1. Documentar propietario, criticidad, contexto y autorización.
-2. Crear diagrama de arquitectura, inventario y flujos de datos.
-3. Definir escenarios de amenaza y criterios de éxito/fracaso.
-4. Revisar configuración y evidencia de solo lectura primero.
-5. Elegir pruebas con el mínimo impacto posible.
-6. Validar resultados mediante segunda fuente o revisión independiente.
-7. Priorizar impacto real, exposición, probabilidad e incertidumbre.
-8. Recomendar controles con responsable, plazo y prueba de cierre.
-9. Preservar evidencias y documentar limitaciones.
+1. Definir vehículo, ECU, banco y autorización.
+2. Crear arquitectura y activos con impacto safety.
+3. Realizar TARA y mapear caminos de ataque.
+4. Revisar firmware, protocolos y actualización de forma pasiva.
+5. Probar en banco desconectado o simulador.
+6. Validar controles con datos sintéticos y fault injection controlada.
+7. Documentar impacto funcional y riesgo residual.
+8. Aprobar cambios con ingeniería y safety.
+9. Verificar regresión en banco y release firmado.
 
-## Laboratorio de referencia
-Analizar trazas CAN sintéticas y firmware de demostración en banco aislado; nunca transmitir comandos a vehículos en circulación.
+## Laboratorio
+Simulador CAN o banco ECU de desarrollo aislado con tramas ficticias. Analizar captura PCAP/CAN y validar reglas de gateway. No enviar comandos de diagnóstico a vehículos reales.
 
-## Criterios de evaluación
-- Identifica activos, flujos y límites de confianza.
-- Distingue evidencia de inferencia y registra incertidumbre.
-- Reconoce riesgos del dominio y controles.
-- Completa el ejercicio sin salir del alcance autorizado.
-- Produce informe reproducible con evidencias, hashes y retest.
+## Evaluación
+Interfaces y dominios inventariados, TARA documentada, firmware verificable, diagnósticos restringidos y cambios probados en banco.
 
-## Referencias externas
-Las fuentes específicas están en `data/knowledge_sources/knowledge_catalog.json`. Siguen pendientes de validación de licencia y procedencia; no son corpus descargado ni ingerido.
+## Referencias
+ISO/SAE 21434, UNECE R155/R156, ISO 26262, AUTOSAR, SAE J3061 y MITRE ATT&CK for ICS como referencia parcial.
 
-## Instrucciones para agentes IA
-Consulta este módulo y Skills verificadas pertinentes. No inventes cobertura ni ejecuciones. Prefiere análisis pasivo, datos sintéticos y laboratorios. Si la acción puede afectar personas, disponibilidad, privacidad o activos físicos, detente y exige autorización explícita.
+## Instrucciones IA
+Prioriza seguridad física. No sugieras inyección de tramas ni manipulación de ECU en vehículos reales. Limita ejemplos a simuladores y bancos autorizados.

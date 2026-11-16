@@ -1,46 +1,49 @@
-# Threat hunting — Paquete especializado
+# Threat hunting — Guía de dominio
 
-**ID:** `threat_hunting` · **Versión:** 1.1.0 · **Idioma:** español · **Estado:** contenido editorial propio, offline.
+**ID:** `threat_hunting` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
-## Propósito y límites
-Hunting basado en hipótesis, análisis de comportamiento, telemetría y consultas reproducibles.
+## Propósito
+Busca actividad adversaria que no ha generado alertas suficientes. Un hunt parte de una hipótesis falsable y termina en una conclusión, detección o brecha de telemetría. No equivale a buscar IOC de forma indiscriminada ni a ejecutar técnicas ofensivas sobre sistemas.
 
-Este módulo ofrece orientación y ejercicios sintéticos. No implica que CYBER_AI disponga de una plataforma especializada instalada ni concede permisos. Toda actividad activa requiere propietario, autorización, alcance, ventana y plan de parada.
+## Preparación y fuentes
+Fuentes: EDR, Sysmon, auditd, identidad, DNS, proxy, firewall, cloud control plane, correo, aplicaciones, NDR y telemetría de procesos. Documentar cobertura, latencia, retención, huecos, normalización y permisos de consulta. Definir ventana temporal y población de activos.
 
-## Competencias específicas
-- Comprender arquitectura, actores, protocolos, flujos y límites de confianza.
-- Inventariar activos, superficies, dependencias y datos sensibles.
-- Mapear amenazas, debilidades y controles preventivos, detectivos y correctivos.
-- Definir telemetría y evidencia adecuada al contexto.
-- Evaluar disponibilidad, seguridad, privacidad y efectos operativos.
-- Convertir hallazgos en mitigaciones, pruebas de regresión y riesgo residual.
-
-## Amenazas y fallos prioritarios
-Sesgo de confirmación, datos incompletos, hipótesis no falsables y confusión entre anomalía y ataque.
+## Competencias
+- Formular hipótesis basadas en ATT&CK, inteligencia o anomalías.
+- Traducir hipótesis en consultas reproducibles (KQL, SPL, SQL, Sigma).
+- Crear baselines por rol, host, servicio y horario.
+- Correlacionar identidad, proceso, red y persistencia.
+- Separar comportamiento benigno raro de actividad maliciosa.
+- Construir detecciones y casos de regresión a partir de resultados.
+- Documentar incertidumbre y cobertura limitada.
 
 ## Metodología
-1. Documentar propietario, criticidad, contexto y autorización.
-2. Crear diagrama de arquitectura, inventario y flujos de datos.
-3. Definir escenarios de amenaza y criterios de éxito/fracaso.
-4. Revisar configuración y evidencia de solo lectura primero.
-5. Elegir pruebas con el mínimo impacto posible.
-6. Validar resultados mediante segunda fuente o revisión independiente.
-7. Priorizar impacto real, exposición, probabilidad e incertidumbre.
-8. Recomendar controles con responsable, plazo y prueba de cierre.
-9. Preservar evidencias y documentar limitaciones.
+1. Escribir hipótesis, TTP, activos y ventana.
+2. Identificar telemetría necesaria y validar calidad.
+3. Crear consulta inicial y limitar coste/volumen.
+4. Establecer baseline y exclusiones justificadas.
+5. Investigar anomalías con pivotes trazables.
+6. Confirmar con fuentes independientes o clasificar inconcluso.
+7. Preservar evidencia y escalar incidentes según proceso.
+8. Convertir comportamiento confirmado en detección y test.
+9. Registrar cobertura, falsos positivos y próxima revisión.
 
-## Laboratorio de referencia
-Definir hipótesis ATT&CK, consultar dataset sintético y registrar hallazgos, falsos positivos e hipótesis descartadas.
+## Controles
+- Consultas read-only y cuotas de recursos.
+- Acceso RBAC y minimización de datos personales.
+- UTC, IDs correlacionables y retención definida.
+- No ejecutar acciones sobre hosts desde el proceso de hunting.
+- No considerar ausencia de telemetría como ausencia de amenaza.
+- Revisar consultas antes de producción y versionarlas.
 
-## Criterios de evaluación
-- Identifica activos, flujos y límites de confianza.
-- Distingue evidencia de inferencia y registra incertidumbre.
-- Reconoce riesgos del dominio y controles.
-- Completa el ejercicio sin salir del alcance autorizado.
-- Produce informe reproducible con evidencias, hashes y retest.
+## Laboratorio
+Logs sintéticos de Windows/Linux, DNS y autenticación. Formular hunts para uso anómalo de PowerShell, creación de servicios, cambios de privilegio y conexiones inusuales. Validar consultas con eventos positivos y negativos conocidos.
 
-## Referencias externas
-Las fuentes específicas están en `data/knowledge_sources/knowledge_catalog.json`. Siguen pendientes de validación de licencia y procedencia; no son corpus descargado ni ingerido.
+## Evaluación
+Cada hunt tiene hipótesis, consulta, ventana, cobertura, resultado, falsos positivos, evidencias y decisión de detección/seguimiento.
 
-## Instrucciones para agentes IA
-Consulta este módulo y Skills verificadas pertinentes. No inventes cobertura ni ejecuciones. Prefiere análisis pasivo, datos sintéticos y laboratorios. Si la acción puede afectar personas, disponibilidad, privacidad o activos físicos, detente y exige autorización explícita.
+## Referencias
+MITRE ATT&CK, Sigma, Kusto Query Language, Splunk SPL, Elastic EQL, NIST SP 800-61 y Threat Hunting Maturity Model.
+
+## Instrucciones IA
+No concluyas compromiso solo por anomalía. Indica qué datos faltan y limita consultas a la autorización y ventana indicadas.

@@ -1,46 +1,51 @@
-# Forense cloud — Paquete especializado
+# Forense cloud — Guía de dominio
 
-**ID:** `cloud_forensics` · **Versión:** 1.1.0 · **Idioma:** español · **Estado:** contenido editorial propio, offline.
+**ID:** `cloud_forensics` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
 ## Propósito y límites
-Logs de control e identidad, snapshots, almacenamiento, contenedores y preservación.
+Preserva y analiza evidencia de control planes, workloads, almacenamiento, identidad y servicios gestionados. La evidencia cloud es efímera, distribuida y dependiente de proveedor, región y configuración de logging. La adquisición debe respetar jurisdicción, contratos y privacidad.
 
-Este módulo ofrece orientación y ejercicios sintéticos. No implica que CYBER_AI disponga de una plataforma especializada instalada ni concede permisos. Toda actividad activa requiere propietario, autorización, alcance, ventana y plan de parada.
+## Fuentes
+CloudTrail/CloudTrail Lake, Azure Activity/Entra logs, GCP Audit Logs, flow logs, DNS, snapshots, object versioning, EDR, Kubernetes audit, IAM, KMS, serverless, CI/CD, SaaS y tickets de cambios. Registrar región, cuenta, proyecto, tenant, actor, API, request ID, timestamp, retención y estado de integridad.
 
-## Competencias específicas
-- Comprender arquitectura, actores, protocolos, flujos y límites de confianza.
-- Inventariar activos, superficies, dependencias y datos sensibles.
-- Mapear amenazas, debilidades y controles preventivos, detectivos y correctivos.
-- Definir telemetría y evidencia adecuada al contexto.
-- Evaluar disponibilidad, seguridad, privacidad y efectos operativos.
-- Convertir hallazgos en mitigaciones, pruebas de regresión y riesgo residual.
+## Competencias
+- Preservar logs de control plane y datos con exportación nativa.
+- Correlacionar identidades humanas, service principals y workloads.
+- Analizar cambios IAM, tokens, claves, redes, storage y snapshots.
+- Construir timeline distribuido y normalizar UTC.
+- Adquirir snapshots y discos sin alterar originales.
+- Evaluar logs ausentes, retrasos, límites y gaps por servicio.
+- Gestionar evidencias de proveedores y solicitudes legales.
 
-## Amenazas y fallos prioritarios
-Rotación de logs, relojes, permisos excesivos, jurisdicción y pérdida de evidencia volátil.
+## Controles de preservación
+- Activar logging organizacional y exportación central fuera de cuenta.
+- Retención bloqueada/inmutable y acceso segregado.
+- Snapshots con tags, hashes y registro de operador.
+- Preservar configuración y metadatos junto al contenido.
+- No apagar ni terminar workloads antes de evaluar volatilidad.
+- Evitar copiar datos personales innecesarios.
+- Registrar API calls y request IDs de adquisición.
+- Cifrar evidencias y limitar acceso por caso.
 
 ## Metodología
-1. Documentar propietario, criticidad, contexto y autorización.
-2. Crear diagrama de arquitectura, inventario y flujos de datos.
-3. Definir escenarios de amenaza y criterios de éxito/fracaso.
-4. Revisar configuración y evidencia de solo lectura primero.
-5. Elegir pruebas con el mínimo impacto posible.
-6. Validar resultados mediante segunda fuente o revisión independiente.
-7. Priorizar impacto real, exposición, probabilidad e incertidumbre.
-8. Recomendar controles con responsable, plazo y prueba de cierre.
-9. Preservar evidencias y documentar limitaciones.
+1. Definir autorización, jurisdicción, cuentas y alcance.
+2. Preservar primero logs de control plane, identidad y red.
+3. Exportar logs nativos y verificar integridad/continuidad.
+4. Capturar snapshots con cambios mínimos y aprobación.
+5. Correlacionar actores, recursos, regiones y tiempos.
+6. Construir timeline y distinguir eventos confirmados de inferencias.
+7. Solicitar evidencias del proveedor si el plano de control no expone detalle.
+8. Revisar hallazgos con analista independiente.
+9. Conservar cadena de custodia y plan de retención.
 
-## Laboratorio de referencia
-Reconstruir incidente con logs sintéticos, preservar exportaciones y hashes sin alterar cuentas reales.
+## Laboratorio
+Cuenta cloud sandbox con audit logs y recursos ficticios. Simular creación de rol, cambio de bucket policy y acceso a secreto; exportar eventos y reconstruir timeline. No usar datos reales ni modificar producción.
 
-## Criterios de evaluación
-- Identifica activos, flujos y límites de confianza.
-- Distingue evidencia de inferencia y registra incertidumbre.
-- Reconoce riesgos del dominio y controles.
-- Completa el ejercicio sin salir del alcance autorizado.
-- Produce informe reproducible con evidencias, hashes y retest.
+## Evaluación
+Evidencia preservada en cuenta separada, timeline trazable, huecos documentados y adquisición reproducible.
 
-## Referencias externas
-Las fuentes específicas están en `data/knowledge_sources/knowledge_catalog.json`. Siguen pendientes de validación de licencia y procedencia; no son corpus descargado ni ingerido.
+## Referencias
+NIST SP 800-86, NIST SP 800-201, CSA Cloud Forensics, AWS/Azure/GCP audit logging guides y ISO/IEC 27037.
 
-## Instrucciones para agentes IA
-Consulta este módulo y Skills verificadas pertinentes. No inventes cobertura ni ejecuciones. Prefiere análisis pasivo, datos sintéticos y laboratorios. Si la acción puede afectar personas, disponibilidad, privacidad o activos físicos, detente y exige autorización explícita.
+## Instrucciones IA
+No borres, detengas ni restaures recursos. Preserva primero y coordina con dueño de cuenta y legal. No afirmes atribución a partir de IP o user-agent aislado.
