@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import math
 import os
 import sys
 import time
@@ -21,6 +22,19 @@ def _terminal_status(evidence):
     if status == "completed" and evidence.get("return_code") == 0:
         return "completed"
     return "failed"
+
+
+def _duration_ms(evidence, started):
+    """Prefer adapter-reported duration; fall back to the local monotonic clock."""
+    elapsed = evidence.get("elapsed_seconds") if isinstance(evidence, dict) else None
+    if (
+        isinstance(elapsed, (int, float))
+        and not isinstance(elapsed, bool)
+        and math.isfinite(elapsed)
+        and elapsed >= 0
+    ):
+        return int(elapsed * 1000)
+    return max(0, int((time.monotonic() - started) * 1000))
 
 
 def main(argv=None):
@@ -101,7 +115,7 @@ def main(argv=None):
                     tool=args.tool,
                     tool_version=evidence.get("tool_version", "unknown"),
                     evidence=evidence,
-                    duration_ms=max(0, int((time.monotonic() - started) * 1000)),
+                    duration_ms=_duration_ms(evidence, started),
                     validator_results=[{
                         "name": "process_exit",
                         "passed": evidence.get("return_code") == 0,
