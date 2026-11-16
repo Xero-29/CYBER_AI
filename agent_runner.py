@@ -461,7 +461,7 @@ def retrieve_knowledge_context(
     return context, metadata
 
 
-def run_agent(
+def _run_agent_impl(
     agent_name, prompt, think_override=None, num_predict_override=None,
     task_id=None, session_id=None, context_task_ids=None, mode=None,
     use_knowledge=False, knowledge_top_k=3,
@@ -1023,6 +1023,69 @@ def run_agent(
             print(f"\nRegistro: {TASK_LOG}")
         finally:
             fcntl.flock(lock, fcntl.LOCK_UN)
+
+
+def run_agent(*args, **kwargs):
+    """Cierra en el ledger cualquier ejecución que falle fuera del flujo normal."""
+    agent_name = args[0] if args else kwargs.get("agent_name")
+    prompt = args[1] if len(args) > 1 else kwargs.get("prompt", "")
+    wrapper_started_at = datetime.now(timezone.utc).isoformat()
+    try:
+        return _run_agent_impl(*args, **kwargs)
+    except Exception as execution_error:
+        ledger_required = os.environ.get("CYBER_AI_LEDGER_REQUIRED") == "1"
+        try:
+            config = load_config()
+            resolved_name, agent = resolve_agent(agent_name, config)
+            memory_config = agent.get("memory") or {}
+            namespace = str(memory_config.get("namespace") or resolved_name)
+            ledger = ExecutionLedger()
+            history = ledger.history(namespace=namespace, limit=1000)
+            starts = [
+                item for item in history
+                if item.get("status") == "started"
+                and item.get("tool") == "agent_runner"
+                and item.get("task") == str(prompt)
+                and item.get("created_at", "") >= wrapper_started_at
+            ]
+            if starts:
+                start_event = max(starts, key=lambda item: item["sequence"])
+                start_event_id = start_event["event_id"]
+                already_finalized = any(
+                    item.get("status") != "started"
+                    and (item.get("metadata") or {}).get("start_event_id") == start_event_id
+                    for item in history
+                )
+                if not already_finalized:
+                    ledger.append(
+                        namespace=namespace,
+                        task=str(prompt),
+                        status="failed",
+                        tool="agent_runner",
+                        tool_version="1",
+                        model="unknown",
+                        environment=f"python:{sys.version_info.major}.{sys.version_info.minor}",
+                        duration_ms=0,
+                        evidence={
+                            "phase": "uncaught_agent_exception",
+                            "error_type": type(execution_error).__name__,
+                            "error": str(execution_error),
+                        },
+                        metadata={
+                            "start_event_id": start_event_id,
+                            "recovered_by": "run_agent_exception_guard",
+                        },
+                    )
+        except Exception as ledger_error:
+            print(
+                f"AVISO: no se pudo cerrar el evento fallido del agente: {ledger_error}",
+                file=sys.stderr,
+            )
+            if ledger_required:
+                raise RuntimeError(
+                    "La ejecución falló y no se pudo cerrar su evento en el ledger."
+                ) from execution_error
+        raise
 
 
 def embed_text(agent_name, text):
