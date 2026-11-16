@@ -16,7 +16,7 @@ from execution_policy import AuthorizationError, authorize_target
 from execution_ledger import ExecutionLedger
 
 
-def _record_task_scan(task, target, report, started, authorization_id=None):
+def _record_task_scan(task, target, report, started, authorization_id=None, start_event_id=None):
     """Registra ejecuciones del runner de plantillas Nuclei."""
     status = report.get("status")
     ledger_status = (
@@ -26,15 +26,18 @@ def _record_task_scan(task, target, report, started, authorization_id=None):
         else "failed"
     )
     try:
-        ExecutionLedger().append(
+        event = ExecutionLedger().append(
             namespace="security-scans", task=f"{task} :: {target}",
             status=ledger_status, tool="nuclei_task_runner",
             evidence=report,
             duration_ms=max(0, int((time.monotonic() - started) * 1000)),
-            metadata={"authorization_id": authorization_id, "scanner_status": status},
+            metadata={"authorization_id": authorization_id, "scanner_status": status,
+                      "start_event_id": start_event_id},
         )
+        return event
     except Exception as error:
         print(f"AVISO: no se pudo registrar el escaneo en el ledger: {error}", file=sys.stderr)
+        return None
 
 
 def main():
@@ -51,6 +54,8 @@ def main():
         "--authorization-id",
         help="ID de una autorización local vigente y limitada al destino",
     )
+    parser.add_argument("--require-ledger", action="store_true",
+                        help="No inicia el escaneo si el ledger no registra inicio y resultado")
     args = parser.parse_args()
 
     parsed = urlparse(args.target)
@@ -158,6 +163,20 @@ def main():
     results_file = output_dir / f"task_scan_{scan_id}.jsonl"
     report_file = output_dir / f"task_scan_{scan_id}_report.json"
 
+    start_event_id = None
+    try:
+        start_event = ExecutionLedger().append(
+            namespace="security-scans", task=f"{args.task} :: {args.target}",
+            status="started", tool="nuclei_task_runner",
+            evidence={"phase": "scan_start", "selected_templates": len(selected)},
+            duration_ms=0, metadata={"authorization_id": args.authorization_id},
+        )
+        start_event_id = start_event["event_id"]
+    except Exception as ledger_error:
+        print("AVISO: no se pudo registrar el inicio:", ledger_error, file=sys.stderr)
+        if args.require_ledger:
+            return 3
+
     command = [
         nuclei, "-u", args.target,
         "-jsonl", "-o", str(results_file.resolve()),
@@ -184,7 +203,9 @@ def main():
             json.dumps(report, indent=2, ensure_ascii=False) + "\n",
             encoding="utf-8",
         )
-        _record_task_scan(args.task, args.target, report, task_started, args.authorization_id)
+        recorded = _record_task_scan(args.task, args.target, report, task_started, args.authorization_id, start_event_id)
+        if args.require_ledger and recorded is None:
+            return 3
         print("Tiempo agotado. Informe:", report_file)
         return 1
 
@@ -212,7 +233,9 @@ def main():
         json.dumps(report, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
-    _record_task_scan(args.task, args.target, report, task_started, args.authorization_id)
+    recorded = _record_task_scan(args.task, args.target, report, task_started, args.authorization_id, start_event_id)
+    if args.require_ledger and recorded is None:
+        return 3
     print("\nEstado:", report["status"])
     print("Tiempo:", elapsed, "segundos")
     print("Hallazgos:", len(findings))
