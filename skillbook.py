@@ -539,6 +539,9 @@ def register_skill_from_ledger(
         f"ledger_event:{item['event_id']}:sha256:{item['evidence_sha256']}"
         for item in selected
     ] + ["candidate_payload_sha256:" + candidate_payload_hash]
+    approved_evidence = evidence_refs + [
+        "candidate_payload_sha256:" + candidate_payload_hash
+    ]
 
     initialize()
     stamp = now()
@@ -556,7 +559,7 @@ def register_skill_from_ledger(
                    verified_by='VERITAS',verifier_verdict='CONFIRMADA',updated_at=?
                    WHERE skill_id=? AND status='candidate' AND version=?""",
                 (
-                    version, json.dumps(evidence_refs), stamp,
+                    version, json.dumps(approved_evidence), stamp,
                     candidate["skill_id"], candidate["version"],
                 ),
             )
@@ -568,11 +571,27 @@ def register_skill_from_ledger(
                 "promoted_candidate": True,
             }
 
+        # Una aprobación ya aplicada debe ser idempotente: no crea Skills duplicadas.
+        existing = db.execute(
+            """SELECT skill_id,version FROM skills
+               WHERE status='active' AND task_pattern=? AND evidence_json=?
+               ORDER BY created_at LIMIT 1""",
+            (task_pattern.strip(), json.dumps(approved_evidence)),
+        ).fetchone()
+        if existing:
+            return {
+                "skill_id": existing["skill_id"],
+                "status": "active",
+                "version": existing["version"],
+                "promoted_candidate": False,
+                "reused": True,
+            }
+
     return _insert_verified_skill(
         name=name, task_pattern=task_pattern, description=description,
         prerequisites=prerequisites, methodology=methodology,
         validation=validation, tools=tools, tags=tags,
-        evidence=evidence_refs, source_urls=source_urls,
+        evidence=approved_evidence, source_urls=source_urls,
         success_runs=len(selected), failure_runs=0,
         verified_by="VERITAS", verifier_verdict="CONFIRMADA",
     )
