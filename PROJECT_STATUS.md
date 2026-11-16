@@ -111,3 +111,14 @@ No declarar el sistema completo ni certificado hasta que cada brecha tenga códi
 - **Límite persistente:** los backups siguen sin cifrado ni firma criptográfica externa. La protección de integridad SHA-256 detecta alteraciones respecto del manifiesto, pero no autentica el origen si un atacante puede reemplazar ambos. La clave/almacenamiento externo, WORM y pruebas de recuperación operacional siguen pendientes.
 - Comparación actual con `main`: `codex/security-integrity-audit` está divergida, **306 commits adelante y 1 detrás**. El commit exclusivo de `main` sigue siendo `7b5ed033f1f6461b5780a10ac4ada67a444b93e5`; no se hizo merge ni force-push.
 - La evidencia CI anterior sustituye la anotación histórica de “CI no verificado” solo para el SHA indicado. No demuestra compatibilidad con proveedores remotos, aislamiento microVM, recuperación ante pérdida física, cifrado/KMS ni certificación institucional.
+
+
+## Validación de Skillbook y HEAD actualizado — 2026-11-16
+
+- HEAD de código validado: `ece33eb64ee9de098fbf63d7147122107f65b3a0`.
+- Se corrigió la promoción repetida de una Skill: la aprobación firmada conserva la huella del payload y una repetición idéntica devuelve la Skill/version ya activada, sin crear una segunda Skill activa. La prueba cubre la repetición y confirma que el historial sigue siendo `proposed → approved`.
+- CI para ese SHA:
+  - [Python tests — success](https://github.com/Xero-29/CYBER_AI/actions/runs/43922107708). El paso de verificación completa terminó correctamente.
+  - [Docker sandbox — success](https://github.com/Xero-29/CYBER_AI/actions/runs/43922107770). Construcción, verificación completa, Ruff en el sandbox y carga de evidencia terminaron correctamente.
+- Comparación con `main` después de estos commits: **310 commits adelante / 1 detrás**, estado `diverged`. Se mantiene la decisión de no hacer merge ni force-push sin resolver el commit exclusivo de `main`.
+- Esta validación confirma las suites y el sandbox CI del código de esta revisión; no sustituye pruebas operacionales con proveedores remotos, despliegue KMS/HSM/WORM, cifrado de backups, microVM ni pruebas de recuperación ante fallos físicos.
