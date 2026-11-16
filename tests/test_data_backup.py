@@ -1,8 +1,10 @@
 import json
+import os
 import sqlite3
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from data_backup import BackupError, create_backup, restore_backup, verify_backup
 
@@ -114,6 +116,35 @@ class DataBackupTests(unittest.TestCase):
             self.assertEqual(db.execute("SELECT value FROM notes").fetchone()[0], "verified")
         with self.assertRaises(BackupError):
             restore_backup(snapshot, snapshot / "inside", confirm_quiesced=True)
+
+    def test_hmac_signature_is_verified_and_required_when_requested(self):
+        key = "backup-signing-key-with-at-least-32-bytes"
+        snapshot = self.root / "signed-backup"
+        with patch.dict(os.environ, {"CYBER_AI_BACKUP_HMAC_KEY": key}):
+            result = create_backup(self.data, snapshot)
+            self.assertTrue(result["signed"])
+            self.assertTrue(verify_backup(snapshot, require_signature=True)["signed"])
+
+        with patch.dict(os.environ, {}, clear=True):
+            with self.assertRaisesRegex(BackupError, "falta CYBER_AI_BACKUP_HMAC_KEY"):
+                verify_backup(snapshot)
+
+        with patch.dict(os.environ, {"CYBER_AI_BACKUP_HMAC_KEY": "different-key-with-at-least-32-bytes"}):
+            with self.assertRaisesRegex(BackupError, "firma HMAC"):
+                verify_backup(snapshot)
+
+    def test_unsigned_backup_is_rejected_when_signature_is_required(self):
+        snapshot = self.root / "unsigned-backup"
+        with patch.dict(os.environ, {}, clear=True):
+            result = create_backup(self.data, snapshot)
+            self.assertFalse(result["signed"])
+            with self.assertRaisesRegex(BackupError, "no tiene firma"):
+                verify_backup(snapshot, require_signature=True)
+
+    def test_short_hmac_key_is_rejected_before_backup_creation(self):
+        with patch.dict(os.environ, {"CYBER_AI_BACKUP_HMAC_KEY": "too-short"}):
+            with self.assertRaisesRegex(BackupError, "al menos 32 bytes"):
+                create_backup(self.data, self.root / "invalid-backup")
 
 if __name__ == "__main__":
     unittest.main()
