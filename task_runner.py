@@ -177,27 +177,58 @@ def main():
         if args.require_ledger:
             return 3
 
-    command = [
-        nuclei, "-u", args.target,
-        "-jsonl", "-o", str(results_file.resolve()),
-        "-no-interactsh", "-disable-update-check", "-disable-redirects",
-        "-rl", "2", "-c", "2", "-timeout", "5", "-retries", "0",
-    ]
-    for item in selected:
-        command.extend(["-t", item["path"]])
-
-    print("\nIniciando comprobaciones limitadas...")
-    started = time.monotonic()
     try:
-        process = subprocess.run(
-            command, capture_output=True, text=True, timeout=90
-        )
-        elapsed = round(time.monotonic() - started, 2)
-    except subprocess.TimeoutExpired:
+        command = [
+            nuclei, "-u", args.target,
+            "-jsonl", "-o", str(results_file.resolve()),
+            "-no-interactsh", "-disable-update-check", "-disable-redirects",
+            "-rl", "2", "-c", "2", "-timeout", "5", "-retries", "0",
+        ]
+        for item in selected:
+            command.extend(["-t", item["path"]])
+    
+        print("\nIniciando comprobaciones limitadas...")
+        started = time.monotonic()
+        try:
+            process = subprocess.run(
+                command, capture_output=True, text=True, timeout=90
+            )
+            elapsed = round(time.monotonic() - started, 2)
+        except subprocess.TimeoutExpired:
+            report = {
+                "task": args.task, "target": args.target,
+                "status": "timeout", "elapsed_seconds": 90,
+                "findings": [],
+            }
+            report_file.write_text(
+                json.dumps(report, indent=2, ensure_ascii=False) + "\n",
+                encoding="utf-8",
+            )
+            recorded = _record_task_scan(args.task, args.target, report, task_started, args.authorization_id, start_event_id)
+            if args.require_ledger and recorded is None:
+                return 3
+            print("Tiempo agotado. Informe:", report_file)
+            return 1
+    
+        findings = []
+        if results_file.is_file():
+            for line in results_file.read_text(encoding="utf-8").splitlines():
+                try:
+                    findings.append(json.loads(line))
+                except json.JSONDecodeError:
+                    pass
+    
         report = {
-            "task": args.task, "target": args.target,
-            "status": "timeout", "elapsed_seconds": 90,
-            "findings": [],
+            "task": args.task,
+            "target": args.target,
+            "authorization": grant,
+            "status": "completed" if process.returncode == 0 else "scanner_error",
+            "elapsed_seconds": elapsed,
+            "templates_used": [item["path"] for item in selected],
+            "findings_count": len(findings),
+            "findings": findings,
+            "scanner_output": (process.stdout + "\n" + process.stderr)[-12000:],
+            "note": "Los resultados son indicios y requieren validación.",
         }
         report_file.write_text(
             json.dumps(report, indent=2, ensure_ascii=False) + "\n",
@@ -206,41 +237,28 @@ def main():
         recorded = _record_task_scan(args.task, args.target, report, task_started, args.authorization_id, start_event_id)
         if args.require_ledger and recorded is None:
             return 3
-        print("Tiempo agotado. Informe:", report_file)
+        print("\nEstado:", report["status"])
+        print("Tiempo:", elapsed, "segundos")
+        print("Hallazgos:", len(findings))
+        print("Informe:", report_file)
+        return 0 if process.returncode == 0 else 1
+    except Exception as error:
+        report = {
+            "task": args.task,
+            "target": args.target,
+            "status": "failed",
+            "error_type": type(error).__name__,
+            "error": str(error),
+            "findings": [],
+        }
+        recorded = _record_task_scan(
+            args.task, args.target, report, task_started,
+            args.authorization_id, start_event_id,
+        )
+        if args.require_ledger and recorded is None:
+            return 3
+        print("ERROR: la ejecución terminó inesperadamente:", error, file=sys.stderr)
         return 1
-
-    findings = []
-    if results_file.is_file():
-        for line in results_file.read_text(encoding="utf-8").splitlines():
-            try:
-                findings.append(json.loads(line))
-            except json.JSONDecodeError:
-                pass
-
-    report = {
-        "task": args.task,
-        "target": args.target,
-        "authorization": grant,
-        "status": "completed" if process.returncode == 0 else "scanner_error",
-        "elapsed_seconds": elapsed,
-        "templates_used": [item["path"] for item in selected],
-        "findings_count": len(findings),
-        "findings": findings,
-        "scanner_output": (process.stdout + "\n" + process.stderr)[-12000:],
-        "note": "Los resultados son indicios y requieren validación.",
-    }
-    report_file.write_text(
-        json.dumps(report, indent=2, ensure_ascii=False) + "\n",
-        encoding="utf-8",
-    )
-    recorded = _record_task_scan(args.task, args.target, report, task_started, args.authorization_id, start_event_id)
-    if args.require_ledger and recorded is None:
-        return 3
-    print("\nEstado:", report["status"])
-    print("Tiempo:", elapsed, "segundos")
-    print("Hallazgos:", len(findings))
-    print("Informe:", report_file)
-    return 0 if process.returncode == 0 else 1
 
 
 if __name__ == "__main__":
