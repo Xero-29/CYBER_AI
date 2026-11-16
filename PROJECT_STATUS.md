@@ -79,3 +79,13 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 ## Criterio de cierre
 
 No declarar el sistema completo ni certificado hasta que cada brecha tenga código, pruebas automatizadas, evidencia reproducible y validación operacional. No descargar indiscriminadamente el atlas, no ejecutar herramientas de red por defecto y no promover Skills por respuestas plausibles.
+
+## Revisión de integración adicional (16-11-2026)
+
+- Comparación directa con `main`: rama de auditoría **296 commits ahead / 1 behind**; estado GitHub `diverged`.
+- El único commit exclusivo de `main` es `7b5ed033f1f6461b5780a10ac4ada67a444b93e5` (`fix: repair sandbox policy tests`), que modifica `tests/test_sandbox_runner.py`.
+- La versión de ese test en la rama de auditoría ya contiene las comprobaciones de ese commit y añade regresiones para el ledger obligatorio, allowlist de herramientas de sandbox, timeout del proceso Docker, imagen fijada por digest y validación de rutas de evidencia. Por tanto, no se debe reemplazar la versión de la rama por el archivo más antiguo de `main`.
+- La divergencia se mantiene explícita; no se ha hecho merge ni force-push. Antes de integrar, revisar el grafo completo y confirmar que no existen otros efectos del commit exclusivo fuera del archivo comparado.
+- Revisión del flujo de excepciones: la firma de `_run_agent_impl` coloca `task_id` en el quinto argumento posicional; el wrapper lo propaga en esa posición o como keyword, y la correlación se realiza por `metadata.task_id`, no por el prompt redactado.
+- **CI del HEAD actual: no verificado.** La consulta de ejecuciones y estados para el SHA de `main` no devuelve checks, y no se obtuvo una referencia verificable al SHA actual de la rama en esta consulta. Los resultados CI históricos indicados arriba no deben interpretarse como validación del HEAD actual.
+
