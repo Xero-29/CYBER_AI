@@ -1027,9 +1027,18 @@ def _run_agent_impl(
 
 def run_agent(*args, **kwargs):
     """Cierra en el ledger cualquier ejecución que falle fuera del flujo normal."""
+    # Asigna un identificador antes de entrar para correlacionar exactamente el
+    # evento inicial, incluso con tareas concurrentes o prompts redactados.
+    positional = list(args)
+    if len(positional) > 4:
+        invocation_task_id = positional[4] or uuid.uuid4().hex
+        positional[4] = invocation_task_id
+        args = tuple(positional)
+    else:
+        invocation_task_id = kwargs.get("task_id") or uuid.uuid4().hex
+        kwargs["task_id"] = invocation_task_id
+
     agent_name = args[0] if args else kwargs.get("agent_name")
-    prompt = args[1] if len(args) > 1 else kwargs.get("prompt", "")
-    wrapper_started_at = datetime.now(timezone.utc).isoformat()
     try:
         return _run_agent_impl(*args, **kwargs)
     except Exception as execution_error:
@@ -1045,8 +1054,7 @@ def run_agent(*args, **kwargs):
                 item for item in history
                 if item.get("status") == "started"
                 and item.get("tool") == "agent_runner"
-                and item.get("task") == str(prompt)
-                and item.get("created_at", "") >= wrapper_started_at
+                and (item.get("metadata") or {}).get("task_id") == invocation_task_id
             ]
             if starts:
                 start_event = max(starts, key=lambda item: item["sequence"])
@@ -1059,7 +1067,7 @@ def run_agent(*args, **kwargs):
                 if not already_finalized:
                     ledger.append(
                         namespace=namespace,
-                        task=str(prompt),
+                        task=start_event["task"],
                         status="failed",
                         tool="agent_runner",
                         tool_version="1",
@@ -1072,6 +1080,7 @@ def run_agent(*args, **kwargs):
                             "error": str(execution_error),
                         },
                         metadata={
+                            "task_id": invocation_task_id,
                             "start_event_id": start_event_id,
                             "recovered_by": "run_agent_exception_guard",
                         },
