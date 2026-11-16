@@ -37,6 +37,13 @@ class SbomGeneratorTests(unittest.TestCase):
         with self.assertRaises(LockfileError):
             build_sbom(self.root)
 
+    def test_rejects_conflicting_versions_across_included_files(self):
+        (self.root / "requirements.lock").write_text(
+            "-r requirements.txt\\nrequests==2.33.0\\n", encoding="utf-8"
+        )
+        with self.assertRaises(LockfileError):
+            build_sbom(self.root)
+
     def test_rejects_missing_direct_dependency_from_lock(self):
         (self.root / "requirements.lock").write_text("certifi==2026.10.23\n", encoding="utf-8")
         with self.assertRaises(LockfileError):

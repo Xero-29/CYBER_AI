@@ -48,8 +48,13 @@ def _read_requirements(path, root, seen=None, depth=0):
             include = line[3:].strip()
             if not include or Path(include).is_absolute() or ".." in Path(include).parts:
                 raise LockfileError(f"Inclusión no permitida en {resolved.name}:{number}.")
-            child = (resolved.parent / include).resolve()
-            packages.update(_read_requirements(child, root, seen, depth + 1))
+            child = resolved.parent / include
+            included = _read_requirements(child, root, seen, depth + 1)
+            for package_name, package in included.items():
+                existing = packages.get(package_name)
+                if existing and existing["version"] != package["version"]:
+                    raise LockfileError(f"Versiones incompatibles para {package_name}.")
+                packages[package_name] = package
             continue
         match = PACKAGE_LINE.fullmatch(line)
         if not match:
