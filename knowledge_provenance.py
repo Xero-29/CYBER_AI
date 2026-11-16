@@ -85,6 +85,16 @@ def audit_catalog(catalog, *, now=None, require_reviewed=False):
             errors += 1
             issues.append({"resource": rid, "severity": "error",
                            "code": "invalid_license_state", "detail": "Estado de licencia desconocido."})
+        elif license_state != "approved":
+            pending += 1
+            issues.append({"resource": rid, "severity": "pending",
+                           "code": "license_not_approved",
+                           "detail": "La licencia no está aprobada para uso/redistribución."})
+        elif not item.get("license_evidence"):
+            pending += 1
+            issues.append({"resource": rid, "severity": "pending",
+                           "code": "missing_license_evidence",
+                           "detail": "Falta evidencia verificable de la aprobación de licencia."})
         if item.get("verified_for_download") is True:
             if license_state != "approved" or not item.get("license_evidence"):
                 errors += 1
