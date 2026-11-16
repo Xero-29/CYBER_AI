@@ -204,6 +204,7 @@ python ledger_cli.py history --namespace local-tools
 ```
 
 - `PROJECT_STATUS.md`: capacidades, limitaciones y brechas conocidas.
+- `docs/THREAT_MODEL.md`: baseline STRIDE, límites de confianza, amenazas y pruebas de aceptación pendientes.
 - `docs/EXECUTION_LEDGER.md`: modelo de evidencia y límites del ledger.
 - `docs/CYBERSECURITY_KNOWLEDGE_ATLAS.md`: mapa de áreas y referencias catalogadas.
 - `data/`: bases de conocimiento, memoria, Skills y eventos locales (no incluidos en el repositorio por defecto).
