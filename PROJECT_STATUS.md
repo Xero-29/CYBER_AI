@@ -136,3 +136,16 @@ No declarar el sistema completo ni certificado hasta que cada brecha tenga códi
   - [Docker sandbox — success](https://github.com/Xero-29/CYBER_AI/actions/runs/43922727384): build, verificación completa, Ruff dentro del sandbox y carga de evidencia.
 - Comparación actual con `main`: **316 commits adelante / 1 detrás**, estado `diverged`. No se ha fusionado ni sobrescrito `main`.
 - Pendiente externo: provisionar y custodiar la clave HMAC desde un gestor de secretos, definir rotación/recuperación, habilitar cifrado de backup y almacenar copias/checkpoints fuera del host. No declarar restauración institucional hasta ejecutar simulacros reales de pérdida y recuperación.
+
+
+## Auditoría de proveedores y procedencia — 2026-11-16
+
+- HEAD de código validado: `08d5f51e133908e3d6586af6cc29102ccc47e505`.
+- `llm_providers.py`: se valida el timeout (finito, mayor que cero y máximo 600 s), la estructura de respuesta normalizada, la cantidad de embeddings solicitados, dimensiones/valores finitos y contadores de uso no negativos. Se añadieron pruebas de límites y respuestas malformadas.
+- Nuevo `knowledge_provenance.py`: auditoría de IDs, URLs HTTPS, editor declarado, licencia/evidencia, compuerta de descarga y fechas/intervalos de revisión. `verify.sh` lo ejecuta y `docs/KNOWLEDGE_PROVENANCE.md` documenta los criterios.
+- Resultado del catálogo actual: **138 referencias externas, 0 aprobadas/revisadas por este control, 276 hallazgos pendientes, 0 errores estructurales y 0 vencidas**. No se marcan como confiables ni descargables por defecto. Las referencias necesitan revisión real de licencia, procedencia y vigencia.
+- CI de este SHA:
+  - [Python tests — success](https://github.com/Xero-29/CYBER_AI/actions/runs/43957123521): verificación completa, **365 pruebas**.
+  - [Docker sandbox — success](https://github.com/Xero-29/CYBER_AI/actions/runs/43957123616): build, verificación completa, Ruff dentro del sandbox y carga de evidencia.
+- La historia se reconcilió con el commit exclusivo de `main` mediante un commit de merge que conserva el árbol de la rama auditada. Comparación: **327 commits adelante / 0 detrás**. PR #2 queda mergeable/clean, pero sigue draft y no se fusionó en `main`.
+- Esto no certifica proveedores reales, seguridad jurídica del corpus, KMS/HSM, cifrado/WORM, microVM, RBAC, recuperación ante pérdida de host ni carga/estrés operacional. Esas pruebas requieren servicios, infraestructura y revisión humana externos.
