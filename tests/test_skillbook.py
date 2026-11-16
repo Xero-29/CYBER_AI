@@ -68,6 +68,9 @@ class SkillbookTests(unittest.TestCase):
    result=skillbook.register_skill_from_ledger(**args,approval_signature=signature)
   self.assertEqual(result["status"],"active")
 
+ def test_empty_source_urls_are_allowed_for_ledger_only_evidence(self):
+  self.assertEqual(skillbook._validate_source_urls([]), [])
+
  def test_candidate_is_not_searchable_until_signed_promotion(self):
   key="test-veritas-approval-key-with-32-bytes-minimum"
   events=[

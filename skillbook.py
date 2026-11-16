@@ -107,6 +107,8 @@ def _list(value, name, minimum=1):
 
 
 def _validate_source_urls(source_urls):
+    if source_urls == []:
+        return []
     urls = _list(source_urls, "source_urls")
     for source_url in urls:
         parsed = urlparse(source_url)

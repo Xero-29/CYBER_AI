@@ -684,6 +684,77 @@ def _record_workflow_ledger(report, task, duration_ms):
     )
 
 
+def _auto_propose_skill_candidate(report, workflow, task, namespace, ledger_event_id):
+    """Propone una Skill candidata tras dos ejecuciones supervisadas del mismo flujo."""
+    if report.get("status") != "completed" or not report.get("objective_contract"):
+        return None
+    ledger = ExecutionLedger()
+    if not ledger.verify().get("valid"):
+        return None
+    history = ledger.history(namespace=namespace, limit=1000)
+    if len(history) >= 1000:
+        return None
+    current = next((item for item in history if item.get("event_id") == ledger_event_id), None)
+    if not current or current.get("status") != "completed":
+        return None
+    related = [
+        item for item in history
+        if item.get("task_fingerprint") == current.get("task_fingerprint")
+        and item.get("status") != "started"
+    ]
+    if len(related) != 2 or any(
+        item.get("status") != "completed"
+        or item.get("tool") != "team_orchestrator"
+        or not (item.get("metadata") or {}).get("objective_supervision")
+        for item in related
+    ):
+        return None
+
+    methodology = [
+        f"Etapa {index}: {step.get('agent', 'especialista')} debe completar: {step.get('objective', '')}"
+        for index, step in enumerate(report.get("steps") or [], 1)
+        if isinstance(step, dict) and isinstance(step.get("objective"), str)
+        and step.get("objective").strip()
+    ]
+    if len(methodology) < 2:
+        return None
+    validation = workflow.get("acceptance_criteria") or [
+        "Completar todas las etapas sin ampliar alcance ni permisos.",
+        "Distinguir evidencia observada de inferencias.",
+        "Superar revisión objetiva independiente.",
+    ]
+    if not isinstance(validation, list) or not validation:
+        return None
+    tools = []
+    for step in workflow.get("steps", []):
+        declared = step.get("tools", []) if isinstance(step, dict) else []
+        if isinstance(declared, str):
+            declared = [declared]
+        if isinstance(declared, list):
+            tools.extend(value for value in declared if isinstance(value, str) and value.strip())
+    agents = [step.get("agent", "") for step in report.get("steps", []) if isinstance(step, dict)]
+    workflow_name = str(report.get("workflow") or "Flujo")
+    from skillbook import propose_skill_from_ledger
+    return propose_skill_from_ledger(
+        name=f"{workflow_name.replace('_', ' ').title()} — procedimiento supervisado",
+        task_pattern=task,
+        description=str(workflow.get("description") or "Metodología generada desde dos ejecuciones supervisadas y verificadas."),
+        prerequisites=[
+            "Alcance, autorización y entorno equivalentes a las ejecuciones verificadas.",
+            "Versiones compatibles de agentes, herramientas y configuración.",
+        ],
+        methodology=methodology,
+        validation=validation,
+        tools=sorted(set(tools)),
+        tags=sorted(set(["team_orchestrator", "supervised", workflow_name, *agents])),
+        source_urls=[],
+        namespace=namespace,
+        event_ids=[
+            item["event_id"] for item in sorted(related, key=lambda value: value["created_at"])
+        ],
+    )
+
+
 def execute_workflow(
     task, workflow_name, dry_run=False, *,
     supervise_objectives=False, acceptance_criteria=None, review_rounds=2
@@ -1021,6 +1092,14 @@ def execute_workflow(
             report, task, (time.monotonic() - workflow_started) * 1000
         )
         report["ledger_event_id"] = ledger_event["event_id"]
+        try:
+            candidate = _auto_propose_skill_candidate(
+                report, workflow, task, namespace, ledger_event["event_id"]
+            )
+            if candidate:
+                report["skill_candidate"] = candidate
+        except Exception as skill_error:
+            report["skill_candidate_warning"] = str(skill_error)[:500]
     except Exception as error:
         report["ledger_error"] = str(error)
         save_report(report_path, report)
