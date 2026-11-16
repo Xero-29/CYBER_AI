@@ -58,5 +58,51 @@ class DataBackupTests(unittest.TestCase):
             restore_backup(snapshot, self.data, confirm_quiesced=True)
 
 
+    def test_rejects_malformed_manifest_metadata(self):
+        snapshot = self.root / "backup"
+        create_backup(self.data, snapshot)
+        manifest_path = snapshot / "manifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["files"][0]["size"] = True
+        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+        with self.assertRaises(BackupError):
+            verify_backup(snapshot)
+
+    def test_rejects_unlisted_files_and_reserved_manifest_path(self):
+        snapshot = self.root / "backup"
+        create_backup(self.data, snapshot)
+        (snapshot / "injected.txt").write_text("untracked", encoding="utf-8")
+        with self.assertRaisesRegex(BackupError, "no coincide"):
+            verify_backup(snapshot)
+
+        (snapshot / "injected.txt").unlink()
+        manifest_path = snapshot / "manifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["files"].append({
+            "path": "manifest.json", "kind": "file_copy_quiesced",
+            "size": manifest_path.stat().st_size, "sha256": "0" * 64,
+        })
+        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+        with self.assertRaises(BackupError):
+            verify_backup(snapshot)
+
+    def test_rejects_noncanonical_and_conflicting_paths(self):
+        snapshot = self.root / "backup"
+        create_backup(self.data, snapshot)
+        manifest_path = snapshot / "manifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["files"][0]["path"] = "./" + manifest["files"][0]["path"]
+        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+        with self.assertRaises(BackupError):
+            verify_backup(snapshot)
+
+    def test_rejects_symlink_inside_backup(self):
+        snapshot = self.root / "backup"
+        create_backup(self.data, snapshot)
+        (snapshot / "escape").symlink_to(self.root, target_is_directory=True)
+        with self.assertRaises(BackupError):
+            verify_backup(snapshot)
+
+
 if __name__ == "__main__":
     unittest.main()
