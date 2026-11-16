@@ -102,6 +102,41 @@ class ExecutionLedger:
                     SELECT RAISE(ABORT, 'execution ledger is append-only');
                 END;
             """)
+        with self.connect() as db:
+            schema = db.execute(
+                "SELECT sql FROM sqlite_master WHERE type='table' AND name='execution_events'"
+            ).fetchone()
+            if schema and "'started'" not in schema["sql"]:
+                db.executescript("""
+                    BEGIN IMMEDIATE;
+                    DROP TRIGGER IF EXISTS execution_events_no_update;
+                    DROP TRIGGER IF EXISTS execution_events_no_delete;
+                    DROP INDEX IF EXISTS idx_execution_task;
+                    ALTER TABLE execution_events RENAME TO execution_events_legacy;
+                    CREATE TABLE execution_events (
+                        sequence INTEGER PRIMARY KEY AUTOINCREMENT,
+                        event_id TEXT NOT NULL UNIQUE, created_at TEXT NOT NULL,
+                        namespace TEXT NOT NULL, task_fingerprint TEXT NOT NULL,
+                        task TEXT NOT NULL,
+                        status TEXT NOT NULL CHECK(status IN
+                            ('started','completed','failed','timeout','denied','cancelled')),
+                        tool TEXT NOT NULL, tool_version TEXT NOT NULL,
+                        model TEXT NOT NULL, environment TEXT NOT NULL,
+                        duration_ms INTEGER NOT NULL CHECK(duration_ms >= 0),
+                        cost_microunits INTEGER CHECK(cost_microunits IS NULL OR cost_microunits >= 0),
+                        evidence_sha256 TEXT NOT NULL, validator_results TEXT NOT NULL,
+                        metadata TEXT NOT NULL, previous_hash TEXT NOT NULL, event_hash TEXT NOT NULL
+                    );
+                    INSERT INTO execution_events SELECT * FROM execution_events_legacy;
+                    DROP TABLE execution_events_legacy;
+                    CREATE INDEX idx_execution_task
+                        ON execution_events(namespace, task_fingerprint, created_at);
+                    CREATE TRIGGER execution_events_no_update BEFORE UPDATE ON execution_events
+                        BEGIN SELECT RAISE(ABORT, 'execution ledger is append-only'); END;
+                    CREATE TRIGGER execution_events_no_delete BEFORE DELETE ON execution_events
+                        BEGIN SELECT RAISE(ABORT, 'execution ledger is append-only'); END;
+                    COMMIT;
+                """)
 
     def append(self, *, namespace, task, status, tool, evidence, duration_ms,
                tool_version="unknown", model="none", environment="unknown",
