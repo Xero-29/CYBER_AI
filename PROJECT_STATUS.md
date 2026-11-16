@@ -149,3 +149,17 @@ No declarar el sistema completo ni certificado hasta que cada brecha tenga códi
   - [Docker sandbox — success](https://github.com/Xero-29/CYBER_AI/actions/runs/43957123616): build, verificación completa, Ruff dentro del sandbox y carga de evidencia.
 - La historia se reconcilió con el commit exclusivo de `main` mediante un commit de merge que conserva el árbol de la rama auditada. Comparación: **327 commits adelante / 0 detrás**. PR #2 queda mergeable/clean, pero sigue draft y no se fusionó en `main`.
 - Esto no certifica proveedores reales, seguridad jurídica del corpus, KMS/HSM, cifrado/WORM, microVM, RBAC, recuperación ante pérdida de host ni carga/estrés operacional. Esas pruebas requieren servicios, infraestructura y revisión humana externos.
+
+
+
+## Trabajo de cierre adicional — 2026-11-16
+
+- HEAD de la rama: `b5974450f8341a30d5197707cf2997296b4d2223`.
+- Se añadieron `.github/dependabot.yml` para proponer actualizaciones semanales de dependencias Python y GitHub Actions, `SECURITY.md` con canal/proceso de reporte responsable y `docs/RELEASE_GATES.md` con criterios verificables de build, seguridad, conocimiento/IA, resiliencia y autorización de release.
+- La rama no tiene protección habilitada (`protected=false`); branch protection y required checks siguen siendo una configuración administrativa pendiente. No se activaron porque el acceso disponible no permite garantizar que los permisos de administración estén concedidos.
+- PR #2 permanece abierto y en draft; no se fusionó.
+- CI disparada por los cambios: para el commit `60148e426e9e1c61edcd543de9320d213f1bd97b`, Python tests estaba `in_progress` y Docker sandbox `queued` al momento de esta actualización. Los resultados verdes del SHA anterior `4dfca8889ab84bd0345dce80dd084f95faecec16` no validan los nuevos archivos ni el HEAD actual.
+- Dependabot solo crea propuestas; no aprueba ni fusiona actualizaciones automáticamente.
+- No se ha añadido una licencia: es una decisión legal del propietario del repositorio, no algo que deba inventarse.
+- El lock `requirements.lock` sigue sin hashes de artefactos. Añadir hashes no verificados sería inseguro; debe generarse desde un entorno de resolución confiable y fijarse para todas las plataformas objetivo.
+- Próximas brechas implementables: hash-locked reproducible con verificación de artefactos, pruebas de estrés/concurrencia automatizadas, política de release y cobertura adicional de fallo abrupto. Las brechas que dependen de servicios/decisiones externas siguen abiertas: KMS/HSM, cifrado y rotación, WORM externo, RBAC/IdP, microVM, licencias y restauración real.
