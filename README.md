@@ -195,6 +195,16 @@ Los datos locales, bases SQLite, historiales y reportes se guardan fuera del con
 
 ## Evidencia y diagnóstico
 
+Consulta la integridad del ledger, el historial y ancla su cabeza con una clave externa:
+
+```bash
+export CYBER_AI_LEDGER_CHECKPOINT_KEY="secreto-de-al-menos-32-bytes-guardado-fuera-del-repo"
+python ledger_checkpoint.py create --output /ruta/externa/checkpoint.json
+python ledger_checkpoint.py verify --checkpoint /ruta/externa/checkpoint.json
+```
+
+Guarda los checkpoints fuera del host/volumen del ledger y protege la clave mediante un gestor de secretos o KMS. El HMAC local no sustituye WORM ni una identidad de operador independiente.
+
 Consulta la integridad del ledger y el historial registrado:
 
 ```bash
