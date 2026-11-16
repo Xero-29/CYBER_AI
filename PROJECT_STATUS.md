@@ -97,3 +97,17 @@ No declarar el sistema completo ni certificado hasta que cada brecha tenga códi
 - La rama sigue divergida respecto de `main`: 301 commits por delante y 1 por detrás según la comparación consultada. No se hizo merge ni force-push.
 - La ejecución de la suite completa, Docker, proveedores externos, restauración y pruebas de aislamiento deben confirmarse mediante ejecuciones reproducibles. Los resultados históricos no sustituyen la validación del HEAD actual.
 - No se declara cierre institucional: permanecen las dependencias de infraestructura y validación externa enumeradas en este documento.
+
+
+## Cierre incremental y evidencia CI — 2026-11-16
+
+- HEAD de esta validación: `9e08af07c88b34aacf21ac43ca3dfc265022d53d` (`test: cover restore destination safety and missing parents`).
+- GitHub Actions para ese SHA:
+  - [Python tests — success](https://github.com/Xero-29/CYBER_AI/actions/runs/43921744002). Instalación, validación de sintaxis y paso `Run complete local verification` completados correctamente.
+  - [Docker sandbox — success](https://github.com/Xero-29/CYBER_AI/actions/runs/43921743898). Construcción de imagen, verificación completa, Ruff dentro del sandbox y carga de evidencia completados correctamente.
+- `data_backup.py`: el manifiesto ahora exige esquema y metadatos coherentes, entradas con tipo/tamaño/SHA-256 válidos, rutas POSIX canónicas, tipos de archivo permitidos y coincidencia exacta entre archivos declarados y existentes. Rechaza rutas duplicadas/conflictivas, symlinks, archivos extra y el uso de `manifest.json` como entrada.
+- Restauración: rechaza destinos que se solapan con el backup y crea directorios padre ausentes antes de preparar el reemplazo. La restauración sigue requiriendo escritores detenidos y confirmación explícita para sustituir datos.
+- Se añadieron pruebas para manifiestos manipulados, archivos no declarados, rutas no canónicas, symlinks, destinos solapados y restauración en directorios nuevos.
+- **Límite persistente:** los backups siguen sin cifrado ni firma criptográfica externa. La protección de integridad SHA-256 detecta alteraciones respecto del manifiesto, pero no autentica el origen si un atacante puede reemplazar ambos. La clave/almacenamiento externo, WORM y pruebas de recuperación operacional siguen pendientes.
+- Comparación actual con `main`: `codex/security-integrity-audit` está divergida, **306 commits adelante y 1 detrás**. El commit exclusivo de `main` sigue siendo `7b5ed033f1f6461b5780a10ac4ada67a444b93e5`; no se hizo merge ni force-push.
+- La evidencia CI anterior sustituye la anotación histórica de “CI no verificado” solo para el SHA indicado. No demuestra compatibilidad con proveedores remotos, aislamiento microVM, recuperación ante pérdida física, cifrado/KMS ni certificación institucional.
