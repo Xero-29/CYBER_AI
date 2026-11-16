@@ -132,6 +132,14 @@ python knowledge_bootstrap.py --rebuild-text-index
 
 La recuperación combina búsqueda semántica y texto completo mediante Reciprocal Rank Fusion (RRF), respetando el aislamiento por tenant. Si SQLite no incluye FTS5, el sistema conserva el modo semántico. Para bibliotecas existentes, `--rebuild-text-index` reconstruye FTS5 verificando SHA-256 de cada fragmento.
 
+Genera un SBOM CycloneDX determinista a partir de las dependencias fijadas:
+
+```bash
+python sbom_generator.py --output reports/cyber-ai-sbom.cdx.json
+```
+
+El SBOM distingue dependencias directas y transitivas y registra el hash del lock. El lock actual no contiene hashes de artefactos ni un grafo transitivo completo; el SBOM no afirma verificar esos elementos.
+
 Para medir la calidad de recuperación tras indexar, ejecuta el benchmark inicial de 12 consultas:
 
 ```bash
