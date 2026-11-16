@@ -54,7 +54,7 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 ## Avance de biblioteca offline
 
 - Catálogo ampliado a 48 especialidades.
-- 48 paquetes propios en español incluidos en `knowledge/packs/`; 31 ampliados con guías de dominio y 17 con contenido metodológico base. No equivalen a corpus experto exhaustivo.
+- 48 paquetes propios en español incluidos en `knowledge/packs/`; 48 ampliados con guías de dominio, metodología, controles, laboratorio y criterios de evaluación. No equivalen a corpus experto exhaustivo ni a documentación oficial de fabricantes.
 - Las referencias externas siguen pendientes de licencia/procedencia y no se declaran descargadas ni ingeridas.
 
 - `knowledge_bootstrap.py` valida e indexa paquetes offline con ECO. El dry-run no requiere IA. La ingestión real requiere un proveedor con embeddings configurado. El proceso es reanudable, idempotente y detecta cambios de espacio vectorial para reindexar. No se inicia automáticamente por conectar un chat.
