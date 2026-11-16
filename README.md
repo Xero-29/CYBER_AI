@@ -141,7 +141,14 @@ python data_backup.py verify --snapshot /ruta/segura/cyber-ai-backup
 python data_backup.py restore --snapshot /ruta/segura/cyber-ai-backup --confirm-quiesced --confirm-replace
 ```
 
-Este backup verifica integridad y usa snapshots SQLite consistentes, pero **no cifra** los datos. No lo copies a almacenamiento externo sin cifrado y controles de acceso; no sustituye WORM ni una estrategia de recuperación institucional.
+Para autenticar el manifiesto, inyecta `CYBER_AI_BACKUP_HMAC_KEY` desde un gestor de secretos (mínimo 32 bytes; no la guardes en Git). Si está configurada, los backups se firman automáticamente con HMAC-SHA256. Verifica y restaura exigiendo firma:
+
+```bash
+python data_backup.py verify --snapshot /ruta/segura/cyber-ai-backup --require-signature
+python data_backup.py restore --snapshot /ruta/segura/cyber-ai-backup --confirm-quiesced --confirm-replace --require-signature
+```
+
+La verificación de un backup firmado requiere la misma clave. HMAC autentica el manifiesto frente a quien no controla la clave, pero **no cifra** los datos ni proporciona identidad individual, KMS/HSM o almacenamiento WORM. Sin clave configurada, el backup sigue siendo compatible con el modo anterior sin firma. Protege también el acceso al directorio de backups y conserva la clave fuera del host de origen.
 
 Genera un SBOM CycloneDX determinista a partir de las dependencias fijadas:
 
