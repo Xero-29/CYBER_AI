@@ -133,7 +133,8 @@ def audit_catalog(catalog, *, now=None, require_reviewed=False):
     if require_reviewed and (pending or stale):
         issues.append({"severity": "error", "code": "review_gate",
                        "detail": "El modo estricto exige fuentes revisadas y vigentes."})
-        errors += 1
+    # Todas las rutas de validación, incluidas fechas inválidas, se contabilizan.
+    errors = sum(issue.get("severity") == "error" for issue in issues)
     status = "invalid" if errors else ("needs_review" if pending or stale else "ready")
     return {"status": status, "resources": len(resources), "reviewed": reviewed,
             "pending": pending, "stale": stale, "errors": errors, "issues": issues}
