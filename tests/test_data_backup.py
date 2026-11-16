@@ -104,5 +104,16 @@ class DataBackupTests(unittest.TestCase):
             verify_backup(snapshot)
 
 
+    def test_restore_creates_missing_parent_and_rejects_overlap(self):
+        snapshot = self.root / "backup"
+        create_backup(self.data, snapshot)
+        destination = self.root / "new" / "nested" / "data"
+        result = restore_backup(snapshot, destination, confirm_quiesced=True)
+        self.assertTrue(result["restored"])
+        with sqlite3.connect(destination / "memory.sqlite3") as db:
+            self.assertEqual(db.execute("SELECT value FROM notes").fetchone()[0], "verified")
+        with self.assertRaises(BackupError):
+            restore_backup(snapshot, snapshot / "inside", confirm_quiesced=True)
+
 if __name__ == "__main__":
     unittest.main()
