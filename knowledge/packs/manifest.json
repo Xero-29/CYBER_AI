@@ -240,7 +240,7 @@
       "id": "edr_xdr",
       "name": "EDR, XDR y endpoints",
       "path": "knowledge/packs/edr_xdr/README.md",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "status": "included_authored_baseline",
       "verified_external_sources": 0
     },
@@ -256,7 +256,7 @@
       "id": "red_team",
       "name": "Red Team autorizado",
       "path": "knowledge/packs/red_team/README.md",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "status": "included_authored_baseline",
       "verified_external_sources": 0
     },
@@ -304,7 +304,7 @@
       "id": "physical_security",
       "name": "Seguridad física ciberfísica",
       "path": "knowledge/packs/physical_security/README.md",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "status": "included_authored_baseline",
       "verified_external_sources": 0
     },
@@ -312,7 +312,7 @@
       "id": "email_dns_security",
       "name": "Correo, DNS y dominios",
       "path": "knowledge/packs/email_dns_security/README.md",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "status": "included_authored_baseline",
       "verified_external_sources": 0
     },
@@ -320,7 +320,7 @@
       "id": "fraud_abuse",
       "name": "Fraude digital y abuso",
       "path": "knowledge/packs/fraud_abuse/README.md",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "status": "included_authored_baseline",
       "verified_external_sources": 0
     },
@@ -344,7 +344,7 @@
       "id": "ai_red_team",
       "name": "Red teaming de IA y agentes",
       "path": "knowledge/packs/ai_red_team/README.md",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "status": "included_authored_baseline",
       "verified_external_sources": 0
     },
@@ -360,7 +360,7 @@
       "id": "post_quantum_crypto",
       "name": "Criptografía poscuántica",
       "path": "knowledge/packs/post_quantum_crypto/README.md",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "status": "included_authored_baseline",
       "verified_external_sources": 0
     },
@@ -368,7 +368,7 @@
       "id": "business_continuity",
       "name": "Continuidad y recuperación",
       "path": "knowledge/packs/business_continuity/README.md",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "status": "included_authored_baseline",
       "verified_external_sources": 0
     },
@@ -376,7 +376,7 @@
       "id": "database_security",
       "name": "Seguridad de bases de datos",
       "path": "knowledge/packs/database_security/README.md",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "status": "included_authored_baseline",
       "verified_external_sources": 0
     },
@@ -384,7 +384,7 @@
       "id": "vulnerability_research",
       "name": "Investigación de vulnerabilidades",
       "path": "knowledge/packs/vulnerability_research/README.md",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "status": "included_authored_baseline",
       "verified_external_sources": 0
     }
