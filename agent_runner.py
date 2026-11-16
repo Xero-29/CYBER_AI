@@ -5,6 +5,7 @@ from collections import deque
 import argparse
 import fcntl
 import json
+import os
 import time
 import sys
 import uuid
@@ -475,23 +476,6 @@ def run_agent(
 
     config = load_config()
     name, agent = resolve_agent(agent_name, config)
-    memory_config = agent.get("memory") or {}
-    ledger_namespace = str(memory_config.get("namespace") or name)
-    ledger_required = os.environ.get("CYBER_AI_LEDGER_REQUIRED") == "1"
-    ledger_start_event = None
-    try:
-        ledger_start_event = ExecutionLedger().append(
-            namespace=ledger_namespace, task=str(prompt), status="started",
-            tool="agent_runner", tool_version="1", model="pending",
-            environment=f"python:{sys.version_info.major}.{sys.version_info.minor}",
-            evidence={"phase": "agent_start", "task_id": task_id},
-            duration_ms=0, metadata={"task_id": task_id, "session_id": session_id},
-        )
-    except Exception as ledger_error:
-        print(f"AVISO: no se pudo registrar el inicio del agente en el ledger: {ledger_error}", flush=True)
-        if ledger_required:
-            raise RuntimeError("Ejecución bloqueada: no se pudo registrar el inicio en el ledger.") from ledger_error
-
     # Recuperar la sesión anterior al reanudar una tarea existente.
     existing_checkpoint = get_checkpoint(task_id) if explicit_task_id else None
 
@@ -515,6 +499,23 @@ def run_agent(
             )
     else:
         session_id = create_session(f"{name}: {prompt[:60]}")
+
+    memory_config = agent.get("memory") or {}
+    ledger_namespace = str(memory_config.get("namespace") or name)
+    ledger_required = os.environ.get("CYBER_AI_LEDGER_REQUIRED") == "1"
+    ledger_start_event = None
+    try:
+        ledger_start_event = ExecutionLedger().append(
+            namespace=ledger_namespace, task=str(prompt), status="started",
+            tool="agent_runner", tool_version="1", model="pending",
+            environment=f"python:{sys.version_info.major}.{sys.version_info.minor}",
+            evidence={"phase": "agent_start", "task_id": task_id},
+            duration_ms=0, metadata={"task_id": task_id, "session_id": session_id},
+        )
+    except Exception as ledger_error:
+        print(f"AVISO: no se pudo registrar el inicio del agente en el ledger: {ledger_error}", flush=True)
+        if ledger_required:
+            raise RuntimeError("Ejecución bloqueada: no se pudo registrar el inicio en el ledger.") from ledger_error
 
     # Toda consulta de historial queda delimitada por esta sesión.
     isolate_history = True
