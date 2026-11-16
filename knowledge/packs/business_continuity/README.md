@@ -1,46 +1,48 @@
-# Continuidad/DR — Paquete especializado
+# Continuidad de negocio y recuperación ante desastres — Guía de dominio
 
-**ID:** `business_continuity` · **Versión:** 1.1.0 · **Idioma:** español · **Estado:** contenido editorial propio, offline.
+**ID:** `business_continuity` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
-## Propósito y límites
-BIA, RTO/RPO, dependencias, backups, recuperación y ejercicios de crisis.
+## Propósito
+Mantiene servicios críticos durante interrupciones y recupera operaciones dentro de objetivos aprobados. La continuidad incluye personas, procesos, proveedores, instalaciones, datos y tecnología. Tener backups no equivale a poder recuperar un servicio.
 
-Este módulo ofrece orientación y ejercicios sintéticos. No implica que CYBER_AI disponga de una plataforma especializada instalada ni concede permisos. Toda actividad activa requiere propietario, autorización, alcance, ventana y plan de parada.
+## Competencias
+- Realizar BIA y clasificar procesos críticos.
+- Definir RTO, RPO, MTPD y dependencias.
+- Diseñar DR por zona/región/proveedor.
+- Proteger backups, claves, runbooks y comunicaciones.
+- Ensayar failover, restauración y operación degradada.
+- Gestionar proveedores, capacidad y recursos alternativos.
+- Coordinar crisis, comunicaciones y toma de decisiones.
 
-## Competencias específicas
-- Comprender arquitectura, actores, protocolos, flujos y límites de confianza.
-- Inventariar activos, superficies, dependencias y datos sensibles.
-- Mapear amenazas, debilidades y controles preventivos, detectivos y correctivos.
-- Definir telemetría y evidencia adecuada al contexto.
-- Evaluar disponibilidad, seguridad, privacidad y efectos operativos.
-- Convertir hallazgos en mitigaciones, pruebas de regresión y riesgo residual.
-
-## Amenazas y fallos prioritarios
-Backups no restaurables, ransomware, terceros y pérdida regional.
+## Controles
+- BIA actualizado y propietario por servicio.
+- RTO/RPO aprobados y medidos.
+- Backups cifrados, aislados y protegidos contra borrado.
+- Copias de configuración, secretos y dependencias.
+- Runbooks versionados y accesibles fuera del entorno principal.
+- Canales alternos y suplencias.
+- Capacidad reservada y pruebas de failover.
+- Retención y restauración verificadas, no solo jobs exitosos.
 
 ## Metodología
-1. Documentar propietario, criticidad, contexto y autorización.
-2. Crear diagrama de arquitectura, inventario y flujos de datos.
-3. Definir escenarios de amenaza y criterios de éxito/fracaso.
-4. Revisar configuración y evidencia de solo lectura primero.
-5. Elegir pruebas con el mínimo impacto posible.
-6. Validar resultados mediante segunda fuente o revisión independiente.
-7. Priorizar impacto real, exposición, probabilidad e incertidumbre.
-8. Recomendar controles con responsable, plazo y prueba de cierre.
-9. Preservar evidencias y documentar limitaciones.
+1. Identificar procesos, clientes, impacto y obligaciones.
+2. Mapear sistemas, personas y proveedores dependientes.
+3. Definir BIA, RTO/RPO y escenarios.
+4. Seleccionar estrategia: backup/restore, pilot light, warm/hot standby.
+5. Preparar runbooks, contactos y criterios de activación.
+6. Ensayar restauración con datos sintéticos.
+7. Medir tiempo real, pérdida y errores.
+8. Corregir brechas y repetir simulacro.
+9. Reportar resultados y aceptar riesgo residual.
 
-## Laboratorio de referencia
-Diseñar BIA y ejercicio de mesa; restaurar backup sintético en entorno aislado y medir RTO/RPO.
+## Laboratorio
+Servicio ficticio con base SQLite, almacenamiento de archivos y configuración. Crear backup, simular pérdida, restaurar en entorno alterno y medir RTO/RPO.
 
-## Criterios de evaluación
-- Identifica activos, flujos y límites de confianza.
-- Distingue evidencia de inferencia y registra incertidumbre.
-- Reconoce riesgos del dominio y controles.
-- Completa el ejercicio sin salir del alcance autorizado.
-- Produce informe reproducible con evidencias, hashes y retest.
+## Evaluación
+Restauración reproducible, RTO/RPO demostrados, runbooks disponibles y responsabilidades claras.
 
-## Referencias externas
-Las fuentes específicas están en `data/knowledge_sources/knowledge_catalog.json`. Siguen pendientes de validación de licencia y procedencia; no son corpus descargado ni ingerido.
+## Referencias
+ISO 22301, NIST SP 800-34, NIST SP 800-184, FFIEC business continuity y CISA resilience guidance.
 
 ## Instrucciones para agentes IA
-Consulta este módulo y Skills verificadas pertinentes. No inventes cobertura ni ejecuciones. Prefiere análisis pasivo, datos sintéticos y laboratorios. Si la acción puede afectar personas, disponibilidad, privacidad o activos físicos, detente y exige autorización explícita.
+No apagues servicios ni restaures producción. Los ejercicios usan copias y entornos aislados; la activación de DR requiere autoridad humana.

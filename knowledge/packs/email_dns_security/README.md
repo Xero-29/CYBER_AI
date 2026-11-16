@@ -1,46 +1,48 @@
-# Correo/DNS — Paquete especializado
+# Seguridad de correo y DNS — Guía de dominio
 
-**ID:** `email_dns_security` · **Versión:** 1.1.0 · **Idioma:** español · **Estado:** contenido editorial propio, offline.
+**ID:** `email_dns_security` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
-## Propósito y límites
-SPF, DKIM, DMARC, DNSSEC, TLS, MTA-STS, DANE y protección de dominios.
+## Propósito
+Protege correo, dominios, resolución de nombres y autenticación de mensajes. El correo es vector de fraude, phishing, malware y fuga; DNS soporta identidad, routing y confianza. Cambios de DNS o correo pueden interrumpir servicios, por lo que deben revisarse y planificarse.
 
-Este módulo ofrece orientación y ejercicios sintéticos. No implica que CYBER_AI disponga de una plataforma especializada instalada ni concede permisos. Toda actividad activa requiere propietario, autorización, alcance, ventana y plan de parada.
+## Competencias
+- Configurar SPF, DKIM y DMARC con alineación y reportes.
+- Revisar MTA, relay, TLS, MTA-STS y TLS-RPT.
+- Proteger MX, DNS autoritativo, registrar y DNSSEC.
+- Analizar BEC, spoofing, phishing y abuso de dominios.
+- Revisar forwarding, reglas inbox, OAuth apps y cuentas delegadas.
+- Gestionar dominios similares, expiración y transfer locks.
+- Correlacionar cabeceras, autenticación y logs.
 
-## Competencias específicas
-- Comprender arquitectura, actores, protocolos, flujos y límites de confianza.
-- Inventariar activos, superficies, dependencias y datos sensibles.
-- Mapear amenazas, debilidades y controles preventivos, detectivos y correctivos.
-- Definir telemetría y evidencia adecuada al contexto.
-- Evaluar disponibilidad, seguridad, privacidad y efectos operativos.
-- Convertir hallazgos en mitigaciones, pruebas de regresión y riesgo residual.
-
-## Amenazas y fallos prioritarios
-Suplantación, takeover de dominio, configuración permisiva y expiración de certificados.
+## Controles
+- DMARC en política gradual hacia reject tras analizar reportes.
+- SPF con un único registro, límites DNS y remitentes necesarios.
+- DKIM con claves rotadas y selectores controlados.
+- DNSSEC cuando el proveedor y la operación lo soporten.
+- MTA-STS/TLS-RPT para validar transporte.
+- MFA resistente a phishing y protección de OAuth consent.
+- Bloqueo de auto-forward externo no aprobado.
+- Alertas de cambios DNS/MX, reglas inbox y delegación.
+- Protección de registrar, lock y contactos de recuperación.
 
 ## Metodología
-1. Documentar propietario, criticidad, contexto y autorización.
-2. Crear diagrama de arquitectura, inventario y flujos de datos.
-3. Definir escenarios de amenaza y criterios de éxito/fracaso.
-4. Revisar configuración y evidencia de solo lectura primero.
-5. Elegir pruebas con el mínimo impacto posible.
-6. Validar resultados mediante segunda fuente o revisión independiente.
-7. Priorizar impacto real, exposición, probabilidad e incertidumbre.
-8. Recomendar controles con responsable, plazo y prueba de cierre.
-9. Preservar evidencias y documentar limitaciones.
+1. Inventariar dominios, subdominios, DNS, MX y proveedores.
+2. Consultar registros de forma pasiva y guardar evidencia.
+3. Evaluar SPF, DKIM, DMARC, DNSSEC y TLS.
+4. Revisar cabeceras de muestras autorizadas y logs de correo.
+5. Detectar reglas de forwarding y delegaciones sospechosas.
+6. Diseñar rollout de DMARC con monitorización.
+7. Probar cambios en dominio de laboratorio antes de producción.
+8. Verificar recepción, entrega y reportes tras cambios.
 
-## Laboratorio de referencia
-Validar dominios propios con consultas no intrusivas y analizar cabeceras sintéticas.
+## Laboratorio
+Dominio de prueba y MTA local. Generar mensajes sintéticos y validar SPF/DKIM/DMARC; probar DNSSEC en zona de laboratorio. No enviar campañas masivas ni suplantar dominios de terceros.
 
-## Criterios de evaluación
-- Identifica activos, flujos y límites de confianza.
-- Distingue evidencia de inferencia y registra incertidumbre.
-- Reconoce riesgos del dominio y controles.
-- Completa el ejercicio sin salir del alcance autorizado.
-- Produce informe reproducible con evidencias, hashes y retest.
+## Evaluación
+Dominios inventariados, autenticación alineada, forwarding controlado y cambios monitorizados.
 
-## Referencias externas
-Las fuentes específicas están en `data/knowledge_sources/knowledge_catalog.json`. Siguen pendientes de validación de licencia y procedencia; no son corpus descargado ni ingerido.
+## Referencias
+RFC 7208, RFC 6376, RFC 7489, RFC 8461, RFC 8460, RFC 4033-4035 y NIST email security guidance.
 
 ## Instrucciones para agentes IA
-Consulta este módulo y Skills verificadas pertinentes. No inventes cobertura ni ejecuciones. Prefiere análisis pasivo, datos sintéticos y laboratorios. Si la acción puede afectar personas, disponibilidad, privacidad o activos físicos, detente y exige autorización explícita.
+No modifiques DNS ni envíes correos sin aprobación. No uses dominios de terceros para pruebas de spoofing; limita el ejercicio a zonas propias.

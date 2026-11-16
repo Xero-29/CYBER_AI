@@ -1,46 +1,48 @@
-# Criptografía poscuántica — Paquete especializado
+# Criptografía poscuántica — Guía de dominio
 
-**ID:** `post_quantum_crypto` · **Versión:** 1.1.0 · **Idioma:** español · **Estado:** contenido editorial propio, offline.
+**ID:** `post_quantum_crypto` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
-## Propósito y límites
-Estándares PQC, inventario criptográfico, criptoagilidad y transición híbrida.
+## Propósito
+Prepara transición criptográfica ante riesgos de computación cuántica y obsolescencia de algoritmos. El problema inmediato es harvest-now-decrypt-later, vida útil de datos y dependencias criptográficas difíciles de sustituir. No implica que todos los sistemas deban migrar de inmediato ni que algoritmos nuevos eliminen riesgos de implementación.
 
-Este módulo ofrece orientación y ejercicios sintéticos. No implica que CYBER_AI disponga de una plataforma especializada instalada ni concede permisos. Toda actividad activa requiere propietario, autorización, alcance, ventana y plan de parada.
+## Competencias
+- Inventariar algoritmos, protocolos, claves, certificados y vida útil de datos.
+- Entender KEM, firmas y familias estandarizadas NIST PQC.
+- Evaluar tamaños de claves, firmas, rendimiento y compatibilidad.
+- Diseñar criptoagilidad y negociación híbrida.
+- Gestionar HSM/KMS y actualización de firmware.
+- Analizar dependencias TLS, VPN, PKI, code signing y backups.
+- Preparar migración, rollback y validación interoperable.
 
-## Competencias específicas
-- Comprender arquitectura, actores, protocolos, flujos y límites de confianza.
-- Inventariar activos, superficies, dependencias y datos sensibles.
-- Mapear amenazas, debilidades y controles preventivos, detectivos y correctivos.
-- Definir telemetría y evidencia adecuada al contexto.
-- Evaluar disponibilidad, seguridad, privacidad y efectos operativos.
-- Convertir hallazgos en mitigaciones, pruebas de regresión y riesgo residual.
-
-## Amenazas y fallos prioritarios
-Harvest-now-decrypt-later, interoperabilidad, tamaños y dependencias ocultas.
+## Controles
+- Inventario criptográfico con propietario y fecha de retiro.
+- Priorizar datos de larga confidencialidad y claves expuestas.
+- No desplegar algoritmos experimentales sin política y evaluación.
+- Probar esquemas híbridos donde estén estandarizados y soportados.
+- Separar migración de KEM, firma y certificados.
+- Mantener algoritmos clásicos seguros durante transición aprobada.
+- Validar bibliotecas, side channels y actualizaciones HSM.
+- Diseñar rollback y coexistencia sin downgrade inseguro.
 
 ## Metodología
-1. Documentar propietario, criticidad, contexto y autorización.
-2. Crear diagrama de arquitectura, inventario y flujos de datos.
-3. Definir escenarios de amenaza y criterios de éxito/fracaso.
-4. Revisar configuración y evidencia de solo lectura primero.
-5. Elegir pruebas con el mínimo impacto posible.
-6. Validar resultados mediante segunda fuente o revisión independiente.
-7. Priorizar impacto real, exposición, probabilidad e incertidumbre.
-8. Recomendar controles con responsable, plazo y prueba de cierre.
-9. Preservar evidencias y documentar limitaciones.
+1. Inventariar usos criptográficos y flujos.
+2. Clasificar datos por confidencialidad y horizonte.
+3. Identificar dependencias y puntos de sustitución.
+4. Evaluar algoritmos NIST aprobados y estado de estándares.
+5. Medir latencia, tamaño, interoperabilidad y límites.
+6. Probar en laboratorio con bibliotecas mantenidas.
+7. Planificar despliegue gradual y rollback.
+8. Actualizar PKI, clientes, servidores y políticas.
+9. Monitorizar fallos de negociación y compatibilidad.
 
-## Laboratorio de referencia
-Inventariar algoritmos de un sistema ficticio y diseñar plan de migración con implementaciones de prueba.
+## Laboratorio
+Comparar handshake y tamaño de mensajes en TLS de laboratorio con configuraciones clásicas e híbridas soportadas por la versión de biblioteca. No crear algoritmos propios.
 
-## Criterios de evaluación
-- Identifica activos, flujos y límites de confianza.
-- Distingue evidencia de inferencia y registra incertidumbre.
-- Reconoce riesgos del dominio y controles.
-- Completa el ejercicio sin salir del alcance autorizado.
-- Produce informe reproducible con evidencias, hashes y retest.
+## Evaluación
+Inventario completo, prioridad por vida útil, plan de migración, pruebas de interoperabilidad y estrategia de rollback.
 
-## Referencias externas
-Las fuentes específicas están en `data/knowledge_sources/knowledge_catalog.json`. Siguen pendientes de validación de licencia y procedencia; no son corpus descargado ni ingerido.
+## Referencias
+NIST FIPS 203, FIPS 204, FIPS 205, NIST IR 8547, RFC PQC relevantes y NIST SP 800-57.
 
 ## Instrucciones para agentes IA
-Consulta este módulo y Skills verificadas pertinentes. No inventes cobertura ni ejecuciones. Prefiere análisis pasivo, datos sintéticos y laboratorios. Si la acción puede afectar personas, disponibilidad, privacidad o activos físicos, detente y exige autorización explícita.
+Verifica estado normativo y soporte de librería antes de recomendar despliegue. Distingue borrador, estándar final y experimento. No inventes compatibilidad.

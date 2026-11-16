@@ -1,46 +1,49 @@
-# Bases de datos — Paquete especializado
+# Seguridad de bases de datos — Guía de dominio
 
-**ID:** `database_security` · **Versión:** 1.1.0 · **Idioma:** español · **Estado:** contenido editorial propio, offline.
+**ID:** `database_security` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
-## Propósito y límites
-Roles, privilegios, cifrado, auditoría, backups, consultas y motores SQL/NoSQL.
+## Propósito
+Protege motores relacionales, NoSQL, caches, data warehouses y bases embebidas. Cubre identidad, autorización, consultas, cifrado, backups, auditoría, replicación y configuración. El acceso de administración debe estar separado de las cuentas de aplicación.
 
-Este módulo ofrece orientación y ejercicios sintéticos. No implica que CYBER_AI disponga de una plataforma especializada instalada ni concede permisos. Toda actividad activa requiere propietario, autorización, alcance, ventana y plan de parada.
+## Competencias
+- Revisar roles, grants, usuarios, service accounts y privilegios.
+- Prevenir SQL/NoSQL injection y abuso de procedimientos.
+- Proteger secretos, conexiones y certificados.
+- Evaluar cifrado, KMS, TDE y cifrado a nivel de campo.
+- Configurar auditoría, logs y monitoreo de consultas.
+- Proteger replicación, backups, snapshots y restore.
+- Gestionar parches, extensiones, configuración y hardening.
 
-## Competencias específicas
-- Comprender arquitectura, actores, protocolos, flujos y límites de confianza.
-- Inventariar activos, superficies, dependencias y datos sensibles.
-- Mapear amenazas, debilidades y controles preventivos, detectivos y correctivos.
-- Definir telemetría y evidencia adecuada al contexto.
-- Evaluar disponibilidad, seguridad, privacidad y efectos operativos.
-- Convertir hallazgos en mitigaciones, pruebas de regresión y riesgo residual.
-
-## Amenazas y fallos prioritarios
-Escalada de roles, inyección, backups expuestos, credenciales compartidas y logs sensibles.
+## Controles
+- Cuentas de aplicación dedicadas y privilegios mínimos.
+- Secret manager y rotación de credenciales.
+- Consultas parametrizadas y validación de entrada.
+- TLS entre cliente, aplicación y base.
+- Cifrado de backup y control de claves.
+- Auditoría de cambios privilegiados y acceso a datos sensibles.
+- Segmentación de red y acceso por bastión.
+- Parches y extensiones aprobadas.
+- Backups con restore probado y retención.
 
 ## Metodología
-1. Documentar propietario, criticidad, contexto y autorización.
-2. Crear diagrama de arquitectura, inventario y flujos de datos.
-3. Definir escenarios de amenaza y criterios de éxito/fracaso.
-4. Revisar configuración y evidencia de solo lectura primero.
-5. Elegir pruebas con el mínimo impacto posible.
-6. Validar resultados mediante segunda fuente o revisión independiente.
-7. Priorizar impacto real, exposición, probabilidad e incertidumbre.
-8. Recomendar controles con responsable, plazo y prueba de cierre.
-9. Preservar evidencias y documentar limitaciones.
+1. Inventariar motor, versión, instancias, datos y propietarios.
+2. Revisar roles, grants, cuentas huérfanas y accesos remotos.
+3. Analizar consultas, procedimientos y conexiones.
+4. Evaluar cifrado, claves, logs y auditoría.
+5. Revisar exposición de puertos y segmentación.
+6. Verificar backup, replicación y recuperación.
+7. Probar con dataset sintético y usuarios de roles distintos.
+8. Remediar con cambios revisables y rollback.
+9. Repetir auditoría y documentar riesgo residual.
 
-## Laboratorio de referencia
-Revisar base local de prueba con checks de solo lectura y restaurar datos sintéticos.
+## Laboratorio
+Instancia local PostgreSQL/SQLite con usuarios ficticios. Crear roles de solo lectura/escritura, probar inyección sobre fixture vulnerable y validar backup/restore.
 
-## Criterios de evaluación
-- Identifica activos, flujos y límites de confianza.
-- Distingue evidencia de inferencia y registra incertidumbre.
-- Reconoce riesgos del dominio y controles.
-- Completa el ejercicio sin salir del alcance autorizado.
-- Produce informe reproducible con evidencias, hashes y retest.
+## Evaluación
+Privilegios mínimos, conexiones cifradas, consultas seguras, auditoría y restore comprobados.
 
-## Referencias externas
-Las fuentes específicas están en `data/knowledge_sources/knowledge_catalog.json`. Siguen pendientes de validación de licencia y procedencia; no son corpus descargado ni ingerido.
+## Referencias
+CIS Benchmarks, OWASP SQL Injection Prevention, NIST SP 800-123, PostgreSQL Security, MongoDB Security Checklist y SQLite security guidance.
 
 ## Instrucciones para agentes IA
-Consulta este módulo y Skills verificadas pertinentes. No inventes cobertura ni ejecuciones. Prefiere análisis pasivo, datos sintéticos y laboratorios. Si la acción puede afectar personas, disponibilidad, privacidad o activos físicos, detente y exige autorización explícita.
+No consultes datos reales ni exportes tablas completas. Usa esquemas y fixtures sintéticos. No ejecutes cambios de esquema o grants en producción sin aprobación.

@@ -1,46 +1,48 @@
-# Seguridad física — Paquete especializado
+# Seguridad física — Guía de dominio
 
-**ID:** `physical_security` · **Versión:** 1.1.0 · **Idioma:** español · **Estado:** contenido editorial propio, offline.
+**ID:** `physical_security` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
 ## Propósito y límites
-Control de acceso, perímetro, visitantes, sensores, CCTV y convergencia ciberfísica.
+Protege instalaciones, centros de datos, equipos, medios y personas frente a acceso físico no autorizado, sabotaje, robo y amenazas ambientales. La seguridad física se coordina con continuidad, seguridad laboral y protección de personas. No realizar pruebas de intrusión física sin permiso y plan de seguridad.
 
-Este módulo ofrece orientación y ejercicios sintéticos. No implica que CYBER_AI disponga de una plataforma especializada instalada ni concede permisos. Toda actividad activa requiere propietario, autorización, alcance, ventana y plan de parada.
+## Competencias
+- Modelar perímetro, zonas, activos y rutas de acceso.
+- Evaluar controles de entrada, visitantes, credenciales y escolta.
+- Revisar CCTV, alarmas, sensores, registros y retención.
+- Proteger racks, consolas, medios removibles y puertos expuestos.
+- Diseñar seguridad de salas técnicas, energía, climatización y detección de incendios.
+- Evaluar cadena de custodia de dispositivos y medios.
+- Coordinar respuesta ante robo, pérdida o manipulación.
 
-## Competencias específicas
-- Comprender arquitectura, actores, protocolos, flujos y límites de confianza.
-- Inventariar activos, superficies, dependencias y datos sensibles.
-- Mapear amenazas, debilidades y controles preventivos, detectivos y correctivos.
-- Definir telemetría y evidencia adecuada al contexto.
-- Evaluar disponibilidad, seguridad, privacidad y efectos operativos.
-- Convertir hallazgos en mitigaciones, pruebas de regresión y riesgo residual.
-
-## Amenazas y fallos prioritarios
-Tailgating, abuso de credenciales, manipulación de sensores y privacidad.
+## Controles prioritarios
+- Acceso por identidad, mínimo privilegio y recertificación.
+- Separación de zonas públicas, operativas y críticas.
+- Registro de visitantes, acompañamiento y baja de credenciales.
+- Protección de racks, consolas, puertos debug y medios.
+- CCTV/alarma con control de acceso y retención proporcional.
+- Inventario y cadena de custodia para equipos y discos.
+- Protección de energía, UPS, climatización y detección ambiental.
+- Procedimientos de emergencia y acceso de bomberos/servicios.
 
 ## Metodología
-1. Documentar propietario, criticidad, contexto y autorización.
-2. Crear diagrama de arquitectura, inventario y flujos de datos.
-3. Definir escenarios de amenaza y criterios de éxito/fracaso.
-4. Revisar configuración y evidencia de solo lectura primero.
-5. Elegir pruebas con el mínimo impacto posible.
-6. Validar resultados mediante segunda fuente o revisión independiente.
-7. Priorizar impacto real, exposición, probabilidad e incertidumbre.
-8. Recomendar controles con responsable, plazo y prueba de cierre.
-9. Preservar evidencias y documentar limitaciones.
+1. Definir instalaciones, activos, horarios y propietarios.
+2. Dibujar perímetro, zonas y rutas de acceso.
+3. Revisar controles, registros y excepciones.
+4. Analizar escenarios de robo, tailgating, sabotaje y pérdida de energía.
+5. Evaluar controles con walkthrough autorizado y entrevistas.
+6. Probar alarmas y recuperación en simulacro acordado.
+7. Correlacionar eventos físicos con identidad y ciberseguridad.
+8. Documentar brechas, compensaciones y responsables.
+9. Revalidar tras cambios de instalaciones o proveedores.
 
-## Laboratorio de referencia
-Ejercicio de mesa con plano ficticio y matriz de controles; no probar accesos sin permiso expreso.
+## Laboratorio
+Plano ficticio de centro de datos. Crear zonas, matriz de acceso, registro de visitantes y simulacro de pérdida de energía. No manipular instalaciones reales.
 
-## Criterios de evaluación
-- Identifica activos, flujos y límites de confianza.
-- Distingue evidencia de inferencia y registra incertidumbre.
-- Reconoce riesgos del dominio y controles.
-- Completa el ejercicio sin salir del alcance autorizado.
-- Produce informe reproducible con evidencias, hashes y retest.
+## Evaluación
+Zonas y activos identificados, accesos trazables, excepciones caducan y planes de emergencia ensayados.
 
-## Referencias externas
-Las fuentes específicas están en `data/knowledge_sources/knowledge_catalog.json`. Siguen pendientes de validación de licencia y procedencia; no son corpus descargado ni ingerido.
+## Referencias
+ISO/IEC 27001 controles físicos, ISO 22301, NIST SP 800-53 PE, NFPA y ASIS Physical Asset Protection.
 
 ## Instrucciones para agentes IA
-Consulta este módulo y Skills verificadas pertinentes. No inventes cobertura ni ejecuciones. Prefiere análisis pasivo, datos sintéticos y laboratorios. Si la acción puede afectar personas, disponibilidad, privacidad o activos físicos, detente y exige autorización explícita.
+No sugieras entrar en instalaciones ni manipular sensores. Limita el análisis a documentación, planos ficticios y walkthroughs autorizados.
