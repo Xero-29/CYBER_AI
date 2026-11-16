@@ -106,6 +106,8 @@ class NucleiScannerTests(unittest.TestCase):
             self.assertEqual(result["findings"][0]["template-id"], "test-template")
             events = ExecutionLedger(self.ledger_path).history(namespace="security-scans")
             self.assertEqual(events[0]["status"], "completed")
+            self.assertEqual(events[1]["status"], "started")
+            self.assertEqual(events[0]["metadata"]["start_event_id"], events[1]["event_id"])
 
     def test_require_ledger_blocks_scan_when_start_cannot_be_recorded(self):
         with patch("nuclei_scanner.shutil.which", return_value="/usr/bin/nuclei"), \
