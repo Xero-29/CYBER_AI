@@ -27,6 +27,10 @@ echo "== Autoprueba del núcleo =="
 "$PYTHON_BIN" cyber_ai.py --self-test
 
 echo
+echo "== Procedencia y vigencia de la biblioteca =="
+"$PYTHON_BIN" knowledge_provenance.py
+
+echo
 echo "== Suite automatizada =="
 "$PYTHON_BIN" -m unittest discover -s tests -v
 
