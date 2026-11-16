@@ -9,7 +9,7 @@ from knowledge_embeddings import generate_embedding
 from knowledge_library import search_knowledge_hybrid
 
 ROOT = Path(__file__).resolve().parent
-DEFAULT_DATASET = ROOT / "knowledge" / "evaluation" / "smoke_queries.jsonl"
+DEFAULT_DATASET = ROOT / "knowledge" / "evaluation" / "domain_queries.jsonl"
 
 
 def load_dataset(path):

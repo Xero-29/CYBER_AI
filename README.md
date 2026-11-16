@@ -151,10 +151,12 @@ python sbom_generator.py --output reports/cyber-ai-sbom.cdx.json
 
 El SBOM distingue dependencias directas y transitivas y registra el hash del lock. El lock actual no contiene hashes de artefactos ni un grafo transitivo completo; el SBOM no afirma verificar esos elementos.
 
-Para medir la calidad de recuperación tras indexar, ejecuta el benchmark inicial de 12 consultas:
+Para medir la recuperación por especialidad después de indexar, ejecuta el benchmark por defecto de 48 consultas (una por área). El conjunto de 12 consultas anteriores queda disponible como smoke test rápido:
 
 ```bash
 python knowledge_eval.py --top-k 5 --output reports/knowledge-eval.json
+# Smoke test reducido:
+python knowledge_eval.py --dataset knowledge/evaluation/smoke_queries.jsonl --top-k 5
 ```
 
 El informe calcula Recall@K, Precision@K y MRR@K. Los resultados dependen del modelo de embeddings y del contenido indexado; el benchmark no presupone que la calidad sea aceptable. Anthropic está integrado para chat, no para embeddings; si lo usas, configura además un proveedor compatible de embeddings.

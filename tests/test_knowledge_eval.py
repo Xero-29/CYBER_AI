@@ -40,6 +40,15 @@ class KnowledgeEvaluationTests(unittest.TestCase):
         self.assertEqual(result["mrr_at_k"], 0.25)
         self.assertEqual(result["no_hit_queries"], 1)
 
+    def test_default_domain_dataset_covers_all_48_manifest_areas(self):
+        manifest = json.loads((knowledge_eval.ROOT / "knowledge/packs/manifest.json").read_text(encoding="utf-8"))
+        cases = knowledge_eval.load_dataset(knowledge_eval.DEFAULT_DATASET)
+        expected = {f"cybersecurity:{area['id']}" for area in manifest["areas"]}
+        actual = {category for case in cases for category in case["relevant_categories"]}
+        self.assertEqual(len(cases), 48)
+        self.assertEqual(actual, expected)
+        self.assertEqual(len({case["id"] for case in cases}), 48)
+
     def test_invalid_top_k_is_rejected(self):
         with self.assertRaisesRegex(ValueError, "top_k"):
             knowledge_eval.evaluate([{}], 0)
