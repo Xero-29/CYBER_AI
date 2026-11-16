@@ -232,10 +232,17 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
     if data_dir.is_symlink():
         raise BackupError("El directorio de datos no puede ser symlink.")
     data_dir = data_dir.resolve()
+    if (
+        data_dir == snapshot
+        or data_dir in snapshot.parents
+        or snapshot in data_dir.parents
+    ):
+        raise BackupError("El destino de restauración y el backup deben ser rutas independientes.")
     if data_dir.exists() and not confirm_replace:
         raise BackupError("El destino existe; usa --confirm-replace para sustituirlo.")
     if data_dir.is_symlink():
         raise BackupError("El directorio de datos no puede ser symlink.")
+    data_dir.parent.mkdir(parents=True, exist_ok=True)
     staging = data_dir.parent / f".{data_dir.name}.restore-{uuid.uuid4().hex}"
     staging.mkdir(mode=0o700)
     previous = None
