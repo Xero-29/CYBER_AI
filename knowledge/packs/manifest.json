@@ -8,168 +8,168 @@
       "id": "foundations",
       "name": "Fundamentos",
       "path": "knowledge/packs/foundations/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
       "id": "appsec",
       "name": "Seguridad web y aplicaciones",
       "path": "knowledge/packs/appsec/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
       "id": "api",
       "name": "Seguridad de API",
       "path": "knowledge/packs/api/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
       "id": "network",
       "name": "Redes",
       "path": "knowledge/packs/network/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
       "id": "linux",
       "name": "Linux y Unix",
       "path": "knowledge/packs/linux/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
       "id": "windows_ad",
       "name": "Windows y Active Directory",
       "path": "knowledge/packs/windows_ad/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
       "id": "cloud",
       "name": "Seguridad cloud",
       "path": "knowledge/packs/cloud/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
       "id": "containers",
       "name": "Contenedores y Kubernetes",
       "path": "knowledge/packs/containers/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
       "id": "mobile",
       "name": "Seguridad móvil",
       "path": "knowledge/packs/mobile/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
       "id": "crypto",
       "name": "Criptografía",
       "path": "knowledge/packs/crypto/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
       "id": "identity",
       "name": "Identidad y acceso",
       "path": "knowledge/packs/identity/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
       "id": "malware",
       "name": "Análisis de malware",
       "path": "knowledge/packs/malware/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
       "id": "forensics",
       "name": "Forense digital",
       "path": "knowledge/packs/forensics/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
       "id": "incident_response",
       "name": "Respuesta a incidentes",
       "path": "knowledge/packs/incident_response/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
       "id": "threat_intel",
       "name": "Inteligencia de amenazas",
       "path": "knowledge/packs/threat_intel/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
       "id": "reverse",
       "name": "Ingeniería inversa",
       "path": "knowledge/packs/reverse/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
       "id": "iot_hardware",
       "name": "IoT y hardware",
       "path": "knowledge/packs/iot_hardware/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
       "id": "devsecops",
       "name": "DevSecOps y supply chain",
       "path": "knowledge/packs/devsecops/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
       "id": "ai_security",
       "name": "Seguridad de IA",
       "path": "knowledge/packs/ai_security/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
       "id": "governance",
       "name": "GRC, privacidad y auditoría",
       "path": "knowledge/packs/governance/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
       "id": "vuln_management",
       "name": "Gestión de vulnerabilidades",
       "path": "knowledge/packs/vuln_management/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
@@ -232,8 +232,8 @@
       "id": "soc_siem",
       "name": "SOC, SIEM y SOAR",
       "path": "knowledge/packs/soc_siem/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
@@ -248,8 +248,8 @@
       "id": "threat_hunting",
       "name": "Threat hunting",
       "path": "knowledge/packs/threat_hunting/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
@@ -264,40 +264,40 @@
       "id": "wireless_security",
       "name": "Wireless, Bluetooth y NFC",
       "path": "knowledge/packs/wireless_security/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
       "id": "ot_ics",
       "name": "OT, ICS y SCADA",
       "path": "knowledge/packs/ot_ics/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
       "id": "telecom_5g",
       "name": "Telecomunicaciones y 5G",
       "path": "knowledge/packs/telecom_5g/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
       "id": "automotive_security",
       "name": "Ciberseguridad automotriz y CAN",
       "path": "knowledge/packs/automotive_security/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
       "id": "satellite_security",
       "name": "Satélites y sistemas espaciales",
       "path": "knowledge/packs/satellite_security/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
@@ -328,16 +328,16 @@
       "id": "privacy_engineering",
       "name": "Ingeniería de privacidad",
       "path": "knowledge/packs/privacy_engineering/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
       "id": "cloud_forensics",
       "name": "Forense cloud",
       "path": "knowledge/packs/cloud_forensics/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {
@@ -352,8 +352,8 @@
       "id": "pki_hsm",
       "name": "PKI, certificados y HSM",
       "path": "knowledge/packs/pki_hsm/README.md",
-      "version": "1.0.0",
-      "status": "included_authored_baseline",
+      "version": "2.0.0",
+      "status": "included_authored_expanded",
       "verified_external_sources": 0
     },
     {

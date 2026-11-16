@@ -23,6 +23,7 @@ class KnowledgePackTests(unittest.TestCase):
             path = ROOT / area["path"]
             self.assertTrue(path.is_file(), area["id"])
             content = path.read_text(encoding="utf-8")
+            self.assertIn(f"**Versión:** `{area['version']}`", content, area["id"])
             for alternatives in required_groups:
                 self.assertTrue(any(heading in content for heading in alternatives), area["id"])
 
