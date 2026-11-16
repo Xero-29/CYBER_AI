@@ -145,7 +145,7 @@ El informe calcula Recall@K, Precision@K y MRR@K. Los resultados dependen del mo
 
 Los extractores de Office validan el tamaño de los paquetes comprimidos, pero siguen procesando archivos en el proceso local; importa solo documentos confiables hasta que se ejecute la extracción en una sandbox dedicada.
 
-Los ejecutores `tool_executor.py` y `task_runner.py` admiten `--require-ledger`: si el ledger no puede registrar el inicio o el resultado, la operación se bloquea o termina con código 3. Sin esa opción, el sistema emite una advertencia y conserva el comportamiento tolerante a fallos. Los eventos `started` se enlazan a un evento terminal; no se usan como evidencia de éxito para promocionar Skills.
+Los ejecutores `tool_executor.py` y `task_runner.py` admiten `--require-ledger`: si el ledger no puede registrar el inicio o el resultado, la operación se bloquea o termina con código 3. `agent_runner.py` permite exigirlo con `CYBER_AI_LEDGER_REQUIRED=1`; `nuclei_scanner.scan_target` acepta `require_ledger=True`; `team_orchestrator.py` exige registrar inicio y resultado. Sin exigencia configurada, los ejecutores que lo permiten emiten advertencias y continúan. Los eventos `started` se enlazan a un evento terminal; no se usan como evidencia de éxito para promocionar Skills. Una excepción inesperada todavía puede dejar un inicio sin evento terminal.
 
 Los datos locales, bases SQLite, historiales y reportes se guardan fuera del control de versiones mediante `.gitignore`. Haz copias de seguridad antes de borrar o recrear `data/`.
 
