@@ -1,6 +1,6 @@
 # Estado real y plan de cierre de CYBER_AI
 
-**Actualizado:** 2026-11-15  
+**Actualizado:** 2026-11-16  
 **Rama:** codex/security-integrity-audit
 **CI:** Actions fijadas por SHA, checkout v5/setup-python v6/upload-artifact v5 (Node 24)  
 **Base:** main (sin merge ni despliegue)
@@ -21,24 +21,14 @@ Se amplió `tool_adapters.py` con comandos locales acotados para Checkov, detect
 
 Se incorpora execution_ledger.py: registro SQLite transaccional append-only de ejecuciones con namespace, huella de tarea, estado, herramienta/versión, modelo, entorno, duración, coste opcional, resultados de validadores y hash SHA-256 de evidencia. Incluye cadena hash verificable, redacción de campos con nombres sensibles y bloqueo ordinario de UPDATE/DELETE. Se añaden pruebas específicas.
 
-Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptográfica de identidad. Requiere checkpoints firmados fuera del host, KMS/HSM y pruebas operativas de restauración. La captura previa al inicio está implementada solo en los ejecutores locales y task_runner descritos arriba; aún falta cubrir todas las rutas de agent_runner, nuclei_scanner y team_orchestrator. El modo fail-closed es opt-in en tool_executor y task_runner; no es global. La promoción autónoma de Skills sigue pendiente y requiere un aprobador externo independiente.
+Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptográfica de identidad. Requiere checkpoints firmados fuera del host, KMS/HSM y pruebas operativas de restauración. La captura previa al inicio está implementada en tool_executor y task_runner; aún falta cubrir todas las rutas de agent_runner, nuclei_scanner y team_orchestrator. El modo fail-closed es opt-in en tool_executor y task_runner; no es global. La promoción autónoma de Skills sigue pendiente y requiere un aprobador externo independiente.
 
 ## Validación más reciente
 
-- Commit `5a04d73d7ad1a684972dbeddc88ab7217091ecb5`: Python tests **success**, 303 pruebas; Docker sandbox **en curso** en la última consulta.
-- Commit `23a7c0c72ee75a2f3fdcfa962446b3a351abf1f0`: Python tests **success**, 301 pruebas.
-
-- Commit `aa9b58cd125c18975a66430c00ce3c7a0714f3ff`: Python tests **success**, 301 pruebas; Docker sandbox **success**.
-- Commit `df589f7ac23d8ac5fbef175a6fd99f23009c8a9a`: Python tests **success**, 288 pruebas; Docker sandbox **success**.
-
-- Commit `df589f7ac23d8ac5fbef175a6fd99f23009c8a9a`: Python tests **success**, 288 pruebas; Docker sandbox **success**. Incluye FTS5, recuperación híbrida y conexión de recuperación al contexto de agentes.
-
-- Commit `3032550a2a9a6e8e40ffd355e89d0dddb3af2904`: CI Python **success**, 278 pruebas. La ejecución Docker de ese commit se encontraba en curso en la última consulta.
-- Commit `eded0518354b191ecf649c3f6e895819b6200ed9`: CI Python **success**, 267 pruebas. La ejecución Docker de ese commit se encontraba en curso en la última consulta.
-- Commit `819645225ba47549e90e5d6092f388594241b739`: timeout Nuclei con terminación del grupo de procesos y pruebas para ambas rutas.
-- GitHub Actions Python tests: **success**, 257 pruebas, incluyendo compilación, autopruebas y suite completa.
-- Docker sandbox: **success** también en el commit `819645225ba47549e90e5d6092f388594241b739`; ambos workflows (Python y Docker) pasaron en esa revisión.
-- La validación CI no equivale a pruebas con Ollama, proveedores remotos, objetivos reales autorizados, cargas adversariales ni aislamiento microVM.
+- Commit `c8486edb5cf5945fc3916bb1c01ef23fd8ef2d71`: GitHub Actions Python tests **success**, 314 pruebas. Docker sandbox **en curso** en la última consulta.
+- Commit `53b04787ca0b84865e81ad70ea9256cdca30adc5`: Python tests **success** y Docker sandbox **success**.
+- Commit `05986653249dcdb77df39082fffeadb5657e75df`: Python tests **success** y Docker sandbox **success**.
+- La validación CI no equivale a pruebas con Ollama/proveedores remotos, objetivos reales autorizados, cargas adversariales ni aislamiento microVM.
 
 ## Capacidades existentes (no equivalen a cierre institucional)
 
@@ -54,7 +44,7 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 - Dependencias base fijadas en `requirements.lock` para instalaciones repetibles (sin hashes de artefactos; la verificación de procedencia/hash queda pendiente).
 - `preflight.py` para revisar dependencias, configuración, herramientas opcionales y ledger local sin iniciar servicios ni usar red.
 - CLI `ledger_cli.py` para verificar integridad, listar namespaces y consultar historial.
-- Ledger de ejecuciones: integrado con `agent_runner.py`, `tool_executor.py`, `nuclei_scanner.py`, `task_runner.py` y `team_orchestrator.py` para registrar respuestas, ejecuciones locales, timeouts, denegaciones y revisiones objetivas independientes. `agent_runner` marca la autocompletitud como no independiente. La escritura del ledger emite una advertencia si falla y no oculta el resultado original. El ciclo de Skills autónomas y el almacenamiento externo WORM siguen pendientes.
+- Ledger de ejecuciones: registra respuestas, ejecuciones locales, timeouts, denegaciones y revisiones objetivas independientes. Los eventos `started` y terminales se enlazan en `tool_executor.py` y `task_runner.py`; ambos admiten `--require-ledger` para bloquear si no se puede registrar inicio o resultado. `agent_runner.py`, `nuclei_scanner.py` y `team_orchestrator.py` aún no tienen cobertura completa de ciclo de vida ni modo fail-closed. La base existente se migra al esquema nuevo conservando filas y hashes. El ciclo de Skills autónomas y el almacenamiento externo WORM siguen pendientes.
 
 ## Avance de biblioteca offline
 
