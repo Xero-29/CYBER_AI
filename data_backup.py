@@ -2,8 +2,10 @@
 """Backup/verificación/restauración de datos locales con snapshots SQLite y hashes."""
 import argparse
 import hashlib
+import hmac
 import json
 import os
+import re
 import shutil
 import sqlite3
 import sys
@@ -29,6 +31,27 @@ def _sha256(path):
     return digest.hexdigest()
 
 
+def _backup_signing_key():
+    value = os.environ.get("CYBER_AI_BACKUP_HMAC_KEY", "")
+    if not value:
+        return None
+    key = value.encode("utf-8")
+    if len(key) < 32:
+        raise BackupError("CYBER_AI_BACKUP_HMAC_KEY debe tener al menos 32 bytes.")
+    return key
+
+
+def _manifest_payload(manifest):
+    unsigned = {key: value for key, value in manifest.items() if key != "signature"}
+    return json.dumps(
+        unsigned, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+
+
+def _manifest_signature(manifest, key):
+    return hmac.new(key, _manifest_payload(manifest), hashlib.sha256).hexdigest()
+
+
 def _safe_relative(value):
     if not isinstance(value, str) or not value or "\\" in value:
         raise BackupError(f"Ruta insegura en manifiesto: {value!r}")
@@ -42,7 +65,7 @@ def _safe_relative(value):
     return rel
 
 
-def _validate_manifest(snapshot, manifest):
+def _validate_manifest(snapshot, manifest, *, require_signature=False):
     if not isinstance(manifest, dict) or manifest.get("schema") != SCHEMA:
         raise BackupError("Esquema de backup desconocido.")
     files = manifest.get("files")
@@ -112,8 +135,29 @@ def _validate_manifest(snapshot, manifest):
             actual.add(path.relative_to(snapshot).as_posix())
     if actual != expected:
         raise BackupError("El contenido del backup no coincide con el manifiesto.")
+
+    signature = manifest.get("signature")
+    signed = signature is not None
+    if not signed and require_signature:
+        raise BackupError("El backup no tiene firma y se exigió --require-signature.")
+    if signed:
+        if (
+            not isinstance(signature, dict)
+            or set(signature) != {"algorithm", "value"}
+            or signature.get("algorithm") != "HMAC-SHA256"
+            or not isinstance(signature.get("value"), str)
+            or not re.fullmatch(r"[a-f0-9]{64}", signature["value"])
+        ):
+            raise BackupError("Firma del manifiesto inválida.")
+        key = _backup_signing_key()
+        if key is None:
+            raise BackupError("El backup está firmado pero falta CYBER_AI_BACKUP_HMAC_KEY.")
+        expected_signature = _manifest_signature(manifest, key)
+        if not hmac.compare_digest(expected_signature, signature["value"]):
+            raise BackupError("La firma HMAC del manifiesto no coincide.")
+
     return {"valid": True, "files": len(verified), "paths": verified,
-            "encrypted": False}
+            "encrypted": False, "signed": signed}
 
 
 def _sqlite_snapshot(source, destination):
@@ -126,6 +170,7 @@ def _sqlite_snapshot(source, destination):
 
 
 def create_backup(data_dir=DEFAULT_DATA, destination=None):
+    signing_key = _backup_signing_key()
     data_dir = Path(data_dir)
     if data_dir.is_symlink():
         raise BackupError("El directorio de datos no puede ser symlink.")
@@ -184,6 +229,11 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None):
             "requires_quiesced_writers": True,
             "files": sorted(entries, key=lambda item: item["path"]),
         }
+        if signing_key is not None:
+            manifest["signature"] = {
+                "algorithm": "HMAC-SHA256",
+                "value": _manifest_signature(manifest, signing_key),
+            }
         manifest_path = staging / "manifest.json"
         manifest_path.write_text(
             json.dumps(manifest, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
@@ -196,13 +246,14 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None):
             pass
         os.replace(staging, destination)
         return {"destination": str(destination), "files": len(entries),
-                "encrypted": False, "manifest_sha256": _sha256(destination / "manifest.json")}
+                "encrypted": False, "signed": signing_key is not None,
+                "manifest_sha256": _sha256(destination / "manifest.json")}
     except Exception:
         shutil.rmtree(staging, ignore_errors=True)
         raise
 
 
-def verify_backup(snapshot):
+def verify_backup(snapshot, *, require_signature=False):
     snapshot = Path(snapshot)
     if snapshot.is_symlink():
         raise BackupError("El backup no puede ser symlink.")
@@ -216,18 +267,18 @@ def verify_backup(snapshot):
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
         raise BackupError("El manifiesto no es JSON UTF-8 válido.") from error
-    return _validate_manifest(snapshot, manifest)
+    return _validate_manifest(snapshot, manifest, require_signature=require_signature)
 
 
 def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
-                   confirm_replace=False):
+                   confirm_replace=False, require_signature=False):
     if confirm_quiesced is not True:
         raise BackupError("La restauración requiere --confirm-quiesced.")
     snapshot = Path(snapshot)
     if snapshot.is_symlink():
         raise BackupError("El backup no puede ser symlink.")
     snapshot = snapshot.resolve()
-    report = verify_backup(snapshot)
+    report = verify_backup(snapshot, require_signature=require_signature)
     data_dir = Path(data_dir)
     if data_dir.is_symlink():
         raise BackupError("El directorio de datos no puede ser symlink.")
@@ -274,7 +325,7 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
         raise
     return {"restored": True, "files": report["files"],
             "previous_data_preserved_at": str(previous) if previous else None,
-            "encrypted": False}
+            "encrypted": False, "signed": report["signed"]}
 
 
 def main(argv=None):
@@ -286,10 +337,12 @@ def main(argv=None):
     backup.add_argument("--confirm-quiesced", action="store_true")
     verify = sub.add_parser("verify")
     verify.add_argument("--snapshot", type=Path, required=True)
+    verify.add_argument("--require-signature", action="store_true")
     restore = sub.add_parser("restore")
     restore.add_argument("--snapshot", type=Path, required=True)
     restore.add_argument("--confirm-quiesced", action="store_true")
     restore.add_argument("--confirm-replace", action="store_true")
+    restore.add_argument("--require-signature", action="store_true")
     args = parser.parse_args(argv)
     try:
         if args.command == "backup":
@@ -297,12 +350,13 @@ def main(argv=None):
                 raise BackupError("El backup requiere --confirm-quiesced para evitar copiar logs activos.")
             result = create_backup(args.data_dir, args.destination)
         elif args.command == "verify":
-            result = verify_backup(args.snapshot)
+            result = verify_backup(args.snapshot, require_signature=args.require_signature)
         else:
             result = restore_backup(
                 args.snapshot, args.data_dir,
                 confirm_quiesced=args.confirm_quiesced,
                 confirm_replace=args.confirm_replace,
+                require_signature=args.require_signature,
             )
     except (OSError, sqlite3.Error, BackupError, json.JSONDecodeError) as error:
         print(f"ERROR: {error}", file=sys.stderr)
