@@ -54,6 +54,19 @@ class ToolExecutorLedgerTests(unittest.TestCase):
         self.assertEqual(ledger.statuses, ["started", "failed"])
         self.assertIn("ledger_error", output)
 
+    def test_duration_uses_adapter_measurement_and_validates_fallback(self):
+        self.assertEqual(tool_executor._duration_ms({"elapsed_seconds": 0.25}, 10.0), 250)
+        self.assertEqual(tool_executor._duration_ms({"elapsed_seconds": 0}, 10.0), 0)
+
+        invalid_values = [True, -1, float("nan"), float("inf"), "0.25", None]
+        for value in invalid_values:
+            with self.subTest(value=value), patch.object(
+                tool_executor.time, "monotonic", return_value=10.5
+            ):
+                self.assertEqual(
+                    tool_executor._duration_ms({"elapsed_seconds": value}, 10.0), 500
+                )
+
 
 if __name__ == "__main__":
     unittest.main()
