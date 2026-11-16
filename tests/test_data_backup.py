@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 import sqlite3
 import tempfile
 import unittest
@@ -145,6 +146,26 @@ class DataBackupTests(unittest.TestCase):
         with patch.dict(os.environ, {"CYBER_AI_BACKUP_HMAC_KEY": "too-short"}):
             with self.assertRaisesRegex(BackupError, "al menos 32 bytes"):
                 create_backup(self.data, self.root / "invalid-backup")
+
+    def test_restore_detects_source_changes_after_verification(self):
+        snapshot = self.root / "backup"
+        create_backup(self.data, snapshot)
+        original_copy = shutil.copy2
+
+        def mutate_before_copy(source, target):
+            if Path(source) == snapshot / "events.jsonl":
+                Path(source).write_text("tampered", encoding="utf-8")
+            return original_copy(source, target)
+
+        with patch("data_backup.shutil.copy2", side_effect=mutate_before_copy):
+            with self.assertRaisesRegex(BackupError, "cambió durante la restauración"):
+                restore_backup(
+                    snapshot, self.data, confirm_quiesced=True, confirm_replace=True
+                )
+        self.assertEqual(
+            (self.data / "events.jsonl").read_text(encoding="utf-8"),
+            '{"event":"test"}\n',
+        )
 
 if __name__ == "__main__":
     unittest.main()
