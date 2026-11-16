@@ -73,6 +73,10 @@ ollama serve
 ollama pull qwen3.5:4b-q4_K_M
 python agent_runner.py status
 python agent_runner.py ask NEXO "Analiza este problema y propone una metodología verificable."
+
+# Exigir ledger antes de ejecutar y al registrar el resultado:
+export CYBER_AI_LEDGER_REQUIRED=1
+python agent_runner.py ask NEXO "Analiza este problema y propone una metodología verificable."
 ```
 
 Si Ollama ya se ejecuta como servicio, no inicies una segunda instancia con `ollama serve`.

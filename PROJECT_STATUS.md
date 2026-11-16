@@ -21,11 +21,11 @@ Se amplió `tool_adapters.py` con comandos locales acotados para Checkov, detect
 
 Se incorpora execution_ledger.py: registro SQLite transaccional append-only de ejecuciones con namespace, huella de tarea, estado, herramienta/versión, modelo, entorno, duración, coste opcional, resultados de validadores y hash SHA-256 de evidencia. Incluye cadena hash verificable, redacción de campos con nombres sensibles y bloqueo ordinario de UPDATE/DELETE. Se añaden pruebas específicas.
 
-Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptográfica de identidad. Requiere checkpoints firmados fuera del host, KMS/HSM y pruebas operativas de restauración. La captura de inicio/resultado está implementada en los ejecutores principales descritos arriba; quedan excepciones no controladas que pueden dejar eventos `started` abiertos. El modo fail-closed es opt-in en tool_executor, task_runner, nuclei_scanner y agent_runner; team_orchestrator lo exige en su ruta normal. No existe una política global obligatoria para todo el sistema. La promoción autónoma de Skills sigue pendiente y requiere un aprobador externo independiente.
+Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptográfica de identidad. Requiere checkpoints firmados fuera del host, KMS/HSM y pruebas operativas de restauración. La captura de inicio/resultado está implementada en los ejecutores principales descritos arriba; quedan excepciones no controladas que pueden dejar eventos `started` abiertos. El modo fail-closed es opt-in en tool_executor, task_runner, nuclei_scanner y agent_runner; team_orchestrator lo exige en su ruta normal. No existe una política global obligatoria para todo el sistema. La promoción autónoma de Skills sigue pendiente y requiere un aprobador externo independiente; ya existe CLI para proponer, firmar externamente y promover de forma controlada.
 
 ## Validación más reciente
 
-- Commit `c8486edb5cf5945fc3916bb1c01ef23fd8ef2d71`: GitHub Actions Python tests **success**, 314 pruebas. Docker sandbox **en curso** en la última consulta.
+- Commit `a42de0c514efc9e5a5a98b2902b485d6998eef7b`: GitHub Actions Python tests **success**, 318 pruebas. Docker sandbox **en curso** en la última consulta.
 - Commit `53b04787ca0b84865e81ad70ea9256cdca30adc5`: Python tests **success** y Docker sandbox **success**.
 - Commit `05986653249dcdb77df39082fffeadb5657e75df`: Python tests **success** y Docker sandbox **success**.
 - La validación CI no equivale a pruebas con Ollama/proveedores remotos, objetivos reales autorizados, cargas adversariales ni aislamiento microVM.
