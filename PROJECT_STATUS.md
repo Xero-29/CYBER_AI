@@ -122,3 +122,17 @@ No declarar el sistema completo ni certificado hasta que cada brecha tenga códi
   - [Docker sandbox — success](https://github.com/Xero-29/CYBER_AI/actions/runs/43922107770). Construcción, verificación completa, Ruff en el sandbox y carga de evidencia terminaron correctamente.
 - Comparación con `main` después de estos commits: **310 commits adelante / 1 detrás**, estado `diverged`. Se mantiene la decisión de no hacer merge ni force-push sin resolver el commit exclusivo de `main`.
 - Esta validación confirma las suites y el sandbox CI del código de esta revisión; no sustituye pruebas operacionales con proveedores remotos, despliegue KMS/HSM/WORM, cifrado de backups, microVM ni pruebas de recuperación ante fallos físicos.
+
+
+## Integridad autenticada y restauración resistente a TOCTOU — 2026-11-16
+
+- HEAD de código validado: `2350069ab15597cac0699a49ea084163a8265892`.
+- `data_backup.py` admite firma HMAC-SHA256 opcional del manifiesto mediante `CYBER_AI_BACKUP_HMAC_KEY` (mínimo 32 bytes). Cuando existe la clave, los backups se firman automáticamente; `verify` y `restore` aceptan `--require-signature`. Una copia firmada no se valida si falta la clave o no coincide. El modo sin firma sigue disponible para compatibilidad.
+- La restauración vuelve a comprobar la huella del manifiesto después de la verificación y calcula tamaño/SHA-256 de cada archivo copiado antes de publicar el directorio restaurado. Esto detecta cambios de origen entre verificación y copia (TOCTOU).
+- README actualizado con el flujo de firma, verificación y restauración. HMAC no cifra, no equivale a identidad individual ni sustituye KMS/HSM, rotación de claves o almacenamiento WORM.
+- Prueba de regresión que muta el archivo de origen entre verificación y copia; la restauración debe abortar y conservar intacto el directorio de datos existente.
+- CI para este SHA:
+  - [Python tests — success](https://github.com/Xero-29/CYBER_AI/actions/runs/43922727386): verificación completa, **352 pruebas**.
+  - [Docker sandbox — success](https://github.com/Xero-29/CYBER_AI/actions/runs/43922727384): build, verificación completa, Ruff dentro del sandbox y carga de evidencia.
+- Comparación actual con `main`: **316 commits adelante / 1 detrás**, estado `diverged`. No se ha fusionado ni sobrescrito `main`.
+- Pendiente externo: provisionar y custodiar la clave HMAC desde un gestor de secretos, definir rotación/recuperación, habilitar cifrado de backup y almacenar copias/checkpoints fuera del host. No declarar restauración institucional hasta ejecutar simulacros reales de pérdida y recuperación.
