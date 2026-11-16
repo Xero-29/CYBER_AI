@@ -96,7 +96,8 @@ class SkillbookTests(unittest.TestCase):
    promoted=skillbook.register_skill_from_ledger(**args,approval_signature=signature)
   self.assertEqual(promoted["skill_id"],candidate["skill_id"])
   self.assertEqual(promoted["version"],2)
-  repeated=skillbook.register_skill_from_ledger(**args,approval_signature=signature)
+  with patch.dict(os.environ,{"CYBER_AI_VERITAS_APPROVAL_KEY":key}), patch.object(skillbook,"ExecutionLedger",return_value=FakeLedger()):
+   repeated=skillbook.register_skill_from_ledger(**args,approval_signature=signature)
   self.assertEqual(repeated["skill_id"],candidate["skill_id"])
   self.assertEqual(repeated["version"],2)
   self.assertTrue(repeated["reused"])
