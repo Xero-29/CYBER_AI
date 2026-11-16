@@ -732,7 +732,8 @@ def _auto_propose_skill_candidate(report, workflow, task, namespace, ledger_even
             declared = [declared]
         if isinstance(declared, list):
             tools.extend(value for value in declared if isinstance(value, str) and value.strip())
-    agents = [step.get("agent", "") for step in report.get("steps", []) if isinstance(step, dict)]
+    agents = [step.get("agent", "") for step in report.get("steps", [])
+              if isinstance(step, dict) and isinstance(step.get("agent"), str) and step.get("agent").strip()]
     workflow_name = str(report.get("workflow") or "Flujo")
     from skillbook import propose_skill_from_ledger
     return propose_skill_from_ledger(
@@ -745,7 +746,7 @@ def _auto_propose_skill_candidate(report, workflow, task, namespace, ledger_even
         ],
         methodology=methodology,
         validation=validation,
-        tools=sorted(set(tools)),
+        tools=sorted(set(tools)) or ["team_orchestrator"],
         tags=sorted(set(["team_orchestrator", "supervised", workflow_name, *agents])),
         source_urls=[],
         namespace=namespace,
