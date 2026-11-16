@@ -9,7 +9,7 @@
 
 El ledger incorpora eventos `started` y terminales, con migración transaccional de bases existentes que conserva eventos y hashes. `tool_executor.py` y `task_runner.py` enlazan inicio/resultado y admiten `--require-ledger`; `nuclei_scanner.scan_target` admite `require_ledger=True`; `agent_runner.py` enlaza inicio/resultado y permite fail-closed con `CYBER_AI_LEDGER_REQUIRED=1`; `team_orchestrator.py` exige registrar inicio y resultado. Las propuestas de Skills ignoran eventos `started` y siguen exigiendo ejecuciones completadas, revisiones independientes y firma VERITAS. Una excepción inesperada puede dejar un evento inicial sin cierre; la garantía de cierre en un bloque `finally` para todas las rutas aún requiere trabajo. Esto no resuelve almacenamiento WORM externo.
 
-Se añadió `knowledge_eval.py` con un conjunto inicial de 12 consultas y métricas Recall@K, Precision@K y MRR@K. La biblioteca incorpora recuperación híbrida FTS5 + vectores con Reciprocal Rank Fusion (RRF), filtro de namespace/tenant y reconstrucción verificable del índice textual. Si SQLite no tiene FTS5, se conserva la recuperación semántica. El benchmark por defecto ahora cubre las 48 áreas (una consulta sintética por área); conserva un smoke test de 12 consultas. La calidad aún debe medirse con embeddings reales y conjuntos revisados por expertos; faltan umbrales por dominio y evaluaciones validadas por especialistas.
+`knowledge_eval.py` mide Recall@K, Precision@K y MRR@K con 48 consultas sintéticas por especialidad y un smoke test de 12 consultas. La biblioteca incorpora recuperación híbrida FTS5 + vectores con Reciprocal Rank Fusion (RRF), filtro de namespace/tenant y reconstrucción verificable del índice textual. Si SQLite no tiene FTS5, se conserva la recuperación semántica. El benchmark por defecto ahora cubre las 48 áreas (una consulta sintética por área); conserva un smoke test de 12 consultas. La calidad aún debe medirse con embeddings reales y conjuntos revisados por expertos; faltan umbrales por dominio y evaluaciones validadas por especialistas.
 
 La integración de proveedores ahora exige declarar capacidades reales para plugins; valida chat/embeddings/model_listing, selecciona proveedores por capacidad y permite fallbacks configurados cuando un proveedor no tiene la capacidad solicitada. Se añadieron endpoints por defecto seguros para proveedores nativos. El fallback de configuración no cubre fallos de red, cuotas o errores durante una petición.
 
@@ -25,7 +25,7 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 
 ## Validación más reciente
 
-- Commit `9ae0178bf9bbd16cbe801f2d017c2d80c2130fa2`: GitHub Actions Python tests **success**, 323 pruebas; Docker sandbox **success**.
+- Commit `68167813d158ff0897f1839c165b67cf699f8f84`: GitHub Actions Python tests **success**, 333 pruebas; Docker sandbox **en curso** en la última consulta.
 - Commit `53b04787ca0b84865e81ad70ea9256cdca30adc5`: Python tests **success** y Docker sandbox **success**.
 - Commit `05986653249dcdb77df39082fffeadb5657e75df`: Python tests **success** y Docker sandbox **success**.
 - La validación CI no equivale a pruebas con Ollama/proveedores remotos, objetivos reales autorizados, cargas adversariales ni aislamiento microVM.
