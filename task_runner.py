@@ -129,33 +129,33 @@ def main():
 
     if not args.confirm_authorized or not args.authorization_id:
         print("ERROR: se requiere --confirm-authorized y --authorization-id.")
-        _record_task_scan(
+        recorded = _record_task_scan(
             args.task, args.target,
             {"task": args.task, "target": args.target,
              "status": "authorization_denied",
              "reason": "missing_operator_confirmation_or_authorization_id"},
             task_started, args.authorization_id,
         )
-        return 2
+        return 3 if args.require_ledger and recorded is None else 2
 
     try:
         grant = authorize_target(args.target, "nuclei_scan", args.authorization_id)
     except AuthorizationError as error:
         print("ERROR: autorización denegada:", error)
-        _record_task_scan(args.task, args.target,
-                          {"task": args.task, "target": args.target,
-                           "status": "authorization_denied", "error": str(error)},
-                          task_started, args.authorization_id)
-        return 2
+        recorded = _record_task_scan(args.task, args.target,
+                                     {"task": args.task, "target": args.target,
+                                      "status": "authorization_denied", "error": str(error)},
+                                     task_started, args.authorization_id)
+        return 3 if args.require_ledger and recorded is None else 2
 
     nuclei = shutil.which("nuclei")
     if not nuclei:
         print("ERROR: Nuclei no está instalado o no está en PATH.")
-        _record_task_scan(args.task, args.target,
-                          {"task": args.task, "target": args.target,
-                           "status": "scanner_missing", "findings": []},
-                          task_started, args.authorization_id)
-        return 1
+        recorded = _record_task_scan(args.task, args.target,
+                                     {"task": args.task, "target": args.target,
+                                      "status": "scanner_missing", "findings": []},
+                                     task_started, args.authorization_id)
+        return 3 if args.require_ledger and recorded is None else 1
 
     output_dir = Path("reports")
     output_dir.mkdir(parents=True, exist_ok=True)
