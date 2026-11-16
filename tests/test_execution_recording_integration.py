@@ -29,9 +29,11 @@ class ToolExecutorLedgerIntegrationTests(unittest.TestCase):
                 result = tool_executor.main(["--tool", "ruff", "--target", "sample.py", "--execute"])
                 artifact_digest = hashlib.sha256(output.read_bytes()).hexdigest()
         self.assertEqual(result, 0)
-        ledger.return_value.append.assert_called_once()
-        args = ledger.return_value.append.call_args.kwargs
+        self.assertEqual(ledger.return_value.append.call_count, 2)
+        start_args, args = [call.kwargs for call in ledger.return_value.append.call_args_list]
+        self.assertEqual(start_args["status"], "started")
         self.assertEqual(args["status"], "completed")
+        self.assertEqual(args["metadata"]["start_event_id"], "test")
         self.assertEqual(args["tool"], "ruff")
         self.assertEqual(args["duration_ms"], 250)
         self.assertEqual(args["metadata"]["evidence_artifact_sha256"], artifact_digest)
