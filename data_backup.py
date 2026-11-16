@@ -264,10 +264,13 @@ def verify_backup(snapshot, *, require_signature=False):
     if manifest_path.is_symlink() or not manifest_path.is_file():
         raise BackupError("Falta manifest.json válido.")
     try:
-        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest_bytes = manifest_path.read_bytes()
+        manifest = json.loads(manifest_bytes.decode("utf-8"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
         raise BackupError("El manifiesto no es JSON UTF-8 válido.") from error
-    return _validate_manifest(snapshot, manifest, require_signature=require_signature)
+    report = _validate_manifest(snapshot, manifest, require_signature=require_signature)
+    report["manifest_sha256"] = hashlib.sha256(manifest_bytes).hexdigest()
+    return report
 
 
 def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
@@ -298,13 +301,18 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
     staging.mkdir(mode=0o700)
     previous = None
     try:
-        manifest = json.loads((snapshot / "manifest.json").read_text(encoding="utf-8"))
+        manifest_bytes = (snapshot / "manifest.json").read_bytes()
+        if hashlib.sha256(manifest_bytes).hexdigest() != report["manifest_sha256"]:
+            raise BackupError("El manifiesto cambió después de su verificación.")
+        manifest = json.loads(manifest_bytes.decode("utf-8"))
         for item in manifest["files"]:
             relative = _safe_relative(item["path"])
             source = snapshot.joinpath(*relative.parts)
             target = staging.joinpath(*relative.parts)
             target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
             shutil.copy2(source, target)
+            if target.stat().st_size != item["size"] or _sha256(target) != item["sha256"]:
+                raise BackupError(f"El archivo cambió durante la restauración: {relative.as_posix()}")
             if target.suffix.lower() in {".sqlite", ".sqlite3", ".db"}:
                 with sqlite3.connect(str(target), timeout=30) as db:
                     integrity = db.execute("PRAGMA integrity_check").fetchone()[0]
