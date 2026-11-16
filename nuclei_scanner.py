@@ -48,7 +48,7 @@ def _terminate_process_tree(process):
     process.wait()
 
 
-def _record_scan_event(target, result, started, *, authorization_id=None):
+def _record_scan_event(target, result, started, *, authorization_id=None, start_event_id=None):
     """Registra intentos, denegaciones y resultados de Nuclei sin ocultar errores."""
     status = result.get("status")
     ledger_status = (
@@ -58,20 +58,51 @@ def _record_scan_event(target, result, started, *, authorization_id=None):
         else "failed"
     )
     try:
-        ExecutionLedger().append(
+        event = ExecutionLedger().append(
             namespace="security-scans", task=target, status=ledger_status,
             tool="nuclei", evidence=result,
             duration_ms=max(0, int((time.monotonic() - started) * 1000)),
-            metadata={"authorization_id": authorization_id, "scanner_status": status},
+            metadata={"authorization_id": authorization_id, "scanner_status": status,
+                      "start_event_id": start_event_id},
         )
+        return event
     except Exception as error:
         print(f"AVISO: no se pudo registrar el escaneo en el ledger: {error}", file=sys.stderr)
+        return None
 
 
-def scan_target(target, timeout=45, authorized=False, authorization_id=None):
+def _record_scan_start(target, authorization_id):
+    try:
+        event = ExecutionLedger().append(
+            namespace="security-scans", task=target, status="started",
+            tool="nuclei", evidence={"phase": "scan_start"}, duration_ms=0,
+            metadata={"authorization_id": authorization_id},
+        )
+        return event["event_id"]
+    except Exception as error:
+        print(f"AVISO: no se pudo registrar el inicio del escaneo: {error}", file=sys.stderr)
+        return None
+
+
+def _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger):
+    event = _record_scan_event(
+        target, result, started, authorization_id=authorization_id,
+        start_event_id=start_event_id,
+    )
+    if require_ledger and event is None:
+        result["status"] = "ledger_error"
+        result["ledger_error"] = "No se pudo persistir el evento terminal del escaneo."
+    return result
+
+
+def scan_target(target, timeout=45, authorized=False, authorization_id=None,
+                require_ledger=False):
     """Ejecuta Nuclei solo con un permiso local, específico y vigente."""
     target = validate_target(target)
+    if not isinstance(require_ledger, bool):
+        raise TypeError("require_ledger debe ser booleano.")
     started = time.monotonic()
+    start_event_id = None
     if authorized is not True or not authorization_id:
         result = {
             "target": target,
@@ -79,8 +110,7 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None):
             "error": "Se requiere confirmación e identificador de autorización.",
             "findings": [],
         }
-        _record_scan_event(target, result, started, authorization_id=authorization_id)
-        return result
+        return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)
     try:
         grant = authorize_target(target, "nuclei_scan", authorization_id)
     except AuthorizationError as error:
@@ -90,8 +120,7 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None):
             "error": str(error),
             "findings": [],
         }
-        _record_scan_event(target, result, started, authorization_id=authorization_id)
-        return result
+        return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)
     executable = shutil.which("nuclei")
 
     if not executable:
@@ -108,6 +137,14 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None):
     output_dir.mkdir(parents=True, exist_ok=True)
     scan_id = uuid.uuid4().hex
     output_file = output_dir / f"nuclei_scan_{scan_id}.jsonl"
+
+    start_event_id = _record_scan_start(target, authorization_id)
+    if require_ledger and start_event_id is None:
+        return {
+            "target": target, "status": "ledger_error",
+            "error": "Escaneo bloqueado: no se pudo registrar el inicio en el ledger.",
+            "findings": [],
+        }
 
     command = [
         executable,
@@ -175,8 +212,7 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None):
                     "error": f"El escaneo superó {timeout} segundos.",
                     "findings": [],
                 }
-                _record_scan_event(target, result, started, authorization_id=authorization_id)
-                return result
+                return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)
 
             time.sleep(1)
 
@@ -221,5 +257,4 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None):
             "Cero hallazgos no demuestra que el objetivo sea seguro."
         ),
     }
-    _record_scan_event(target, result, started, authorization_id=authorization_id)
-    return result
+    return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)

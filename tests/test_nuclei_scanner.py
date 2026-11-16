@@ -107,6 +107,16 @@ class NucleiScannerTests(unittest.TestCase):
             events = ExecutionLedger(self.ledger_path).history(namespace="security-scans")
             self.assertEqual(events[0]["status"], "completed")
 
+    def test_require_ledger_blocks_scan_when_start_cannot_be_recorded(self):
+        with patch("nuclei_scanner.shutil.which", return_value="/usr/bin/nuclei"), \
+             patch("nuclei_scanner.ExecutionLedger") as ledger:
+            ledger.return_value.append.side_effect = OSError("ledger offline")
+            result = scan_target(
+                "http://127.0.0.1:8765", authorized=True,
+                authorization_id="test-grant", require_ledger=True,
+            )
+        self.assertEqual(result["status"], "ledger_error")
+
     def test_timeout_termination_kills_process_group_on_posix(self):
         process = FakeProcess()
         process.pid = 4321
