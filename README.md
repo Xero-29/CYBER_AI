@@ -141,7 +141,18 @@ El informe calcula Recall@K, Precision@K y MRR@K. Los resultados dependen del mo
 - Ingesta TXT, Markdown, HTML, CSV, JSON/JSONL y código: disponible con las dependencias base. PDF, DOCX, XLSX y PPTX requieren `pip install -r requirements-documents.txt`. Los PDF escaneados necesitan OCR externo; el importador no ejecuta OCR.
 - Recuperación e indexación: revisa `knowledge_library.py`, `knowledge_embeddings.py` y `knowledge_reindex.py`.
 - Fuentes externas: el catálogo requiere revisión de licencia y verificación antes de habilitar descargas.
-- Skills: `propose_skill_from_ledger` crea candidatas no ejecutables; solo la promoción firmada por VERITAS las hace recuperables. El historial de versiones es append-only. Una coincidencia recuperada no concede permisos de ejecución.
+- Skills: `propose_skill_from_ledger` crea candidatas no ejecutables; solo la promoción firmada por VERITAS las hace recuperables. El CLI `skillbook_cli.py` permite proponer desde un manifiesto ligado a dos ejecuciones, exportar el payload canónico para firma independiente, promover con firma y generar/aplicar rollback. El historial de versiones es append-only. Una coincidencia recuperada no concede permisos de ejecución.
+
+Ejemplo de flujo (el manifiesto JSON contiene los campos requeridos por la API):
+
+```bash
+python skillbook_cli.py propose --manifest reports/skill-candidate.json
+python skillbook_cli.py approval-payload --manifest reports/skill-candidate.json
+# Un aprobador independiente firma el payload fuera del proceso de generación.
+python skillbook_cli.py promote --manifest reports/skill-candidate.json --signature-file reports/veritas-signature.txt
+```
+
+No firmes automáticamente la salida del mismo agente que propuso la Skill. Mantén `CYBER_AI_VERITAS_APPROVAL_KEY` fuera del repositorio y delega su uso en un servicio o aprobador independiente.
 
 Los extractores de Office validan el tamaño de los paquetes comprimidos, pero siguen procesando archivos en el proceso local; importa solo documentos confiables hasta que se ejecute la extracción en una sandbox dedicada.
 
