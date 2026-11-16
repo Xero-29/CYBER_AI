@@ -96,6 +96,10 @@ class SkillbookTests(unittest.TestCase):
    promoted=skillbook.register_skill_from_ledger(**args,approval_signature=signature)
   self.assertEqual(promoted["skill_id"],candidate["skill_id"])
   self.assertEqual(promoted["version"],2)
+  repeated=skillbook.register_skill_from_ledger(**args,approval_signature=signature)
+  self.assertEqual(repeated["skill_id"],candidate["skill_id"])
+  self.assertEqual(repeated["version"],2)
+  self.assertTrue(repeated["reused"])
   self.assertEqual(len(skillbook.search_skills("tarea repetible")),1)
   self.assertEqual(
    [v["change_type"] for v in skillbook.list_skill_versions(candidate["skill_id"])],
