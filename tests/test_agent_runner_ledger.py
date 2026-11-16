@@ -15,11 +15,20 @@ class FakeLedger:
             "sequence": 1,
             "event_id": "start-1",
             "namespace": namespace,
-            "task": "task under test",
+            "task": "[REDACTED PROMPT]",
             "status": "started",
             "tool": "agent_runner",
             "metadata": {"task_id": "task-123"},
         }]
+        events.append({
+            "sequence": 2,
+            "event_id": "start-other",
+            "namespace": namespace,
+            "task": "[REDACTED PROMPT]",
+            "status": "started",
+            "tool": "agent_runner",
+            "metadata": {"task_id": "other-task"},
+        })
         if self.finalized:
             events.append({
                 "sequence": 2,
