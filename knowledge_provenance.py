@@ -147,9 +147,10 @@ def main(argv=None):
         print("Auditoría de procedencia del conocimiento")
         print("Estado: {status} | fuentes: {resources} | revisadas: {reviewed} | pendientes: {pending} | vencidas: {stale} | errores: {errors}".format(**report))
         for issue in report["issues"]:
-            print("[{severity}] {resource}: {code} — {detail}".format(
-                severity=issue["severity"].upper(),
-                resource=issue.get("resource", "CATÁLOGO"), **issue))
+            print("[{level}] {resource}: {code} — {detail}".format(
+                level=issue["severity"].upper(),
+                resource=issue.get("resource", "CATÁLOGO"),
+                code=issue["code"], detail=issue["detail"]))
     return 1 if report["errors"] else (2 if args.require_reviewed and report["status"] != "ready" else 0)
 
 
