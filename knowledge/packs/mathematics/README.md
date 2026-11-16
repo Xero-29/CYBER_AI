@@ -1,48 +1,45 @@
-# Matemáticas, estadística y métodos numéricos — Paquete base
+# Matemáticas para ciberseguridad — Guía de dominio
 
-**ID:** `mathematics` · **Versión:** 1.0.0 · **Idioma:** español · **Estado:** contenido propio inicial, incluido offline.
+**ID:** `mathematics` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
 ## Propósito y límites
-Matemáticas, estadística y métodos numéricos: Matemáticas, estadística y métodos numéricos y su arquitectura, amenazas, controles, metodología y validación. Esta guía es base metodológica, no certificación ni enciclopedia. No concede permisos. Toda actividad activa requiere autorización explícita, alcance, ventana y criterios de parada.
+Proporciona fundamentos matemáticos para criptografía, detección, análisis de riesgo, grafos, anomalías y aprendizaje automático. Los resultados matemáticos deben vincularse a supuestos y contexto; una fórmula no valida por sí sola un sistema real.
 
 ## Competencias
-- Explicar arquitectura, componentes, flujos y límites de confianza.
-- Identificar activos, amenazas, vulnerabilidades, controles e impactos.
-- Diseñar prevención, detección, respuesta, recuperación y validación.
-- Seleccionar herramientas por riesgo, evidencia, coste y mantenimiento.
-- Documentar procedencia, versiones, incertidumbre y reproducibilidad.
+- Probabilidad, estadística, inferencia y teoría de información.
+- Álgebra lineal, vectores, matrices, espacios y reducción dimensional.
+- Teoría de números, grupos, anillos, campos y aritmética modular.
+- Grafos, caminos, centralidad y análisis de dependencias.
+- Optimización, complejidad, algoritmos y teoría de juegos.
+- Series temporales, detección de anomalías y calibración.
+- Cuantificación de incertidumbre y análisis bayesiano.
 
-## Metodología reproducible
-1. Definir propietario, autorización, alcance y exclusiones.
-2. Inventariar activos, datos, dependencias y límites de confianza.
-3. Formular hipótesis, amenazas, controles y criterios de parada.
-4. Recopilar evidencia permitida con procedencia, fecha y hash.
-5. Elegir métodos de menor riesgo y registrar versiones/configuración.
-6. Comenzar en modo pasivo/local; pruebas activas solo con autorización explícita.
-7. Validar hallazgos de forma reproducible e independiente.
-8. Priorizar impacto, exposición, explotabilidad e incertidumbre.
-9. Recomendar controles verificables y retest.
-10. Registrar evidencias, limitaciones y riesgo residual.
+## Aplicaciones
+- Criptografía: entropía, grupos, curvas, factorización y seguridad de parámetros.
+- Detección: tasas base, precisión/recall, ROC/PR y coste de falsos positivos.
+- Threat modeling: grafos de ataque, rutas y propagación de privilegios.
+- Riesgo: escenarios, sensibilidad, intervalos y distribución de pérdidas.
+- ML: regularización, overfitting, drift y calibración probabilística.
+- Forense: correlación temporal y análisis de evidencia con incertidumbre.
 
-## Controles mínimos
-- Mínimo privilegio y separación análisis/ejecución.
-- Versiones exactas de herramientas, reglas, modelos y datasets.
-- Secretos fuera de código, prompts y logs; redacción antes de IA remota.
-- No confiar en una herramienta o modelo como prueba concluyente.
-- Preservar originales y registrar SHA-256.
-- Revisión humana antes de cambios o acciones activas.
+## Metodología
+1. Definir pregunta y variables observables.
+2. Declarar supuestos y dominio de validez.
+3. Seleccionar modelo matemático apropiado.
+4. Comprobar unidades, límites y casos extremos.
+5. Validar con datos sintéticos y análisis de sensibilidad.
+6. Comparar con baseline y medir error.
+7. Explicar incertidumbre y reproducibilidad.
+8. Evitar extrapolaciones fuera del dominio.
 
-## Laboratorio seguro
-Usar datos sintéticos, fixtures, aplicaciones deliberadamente vulnerables o máquinas virtuales aisladas. Sin credenciales reales. Debe ser reiniciable y reproducible. No ejecutar pruebas destructivas fuera de laboratorio desechable autorizado.
+## Laboratorio
+Construir un detector de anomalías sobre series sintéticas. Comparar umbral fijo, z-score y modelo robusto; medir precisión/recall con distintas tasas base. Resolver un ejercicio de aritmética modular y explicar por qué no constituye un algoritmo criptográfico seguro.
 
 ## Evaluación
-5 preguntas de fundamentos, 3 escenarios sintéticos, 2 ejercicios de evidencia/falsos positivos, 1 diseño de controles y 1 informe reproducible. Aprobación sugerida: ≥80%, sin errores críticos de alcance y con evidencia verificable.
+Supuestos explícitos, cálculo reproducible, unidades correctas, límites documentados y métricas interpretadas en contexto.
 
-## Entregables
-Alcance y autorización; activos; método y versiones; evidencias con hashes; hallazgos con severidad/confianza; mitigaciones; retest y riesgo residual.
-
-## Fuentes externas
-Consultar `data/knowledge_sources/knowledge_catalog.json`. Las URLs catalogadas no implican descarga, licencia o ingestión. Verificar derechos, procedencia, versión, fecha, tamaño, hash y seguridad del extractor.
+## Referencias
+NIST Statistical Methods, Handbook of Applied Cryptography, Introduction to Algorithms, Applied Cryptography y material universitario de probabilidad/álgebra.
 
 ## Instrucciones para agentes IA
-Lee este paquete antes de planificar tareas de esta especialidad. Reutiliza Skills verificadas con alcance coincidente. No inventes capacidades ni resultados. Si falta evidencia, dilo. No ejecutes acciones activas sin autorización. Cita fragmentos recuperados; no afirmes haber consultado contenido ausente.
+Muestra derivaciones cuando importen. No inventes parámetros ni probabilidades. Distingue demostración matemática, estimación estadística y evidencia empírica.

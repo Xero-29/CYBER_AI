@@ -1,48 +1,49 @@
-# Ingeniería de software y calidad — Paquete base
+# Ingeniería de software segura — Guía de dominio
 
-**ID:** `software_engineering` · **Versión:** 1.0.0 · **Idioma:** español · **Estado:** contenido propio inicial, incluido offline.
+**ID:** `software_engineering` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
 ## Propósito y límites
-Ingeniería de software y calidad: Ingeniería de software y calidad y su arquitectura, amenazas, controles, metodología y validación. Esta guía es base metodológica, no certificación ni enciclopedia. No concede permisos. Toda actividad activa requiere autorización explícita, alcance, ventana y criterios de parada.
+Aplica prácticas de ingeniería para construir sistemas mantenibles, verificables y resistentes a fallos. Seguridad no es una fase final: debe integrarse en requisitos, diseño, código, pruebas, revisión, release y operación. Los cambios se prueban en entornos aislados antes de producción.
 
 ## Competencias
-- Explicar arquitectura, componentes, flujos y límites de confianza.
-- Identificar activos, amenazas, vulnerabilidades, controles e impactos.
-- Diseñar prevención, detección, respuesta, recuperación y validación.
-- Seleccionar herramientas por riesgo, evidencia, coste y mantenimiento.
-- Documentar procedencia, versiones, incertidumbre y reproducibilidad.
+- Definir requisitos funcionales, no funcionales y de seguridad.
+- Diseñar módulos con contratos, invariantes y límites de confianza.
+- Aplicar validación de entrada, manejo de errores y autorización explícita.
+- Crear pruebas unitarias, integración, propiedad, fuzz y regresión.
+- Revisar concurrencia, transacciones, idempotencia y recuperación.
+- Gestionar dependencias, versionado, CI/CD y migraciones.
+- Diseñar observabilidad sin filtrar secretos.
+- Realizar code review y análisis estático.
 
-## Metodología reproducible
-1. Definir propietario, autorización, alcance y exclusiones.
-2. Inventariar activos, datos, dependencias y límites de confianza.
-3. Formular hipótesis, amenazas, controles y criterios de parada.
-4. Recopilar evidencia permitida con procedencia, fecha y hash.
-5. Elegir métodos de menor riesgo y registrar versiones/configuración.
-6. Comenzar en modo pasivo/local; pruebas activas solo con autorización explícita.
-7. Validar hallazgos de forma reproducible e independiente.
-8. Priorizar impacto, exposición, explotabilidad e incertidumbre.
-9. Recomendar controles verificables y retest.
-10. Registrar evidencias, limitaciones y riesgo residual.
+## Controles de diseño
+- Tipos/esquemas estrictos y validación en frontera.
+- Errores seguros, sin stack traces ni secretos al usuario.
+- Consultas parametrizadas y serialización segura.
+- APIs idempotentes y operaciones con límites.
+- Configuración externa validada y secretos fuera del código.
+- Dependencias fijadas y artefactos con procedencia.
+- Test de regresión para cada fallo corregido.
+- Migraciones reversibles y backups antes de cambios de esquema.
 
-## Controles mínimos
-- Mínimo privilegio y separación análisis/ejecución.
-- Versiones exactas de herramientas, reglas, modelos y datasets.
-- Secretos fuera de código, prompts y logs; redacción antes de IA remota.
-- No confiar en una herramienta o modelo como prueba concluyente.
-- Preservar originales y registrar SHA-256.
-- Revisión humana antes de cambios o acciones activas.
+## Metodología
+1. Definir criterios de aceptación y escenarios de abuso.
+2. Crear diseño modular y ADRs.
+3. Implementar cambios pequeños y revisables.
+4. Añadir tests positivos, negativos y de límites.
+5. Ejecutar lint, SAST, SCA y pruebas automatizadas.
+6. Revisar permisos, secretos, logs y errores.
+7. Construir artefacto reproducible y SBOM.
+8. Desplegar gradualmente con monitorización y rollback.
+9. Medir defectos, deuda técnica y recurrencia.
 
-## Laboratorio seguro
-Usar datos sintéticos, fixtures, aplicaciones deliberadamente vulnerables o máquinas virtuales aisladas. Sin credenciales reales. Debe ser reiniciable y reproducible. No ejecutar pruebas destructivas fuera de laboratorio desechable autorizado.
+## Laboratorio
+Servicio API local con autenticación y base de datos. Añadir una función de permisos, testear IDOR y corregir con una prueba de regresión. Simular migración y rollback con datos sintéticos.
 
 ## Evaluación
-5 preguntas de fundamentos, 3 escenarios sintéticos, 2 ejercicios de evidencia/falsos positivos, 1 diseño de controles y 1 informe reproducible. Aprobación sugerida: ≥80%, sin errores críticos de alcance y con evidencia verificable.
+Código revisable, pruebas repetibles, cobertura de errores, dependencias fijadas, cambios reversibles y telemetría segura.
 
-## Entregables
-Alcance y autorización; activos; método y versiones; evidencias con hashes; hallazgos con severidad/confianza; mitigaciones; retest y riesgo residual.
-
-## Fuentes externas
-Consultar `data/knowledge_sources/knowledge_catalog.json`. Las URLs catalogadas no implican descarga, licencia o ingestión. Verificar derechos, procedencia, versión, fecha, tamaño, hash y seguridad del extractor.
+## Referencias
+NIST SSDF, OWASP SAMM, CWE, SEI CERT Coding Standards, Google Engineering Practices y The Twelve-Factor App.
 
 ## Instrucciones para agentes IA
-Lee este paquete antes de planificar tareas de esta especialidad. Reutiliza Skills verificadas con alcance coincidente. No inventes capacidades ni resultados. Si falta evidencia, dilo. No ejecutes acciones activas sin autorización. Cita fragmentos recuperados; no afirmes haber consultado contenido ausente.
+No modifiques archivos ajenos al alcance. No afirmes que una prueba pasó sin ejecutarla. Mantén cambios pequeños, explica invariantes y añade tests de regresión.

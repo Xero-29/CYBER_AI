@@ -1,48 +1,48 @@
-# Aprendizaje automático e ingeniería de IA — Paquete base
+# Seguridad de aprendizaje automático — Guía de dominio
 
-**ID:** `machine_learning` · **Versión:** 1.0.0 · **Idioma:** español · **Estado:** contenido propio inicial, incluido offline.
+**ID:** `machine_learning` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
 ## Propósito y límites
-Aprendizaje automático e ingeniería de IA: Aprendizaje automático e ingeniería de IA y su arquitectura, amenazas, controles, metodología y validación. Esta guía es base metodológica, no certificación ni enciclopedia. No concede permisos. Toda actividad activa requiere autorización explícita, alcance, ventana y criterios de parada.
+Protege pipelines de datos, entrenamiento, evaluación, inferencia y despliegue ML tradicional. Cubre poisoning, leakage, extracción, inversión, membership inference, abuso de APIs y dependencia de modelos/artefactos. Los experimentos adversariales se realizan con datasets sintéticos y modelos propios.
 
 ## Competencias
-- Explicar arquitectura, componentes, flujos y límites de confianza.
-- Identificar activos, amenazas, vulnerabilidades, controles e impactos.
-- Diseñar prevención, detección, respuesta, recuperación y validación.
-- Seleccionar herramientas por riesgo, evidencia, coste y mantenimiento.
-- Documentar procedencia, versiones, incertidumbre y reproducibilidad.
+- Inventariar datasets, modelos, pesos, tokenizers, features y pipelines.
+- Controlar provenance, splits, etiquetas y calidad de datos.
+- Evaluar privacidad, robustez, drift y comportamiento fuera de distribución.
+- Proteger feature stores, endpoints, notebooks y experiment tracking.
+- Gestionar acceso a modelos, cuotas y extracción masiva.
+- Firmar artefactos y fijar dependencias de entrenamiento.
+- Medir leakage, poisoning, fairness y estabilidad.
 
-## Metodología reproducible
-1. Definir propietario, autorización, alcance y exclusiones.
-2. Inventariar activos, datos, dependencias y límites de confianza.
-3. Formular hipótesis, amenazas, controles y criterios de parada.
-4. Recopilar evidencia permitida con procedencia, fecha y hash.
-5. Elegir métodos de menor riesgo y registrar versiones/configuración.
-6. Comenzar en modo pasivo/local; pruebas activas solo con autorización explícita.
-7. Validar hallazgos de forma reproducible e independiente.
-8. Priorizar impacto, exposición, explotabilidad e incertidumbre.
-9. Recomendar controles verificables y retest.
-10. Registrar evidencias, limitaciones y riesgo residual.
+## Controles
+- Dataset versionado, hash y linaje de origen.
+- Separación de entrenamiento/validación/test para evitar leakage.
+- Validación de etiquetas y detección de anomalías en datos.
+- Artefactos firmados y registry con permisos.
+- Endpoints autenticados, rate limits y límites de tamaño/coste.
+- Minimización de datos y controles contra membership inference.
+- Reproducibilidad con versiones de código, datos y entorno.
+- Monitorización de drift, calidad y abuso.
 
-## Controles mínimos
-- Mínimo privilegio y separación análisis/ejecución.
-- Versiones exactas de herramientas, reglas, modelos y datasets.
-- Secretos fuera de código, prompts y logs; redacción antes de IA remota.
-- No confiar en una herramienta o modelo como prueba concluyente.
-- Preservar originales y registrar SHA-256.
-- Revisión humana antes de cambios o acciones activas.
+## Metodología
+1. Modelar amenazas por etapa del ciclo ML.
+2. Validar fuentes, licencias, consentimiento y procedencia.
+3. Analizar datasets por duplicados, sesgo y contaminación.
+4. Entrenar con entorno aislado y dependencias fijadas.
+5. Evaluar robustness y privacidad con datos sintéticos.
+6. Revisar artefactos y permisos antes de publicar.
+7. Probar endpoint frente a abuso, enumeración y extracción.
+8. Monitorizar drift y comportamiento anómalo.
+9. Mantener rollback de modelo y dataset.
 
-## Laboratorio seguro
-Usar datos sintéticos, fixtures, aplicaciones deliberadamente vulnerables o máquinas virtuales aisladas. Sin credenciales reales. Debe ser reiniciable y reproducible. No ejecutar pruebas destructivas fuera de laboratorio desechable autorizado.
+## Laboratorio
+Dataset sintético tabular y clasificador local. Simular label poisoning, data leakage y consultas excesivas; evaluar métricas antes/después y crear controles. No utilizar PII ni modelos de terceros sin permiso.
 
 ## Evaluación
-5 preguntas de fundamentos, 3 escenarios sintéticos, 2 ejercicios de evidencia/falsos positivos, 1 diseño de controles y 1 informe reproducible. Aprobación sugerida: ≥80%, sin errores críticos de alcance y con evidencia verificable.
+Procedencia trazable, splits limpios, métricas reproducibles, endpoint limitado, artefactos firmados y proceso de rollback.
 
-## Entregables
-Alcance y autorización; activos; método y versiones; evidencias con hashes; hallazgos con severidad/confianza; mitigaciones; retest y riesgo residual.
-
-## Fuentes externas
-Consultar `data/knowledge_sources/knowledge_catalog.json`. Las URLs catalogadas no implican descarga, licencia o ingestión. Verificar derechos, procedencia, versión, fecha, tamaño, hash y seguridad del extractor.
+## Referencias
+NIST AI RMF, MITRE ATLAS, OWASP ML Security Top 10, ISO/IEC 23894, Google Secure AI Framework y papers de adversarial ML.
 
 ## Instrucciones para agentes IA
-Lee este paquete antes de planificar tareas de esta especialidad. Reutiliza Skills verificadas con alcance coincidente. No inventes capacidades ni resultados. Si falta evidencia, dilo. No ejecutes acciones activas sin autorización. Cita fragmentos recuperados; no afirmes haber consultado contenido ausente.
+No entrenes ni subas datasets con datos sensibles. Separa robustez, privacidad y fairness. No afirmes que un modelo es seguro por una sola métrica.

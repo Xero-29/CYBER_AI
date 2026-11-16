@@ -1,46 +1,47 @@
-# Red Team autorizado — Paquete especializado
+# Red Team autorizado — Guía de dominio
 
-**ID:** `red_team` · **Versión:** 1.1.0 · **Idioma:** español · **Estado:** contenido editorial propio, offline.
+**ID:** `red_team` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
 ## Propósito y límites
-Emulación adversaria controlada, reglas de compromiso, objetivos y medición de controles defensivos.
+Evalúa de forma controlada la capacidad de prevenir, detectar y responder ante escenarios adversarios. El Red Team requiere autorización escrita, reglas de enfrentamiento, activos, ventanas, límites, canales de emergencia y plan de parada. No es una autorización genérica para atacar Internet o terceros.
 
-Este módulo ofrece orientación y ejercicios sintéticos. No implica que CYBER_AI disponga de una plataforma especializada instalada ni concede permisos. Toda actividad activa requiere propietario, autorización, alcance, ventana y plan de parada.
+## Competencias
+- Planificar objetivos de emulación y criterios de éxito.
+- Mapear TTP a MITRE ATT&CK y controles defensivos.
+- Realizar reconocimiento y validación dentro del scope.
+- Evaluar rutas de identidad, configuración, aplicaciones y cloud.
+- Diseñar simulaciones de phishing solo con autorización específica.
+- Coordinar Purple Team y medir detección/respuesta.
+- Producir evidencia mínima y recomendaciones priorizadas.
 
-## Competencias específicas
-- Comprender arquitectura, actores, protocolos, flujos y límites de confianza.
-- Inventariar activos, superficies, dependencias y datos sensibles.
-- Mapear amenazas, debilidades y controles preventivos, detectivos y correctivos.
-- Definir telemetría y evidencia adecuada al contexto.
-- Evaluar disponibilidad, seguridad, privacidad y efectos operativos.
-- Convertir hallazgos en mitigaciones, pruebas de regresión y riesgo residual.
-
-## Amenazas y fallos prioritarios
-Alcance ambiguo, impacto operacional, exposición de datos y persistencia no autorizada.
+## Controles de operación
+- Rules of Engagement firmadas y lista de exclusiones.
+- Cuentas, infraestructura y datos de prueba dedicados.
+- Límites de tasa, impacto, persistencia y acceso.
+- No DoS, ransomware, exfiltración real ni movimiento fuera del scope.
+- Kill switch y contacto de emergencia.
+- Registro de acciones, operador, herramienta, tiempo y resultado.
+- Revisión legal/privacidad y coordinación con SOC.
 
 ## Metodología
-1. Documentar propietario, criticidad, contexto y autorización.
-2. Crear diagrama de arquitectura, inventario y flujos de datos.
-3. Definir escenarios de amenaza y criterios de éxito/fracaso.
-4. Revisar configuración y evidencia de solo lectura primero.
-5. Elegir pruebas con el mínimo impacto posible.
-6. Validar resultados mediante segunda fuente o revisión independiente.
-7. Priorizar impacto real, exposición, probabilidad e incertidumbre.
-8. Recomendar controles con responsable, plazo y prueba de cierre.
-9. Preservar evidencias y documentar limitaciones.
+1. Acordar objetivos, autorización, scope y stop conditions.
+2. Construir hipótesis de amenaza y plan de emulación.
+3. Validar alcance y controles antes de iniciar.
+4. Ejecutar pruebas de mínimo impacto y detener al obtener evidencia.
+5. Notificar hallazgos críticos según protocolo.
+6. Correlacionar acciones con telemetría defensiva.
+7. Realizar debrief con Blue Team y responsables.
+8. Documentar rutas, evidencias y brechas.
+9. Retestar controles y cerrar con lecciones.
 
-## Laboratorio de referencia
-Usar pruebas Atomic Red Team solo en laboratorio propio, con técnica aprobada, observables y rollback.
+## Laboratorio
+Entorno AD/cloud/web desechable con usuarios sintéticos. Emular TTP benignas y verificar detecciones sin payload destructivo ni persistencia real.
 
-## Criterios de evaluación
-- Identifica activos, flujos y límites de confianza.
-- Distingue evidencia de inferencia y registra incertidumbre.
-- Reconoce riesgos del dominio y controles.
-- Completa el ejercicio sin salir del alcance autorizado.
-- Produce informe reproducible con evidencias, hashes y retest.
+## Evaluación
+Autorización vigente, scope respetado, impacto controlado, trazabilidad completa, hallazgos reproducibles y mejora defensiva medida.
 
-## Referencias externas
-Las fuentes específicas están en `data/knowledge_sources/knowledge_catalog.json`. Siguen pendientes de validación de licencia y procedencia; no son corpus descargado ni ingerido.
+## Referencias
+MITRE ATT&CK, PTES, NIST SP 800-115, CREST, OWASP Testing Guide y CISA Red Team guidance.
 
 ## Instrucciones para agentes IA
-Consulta este módulo y Skills verificadas pertinentes. No inventes cobertura ni ejecuciones. Prefiere análisis pasivo, datos sintéticos y laboratorios. Si la acción puede afectar personas, disponibilidad, privacidad o activos físicos, detente y exige autorización explícita.
+No asumas autorización. No generes payloads destructivos, persistencia, evasión ni robo de credenciales. Si scope o stop conditions faltan, limita el trabajo a planificación defensiva.

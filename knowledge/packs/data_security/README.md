@@ -1,48 +1,49 @@
-# Seguridad de datos — Paquete base
+# Seguridad y gobierno de datos — Guía de dominio
 
-**ID:** `data_security` · **Versión:** 1.0.0 · **Idioma:** español · **Estado:** contenido propio inicial, incluido offline.
+**ID:** `data_security` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
 ## Propósito y límites
-Seguridad de datos: Seguridad de datos y su arquitectura, amenazas, controles, metodología y validación. Esta guía es base metodológica, no certificación ni enciclopedia. No concede permisos. Toda actividad activa requiere autorización explícita, alcance, ventana y criterios de parada.
+Protege datos estructurados y no estructurados durante creación, uso, compartición, almacenamiento, backup y eliminación. Considera confidencialidad, integridad, disponibilidad, privacidad, calidad, linaje y soberanía. Clasificación y cifrado no sustituyen controles de acceso ni gobierno de finalidad.
 
 ## Competencias
-- Explicar arquitectura, componentes, flujos y límites de confianza.
-- Identificar activos, amenazas, vulnerabilidades, controles e impactos.
-- Diseñar prevención, detección, respuesta, recuperación y validación.
-- Seleccionar herramientas por riesgo, evidencia, coste y mantenimiento.
-- Documentar procedencia, versiones, incertidumbre y reproducibilidad.
+- Inventariar datasets, propietarios, consumidores y linaje.
+- Clasificar datos públicos, internos, confidenciales y sensibles.
+- Diseñar controles de acceso, cifrado, tokenización y seudonimización.
+- Gestionar data loss prevention, retención y borrado.
+- Evaluar exposición en logs, backups, analytics, RAG y entrenamiento ML.
+- Proteger data lakes, warehouses, object storage y pipelines.
+- Medir calidad, integridad y trazabilidad de transformaciones.
 
-## Metodología reproducible
-1. Definir propietario, autorización, alcance y exclusiones.
-2. Inventariar activos, datos, dependencias y límites de confianza.
-3. Formular hipótesis, amenazas, controles y criterios de parada.
-4. Recopilar evidencia permitida con procedencia, fecha y hash.
-5. Elegir métodos de menor riesgo y registrar versiones/configuración.
-6. Comenzar en modo pasivo/local; pruebas activas solo con autorización explícita.
-7. Validar hallazgos de forma reproducible e independiente.
-8. Priorizar impacto, exposición, explotabilidad e incertidumbre.
-9. Recomendar controles verificables y retest.
-10. Registrar evidencias, limitaciones y riesgo residual.
+## Controles prioritarios
+- Minimización y finalidad definida.
+- ACL por dataset/columna/fila y segregación de tenants.
+- Cifrado en tránsito y reposo con gestión de claves separada.
+- Tokenización de identificadores y redacción de campos sensibles.
+- DLP contextual y revisión de exportaciones.
+- Integridad con hashes, firmas y linaje.
+- Retención automática, legal hold y borrado verificable.
+- Acceso temporal y recertificación periódica.
+- Backups cifrados, aislados y restauración ensayada.
 
-## Controles mínimos
-- Mínimo privilegio y separación análisis/ejecución.
-- Versiones exactas de herramientas, reglas, modelos y datasets.
-- Secretos fuera de código, prompts y logs; redacción antes de IA remota.
-- No confiar en una herramienta o modelo como prueba concluyente.
-- Preservar originales y registrar SHA-256.
-- Revisión humana antes de cambios o acciones activas.
+## Metodología
+1. Identificar fuentes, sistemas, sujetos y propietarios.
+2. Mapear flujos, copias, exportaciones y transferencias.
+3. Clasificar sensibilidad y definir propósito/retención.
+4. Evaluar amenazas de acceso indebido, corrupción y fuga.
+5. Diseñar controles por nivel de dato y contexto.
+6. Probar acceso negativo, redacción, cifrado y borrado.
+7. Verificar backups, recuperación y consistencia de linaje.
+8. Monitorizar acceso anómalo y cambios de permisos.
+9. Revisar ante nuevos usos, modelos o proveedores.
 
-## Laboratorio seguro
-Usar datos sintéticos, fixtures, aplicaciones deliberadamente vulnerables o máquinas virtuales aisladas. Sin credenciales reales. Debe ser reiniciable y reproducible. No ejecutar pruebas destructivas fuera de laboratorio desechable autorizado.
+## Laboratorio
+Dataset sintético con PII ficticia. Aplicar clasificación, masking, RBAC por columna y retención; comprobar que exports, logs y RAG no filtran campos restringidos.
 
 ## Evaluación
-5 preguntas de fundamentos, 3 escenarios sintéticos, 2 ejercicios de evidencia/falsos positivos, 1 diseño de controles y 1 informe reproducible. Aprobación sugerida: ≥80%, sin errores críticos de alcance y con evidencia verificable.
+Cada dataset tiene dueño, clasificación, finalidad, acceso, retención, linaje y evidencia de controles. El borrado y restore se verifican.
 
-## Entregables
-Alcance y autorización; activos; método y versiones; evidencias con hashes; hallazgos con severidad/confianza; mitigaciones; retest y riesgo residual.
-
-## Fuentes externas
-Consultar `data/knowledge_sources/knowledge_catalog.json`. Las URLs catalogadas no implican descarga, licencia o ingestión. Verificar derechos, procedencia, versión, fecha, tamaño, hash y seguridad del extractor.
+## Referencias
+NIST Privacy Framework, ISO/IEC 27040, DAMA-DMBOK, OWASP Data Security, NIST SP 800-88 y CIS Controls.
 
 ## Instrucciones para agentes IA
-Lee este paquete antes de planificar tareas de esta especialidad. Reutiliza Skills verificadas con alcance coincidente. No inventes capacidades ni resultados. Si falta evidencia, dilo. No ejecutes acciones activas sin autorización. Cita fragmentos recuperados; no afirmes haber consultado contenido ausente.
+No incluyas datos personales reales en fixtures. No exportes datasets completos para probar una hipótesis. Diferencia cifrado, anonimización y seudonimización.

@@ -1,48 +1,49 @@
-# Arquitectura segura — Paquete base
+# Arquitectura segura — Guía de dominio
 
-**ID:** `secure_arch` · **Versión:** 1.0.0 · **Idioma:** español · **Estado:** contenido propio inicial, incluido offline.
+**ID:** `secure_arch` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
 ## Propósito y límites
-Arquitectura segura: Arquitectura segura y su arquitectura, amenazas, controles, metodología y validación. Esta guía es base metodológica, no certificación ni enciclopedia. No concede permisos. Toda actividad activa requiere autorización explícita, alcance, ventana y criterios de parada.
+Integra seguridad en arquitectura empresarial, aplicaciones, datos, identidad, infraestructura y operación. El objetivo es que controles, riesgos y requisitos formen parte del diseño y puedan verificarse en producción. Un diagrama o checklist no demuestra que los controles estén desplegados.
 
 ## Competencias
-- Explicar arquitectura, componentes, flujos y límites de confianza.
-- Identificar activos, amenazas, vulnerabilidades, controles e impactos.
-- Diseñar prevención, detección, respuesta, recuperación y validación.
-- Seleccionar herramientas por riesgo, evidencia, coste y mantenimiento.
-- Documentar procedencia, versiones, incertidumbre y reproducibilidad.
+- Definir requisitos de seguridad y atributos de calidad medibles.
+- Modelar límites de confianza, flujos de datos y dependencias.
+- Aplicar Zero Trust, least privilege, defense in depth y fail secure.
+- Diseñar segmentación, identidad, secretos, cifrado y observabilidad.
+- Evaluar resiliencia, privacidad, disponibilidad y recuperación.
+- Analizar decisiones mediante ADRs y excepciones de riesgo.
+- Diseñar arquitectura multi-tenant y separación de funciones.
 
-## Metodología reproducible
-1. Definir propietario, autorización, alcance y exclusiones.
-2. Inventariar activos, datos, dependencias y límites de confianza.
-3. Formular hipótesis, amenazas, controles y criterios de parada.
-4. Recopilar evidencia permitida con procedencia, fecha y hash.
-5. Elegir métodos de menor riesgo y registrar versiones/configuración.
-6. Comenzar en modo pasivo/local; pruebas activas solo con autorización explícita.
-7. Validar hallazgos de forma reproducible e independiente.
-8. Priorizar impacto, exposición, explotabilidad e incertidumbre.
-9. Recomendar controles verificables y retest.
-10. Registrar evidencias, limitaciones y riesgo residual.
+## Patrones y controles
+- Autenticación centralizada y autorización por recurso/acción.
+- Identidades de workload y credenciales efímeras.
+- APIs con esquemas estrictos, rate limits y trazabilidad.
+- Segmentación de red y egress mínimo.
+- Secret manager/KMS para material sensible.
+- Logs estructurados con redacción y retención.
+- Backups probados, recuperación y degradación segura.
+- Supply chain con SBOM, firma y procedencia.
+- Separación de planos de control, datos y administración.
 
-## Controles mínimos
-- Mínimo privilegio y separación análisis/ejecución.
-- Versiones exactas de herramientas, reglas, modelos y datasets.
-- Secretos fuera de código, prompts y logs; redacción antes de IA remota.
-- No confiar en una herramienta o modelo como prueba concluyente.
-- Preservar originales y registrar SHA-256.
-- Revisión humana antes de cambios o acciones activas.
+## Metodología
+1. Definir contexto, objetivos, criticidad, actores y restricciones.
+2. Dibujar contenedores, componentes, flujos y trust boundaries.
+3. Clasificar datos y asignar propietario y retención.
+4. Elaborar threat model STRIDE y escenarios de abuso.
+5. Seleccionar controles con requisitos de aceptación.
+6. Documentar ADRs, trade-offs y riesgo residual.
+7. Construir prototipo y validar controles de forma automatizada.
+8. Revisar resiliencia, operación, backup y recuperación.
+9. Verificar despliegue real y reevaluar ante cambios.
 
-## Laboratorio seguro
-Usar datos sintéticos, fixtures, aplicaciones deliberadamente vulnerables o máquinas virtuales aisladas. Sin credenciales reales. Debe ser reiniciable y reproducible. No ejecutar pruebas destructivas fuera de laboratorio desechable autorizado.
+## Laboratorio
+Diseñar una plataforma multi-tenant con frontend, API, workers, base de datos y proveedor externo. Producir diagramas, ADRs, threat model, matriz de controles y pruebas de aislamiento.
 
 ## Evaluación
-5 preguntas de fundamentos, 3 escenarios sintéticos, 2 ejercicios de evidencia/falsos positivos, 1 diseño de controles y 1 informe reproducible. Aprobación sugerida: ≥80%, sin errores críticos de alcance y con evidencia verificable.
+Cada límite de confianza tiene controles, propietario y evidencia. Los requisitos son medibles, las decisiones trazables y los riesgos residuales aceptados por autoridad competente.
 
-## Entregables
-Alcance y autorización; activos; método y versiones; evidencias con hashes; hallazgos con severidad/confianza; mitigaciones; retest y riesgo residual.
-
-## Fuentes externas
-Consultar `data/knowledge_sources/knowledge_catalog.json`. Las URLs catalogadas no implican descarga, licencia o ingestión. Verificar derechos, procedencia, versión, fecha, tamaño, hash y seguridad del extractor.
+## Referencias
+NIST SP 800-160, NIST CSF 2.0, ISO/IEC 27001/27002, SABSA, OWASP ASVS, C4 Model y AWS/Azure Well-Architected Frameworks.
 
 ## Instrucciones para agentes IA
-Lee este paquete antes de planificar tareas de esta especialidad. Reutiliza Skills verificadas con alcance coincidente. No inventes capacidades ni resultados. Si falta evidencia, dilo. No ejecutes acciones activas sin autorización. Cita fragmentos recuperados; no afirmes haber consultado contenido ausente.
+No declares segura una arquitectura por cumplir un patrón. Expón supuestos, fallos de diseño, compensaciones y pruebas necesarias. No conviertas diagramas en evidencia de despliegue.

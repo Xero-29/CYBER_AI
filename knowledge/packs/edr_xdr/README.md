@@ -1,46 +1,48 @@
-# EDR/XDR — Paquete especializado
+# EDR y XDR — Guía de dominio
 
-**ID:** `edr_xdr` · **Versión:** 1.1.0 · **Idioma:** español · **Estado:** contenido editorial propio, offline.
+**ID:** `edr_xdr` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
 ## Propósito y límites
-Telemetría endpoint de procesos, archivos, red e identidad; detección, investigación y respuesta.
+Diseña cobertura de detección y respuesta en endpoints, servidores, identidades, red y cloud. EDR/XDR agrega telemetría y acciones; puede causar impacto operacional si aísla equipos o mata procesos. Las acciones de respuesta requieren autoridad, alcance y reversibilidad.
 
-Este módulo ofrece orientación y ejercicios sintéticos. No implica que CYBER_AI disponga de una plataforma especializada instalada ni concede permisos. Toda actividad activa requiere propietario, autorización, alcance, ventana y plan de parada.
+## Competencias
+- Comprender sensores, agentes, telemetría, consola y backend.
+- Analizar procesos, árbol de ejecución, módulos, archivos, red y persistencia.
+- Correlacionar endpoint con identidad, correo, DNS y cloud.
+- Diseñar reglas de detección, exclusiones y prevención.
+- Evaluar tamper protection, aislamiento y rollback.
+- Gestionar alertas, evidencias, cuarentena y respuesta coordinada.
+- Medir cobertura, falsos positivos, rendimiento y privacidad.
 
-## Competencias específicas
-- Comprender arquitectura, actores, protocolos, flujos y límites de confianza.
-- Inventariar activos, superficies, dependencias y datos sensibles.
-- Mapear amenazas, debilidades y controles preventivos, detectivos y correctivos.
-- Definir telemetría y evidencia adecuada al contexto.
-- Evaluar disponibilidad, seguridad, privacidad y efectos operativos.
-- Convertir hallazgos en mitigaciones, pruebas de regresión y riesgo residual.
-
-## Amenazas y fallos prioritarios
-Evasión de telemetría, abuso de privilegios, aislamiento erróneo, rendimiento y privacidad.
+## Controles
+- Agentes con tamper protection y política gestionada.
+- Consola con RBAC, MFA y registro de acciones.
+- Exclusiones limitadas, justificadas y con vencimiento.
+- Actualizaciones firmadas y despliegue gradual.
+- Telemetría con redacción y retención.
+- Aislamiento de endpoint solo con autorización de incident commander.
+- Integración SIEM con IDs correlacionables.
+- Pruebas de impacto sobre rendimiento y aplicaciones críticas.
 
 ## Metodología
-1. Documentar propietario, criticidad, contexto y autorización.
-2. Crear diagrama de arquitectura, inventario y flujos de datos.
-3. Definir escenarios de amenaza y criterios de éxito/fracaso.
-4. Revisar configuración y evidencia de solo lectura primero.
-5. Elegir pruebas con el mínimo impacto posible.
-6. Validar resultados mediante segunda fuente o revisión independiente.
-7. Priorizar impacto real, exposición, probabilidad e incertidumbre.
-8. Recomendar controles con responsable, plazo y prueba de cierre.
-9. Preservar evidencias y documentar limitaciones.
+1. Inventariar sistemas, SO, criticidad y cobertura de agentes.
+2. Revisar políticas, exclusiones, versiones y salud de sensores.
+3. Mapear detecciones a ATT&CK y fuentes de telemetría.
+4. Probar reglas con eventos sintéticos y benignos.
+5. Medir falsos positivos y pérdida de telemetría.
+6. Ensayar aislamiento y rollback en endpoints de laboratorio.
+7. Verificar integración SIEM, alertas y auditoría.
+8. Revisar privacidad, acceso y retención.
+9. Mejorar cobertura según incidentes y cambios.
 
-## Laboratorio de referencia
-Reconstruir una línea temporal desde eventos sintéticos y simular contención sin aislar endpoints reales.
+## Laboratorio
+Endpoints virtuales desechables con EDR de prueba y eventos sintéticos. Simular detección, triage y aislamiento controlado; comprobar restauración de conectividad y registro de operador.
 
-## Criterios de evaluación
-- Identifica activos, flujos y límites de confianza.
-- Distingue evidencia de inferencia y registra incertidumbre.
-- Reconoce riesgos del dominio y controles.
-- Completa el ejercicio sin salir del alcance autorizado.
-- Produce informe reproducible con evidencias, hashes y retest.
+## Evaluación
+Cobertura de activos medida, reglas versionadas, exclusiones acotadas, telemetría fiable y acciones de respuesta auditables.
 
-## Referencias externas
-Las fuentes específicas están en `data/knowledge_sources/knowledge_catalog.json`. Siguen pendientes de validación de licencia y procedencia; no son corpus descargado ni ingerido.
+## Referencias
+MITRE ATT&CK, NIST SP 800-61, CIS Controls, vendor EDR/XDR hardening guides y Sigma.
 
 ## Instrucciones para agentes IA
-Consulta este módulo y Skills verificadas pertinentes. No inventes cobertura ni ejecuciones. Prefiere análisis pasivo, datos sintéticos y laboratorios. Si la acción puede afectar personas, disponibilidad, privacidad o activos físicos, detente y exige autorización explícita.
+No aísles endpoints ni mates procesos. Recomienda acciones y su impacto; el operador autorizado decide.
