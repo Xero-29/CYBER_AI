@@ -130,8 +130,7 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
             "error": "Nuclei no se encuentra en el PATH.",
             "findings": [],
         }
-        _record_scan_event(target, result, started, authorization_id=authorization_id)
-        return result
+        return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)
 
     output_dir = Path("reports")
     output_dir.mkdir(parents=True, exist_ok=True)
