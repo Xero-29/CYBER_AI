@@ -317,3 +317,53 @@ class NativeProtocolTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ProviderBoundaryValidationTests(unittest.TestCase):
+    def test_timeout_must_be_finite_and_bounded(self):
+        provider = {"name": "local", "protocol": "ollama",
+                    "base_url": "http://127.0.0.1:11434"}
+        for timeout in (0, -1, 601, float("inf"), float("nan"), True, "5"):
+            with self.subTest(timeout=timeout), self.assertRaises(ValueError):
+                llm_providers.request(provider, "api/chat", {}, timeout=timeout)
+
+    def test_timeout_is_forwarded_to_builtin_transport(self):
+        provider = {"name": "local", "protocol": "ollama",
+                    "base_url": "http://127.0.0.1:11434"}
+        with patch.object(llm_providers, "_http_json", return_value={"message": {"content": "ok"}}) as call:
+            llm_providers.request(provider, "api/chat", {}, timeout=12.5)
+        self.assertEqual(call.call_args.kwargs["timeout"], 12.5)
+
+    def test_builtin_embedding_response_must_match_input_count(self):
+        provider = {"name": "cloud", "protocol": "openai",
+                    "base_url": "https://api.example/v1", "requires_api_key": False}
+        with patch.object(llm_providers, "_http_json", return_value={
+            "data": [{"index": 0, "embedding": [0.1, 0.2]}]
+        }):
+            with self.assertRaisesRegex(RuntimeError, "número de embeddings"):
+                llm_providers.request(provider, "api/embed", {
+                    "model": "embed", "input": ["uno", "dos"]
+                })
+
+    def test_builtin_embedding_response_rejects_non_finite_values(self):
+        provider = {"name": "cloud", "protocol": "openai",
+                    "base_url": "https://api.example/v1", "requires_api_key": False}
+        with patch.object(llm_providers, "_http_json", return_value={
+            "data": [{"index": 0, "embedding": [0.1, float("nan")]}]
+        }):
+            with self.assertRaisesRegex(RuntimeError, "vector inválido"):
+                llm_providers.request(provider, "api/embed", {
+                    "model": "embed", "input": ["uno"]
+                })
+
+    def test_invalid_usage_counters_are_rejected(self):
+        provider = {"name": "cloud", "protocol": "openai",
+                    "base_url": "https://api.example/v1", "requires_api_key": False}
+        with patch.object(llm_providers, "_http_json", return_value={
+            "choices": [{"message": {"content": "ok"}, "finish_reason": "stop"}],
+            "usage": {"prompt_tokens": -1, "completion_tokens": 2},
+        }):
+            with self.assertRaisesRegex(RuntimeError, "contador inválido"):
+                llm_providers.request(provider, "api/chat", {
+                    "model": "m", "messages": [{"role": "user", "content": "hola"}]
+                })
