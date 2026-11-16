@@ -37,8 +37,7 @@ def _safe_relative(value):
 
 
 def _sqlite_snapshot(source, destination):
-    source_uri = f"file:{source.as_posix()}?mode=ro"
-    with sqlite3.connect(source_uri, uri=True, timeout=30) as src:
+    with sqlite3.connect(str(source), timeout=30) as src:
         with sqlite3.connect(str(destination), timeout=30) as dst:
             src.backup(dst)
             result = dst.execute("PRAGMA integrity_check").fetchone()[0]
@@ -47,8 +46,11 @@ def _sqlite_snapshot(source, destination):
 
 
 def create_backup(data_dir=DEFAULT_DATA, destination=None):
-    data_dir = Path(data_dir).resolve()
-    if not data_dir.is_dir() or data_dir.is_symlink():
+    data_dir = Path(data_dir)
+    if data_dir.is_symlink():
+        raise BackupError("El directorio de datos no puede ser symlink.")
+    data_dir = data_dir.resolve()
+    if not data_dir.is_dir():
         raise BackupError("El directorio de datos debe existir y no ser symlink.")
     if destination is None:
         raise BackupError("Indica un destino de backup.")
@@ -76,6 +78,8 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None):
                 if source.suffix in LOCK_SUFFIXES or source.name.endswith(("-wal", "-shm")):
                     continue
                 relative = source.relative_to(data_dir).as_posix()
+                if relative == "manifest.json":
+                    raise BackupError("data/manifest.json está reservado para el manifiesto del backup.")
                 target = staging / relative
                 target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
                 if source.suffix.lower() in {".sqlite", ".sqlite3", ".db"}:
@@ -119,8 +123,11 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None):
 
 
 def verify_backup(snapshot):
-    snapshot = Path(snapshot).resolve()
-    if not snapshot.is_dir() or snapshot.is_symlink():
+    snapshot = Path(snapshot)
+    if snapshot.is_symlink():
+        raise BackupError("El backup no puede ser symlink.")
+    snapshot = snapshot.resolve()
+    if not snapshot.is_dir():
         raise BackupError("El backup debe ser un directorio existente.")
     manifest_path = snapshot / "manifest.json"
     if manifest_path.is_symlink() or not manifest_path.is_file():
@@ -137,9 +144,17 @@ def verify_backup(snapshot):
         if relative.as_posix() in seen:
             raise BackupError("Ruta duplicada en manifiesto.")
         seen.add(relative.as_posix())
-        path = snapshot.joinpath(*relative.parts)
-        if path.is_symlink() or not path.is_file():
-            raise BackupError(f"Falta archivo o hay symlink: {relative.as_posix()}")
+        path = snapshot
+        for part in relative.parts:
+            path = path / part
+            if path.is_symlink():
+                raise BackupError(f"Hay symlink en el backup: {relative.as_posix()}")
+        if not path.is_file():
+            raise BackupError(f"Falta archivo: {relative.as_posix()}")
+        try:
+            path.resolve().relative_to(snapshot)
+        except ValueError as error:
+            raise BackupError(f"Ruta fuera del backup: {relative.as_posix()}") from error
         actual_hash = _sha256(path)
         if actual_hash != item.get("sha256") or path.stat().st_size != item.get("size"):
             raise BackupError(f"Integridad no válida: {relative.as_posix()}")
@@ -152,9 +167,15 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
                    confirm_replace=False):
     if confirm_quiesced is not True:
         raise BackupError("La restauración requiere --confirm-quiesced.")
-    snapshot = Path(snapshot).resolve()
+    snapshot = Path(snapshot)
+    if snapshot.is_symlink():
+        raise BackupError("El backup no puede ser symlink.")
+    snapshot = snapshot.resolve()
     report = verify_backup(snapshot)
-    data_dir = Path(data_dir).resolve()
+    data_dir = Path(data_dir)
+    if data_dir.is_symlink():
+        raise BackupError("El directorio de datos no puede ser symlink.")
+    data_dir = data_dir.resolve()
     if data_dir.exists() and not confirm_replace:
         raise BackupError("El destino existe; usa --confirm-replace para sustituirlo.")
     if data_dir.is_symlink():
@@ -170,6 +191,11 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
             target = staging.joinpath(*relative.parts)
             target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
             shutil.copy2(source, target)
+            if target.suffix.lower() in {".sqlite", ".sqlite3", ".db"}:
+                with sqlite3.connect(str(target), timeout=30) as db:
+                    integrity = db.execute("PRAGMA integrity_check").fetchone()[0]
+                    if integrity != "ok":
+                        raise BackupError(f"Snapshot SQLite corrupto: {relative.as_posix()}")
             try:
                 os.chmod(target, 0o600)
             except OSError:
