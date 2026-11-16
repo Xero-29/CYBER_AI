@@ -341,27 +341,43 @@ def _validate_plugin_response(endpoint, result, protocol):
 
 
 def request(provider, endpoint, payload=None, timeout=600):
-    """Normaliza llamadas y deniega endpoints no declarados por capacidades."""
+    """Normaliza llamadas y valida respuestas de todos los proveedores."""
+    if isinstance(timeout, bool) or not isinstance(timeout, (int, float)) or not math.isfinite(timeout) or not 0 < timeout <= 600:
+        raise ValueError("timeout debe ser un número finito mayor que 0 y máximo 600 segundos.")
     protocol = provider.get("protocol")
     required = {"api/chat": "chat", "api/embed": "embeddings", "api/ps": "model_listing"}.get(endpoint)
     if required and required not in provider_capabilities(provider):
         raise ValueError(f"El proveedor {provider.get('name', protocol)} no ofrece {required}.")
+    request_payload = payload or {}
     if protocol == "ollama":
         base = str(provider.get("base_url", "")).rstrip("/")
         if not base:
             raise ValueError("base_url es obligatorio para Ollama.")
-        return _http_json(base + "/" + endpoint, payload, timeout=timeout)
-    if protocol == "openai":
-        return _openai_request(provider, endpoint, payload or {}, timeout)
-    if protocol == "anthropic":
-        return _anthropic_request(provider, endpoint, payload or {}, timeout)
-    if protocol == "gemini":
-        return _gemini_request(provider, endpoint, payload or {}, timeout)
-    adapter = _load_provider_plugin(protocol)
-    if adapter is not None:
-        result = adapter.request(provider, endpoint, payload or {}, timeout)
-        return _validate_plugin_response(endpoint, result, protocol)
-    raise ValueError(f"Protocolo no compatible: {protocol}")
+        result = _http_json(base + "/" + endpoint, request_payload, timeout=timeout)
+    elif protocol == "openai":
+        result = _openai_request(provider, endpoint, request_payload, timeout)
+    elif protocol == "anthropic":
+        result = _anthropic_request(provider, endpoint, request_payload, timeout)
+    elif protocol == "gemini":
+        result = _gemini_request(provider, endpoint, request_payload, timeout)
+    else:
+        adapter = _load_provider_plugin(protocol)
+        if adapter is None:
+            raise ValueError(f"Protocolo no compatible: {protocol}")
+        result = adapter.request(provider, endpoint, request_payload, timeout)
+    result = _validate_plugin_response(endpoint, result, protocol)
+    if endpoint == "api/embed":
+        expected = request_payload.get("input")
+        if isinstance(expected, list) and len(result["embeddings"]) != len(expected):
+            raise RuntimeError(f"El proveedor {protocol} devolvió un número de embeddings distinto al solicitado.")
+    for field in ("prompt_eval_count", "eval_count"):
+        value = result.get(field)
+        if value is not None and (
+            isinstance(value, bool) or not isinstance(value, (int, float))
+            or not math.isfinite(value) or value < 0
+        ):
+            raise RuntimeError(f"El proveedor {protocol} devolvió un contador inválido: {field}.")
+    return result
 
 
 def provider_capabilities(provider):
