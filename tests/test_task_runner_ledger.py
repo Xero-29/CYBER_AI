@@ -30,7 +30,6 @@ class TaskRunnerLedgerTests(unittest.TestCase):
             )
         self.assertIsNone(result)
 
-
     def test_unexpected_scanner_exception_is_recorded_as_failed(self):
         ledger = unittest.mock.Mock()
         ledger.append.side_effect = [
@@ -43,18 +42,20 @@ class TaskRunnerLedgerTests(unittest.TestCase):
                 os.chdir(workspace)
                 template = Path(home) / "nuclei-templates/http/technologies/tech-detect.yaml"
                 template.parent.mkdir(parents=True)
-                template.write_text("id: test\\n", encoding="utf-8")
-                with patch.object(Path, "home", return_value=Path(home)), \\
-                     patch.object(task_runner, "select_capabilities", return_value=[{"path": str(template)}]), \\
-                     patch.object(task_runner, "authorize_target", return_value={"authorization_id": "grant"}), \\
-                     patch.object(task_runner.shutil, "which", return_value="/usr/bin/nuclei"), \\
-                     patch.object(task_runner.subprocess, "run", side_effect=RuntimeError("scanner crashed")), \\
-                     patch.object(task_runner, "ExecutionLedger", return_value=ledger), \\
-                     patch.object(sys, "argv", [
-                         "task_runner.py", "--task", "inspect web headers",
-                         "--target", "https://203.0.113.10", "--execute",
-                         "--confirm-authorized", "--authorization-id", "grant",
-                     ]):
+                template.write_text("id: test\n", encoding="utf-8")
+                with (
+                    patch.object(Path, "home", return_value=Path(home)),
+                    patch.object(task_runner, "select_capabilities", return_value=[{"path": str(template)}]),
+                    patch.object(task_runner, "authorize_target", return_value={"authorization_id": "grant"}),
+                    patch.object(task_runner.shutil, "which", return_value="/usr/bin/nuclei"),
+                    patch.object(task_runner.subprocess, "run", side_effect=RuntimeError("scanner crashed")),
+                    patch.object(task_runner, "ExecutionLedger", return_value=ledger),
+                    patch.object(sys, "argv", [
+                        "task_runner.py", "--task", "inspect web headers",
+                        "--target", "https://203.0.113.10", "--execute",
+                        "--confirm-authorized", "--authorization-id", "grant",
+                    ]),
+                ):
                     result = task_runner.main()
             finally:
                 os.chdir(old_cwd)
