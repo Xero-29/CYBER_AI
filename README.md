@@ -132,6 +132,17 @@ python knowledge_bootstrap.py --rebuild-text-index
 
 La recuperación combina búsqueda semántica y texto completo mediante Reciprocal Rank Fusion (RRF), respetando el aislamiento por tenant. Si SQLite no incluye FTS5, el sistema conserva el modo semántico. Para bibliotecas existentes, `--rebuild-text-index` reconstruye FTS5 verificando SHA-256 de cada fragmento.
 
+Crea y verifica copias locales de las bases SQLite y archivos de datos. Detén los procesos que escriben en `data/` antes de copiar/restaurar:
+
+```bash
+python data_backup.py backup --destination /ruta/segura/cyber-ai-backup --confirm-quiesced
+python data_backup.py verify --snapshot /ruta/segura/cyber-ai-backup
+# La restauración conserva el directorio anterior como .pre-restore-*:
+python data_backup.py restore --snapshot /ruta/segura/cyber-ai-backup --confirm-quiesced --confirm-replace
+```
+
+Este backup verifica integridad y usa snapshots SQLite consistentes, pero **no cifra** los datos. No lo copies a almacenamiento externo sin cifrado y controles de acceso; no sustituye WORM ni una estrategia de recuperación institucional.
+
 Genera un SBOM CycloneDX determinista a partir de las dependencias fijadas:
 
 ```bash
