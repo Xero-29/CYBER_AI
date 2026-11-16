@@ -1,5 +1,5 @@
 import unittest
-from datetime import datetime, timezone
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import agent_runner
@@ -11,22 +11,19 @@ class FakeLedger:
         self.appended = []
 
     def history(self, *, namespace, limit):
-        created_at = datetime.now(timezone.utc).isoformat()
         events = [{
             "sequence": 1,
             "event_id": "start-1",
-            "created_at": created_at,
             "namespace": namespace,
             "task": "task under test",
             "status": "started",
             "tool": "agent_runner",
-            "metadata": {},
+            "metadata": {"task_id": "task-123"},
         }]
         if self.finalized:
             events.append({
                 "sequence": 2,
                 "event_id": "end-1",
-                "created_at": created_at,
                 "namespace": namespace,
                 "task": "task under test",
                 "status": "failed",
@@ -45,7 +42,8 @@ class AgentRunnerLedgerGuardTests(unittest.TestCase):
         with patch.object(agent_runner, "_run_agent_impl", side_effect=RuntimeError("provider failed")), \
              patch.object(agent_runner, "load_config", return_value={}), \
              patch.object(agent_runner, "resolve_agent", return_value=("agent", {"memory": {"namespace": "ns"}})), \
-             patch.object(agent_runner, "ExecutionLedger", return_value=ledger):
+             patch.object(agent_runner, "ExecutionLedger", return_value=ledger),
+             patch.object(agent_runner.uuid, "uuid4", return_value=SimpleNamespace(hex="task-123")):
             with self.assertRaisesRegex(RuntimeError, "provider failed"):
                 agent_runner.run_agent("agent", "task under test")
 
