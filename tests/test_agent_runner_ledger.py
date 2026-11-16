@@ -39,11 +39,13 @@ class FakeLedger:
 
 class AgentRunnerLedgerGuardTests(unittest.TestCase):
     def invoke(self, ledger):
-        with patch.object(agent_runner, "_run_agent_impl", side_effect=RuntimeError("provider failed")), \
-             patch.object(agent_runner, "load_config", return_value={}), \
-             patch.object(agent_runner, "resolve_agent", return_value=("agent", {"memory": {"namespace": "ns"}})), \
-             patch.object(agent_runner, "ExecutionLedger", return_value=ledger),
-             patch.object(agent_runner.uuid, "uuid4", return_value=SimpleNamespace(hex="task-123")):
+        with (
+            patch.object(agent_runner, "_run_agent_impl", side_effect=RuntimeError("provider failed")),
+            patch.object(agent_runner, "load_config", return_value={}),
+            patch.object(agent_runner, "resolve_agent", return_value=("agent", {"memory": {"namespace": "ns"}})),
+            patch.object(agent_runner, "ExecutionLedger", return_value=ledger),
+            patch.object(agent_runner.uuid, "uuid4", return_value=SimpleNamespace(hex="task-123")),
+        ):
             with self.assertRaisesRegex(RuntimeError, "provider failed"):
                 agent_runner.run_agent("agent", "task under test")
 
