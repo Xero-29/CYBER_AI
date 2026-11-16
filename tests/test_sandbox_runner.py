@@ -43,6 +43,7 @@ class SandboxRunnerTests(unittest.TestCase):
         self.assertIn("readonly", joined)
         self.assertIn("dst=/evidence", joined)
         self.assertIn("CYBER_AI_LEDGER_PATH=/evidence/execution_ledger.sqlite3", command)
+        self.assertIn("--require-ledger", command)
         self.assertNotIn("--privileged", command)
         self.assertNotIn("/var/run/docker.sock", joined)
 

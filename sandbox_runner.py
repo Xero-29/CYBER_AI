@@ -67,7 +67,7 @@ def build_docker_command(tool_id, target, evidence_dir, image=DEFAULT_IMAGE, tim
         "/workspace/tool_executor.py",
         "--tool", tool_id,
         "--target", relative_target,
-        "--execute",
+        "--execute", "--require-ledger",
     ]
     if timeout is not None:
         if isinstance(timeout, bool) or not isinstance(timeout, int) or not 1 <= timeout <= 600:
