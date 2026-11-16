@@ -49,6 +49,25 @@ class SkillbookTests(unittest.TestCase):
    with self.assertRaisesRegex(ValueError,"Hay ejecuciones fallidas"):
     skillbook.register_skill_from_ledger(**args,approval_signature=signature)
 
+ def test_started_lifecycle_events_do_not_invalidate_successful_skill_evidence(self):
+  key="test-veritas-approval-key-with-32-bytes-minimum"
+  events=[
+   {"event_id":"start-1","task_fingerprint":"e"*64,"status":"started","created_at":"2026-03-01T00:00:00Z"},
+   {"event_id":"run-1","task_fingerprint":"e"*64,"status":"completed","tool":"team_orchestrator","metadata":{"objective_supervision":True},"created_at":"2026-03-01T00:01:00Z","validator_results":[{"name":"objective_review:VERITAS","reviewer":"VERITAS","passed":True,"independent":True,"evidence":["review"]}],"evidence_sha256":"a"*64},
+   {"event_id":"start-2","task_fingerprint":"e"*64,"status":"started","created_at":"2026-03-02T00:00:00Z"},
+   {"event_id":"run-2","task_fingerprint":"e"*64,"status":"completed","tool":"team_orchestrator","metadata":{"objective_supervision":True},"created_at":"2026-03-02T00:01:00Z","validator_results":[{"name":"objective_review:VERITAS","reviewer":"VERITAS","passed":True,"independent":True,"evidence":["review"]}],"evidence_sha256":"b"*64},
+  ]
+  class FakeLedger:
+   def verify(self): return {"valid":True}
+   def history(self,**kwargs): return events
+  args=dict(name="Skill lifecycle",task_pattern="tarea lifecycle verificada",description="Procedimiento validado",prerequisites=["fixture"],methodology=["preparar fixture","ejecutar prueba"],validation=["verificar resultado"],tools=["ruff"],tags=["test","lifecycle"],source_urls=["https://example.org/"],namespace="nexo",event_ids=["run-1","run-2"])
+  with patch.object(skillbook,"ExecutionLedger",return_value=FakeLedger()):
+   payload=skillbook.skill_approval_payload(**args)
+  signature=hmac.new(key.encode(),payload.encode(),hashlib.sha256).hexdigest()
+  with patch.dict(os.environ,{"CYBER_AI_VERITAS_APPROVAL_KEY":key}), patch.object(skillbook,"ExecutionLedger",return_value=FakeLedger()):
+   result=skillbook.register_skill_from_ledger(**args,approval_signature=signature)
+  self.assertEqual(result["status"],"active")
+
  def test_candidate_is_not_searchable_until_signed_promotion(self):
   key="test-veritas-approval-key-with-32-bytes-minimum"
   events=[

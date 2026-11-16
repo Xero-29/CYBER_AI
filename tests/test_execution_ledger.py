@@ -31,6 +31,11 @@ class ExecutionLedgerTests(unittest.TestCase):
         self.assertTrue(self.ledger.verify()["valid"])
         self.assertEqual(self.ledger.verify()["checked"], 2)
 
+    def test_started_event_is_a_valid_lifecycle_record(self):
+        event = self.append(status="started", evidence={"phase": "start"}, duration_ms=0)
+        self.assertEqual(event["status"], "started")
+        self.assertTrue(self.ledger.verify()["valid"])
+
     def test_update_delete_blocked(self):
         self.append()
         with sqlite3.connect(self.ledger.path) as db:

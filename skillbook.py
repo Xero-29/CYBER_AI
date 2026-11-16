@@ -440,7 +440,8 @@ def _verified_ledger_evidence(namespace, event_ids, ledger=None):
     if len({item.get("created_at") for item in selected}) != len(selected):
         raise ValueError("Las ejecuciones no son independientes en el tiempo.")
 
-    related = [item for item in history if item.get("task_fingerprint") == fingerprint]
+    related = [item for item in history if item.get("task_fingerprint") == fingerprint
+               and item.get("status") != "started"]
     if any(item.get("status") != "completed" for item in related):
         raise ValueError("Hay ejecuciones fallidas o no completadas para esta tarea.")
 

@@ -19,6 +19,8 @@ def main(argv=None):
     parser.add_argument("--config", help="Configuración local para Semgrep")
     parser.add_argument("--timeout", type=int)
     parser.add_argument("--execute", action="store_true", help="Confirma la ejecución local")
+    parser.add_argument("--require-ledger", action="store_true",
+                        help="Bloquea la ejecución si no puede registrar inicio y resultado")
     args = parser.parse_args(argv)
 
     if not args.execute:
@@ -32,19 +34,34 @@ def main(argv=None):
         return 0
 
     started = time.monotonic()
+    ledger = ExecutionLedger()
+    start_event = None
+    try:
+        start_event = ledger.append(
+            namespace="local-tools", task=args.target, status="started",
+            tool=args.tool, evidence={"phase": "execution_start"},
+            duration_ms=0, metadata={"target": args.target},
+        )
+    except Exception as ledger_error:
+        print(f"AVISO: no se pudo registrar el inicio: {ledger_error}", file=sys.stderr)
+        if args.require_ledger:
+            return 3
     try:
         evidence = run_local_tool(
             args.tool, args.target, config_path=args.config, timeout=args.timeout
         )
     except ToolExecutionError as exc:
         try:
-            ExecutionLedger().append(
+            ledger.append(
                 namespace="local-tools", task=args.target, status="denied",
                 tool=args.tool, evidence={"reason": str(exc)},
                 duration_ms=max(0, int((time.monotonic() - started) * 1000)),
+                metadata={"start_event_id": start_event["event_id"] if start_event else None},
             )
         except Exception as ledger_error:
-            print(f"AVISO: ledger no disponible: {ledger_error}", file=sys.stderr)
+            print(f"AVISO: no se pudo registrar la denegación: {ledger_error}", file=sys.stderr)
+            if args.require_ledger:
+                return 3
         print(json.dumps({"status": "denied", "reason": str(exc)}, ensure_ascii=False), file=sys.stderr)
         return 2
 
@@ -66,7 +83,7 @@ def main(argv=None):
         ledger_status = evidence.get("status")
         if ledger_status not in {"completed", "timeout"}:
             ledger_status = "failed"
-        ledger_event = ExecutionLedger().append(
+        ledger_event = ledger.append(
             namespace="local-tools", task=args.target, status=ledger_status,
             tool=args.tool, tool_version=evidence.get("tool_version", "unknown"),
             evidence=evidence,
@@ -75,11 +92,15 @@ def main(argv=None):
             metadata={"target": evidence.get("target"),
                       "target_sha256": evidence.get("target_sha256"),
                       "target_modified": evidence.get("target_modified"),
-                      "evidence_artifact_sha256": artifact_sha256},
+                      "evidence_artifact_sha256": artifact_sha256,
+                      "start_event_id": start_event["event_id"] if start_event else None},
         )
         evidence["ledger_event"] = ledger_event
     except Exception as ledger_error:
         evidence["ledger_error"] = str(ledger_error)
+        if args.require_ledger:
+            print(json.dumps(evidence, ensure_ascii=False, indent=2))
+            return 3
     print(json.dumps(evidence, ensure_ascii=False, indent=2))
     return 0 if evidence["status"] == "completed" and evidence["return_code"] == 0 else 1
 
