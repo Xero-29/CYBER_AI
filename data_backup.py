@@ -30,10 +30,90 @@ def _sha256(path):
 
 
 def _safe_relative(value):
+    if not isinstance(value, str) or not value or "\\" in value:
+        raise BackupError(f"Ruta insegura en manifiesto: {value!r}")
     rel = PurePosixPath(value)
-    if rel.is_absolute() or not rel.parts or ".." in rel.parts or "\\" in value:
+    if (
+        rel.is_absolute() or not rel.parts or ".." in rel.parts
+        or value != rel.as_posix() or rel.parts[0].endswith(":")
+        or rel.as_posix() == "manifest.json"
+    ):
         raise BackupError(f"Ruta insegura en manifiesto: {value!r}")
     return rel
+
+
+def _validate_manifest(snapshot, manifest):
+    if not isinstance(manifest, dict) or manifest.get("schema") != SCHEMA:
+        raise BackupError("Esquema de backup desconocido.")
+    files = manifest.get("files")
+    if not isinstance(files, list):
+        raise BackupError("Lista de archivos del manifiesto inválida.")
+    if manifest.get("encrypted") is not False:
+        raise BackupError("Metadato de cifrado inválido o no compatible.")
+    if manifest.get("requires_quiesced_writers") is not True:
+        raise BackupError("El manifiesto no acredita escritores detenidos.")
+    seen = set()
+    expected = {"manifest.json"}
+    verified = []
+    for item in files:
+        if not isinstance(item, dict):
+            raise BackupError("Entrada de manifiesto inválida.")
+        relative = _safe_relative(item.get("path"))
+        key = relative.as_posix()
+        if key in seen:
+            raise BackupError("Ruta duplicada en manifiesto.")
+        seen.add(key)
+        if (
+            isinstance(item.get("size"), bool)
+            or not isinstance(item.get("size"), int)
+            or item["size"] < 0
+        ):
+            raise BackupError(f"Tamaño inválido en manifiesto: {key}")
+        digest = item.get("sha256")
+        if (
+            not isinstance(digest, str) or len(digest) != 64
+            or any(char not in "0123456789abcdef" for char in digest)
+        ):
+            raise BackupError(f"SHA-256 inválido en manifiesto: {key}")
+        if item.get("kind") not in {"sqlite_snapshot", "file_copy_quiesced"}:
+            raise BackupError(f"Tipo de archivo no permitido: {key}")
+        for parent in relative.parents:
+            if parent.as_posix() != "." and parent.as_posix() in seen:
+                raise BackupError("Conflicto entre archivo y directorio en manifiesto.")
+        if any(existing.startswith(key + "/") for existing in seen):
+            raise BackupError("Conflicto entre archivo y directorio en manifiesto.")
+        path = snapshot.joinpath(*relative.parts)
+        cursor = snapshot
+        for part in relative.parts:
+            cursor = cursor / part
+            if cursor.is_symlink():
+                raise BackupError(f"Hay symlink en el backup: {key}")
+        if not path.is_file():
+            raise BackupError(f"Falta archivo: {key}")
+        try:
+            path.resolve().relative_to(snapshot)
+        except ValueError as error:
+            raise BackupError(f"Ruta fuera del backup: {key}") from error
+        if path.stat().st_size != item["size"] or _sha256(path) != digest:
+            raise BackupError(f"Integridad no válida: {key}")
+        expected.add(key)
+        verified.append(key)
+
+    actual = set()
+    for current, dirs, names in os.walk(snapshot, followlinks=False):
+        current_path = Path(current)
+        for name in dirs:
+            if (current_path / name).is_symlink():
+                raise BackupError("No se permiten symlinks en el backup.")
+        for name in names:
+            path = current_path / name
+            if path.is_symlink():
+                raise BackupError("No se permiten symlinks en el backup.")
+            actual.add(path.relative_to(snapshot).as_posix())
+    if actual != expected:
+        raise BackupError("El contenido del backup no coincide con el manifiesto.")
+    return {"valid": True, "files": len(verified), "paths": verified,
+            "encrypted": False}
 
 
 def _sqlite_snapshot(source, destination):
@@ -132,35 +212,11 @@ def verify_backup(snapshot):
     manifest_path = snapshot / "manifest.json"
     if manifest_path.is_symlink() or not manifest_path.is_file():
         raise BackupError("Falta manifest.json válido.")
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    if manifest.get("schema") != SCHEMA or not isinstance(manifest.get("files"), list):
-        raise BackupError("Esquema de backup desconocido.")
-    seen = set()
-    verified = []
-    for item in manifest["files"]:
-        if not isinstance(item, dict):
-            raise BackupError("Entrada de manifiesto inválida.")
-        relative = _safe_relative(item.get("path", ""))
-        if relative.as_posix() in seen:
-            raise BackupError("Ruta duplicada en manifiesto.")
-        seen.add(relative.as_posix())
-        path = snapshot
-        for part in relative.parts:
-            path = path / part
-            if path.is_symlink():
-                raise BackupError(f"Hay symlink en el backup: {relative.as_posix()}")
-        if not path.is_file():
-            raise BackupError(f"Falta archivo: {relative.as_posix()}")
-        try:
-            path.resolve().relative_to(snapshot)
-        except ValueError as error:
-            raise BackupError(f"Ruta fuera del backup: {relative.as_posix()}") from error
-        actual_hash = _sha256(path)
-        if actual_hash != item.get("sha256") or path.stat().st_size != item.get("size"):
-            raise BackupError(f"Integridad no válida: {relative.as_posix()}")
-        verified.append(relative.as_posix())
-    return {"valid": True, "files": len(verified), "paths": verified,
-            "encrypted": manifest.get("encrypted") is True}
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise BackupError("El manifiesto no es JSON UTF-8 válido.") from error
+    return _validate_manifest(snapshot, manifest)
 
 
 def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
