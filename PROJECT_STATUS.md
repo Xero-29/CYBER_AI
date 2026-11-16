@@ -7,6 +7,8 @@
 
 ## Avance de esta iteración
 
+El ledger incorpora ahora eventos de ciclo de vida `started` y terminales, con migración transaccional de bases existentes que conserva eventos y hashes. `tool_executor.py` registra inicio y resultado; `--require-ledger` impide iniciar o declarar éxito si no puede persistir la evidencia. `task_runner.py` también registra el inicio antes de invocar Nuclei y enlaza el resultado terminal; admite `--require-ledger`. Las propuestas de Skills ignoran eventos `started` y siguen exigiendo ejecuciones completadas, revisiones independientes y firma VERITAS. Esto no completa todavía la cobertura de inicio/fin en agent_runner, nuclei_scanner y team_orchestrator, ni resuelve almacenamiento WORM externo.
+
 Se añadió `knowledge_eval.py` con un conjunto inicial de 12 consultas y métricas Recall@K, Precision@K y MRR@K. La biblioteca incorpora recuperación híbrida FTS5 + vectores con Reciprocal Rank Fusion (RRF), filtro de namespace/tenant y reconstrucción verificable del índice textual. Si SQLite no tiene FTS5, se conserva la recuperación semántica. La calidad aún debe medirse con embeddings reales y conjuntos revisados por expertos. El arnés y los datos están versionados; aún falta ejecutar el benchmark con modelos reales, fijar umbrales por dominio y ampliar el conjunto con evaluaciones revisadas por expertos.
 
 La integración de proveedores ahora exige declarar capacidades reales para plugins; valida chat/embeddings/model_listing, selecciona proveedores por capacidad y permite fallbacks configurados cuando un proveedor no tiene la capacidad solicitada. Se añadieron endpoints por defecto seguros para proveedores nativos. El fallback de configuración no cubre fallos de red, cuotas o errores durante una petición.
@@ -19,7 +21,7 @@ Se amplió `tool_adapters.py` con comandos locales acotados para Checkov, detect
 
 Se incorpora execution_ledger.py: registro SQLite transaccional append-only de ejecuciones con namespace, huella de tarea, estado, herramienta/versión, modelo, entorno, duración, coste opcional, resultados de validadores y hash SHA-256 de evidencia. Incluye cadena hash verificable, redacción de campos con nombres sensibles y bloqueo ordinario de UPDATE/DELETE. Se añaden pruebas específicas.
 
-Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptográfica de identidad. Requiere checkpoints firmados fuera del host, KMS/HSM y pruebas operativas de restauración. La captura previa al inicio, la cobertura de todas las rutas de error y el comportamiento fail-closed ante caída del ledger siguen pendientes; también la promoción autónoma de Skills.
+Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptográfica de identidad. Requiere checkpoints firmados fuera del host, KMS/HSM y pruebas operativas de restauración. La captura previa al inicio está implementada solo en los ejecutores locales y task_runner descritos arriba; aún falta cubrir todas las rutas de agent_runner, nuclei_scanner y team_orchestrator. El modo fail-closed es opt-in en tool_executor y task_runner; no es global. La promoción autónoma de Skills sigue pendiente y requiere un aprobador externo independiente.
 
 ## Validación más reciente
 
@@ -64,7 +66,7 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 
 ## Pendientes de cierre
 
-1. **Ejecución y aprendizaje:** completar captura de inicio/fin y cobertura de fallos en todos los ejecutores; almacenar artefactos en repositorio controlado; checkpoints firmados externos; costes reales por proveedor; retención y privacidad.
+1. **Ejecución y aprendizaje:** extender eventos de inicio/fin a agent_runner, nuclei_scanner y team_orchestrator; almacenar artefactos en repositorio controlado; checkpoints firmados externos; costes reales por proveedor; retención y privacidad.
 2. **Skills verificadas:** conectar el ciclo automático de propuestas con la API de promoción firmada; provisionar firma desde KMS/HSM o servicio independiente; versionado, rollback, regresión y detección de obsolescencia.
 3. **Biblioteca documental:** validar extractores PDF/Office en fixtures adversariales y sandbox; OCR cuando aplique; deduplicación/versionado; índice híbrido FTS + vector/ANN; evaluación de recuperación; citas por fragmento; revisión de licencias/procedencia.
 4. **Herramientas:** completar adaptadores según utilidad y riesgo, fijar versiones e imágenes por digest, SBOM/procedencia, hashes y pruebas; no habilitar herramientas de red sin política explícita; el downloader aún requiere mitigación externa del riesgo DNS rebinding.

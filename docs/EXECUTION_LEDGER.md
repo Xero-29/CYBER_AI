@@ -4,6 +4,8 @@ execution_ledger.py adds a transactional SQLite event log for observed task runs
 
 ## Guarantees
 - BEGIN IMMEDIATE, WAL and synchronous=FULL for writes.
+- Eventos de ciclo de vida `started` y estados terminales, enlazados mediante `metadata.start_event_id`.
+- Migración automática de bases existentes al esquema que admite `started`, conservando filas y hashes.
 - Namespace, task fingerprint, status, tool/version, model, environment, duration,
   optional cost, validator outcomes and evidence SHA-256 digest.
 - Hash chaining detects modified, missing, reordered or broken-chain rows.
@@ -17,7 +19,7 @@ and recompute the chain. Production requires signed checkpoints exported to
 independently controlled immutable storage, KMS/HSM-backed keys, OS permissions
 and tested restore procedures. The ledger stores an evidence digest, not the
 artifact itself. A successful process exit is not proof of correctness;
-independent validators must establish outcomes. The team orchestrator records objective reviews as independent validators only when a separate reviewer (VERITAS/FILTRO) returns a grounded compliant verdict. Agent self-completion is explicitly non-independent. The ledger does not itself promote Skills; signed approval is required.
+independent validators must establish outcomes. The team orchestrator records objective reviews as independent validators only when a separate reviewer (VERITAS/FILTRO) returns a grounded compliant verdict. Agent self-completion is explicitly non-independent. The ledger does not itself promote Skills; signed approval is required. Lifecycle `started` rows are ignored when checking whether all actual task outcomes completed successfully. The CLI executors `tool_executor.py` and `task_runner.py` offer opt-in `--require-ledger` fail-closed operation; other runners still record best-effort terminal events and need equivalent lifecycle coverage.
 
 ## Use
 from execution_ledger import ExecutionLedger
