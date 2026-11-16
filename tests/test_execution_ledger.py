@@ -68,6 +68,31 @@ class ExecutionLedgerTests(unittest.TestCase):
         with self.assertRaises(LedgerError):
             self.append(duration_ms=-1)
 
+    def test_migrates_legacy_schema_without_breaking_hash_chain(self):
+        path = Path(self.tmp.name) / "legacy.sqlite3"
+        with sqlite3.connect(path) as db:
+            db.executescript("""
+                CREATE TABLE execution_events (
+                    sequence INTEGER PRIMARY KEY AUTOINCREMENT,
+                    event_id TEXT NOT NULL UNIQUE, created_at TEXT NOT NULL,
+                    namespace TEXT NOT NULL, task_fingerprint TEXT NOT NULL,
+                    task TEXT NOT NULL,
+                    status TEXT NOT NULL CHECK(status IN
+                        ('completed','failed','timeout','denied','cancelled')),
+                    tool TEXT NOT NULL, tool_version TEXT NOT NULL,
+                    model TEXT NOT NULL, environment TEXT NOT NULL,
+                    duration_ms INTEGER NOT NULL CHECK(duration_ms >= 0),
+                    cost_microunits INTEGER CHECK(cost_microunits IS NULL OR cost_microunits >= 0),
+                    evidence_sha256 TEXT NOT NULL, validator_results TEXT NOT NULL,
+                    metadata TEXT NOT NULL, previous_hash TEXT NOT NULL, event_hash TEXT NOT NULL
+                );
+            """)
+        migrated = ExecutionLedger(path)
+        event = migrated.append(namespace="test", task="after migration",
+                                status="started", tool="unit", evidence={}, duration_ms=0)
+        self.assertEqual(event["status"], "started")
+        self.assertTrue(migrated.verify()["valid"])
+
     def test_environment_path_is_used_when_no_path_is_passed(self):
         configured = Path(self.tmp.name) / "external" / "ledger.sqlite3"
         with patch.dict(os.environ, {"CYBER_AI_LEDGER_PATH": str(configured)}):

@@ -34,9 +34,10 @@ def main(argv=None):
         return 0
 
     started = time.monotonic()
-    ledger = ExecutionLedger()
+    ledger = None
     start_event = None
     try:
+        ledger = ExecutionLedger()
         start_event = ledger.append(
             namespace="local-tools", task=args.target, status="started",
             tool=args.tool, evidence={"phase": "execution_start"},
@@ -52,6 +53,8 @@ def main(argv=None):
         )
     except ToolExecutionError as exc:
         try:
+            if ledger is None:
+                raise RuntimeError("Ledger no disponible.")
             ledger.append(
                 namespace="local-tools", task=args.target, status="denied",
                 tool=args.tool, evidence={"reason": str(exc)},
@@ -83,6 +86,8 @@ def main(argv=None):
         ledger_status = evidence.get("status")
         if ledger_status not in {"completed", "timeout"}:
             ledger_status = "failed"
+        if ledger is None:
+            raise RuntimeError("Ledger no disponible.")
         ledger_event = ledger.append(
             namespace="local-tools", task=args.target, status=ledger_status,
             tool=args.tool, tool_version=evidence.get("tool_version", "unknown"),

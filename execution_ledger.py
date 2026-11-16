@@ -110,7 +110,7 @@ class ExecutionLedger:
         for name, value in (("namespace", namespace), ("task", task), ("tool", tool)):
             if not isinstance(value, str) or not value.strip():
                 raise LedgerError(f"{name} es obligatorio.")
-        if status not in {"completed", "failed", "timeout", "denied", "cancelled"}:
+        if status not in {"started", "completed", "failed", "timeout", "denied", "cancelled"}:
             raise LedgerError("Estado de ejecución no permitido.")
         if isinstance(duration_ms, bool) or not isinstance(duration_ms, int) or duration_ms < 0:
             raise LedgerError("duration_ms debe ser un entero no negativo.")
