@@ -25,7 +25,7 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 
 ## Validación más reciente
 
-- Commit `a42de0c514efc9e5a5a98b2902b485d6998eef7b`: GitHub Actions Python tests **success**, 318 pruebas. Docker sandbox **en curso** en la última consulta.
+- Commit `9ae0178bf9bbd16cbe801f2d017c2d80c2130fa2`: GitHub Actions Python tests **success**, 323 pruebas; Docker sandbox **success**.
 - Commit `53b04787ca0b84865e81ad70ea9256cdca30adc5`: Python tests **success** y Docker sandbox **success**.
 - Commit `05986653249dcdb77df39082fffeadb5657e75df`: Python tests **success** y Docker sandbox **success**.
 - La validación CI no equivale a pruebas con Ollama/proveedores remotos, objetivos reales autorizados, cargas adversariales ni aislamiento microVM.
@@ -43,6 +43,7 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 - Memoria de lecciones con HMAC VERITAS vinculado a dos ejecuciones con revisiones objetivas de un agente revisor distinto y hashes del ledger, validación de firma al leer, aislamiento por namespace, lock y permisos 0600. El registro directo se bloquea; las lecciones v1 sin firma se ignoran. HMAC no autentica por sí solo la identidad del modelo.
 - Dependencias base fijadas en `requirements.lock` para instalaciones repetibles (sin hashes de artefactos; la verificación de procedencia/hash queda pendiente).
 - `preflight.py` para revisar dependencias, configuración, herramientas opcionales y ledger local sin iniciar servicios ni usar red.
+- `sbom_generator.py` genera SBOM CycloneDX 1.5 determinista desde los requirements fijados, separa dependencias directas/transitivas y registra el hash del lock. No inventa hashes de artefactos ni relaciones transitivas no declaradas.
 - CLI `ledger_cli.py` para verificar integridad, listar namespaces y consultar historial.
 - Ledger de ejecuciones: registra respuestas, ejecuciones locales, timeouts, denegaciones y revisiones objetivas independientes. Los eventos `started` y terminales se enlazan en `tool_executor.py`, `task_runner.py`, `nuclei_scanner.py`, `agent_runner.py` y `team_orchestrator.py`. Los dos primeros admiten `--require-ledger`; Nuclei admite `require_ledger=True`; agent_runner usa `CYBER_AI_LEDGER_REQUIRED=1`; team_orchestrator falla si no registra inicio o resultado. La base existente se migra al esquema nuevo conservando filas y hashes. La garantía de cierre ante toda excepción, el ciclo de Skills autónomas y el almacenamiento externo WORM siguen pendientes.
 
@@ -59,7 +60,7 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 1. **Ejecución y aprendizaje:** extender eventos de inicio/fin a agent_runner, nuclei_scanner y team_orchestrator; almacenar artefactos en repositorio controlado; checkpoints firmados externos; costes reales por proveedor; retención y privacidad.
 2. **Skills verificadas:** conectar el ciclo automático de propuestas con la API de promoción firmada; provisionar firma desde KMS/HSM o servicio independiente; versionado, rollback, regresión y detección de obsolescencia.
 3. **Biblioteca documental:** validar extractores PDF/Office en fixtures adversariales y sandbox; OCR cuando aplique; deduplicación/versionado; índice híbrido FTS + vector/ANN; evaluación de recuperación; citas por fragmento; revisión de licencias/procedencia.
-4. **Herramientas:** completar adaptadores según utilidad y riesgo, fijar versiones e imágenes por digest, SBOM/procedencia, hashes y pruebas; no habilitar herramientas de red sin política explícita; el downloader aún requiere mitigación externa del riesgo DNS rebinding.
+4. **Herramientas:** completar adaptadores según utilidad y riesgo, fijar versiones e imágenes por digest, añadir hashes verificables de artefactos y procedencia completa; existe SBOM CycloneDX inicial basado en el lock, pero no sustituye hashes ni attestation. No habilitar herramientas de red sin política explícita; el downloader aún requiere mitigación externa del riesgo DNS rebinding.
 5. **Sandbox:** Docker solo para código confiable/acotado; microVM/VM desechable requiere infraestructura externa y pruebas de aislamiento; gestión de secretos y permisos.
 6. **IA:** contrato de capacidades común, embeddings equivalentes, detección de capacidades, selección/fallback de modelos, pruebas de compatibilidad y gestión segura de credenciales.
 7. **Operación institucional:** threat model formal, RBAC, auditoría inmutable externa, backups cifrados y restauración probada, retención, redacción, migraciones, concurrencia, observabilidad, carga y revisión independiente.
