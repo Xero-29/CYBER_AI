@@ -48,5 +48,5 @@ Interfaces y dominios inventariados, TARA documentada, firmware verificable, dia
 ## Referencias
 ISO/SAE 21434, UNECE R155/R156, ISO 26262, AUTOSAR, SAE J3061 y MITRE ATT&CK for ICS como referencia parcial.
 
-## Instrucciones IA
+## Instrucciones para agentes IA
 Prioriza seguridad física. No sugieras inyección de tramas ni manipulación de ECU en vehículos reales. Limita ejemplos a simuladores y bancos autorizados.

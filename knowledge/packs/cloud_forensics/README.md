@@ -47,5 +47,5 @@ Evidencia preservada en cuenta separada, timeline trazable, huecos documentados 
 ## Referencias
 NIST SP 800-86, NIST SP 800-201, CSA Cloud Forensics, AWS/Azure/GCP audit logging guides y ISO/IEC 27037.
 
-## Instrucciones IA
+## Instrucciones para agentes IA
 No borres, detengas ni restaures recursos. Preserva primero y coordina con dueño de cuenta y legal. No afirmes atribución a partir de IP o user-agent aislado.

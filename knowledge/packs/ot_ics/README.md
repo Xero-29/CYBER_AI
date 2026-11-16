@@ -47,5 +47,5 @@ Activos y flujos críticos identificados, segmentación revisada, acceso remoto 
 ## Referencias
 IEC 62443, NIST SP 800-82 Rev. 3, CISA Cross-Sector Cybersecurity Performance Goals, MITRE ATT&CK for ICS y CISA ICS advisories.
 
-## Instrucciones IA
+## Instrucciones para agentes IA
 Prioriza seguridad humana y continuidad. No envíes paquetes activos ni comandos a PLC/RTU. Recomienda primero captura pasiva y simulación; exige aprobación operacional para cambios.

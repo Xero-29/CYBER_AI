@@ -2,7 +2,7 @@
 
 **ID:** `wireless_security` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
-## Propósito
+## Propósito y límites
 Evalúa WLAN, Bluetooth Classic/LE, NFC, RFID y protocolos de proximidad. Las pruebas radioeléctricas afectan dispositivos y espectro; solo deben ejecutarse en laboratorio blindado o entorno controlado con autorización. No capturar comunicaciones privadas de terceros.
 
 ## Superficie y amenazas
@@ -46,5 +46,5 @@ Cifrado moderno, autenticación validada, segmentación, servicios mínimos, fir
 ## Referencias
 IEEE 802.11, WPA3/ Wi-Fi Alliance, Bluetooth Core Specification, NFC Forum, NIST SP 800-153 y OWASP IoT.
 
-## Instrucciones IA
+## Instrucciones para agentes IA
 No recomiendes jamming, deauthentication ni interceptación. Usa configuraciones exportadas, simuladores y equipos propios; prioriza controles defensivos.

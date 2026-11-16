@@ -2,7 +2,7 @@
 
 **ID:** `threat_hunting` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
-## Propósito
+## Propósito y límites
 Busca actividad adversaria que no ha generado alertas suficientes. Un hunt parte de una hipótesis falsable y termina en una conclusión, detección o brecha de telemetría. No equivale a buscar IOC de forma indiscriminada ni a ejecutar técnicas ofensivas sobre sistemas.
 
 ## Preparación y fuentes
@@ -45,5 +45,5 @@ Cada hunt tiene hipótesis, consulta, ventana, cobertura, resultado, falsos posi
 ## Referencias
 MITRE ATT&CK, Sigma, Kusto Query Language, Splunk SPL, Elastic EQL, NIST SP 800-61 y Threat Hunting Maturity Model.
 
-## Instrucciones IA
+## Instrucciones para agentes IA
 No concluyas compromiso solo por anomalía. Indica qué datos faltan y limita consultas a la autorización y ventana indicadas.

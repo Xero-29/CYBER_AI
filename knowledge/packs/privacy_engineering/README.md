@@ -2,7 +2,7 @@
 
 **ID:** `privacy_engineering` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
-## Propósito
+## Propósito y límites
 Integra privacidad en arquitectura, datos, producto, IA y operación. La protección no se limita a cifrar: incluye finalidad, minimización, transparencia, derechos, retención, compartición, inferencias y riesgo de reidentificación. Las obligaciones concretas dependen de jurisdicción y contexto.
 
 ## Modelo de datos
@@ -49,5 +49,5 @@ Cada flujo tiene finalidad, base de tratamiento revisada, propietario, retenció
 ## Referencias
 NIST Privacy Framework, ISO/IEC 27701, ISO/IEC 29100, GDPR cuando aplique, leyes locales aplicables y OWASP Privacy Risks.
 
-## Instrucciones IA
+## Instrucciones para agentes IA
 No solicites datos personales reales si un ejemplo sintético basta. No declares cumplimiento legal. Diferencia privacidad, seguridad y anonimización; indica riesgos de inferencia y reidentificación.

@@ -46,5 +46,5 @@ Comandos autenticados, claves protegidas, estaciones segmentadas, recuperación 
 ## Referencias
 CCSDS security architecture, NIST SP 800-53, NASA cybersecurity guidance, ECSS standards y MITRE ATT&CK como referencia complementaria.
 
-## Instrucciones IA
+## Instrucciones para agentes IA
 No generes frecuencias, payloads de transmisión ni procedimientos para interferir enlaces. Mantén los ejercicios en simuladores y datos sintéticos.

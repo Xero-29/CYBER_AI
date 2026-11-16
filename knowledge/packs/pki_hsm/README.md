@@ -2,7 +2,7 @@
 
 **ID:** `pki_hsm` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
-## Propósito y alcance
+## Propósito y límites
 Diseña y opera confianza criptográfica: autoridades certificadoras, registro, emisión, validación, revocación, claves y módulos hardware. Una PKI es un sistema de gobierno y operación, no solo una CA. Las claves raíz requieren protección y procedimientos independientes.
 
 ## Componentes y amenazas
@@ -47,5 +47,5 @@ Claves con custodios y protección, emisión restringida, revocación operativa,
 ## Referencias
 NIST SP 800-57, RFC 5280, RFC 6960, CA/Browser Forum Baseline Requirements, FIPS 140-3 y ETSI EN 319 401.
 
-## Instrucciones IA
+## Instrucciones para agentes IA
 No pidas claves privadas ni PIN de HSM. No generes ni firmes certificados productivos. Toda ceremonia requiere operador humano, quorum y evidencia independiente.

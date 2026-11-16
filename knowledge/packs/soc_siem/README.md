@@ -2,7 +2,7 @@
 
 **ID:** `soc_siem` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
-## Propósito y alcance
+## Propósito y límites
 Diseña y opera capacidades de detección, triage, respuesta y mejora continua. El SOC debe convertir telemetría en decisiones y acciones verificables, no maximizar alertas. Definir servicios, cobertura horaria, severidades, propietarios, escalamiento y límites de autoridad.
 
 ## Arquitectura y fuentes
@@ -45,5 +45,5 @@ Cada caso tiene hipótesis, fuentes, cobertura ATT&CK, datos de prueba, propieta
 ## Referencias
 MITRE ATT&CK, Sigma, OCSF, Elastic Common Schema, NIST SP 800-61 Rev. 3, FIRST CSIRT Framework y CISA logging guidance.
 
-## Instrucciones IA
+## Instrucciones para agentes IA
 No automatices aislamiento, borrado o bloqueo de identidades sin autorización. Expón evidencia y confianza; no presentes una alerta como incidente confirmado.

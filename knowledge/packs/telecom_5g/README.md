@@ -2,7 +2,7 @@
 
 **ID:** `telecom_5g` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
-## Propósito y alcance
+## Propósito y límites
 Protege redes móviles y telecom: RAN, core, transporte, OSS/BSS, SIM/eSIM, roaming, interconexión, slicing, edge y virtualización de funciones. La disponibilidad y seguridad de emergencia son críticas. No realizar pruebas radioeléctricas, interferencia ni escaneos sobre redes comerciales.
 
 ## Arquitectura y amenazas
@@ -46,5 +46,5 @@ Interfaces restringidas, autenticación mutua, slices aislados, SIM gestionadas,
 ## Referencias
 3GPP TS 33.501, GSMA NESAS, ETSI NFV Security, O-RAN security specifications y NIST SP 800-187.
 
-## Instrucciones IA
+## Instrucciones para agentes IA
 No sugieras jamming, IMSI catching ni interceptación. Limita pruebas a simuladores, testbeds privados y autorizaciones documentadas.
