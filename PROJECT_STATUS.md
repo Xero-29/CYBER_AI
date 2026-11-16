@@ -51,14 +51,14 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 ## Avance de biblioteca offline
 
 - Catálogo ampliado a 48 especialidades.
-- 48 paquetes base propios en español incluidos en `knowledge/packs/`, con competencias, metodología, controles, laboratorio y evaluación.
+- 48 paquetes propios en español incluidos en `knowledge/packs/`; 31 ampliados con guías de dominio y 17 con contenido metodológico base. No equivalen a corpus experto exhaustivo.
 - Las referencias externas siguen pendientes de licencia/procedencia y no se declaran descargadas ni ingeridas.
 
 - `knowledge_bootstrap.py` valida e indexa paquetes offline con ECO. El dry-run no requiere IA. La ingestión real requiere un proveedor con embeddings configurado. El proceso es reanudable, idempotente y detecta cambios de espacio vectorial para reindexar. No se inicia automáticamente por conectar un chat.
 
 ## Pendientes de cierre
 
-1. **Ejecución y aprendizaje:** extender eventos de inicio/fin a agent_runner, nuclei_scanner y team_orchestrator; almacenar artefactos en repositorio controlado; checkpoints firmados externos; costes reales por proveedor; retención y privacidad.
+1. **Ejecución y aprendizaje:** cerrar eventos huérfanos ante excepciones no controladas; almacenar artefactos en repositorio controlado; checkpoints firmados externos; costes reales por proveedor; retención y privacidad.
 2. **Skills verificadas:** conectar el ciclo automático de propuestas con la API de promoción firmada; provisionar firma desde KMS/HSM o servicio independiente; versionado, rollback, regresión y detección de obsolescencia.
 3. **Biblioteca documental:** validar extractores PDF/Office en fixtures adversariales y sandbox; OCR cuando aplique; deduplicación/versionado; índice híbrido FTS + vector/ANN; evaluación de recuperación; citas por fragmento; revisión de licencias/procedencia.
 4. **Herramientas:** completar adaptadores según utilidad y riesgo, fijar versiones e imágenes por digest, añadir hashes verificables de artefactos y procedencia completa; existe SBOM CycloneDX inicial basado en el lock, pero no sustituye hashes ni attestation. No habilitar herramientas de red sin política explícita; el downloader aún requiere mitigación externa del riesgo DNS rebinding.
