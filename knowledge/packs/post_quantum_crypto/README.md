@@ -2,7 +2,7 @@
 
 **ID:** `post_quantum_crypto` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
-## Propósito
+## Propósito y límites
 Prepara transición criptográfica ante riesgos de computación cuántica y obsolescencia de algoritmos. El problema inmediato es harvest-now-decrypt-later, vida útil de datos y dependencias criptográficas difíciles de sustituir. No implica que todos los sistemas deban migrar de inmediato ni que algoritmos nuevos eliminen riesgos de implementación.
 
 ## Competencias

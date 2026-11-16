@@ -2,7 +2,7 @@
 
 **ID:** `business_continuity` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
-## Propósito
+## Propósito y límites
 Mantiene servicios críticos durante interrupciones y recupera operaciones dentro de objetivos aprobados. La continuidad incluye personas, procesos, proveedores, instalaciones, datos y tecnología. Tener backups no equivale a poder recuperar un servicio.
 
 ## Competencias

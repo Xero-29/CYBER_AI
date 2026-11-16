@@ -2,7 +2,7 @@
 
 **ID:** `database_security` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
-## Propósito
+## Propósito y límites
 Protege motores relacionales, NoSQL, caches, data warehouses y bases embebidas. Cubre identidad, autorización, consultas, cifrado, backups, auditoría, replicación y configuración. El acceso de administración debe estar separado de las cuentas de aplicación.
 
 ## Competencias

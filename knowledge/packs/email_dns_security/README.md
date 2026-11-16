@@ -2,7 +2,7 @@
 
 **ID:** `email_dns_security` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio offline.
 
-## Propósito
+## Propósito y límites
 Protege correo, dominios, resolución de nombres y autenticación de mensajes. El correo es vector de fraude, phishing, malware y fuga; DNS soporta identidad, routing y confianza. Cambios de DNS o correo pueden interrumpir servicios, por lo que deben revisarse y planificarse.
 
 ## Competencias
