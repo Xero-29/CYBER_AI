@@ -44,6 +44,7 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 - Dependencias base fijadas en `requirements.lock` para instalaciones repetibles (sin hashes de artefactos; la verificación de procedencia/hash queda pendiente).
 - `preflight.py` para revisar dependencias, configuración, herramientas opcionales y ledger local sin iniciar servicios ni usar red.
 - `sbom_generator.py` genera SBOM CycloneDX 1.5 determinista desde los requirements fijados, separa dependencias directas/transitivas y registra el hash del lock. No inventa hashes de artefactos ni relaciones transitivas no declaradas.
+- `data_backup.py` crea snapshots SQLite mediante la API backup, copia archivos restantes solo con confirmación de procesos detenidos, verifica SHA-256 y permite restaurar conservando el directorio previo. El backup no cifra ni firma el manifiesto; el almacenamiento externo requiere cifrado y controles independientes.
 - CLI `ledger_cli.py` para verificar integridad, listar namespaces y consultar historial.
 - Ledger de ejecuciones: registra respuestas, ejecuciones locales, timeouts, denegaciones y revisiones objetivas independientes. Los eventos `started` y terminales se enlazan en `tool_executor.py`, `task_runner.py`, `nuclei_scanner.py`, `agent_runner.py` y `team_orchestrator.py`. Los dos primeros admiten `--require-ledger`; Nuclei admite `require_ledger=True`; agent_runner usa `CYBER_AI_LEDGER_REQUIRED=1`; team_orchestrator falla si no registra inicio o resultado. La base existente se migra al esquema nuevo conservando filas y hashes. La garantía de cierre ante toda excepción, el ciclo de Skills autónomas y el almacenamiento externo WORM siguen pendientes.
 
@@ -63,7 +64,7 @@ Límite: es evidencia tamper-evident, no almacenamiento WORM ni prueba criptogr�
 4. **Herramientas:** completar adaptadores según utilidad y riesgo, fijar versiones e imágenes por digest, añadir hashes verificables de artefactos y procedencia completa; existe SBOM CycloneDX inicial basado en el lock, pero no sustituye hashes ni attestation. No habilitar herramientas de red sin política explícita; el downloader aún requiere mitigación externa del riesgo DNS rebinding.
 5. **Sandbox:** Docker solo para código confiable/acotado; microVM/VM desechable requiere infraestructura externa y pruebas de aislamiento; gestión de secretos y permisos.
 6. **IA:** contrato de capacidades común, embeddings equivalentes, detección de capacidades, selección/fallback de modelos, pruebas de compatibilidad y gestión segura de credenciales.
-7. **Operación institucional:** threat model formal, RBAC, auditoría inmutable externa, backups cifrados y restauración probada, retención, redacción, migraciones, concurrencia, observabilidad, carga y revisión independiente.
+7. **Operación institucional:** threat model formal, RBAC, auditoría inmutable externa, cifrado de backups, almacenamiento externo/WORM y restauración operacional probada (existe backup local con hashes, no cifrado), retención, redacción, migraciones, concurrencia, observabilidad, carga y revisión independiente.
 
 ## Criterio de cierre
 
