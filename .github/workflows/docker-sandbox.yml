@@ -3,6 +3,7 @@ name: Docker sandbox
 on:
   push:
     branches:
+      - main
       - codex/security-integrity-audit
   pull_request:
     branches:
