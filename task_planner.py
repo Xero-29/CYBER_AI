@@ -37,12 +37,24 @@ def create_plan(task, output_path=None):
         )
 
     domain_tools = {}
+    planned_tools = {item["id"]: {**item, "source_domains": []}
+                     for item in tool_plan["candidates"]}
     for domain in domain_plan["domains"]:
         for candidate in domain["tool_candidates"]:
             entry = domain_tools.setdefault(candidate["id"], {
                 **candidate, "source_domains": [],
             })
             entry["source_domains"].append(domain["id"])
+            # La matriz aporta candidatos al plan de ejecución, pero solo
+            # después se aplican las mismas barreras del pipeline: adaptador,
+            # disponibilidad, riesgo y confirmación explícita.
+            planned = planned_tools.setdefault(candidate["id"], {
+                **candidate, "source_domains": [],
+            })
+            if domain["id"] not in planned["source_domains"]:
+                planned["source_domains"].append(domain["id"])
+
+    merged_tool_candidates = list(planned_tools.values())
 
     plan = {
         "planning_warnings": planning_warnings,
@@ -50,8 +62,8 @@ def create_plan(task, output_path=None):
         "created_at": datetime.now(timezone.utc).isoformat(),
         "status": "planned",
         "candidate_count": len(candidates),
-        "tool_candidates": tool_plan["candidates"],
-        "tool_candidate_count": tool_plan["candidate_count"],
+        "tool_candidates": merged_tool_candidates,
+        "tool_candidate_count": len(merged_tool_candidates),
         "domain_capabilities": domain_plan["domains"],
         "domain_candidate_count": domain_plan["matched_domain_count"],
         "domain_tool_candidates": list(domain_tools.values()),
