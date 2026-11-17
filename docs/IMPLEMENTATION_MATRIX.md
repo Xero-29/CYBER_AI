@@ -69,7 +69,14 @@ Toda afirmación de CI debe indicar SHA completo y enlace a cada workflow. Si el
 
 | Criterio | Estado | Evidencia / límite |
 |---|---|---|
-| 48 paquetes offline ↔ 48 perfiles | Implementado en código; CI pendiente | `domain_capability_matrix.py` compara IDs exactos contra `knowledge/packs/manifest.json`; prueba de integridad de cobertura añadida. |
-| Dominio ↔ herramientas candidatas | Implementado en código; CI pendiente | Cada perfil declara IDs del catálogo; el plan informa disponibilidad, adaptador y estado de integración. La selección no autoriza ni ejecuta. |
-| Dominio ↔ Skills activas | Integrado en planificación; CI pendiente | Se consultan Skills activas por tarea/dominio sin modificar contadores; solo se sugieren, no se promueven. |
-| Cobertura operativa de las 48 áreas | Pendiente | Los perfiles de enrutamiento no sustituyen herramientas específicas, corpus experto, laboratorios, pruebas ni aceptación de resultados por dominio. |
+| 48 paquetes offline ↔ 48 perfiles | CI aprobado en SHA `d560a11cc890a02a0388ebbb27c36044832f8d02` | `domain_capability_matrix.py` compara IDs exactos contra `knowledge/packs/manifest.json`; 510 pruebas pasaron en el workflow Docker run `44130731532`. |
+| Dominio ↔ herramientas candidatas | CI aprobado en SHA `d560a11cc890a02a0388ebbb27c36044832f8d02` | Cada perfil declara IDs del catálogo; el plan informa disponibilidad, adaptador y estado de integración y añade candidatas al plan de ejecución. La selección no autoriza ni ejecuta. |
+| Dominio ↔ Skills activas | Integrado en planificación; CI aprobado para la ruta de planificación | Se consultan Skills activas por tarea/dominio sin modificar contadores; solo se sugieren, no se promueven. La recuperación semántica real con corpus/Skills expertas sigue requiriendo validación de calidad. |
+| Cobertura operativa de las 48 áreas | Pendiente | Los perfiles de enrutamiento no sustituyen herramientas específicas, corpus experto, laboratorios, pruebas ni aceptación de resultados por dominio. La cobertura operativa integral sigue pendiente. |
+
+## CI de la integración transversal
+
+- SHA de código: `d560a11cc890a02a0388ebbb27c36044832f8d02`.
+- Docker sandbox: [run 44130731532 — success](https://github.com/Xero-29/CYBER_AI/actions/runs/44130731532). Ejecutó 510 pruebas, construyó el sandbox de YARA/TShark y completó el smoke de Ruff.
+- Python tests independiente: run 44130731618 estaba pendiente al registrar este estado; no se marca como aprobado.
+- Los resultados CI no prueban que todas las herramientas estén instaladas ni que las 48 áreas tengan cobertura operativa.
