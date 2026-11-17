@@ -8,9 +8,18 @@ from capability_selector import select_capabilities
 from tool_registry import select_tools
 
 def create_plan(task, output_path=None):
-    candidates = select_capabilities(task, limit=25)
+    planning_warnings = []
+    try:
+        candidates = select_capabilities(task, limit=25)
+    except FileNotFoundError:
+        candidates = []
+        planning_warnings.append(
+            "El inventario de capacidades no está generado; se continúa "
+            "en modo degradado sin plantillas candidatas."
+        )
     tool_plan = select_tools(task, limit=10)
     plan = {
+        "planning_warnings": planning_warnings,
         "task": task,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "status": "planned",
