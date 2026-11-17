@@ -43,19 +43,19 @@ def load_dataset(path):
             case_id, query, expected = (
                 item["id"], item["query"], item["relevant_categories"]
             )
-            if not isinstance(case_id, str) or not case_id.strip() or case_id in seen_ids:
+            if not isinstance(case_id, str) or not case_id.strip() or case_id.strip() in seen_ids:
                 raise ValueError(f"ID ausente o duplicado en línea {line_number}.")
             if not isinstance(query, str) or not query.strip():
                 raise ValueError(f"query inválida en línea {line_number}.")
             if (
                 not isinstance(expected, list) or not expected
                 or any(not isinstance(value, str) or not value.strip() for value in expected)
-                or len(set(expected)) != len(expected)
+                or len({value.strip() for value in expected}) != len(expected)
             ):
                 raise ValueError(f"relevant_categories inválida en línea {line_number}.")
-            seen_ids.add(case_id)
+            seen_ids.add(case_id.strip())
             cases.append({
-                "id": case_id,
+                "id": case_id.strip(),
                 "query": query.strip(),
                 "relevant_categories": [value.strip() for value in expected],
             })
