@@ -322,8 +322,21 @@ class ExecutionLedger:
         return {"reconciled": len(reconciled), "events": reconciled}
 
     def verify(self):
-        with self.connect() as db:
-            rows = db.execute("SELECT * FROM execution_events ORDER BY sequence").fetchall()
+        """Verifica integridad SQLite y cadena lógica sin propagar errores de corrupción."""
+        try:
+            with self.connect() as db:
+                integrity = db.execute("PRAGMA quick_check").fetchall()
+                if not integrity or any(row[0] != "ok" for row in integrity):
+                    return {
+                        "valid": False, "checked": 0,
+                        "reason": "sqlite_integrity",
+                    }
+                rows = db.execute(
+                    "SELECT * FROM execution_events ORDER BY sequence"
+                ).fetchall()
+        except sqlite3.DatabaseError:
+            return {"valid": False, "checked": 0, "reason": "database_error"}
+
         previous = GENESIS
         fields = ("event_id", "created_at", "namespace", "task_fingerprint", "task",
                   "status", "tool", "tool_version", "model", "environment",
@@ -333,10 +346,14 @@ class ExecutionLedger:
             if item["sequence"] != expected or item["previous_hash"] != previous:
                 return {"valid": False, "checked": expected - 1,
                         "failed_sequence": expected, "reason": "chain_link"}
-            payload = {key: item[key] for key in fields}
-            payload["validator_results"] = json.loads(item["validator_results"])
-            payload["metadata"] = json.loads(item["metadata"])
-            calculated = _digest(previous, _canonical(payload))
+            try:
+                payload = {key: item[key] for key in fields}
+                payload["validator_results"] = json.loads(item["validator_results"])
+                payload["metadata"] = json.loads(item["metadata"])
+                calculated = _digest(previous, _canonical(payload))
+            except (KeyError, TypeError, ValueError, json.JSONDecodeError):
+                return {"valid": False, "checked": expected - 1,
+                        "failed_sequence": expected, "reason": "malformed_payload"}
             if calculated != item["event_hash"]:
                 return {"valid": False, "checked": expected - 1,
                         "failed_sequence": expected, "reason": "event_hash"}
