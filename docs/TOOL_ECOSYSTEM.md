@@ -60,7 +60,7 @@ python task_planner.py "auditoria de red y analisis de PCAP"
 
 - Implementar aislamiento de egress obligatorio para Nmap; el adaptador actual restringe alcance, puertos y duración, pero no impone firewall/sandbox de red a nivel del sistema operativo.
 - Implementar aislamiento general para adaptadores host y herramientas personalizadas.
-- Verificar en preflight la presencia y vigencia de las bases locales OSV-Scanner/Grype antes de declarar esos escáneres listos.
+- El preflight integrado verifica presencia y estructura de los ZIP OSV-Scanner, pero OSV no expone en ese layout una fecha de construcción autoritativa ni un identificador de esquema; su frescura permanece desconocida y el escáner valida el ecosistema requerido durante la ejecución. Para Grype se ejecuta `grype db status --output json` sin auto-update, se exige metadato válido y base local existente, y se rechazan bases de más de 14 días por defecto (`CYBER_AI_GRYPE_DB_MAX_AGE_DAYS`, rango 1–3650).
 - Aplicar filtrado de egress para Nuclei y DNS pinning antes de admitir nombres DNS.
 - Ampliar los conectores de SOC/SIEM, EDR/XDR, cloud, móvil, wireless, OT/ICS, hardware/firmware, PKI/HSM y seguridad de IA.
 - Crear Skills verificadas por dominio; no generar Skills activas solo por coincidencia textual.
@@ -87,7 +87,19 @@ python tool_executor.py --tool zeek --target captures/sample.pcap --execute
 python tool_executor.py --tool volatility3 --target captures/memory.raw --plugin windows.info --execute
 ```
 
-Los ejemplos requieren binarios y, para OSV-Scanner/Grype, bases locales ya aprovisionadas. La ejecución no se activa automáticamente ni descarga herramientas o bases.
+Los ejemplos requieren binarios y bases locales ya aprovisionadas. Antes de ejecutar OSV-Scanner/Grype, CYBER_AI ejecuta un preflight read-only y falla cerrado si la base está ausente o inválida; Grype también falla si su fecha supera la política de antigüedad. Para inspeccionar el estado sin iniciar escaneos: `python tool_database_preflight.py --json`. El preflight no descarga, actualiza ni extrae bases. OSV solo permite confirmar estructura ZIP y ecosistemas presentes: no se atribuye frescura ni esquema no expuestos por su formato documentado. La ejecución no se activa automáticamente ni descarga herramientas o bases.
+
+## Preflight de bases de vulnerabilidades
+
+- **OSV-Scanner:** localiza `osv-scalibr/<ecosystem>/all.zip` bajo `OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY` (o la variable alternativa documentada), valida estructura ZIP y registra ecosistemas. El formato no aporta una fecha de construcción autoritativa ni versión de esquema; el estado de frescura se informa como desconocido. La base concreta del ecosistema requerido se valida también al escanear.
+- **Grype:** consulta `grype db status --output json` con auto-update y consultas externas desactivadas. Exige ruta local, metadatos válidos, versión de esquema y fecha de construcción de hasta 14 días; configura el límite con `CYBER_AI_GRYPE_DB_MAX_AGE_DAYS` (1–3650).
+- **Ambos:** preflight de solo lectura; no descarga ni actualiza bases. La ejecución se bloquea cuando el preflight falla.
+
+```bash
+python tool_database_preflight.py --json
+python tool_database_preflight.py --tool osv_scanner --json
+python tool_database_preflight.py --tool grype --json
+```
 
 ## Nmap: autorización obligatoria
 
