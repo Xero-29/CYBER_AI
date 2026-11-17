@@ -154,7 +154,10 @@ os._exit(0)
         recovered = ExecutionLedger(path)
         result = recovered.reconcile_interrupted(stale_after_seconds=0)
         self.assertEqual(result["reconciled"], 1)
-        history = recovered.history(namespace="crash-test")
+        history = sorted(
+            recovered.history(namespace="crash-test"),
+            key=lambda event: event["sequence"],
+        )
         self.assertEqual(
             [event["status"] for event in history],
             ["started", "interrupted"],
