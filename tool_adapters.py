@@ -18,6 +18,8 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
+from tool_allowlist import verify_tool_allowed
+
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 MAX_OUTPUT_BYTES = 2_000_000
@@ -200,6 +202,7 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
     if not binary:
         raise ToolExecutionError("La herramienta no está instalada o no está en PATH.")
     binary_provenance = _hash_binary(binary)
+    allowlist_evidence = verify_tool_allowed(tool_id, binary_provenance["sha256"])
     binary = binary_provenance["resolved_path"]
     limit = spec["timeout"] if timeout is None else timeout
     if not isinstance(limit, int) or not 1 <= limit <= 600:
@@ -290,6 +293,7 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
         "tool_binary_sha256": binary_provenance["sha256"],
         "tool_binary_sha256_after": binary_hash_after,
         "tool_binary_modified": binary_modified,
+        "tool_allowlist": allowlist_evidence,
         "target": str(path.relative_to(PROJECT_ROOT)),
         "target_sha256": target_hash_before,
         "target_sha256_after": target_hash_after,
