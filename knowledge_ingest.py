@@ -7,7 +7,6 @@ import hashlib
 import json
 import stat
 import zipfile
-import uuid
 from html.parser import HTMLParser
 from pathlib import Path
 
@@ -389,7 +388,7 @@ def ingest_document(
     text = extract_document_text(file_path)
     chunks = split_text(text, max_chars=max_chars)
 
-    source = source or file_path.name
+    source = file_path.name if source is None else source
     for field, value in (
         ("title", title), ("category", category), ("source", source),
         ("license", license),
@@ -399,7 +398,7 @@ def ingest_document(
     title, category, source, license = (
         title.strip(), category.strip(), source.strip(), license.strip()
     )
-    if visibility not in {"shared", "tenant"}:
+    if not isinstance(visibility, str) or visibility not in {"shared", "tenant"}:
         raise ValueError("visibility debe ser 'shared' o 'tenant'.")
     if visibility == "tenant":
         if not isinstance(tenant_id, str) or not tenant_id.strip():
