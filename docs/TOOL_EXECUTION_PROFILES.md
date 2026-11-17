@@ -51,16 +51,16 @@ Reglas:
 YARA y TShark ya no se ejecutan directamente en el host. Se delegan a `isolated_tool_runner.py`, que usa la imagen Docker construida con:
 
 ```bash
-./build-analysis-sandbox.sh
+sh build-analysis-sandbox.sh
 ```
 
-El runner exige la imagen local `cyber-ai-analysis-sandbox:1.0` (o `CYBER_AI_ANALYSIS_SANDBOX_IMAGE`) y la incluye en la allowlist HMAC por su ID de imagen SHA-256. La huella se obtiene con:
+El runner exige la imagen local `cyber-ai-analysis-sandbox:1.0` (o `CYBER_AI_ANALYSIS_SANDBOX_IMAGE`) y la incluye en la allowlist HMAC por su ID de imagen SHA-256. Obtén el ID con:
 
 ```bash
 docker image inspect --format '{{.Id}}' cyber-ai-analysis-sandbox:1.0
 ```
 
-Incluye el hash sin el prefijo `sha256:` en las entradas de allowlist para `yara` y `tshark`. El contenedor se ejecuta con red deshabilitada, root filesystem de solo lectura, objetivo/reglas en solo lectura, sin capacidades, no-new-privileges, límite de procesos, memoria y CPU, y sin montar el socket Docker. YARA recibe reglas locales mediante `CYBER_AI_YARA_RULES`.
+Incluye el hash sin el prefijo `sha256:` en las entradas de allowlist para `yara` y `tshark`. La firma debe generarse con `sign_tool_allowlist` y una clave de al menos 32 bytes, mantenida fuera del repositorio. Configura `CYBER_AI_TOOL_ALLOWLIST_PATH` y `CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY` antes de ejecutar. El contenedor se ejecuta con red deshabilitada, root filesystem de solo lectura, objetivo/reglas en solo lectura, sin capacidades, no-new-privileges, límite de procesos, memoria y CPU, y sin montar el socket Docker. YARA recibe reglas locales mediante `CYBER_AI_YARA_RULES`.
 
 La imagen debe construirse y revisarse en un entorno confiable. El Docker daemon y el kernel del host siguen formando parte de la base de confianza; esto no equivale a una MicroVM.
 
