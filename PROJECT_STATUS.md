@@ -2,7 +2,7 @@
 
 **HEAD verificado:** `6fd37146aa249aef11aee40fb56d0d578352d4f2`  
 **Rama:** `codex/security-integrity-audit`  
-**Comparación con main:** 350 commits adelante, 0 detrás (según el PR abierto).  
+**Comparación con main:** 357 commits adelante, 0 detrás (comparación directa con el HEAD de main consultado).  
 **CI de este HEAD:** Python tests — [success, 377 pruebas](https://github.com/Xero-29/CYBER_AI/actions/runs/43997173079); Docker sandbox — [success](https://github.com/Xero-29/CYBER_AI/actions/runs/43997173115).  
 **PR #2:** abierto, en borrador; no fusionado. `main` no fue modificado.
 
