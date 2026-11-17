@@ -4,6 +4,7 @@ Define la profundidad objetivo y los artefactos de aprendizaje de las 48 áreas 
 
 - `domain_curriculum.json`: currículo de cada dominio con niveles L0–L4, temas técnicos específicos, artefactos, laboratorio y evaluación.
 - `knowledge_quality.py`: auditoría local de integridad estructural y madurez editorial.
+- `../deep_modules/README.md`: índice de los 48 módulos de profundización, con temas, competencias, procedimiento, laboratorio, evaluación y requisitos de procedencia.
 
 ## Uso
 
@@ -15,9 +16,13 @@ python knowledge_quality.py --require-deep
 
 L0 es orientación; L1 fundamentos y arquitectura; L2 metodología y controles; L3 análisis experto y validación; L4 investigación y evaluación crítica. Son objetivos editoriales, no certificaciones.
 
-La existencia de un currículo no convierte automáticamente un pack en contenido profundo. La auditoría mide estructura, no exactitud semántica. Las fuentes externas solo cuentan como verificadas tras revisión real de procedencia, licencia, versión, integridad y contenido.
+La existencia de un currículo o módulo no convierte automáticamente un pack en contenido profundo. La auditoría mide estructura, no exactitud semántica. Las fuentes externas solo cuentan como verificadas tras revisión real de procedencia, licencia, versión, integridad y contenido.
 
-## Ampliación por dominio
+## Estado de los módulos de profundización
+
+Se han creado 48 módulos, uno por cada área del manifiesto. Su estado inicial es `draft_structured_not_expert_validated`: definen ruta de trabajo, competencias, procedimiento, laboratorio, evaluación y requisitos de fuentes. No se contabilizan como manuales expertos terminados.
+
+## Ampliación editorial obligatoria
 
 1. Desarrollar cada tema con teoría, arquitectura, amenazas, controles y metodología.
 2. Añadir laboratorios reproducibles, datos sintéticos y criterios de parada.
