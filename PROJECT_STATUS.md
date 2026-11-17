@@ -3,7 +3,7 @@
 > Esta sección describe el HEAD auditado; los bloques históricos inferiores son contexto.
 
 **Rama:** `main`  
-**Último cambio funcional:** `88c68a79755c583f80921af41b86e4864333818e` (el commit `59a5254b30b7bb5d6170fdface07d1142b646de6` actualiza este estado). CI de estos cambios pendiente de resultado; no se extrapolan resultados de CI previos. Las pruebas Windows siguen aplazadas.  
+**Último cambio funcional de integración:** `decfae411dc1d9871a4b646087b821408d118239` (matriz de dominios, inventario y planificación); documentación actualizada hasta `29bdf7583e5b14ba51da072bcf0e18418e5a4608`. CI de estos cambios no tiene ejecuciones registradas para el SHA auditado; no se declara aprobado. Las pruebas Windows siguen aplazadas.  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17`, sin modificar.
 
 ## Integración de dominios, herramientas y Skills
