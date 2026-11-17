@@ -10,7 +10,7 @@
 
 ## Síntesis primaria
 
-NIST SP 800-61 Rev. 3 (abril de 2025) sustituye a Rev. 2 (2012) y sitúa la respuesta a incidentes dentro de la gestión del riesgo del CSF 2.0. No es correcto modelar IR únicamente como una secuencia aislada de «preparar, detectar, contener»: las funciones Govern, Identify y Protect ayudan a prevenir/preparar y mejorar, mientras Detect, Respond y Recover soportan descubrimiento, gestión, contención, erradicación y recuperación. El documento también advierte que sus ejemplos de equipos/productos no constituyen aval de proveedores.
+La revisión del PDF oficial cubrió portada y secciones ejecutivas/operativas relevantes (páginas impresas 4–6 y fragmentos de Respond/containment). NIST SP 800-61 Rev. 3 (abril de 2025) sustituye a Rev. 2 (2012) y sitúa la respuesta a incidentes dentro de la gestión del riesgo del CSF 2.0. El modelo distingue preparación (Govern, Identify, Protect), respuesta directa (Detect, Respond, Recover) y mejora continua (Identify/Improvement). Las lecciones se incorporan continuamente; no se espera necesariamente al cierre de la recuperación. La tabla de mapeo conecta las fases tradicionales con las funciones CSF 2.0. En la sección RS.MI, NIST define contención como impedir la expansión del incidente, contempla automatización bajo criterios y recomienda permitir que los handlers seleccionen acciones manuales además de medidas automáticas. Esto respalda gates de autorización y selección contextual, no automatización indiscriminada. [Páginas impresas 4–6 y 31–32; PDF oficial enlazado abajo].
 
 **Implicación para CYBER_AI:** el orquestador debe tratar un incidente como proceso con estado, autoridad, alcance, evidencia y decisiones humanas; no como una orden libre de ejecutar herramientas. Cada acción debe conservar autorización, actor, timestamp, hash de evidencia, justificación, resultado y rollback cuando proceda.
 
@@ -61,3 +61,4 @@ NIST SP 800-61 Rev. 3 (abril de 2025) sustituye a Rev. 2 (2012) y sitúa la resp
 
 - Nelson et al., NIST SP 800-61 Rev. 3, abril 2025. https://doi.org/10.6028/NIST.SP.800-61r3
 - NIST, Cybersecurity Framework 2.0, febrero 2024. https://doi.org/10.6028/NIST.CSWP.29
+\n\n## Identificadores del registro de fuentes\n\n- `NIST-SP-800-61r3`\n- `NIST-CSWP-29-CSF-2.0`\n
