@@ -45,7 +45,7 @@ def _logical_requirement_lines(path):
         raise LockfileError(f"Continuación incompleta en {path.name}:{start_line}.")
 
 
-def _read_requirements(path, root, seen=None, depth=0):
+def _read_requirements(path, root, seen=None, depth=0, require_hashes=True):
     if seen is None:
         seen = set()
     if depth > 8:
@@ -70,7 +70,7 @@ def _read_requirements(path, root, seen=None, depth=0):
             if not include or Path(include).is_absolute() or ".." in Path(include).parts:
                 raise LockfileError(f"Inclusión no permitida en {resolved.name}:{number}.")
             child = resolved.parent / include
-            included = _read_requirements(child, root, seen, depth + 1)
+            included = _read_requirements(child, root, seen, depth + 1, require_hashes)
             for package_name, package in included.items():
                 existing = packages.get(package_name)
                 if existing and existing["version"] != package["version"]:
@@ -93,7 +93,7 @@ def _read_requirements(path, root, seen=None, depth=0):
             if not hash_match:
                 raise LockfileError(f"Hash SHA-256 inválido en {resolved.name}:{number}.")
             hashes.append(hash_match.group(1))
-        if not hashes:
+        if not hashes and require_hashes:
             raise LockfileError(
                 f"Dependencia sin hash SHA-256 en {resolved.name}:{number}: {name}=={version}."
             )
@@ -111,19 +111,45 @@ def _read_requirements(path, root, seen=None, depth=0):
     return packages
 
 
-def build_sbom(root=PROJECT, artifact_manifest=None):
+def _project_file(root, value):
+    candidate = Path(value)
+    if not candidate.is_absolute():
+        candidate = root / candidate
+    if candidate.is_symlink():
+        raise LockfileError("No se permiten symlinks en archivos de dependencias.")
+    resolved = candidate.resolve(strict=True)
+    try:
+        resolved.relative_to(root)
+    except ValueError as error:
+        raise LockfileError("Los archivos de dependencias deben permanecer en el proyecto.") from error
+    if not resolved.is_file():
+        raise LockfileError("Archivo de dependencias inexistente o inválido.")
+    return resolved
+
+
+def build_sbom(
+    root=PROJECT,
+    artifact_manifest=None,
+    lock_file="requirements.lock",
+    direct_requirements="requirements.txt",
+):
     root = Path(root).resolve()
-    lock_path = root / "requirements.lock"
-    direct_path = root / "requirements.txt"
-    if not lock_path.is_file() or not direct_path.is_file():
-        raise LockfileError("Faltan requirements.lock o requirements.txt.")
+    lock_path = _project_file(root, lock_file)
+    direct_path = _project_file(root, direct_requirements)
     locked = _read_requirements(lock_path, root)
-    direct = _read_requirements(direct_path, root)
+    direct = _read_requirements(direct_path, root, require_hashes=False)
     if not locked or not direct:
         raise LockfileError("No se encontraron dependencias fijadas.")
     missing = set(direct) - set(locked)
-    if missing:
-        raise LockfileError(f"Dependencias directas ausentes del lock: {sorted(missing)}.")
+    mismatched = {
+        name for name in direct
+        if name in locked and direct[name]["version"] != locked[name]["version"]
+    }
+    if missing or mismatched:
+        raise LockfileError(
+            f"Dependencias directas ausentes o con versión distinta: "
+            f"missing={sorted(missing)}, mismatched={sorted(mismatched)}."
+        )
     lock_hash = hashlib.sha256(lock_path.read_bytes()).hexdigest()
     artifact_hashes = {}
     if artifact_manifest is not None:
@@ -135,7 +161,7 @@ def build_sbom(root=PROJECT, artifact_manifest=None):
         except (OSError, json.JSONDecodeError) as error:
             raise LockfileError("No se pudo leer el manifiesto de artefactos.") from error
         if not isinstance(manifest, dict) or manifest.get("lock_sha256") != lock_hash:
-            raise LockfileError("El manifiesto corresponde a otro requirements.lock o tiene formato inválido.")
+            raise LockfileError("El manifiesto corresponde a otro lock o tiene formato inválido.")
         artifacts = manifest.get("artifacts")
         if not isinstance(artifacts, list):
             raise LockfileError("La lista de artefactos del manifiesto es inválida.")
@@ -155,7 +181,7 @@ def build_sbom(root=PROJECT, artifact_manifest=None):
                 raise LockfileError("El manifiesto contiene un artefacto no fijado o inválido.")
             if digest not in locked[name]["hashes"]:
                 raise LockfileError(
-                    f"El hash del artefacto de {name} no coincide con requirements.lock."
+                    f"El hash del artefacto de {name} no coincide con el lock."
                 )
             artifact_hashes[name] = digest
         if set(artifact_hashes) != set(locked):
@@ -179,7 +205,8 @@ def build_sbom(root=PROJECT, artifact_manifest=None):
                 {"name": "cyber_ai:dependency_type",
                  "value": "direct" if name in direct else "transitive"},
                 {"name": "cyber_ai:lock_source", "value": item["source"]},
-                {"name": "cyber_ai:artifact_hash", "value": artifact_hashes.get(name, "not-recorded")},
+                {"name": "cyber_ai:artifact_hash",
+                 "value": artifact_hashes.get(name, "not-recorded")},
             ],
         })
     serial = uuid.uuid5(uuid.NAMESPACE_URL, f"cyber-ai-requirements:{lock_hash}")
@@ -195,10 +222,12 @@ def build_sbom(root=PROJECT, artifact_manifest=None):
                 "name": "CYBER_AI", "version": "unreleased",
             },
             "properties": [
-                {"name": "cyber_ai:lock_file", "value": "requirements.lock"},
+                {"name": "cyber_ai:lock_file", "value": lock_path.relative_to(root).as_posix()},
                 {"name": "cyber_ai:lock_sha256", "value": lock_hash},
-                {"name": "cyber_ai:artifact_hashes", "value": "captured-for-build-platform" if artifact_hashes else "not-recorded"},
-                {"name": "cyber_ai:dependency_graph", "value": "root-to-locked-components; transitive edges not inferred"},
+                {"name": "cyber_ai:artifact_hashes",
+                 "value": "captured-for-build-platform" if artifact_hashes else "not-recorded"},
+                {"name": "cyber_ai:dependency_graph",
+                 "value": "root-to-locked-components; transitive edges not inferred"},
             ],
         },
         "components": components,
@@ -211,9 +240,16 @@ def main(argv=None):
     parser.add_argument("--root", type=Path, default=PROJECT)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--artifact-manifest", type=Path)
+    parser.add_argument("--lock-file", type=Path, default=Path("requirements.lock"))
+    parser.add_argument("--direct-requirements", type=Path, default=Path("requirements.txt"))
     args = parser.parse_args(argv)
     try:
-        document = build_sbom(args.root, artifact_manifest=args.artifact_manifest)
+        document = build_sbom(
+            args.root,
+            artifact_manifest=args.artifact_manifest,
+            lock_file=args.lock_file,
+            direct_requirements=args.direct_requirements,
+        )
         rendered = json.dumps(document, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
         if args.output:
             args.output.parent.mkdir(parents=True, exist_ok=True)

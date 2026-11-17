@@ -73,6 +73,28 @@ class DependencyArtifactManifestTests(unittest.TestCase):
         with self.assertRaisesRegex(ArtifactManifestError, "no coincide con requirements.lock"):
             build_manifest(self.root, self.wheelhouse)
 
+    def test_manifest_supports_a_secondary_lock_path(self):
+        sandbox = self.root / "sandbox"
+        sandbox.mkdir()
+        wheelhouse = self.root / "sandbox-wheelhouse"
+        wheelhouse.mkdir()
+        first = self.wheel("ruff-0.14.5-py3-none-any.whl", "ruff", "0.14.5")
+        second = self.wheel("bandit-1.8.6-py3-none-any.whl", "bandit", "1.8.6")
+        (sandbox / "requirements.lock").write_text(
+            "bandit==1.8.6 --hash=sha256:"
+            + hashlib.sha256(second.read_bytes()).hexdigest() + chr(10)
+            + "ruff==0.14.5 --hash=sha256:"
+            + hashlib.sha256(first.read_bytes()).hexdigest() + chr(10),
+            encoding="utf-8",
+        )
+        for item in (first, second):
+            (wheelhouse / item.name).write_bytes(item.read_bytes())
+        result = build_manifest(
+            self.root, wheelhouse, lock_file="sandbox/requirements.lock"
+        )
+        self.assertEqual(result["lock_file"], "sandbox/requirements.lock")
+        self.assertEqual(len(result["artifacts"]), 2)
+
     def test_manifest_rejects_missing_locked_wheel(self):
         requests_wheel = self.wheel("requests-2.0-py3-none-any.whl", "requests", "2.0")
         self.pin_created_wheels(requests_wheel=requests_wheel)

@@ -57,6 +57,32 @@ class SbomGeneratorTests(unittest.TestCase):
             by_name["certifi"]["properties"][2]["value"], "b" * 64
         )
 
+    def test_generates_sbom_for_secondary_locked_environment(self):
+        sandbox = self.root / "sandbox"
+        sandbox.mkdir()
+        (sandbox / "requirements.in").write_text(
+            "ruff==0.14.5" + chr(10) + "bandit==1.8.6" + chr(10),
+            encoding="utf-8",
+        )
+        (sandbox / "requirements.lock").write_text(
+            "bandit==1.8.6 --hash=sha256:" + "b" * 64 + chr(10)
+            + "pygments==2.21.0 --hash=sha256:" + "c" * 64 + chr(10)
+            + "ruff==0.14.5 --hash=sha256:" + "a" * 64 + chr(10),
+            encoding="utf-8",
+        )
+        sbom = build_sbom(
+            self.root,
+            lock_file="sandbox/requirements.lock",
+            direct_requirements="sandbox/requirements.in",
+        )
+        by_name = {item["name"]: item for item in sbom["components"]}
+        self.assertEqual(by_name["ruff"]["properties"][0]["value"], "direct")
+        self.assertEqual(by_name["bandit"]["properties"][0]["value"], "direct")
+        self.assertEqual(by_name["pygments"]["properties"][0]["value"], "transitive")
+        self.assertEqual(
+            sbom["metadata"]["properties"][0]["value"], "sandbox/requirements.lock"
+        )
+
     def test_rejects_artifact_manifest_for_different_lock(self):
         manifest_path = self.root / "artifacts.json"
         manifest_path.write_text(json.dumps({

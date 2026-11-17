@@ -40,12 +40,21 @@ def _wheel_metadata(path):
         raise ArtifactManifestError(f"Wheel inválido: {path.name}") from error
 
 
-def build_manifest(root, wheelhouse):
+def build_manifest(root, wheelhouse, lock_file="requirements.lock"):
     root = Path(root).resolve()
     wheelhouse = Path(wheelhouse)
     if wheelhouse.is_symlink() or not wheelhouse.is_dir():
         raise ArtifactManifestError("Wheelhouse debe ser un directorio real.")
-    lock = root / "requirements.lock"
+    lock_candidate = Path(lock_file)
+    if not lock_candidate.is_absolute():
+        lock_candidate = root / lock_candidate
+    if lock_candidate.is_symlink():
+        raise ArtifactManifestError("No se permiten symlinks en el lock.")
+    lock = lock_candidate.resolve(strict=True)
+    try:
+        lock.relative_to(root)
+    except ValueError as error:
+        raise ArtifactManifestError("El lock debe permanecer dentro del proyecto.") from error
     direct = _read_requirements(lock, root)
     wheels = sorted(wheelhouse.glob("*.whl"))
     if not wheels:
@@ -88,7 +97,7 @@ def build_manifest(root, wheelhouse):
         )
     return {
         "schema": "cyber-ai-dependency-artifacts-v1",
-        "lock_file": "requirements.lock",
+        "lock_file": lock.relative_to(root).as_posix(),
         "lock_sha256": hashlib.sha256(lock.read_bytes()).hexdigest(),
         "python": platform.python_version(),
         "platform": platform.platform(),
@@ -101,10 +110,11 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parent)
     parser.add_argument("--wheelhouse", type=Path, required=True)
+    parser.add_argument("--lock-file", type=Path, default=Path("requirements.lock"))
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(argv)
     try:
-        manifest = build_manifest(args.root, args.wheelhouse)
+        manifest = build_manifest(args.root, args.wheelhouse, lock_file=args.lock_file)
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(
             json.dumps(manifest, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
