@@ -6,6 +6,15 @@
 **Último cambio funcional:** `88c68a79755c583f80921af41b86e4864333818e` (el commit `59a5254b30b7bb5d6170fdface07d1142b646de6` actualiza este estado). CI de estos cambios pendiente de resultado; no se extrapolan resultados de CI previos. Las pruebas Windows siguen aplazadas.  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17`, sin modificar.
 
+## Integración de dominios, herramientas y Skills
+
+- Se añadió `domain_capability_matrix.py`: exige correspondencia exacta entre los 48 paquetes del manifiesto offline y sus 48 perfiles de enrutamiento.
+- Cada perfil enlaza el paquete de conocimiento con las herramientas declaradas para esa especialidad. La matriz diferencia herramientas disponibles, adaptadores registrados, runners separados y herramientas solo catalogadas.
+- `task_planner.py` añade dominios coincidentes, herramientas candidatas por dominio y Skills activas potencialmente relacionadas. La consulta de Skills usa `record_usage=False`; planificar no altera sus métricas de uso.
+- `capability_inventory.py` informa la consistencia de los 48 perfiles y deja explícito que esto no acredita cobertura operativa.
+- Nuevas pruebas: `tests/test_domain_capability_matrix.py` y ampliación de `tests/test_task_planner_fallback.py` y `tests/test_capability_inventory.py`.
+- **Límite:** la matriz conecta y enruta; no implementa adaptadores ausentes, no descarga conocimiento externo y no convierte automáticamente Skills candidatas en Skills verificadas.
+
 ## Cambio reciente: perfiles y herramientas personalizadas
 
 - Se incorporó `config/tool_execution_profiles.json` con perfiles `standard`, `extended` y `restricted`; el perfil se selecciona con `--tool-profile` en `cyber_ai.py --team`, o con `CYBER_AI_TOOL_PROFILE`.
