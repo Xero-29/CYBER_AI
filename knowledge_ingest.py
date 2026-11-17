@@ -190,7 +190,7 @@ def extract_document_text(file_path):
         for page_number, page in enumerate(reader.pages, 1):
             page_text = page.extract_text() or ""
             total = _append_bounded(
-                parts, f"[PDF page {page_number}]\\n{page_text}", total
+                parts, f"[PDF page {page_number}]\n{page_text}", total
             )
         text = "\n\n".join(parts)
         if not text.strip():
