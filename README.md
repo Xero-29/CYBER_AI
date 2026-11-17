@@ -126,7 +126,7 @@ La allowlist está desactivada por compatibilidad si no se configura. En desplie
 
 ## Herramientas locales y sandbox
 
-El inventario de 21 herramientas distingue disponibilidad del binario y adaptadores realmente registrados. Hay 14 especificaciones de adaptador: 11 herramientas de ejecución local acotada; YARA y TShark quedan bloqueadas en el host hasta disponer de sandbox aislado; pip-audit queda bloqueado por requerir red. El informe separa adaptador registrado de ejecución realmente habilitada. La presencia en el catálogo no significa que la herramienta esté instalada. Genera el informe con `python capability_inventory.py`.
+El inventario declara **21 herramientas**: **20 IDs** en `TOOL_SPECS` y Nuclei con runner remoto separado. De los 20 IDs, **17 adaptadores** se ejecutan directamente en el host (16 locales/offline y Nmap con autorización de red); **pip-audit** está registrado pero bloqueado por política de red; **YARA y TShark** usan un runner Docker aislado. Nmap no tiene aislamiento de egress impuesto por el sistema operativo y los adaptadores host no tienen sandbox general. OSV-Scanner y Grype requieren bases locales, pero todavía no cuentan con preflight de vigencia/esquema; no se deben considerar listos solo por detectar el binario. La presencia en el catálogo no significa que la herramienta esté instalada, que su base exista o que haya sido validada operacionalmente. Genera el informe con `python capability_inventory.py`.
 
 El registro de herramientas se encuentra en `tool_adapters.py`. Para ejecutar directamente un adaptador local:
 
