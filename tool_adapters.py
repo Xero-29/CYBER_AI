@@ -181,7 +181,7 @@ def _probe_tool_version(binary, tool_id, env):
 
 
 def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
-    """Ejecuta un adaptador local; pip-audit se deniega por requerir red."""
+    """Ejecuta un adaptador local; no aplica aislamiento de red al proceso."""
     if tool_id not in TOOL_SPECS:
         raise ToolExecutionError("Herramienta no registrada.")
     spec = TOOL_SPECS[tool_id]
@@ -303,7 +303,9 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
         "stderr": err_text,
         "parsed_json": parsed,
         "command": command[1:],
-        "network_access": False,
+        "network_access": "not_enforced",
+        "network_isolation_enforced": False,
+        "network_policy": "Los adaptadores que requieren red se deniegan; el egress de procesos locales no está aislado por este ejecutor.",
         "note": "Salida de herramienta no confiable; requiere validación antes de generar hallazgos o Skills. La ejecución no sustituye aislamiento del sistema operativo.",
     }
     return evidence
