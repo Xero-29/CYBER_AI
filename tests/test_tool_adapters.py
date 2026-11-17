@@ -297,6 +297,36 @@ class ToolAdapterTests(unittest.TestCase):
 
     @patch("tool_adapters.subprocess.Popen")
     @patch("tool_adapters.shutil.which", return_value="/usr/bin/osv-scanner")
+    def test_osv_preflight_failure_blocks_before_process_start(self, which, popen):
+        provenance = {"resolved_path": "/usr/bin/osv-scanner", "sha256": "a" * 64}
+        with (
+            patch.object(tool_adapters, "_hash_binary", return_value=provenance),
+            patch.object(tool_adapters, "verify_tool_allowed", return_value={"allowed": True}),
+            patch.object(tool_adapters, "inspect_tool_database", return_value={
+                "tool": "osv_scanner", "status": "missing",
+            }),
+            self.assertRaisesRegex(ToolExecutionError, "no se inició el escaneo"),
+        ):
+            run_local_tool("osv_scanner", ".")
+        popen.assert_not_called()
+
+    @patch("tool_adapters.subprocess.Popen")
+    @patch("tool_adapters.shutil.which", return_value="/usr/bin/grype")
+    def test_grype_stale_database_blocks_before_process_start(self, which, popen):
+        provenance = {"resolved_path": "/usr/bin/grype", "sha256": "b" * 64}
+        with (
+            patch.object(tool_adapters, "_hash_binary", return_value=provenance),
+            patch.object(tool_adapters, "verify_tool_allowed", return_value={"allowed": True}),
+            patch.object(tool_adapters, "inspect_tool_database", return_value={
+                "tool": "grype", "status": "stale", "age_days": 20,
+            }),
+            self.assertRaisesRegex(ToolExecutionError, "no se inició el escaneo"),
+        ):
+            run_local_tool("grype", ".")
+        popen.assert_not_called()
+
+    @patch("tool_adapters.subprocess.Popen")
+    @patch("tool_adapters.shutil.which", return_value="/usr/bin/osv-scanner")
     @patch("tool_adapters.subprocess.run")
     def test_osv_execution_records_offline_configuration(self, version_run, which, popen):
         version_run.return_value = subprocess.CompletedProcess(
