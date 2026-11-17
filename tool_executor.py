@@ -116,10 +116,26 @@ def main(argv=None):
                     tool_version=evidence.get("tool_version", "unknown"),
                     evidence=evidence,
                     duration_ms=_duration_ms(evidence, started),
-                    validator_results=[{
-                        "name": "process_exit",
-                        "passed": evidence.get("return_code") == 0,
-                    }],
+                    validator_results=[
+                        {
+                            "name": "process_exit",
+                            "passed": (
+                                evidence.get("status") == "completed"
+                                and evidence.get("return_code") == 0
+                            ),
+                        },
+                        {
+                            "name": "tool_binary_integrity",
+                            "passed": (
+                                evidence.get("status") == "completed"
+                                and evidence.get("tool_binary_modified") is False
+                            ),
+                            "evidence": {
+                                "sha256_before": evidence.get("tool_binary_sha256"),
+                                "sha256_after": evidence.get("tool_binary_sha256_after"),
+                            },
+                        },
+                    ],
                     metadata={
                         "target": evidence.get("target", args.target),
                         "target_sha256": evidence.get("target_sha256"),
