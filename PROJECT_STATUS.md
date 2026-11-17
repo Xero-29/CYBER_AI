@@ -92,7 +92,7 @@
 ## Investigación de biblioteca — ampliación 2026-11-17
 
 - Se añadió `knowledge/research/RESEARCH_PROTOCOL.md`: método de investigación, revisión de literatura, formulación de hipótesis, diseño experimental, métricas, análisis de incertidumbre, amenazas a validez, reproducibilidad, ética y puertas M0–M5.
-- Se añadió `knowledge/research/source_registry.json` con cuatro recursos oficiales NIST cuyos metadatos se revisaron. El estado es de metadatos oficiales revisados, no lectura integral ni validación de cada afirmación técnica.
+- Se añadió `knowledge/research/source_registry.json` con seis recursos oficiales NIST cuyos metadatos se revisaron. El estado es de metadatos oficiales revisados, no lectura integral ni validación de cada afirmación técnica.
 - Se añadieron agendas de investigación específicas para los 48 dominios en `knowledge/deep_modules/<area>/RESEARCH_AGENDA.md`, con preguntas por tema, hipótesis provisionales, método, métricas, entregables y salvaguardas.
 - El índice de la biblioteca enlaza las 48 agendas. Se añadió `knowledge_research_audit.py` y pruebas en `tests/test_knowledge_research_audit.py` para auditar estructura, no validez científica.
 - **Madurez real:** 48/48 agendas de investigación creadas. Ninguna se declara M4/M5: aún faltan revisiones bibliográficas ejecutadas, lectura integral de fuentes, experimentos, resultados, análisis y reproducción independiente.
