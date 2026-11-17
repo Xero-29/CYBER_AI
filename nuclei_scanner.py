@@ -204,7 +204,7 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
 
     command = [
         executable, "-u", target, "-t", str(template_root),
-        "-severity", selected_severity,
+        "-severity", selected_severity, "-type", "http",
         "-exclude-tags", "dos,intrusive,fuzz,code,headless",
         "-disable-unsigned-templates", "-jsonl", "-stats",
         "-stats-interval", "5", "-no-interactsh",
