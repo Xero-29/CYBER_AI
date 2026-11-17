@@ -127,7 +127,7 @@ class ToolAdapterTests(unittest.TestCase):
             self.assertEqual(stat.S_IMODE(path.parent.stat().st_mode), 0o700)
 
     def test_evidence_rejects_symlink_destination_and_unsafe_tool_name(self):
-        outside = self.root.parent / (self.root.name + "-outside")
+        outside = self.root / "outside"
         outside.mkdir()
         link = self.root / "linked-evidence"
         link.symlink_to(outside, target_is_directory=True)
