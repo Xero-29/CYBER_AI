@@ -8,8 +8,9 @@ class TestCyberAI(unittest.TestCase):
             with self.subTest(directory=name):
                 self.assertTrue(Path(name).is_dir())
 
-    def test_verifier_exists(self):
-        self.assertTrue(Path("verifier.py").is_file())
+    def test_integrated_nvd_client_exists(self):
+        self.assertTrue(Path("nvd_client.py").is_file())
+        self.assertTrue(Path("report_analyzer.py").is_file())
 
     def test_context_exists(self):
         self.assertTrue(Path("CONTEXT.md").is_file())
