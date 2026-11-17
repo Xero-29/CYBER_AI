@@ -79,10 +79,17 @@ def authorize_target(target, action, authorization_id):
     if not isinstance(authorization_id, str) or not authorization_id.strip():
         raise AuthorizationError("Se requiere un identificador de autorización.")
     canonical, address = _canonical_target(target)
+    allowed_private_ranges = (
+        ipaddress.ip_network("10.0.0.0/8"),
+        ipaddress.ip_network("172.16.0.0/12"),
+        ipaddress.ip_network("192.168.0.0/16"),
+        ipaddress.ip_network("fc00::/7"),
+    )
+    is_approved_private = any(address in network for network in allowed_private_ranges)
     if address.is_multicast or address.is_unspecified or address.is_link_local or address.is_reserved:
         raise AuthorizationError("La dirección IP es reservada, multicast, no especificada o link-local.")
-    if not (address.is_global or address.is_private or address.is_loopback):
-        raise AuthorizationError("La dirección IP no es global, privada ni loopback; destino rechazado.")
+    if not (address.is_global or is_approved_private or address.is_loopback):
+        raise AuthorizationError("La dirección IP no pertenece a un rango global, RFC1918/ULA o loopback permitido.")
     now = datetime.now(timezone.utc)
     for grant in _load_grants():
         if not isinstance(grant, dict) or grant.get("id") != authorization_id:
