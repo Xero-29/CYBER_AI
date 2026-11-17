@@ -18,7 +18,7 @@ REQUIRED_DOSSIER_MARKERS = (
     "## brechas",
     "## identificadores del registro de fuentes",
 )
-SOURCE_ID_PATTERN = re.compile(r"^- `([A-Za-z0-9-]+)`$", re.MULTILINE)
+SOURCE_ID_PATTERN = re.compile(r"^- `([A-Za-z0-9.-]+)`$", re.MULTILINE)
 
 
 def _read_text(path: Path) -> str:
@@ -157,7 +157,9 @@ def audit_research_library(root: Path = ROOT) -> dict:
         "official_project_page_reviewed", "official_risk_page_reviewed",
         "official_metadata_and_abstract_reviewed", "official_pdf_sections_inspected",
         "official_draft_metadata_reviewed", "official_draft_metadata_and_announcement_reviewed",
-        "official_specification_pages_reviewed", "official_model_documentation_reviewed",
+        "official_specification_pages_reviewed",
+        "official_data_repository_reviewed", "official_release_notes_reviewed",
+        "official_version_history_reviewed", "official_model_documentation_reviewed",
         "official_methodology_page_reviewed", "official_standard_metadata_reviewed",
     }
     source_reviewed_count = sum(s.get("verification_status") in reviewed_statuses for s in sources)
