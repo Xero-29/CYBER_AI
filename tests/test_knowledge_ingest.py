@@ -274,6 +274,49 @@ class TestKnowledgeIngest(unittest.TestCase):
             embeddings.assert_not_called()
             store.assert_not_called()
 
+    def test_default_document_id_is_stable_and_scope_specific(self):
+        identity = {
+            "document_sha256": "a" * 64, "title": "Manual", "category": "network",
+            "source": "manual.pdf", "license": "CC-BY-4.0",
+            "visibility": "tenant", "tenant_id": "tenant-a", "tags": ["dns", "tls"],
+            "expected_embedding_model": "provider::embed-v1",
+        }
+        first = ingest._default_document_id(**identity)
+        self.assertEqual(first, ingest._default_document_id(**identity))
+        self.assertNotEqual(
+            first,
+            ingest._default_document_id(**{**identity, "tenant_id": "tenant-b"}),
+        )
+        self.assertNotEqual(
+            first,
+            ingest._default_document_id(**{**identity, "visibility": "shared", "tenant_id": None}),
+        )
+        self.assertNotEqual(
+            first,
+            ingest._default_document_id(**{**identity, "document_sha256": "b" * 64}),
+        )
+
+    def test_default_document_id_makes_retries_idempotent(self):
+        with tempfile.TemporaryDirectory() as temp:
+            document = Path(temp) / "repeat.md"
+            document.write_text("# Repeat\nTexto estable", encoding="utf-8")
+            with patch.object(ingest, "document_chunk_count", side_effect=[0, 1]), \
+                 patch.object(ingest, "generate_embeddings", return_value={
+                     "model": "fixture-v1", "embedding_space": "fixture::v1",
+                     "embeddings": [[1.0, 0.0]],
+                 }) as embeddings, \
+                 patch.object(ingest, "store_chunks", return_value=["chunk-1"]):
+                first = ingest.ingest_document(
+                    document, title="Repeat", category="test", source="repeat.md"
+                )
+                second = ingest.ingest_document(
+                    document, title="Repeat", category="test", source="repeat.md"
+                )
+        self.assertEqual(first["document_id"], second["document_id"])
+        self.assertFalse(first.get("already_present", False))
+        self.assertTrue(second["already_present"])
+        embeddings.assert_called_once()
+
     def test_invalid_deterministic_document_id_is_rejected(self):
         with tempfile.TemporaryDirectory() as temp:
             document = Path(temp) / "input.md"
