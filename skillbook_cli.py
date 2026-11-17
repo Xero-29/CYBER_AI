@@ -51,6 +51,16 @@ def main(argv=None):
     rollback.add_argument("--target-version", type=int, required=True)
     rollback.add_argument("--signature", required=True)
 
+    deprecate_payload = sub.add_parser("deprecate-payload")
+    deprecate_payload.add_argument("--skill-id", required=True)
+    deprecate_payload.add_argument("--reason", required=True)
+    deprecate = sub.add_parser("deprecate")
+    deprecate.add_argument("--skill-id", required=True)
+    deprecate.add_argument("--reason", required=True)
+    deprecate_signature = deprecate.add_mutually_exclusive_group(required=True)
+    deprecate_signature.add_argument("--signature")
+    deprecate_signature.add_argument("--signature-file")
+
     args = parser.parse_args(argv)
     try:
         if args.command in {"propose", "approval-payload", "promote"}:
@@ -71,10 +81,20 @@ def main(argv=None):
             result = {"rollback_payload": skillbook.skill_rollback_payload(
                 args.skill_id, args.target_version
             )}
-        else:
+        elif args.command == "rollback":
             result = skillbook.rollback_skill_version(
                 args.skill_id, args.target_version, args.signature
             )
+        elif args.command == "deprecate-payload":
+            result = {"deprecation_payload": skillbook.skill_deprecation_payload(
+                args.skill_id, args.reason
+            )}
+        else:
+            signed = (
+                Path(args.signature_file).read_text(encoding="ascii").strip()
+                if args.signature_file else args.signature
+            )
+            result = skillbook.deprecate_skill(args.skill_id, args.reason, signed)
     except (OSError, ValueError, json.JSONDecodeError) as error:
         print(f"ERROR: {error}", file=sys.stderr)
         return 2
