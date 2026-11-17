@@ -66,6 +66,14 @@ class LearningCycleAuditTests(unittest.TestCase):
         self.assertFalse(missing.exists())
         self.assertFalse(missing.parent.exists())
 
+    def test_invalid_skill_review_window_is_rejected(self):
+        for value in (0, -1, 3651, True, 1.5):
+            with self.subTest(value=value):
+                with self.assertRaises(ValueError):
+                    learning_cycle_audit.audit_learning_cycle(
+                        max_review_age_days=value
+                    )
+
     def test_orphan_started_event_is_reported_but_not_reconciled(self):
         self.ledger.append(
             namespace="audit",
