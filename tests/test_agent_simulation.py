@@ -88,9 +88,10 @@ class TestAgentSimulation(unittest.TestCase):
         with self.assertRaises(SimulationError):
             simulate_workflow(self.workflow, "tarea", {"AGENTE_INEXISTENTE": "texto"})
 
-    def test_fixture_sequence_rejects_non_text_items(self):
-        with self.assertRaises(SimulationError):
-            simulate_workflow(self.workflow, "tarea", {"NEXO": ["texto", None]})
+    def test_fixture_sequence_with_non_text_item_stops_at_output_contract(self):
+        report = simulate_workflow(self.workflow, "tarea", {"NEXO": ["texto", None]})
+        self.assertEqual(report["status"], "stopped_invalid_output")
+        self.assertEqual(report["metrics"]["steps_executed"], 1)
 
     def test_unhashable_mode_is_rejected_as_contract_error(self):
         with self.assertRaises(SimulationError):
