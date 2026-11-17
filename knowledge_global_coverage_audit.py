@@ -39,10 +39,15 @@ def audit(root: Path = ROOT) -> dict:
         if unknown: errors.append(f"{ref.get('id')}: dominios inexistentes {sorted(unknown)}")
     reference_domains = {item["id"]: set(item.get("domains", [])) for item in refs}
     rows = []
+    compendia_present = 0
+    missing_compendia = []
     topic_total = artifact_total = topic_assessed = artifact_assessed = gates_assessed = 0
     validated_specialties = 0
     for area in area_rows:
         aid, links = area.get("id", "?"), area.get("reference_ids", [])
+        compendium_path = root / "knowledge" / "deep_modules" / aid / "TECHNICAL_COMPENDIUM.md"
+        if compendium_path.is_file() and compendium_path.stat().st_size > 500: compendia_present += 1
+        else: missing_compendia.append(aid)
         unknown = sorted(set(links) - known_refs)
         if unknown: errors.append(f"{aid}: referencias inexistentes {unknown}")
         inconsistent = sorted(ref_id for ref_id in links if ref_id in reference_domains and aid not in reference_domains[ref_id])
@@ -78,6 +83,7 @@ def audit(root: Path = ROOT) -> dict:
     mapped = sum(x["reference_count"] > 0 for x in rows)
     return {"ok":not errors,"errors":errors,"warnings":warnings,"area_count":len(rows),
       "areas_with_reference_mapping":mapped,"areas_without_reference_mapping":len(rows)-mapped,
+      "compendia_present":compendia_present,"compendia_missing":missing_compendia,
       "reference_count":len(refs),"cross_cutting_gap_count":len(matrix.get("cross_cutting_gaps",[])),
       "topic_requirement_count":topic_total,"topics_assessed":topic_assessed,
       "artifact_requirement_count":artifact_total,"artifacts_assessed":artifact_assessed,
