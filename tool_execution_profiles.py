@@ -93,8 +93,10 @@ def load_execution_config(path=None):
                 any(not isinstance(arg, str) or len(arg) > 2048 for arg in argv) or
                 not any("{target}" in arg for arg in argv)):
             raise ProfileConfigError("argv debe ser una lista e incluir {target}.")
-        if not isinstance(tool["keywords"], list) or any(not isinstance(x, str) for x in tool["keywords"]):
-            raise ProfileConfigError("keywords debe ser una lista de texto.")
+        if (not isinstance(tool["keywords"], list) or not tool["keywords"] or
+                any(not isinstance(x, str) or not x.strip() or len(x) > 128
+                    for x in tool["keywords"])):
+            raise ProfileConfigError("keywords debe contener textos no vacíos de hasta 128 caracteres.")
         timeout = tool.get("timeout_seconds", 180)
         if type(timeout) is not int or not 1 <= timeout <= 600:
             raise ProfileConfigError("timeout_seconds de herramienta debe estar entre 1 y 600.")
