@@ -311,3 +311,12 @@ No declarar el sistema completo ni certificado hasta que cada brecha tenga códi
 - Artefacto SBOM/procedencia publicado: `cyber-ai-sbom-defa615b7ff46bf36b3382d4396bc1082ce1ab29`.
 - Comparación actual con `main`: 427 commits adelante, 0 detrás. PR #2 sigue abierto como draft; no se ha fusionado.
 
+## Validación adicional de crash y protección de evidencias — 17-11-2026
+
+- **Crash real de proceso simulado:** prueba que inicia una ejecución del ledger en un subproceso y termina abruptamente con `os._exit`; un nuevo proceso reconcilia el evento `started` como `interrupted`, conserva la cadena y confirma idempotencia. Es una simulación reproducible de terminación abrupta, no de fallo físico de disco/host.
+- **Evidencias de herramientas:** directorio privado 0700 en POSIX, archivos 0600, creación exclusiva sin seguir symlinks, nombre de herramienta validado, flush/fsync y limpieza del archivo ante fallo de escritura. Se añadieron pruebas de permisos y rutas simbólicas/identificadores maliciosos.
+- **CI del HEAD exacto:** `c552c104a44fa85b962d92601fb214a7f65295ff`.
+  - Python tests, preflight, suite completa, manifiesto SHA-256 de wheels y SBOM CycloneDX: **success** — https://github.com/Xero-29/CYBER_AI/actions/runs/44107141259
+  - Docker build, suite completa y Ruff dentro del sandbox: **success** — https://github.com/Xero-29/CYBER_AI/actions/runs/44107141220
+- Comparación con `main`: 435 commits adelante, 0 detrás. PR #2 abierto como draft, no fusionado.
+
