@@ -24,6 +24,23 @@ class CapabilityInventoryTests(unittest.TestCase):
         self.assertFalse(result["tools"]["ruff"]["host_network_isolation_enforced"])
         self.assertTrue(result["tools"]["ruff"]["explicit_execute_required"])
 
+    @patch("capability_inventory.subprocess.run")
+    @patch("capability_inventory.shutil.which")
+    def test_yara_and_tshark_availability_comes_from_isolated_docker_image(self, which, run):
+        which.side_effect = lambda name: "/usr/bin/docker" if name == "docker" else None
+        run.return_value = __import__("subprocess").CompletedProcess(
+            ["docker"], 0, stdout="sha256:" + "a" * 64, stderr=""
+        )
+        result = capability_inventory.build_inventory()
+        self.assertTrue(result["tools"]["yara"]["available"])
+        self.assertTrue(result["tools"]["tshark"]["available"])
+        self.assertEqual(result["tools"]["yara"]["path"], "docker-image:sha256:" + "a" * 64)
+        self.assertTrue(result["tools"]["yara"]["host_network_isolation_enforced"])
+        self.assertEqual(
+            result["safety"]["local_host_egress_isolation"],
+            "docker_network_none_for_yara_tshark_only",
+        )
+
     def test_active_network_tools_require_scoped_authorization(self):
         active = [
             item for item in capability_inventory.TOOL_CATALOG
