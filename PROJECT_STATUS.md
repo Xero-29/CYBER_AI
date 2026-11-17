@@ -1,3 +1,54 @@
+# Estado verificado y brechas pendientes — 2026-11-17
+
+**HEAD de código:** `be2d7422942a8683a666d043a243cec0abbadcb6`  
+**Rama:** `codex/security-integrity-audit`  
+**Comparación con main:** 363 commits adelante, 0 detrás.  
+**PR #2:** abierto, no fusionado. `main` intacta.  
+**CI en este SHA:** Python tests — success; Docker sandbox — success.  
+- Python: https://github.com/Xero-29/CYBER_AI/actions/runs/44098838484
+- Docker: https://github.com/Xero-29/CYBER_AI/actions/runs/44098838473
+
+## Cambios recientes cerrados con CI
+- `preflight.py` detecta secretos literales en campos sensibles y nombres inválidos de variables `api_key_env`; los valores secretos no se imprimen en el diagnóstico.
+- El preflight revisa archivos `.env*` locales, rechaza symlinks y permisos legibles por grupo/otros; excluye plantillas públicas `.env.example`, `.env.sample` y `.env.template`. Recomienda permisos 0600.
+- Pruebas de ambas funciones: Python tests y Docker sandbox pasan en el SHA indicado.
+
+## Inventario de brechas: qué falta realmente
+### Requiere infraestructura o decisiones externas (no se puede cerrar solo desde este repositorio)
+1. **Gestión de claves institucional:** KMS/HSM o gestor de secretos externo, rotación, revocación, recuperación y segregación de funciones. El código admite claves HMAC por entorno, pero no despliega ni custodia esas claves.
+2. **Identidad y acceso:** RBAC/IdP, MFA, roles de aprobador y separación real entre operadores, revisores y administradores.
+3. **Auditoría resistente a administrador hostil:** anclaje de checkpoints fuera del host, almacenamiento WORM/inmutable y retención legal. La cadena SHA-256/HMAC local no es WORM.
+4. **Protección de respaldos:** cifrado en reposo, copias offsite, gestión/rotación de claves y simulacros reales de restauración/DR. El backup actual verifica integridad y admite HMAC, pero HMAC no cifra.
+5. **Aislamiento fuerte:** microVM/VM desechable, pruebas de escape y separación para malware/herramientas hostiles. Docker comparte kernel.
+6. **Proveedores IA reales:** pruebas con cuentas y servicios reales de Ollama/OpenAI/Anthropic/Gemini, cuotas, latencia, fallos de red, costes, límites y regresiones.
+7. **Conocimiento y legalidad:** revisión experta de las 138 fuentes externas (licencia, procedencia, vigencia y exactitud); embeddings reales y evaluación experta por dominio. Las 48 guías propias offline no equivalen a corpus exhaustivo.
+8. **Operación:** pruebas de carga/estrés, RPO/RTO, pérdida de host, concurrencia multiusuario, observabilidad integrada, alertas y simulacros de respuesta.
+9. **Gobierno del release:** revisión independiente, decisión de licencia del propietario, branch protection/required checks y autorización de publicación.
+
+### Implementable en código, pero todavía requiere trabajo y CI adicional
+1. **Dependencias reproducibles:** añadir hashes de artefactos verificados a un lock multiplataforma; hoy hay versiones fijadas, no hashes de distribución. No inventar hashes.
+2. **Herramientas e imágenes:** fijar versiones/digests de cada herramienta e imagen, validar procedencia y añadir pruebas de compatibilidad por plataforma.
+3. **Biblioteca documental:** fixtures adversariales de PDF/Office, límites de extracción, OCR opcional, deduplicación/versionado y citas de fragmento.
+4. **Skillbook:** ampliar pruebas de expiración/obsolescencia, rollback, replay, revocación de aprobación y regresión automática de cada versión. La promoción ya exige evidencia y firma HMAC, pero el servicio de identidad/clave sigue externo.
+5. **Ledger y resiliencia:** ampliar pruebas de crash entre escritura de inicio/resultado, disco lleno, SQLite busy/corrupción y recuperación sin duplicación; el reconciliador existente es manual y no recupera resultados perdidos.
+6. **Preflight:** integrar comprobaciones de permisos de directorios de datos, claves locales y configuración efectiva de despliegue, sin filtrar secretos.
+
+## Capacidades presentes — no confundir con certificación
+- 48 áreas y 48 paquetes metodológicos offline; 138 fuentes externas catalogadas, aún no aprobadas/ingeridas en bloque.
+- Biblioteca SQLite, ingesta transaccional, indexación híbrida FTS5/vectorial, RRF, reindexación y evaluación sintética.
+- Memoria de lecciones y Skillbook con evidencias, versiones y aprobación HMAC.
+- Adaptadores Ollama, OpenAI-compatible, Anthropic y Gemini; plugins por entry points.
+- Inventario de herramientas con ejecución local acotada; herramientas de red no quedan habilitadas por defecto.
+- Sandbox Docker endurecido; no sustituye microVM.
+- Ledger append-only local con hash chain, cierre de ejecuciones, checkpoints HMAC y reconciliación manual.
+- Backups SQLite con manifiesto, SHA-256, restauración segura y firma HMAC opcional; no cifrados ni offsite.
+- SBOM CycloneDX y procedencia CI; lock fijado por versión, sin hashes de artefactos.
+- Auditoría de conocimiento endurecida frente a rutas absolutas, traversal y symlinks.
+
+**Criterio:** no declarar el sistema completo/certificado hasta tener implementación, pruebas reproducibles, evidencia del SHA final y validación operacional independiente. Las brechas que requieren credenciales, infraestructura, decisiones legales o personal externo se entregan como lista de puesta en marcha; no se simulan.
+
+---
+
 # Estado actual verificado — 2026-11-17
 
 **HEAD verificado:** `b2477cff69e72b2576656b9e2b5ae4841547b667`  
