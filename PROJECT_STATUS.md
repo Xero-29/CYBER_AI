@@ -1,36 +1,29 @@
 # Estado canónico vigente — 2026-11-17
 
-> Esta sección registra el último código funcional verificado; los bloques inferiores conservan el historial.
-
 **Rama:** `main`  
-**Código funcional verificado:** `6fa5da29c23f2d39c79ea93adb3a1fbb1018a0bf`.  
-**CI Python:** run `44179766971` — **594 pruebas aprobadas, 1 omitida**.  
-**CI Docker sandbox:** run `44179766961` — **success**, build de ambas imágenes, verificación completa y Ruff en el sandbox.  
+**Último commit verificado en CI:** `0767cd68d418f7bfbb69bbe336106a9e869de563` (plan maestro).  
+**CI Python:** [run 44181807943](https://github.com/Xero-29/CYBER_AI/actions/runs/44181807943) — **594 pruebas aprobadas, 1 omitida**.  
+**CI Docker sandbox:** [run 44181807961](https://github.com/Xero-29/CYBER_AI/actions/runs/44181807961) — **success**.  
+**Plan de cierre:** [docs/PROJECT_COMPLETION_PLAN.md](docs/PROJECT_COMPLETION_PLAN.md).  
+**Matriz vigente:** [docs/IMPLEMENTATION_MATRIX.md](docs/IMPLEMENTATION_MATRIX.md).  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17`, sin modificar.
 
-## Último cambio: memoria, Skills, diagnóstico y herramientas — 2026-11-17
+## Estado real resumido
 
-### Ciclo de aprendizaje
-- `learning_memory.read_lessons` verifica la firma VERITAS y vuelve a contrastar IDs, hashes, namespace, estado de las ejecuciones y revisiones independientes contra el ledger actual. Si la evidencia falta, cambia o el ledger no es íntegro, la lección no se inyecta.
-- `skillbook.search_skills` verifica la cadena append-only y el snapshot vigente de cada Skill antes de recuperarla. Una Skill alterada o con historial roto queda excluida del contexto.
-- `learning_cycle_audit.py` inspecciona ledger, memoria, versiones de Skills, ejecuciones interrumpidas y revisiones pendientes. No modifica eventos ni Skills; admite informe JSON privado.
-- `ExecutionLedger(..., initialize=False)` permite auditorías sin crear ni migrar el ledger.
-- Se añadieron pruebas de evidencia ausente, hash alterado, ledger corrupto, historial de Skill manipulado, eventos huérfanos, escritura segura y modo de solo lectura.
+- El último cambio funcional de memoria, Skills y adaptadores sigue siendo `6fa5da29c23f2d39c79ea93adb3a1fbb1018a0bf`; el commit `0767cd68` añadió el plan maestro. La suite Python del commit del plan ejecutó 594 pruebas, con 1 omitida; Docker sandbox terminó correctamente.
+- Herramientas: 21 declaradas, 20 IDs `TOOL_SPECS`, 17 adaptadores host (16 local/offline y Nmap scoped), pip-audit bloqueado, YARA/TShark en Docker y Nuclei con runner separado. El catálogo no garantiza instalación.
+- Conocimiento: 48 paquetes, perfiles, agendas y dossiers exploratorios; profundidad aún no validada. El preflight registró 138 fuentes de investigación, 0 revisadas y 276 verificaciones pendientes en el commit probado.
+- Agentes y proveedores están implementados, pero falta evaluar calidad semántica, robustez y coste con proveedores reales.
+- Memoria y Skillbook verifican evidencia local; faltan firmante externo, identidad y doble aprobación.
+- Adaptadores host no tienen aislamiento general; Nmap no fuerza aislamiento egress del sistema operativo; Nuclei requiere DNS pinning y egress enforcement.
+- No se han validado operacionalmente todos los binarios, modelos, escáneres, laboratorios, restauración DR ni cargas reales.
+- Windows continúa aplazado.
 
-### Herramientas
-- Se agregaron adaptadores locales para OSV-Scanner (`--offline`), Grype (actualización automática y fuentes externas deshabilitadas), Gitleaks (redacción total), Zeek (solo PCAP/PCAPNG/CAP y workspace temporal) y Volatility 3 (modo offline, plugin allowlisted y caché temporal).
-- Se añadió Nmap con autorización explícita `--authorized-network`, IP/CIDR literal de máximo 16 direcciones, allowlist `CYBER_AI_NMAP_ALLOWED_CIDRS`, TCP connect limitado a 100 puertos, sin NSE, DNS ni evasión.
-- El inventario ahora registra **21 herramientas declaradas, 20 IDs en TOOL_SPECS y 1 herramienta con runner separado/catalogación fuera de TOOL_SPECS (Nuclei)**. pip-audit continúa registrado pero bloqueado por política de red.
-- Se corrigió el registro de códigos de salida con hallazgos: Gitleaks puede terminar con código 1 y seguir siendo un escaneo completado, sin confundir hallazgos con fallo del proceso.
+**Interpretación:** CI verde demuestra que el código y los contratos probados pasan en ese entorno. No demuestra cobertura experta de los dominios, eficacia de hallazgos, aislamiento frente a cargas hostiles ni preparación para producción.
 
-### Límites pendientes
-- OSV-Scanner y Grype requieren bases locales; falta un preflight que compruebe su presencia, esquema y vigencia antes de declarar disponibilidad.
-- Nmap tiene alcance limitado por software, pero **no** aislamiento de egress a nivel del sistema operativo. Falta aplicar firewall/sandbox de red obligatorio.
-- Los adaptadores host no tienen sandbox general. pip-audit sigue bloqueado y Nuclei requiere completar filtrado de egress y DNS pinning.
-- La memoria y promoción de Skills siguen dependiendo de una clave HMAC externa; falta firma independiente KMS/HSM, identidad del aprobador y doble control.
-- El benchmark de regresión requiere consultas y juicios de relevancia revisados sobre Skills reales; no se fabricaron etiquetas ni resultados.
-- No se han ejecutado modelos LLM reales, escáneres reales, laboratorios de explotación/forense ni pruebas locales del usuario. CI valida código, no eficacia semántica ni exactitud de hallazgos.
-- Windows sigue aplazado. La adquisición externa de conocimiento continúa con descargas deshabilitadas y licencias pendientes de revisión por documento.
+## Historial de cambios
+
+El contenido histórico que sigue registra implementaciones y validaciones de commits anteriores. No debe leerse como estado del HEAD actual si no enlaza explícitamente un SHA y un workflow vigentes.
 
 ## Integración de dominios, herramientas y Skills
 
