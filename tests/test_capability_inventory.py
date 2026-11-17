@@ -65,6 +65,9 @@ class CapabilityInventoryTests(unittest.TestCase):
             result["summary"]["registered"] - result["summary"]["adapter_registered"],
         )
         self.assertIn("adapter_registered", result["tools"]["ruff"])
+        self.assertEqual(result["domain_matrix"]["manifest_area_count"], 48)
+        self.assertTrue(result["domain_matrix"]["all_areas_mapped"])
+        self.assertFalse(result["domain_matrix"]["operational_coverage_claimed"])
 
 if __name__ == "__main__":
     unittest.main()
