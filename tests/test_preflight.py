@@ -196,5 +196,49 @@ class PreflightTests(unittest.TestCase):
         self.assertEqual(checks[0]["status"], "warning")
         self.assertIn("se validan al cargarlo", checks[0]["detail"])
 
+
+    def test_data_directory_requires_private_permissions(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            data = root / "data"
+            data.mkdir()
+            data.chmod(0o755)
+            findings = preflight.validate_data_permissions(root)
+        self.assertEqual(len(findings), 1)
+        self.assertIn("chmod 700", findings[0]["reason"])
+
+    def test_private_data_directory_and_nested_directory_are_accepted(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            nested = root / "data" / "nested"
+            nested.mkdir(parents=True)
+            (root / "data").chmod(0o700)
+            nested.chmod(0o700)
+            findings = preflight.validate_data_permissions(root)
+        self.assertEqual(findings, [])
+
+    def test_sensitive_local_key_file_rejects_group_or_world_access(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            data = root / "data"
+            data.mkdir()
+            data.chmod(0o700)
+            key = data / "provider_private.key"
+            key.write_text("fixture", encoding="utf-8")
+            key.chmod(0o644)
+            findings = preflight.validate_data_permissions(root)
+        self.assertEqual(len(findings), 1)
+        self.assertIn("chmod 600", findings[0]["reason"])
+
+    def test_data_symlink_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            outside = root / "outside"
+            outside.mkdir()
+            (root / "data").symlink_to(outside, target_is_directory=True)
+            findings = preflight.validate_data_permissions(root)
+        self.assertEqual(len(findings), 1)
+        self.assertIn("enlace simbólico", findings[0]["reason"])
+
 if __name__ == "__main__":
     unittest.main()
