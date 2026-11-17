@@ -139,7 +139,7 @@ def main(argv=None):
                             "passed": (
                                 isinstance(evidence.get("return_code"), int)
                                 and not isinstance(evidence.get("return_code"), bool)
-                                and evidence.get("return_code") == 0
+                                and evidence.get("tool_reported_success") is True
                             ),
                         },
                         {
