@@ -48,7 +48,9 @@ class ToolAdapterTests(unittest.TestCase):
         version_run.return_value = subprocess.CompletedProcess(["ruff", "--version"], 0, stdout="ruff 0.14.5\n", stderr="")
         process = FakeProcess()
         popen.return_value = process
-        evidence = run_local_tool("ruff", "sample.py")
+        provenance = {"resolved_path": "/usr/bin/ruff", "sha256": "a" * 64}
+        with patch.object(tool_adapters, "_hash_binary", return_value=provenance):
+            evidence = run_local_tool("ruff", "sample.py")
         command = popen.call_args.args[0]
         self.assertEqual(command[:3], ["/usr/bin/ruff", "check", "--no-cache"])
         self.assertIn("--output-format=json", command)
@@ -58,9 +60,29 @@ class ToolAdapterTests(unittest.TestCase):
         self.assertEqual(evidence["parsed_json"], [])
         self.assertFalse(evidence["network_access"])
         self.assertEqual(len(evidence["target_sha256"]), 64)
+        self.assertEqual(evidence["tool_binary_sha256"], "a" * 64)
+        self.assertEqual(evidence["tool_binary_sha256_after"], "a" * 64)
+        self.assertFalse(evidence["tool_binary_modified"])
 
     @patch("tool_adapters.subprocess.Popen")
     @patch("tool_adapters.shutil.which", return_value="/usr/bin/semgrep")
+    @patch("tool_adapters.subprocess.Popen")
+    @patch("tool_adapters.shutil.which", return_value="/usr/bin/ruff")
+    @patch("tool_adapters.subprocess.run")
+    def test_binary_replacement_during_execution_invalidates_evidence(self, version_run, which, popen):
+        version_run.return_value = subprocess.CompletedProcess(["ruff", "--version"], 0, stdout="ruff 0.14.5", stderr="")
+        popen.return_value = FakeProcess()
+        hashes = [
+            {"resolved_path": "/usr/bin/ruff", "sha256": "a" * 64},
+            {"resolved_path": "/usr/bin/ruff", "sha256": "a" * 64},
+            {"resolved_path": "/usr/bin/ruff", "sha256": "c" * 64},
+        ]
+        with patch.object(tool_adapters, "_hash_binary", side_effect=hashes):
+            evidence = run_local_tool("ruff", "sample.py")
+        self.assertEqual(evidence["status"], "integrity_error")
+        self.assertTrue(evidence["tool_binary_modified"])
+        self.assertFalse(evidence["tool_reported_success"])
+
     def test_semgrep_requires_local_config(self, which, popen):
         with self.assertRaisesRegex(ToolExecutionError, "configuración local"):
             run_local_tool("semgrep", "sample.py")
@@ -84,7 +106,9 @@ class ToolAdapterTests(unittest.TestCase):
     def test_timeout_is_recorded(self, version_run, which, popen):
         version_run.return_value = subprocess.CompletedProcess(["bandit", "--version"], 0, stdout="Bandit 1.8.6", stderr="")
         popen.return_value = FakeProcess(timeout=True)
-        evidence = run_local_tool("bandit", "sample.py", timeout=1)
+        provenance = {"resolved_path": "/usr/bin/bandit", "sha256": "b" * 64}
+        with patch.object(tool_adapters, "_hash_binary", return_value=provenance):
+            evidence = run_local_tool("bandit", "sample.py", timeout=1)
         self.assertEqual(evidence["status"], "timeout")
         self.assertIsNone(evidence["return_code"])
 
