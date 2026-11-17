@@ -28,6 +28,24 @@ class KnowledgeEvaluationTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "duplicado"):
                 knowledge_eval.load_dataset(path)
 
+    def test_rejects_duplicates_after_normalization(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "cases.jsonl"
+            first = {
+                "id": "case", "query": "api",
+                "relevant_categories": ["cybersecurity:api"],
+            }
+            second = {
+                "id": " case ", "query": "api",
+                "relevant_categories": ["cybersecurity:api"],
+            }
+            path.write_text(
+                json.dumps(first) + "\n" + json.dumps(second) + "\n",
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(ValueError, "duplicado"):
+                knowledge_eval.load_dataset(path)
+
     def test_rejects_symlink_dataset(self):
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp) / "cases.jsonl"
