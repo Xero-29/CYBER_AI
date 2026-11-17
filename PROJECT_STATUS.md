@@ -24,6 +24,7 @@
 
 - El lock SHA-256 actual cubre solo CPython 3.12.x/Linux x86_64/glibc >= 2.26. Windows, macOS, ARM y otras plataformas necesitan hashes verificados propios.
 - Los hashes fijan los wheels descargados y comparados con el lock; no demuestran por sí solos la procedencia del publicador ni sustituyen firmas o attestations upstream.
+- `requirements-documents.txt` conserva rangos de versión sin hashes; los extractores documentales opcionales no están cubiertos por el lock base ni por los SBOM de CI.
 - Docker comparte el kernel del host; no equivale a una microVM.
 - La allowlist HMAC local no sustituye firma asimétrica, KMS/HSM ni custodia independiente.
 - La validación técnica de herramientas no demuestra la verdad, explotabilidad ni exhaustividad de un hallazgo.
@@ -38,6 +39,7 @@
 6. Validar aislamiento fuerte de procesos/red y extracción/OCR en sandbox.
 7. Revisar con especialistas la calidad, licencias, vigencia, cobertura y umbrales de la biblioteca de conocimiento.
 8. Configurar branch protection/required checks, revisión independiente, observabilidad, alertas y respuesta a incidentes.
+9. Generar lock SHA-256 y SBOM de plataforma para `requirements-documents.txt`; sus rangos actuales no son reproducibles.
 
 **Conclusión provisional:** se preparó una rama de integración que conserva el trabajo reciente de `main` y añade locks reproducibles y SBOM de ambos entornos sin tocar `main`. No está certificada ni lista para producción. El siguiente criterio es CI verde sobre el HEAD exacto y revisión del PR; después quedan las validaciones operacionales externas enumeradas arriba.
 
