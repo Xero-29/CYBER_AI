@@ -80,9 +80,16 @@ def audit_learning_cycle(*, max_review_age_days: int = 180) -> dict:
         records_on_disk = _memory_line_count(learning_memory.MEMORY_FILE)
         memory["records_on_disk"] = records_on_disk
         if memory_key_configured:
-            verified = learning_memory.read_lessons()
+            if ledger is None or not ledger_check.get("valid"):
+                verified = []
+                memory_status = "degraded" if records_on_disk else "verified"
+            else:
+                verified = learning_memory.read_lessons(ledger=ledger)
+                memory_status = (
+                    "verified" if len(verified) == records_on_disk else "degraded"
+                )
             memory.update({
-                "status": "verified" if len(verified) == records_on_disk else "degraded",
+                "status": memory_status,
                 "verified_records": len(verified),
                 "rejected_or_unverifiable_records": max(0, records_on_disk - len(verified)),
             })
