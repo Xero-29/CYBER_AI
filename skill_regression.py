@@ -141,7 +141,7 @@ def main(argv=None):
             and report["metrics"]["mrr_at_k"] >= args.min_mrr
         )
         report["passed"] = passed
-        serialized = json.dumps(report, ensure_ascii=False, indent=2) + "\\n"
+        serialized = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
         if args.output:
             if args.output.is_symlink():
                 raise SkillRegressionError("No se permite escribir el informe sobre un symlink.")
