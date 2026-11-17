@@ -3,30 +3,31 @@
 > Esta sección es la fuente de verdad vigente. Los bloques históricos que aparecen debajo documentan etapas anteriores y no deben interpretarse como el estado actual.
 
 **Rama:** `main`  
-**HEAD antes de esta actualización:** `cb25536fab1b2fd980f268d7f78fa112e342e117`  
+**HEAD antes de esta actualización:** `9bca5cc15988eb76fea5f8b65f017f80bc80b114`  
 **Último cambio funcional:** `2f472c9b734c3cdf38c4c69a5f51a1186b2e8d53`  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17` (no modificado).
 
 ## Integración realizada
 
-- `cyber_ai.py --ask "tarea"` envía tareas a DIRECTOR; admite `--agent` y `--no-knowledge`.
-- DIRECTOR selecciona el especialista y activa `agent_runner.py --knowledge` por defecto; `--no-knowledge` desactiva esa recuperación.
-- El agente incorpora Skills activas y lecciones aprobadas; con ECO, embeddings y biblioteca indexada disponibles, también incorpora resultados de la búsqueda híbrida de conocimiento.
-- El texto de tarea se transmite mediante `--task-text`, evitando perder espacios o saltos de línea.
-- Se añadieron pruebas de enrutamiento de la entrada principal, activación por defecto de conocimiento y exclusión explícita.
+- `cyber_ai.py --ask "tarea"` delega en DIRECTOR; admite especialista manual y exclusión explícita de conocimiento.
+- `cyber_ai.py --team "tarea"` delega en el orquestador multiagente con supervisión del objetivo global.
+- DIRECTOR activa la recuperación híbrida de conocimiento por defecto.
+- El orquestador multiagente activa conocimiento por defecto en las etapas y revisiones; una política explícita de etapa o flujo puede desactivarlo. Las políticas no booleanas se rechazan.
+- El agente incorpora Skills activas y lecciones aprobadas; con ECO, embeddings y biblioteca indexada disponibles, recupera también conocimiento compartido.
+- Se añadieron pruebas de enrutamiento CLI y de política de conocimiento para los flujos multiagente.
 - README y matriz de implementación actualizados.
 
 ## Límites de esta integración
 
 - La recuperación semántica requiere un proveedor de embeddings configurado y la biblioteca indexada; no se ha validado con un proveedor real.
-- El flujo de agente no ejecuta automáticamente herramientas de seguridad. Las herramientas mantienen autorización y ejecución explícitas.
-- El orquestador multiagente, el planificador de capacidades, los escáneres y el análisis de informes todavía no están integrados en un único ciclo de extremo a extremo.
-- Las pruebas nuevas están versionadas, pero no se han ejecutado en esta sesión. CI sobre el HEAD actual no tiene evidencia recuperable.
+- Las herramientas de seguridad no se ejecutan automáticamente. Conservan autorización y ejecución explícitas; el orquestador aún no coordina la ejecución de herramientas.
+- Planificador, inventario/selector de capacidades, orquestador, ejecución autorizada de herramientas, validación y evidencia no forman todavía un único ciclo extremo a extremo.
+- Las pruebas nuevas están versionadas, pero no se han ejecutado en esta sesión. CI sobre el HEAD actual está pendiente.
 - No se afirma preparación para producción ni cierre de validación operacional.
 
 ## Siguiente brecha de integración
 
-Conectar planificador, selección de capacidades, orquestador multiagente, herramientas autorizadas y cierre de evidencia/ledger mediante contratos compartidos. La automatización debe conservar autorizaciones explícitas, límites de alcance y controles de seguridad.
+Conectar el planificador y selector de capacidades al informe del orquestador, y vincular las herramientas autorizadas y sus resultados al flujo de evidencia/ledger sin ampliar permisos implícitamente.
 
 ---
 
