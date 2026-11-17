@@ -49,6 +49,11 @@ jobs:
           python dependency_artifact_manifest.py \
             --wheelhouse "$RUNNER_TEMP/cyber-ai-wheelhouse" \
             --output "$RUNNER_TEMP/cyber-ai-dependency-artifacts.json"
+      - name: Capture hardened sandbox tool lock
+        run: |
+          mkdir -p "$RUNNER_TEMP/sandbox-wheelhouse"
+          python -m pip download --only-binary=:all: --dest "$RUNNER_TEMP/sandbox-wheelhouse" -r sandbox/requirements.in
+          python wheel_lock_generator.py --wheelhouse "$RUNNER_TEMP/sandbox-wheelhouse" --requirements sandbox/requirements.in --output "$RUNNER_TEMP/sandbox-requirements.lock"
       - name: Generate CycloneDX SBOM
         run: |
           python sbom_generator.py \
@@ -81,5 +86,6 @@ jobs:
             ${{ runner.temp }}/cyber-ai-sbom.cdx.json
             ${{ runner.temp }}/cyber-ai-sbom-provenance.json
             ${{ runner.temp }}/cyber-ai-dependency-artifacts.json
+            ${{ runner.temp }}/sandbox-requirements.lock
           if-no-files-found: error
           retention-days: 90
