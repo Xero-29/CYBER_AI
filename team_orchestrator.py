@@ -869,6 +869,14 @@ def execute_workflow(
                 confirmed=confirm_tool_execution,
             )
             report["tool_execution"] = tool_execution
+            capability_plan["tool_execution_started"] = True
+            capability_plan["tool_execution_results"] = tool_execution["results"]
+            report["capability_plan"]["tool_execution_started"] = True
+            report["capability_plan"]["tool_execution_results"] = tool_execution["results"]
+            capability_plan_path.write_text(
+                json.dumps(capability_plan, ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
             tool_context = json.dumps(tool_execution, ensure_ascii=False, indent=2)
             history.append({
                 "agent": "TOOL_EXECUTION_EVIDENCE",
@@ -880,7 +888,7 @@ def execute_workflow(
                 ),
             })
             save_report(report_path, report)
-        except (ToolExecutionError, OSError, ValueError, RuntimeError) as error:
+        except Exception as error:
             report["tool_execution"] = {
                 "status": "blocked",
                 "error_type": type(error).__name__,
