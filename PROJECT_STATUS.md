@@ -1,3 +1,20 @@
+# Última validación — 2026-11-17
+
+**HEAD:** `1a6d2ca20fe480e953fa6d464bd7fd957dbac239`  
+**CI en este SHA:** Python tests — success; Docker sandbox — success.  
+- Python: https://github.com/Xero-29/CYBER_AI/actions/runs/44099162589
+- Docker: https://github.com/Xero-29/CYBER_AI/actions/runs/44099170617
+
+## Endurecimiento adicional del preflight
+- Los archivos `.env*` reales se rechazan si grupo u otros tienen cualquier permiso (lectura, escritura o ejecución); solo se aceptan permisos del propietario, recomendación `chmod 600`.
+- Se rechazan symlinks para archivos `.env*`; se excluyen plantillas públicas.
+- Se mantiene detección de secretos literales y validación de referencias `api_key_env`.
+- Prueba añadida para permisos de escritura de grupo. Ambos workflows pasan en el SHA actual.
+
+El inventario detallado de brechas y límites sigue en la sección inmediatamente inferior y en el resto de este documento. No se declara certificación ni cierre operacional.
+
+---
+
 # Estado verificado y brechas pendientes — 2026-11-17
 
 **HEAD de código:** `be2d7422942a8683a666d043a243cec0abbadcb6`  
