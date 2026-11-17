@@ -36,6 +36,8 @@ def _docker_image_id(docker, image):
 
 def run_isolated_tool(tool_id, target, *, config_path=None, timeout=180,
                       allow_external=False):
+    if os.name != "posix":
+        raise ToolExecutionError("El sandbox Docker de análisis está habilitado solo en sistemas POSIX; Windows queda bloqueado hasta su validación.")
     if tool_id not in {"yara", "tshark"}:
         raise ToolExecutionError("La herramienta no está habilitada para el sandbox Docker.")
     path = _confined_path(target, allow_external=allow_external)
@@ -60,7 +62,6 @@ def run_isolated_tool(tool_id, target, *, config_path=None, timeout=180,
     allowlist = verify_tool_allowed(tool_id, image_id)
     before = _hash_target(path)
     started = time.monotonic()
-    target_mount = str(path) + (":/input:ro" if path.is_dir() else ":/input/target:ro")
     if os.name == "posix" and hasattr(os, "getuid") and os.getuid() != 0:
         container_user = f"{os.getuid()}:{os.getgid()}"
     else:
