@@ -1,6 +1,7 @@
 """Transactional append-only execution evidence ledger for CYBER_AI."""
 import hashlib
 import json
+import math
 import os
 import re
 import sqlite3
@@ -204,8 +205,13 @@ class ExecutionLedger:
         finally:
             db.close()
 
-    def reconcile_interrupted(self, *, namespace=None):
-        """Atomically close orphaned starts as interrupted, never as successful."""
+    def reconcile_interrupted(self, *, namespace=None, stale_after_seconds=300):
+        """Atomically close stale orphaned starts; call only after stopping workers."""
+        if (isinstance(stale_after_seconds, bool)
+                or not isinstance(stale_after_seconds, (int, float))
+                or not math.isfinite(stale_after_seconds) or stale_after_seconds < 0):
+            raise LedgerError("stale_after_seconds debe ser finito y no negativo.")
+        cutoff = datetime.now(timezone.utc).timestamp() - stale_after_seconds
         db = self.connect()
         reconciled = []
         try:
@@ -253,6 +259,12 @@ class ExecutionLedger:
 
             for start in starts:
                 if start["event_id"] in closed:
+                    continue
+                try:
+                    started_at = datetime.fromisoformat(start["created_at"]).timestamp()
+                except (TypeError, ValueError, OverflowError) as error:
+                    raise LedgerError("Fecha de inicio inválida; no se reconcilia.") from error
+                if started_at > cutoff:
                     continue
                 event_id = "interrupted-" + start["event_id"]
                 created_at = datetime.now(timezone.utc).isoformat()
