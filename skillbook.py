@@ -342,7 +342,8 @@ def list_skill_versions(skill_id):
     initialize()
     with connect() as db:
         rows = db.execute(
-            """SELECT version, change_type, actor, snapshot_json, created_at
+            """SELECT version, change_type, actor, snapshot_json, created_at,
+                      previous_hash, entry_hash
                FROM skill_versions WHERE skill_id=? ORDER BY version""",
             (skill_id,),
         ).fetchall()
@@ -353,6 +354,8 @@ def list_skill_versions(skill_id):
             "actor": row["actor"],
             "snapshot": json.loads(row["snapshot_json"]),
             "created_at": row["created_at"],
+            "previous_hash": row["previous_hash"],
+            "entry_hash": row["entry_hash"],
         }
         for row in rows
     ]
