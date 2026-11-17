@@ -113,6 +113,8 @@ def main():
     args = parser.parse_args()
 
     if args.team:
+        if args.agent or args.no_knowledge:
+            parser.error("--agent y --no-knowledge no se aplican al flujo --team.")
         command = [
             sys.executable,
             str(Path(__file__).resolve().parent / "team_orchestrator.py"),
@@ -120,7 +122,7 @@ def main():
         ]
         if args.workflow:
             command.extend(["--workflow", args.workflow])
-        command.extend(args.team.split())
+        command.append(args.team)
         result = subprocess.run(command, cwd=Path(__file__).resolve().parent, check=False)
         return result.returncode
 
