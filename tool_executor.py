@@ -158,7 +158,7 @@ def main(argv=None):
                             "passed": (
                                 isinstance(evidence.get("return_code"), int)
                                 and not isinstance(evidence.get("return_code"), bool)
-                                and evidence.get("tool_reported_success") is True
+                                and _tool_succeeded(evidence)
                             ),
                         },
                         {
