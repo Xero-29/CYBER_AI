@@ -10,9 +10,11 @@ import tool_executor
 class FakeLedger:
     def __init__(self, fail_terminal=False):
         self.statuses = []
+        self.events = []
         self.fail_terminal = fail_terminal
 
     def append(self, **event):
+        self.events.append(event)
         self.statuses.append(event["status"])
         if event["status"] == "started":
             return {"event_id": "start-1"}
@@ -55,7 +57,7 @@ class ToolExecutorLedgerTests(unittest.TestCase):
         result, output = self.invoke(ledger, evidence)
         self.assertEqual(result, 1)
         self.assertEqual(ledger.statuses, ["started", "failed"])
-        terminal = json.loads(output)["ledger_event"]
+        terminal = ledger.events[-1]
         self.assertEqual(terminal["status"], "failed")
         self.assertFalse(terminal["validator_results"][0]["passed"])
         self.assertFalse(terminal["validator_results"][1]["passed"])
