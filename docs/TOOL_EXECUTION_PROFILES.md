@@ -62,6 +62,39 @@ docker image inspect --format '{{.Id}}' cyber-ai-analysis-sandbox:1.0
 
 Incluye el hash sin el prefijo `sha256:` en las entradas de allowlist para `yara` y `tshark`. La firma debe generarse con `sign_tool_allowlist` y una clave de al menos 32 bytes, mantenida fuera del repositorio. Configura `CYBER_AI_TOOL_ALLOWLIST_PATH` y `CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY` antes de ejecutar. El contenedor se ejecuta con red deshabilitada, root filesystem de solo lectura, objetivo/reglas en solo lectura, sin capacidades, no-new-privileges, límite de procesos, memoria y CPU, y sin montar el socket Docker. YARA recibe reglas locales mediante `CYBER_AI_YARA_RULES`.
 
+Ejemplo para incorporar esos dos IDs a una allowlist existente sin perder las entradas firmadas anteriores (requiere que `CYBER_AI_TOOL_ALLOWLIST_PATH` y `CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY` ya estén configuradas):
+
+```bash
+IMAGE_ID="$(docker image inspect --format '{{.Id}}' cyber-ai-analysis-sandbox:1.0)"
+export CYBER_AI_SANDBOX_IMAGE_SHA256="${IMAGE_ID#sha256:}"
+python - <<'PY'
+import json, os, tempfile
+from pathlib import Path
+from tool_allowlist import load_signed_tool_allowlist, sign_tool_allowlist
+
+path = Path(os.environ["CYBER_AI_TOOL_ALLOWLIST_PATH"])
+key = os.environ["CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY"].encode()
+digest = os.environ["CYBER_AI_SANDBOX_IMAGE_SHA256"]
+tools = load_signed_tool_allowlist(path, key) if path.exists() else {}
+tools.update({
+    "yara": {"sha256": digest},
+    "tshark": {"sha256": digest},
+})
+signed = sign_tool_allowlist(tools, key)
+temporary = path.with_name(path.name + ".new")
+if temporary.exists() or temporary.is_symlink():
+    raise SystemExit("El archivo temporal ya existe; revísalo antes de continuar.")
+fd = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+with os.fdopen(fd, "w", encoding="utf-8") as stream:
+    json.dump(signed, stream, ensure_ascii=False, indent=2)
+    stream.write("\\n")
+os.replace(temporary, path)
+os.chmod(path, 0o600)
+PY
+```
+
+Para YARA define también `CYBER_AI_YARA_RULES` con la ruta de un archivo de reglas local revisado. El ejecutor de YARA/TShark exige que la ruta objetivo y las reglas sean legibles por el usuario que se ejecuta dentro del contenedor. El pipeline continúa exigiendo confirmación explícita.
+
 La imagen debe construirse y revisarse en un entorno confiable. El Docker daemon y el kernel del host siguen formando parte de la base de confianza; esto no equivale a una MicroVM.
 
 ## Límites no resueltos
