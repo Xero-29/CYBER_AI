@@ -110,6 +110,7 @@ No se promete una cobertura universal y perpetuamente completa de toda la cibers
 
 **Aceptación**
 - Pruebas de escape, acceso a rutas fuera del workspace, escritura del objetivo, acceso a secretos, egress, DNS rebinding, redirecciones, timeout y agotamiento de recursos.
+- Preflight de bases OSV/Grype read-only integrado: Grype con metadatos/antigüedad verificados; OSV con integridad estructural y limitación de frescura documentada.
 - Una herramienta local no puede abrir red por defecto.
 - Nmap/Nuclei no conectan fuera del alcance autorizado aunque el agente lo solicite.
 - La evidencia registra imagen/binario, versión, hash, política aplicada, objetivo, duración, salida y estado de aislamiento.
