@@ -109,6 +109,7 @@ def simulate_workflow(
 
     started = time.perf_counter()
     history: list[dict[str, Any]] = []
+    response_offsets: dict[str, int] = {}
     results = []
     status = "completed"
 
@@ -116,7 +117,9 @@ def simulate_workflow(
         agent = step["agent"]
         supplied = responses.get(agent)
         if isinstance(supplied, list):
-            response = supplied.pop(0) if supplied else _synthetic_response(agent, step)
+            offset = response_offsets.get(agent, 0)
+            response = supplied[offset] if offset < len(supplied) else _synthetic_response(agent, step)
+            response_offsets[agent] = offset + 1
         elif supplied is None:
             response = _synthetic_response(agent, step)
         else:
@@ -129,6 +132,7 @@ def simulate_workflow(
             "response": response if isinstance(response, str) else repr(response),
             "validation_errors": errors,
             "input_context_steps": len(history),
+            "input_context": [dict(entry) for entry in history],
             "simulated": True,
         }
         results.append(item)
