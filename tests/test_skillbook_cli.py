@@ -52,5 +52,32 @@ class SkillbookCliTests(unittest.TestCase):
         self.assertEqual(result, 2)
 
 
+
+    def test_deprecate_payload_calls_signed_revocation_api(self):
+        with patch.object(
+            skillbook_cli.skillbook,
+            "skill_deprecation_payload",
+            return_value='{"action":"deprecate"}',
+        ) as payload, patch("builtins.print"):
+            result = skillbook_cli.main([
+                "deprecate-payload", "--skill-id", "skill-1",
+                "--reason", "metodología obsoleta",
+            ])
+        self.assertEqual(result, 0)
+        payload.assert_called_once_with("skill-1", "metodología obsoleta")
+
+    def test_deprecate_command_calls_revocation_api(self):
+        with patch.object(
+            skillbook_cli.skillbook,
+            "deprecate_skill",
+            return_value={"status": "deprecated"},
+        ) as deprecate, patch("builtins.print"):
+            result = skillbook_cli.main([
+                "deprecate", "--skill-id", "skill-1",
+                "--reason", "metodología obsoleta", "--signature", "a" * 64,
+            ])
+        self.assertEqual(result, 0)
+        deprecate.assert_called_once_with("skill-1", "metodología obsoleta", "a" * 64)
+
 if __name__ == "__main__":
     unittest.main()
