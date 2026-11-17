@@ -184,6 +184,8 @@ def main():
         parser.error("--agent y --no-knowledge solo pueden utilizarse junto con --ask.")
 
     if args.scan:
+        if not args.confirm_authorized or not args.authorization_id:
+            parser.error("--scan requiere --confirm-authorized y --authorization-id.")
         try:
             result = scan_target(
                 args.scan,
