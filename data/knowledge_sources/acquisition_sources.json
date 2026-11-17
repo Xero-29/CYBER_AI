@@ -1,0 +1,265 @@
+{
+  "schema_version": "1.0.0",
+  "policy": {
+    "default_download_enabled": false,
+    "require_manual_license_review": true,
+    "require_manual_source_verification": true,
+    "require_https": true,
+    "no_paywall_bypass": true,
+    "no_automatic_execution": true,
+    "preserve_original_and_sha256": true
+  },
+  "sources": [
+    {
+      "id": "nist-csf-2",
+      "title": "NIST Cybersecurity Framework 2.0",
+      "publisher": "NIST",
+      "url": "https://csrc.nist.gov/pubs/cswp/29/final",
+      "landing_url": "https://csrc.nist.gov/pubs/cswp/29/final",
+      "type": "standard",
+      "license": "US Government work; verify item-specific notice",
+      "license_url": "https://www.nist.gov/open",
+      "areas": [
+        "foundations",
+        "governance",
+        "secure_arch",
+        "vuln_management",
+        "incident_response",
+        "business_continuity"
+      ],
+      "format": "PDF/HTML",
+      "cadence": "versioned",
+      "download_url": null
+    },
+    {
+      "id": "nist-sp-800-series",
+      "title": "NIST SP 800 Series",
+      "publisher": "NIST",
+      "url": "https://csrc.nist.gov/publications/sp",
+      "landing_url": "https://csrc.nist.gov/publications/sp",
+      "type": "standards_collection",
+      "license": "US Government work; verify item-specific notice",
+      "license_url": "https://www.nist.gov/open",
+      "areas": [
+        "foundations",
+        "governance",
+        "appsec",
+        "cloud",
+        "network",
+        "identity",
+        "forensics",
+        "incident_response",
+        "devsecops",
+        "crypto",
+        "privacy_engineering"
+      ],
+      "format": "PDF/HTML",
+      "cadence": "continuous",
+      "download_url": null
+    },
+    {
+      "id": "mitre-attack-stix",
+      "title": "MITRE ATT&CK STIX Data",
+      "publisher": "MITRE",
+      "url": "https://github.com/mitre-attack/attack-stix-data",
+      "landing_url": "https://github.com/mitre-attack/attack-stix-data",
+      "type": "machine_readable_dataset",
+      "license": "Apache-2.0 (verify repository version)",
+      "license_url": "https://github.com/mitre-attack/attack-stix-data/blob/master/LICENSE.txt",
+      "areas": [
+        "threat_intel",
+        "threat_hunting",
+        "red_team",
+        "soc_siem",
+        "incident_response"
+      ],
+      "format": "STIX JSON",
+      "cadence": "release",
+      "download_url": null
+    },
+    {
+      "id": "cisa-kev",
+      "title": "Known Exploited Vulnerabilities Catalog",
+      "publisher": "CISA",
+      "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog",
+      "landing_url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog",
+      "type": "machine_readable_dataset",
+      "license": "US Government work; verify dataset notice",
+      "license_url": "https://www.cisa.gov/about",
+      "areas": [
+        "vuln_management",
+        "threat_intel",
+        "incident_response"
+      ],
+      "format": "JSON/CSV",
+      "cadence": "continuous",
+      "download_url": "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json"
+    },
+    {
+      "id": "owasp-cheatsheets",
+      "title": "OWASP Cheat Sheet Series",
+      "publisher": "OWASP Foundation",
+      "url": "https://github.com/OWASP/CheatSheetSeries",
+      "landing_url": "https://github.com/OWASP/CheatSheetSeries",
+      "type": "technical_guidance",
+      "license": "CC BY-SA 4.0 (verify repository notice)",
+      "license_url": "https://github.com/OWASP/CheatSheetSeries/blob/master/LICENSE",
+      "areas": [
+        "appsec",
+        "api",
+        "identity",
+        "crypto",
+        "cloud",
+        "containers",
+        "devsecops",
+        "mobile",
+        "privacy_engineering"
+      ],
+      "format": "Markdown",
+      "cadence": "continuous",
+      "download_url": null
+    },
+    {
+      "id": "enisa-publications",
+      "title": "ENISA Publications",
+      "publisher": "ENISA",
+      "url": "https://www.enisa.europa.eu/publications",
+      "landing_url": "https://www.enisa.europa.eu/publications",
+      "type": "research_and_guidance",
+      "license": "Per-publication terms; manual review required",
+      "license_url": "https://www.enisa.europa.eu/legal-notice",
+      "areas": [
+        "governance",
+        "incident_response",
+        "business_continuity",
+        "threat_intel",
+        "iot_hardware",
+        "ot_ics"
+      ],
+      "format": "PDF/HTML",
+      "cadence": "continuous",
+      "download_url": null
+    },
+    {
+      "id": "usenix-security",
+      "title": "USENIX Security Symposium Proceedings",
+      "publisher": "USENIX",
+      "url": "https://www.usenix.org/publications/proceedings",
+      "landing_url": "https://www.usenix.org/publications/proceedings",
+      "type": "peer_reviewed_research",
+      "license": "Per-paper license; do not bulk-download",
+      "license_url": "https://www.usenix.org/about/terms",
+      "areas": [
+        "foundations",
+        "appsec",
+        "network",
+        "forensics",
+        "hardware_security",
+        "machine_learning",
+        "crypto",
+        "software_engineering"
+      ],
+      "format": "PDF/HTML",
+      "cadence": "annual",
+      "download_url": null
+    },
+    {
+      "id": "arxiv-cs-cr",
+      "title": "arXiv Cryptography and Security Research",
+      "publisher": "arXiv",
+      "url": "https://arxiv.org/list/cs.CR/recent",
+      "landing_url": "https://arxiv.org/list/cs.CR/recent",
+      "type": "preprints",
+      "license": "Per-paper license; inspect metadata",
+      "license_url": "https://arxiv.org/licenses/nonexclusive-distrib/1.0/",
+      "areas": [
+        "crypto",
+        "post_quantum_crypto",
+        "vulnerability_research",
+        "machine_learning",
+        "ai_security",
+        "ai_red_team"
+      ],
+      "format": "PDF/HTML",
+      "cadence": "daily",
+      "download_url": null
+    },
+    {
+      "id": "cfreds",
+      "title": "NIST Computer Forensic Reference Data Sets",
+      "publisher": "NIST",
+      "url": "https://cfreds.nist.gov/",
+      "landing_url": "https://cfreds.nist.gov/",
+      "type": "forensic_datasets",
+      "license": "Per-dataset terms; review before use",
+      "license_url": "https://cfreds.nist.gov/",
+      "areas": [
+        "forensics",
+        "cloud_forensics",
+        "malware",
+        "reverse"
+      ],
+      "format": "Images/archives",
+      "cadence": "periodic",
+      "download_url": null
+    },
+    {
+      "id": "cic-datasets",
+      "title": "Canadian Institute for Cybersecurity Datasets",
+      "publisher": "University of New Brunswick CIC",
+      "url": "https://www.unb.ca/cic/datasets/",
+      "landing_url": "https://www.unb.ca/cic/datasets/",
+      "type": "research_datasets",
+      "license": "Per-dataset terms; review before use",
+      "license_url": "https://www.unb.ca/cic/datasets/",
+      "areas": [
+        "network",
+        "machine_learning",
+        "threat_hunting",
+        "soc_siem",
+        "iot_hardware"
+      ],
+      "format": "PCAP/CSV/archives",
+      "cadence": "periodic",
+      "download_url": null
+    },
+    {
+      "id": "kubernetes-security",
+      "title": "Kubernetes Security Documentation",
+      "publisher": "Kubernetes",
+      "url": "https://kubernetes.io/docs/concepts/security/",
+      "landing_url": "https://kubernetes.io/docs/concepts/security/",
+      "type": "technical_documentation",
+      "license": "CC BY 4.0 (verify content scope)",
+      "license_url": "https://github.com/kubernetes/website/blob/main/LICENSE",
+      "areas": [
+        "containers",
+        "cloud",
+        "devsecops",
+        "secure_arch"
+      ],
+      "format": "HTML/Markdown",
+      "cadence": "continuous",
+      "download_url": null
+    },
+    {
+      "id": "york-bccc-datasets",
+      "title": "York University BCCC Cybersecurity Datasets",
+      "publisher": "York University",
+      "url": "https://www.yorku.ca/research/bccc/ucs-technical/cybersecurity-datasets/",
+      "landing_url": "https://www.yorku.ca/research/bccc/ucs-technical/cybersecurity-datasets/",
+      "type": "research_datasets",
+      "license": "Per-dataset terms; review before use",
+      "license_url": "https://www.yorku.ca/",
+      "areas": [
+        "network",
+        "machine_learning",
+        "malware",
+        "iot_hardware"
+      ],
+      "format": "Dataset catalogue",
+      "cadence": "periodic",
+      "download_url": null
+    }
+  ]
+}
