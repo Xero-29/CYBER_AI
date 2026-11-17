@@ -5,8 +5,8 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from workflow_contracts import WorkflowContractError, validate_workflow_definition
 import team_orchestrator
+from workflow_contracts import WorkflowContractError, validate_workflow_definition
 
 
 class WorkflowContractTests(unittest.TestCase):
@@ -97,6 +97,7 @@ class WorkflowContractTests(unittest.TestCase):
                 patch.object(team_orchestrator, "WORKFLOW_FILE", path),
                 patch.object(team_orchestrator, "load_config") as load_config,
             ):
+                with self.assertRaises(ValueError):
                     team_orchestrator.load_workflow("invalid")
                 load_config.assert_not_called()
 
@@ -123,6 +124,7 @@ class WorkflowContractTests(unittest.TestCase):
                 patch.object(team_orchestrator, "WORKFLOW_FILE", path),
                 patch.object(team_orchestrator, "load_config", return_value=config),
             ):
+                workflow = team_orchestrator.load_workflow("valid")
             self.assertEqual(workflow["steps"][0]["agent"], "NEXO")
             self.assertEqual(workflow["steps"][0]["objective"], "revisar")
             self.assertEqual(workflow["steps"][0]["mode"], "technical")
