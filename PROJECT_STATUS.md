@@ -131,4 +131,4 @@
 - Cobertura editorial: **48/48 dossiers exploratorios** y 48/48 agendas. No significa 48 revisiones sistemáticas, 48 documentos leídos ni investigaciones empíricas completadas.
 - Madurez: M1; no se declara M3/M4/M5. Los experimentos propuestos no se han ejecutado.
 - Pendiente: lectura integral, revisión sistemática de literatura académica, síntesis de evidencia, laboratorios, análisis estadístico, revisión experta y reproducción independiente.
-- CI del nuevo SHA pendiente; resultados de commits anteriores no validan estos cambios.
+- Validación del contenido de los 35 dossiers y del auditor: Python workflow `44142729195` **success** y Docker sandbox workflow `44142729114` **success**, ambos sobre SHA `6b352c0e113a3b5c192473960985d0587b3a851c`. `verify.sh` reportó 48 áreas, 48 agendas completas, 48 revisiones trazables, 68 fuentes registradas, 25 páginas/documentos con estado de revisión verificable y **522 pruebas** aprobadas. Docker construyó ambas imágenes, ejecutó la verificación completa y Ruff dentro del sandbox endurecido.
