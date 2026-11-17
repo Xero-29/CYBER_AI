@@ -15,6 +15,7 @@ from urllib.parse import urlparse
 
 from execution_policy import AuthorizationError, authorize_target
 from execution_ledger import ExecutionLedger
+from scan_result_validator import validate_scan_result
 
 
 def validate_target(target):
