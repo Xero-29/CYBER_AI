@@ -290,3 +290,4 @@ No declarar el sistema completo ni certificado hasta que cada brecha tenga códi
 - **Pruebas adicionales del ledger:** se cubre contención por bloqueo SQLite (writer ocupado) y diagnóstico ante un archivo de base de datos ilegible. Se comprueba que el intento bloqueado no deja eventos parciales y que la cadena previa permanece válida.
 - **Skillbook concurrente:** prueba con dos promociones HMAC simultáneas; ambas deben devolver el mismo ID y dejar una sola Skill y una sola versión inicial.
 - **Estado CI:** pendiente de finalización para el HEAD que incorpora estas pruebas.
+- **Citas PDF:** la extracción conserva marcadores `[PDF page N]` dentro del texto para que los fragmentos recuperados mantengan la referencia de página; se añadió una prueba con lector PDF simulado. No se ha añadido OCR: sigue siendo una dependencia externa opcional.
