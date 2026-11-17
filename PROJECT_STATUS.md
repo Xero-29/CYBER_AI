@@ -3,8 +3,7 @@
 > Esta sección describe el HEAD auditado; los bloques históricos inferiores son contexto.
 
 **Rama:** `main`  
-**HEAD auditado:** `d9337c5e46e6760ae16f14e99afba1986644ffa7`.  
-**CI:** Python `unit-tests` aprobado en este SHA (run `44125848717`, 493 pruebas). Docker sandbox de este SHA pendiente de conclusión al actualizar este estado. Las pruebas Windows siguen aplazadas.  
+**HEAD de implementación:** cambios posteriores a `d9337c5e46e6760ae16f14e99afba1986644ffa7`; CI del nuevo HEAD pendiente de verificación. No se extrapolan resultados de CI previos a estos cambios. Las pruebas Windows siguen aplazadas.  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17`, sin modificar.
 
 ## Cambio reciente: perfiles y herramientas personalizadas
@@ -19,6 +18,18 @@
 
 
 
+
+## Aislamiento y Nuclei (cambios en curso de validación)
+
+- YARA y TShark ahora se delegan en `isolated_tool_runner.py`; ya no se intenta ejecutarlos directamente en el host.
+- Se añadió `Dockerfile.analysis-sandbox` y `build-analysis-sandbox.sh` para construir una imagen local con YARA/TShark.
+- El contenedor aplica `--network=none`, root filesystem de solo lectura, mounts de muestras/reglas de solo lectura, capacidades eliminadas, `no-new-privileges`, límites de CPU/memoria/PIDs y no monta el socket Docker.
+- La imagen se valida por SHA-256 mediante la allowlist HMAC. El daemon Docker y el kernel siguen dentro de la base de confianza; esto no es una MicroVM.
+- Nuclei dejó de usar dos rutas de plantillas codificadas. Ahora acepta un directorio de plantillas HTTP completo, severidades configurables, exclusión de plantillas no firmadas y etiquetas de alto impacto, límites de tasa/concurrencia y límite de tamaño de evidencia.
+- La CLI Nuclei exige autorización y ledger, y permite IP públicas, privadas o loopback únicamente con un permiso exacto, vigente y local. Los nombres DNS siguen bloqueados hasta implementar DNS pinning.
+- Nuclei sigue separado de la ejecución local: requiere `--scan`, confirmación e ID de autorización; el plan multiagente no puede iniciar escaneos de red.
+- Documentación: `docs/NUCLEI_INTEGRATION.md` y `docs/TOOL_EXECUTION_PROFILES.md`.
+- Pruebas añadidas/actualizadas: `tests/test_isolated_tool_runner.py`, `tests/test_nuclei_scanner.py`, `tests/test_execution_policy.py`, `tests/test_tool_adapters.py`.
 
 ## Auditoría estructural y funcional
 
@@ -41,9 +52,9 @@
 ## Límites que siguen abiertos
 
 - La validación de evidencia comprueba integridad/estructura y alcance declarado; no demuestra por sí sola veracidad, explotabilidad ni exhaustividad.
-- El aislamiento de red de los procesos locales no está forzado (`network_access=not_enforced`).
-- Nuclei conserva un flujo de autorización separado del planificador local.
+- El aislamiento Docker cubre YARA y TShark; los adaptadores locales generales y herramientas personalizadas aún no tienen aislamiento de red/sistema obligatorio (`network_access=not_enforced`).
+- Nuclei dispone de CLI operativa separada del planificador local; faltan pruebas E2E con Nuclei real y objetivos de laboratorio.
 - El catálogo de herramientas no garantiza instalación, adaptación ni disponibilidad operativa.
 - Custodia/rotación externa de claves, ACL Windows completas, aislamiento de parsers, KMS/HSM, RBAC/IdP/MFA, WORM/offsite, DR, MicroVM, proveedores IA reales, observabilidad, pruebas de carga y revisión independiente requieren infraestructura y validación externas.
 
-**Conclusión:** el repositorio tiene cobertura modular y CI automatizada, pero no debe declararse listo ni certificado para producción hasta cerrar los límites anteriores y superar pruebas E2E autorizadas.
+**Conclusión:** la ejecución aislada de YARA/TShark y el flujo configurable de Nuclei están implementados en código, pero la CI del nuevo HEAD, el build real de la imagen, la ejecución real de Nuclei y las pruebas E2E autorizadas aún deben verificarse. El repositorio no debe declararse certificado para producción.
