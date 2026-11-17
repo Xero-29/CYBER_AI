@@ -279,3 +279,11 @@ No declarar el sistema completo ni certificado hasta que cada brecha tenga códi
 - Skill revocation también está disponible desde `skillbook_cli.py` mediante `deprecate-payload` y `deprecate`; la aprobación se vincula a la versión actual y al motivo, y una aprobación obsoleta no se puede reutilizar.
 - Ledger: se añadieron pruebas de fallo SQLite después del intento de inserción y de IDs duplicados; ambas verifican rollback sin eventos parciales y preservación de la cadena SHA-256.
 - Estas pruebas simulan fallos transaccionales; no equivalen a ensayos físicos de disco lleno, corrupción del sistema de archivos o pérdida de host.
+
+## Endurecimiento adicional implementable por código (17-11-2026)
+
+- **Ledger:** `verify()` ejecuta primero `PRAGMA quick_check` y después valida la cadena SHA-256. Devuelve diagnósticos estructurados ante errores SQLite o JSON de eventos malformado, en lugar de propagar una excepción inesperada. Se añadieron pruebas para payload JSON corrupto y ejecución del chequeo SQLite.
+- **Ingestión Office:** el validador de paquetes DOCX/XLSX/PPTX rechaza entradas ZIP que sean symlinks, nombres duplicados, entradas cifradas y cargas VBA/macros, además de los controles existentes de traversal, tamaño y ratio de compresión. Se añadieron fixtures adversariales.
+- **Skillbook:** la promoción firmada de una Skill que no tenga candidata previa ahora comprueba duplicados e inserta la Skill y su primera versión dentro de la misma transacción `BEGIN IMMEDIATE`. Evita la ventana de carrera que podía crear Skills duplicadas ante aprobaciones concurrentes.
+- **Límite de validación:** los cambios están publicados en esta rama. No se consideran aprobados hasta que terminen los workflows del HEAD final. `quick_check` detecta corrupción estructural SQLite, pero no reemplaza restauración desde backup ni un checkpoint externo contra truncamiento deliberado.
+
