@@ -3,8 +3,19 @@
 > Esta sección describe el HEAD auditado; los bloques históricos inferiores son contexto.
 
 **Rama:** `main`  
-**Último cambio funcional de integración:** `31726b15a8555f558bfcb739fb04b9e51d357908` (auditoría de investigación, trazabilidad de fuentes y equivalencias de estructura). Validación CI aprobada en Python run `44140837562` (522 pruebas, SBOM/provenance generados) y Docker run `44140837454` (imágenes base y análisis YARA/TShark, verificación completa y Ruff en sandbox). Las pruebas Windows siguen aplazadas.  
+**Código funcional más reciente verificado:** `1e299f7b9850e8ded9b52a8aec7d61c2b836a6aa`. Incluye endurecimiento del simulador multiagente, validación de los tres flujos del catálogo, pruebas de CLI y límites de contexto.  
+**CI del código verificado:** Python run `44152426235` — **553 pruebas, OK (1 omitida)**; Docker sandbox run `44152426130` — **success**, incluyendo build de ambas imágenes, suite completa y Ruff en sandbox.  
+**Alcance:** estas pruebas no conectan proveedores LLM reales ni demuestran exactitud semántica o eficacia de herramientas. Las pruebas Windows siguen aplazadas.  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17`, sin modificar.
+
+## Último cambio: simulación multiagente endurecida — 2026-11-17
+
+- `agent_simulation.py` ahora valida el esquema del catálogo, versión, identificadores seguros, estructura de flujos, modos y límites positivos.
+- Las fixtures de agentes desconocidos y secuencias vacías se rechazan como errores de configuración. Las respuestas no textuales o malformadas se conservan como casos adversariales: el paso falla por contrato y el flujo se detiene.
+- La simulación reproduce el límite `max_context_chars` del orquestador, descarta primero el contexto más antiguo y registra cuántas etapas se descartaron.
+- Se añadió cobertura para los tres flujos reales (`investigacion`, `critica_corta`, `revision_tecnica`), el CLI, entradas inválidas, fixtures adversariales y recorte de contexto.
+- Documentación actualizada en `docs/AGENT_SIMULATION.md`.
+- **Límite:** sigue siendo simulación determinista. No prueba la calidad de los modelos, su coordinación semántica ni la ejecución de herramientas reales.
 
 ## Integración de dominios, herramientas y Skills
 
