@@ -168,6 +168,21 @@ python knowledge_eval.py --dataset knowledge/evaluation/smoke_queries.jsonl --to
 
 El informe calcula Recall@K, Precision@K y MRR@K. Los resultados dependen del modelo de embeddings y del contenido indexado; el benchmark no presupone que la calidad sea aceptable. Anthropic está integrado para chat, no para embeddings; si lo usas, configura además un proveedor compatible de embeddings.
 
+## Regresión del Skillbook
+
+Mantén un dataset JSONL versionado con consultas reales y los IDs de Skills activas que deben recuperarse. El benchmark verifica primero la integridad de cada historial y después mide Recall@K, Precision@K, MRR@K y hit rate sin incrementar los contadores de uso:
+
+```bash
+python skill_regression.py \
+  --dataset knowledge/evaluation/skill_retrieval.jsonl \
+  --top-k 5 \
+  --min-recall 0.80 \
+  --min-mrr 0.70 \
+  --output reports/skill-regression.json
+```
+
+Cada línea del dataset debe ser un objeto JSON con exactamente `id`, `query` y `relevant_skill_ids`. Los IDs relevantes deben corresponder a Skills activas cuyo historial supere `verify-history`. El benchmark falla de forma cerrada ante IDs ausentes, Skills inactivas, historiales manipulados o datasets inválidos. Los umbrales son criterios configurables, no una certificación de calidad experta; el dataset debe ser curado y revisado por especialistas.
+
 ## Conocimiento y Skills
 
 - Ingesta TXT, Markdown, HTML, CSV, JSON/JSONL y código: disponible con las dependencias base. PDF, DOCX, XLSX y PPTX requieren `pip install -r requirements-documents.txt`. Los PDF escaneados necesitan OCR externo; el importador no ejecuta OCR.
