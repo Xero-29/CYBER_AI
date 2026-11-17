@@ -1,4 +1,5 @@
 import os
+from concurrent.futures import ThreadPoolExecutor
 import sqlite3
 import tempfile
 import unittest
@@ -106,6 +107,34 @@ class ExecutionLedgerTests(unittest.TestCase):
         self.append(namespace="beta")
         self.assertEqual(len(self.ledger.history(namespace="alpha")), 1)
         self.assertEqual(len(self.ledger.history(namespace="beta")), 1)
+
+    def test_concurrent_writers_preserve_a_valid_contiguous_hash_chain(self):
+        worker_count = 6
+        events_per_worker = 8
+
+        def write_events(worker):
+            return [
+                self.ledger.append(
+                    namespace=f"worker-{worker}",
+                    task=f"concurrent task {worker}-{index}",
+                    status="completed",
+                    tool="concurrency-test",
+                    evidence={"worker": worker, "index": index},
+                    duration_ms=index,
+                )
+                for index in range(events_per_worker)
+            ]
+
+        with ThreadPoolExecutor(max_workers=worker_count) as pool:
+            results = list(pool.map(write_events, range(worker_count)))
+
+        written = [event for worker_events in results for event in worker_events]
+        sequences = sorted(event["sequence"] for event in written)
+        expected_count = worker_count * events_per_worker
+        self.assertEqual(sequences, list(range(1, expected_count + 1)))
+        verification = self.ledger.verify()
+        self.assertTrue(verification["valid"], verification)
+        self.assertEqual(verification["checked"], expected_count)
 
 
 if __name__ == "__main__":
