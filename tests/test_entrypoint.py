@@ -54,6 +54,20 @@ class EntryPointTests(unittest.TestCase):
         self.assertIn("--workflow", command)
         self.assertEqual(command[-1], "investiga integración de agentes")
 
+    @patch("cyber_ai.subprocess.run")
+    def test_team_can_explicitly_enable_guarded_local_tools(self, run):
+        run.return_value.returncode = 0
+        with patch.object(sys, "argv", [
+            "cyber_ai.py", "--team", "review source", "--execute-tools",
+            "--confirm-tool-execution", "--tool-target", "src"
+        ]):
+            from cyber_ai import main
+            self.assertEqual(main(), 0)
+        command = run.call_args.args[0]
+        self.assertIn("--execute-tools", command)
+        self.assertIn("--confirm-tool-execution", command)
+        self.assertEqual(command[command.index("--tool-target") + 1], "src")
+
     def test_missing_report_returns_error(self):
         result = subprocess.run(
             [sys.executable, "cyber_ai.py", "--report", "archivo_inexistente.txt"],
