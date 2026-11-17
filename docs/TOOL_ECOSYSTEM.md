@@ -2,26 +2,26 @@
 
 ## Inventario del código
 
-El catálogo declarativo de `capability_inventory.py` contiene **21 herramientas**. El registro de adaptadores locales contiene **14 IDs**; Nuclei, además, tiene un runner de escaneo remoto separado.
+El catálogo declarativo de `capability_inventory.py` contiene **21 herramientas**. El registro local contiene **19 IDs**; Nuclei conserva un runner remoto separado y Nmap sigue sin adaptador local.
 
 | Grupo | Herramientas | Estado de integración |
 |---|---|---|
 | SAST y calidad | Semgrep, Bandit, Ruff, ShellCheck | Adaptadores locales |
-| Dependencias | pip-audit, OSV-Scanner | pip-audit registrado pero bloqueado por política de red; OSV-Scanner solo catalogado |
-| Supply chain y SBOM | Trivy, Grype, Syft | Trivy y Syft con adaptador; Grype solo catalogado |
-| IaC y secretos | Checkov, Gitleaks, detect-secrets | Checkov y detect-secrets con adaptador; Gitleaks solo catalogado |
+| Dependencias | pip-audit, OSV-Scanner | OSV-Scanner en modo offline con base local; pip-audit bloqueado por política de red |
+| Supply chain y SBOM | Trivy, Grype, Syft | Grype en modo offline con base local; Trivy y Syft con adaptador |
+| IaC y secretos | Checkov, Gitleaks, detect-secrets | Gitleaks local con redacción total de secretos; Checkov y detect-secrets con adaptador |
 | Contenedores y CI/CD | Hadolint, actionlint, Kube-Linter | Adaptadores locales |
-| Malware y forense | YARA, TShark, Zeek, Volatility 3 | YARA/TShark por runner Docker; Zeek/Volatility 3 solo catalogados |
-| Red y vulnerabilidades | Nmap, Nuclei | Nuclei con runner remoto separado; Nmap solo catalogado |
+| Malware y forense | YARA, TShark, Zeek, Volatility 3 | YARA/TShark por runner Docker; Zeek offline sobre PCAP; Volatility 3 con plugins allowlisted y modo offline |
+| Red y vulnerabilidades | Nmap, Nuclei | Nuclei con runner remoto separado; Nmap catalogado, sin runner local |
 
 ### Recuento que no debe confundirse
 
 - **21:** herramientas declaradas en el catálogo.
-- **14:** IDs registrados en `TOOL_SPECS`.
-- **11:** adaptadores que pueden ejecutarse directamente en host (siguen sin aislamiento de red obligatorio).
+- **19:** IDs registrados en `TOOL_SPECS`.
+- **16:** adaptadores ejecutables directamente en host; los cinco nuevos modos offline no equivalen a aislamiento de egress del sistema operativo.
 - **1:** pip-audit, registrado pero bloqueado porque aún no existe una política de red específica.
 - **2:** YARA y TShark, integrados mediante runner Docker aislado.
-- **7:** herramientas sin adaptador en `TOOL_SPECS`; Nuclei tiene su runner independiente, mientras que OSV-Scanner, Grype, Gitleaks, Zeek, Volatility 3 y Nmap siguen sin runner integrado.
+- **2:** Nmap sin adaptador local y Nuclei con runner separado.
 
 La presencia de un binario, una entrada de catálogo o una ruta de integración no significa que esté instalado, probado ni autorizado para ejecutarse.
 
@@ -51,7 +51,7 @@ python task_planner.py "auditoria de red y analisis de PCAP"
 3. Una herramienta sin adaptador se marca como catálogo solamente.
 4. Las herramientas de análisis local deben ejecutarse sobre rutas explícitas y con límites de recursos.
 5. Las herramientas de red requieren autorización y alcance específicos.
-6. YARA/TShark usan Docker con red deshabilitada; los adaptadores host y herramientas personalizadas no tienen aislamiento de egress obligatorio.
+6. YARA/TShark usan Docker con red deshabilitada. OSV-Scanner, Grype y Volatility 3 solicitan modo offline; Gitleaks y Zeek procesan archivos locales. Estas opciones del propio programa no son aislamiento de egress del sistema operativo; los adaptadores host siguen sin sandbox general.
 7. La salida de una herramienta es evidencia no confiable: se valida, normaliza y conserva con versión, hash y procedencia.
 8. El catálogo no instala paquetes ni descarga binarios. La instalación debe gestionarse por un proceso reproducible y verificado.
 9. Una Skill solo se sugiere cuando está activa en Skillbook. Una Skill no concede permisos ni sustituye validación humana.
@@ -67,3 +67,23 @@ python task_planner.py "auditoria de red y analisis de PCAP"
 - Validar herramientas y metodología en laboratorios autorizados.
 
 **Conclusión:** la matriz ahora relaciona los 48 paquetes con el planificador y muestra las herramientas/Skills candidatas. Esto cierra la desconexión de enrutamiento, pero no convierte los paquetes en 48 capacidades operativas ni certifica cobertura integral.
+
+## Adaptadores offline añadidos
+
+- `osv_scanner`: `--offline`, salida JSON y base local previamente descargada. La base no se descarga desde CYBER_AI.
+- `grype`: análisis de directorio en JSON; se desactiva la actualización automática y las fuentes externas. Requiere base local válida.
+- `gitleaks`: análisis de directorio con informe JSON y `--redact=100`; puede devolver código 1 cuando encuentra secretos, que se interpreta como escaneo completado con hallazgos, no como fallo de ejecución.
+- `zeek`: solo acepta PCAP/PCAPNG/CAP y ejecuta `-r` en un directorio temporal; los logs JSON se incorporan a la evidencia.
+- `volatility3`: solo acepta archivo de volcado y plugin explícito de una allowlist; usa `--offline` y caché temporal.
+
+Ejemplos:
+
+```bash
+python tool_executor.py --tool osv_scanner --target . --execute
+python tool_executor.py --tool grype --target . --execute
+python tool_executor.py --tool gitleaks --target . --execute
+python tool_executor.py --tool zeek --target captures/sample.pcap --execute
+python tool_executor.py --tool volatility3 --target captures/memory.raw --plugin windows.info --execute
+```
+
+Los ejemplos requieren binarios y, para OSV-Scanner/Grype, bases locales ya aprovisionadas. La ejecución no se activa automáticamente ni descarga herramientas o bases.
