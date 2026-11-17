@@ -7,7 +7,7 @@ import os
 import re
 import sqlite3
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -164,6 +164,48 @@ def list_skill_versions(skill_id):
         }
         for row in rows
     ]
+
+
+def list_skills_due_for_review(max_age_days=180):
+    """Lista Skills activas cuya última aprobación/actualización requiere revisión."""
+    if (
+        isinstance(max_age_days, bool)
+        or not isinstance(max_age_days, int)
+        or not 1 <= max_age_days <= 3650
+    ):
+        raise ValueError("max_age_days debe estar entre 1 y 3650.")
+    cutoff = datetime.now(timezone.utc) - timedelta(days=max_age_days)
+    initialize()
+    with connect() as db:
+        rows = db.execute(
+            """SELECT skill_id,name,version,updated_at,success_runs,failure_runs
+               FROM skills WHERE status='active' ORDER BY updated_at,skill_id"""
+        ).fetchall()
+    due = []
+    for row in rows:
+        try:
+            updated = datetime.fromisoformat(row["updated_at"])
+            if updated.tzinfo is None:
+                updated = updated.replace(tzinfo=timezone.utc)
+            else:
+                updated = updated.astimezone(timezone.utc)
+        except (TypeError, ValueError, OverflowError):
+            updated = None
+        if updated is None or updated < cutoff:
+            due.append({
+                "skill_id": row["skill_id"],
+                "name": row["name"],
+                "version": row["version"],
+                "updated_at": row["updated_at"],
+                "review_due_at": (
+                    (updated + timedelta(days=max_age_days)).isoformat()
+                    if updated is not None else None
+                ),
+                "reason": "invalid_review_timestamp" if updated is None else "review_age_exceeded",
+                "success_runs": row["success_runs"],
+                "failure_runs": row["failure_runs"],
+            })
+    return due
 
 
 def _insert_verified_skill(
