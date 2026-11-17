@@ -64,7 +64,11 @@ def execute_tool_plan(plan, target, *, confirmed=False, max_tools=None, allow_ex
         for item in selected:
             tool_id = item["id"]
             try:
-                evidence = run_local_tool(tool_id, str(target_path), allow_external=allow_external_targets)
+                tool_target = (
+                    str(target_path.relative_to(project_root))
+                    if target_path.is_relative_to(project_root) else str(target_path)
+                )
+                evidence = run_local_tool(tool_id, tool_target, allow_external=allow_external_targets)
                 validation = validate_tool_evidence(evidence)
                 evidence["independent_integrity_validation"] = validation
                 evidence_path = write_evidence(evidence, allow_external=allow_external_targets)
