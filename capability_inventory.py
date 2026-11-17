@@ -2,6 +2,7 @@
 """Inventario declarativo de herramientas locales; no ejecuta herramientas."""
 import json
 import os
+import re
 import shutil
 import subprocess
 from collections import Counter
@@ -50,7 +51,7 @@ def _isolated_image_available():
     except (OSError, subprocess.TimeoutExpired):
         return False, None
     image_id = result.stdout.strip()
-    if result.returncode != 0 or not image_id.startswith("sha256:") or len(image_id) != 71:
+    if result.returncode != 0 or not re.fullmatch(r"sha256:[0-9a-f]{64}", image_id):
         return False, None
     return True, "docker-image:" + image_id
 
