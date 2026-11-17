@@ -1,4 +1,5 @@
 import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -229,6 +230,47 @@ class PreflightTests(unittest.TestCase):
             findings = preflight.validate_data_permissions(root)
         self.assertEqual(len(findings), 1)
         self.assertIn("chmod 600", findings[0]["reason"])
+
+    def test_evidence_directory_and_files_require_private_permissions(self):
+        if os.name != "posix":
+            self.skipTest("POSIX mode bits are not a Windows ACL check")
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            evidence = root / "reports" / "tool_evidence"
+            evidence.mkdir(parents=True)
+            (evidence / "ruff.json").write_text('{"tool":"ruff"}', encoding="utf-8")
+            evidence.chmod(0o755)
+            (evidence / "ruff.json").chmod(0o644)
+            findings = preflight.validate_evidence_permissions(root)
+        self.assertEqual(len(findings), 2)
+        self.assertTrue(any("chmod 700" in item["reason"] for item in findings))
+        self.assertTrue(any("chmod 600" in item["reason"] for item in findings))
+
+    def test_private_evidence_directory_and_file_are_accepted(self):
+        if os.name != "posix":
+            self.skipTest("POSIX mode bits are not a Windows ACL check")
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            evidence = root / "reports" / "tool_evidence"
+            evidence.mkdir(parents=True)
+            (evidence / "ruff.json").write_text('{"tool":"ruff"}', encoding="utf-8")
+            evidence.chmod(0o700)
+            (evidence / "ruff.json").chmod(0o600)
+            self.assertEqual(preflight.validate_evidence_permissions(root), [])
+
+    def test_evidence_symlink_is_rejected(self):
+        if os.name != "posix":
+            self.skipTest("POSIX symlinks are not a Windows ACL check")
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            outside = root / "outside"
+            outside.mkdir()
+            reports = root / "reports"
+            reports.mkdir()
+            (reports / "tool_evidence").symlink_to(outside, target_is_directory=True)
+            findings = preflight.validate_evidence_permissions(root)
+        self.assertEqual(len(findings), 1)
+        self.assertIn("enlaces simbólicos", findings[0]["reason"])
 
     def test_data_symlink_is_rejected(self):
         with tempfile.TemporaryDirectory() as temp:
