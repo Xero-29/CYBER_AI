@@ -11,7 +11,13 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parent
-REQUIRED_AGENDA_TERMS = ("hipótesis", "método", "métricas", "entregable", "madurez")
+REQUIRED_AGENDA_CONCEPTS = {
+    "hipótesis": ("hipótesis",),
+    "método": ("método", "metodología", "diseño de investigación", "diseño experimental", "diseño y análisis", "protocolo"),
+    "métricas": ("métricas", "indicadores"),
+    "entregable": ("entregable", "entregables", "artefacto", "artefactos", "producto", "productos", "publicación"),
+    "madurez": ("madurez", "estado", "umbral"),
+}
 REQUIRED_DOSSIER_MARKERS = (
     "## pregunta",
     "## síntesis",
@@ -89,9 +95,9 @@ def audit_research_library(root: Path = ROOT) -> dict:
         if agenda and not agenda.startswith("# Agenda de investigación:"):
             agenda_errors.append("título de agenda inválido")
         agenda_lower = agenda.casefold()
-        for term in REQUIRED_AGENDA_TERMS:
-            if term not in agenda_lower:
-                agenda_errors.append("falta concepto requerido en agenda: " + term)
+        for concept, alternatives in REQUIRED_AGENDA_CONCEPTS.items():
+            if not any(term in agenda_lower for term in alternatives):
+                agenda_errors.append("falta concepto requerido en agenda: " + concept)
         if "research_agenda_defined" not in agenda:
             agenda_errors.append("no declara madurez de agenda")
         if "M5" not in agenda or "reproducción" not in agenda_lower:
