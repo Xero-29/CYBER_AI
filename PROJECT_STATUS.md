@@ -17,7 +17,7 @@
 ## Evidencia de validación
 
 - Rama fuente `482df7480ac547003a90e621c95c15789067c4dc`: Python Tests **success, 471 pruebas** ([run 44116054953](https://github.com/Xero-29/CYBER_AI/actions/runs/44116054953)); Docker Sandbox **success** ([run 44116054989](https://github.com/Xero-29/CYBER_AI/actions/runs/44116054989)). CI generó manifiestos de 9 wheels principales y 8 wheels del sandbox, además de dos SBOM CycloneDX.
-- Main `039e6c79fcd59bdbb9891bd5e105a528ec152352`: Docker Sandbox **success** ([run 44117766473]); Python Tests seguía pendiente al preparar esta integración ([run 44117766456]). No se declara verde el conjunto de checks.
+- Main `039e6c79fcd59bdbb9891bd5e105a528ec152352`: Docker Sandbox **success** ([run 44117766473]) y Python Tests **success** ([run 44117766456]). Ambos checks concluyeron en éxito sobre ese SHA.
 - La rama de integración necesita sus propias ejecuciones sobre el HEAD final. Hasta entonces no se considera validada.
 
 ## Límites de la implementación
