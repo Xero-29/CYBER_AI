@@ -128,6 +128,14 @@ La allowlist está desactivada por compatibilidad si no se configura. En desplie
 
 El inventario declara **21 herramientas**: **20 IDs** en `TOOL_SPECS` y Nuclei con runner remoto separado. De los 20 IDs, **17 adaptadores** se ejecutan directamente en el host (16 locales/offline y Nmap con autorización de red); **pip-audit** está registrado pero bloqueado por política de red; **YARA y TShark** usan un runner Docker aislado. Nmap no tiene aislamiento de egress impuesto por el sistema operativo y los adaptadores host no tienen sandbox general. OSV-Scanner y Grype requieren bases locales, pero todavía no cuentan con preflight de vigencia/esquema; no se deben considerar listos solo por detectar el binario. La presencia en el catálogo no significa que la herramienta esté instalada, que su base exista o que haya sido validada operacionalmente. Genera el informe con `python capability_inventory.py`.
 
+Antes de usar OSV-Scanner o Grype, revisa las bases locales sin descargar ni actualizarlas:
+
+```bash
+python tool_database_preflight.py --json
+```
+
+Grype se bloquea si la base falta, es inválida o supera 14 días (configurable mediante `CYBER_AI_GRYPE_DB_MAX_AGE_DAYS`). OSV-Scanner valida presencia y estructura de sus archivos ZIP, pero su formato documentado no ofrece una fecha de construcción autoritativa; CYBER_AI no afirma que esté actualizado.
+
 El registro de herramientas se encuentra en `tool_adapters.py`. Para ejecutar directamente un adaptador local:
 
 ```bash
