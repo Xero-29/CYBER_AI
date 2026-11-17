@@ -33,6 +33,7 @@ def execute_tool_plan(plan, target, *, confirmed=False, max_tools=3):
         if isinstance(item, dict)
         and item.get("id") in TOOL_SPECS
         and item.get("adapter_supported") is True
+        and item.get("available") is True
         and item.get("risk") != "active_network"
     ][:max_tools]
     if not selected:
