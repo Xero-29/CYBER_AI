@@ -5,6 +5,10 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
+MAX_DATASET_BYTES = 2 * 1024 * 1024
+MAX_CASES = 5000
+MAX_LINE_BYTES = 64 * 1024
+
 from knowledge_embeddings import generate_embedding
 from knowledge_library import search_knowledge_hybrid
 
@@ -13,29 +17,50 @@ DEFAULT_DATASET = ROOT / "knowledge" / "evaluation" / "domain_queries.jsonl"
 
 
 def load_dataset(path):
+    source = Path(path)
+    if source.is_symlink() or not source.is_file():
+        raise ValueError("El dataset debe ser un archivo regular, no un symlink.")
+    if source.stat().st_size > MAX_DATASET_BYTES:
+        raise ValueError("El dataset supera 2 MiB.")
     cases = []
-    with Path(path).open(encoding="utf-8") as stream:
-        for line_number, line in enumerate(stream, 1):
-            if not line.strip():
+    seen_ids = set()
+    with source.open("rb") as stream:
+        for line_number, raw in enumerate(stream, 1):
+            if len(raw) > MAX_LINE_BYTES:
+                raise ValueError(f"Línea {line_number} supera 64 KiB.")
+            if not raw.strip():
                 continue
             try:
-                item = json.loads(line)
-            except json.JSONDecodeError as error:
+                item = json.loads(raw.decode("utf-8"))
+            except (UnicodeDecodeError, json.JSONDecodeError) as error:
                 raise ValueError(f"JSONL inválido en línea {line_number}.") from error
-            query = item.get("query") if isinstance(item, dict) else None
-            expected = item.get("relevant_categories") if isinstance(item, dict) else None
+            if not isinstance(item, dict) or set(item) != {
+                "id", "query", "relevant_categories"
+            }:
+                raise ValueError(
+                    f"Línea {line_number}: se requieren exactamente id, query y relevant_categories."
+                )
+            case_id, query, expected = (
+                item["id"], item["query"], item["relevant_categories"]
+            )
+            if not isinstance(case_id, str) or not case_id.strip() or case_id in seen_ids:
+                raise ValueError(f"ID ausente o duplicado en línea {line_number}.")
             if not isinstance(query, str) or not query.strip():
                 raise ValueError(f"query inválida en línea {line_number}.")
             if (
                 not isinstance(expected, list) or not expected
                 or any(not isinstance(value, str) or not value.strip() for value in expected)
+                or len(set(expected)) != len(expected)
             ):
                 raise ValueError(f"relevant_categories inválida en línea {line_number}.")
+            seen_ids.add(case_id)
             cases.append({
-                "id": str(item.get("id", line_number)),
+                "id": case_id,
                 "query": query.strip(),
-                "relevant_categories": sorted(set(value.strip() for value in expected)),
+                "relevant_categories": [value.strip() for value in expected],
             })
+            if len(cases) > MAX_CASES:
+                raise ValueError("El dataset supera 5000 casos.")
     if not cases:
         raise ValueError("El conjunto de evaluación está vacío.")
     return cases
