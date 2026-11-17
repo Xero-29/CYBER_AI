@@ -1,6 +1,7 @@
 import subprocess
 import sys
 import unittest
+from unittest.mock import patch, call
 from pathlib import Path
 
 
@@ -14,6 +15,19 @@ class EntryPointTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("correcta", result.stdout)
+
+    @patch("cyber_ai.subprocess.run")
+    def test_ask_routes_to_director_with_complete_task(self, run):
+        run.return_value.returncode = 0
+        with patch.object(sys, "argv", [
+            "cyber_ai.py", "--ask", "auditoría web de mi aplicación"
+        ]):
+            from cyber_ai import main
+            self.assertEqual(main(), 0)
+        command = run.call_args.args[0]
+        self.assertTrue(command[1].endswith("director.py"))
+        self.assertEqual(command[2], "auditoría web de mi aplicación")
+        self.assertEqual(run.call_args.kwargs["check"], False)
 
     def test_missing_report_returns_error(self):
         result = subprocess.run(
