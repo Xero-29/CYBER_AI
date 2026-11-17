@@ -254,7 +254,10 @@ def _validated_nmap_scope(target):
                 ))
         except ValueError as error:
             raise ToolExecutionError("La allowlist CIDR de Nmap contiene una entrada inválida.") from error
-    if not allowed or not any(requested.subnet_of(network) for network in allowed):
+    if not allowed or not any(
+        requested.version == network.version and requested.subnet_of(network)
+        for network in allowed
+    ):
         raise ToolExecutionError("El objetivo Nmap no está contenido en la allowlist autorizada.")
     return str(requested), str(requested), hashlib.sha256(
         raw_allowlist.encode("utf-8")
