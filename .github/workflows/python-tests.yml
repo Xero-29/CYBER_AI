@@ -33,6 +33,11 @@ jobs:
       - name: Validate source and installer syntax
         run: |
           bash -n setup.sh verify.sh
+      - name: Protect checked-out runtime data directories
+        run: |
+          if [[ -d data && ! -L data ]]; then
+            find data -type d -exec chmod 700 {} +
+          fi
       - name: Run complete local verification
         run: bash verify.sh
       - name: Generate CycloneDX SBOM
