@@ -87,7 +87,7 @@ if temporary.exists() or temporary.is_symlink():
 fd = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
 with os.fdopen(fd, "w", encoding="utf-8") as stream:
     json.dump(signed, stream, ensure_ascii=False, indent=2)
-    stream.write("\\n")
+    stream.write("\n")
 os.replace(temporary, path)
 os.chmod(path, 0o600)
 PY
