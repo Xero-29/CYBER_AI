@@ -112,7 +112,7 @@ Referencia: https://example.org/source
     def test_rejects_unknown_source_reference(self) -> None:
         self.write_dossier("UNKNOWN-SOURCE")
         report = audit_research_library(self.root)
-        self.assertTrue(report["ok"])
+        self.assertFalse(report["ok"])
         self.assertEqual(report["traceable_literature_reviews"], 0)
         self.assertTrue(any(
             "ID de fuente no registrado" in error
