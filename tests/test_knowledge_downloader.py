@@ -135,10 +135,10 @@ class KnowledgeDownloaderSecurityTests(unittest.TestCase):
         args = __import__("argparse").Namespace(
             area=None, dry_run=False, retry_failed=False,
         )
-        with patch.object(downloader, "load_json", side_effect=[catalog, manifest]), \\
-             patch.object(downloader, "save_json"), \\
-             patch.object(downloader, "used_bytes", return_value=0), \\
-             patch.object(downloader, "download", return_value="downloaded") as run_download, \\
+        with patch.object(downloader, "load_json", side_effect=[catalog, manifest]), \
+             patch.object(downloader, "save_json"), \
+             patch.object(downloader, "used_bytes", return_value=0), \
+             patch.object(downloader, "download", return_value="downloaded") as run_download, \
              patch.object(downloader.time, "sleep"):
             result = downloader._run(args)
         self.assertEqual(result, 0)
