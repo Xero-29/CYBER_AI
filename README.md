@@ -60,6 +60,23 @@ python cyber_ai.py --report reports/mi_informe.txt
 python cyber_ai.py --batch reports
 ```
 
+## Ejecutar tareas desde la entrada principal
+
+La entrada principal ya permite enviar una tarea al flujo de agentes:
+
+```bash
+python cyber_ai.py --ask "Audita la configuración de seguridad de mi aplicación"
+```
+
+La ruta pasa por DIRECTOR y después por `agent_runner.py`. La recuperación de Skills y lecciones aprobadas se incorpora durante la ejecución; la biblioteca de conocimiento se consulta por defecto mediante ECO. Para usar esta ruta, configura un proveedor de chat y un proveedor de embeddings compatibles e indexa primero la biblioteca. Si necesitas ejecutar una consulta sin recuperación de conocimiento:
+
+```bash
+python cyber_ai.py --ask "Explica este hallazgo" --agent NEXO
+python director.py --no-knowledge "Explica este hallazgo"
+```
+
+Esta entrada no ejecuta automáticamente herramientas de seguridad ni sustituye la autorización de objetivos. Los escáneres y adaptadores conservan sus flujos explícitos de autorización y ejecución documentados más abajo.
+
 ## Ejecutar agentes LLM locales
 
 1. Instala Ollama siguiendo su documentación oficial y arranca el servicio.
