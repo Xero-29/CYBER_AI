@@ -79,6 +79,12 @@ No se promete una cobertura universal y perpetuamente completa de toda la cibers
 - Linux es el objetivo de ejecución documentado.
 - Windows continúa aplazado por decisión anterior; no debe declararse compatible mientras no se implemente y valide el soporte de locks, permisos, procesos, rutas y ACL.
 
+## Progreso de ejecución del plan
+
+- **Fase 0 — Coherencia documental: completada en repositorio.** README, contexto, estado canónico, matriz de implementación e inventario de herramientas fueron reconciliados; la auditoría de 2026-11-12 quedó marcada como histórica. Los cambios de documentación se verifican por CI sobre los commits de esta fase.
+- **Fase 1 — Primer control de bases locales: implementado, CI pendiente.** Se añadió `tool_database_preflight.py`; Grype exige metadatos, esquema, archivo local y antigüedad configurable; OSV valida estructura ZIP y ecosistemas, pero informa frescura/esquema desconocidos. La ejecución de ambos escáneres falla cerrado si el preflight no pasa. No se descargan ni actualizan bases.
+- **Fase 1 — Aislamiento general, Nmap y Nuclei: pendiente.** El preflight de bases no resuelve aislamiento del proceso ni egress del host.
+
 ## 3. Plan de acción priorizado
 
 ### Fase 0 — Establecer una única verdad del proyecto (P0)
