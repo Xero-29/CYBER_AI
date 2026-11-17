@@ -11,6 +11,8 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("verify", help="Verificar la cadena hash completa")
+    reconcile = commands.add_parser("reconcile", help="Marcar inicios huérfanos como interrumpidos")
+    reconcile.add_argument("--namespace", help="Limitar la reconciliación a un namespace")
     commands.add_parser("namespaces", help="Listar namespaces con eventos")
     history = commands.add_parser("history", help="Consultar eventos de un namespace")
     history.add_argument("--namespace", required=True)
@@ -18,6 +20,10 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     ledger = ExecutionLedger()
+    if args.command == "reconcile":
+        result = ledger.reconcile_interrupted(namespace=args.namespace)
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0
     if args.command == "verify":
         result = ledger.verify()
         print(json.dumps(result, ensure_ascii=False, indent=2))
