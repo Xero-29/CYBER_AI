@@ -224,7 +224,7 @@ def main():
     if args.self_test:
         required = [
             "report_analyzer.py", "nvd_client.py", "report_manager.py",
-            "batch_analyzer.py", "nuclei_scanner.py", "director.py",
+            "batch_analyzer.py", "nuclei_scanner.py", "isolated_tool_runner.py", "director.py",
             "agent_runner.py", "CONTEXT.md",
         ]
         missing = [name for name in required if not Path(name).is_file()]
