@@ -37,6 +37,9 @@ def validate_scan_result(result, *, expected_target=None):
         findings = []
     if result.get("findings_count") != len(findings):
         errors.append("findings_count_mismatch")
+    malformed_lines = result.get("malformed_findings_lines", 0)
+    if not isinstance(malformed_lines, int) or malformed_lines != 0:
+        errors.append("malformed_findings_output")
     for index, finding in enumerate(findings):
         if not isinstance(finding, dict):
             errors.append(f"finding_{index}_not_object")
