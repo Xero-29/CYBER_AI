@@ -23,6 +23,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from tool_allowlist import verify_tool_allowed
+from tool_database_preflight import inspect_tool_database
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent
@@ -438,9 +439,6 @@ def run_local_tool(tool_id, target, *, config_path=None, plugin=None, timeout=No
         raise ToolExecutionError("El timeout debe estar entre 1 y 600 segundos.")
     if config_path is None and tool_id == "semgrep":
         config_path = os.environ.get("CYBER_AI_SEMGREP_CONFIG")
-    command = _build_command(
-        tool_id, binary, path, config_path=config_path, plugin=plugin
-    )
     env = {
         "PATH": os.environ.get("PATH", ""),
         "HOME": os.environ.get("HOME", ""),
@@ -448,9 +446,31 @@ def run_local_tool(tool_id, target, *, config_path=None, plugin=None, timeout=No
         "LC_ALL": "C.UTF-8",
         "NO_COLOR": "1",
     }
+    for variable in (
+        "OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY",
+        "OSV_SCALIBR_LOCAL_DB_CACHE_DIRECTORY",
+        "GRYPE_DB_CACHE_DIR",
+        "CYBER_AI_GRYPE_DB_MAX_AGE_DAYS",
+    ):
+        if os.environ.get(variable):
+            env[variable] = os.environ[variable]
     if tool_id == "grype":
         env["GRYPE_DB_AUTO_UPDATE"] = "false"
         env["GRYPE_EXTERNAL_SOURCES_ENABLE"] = "false"
+        env["GRYPE_CHECK_FOR_APP_UPDATE"] = "false"
+    command = _build_command(
+        tool_id, binary, path, config_path=config_path, plugin=plugin
+    )
+    database_preflight = inspect_tool_database(tool_id, binary, environ=env)
+    if database_preflight is not None:
+        expected_status = (
+            "present_structure_checked" if tool_id == "osv_scanner" else "ready"
+        )
+        if database_preflight.get("status") != expected_status:
+            raise ToolExecutionError(
+                f"Preflight de base local de {tool_id} no superado "
+                f"({database_preflight.get('status', 'unknown')}); no se inició el escaneo."
+            )
     tool_version = _probe_tool_version(binary, tool_id, env)
     if _hash_binary(binary)["sha256"] != binary_provenance["sha256"]:
         raise ToolExecutionError("El ejecutable cambió durante la identificación de versión.")
@@ -603,6 +623,7 @@ def run_local_tool(tool_id, target, *, config_path=None, plugin=None, timeout=No
             if spec.get("offline_only") else
             "Los adaptadores que requieren red se deniegan; el egress de procesos locales no está aislado por este ejecutor."
         ),
+        "database_preflight": database_preflight,
         "note": "Salida de herramienta no confiable; requiere validación antes de generar hallazgos o Skills. La ejecución no sustituye aislamiento del sistema operativo.",
     }
     return evidence
