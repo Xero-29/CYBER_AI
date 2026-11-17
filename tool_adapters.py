@@ -373,8 +373,8 @@ def write_evidence(evidence, output_dir="reports/tool_evidence", *, allow_extern
         return path
     except ToolExecutionError:
         raise
-    except OSError as error:
-        raise ToolExecutionError("No se pudo escribir evidencia protegida.") from error
+    except (OSError, TypeError, ValueError) as error:
+        raise ToolExecutionError("No se pudo serializar o escribir evidencia protegida.") from error
 
 
 __all__ = ["TOOL_SPECS", "ToolExecutionError", "run_local_tool", "write_evidence"]
