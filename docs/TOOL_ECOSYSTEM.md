@@ -2,7 +2,7 @@
 
 ## Inventario del código
 
-El catálogo declarativo de `capability_inventory.py` contiene **21 herramientas**. El registro local contiene **19 IDs**; Nuclei conserva un runner remoto separado y Nmap sigue sin adaptador local.
+El catálogo declarativo de `capability_inventory.py` contiene **21 herramientas**. El registro local contiene **20 IDs**; Nuclei conserva un runner remoto separado.
 
 | Grupo | Herramientas | Estado de integración |
 |---|---|---|
@@ -12,16 +12,16 @@ El catálogo declarativo de `capability_inventory.py` contiene **21 herramientas
 | IaC y secretos | Checkov, Gitleaks, detect-secrets | Gitleaks local con redacción total de secretos; Checkov y detect-secrets con adaptador |
 | Contenedores y CI/CD | Hadolint, actionlint, Kube-Linter | Adaptadores locales |
 | Malware y forense | YARA, TShark, Zeek, Volatility 3 | YARA/TShark por runner Docker; Zeek offline sobre PCAP; Volatility 3 con plugins allowlisted y modo offline |
-| Red y vulnerabilidades | Nmap, Nuclei | Nuclei con runner remoto separado; Nmap catalogado, sin runner local |
+| Red y vulnerabilidades | Nmap, Nuclei | Nmap con adaptador TCP limitado a IP/CIDR autorizado; Nuclei con runner remoto separado |
 
 ### Recuento que no debe confundirse
 
 - **21:** herramientas declaradas en el catálogo.
-- **19:** IDs registrados en `TOOL_SPECS`.
-- **16:** adaptadores ejecutables directamente en host; los cinco nuevos modos offline no equivalen a aislamiento de egress del sistema operativo.
+- **20:** IDs registrados en `TOOL_SPECS`.
+- **17:** adaptadores directos en host: 16 locales/offline y Nmap, que requiere autorización activa y allowlist CIDR; el egress del host no está aislado.
 - **1:** pip-audit, registrado pero bloqueado porque aún no existe una política de red específica.
 - **2:** YARA y TShark, integrados mediante runner Docker aislado.
-- **2:** Nmap sin adaptador local y Nuclei con runner separado.
+- **1:** Nuclei conserva su runner remoto separado y no es un ID de `TOOL_SPECS`.
 
 La presencia de un binario, una entrada de catálogo o una ruta de integración no significa que esté instalado, probado ni autorizado para ejecutarse.
 
@@ -87,3 +87,14 @@ python tool_executor.py --tool volatility3 --target captures/memory.raw --plugin
 ```
 
 Los ejemplos requieren binarios y, para OSV-Scanner/Grype, bases locales ya aprovisionadas. La ejecución no se activa automáticamente ni descarga herramientas o bases.
+
+## Nmap: autorización obligatoria
+
+El adaptador Nmap no acepta nombres DNS ni argumentos libres. Exige el flag `--authorized-network`, una IP/CIDR literal de máximo 16 direcciones y pertenencia a la allowlist del operador `CYBER_AI_NMAP_ALLOWED_CIDRS` (lista separada por comas). Ejecuta TCP connect sobre los 100 puertos frecuentes, con un reintento y límite de tiempo por host; no habilita NSE, detección de sistema operativo, DNS ni evasión. El inventario no lo marca `execution_ready` automáticamente. La allowlist no sustituye aislamiento de egress del host: úsalo únicamente con autorización expresa y controles de red externos.
+
+```bash
+export CYBER_AI_NMAP_ALLOWED_CIDRS="192.0.2.0/28"
+python tool_executor.py --tool nmap --target 192.0.2.10 --authorized-network --execute
+```
+
+El rango anterior es solo un ejemplo documental reservado para pruebas; no representa un activo real.
