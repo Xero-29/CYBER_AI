@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from tool_adapters import TOOL_SPECS
+from domain_capability_matrix import audit_domain_matrix
 
 TOOL_CATALOG = [
  {"id":"semgrep","binary":"semgrep","category":"sast","purpose":"Análisis estático multi-lenguaje","risk":"local_read_only","execution_policy":"local_code_review"},
@@ -34,6 +35,7 @@ TOOL_CATALOG = [
  {"id":"nmap","binary":"nmap","category":"network_discovery","purpose":"Descubrimiento y auditoría de red","risk":"active_network","execution_policy":"scoped_network_authorization"},
  {"id":"nuclei","binary":"nuclei","category":"vulnerability_scanning","purpose":"Detección basada en plantillas","risk":"active_network","execution_policy":"scoped_network_authorization"}
 ]
+
 
 def _isolated_image_available():
     docker = shutil.which("docker")
@@ -103,12 +105,26 @@ def build_inventory():
     adapted = sum(item["adapter_registered"] for item in tools.values())
     available_and_adapted = sum(item["available"] and item["adapter_registered"] for item in tools.values())
     execution_ready = sum(item["execution_ready"] for item in tools.values())
+    domain_matrix = audit_domain_matrix()
     return {
-        "schema_version": "2.1.0",
+        "schema_version": "2.2.0",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "tools": tools,
         "tool_catalog": TOOL_CATALOG,
-        "summary": {"registered": len(TOOL_CATALOG), "available": available, "unavailable": len(TOOL_CATALOG)-available, "adapter_registered": adapted, "catalog_only": len(TOOL_CATALOG)-adapted, "available_and_adapted": available_and_adapted, "execution_ready": execution_ready},
+        "summary": {
+            "registered": len(TOOL_CATALOG),
+            "available": available,
+            "unavailable": len(TOOL_CATALOG) - available,
+            "adapter_registered": adapted,
+            "catalog_only": len(TOOL_CATALOG) - adapted,
+            "available_and_adapted": available_and_adapted,
+            "execution_ready": execution_ready,
+        },
+        "domain_matrix": {
+            **domain_matrix,
+            "knowledge_pack_profiles_only": True,
+            "operational_coverage_claimed": False,
+        },
         "nuclei_templates": {
             "root": str(root), "available": root.is_dir() and not root.is_symlink(), "count": len(items),
             "categories": dict(sorted(categories.items())),
@@ -124,8 +140,9 @@ def build_inventory():
             ),
             "direct_execution_requires_explicit_execute": True,
         },
-        "note": "Inventario de presencia; no ejecuta, instala ni autoriza herramientas. YARA/TShark requieren imagen Docker y allowlist HMAC.",
+        "note": "Inventario de presencia; no ejecuta, instala ni autoriza herramientas. YARA/TShark requieren imagen Docker y allowlist HMAC. La matriz de dominios enlaza paquetes y candidatas, no acredita cobertura operativa.",
     }
+
 
 if __name__ == "__main__":
     output = Path("reports/capability_inventory.json")
@@ -134,5 +151,7 @@ if __name__ == "__main__":
     output.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print("Herramientas registradas:", data["summary"]["registered"])
     print("Herramientas disponibles:", data["summary"]["available"])
+    print("Adaptadores registrados:", data["summary"]["adapter_registered"])
+    print("Áreas con perfil de matriz:", data["domain_matrix"]["profile_count"])
     print("Plantillas encontradas:", data["nuclei_templates"]["count"])
     print("Informe:", output)
