@@ -72,7 +72,7 @@ La ruta pasa por DIRECTOR y después por `agent_runner.py`. La recuperación de 
 
 ```bash
 python cyber_ai.py --ask "Explica este hallazgo" --agent NEXO
-python director.py --no-knowledge "Explica este hallazgo"
+python cyber_ai.py --ask "Explica este hallazgo" --no-knowledge
 ```
 
 Esta entrada no ejecuta automáticamente herramientas de seguridad ni sustituye la autorización de objetivos. Los escáneres y adaptadores conservan sus flujos explícitos de autorización y ejecución documentados más abajo.
