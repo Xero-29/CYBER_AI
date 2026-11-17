@@ -122,6 +122,14 @@ def main():
     parser.add_argument("--scan-rate-limit", type=int, default=2, help="Máximo de solicitudes Nuclei por segundo (1-20).")
     parser.add_argument("--scan-concurrency", type=int, default=2, help="Concurrencia Nuclei (1-10).")
     args = parser.parse_args()
+    scan_options_requested = (
+        args.nuclei_templates or args.authorization_id or args.confirm_authorized
+        or args.scan_severity != "info,low,medium,high,critical"
+        or args.scan_timeout != 300 or args.scan_rate_limit != 2
+        or args.scan_concurrency != 2
+    )
+    if scan_options_requested and not args.scan:
+        parser.error("Las opciones de Nuclei requieren --scan.")
 
     if args.team:
         if args.tool_profile:
@@ -215,12 +223,6 @@ def main():
             print(f"Objetivo inválido: {exc}", file=sys.stderr)
             return 2
 
-    if (args.nuclei_templates or args.authorization_id or args.confirm_authorized
-            or args.scan_severity != "info,low,medium,high,critical"
-            or args.scan_timeout != 300 or args.scan_rate_limit != 2
-            or args.scan_concurrency != 2) and not args.scan:
-        parser.error("Las opciones de Nuclei requieren --scan.")
- 
     if args.self_test:
         required = [
             "report_analyzer.py", "nvd_client.py", "report_manager.py",
