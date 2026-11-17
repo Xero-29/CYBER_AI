@@ -32,3 +32,9 @@ Actualizar prácticas para cloud snapshots, contenedores, móviles, memoria y Sa
 ## Identificadores del registro de fuentes
 - `NIST-SP-800-86`
 - `NIST-SP-800-61r3`
+
+
+## Identificadores del registro de fuentes
+
+- `NIST-SP-800-86`
+- `NIST-SP-800-61r3`
