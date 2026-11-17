@@ -89,6 +89,16 @@ export CYBER_AI_LLM_API_KEY="..."
 
 Los proveedores remotos están deshabilitados por defecto. Anthropic no ofrece embeddings en este adaptador; usa un proveedor de embeddings compatible para indexar y recuperar vectores.
 
+## Allowlist de ejecutables locales
+
+Para validar ejecutables contra una lista aprobada, configura fuera del repositorio:
+
+- `CYBER_AI_TOOL_ALLOWLIST_PATH`: ruta del manifiesto JSON firmado.
+- `CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY`: clave HMAC de al menos 32 bytes, custodiada fuera del repositorio.
+- `CYBER_AI_TOOL_ALLOWLIST_REQUIRED=1`: bloquea la ejecución si la política no está configurada o el binario no coincide.
+
+La allowlist está desactivada por compatibilidad si no se configura. En despliegues controlados activa el modo obligatorio y genera el manifiesto mediante un enrolamiento que verifique previamente el origen del binario. HMAC no es firma asimétrica ni reemplaza KMS/HSM. Consulta [docs/TOOL_ALLOWLIST.md](docs/TOOL_ALLOWLIST.md).
+
 ## Herramientas locales y sandbox
 
 El inventario de 21 herramientas distingue disponibilidad del binario y adaptadores realmente registrados. Hay 14 especificaciones de adaptador: 11 herramientas de ejecución local acotada; YARA y TShark quedan bloqueadas en el host hasta disponer de sandbox aislado; pip-audit queda bloqueado por requerir red. El informe separa adaptador registrado de ejecución realmente habilitada. La presencia en el catálogo no significa que la herramienta esté instalada. Genera el informe con `python capability_inventory.py`.
