@@ -4,6 +4,7 @@
 import argparse
 import hashlib
 import json
+import os
 import sys
 import subprocess
 import uuid
@@ -110,13 +111,20 @@ def main():
     parser.add_argument("--execute-tools", action="store_true", help="Ejecutar adaptadores locales planificados.")
     parser.add_argument("--confirm-tool-execution", action="store_true", help="Confirmación explícita para ejecutar adaptadores.")
     parser.add_argument("--tool-target", help="Ruta del archivo o directorio que se analizará.")
-    parser.add_argument("--allow-external-targets", action="store_true", help="Permitir objetivos fuera del repositorio; requiere confirmación explícita.")
+    parser.add_argument("--allow-external-targets", action="store_true", help="Permitir objetivos externos; requiere perfil extended y confirmación.")
+    parser.add_argument("--tool-profile", help="Perfil de ejecución: standard, extended o restricted.")
     parser.add_argument("--no-knowledge", action="store_true", help="Desactivar recuperación de conocimiento en --ask.")
     parser.add_argument("--confirm-authorized", action="store_true", help="Confirmación adicional del operador.")
     parser.add_argument("--authorization-id", help="ID de autorización local, vigente y limitada al destino.")
     args = parser.parse_args()
 
     if args.team:
+        if args.tool_profile:
+            if not args.execute_tools:
+                parser.error("--tool-profile requiere --execute-tools.")
+            if not __import__("re").fullmatch(r"[a-z0-9_-]{1,48}", args.tool_profile):
+                parser.error("Nombre de perfil inválido.")
+            os.environ["CYBER_AI_TOOL_PROFILE"] = args.tool_profile
         if args.agent or args.no_knowledge:
             parser.error("--agent y --no-knowledge no se aplican al flujo --team.")
         if args.execute_tools and (
@@ -145,7 +153,7 @@ def main():
         result = subprocess.run(command, cwd=Path(__file__).resolve().parent, check=False)
         return result.returncode
 
-    if args.workflow or args.execute_tools or args.confirm_tool_execution or args.tool_target or args.allow_external_targets:
+    if args.workflow or args.execute_tools or args.confirm_tool_execution or args.tool_target or args.allow_external_targets or args.tool_profile:
         parser.error("--workflow y las opciones de ejecución solo pueden utilizarse junto con --team.")
 
     if args.ask:
