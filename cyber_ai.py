@@ -109,7 +109,8 @@ def main():
     parser.add_argument("--workflow", help="Flujo de config/workflows.json para --team.")
     parser.add_argument("--execute-tools", action="store_true", help="Ejecutar adaptadores locales planificados.")
     parser.add_argument("--confirm-tool-execution", action="store_true", help="Confirmación explícita para ejecutar adaptadores.")
-    parser.add_argument("--tool-target", help="Ruta relativa al repositorio que se analizará.")
+    parser.add_argument("--tool-target", help="Ruta del archivo o directorio que se analizará.")
+    parser.add_argument("--allow-external-targets", action="store_true", help="Permitir objetivos fuera del repositorio; requiere confirmación explícita.")
     parser.add_argument("--no-knowledge", action="store_true", help="Desactivar recuperación de conocimiento en --ask.")
     parser.add_argument("--confirm-authorized", action="store_true", help="Confirmación adicional del operador.")
     parser.add_argument("--authorization-id", help="ID de autorización local, vigente y limitada al destino.")
@@ -123,7 +124,7 @@ def main():
         ):
             parser.error("--execute-tools requiere --confirm-tool-execution y --tool-target.")
         if not args.execute_tools and (
-            args.confirm_tool_execution or args.tool_target
+            args.confirm_tool_execution or args.tool_target or args.allow_external_targets
         ):
             parser.error("--confirm-tool-execution y --tool-target requieren --execute-tools.")
         command = [
@@ -138,11 +139,13 @@ def main():
                 "--execute-tools", "--confirm-tool-execution",
                 "--tool-target", args.tool_target,
             ])
+            if args.allow_external_targets:
+                command.append("--allow-external-targets")
         command.append(args.team)
         result = subprocess.run(command, cwd=Path(__file__).resolve().parent, check=False)
         return result.returncode
 
-    if args.workflow or args.execute_tools or args.confirm_tool_execution or args.tool_target:
+    if args.workflow or args.execute_tools or args.confirm_tool_execution or args.tool_target or args.allow_external_targets:
         parser.error("--workflow y las opciones de ejecución solo pueden utilizarse junto con --team.")
 
     if args.ask:
