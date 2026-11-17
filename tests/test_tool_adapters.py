@@ -127,6 +127,14 @@ class ToolAdapterTests(unittest.TestCase):
             self.assertEqual(stat.S_IMODE(path.stat().st_mode), 0o600)
             self.assertEqual(stat.S_IMODE(path.parent.stat().st_mode), 0o700)
 
+    def test_evidence_publication_failure_removes_temporary_file(self):
+        with patch.object(tool_adapters.os, "replace", side_effect=OSError("publish failed")):
+            with self.assertRaisesRegex(ToolExecutionError, "evidencia protegida"):
+                write_evidence({"tool": "ruff", "status": "completed"})
+        evidence_dir = self.root / "reports" / "tool_evidence"
+        self.assertTrue(evidence_dir.is_dir())
+        self.assertEqual(list(evidence_dir.iterdir()), [])
+
     def test_evidence_rejects_symlink_destination_and_unsafe_tool_name(self):
         outside = self.root / "outside"
         outside.mkdir()
