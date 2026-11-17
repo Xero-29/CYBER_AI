@@ -53,7 +53,7 @@ Los 11 adaptadores que pueden ejecutarse directamente en el host son Semgrep, Ba
 
 - `tool_executor.py`: CLI explícita; sin `--execute` solo presenta un dry-run.
 - Cada ejecución exige una ruta existente dentro del repositorio, rechaza enlaces simbólicos, limita el objetivo a 10.000 archivos y 100 MB, fija timeout (máximo 600 s), limita la salida capturada a 2 MB, evita shell y mata el grupo de procesos al agotar el tiempo.
-- La evidencia registra versión y SHA-256 del binario antes/después, huellas del objetivo, código de salida, duración y salida. Si el binario cambia o desaparece, el resultado queda como error de integridad y los validadores del ledger fallan.
+- La evidencia registra versión y SHA-256 del binario antes/después, huellas del objetivo antes/después, código de salida, duración y salida. Si el binario o el objetivo cambia durante el análisis, el resultado queda como error de integridad; el ledger conserva validadores separados para salida del proceso, integridad del binario e integridad del objetivo.
 - Los archivos de evidencia se publican mediante rename atómico; en POSIX usan modo 0600 y directorio 0700. Pueden contener salida sensible. El preflight detecta directorios/archivos de evidencia con permisos de grupo/otros y symlinks. En Windows se deben aplicar ACL privadas en el directorio de evidencia.
 - Semgrep exige configuración local explícita; no descarga reglas. Trivy usa flags offline y no actualiza bases.
 - pip-audit se deniega porque requiere red. YARA y TShark se deniegan en el ejecutor local hasta integrarse en aislamiento. Nmap y Nuclei siguen bajo autorización de red separada.

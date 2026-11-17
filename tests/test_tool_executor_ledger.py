@@ -62,6 +62,32 @@ class ToolExecutorLedgerTests(unittest.TestCase):
         self.assertFalse(terminal["validator_results"][0]["passed"])
         self.assertFalse(terminal["validator_results"][1]["passed"])
 
+    def test_target_integrity_error_is_failed_and_validators_are_independent(self):
+        ledger = FakeLedger()
+        evidence = {
+            "status": "integrity_error",
+            "tool": "ruff",
+            "target": "tests/fixtures/sample.py",
+            "return_code": 0,
+            "tool_binary_modified": False,
+            "tool_binary_sha256": "a" * 64,
+            "tool_binary_sha256_after": "a" * 64,
+            "target_modified": True,
+            "target_sha256": "b" * 64,
+            "target_sha256_after": "c" * 64,
+        }
+        result, output = self.invoke(ledger, evidence)
+        self.assertEqual(result, 1)
+        terminal = ledger.events[-1]
+        self.assertEqual(terminal["status"], "failed")
+        validators = {item["name"]: item["passed"] for item in terminal["validator_results"]}
+        self.assertTrue(validators["process_exit"])
+        self.assertTrue(validators["tool_binary_integrity"])
+        self.assertFalse(validators["target_integrity"])
+        self.assertEqual(
+            terminal["metadata"]["target_sha256_after"], "c" * 64
+        )
+
     def test_adapter_denial_is_recorded_as_terminal_denied(self):
         ledger = FakeLedger()
         result, output = self.invoke(ledger, tool_executor.ToolExecutionError("blocked"))

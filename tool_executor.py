@@ -37,6 +37,21 @@ def _duration_ms(evidence, started):
     return max(0, int((time.monotonic() - started) * 1000))
 
 
+def _integrity_pair_passed(evidence, modified_key, before_key, after_key):
+    """Require an explicit unchanged flag and two matching SHA-256 digests."""
+    before = evidence.get(before_key)
+    after = evidence.get(after_key)
+    if evidence.get(modified_key) is not False:
+        return False
+    if not isinstance(before, str) or not isinstance(after, str):
+        return False
+    if len(before) != 64 or len(after) != 64:
+        return False
+    if any(char not in "0123456789abcdef" for char in before.lower() + after.lower()):
+        return False
+    return before.lower() == after.lower()
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--tool", required=True, choices=sorted(TOOL_SPECS))
@@ -120,25 +135,38 @@ def main(argv=None):
                         {
                             "name": "process_exit",
                             "passed": (
-                                evidence.get("status") == "completed"
+                                isinstance(evidence.get("return_code"), int)
+                                and not isinstance(evidence.get("return_code"), bool)
                                 and evidence.get("return_code") == 0
                             ),
                         },
                         {
                             "name": "tool_binary_integrity",
-                            "passed": (
-                                evidence.get("status") == "completed"
-                                and evidence.get("tool_binary_modified") is False
+                            "passed": _integrity_pair_passed(
+                                evidence, "tool_binary_modified",
+                                "tool_binary_sha256", "tool_binary_sha256_after",
                             ),
                             "evidence": {
                                 "sha256_before": evidence.get("tool_binary_sha256"),
                                 "sha256_after": evidence.get("tool_binary_sha256_after"),
                             },
                         },
+                        {
+                            "name": "target_integrity",
+                            "passed": _integrity_pair_passed(
+                                evidence, "target_modified",
+                                "target_sha256", "target_sha256_after",
+                            ),
+                            "evidence": {
+                                "sha256_before": evidence.get("target_sha256"),
+                                "sha256_after": evidence.get("target_sha256_after"),
+                            },
+                        },
                     ],
                     metadata={
                         "target": evidence.get("target", args.target),
                         "target_sha256": evidence.get("target_sha256"),
+                        "target_sha256_after": evidence.get("target_sha256_after"),
                         "target_modified": evidence.get("target_modified"),
                         "evidence_artifact_sha256": artifact_sha256,
                         "start_event_id": start_event["event_id"],

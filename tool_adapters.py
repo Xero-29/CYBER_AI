@@ -274,12 +274,13 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
     except json.JSONDecodeError:
         parsed = None
     target_hash_after = _hash_target(path)
+    target_modified = target_hash_before != target_hash_after
     try:
         binary_hash_after = _hash_binary(binary)["sha256"]
     except ToolExecutionError:
         binary_hash_after = None
     binary_modified = binary_hash_after != binary_provenance["sha256"]
-    if binary_modified:
+    if binary_modified or target_modified:
         status = "integrity_error"
     evidence = {
         "schema_version": "1.0",
@@ -292,12 +293,12 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
         "target": str(path.relative_to(PROJECT_ROOT)),
         "target_sha256": target_hash_before,
         "target_sha256_after": target_hash_after,
-        "target_modified": target_hash_before != target_hash_after,
+        "target_modified": target_modified,
         "started_at": timestamp,
         "elapsed_seconds": round(time.monotonic() - started, 3),
         "status": status,
         "return_code": returncode,
-        "tool_reported_success": returncode == 0 and not binary_modified,
+        "tool_reported_success": returncode == 0 and not binary_modified and not target_modified,
         "output_truncated": truncated,
         "stdout": out_text,
         "stderr": err_text,
