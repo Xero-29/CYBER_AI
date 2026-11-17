@@ -112,6 +112,25 @@ class TestAgentSimulation(unittest.TestCase):
         with self.assertRaises(SimulationError):
             simulate_workflow(self.workflow, "x" * 100_001)
 
+    def test_context_handoff_respects_workflow_character_limit(self):
+        workflow = {
+            "name": "bounded",
+            "max_context_chars": 250,
+            "steps": [
+                {"agent": "NEXO", "objective": "Generar borrador"},
+                {"agent": "VERITAS", "objective": "Revisar borrador"},
+            ],
+        }
+        fixtures = {
+            "NEXO": "Borrador: " + ("x" * 1200),
+        }
+        report = simulate_workflow(workflow, "tarea", fixtures)
+        second = report["steps"][1]
+        self.assertEqual(second["input_context_steps"], 0)
+        self.assertEqual(second["context_steps_dropped"], 1)
+        self.assertLessEqual(second["input_context_chars"], 250)
+        self.assertEqual(report["metrics"]["context_steps_dropped"], 1)
+
     def test_all_repository_workflows_load_and_simulate(self):
         from agent_simulation import load_workflow
 
