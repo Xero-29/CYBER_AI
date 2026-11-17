@@ -5,6 +5,8 @@ pip-audit queda bloqueado porque requiere red y aún no existe una política
 específica y auditable para ese servicio.
 """
 import hashlib
+import ipaddress
+import xml.etree.ElementTree as ET
 import json
 import os
 import re
@@ -45,6 +47,7 @@ TOOL_SPECS = {
     "gitleaks": {"binary": "gitleaks", "network": False, "offline_only": True, "timeout": 180, "version_args": ["version"], "accepted_exit_codes": [0, 1]},
     "zeek": {"binary": "zeek", "network": False, "offline_only": True, "timeout": 300, "version_args": ["--version"], "input_extensions": [".pcap", ".pcapng", ".cap"]},
     "volatility3": {"binary": "vol", "network": False, "offline_only": True, "timeout": 300, "version_args": ["--version"], "allowed_plugins": ["windows.info", "windows.pslist", "windows.pstree", "windows.netscan", "windows.cmdline", "windows.dlllist", "linux.pslist", "linux.pstree", "linux.bash", "linux.lsmod", "linux.mount", "linux.sockstat", "mac.pslist", "mac.lsmod"]},
+    "nmap": {"binary": "nmap", "network": True, "scoped_network": True, "timeout": 90, "version_args": ["--version"], "accepted_exit_codes": [0]},
     "yara": {"binary": "yara", "network": False, "requires_isolation": True, "timeout": 180, "version_args": ["--version"]},
     "tshark": {"binary": "tshark", "network": False, "requires_isolation": True, "timeout": 180, "version_args": ["--version"]},
 }
@@ -213,11 +216,199 @@ def _probe_tool_version(binary, tool_id, env):
     return result.stdout.strip().splitlines()[0][:256]
 
 
-def run_local_tool(tool_id, target, *, config_path=None, plugin=None, timeout=None, allow_external=False):
+
+def _validated_nmap_scope(target):
+    """Valida una IP/CIDR pequeña contra una allowlist explícita del operador."""
+    if not isinstance(target, str) or not target.strip() or any(ch.isspace() for ch in target):
+        raise ToolExecutionError("Nmap requiere una IP o CIDR literal, sin espacios.")
+    try:
+        if "/" in target:
+            requested = ipaddress.ip_network(target, strict=False)
+        else:
+            address = ipaddress.ip_address(target)
+            requested = ipaddress.ip_network(
+                f"{address}/{address.max_prefixlen}", strict=True
+            )
+    except ValueError as error:
+        raise ToolExecutionError("Nmap no acepta DNS, argumentos ni objetivos no IP.") from error
+    if requested.num_addresses > 16 or requested.is_multicast or requested.is_unspecified:
+        raise ToolExecutionError("El alcance Nmap debe ser un bloque unicast de máximo 16 direcciones.")
+
+    raw_allowlist = os.environ.get("CYBER_AI_NMAP_ALLOWED_CIDRS", "")
+    if not raw_allowlist.strip():
+        raise ToolExecutionError(
+            "Nmap está bloqueado: configura CYBER_AI_NMAP_ALLOWED_CIDRS con los rangos autorizados."
+        )
+    allowed = []
+    for value in raw_allowlist.split(","):
+        value = value.strip()
+        if not value:
+            continue
+        try:
+            if "/" in value:
+                allowed.append(ipaddress.ip_network(value, strict=False))
+            else:
+                address = ipaddress.ip_address(value)
+                allowed.append(ipaddress.ip_network(
+                    f"{address}/{address.max_prefixlen}", strict=True
+                ))
+        except ValueError as error:
+            raise ToolExecutionError("La allowlist CIDR de Nmap contiene una entrada inválida.") from error
+    if not allowed or not any(requested.subnet_of(network) for network in allowed):
+        raise ToolExecutionError("El objetivo Nmap no está contenido en la allowlist autorizada.")
+    return str(requested), str(requested), hashlib.sha256(
+        raw_allowlist.encode("utf-8")
+    ).hexdigest()
+
+
+def _build_nmap_command(binary, target):
+    """Escaneo TCP connect acotado; sin NSE, detección OS, DNS ni evasión."""
+    return [
+        binary, "-sT", "-Pn", "-n", "--top-ports", "100",
+        "--max-retries", "1", "--host-timeout", "60s",
+        "--max-rate", "25", "-oX", "-", target,
+    ]
+
+
+def _parse_nmap_xml(output):
+    try:
+        root = ET.fromstring(output)
+    except (ET.ParseError, ValueError):
+        return None
+    hosts = []
+    for host in root.findall("host"):
+        addresses = [
+            item.attrib.get("addr")
+            for item in host.findall("address")
+            if item.attrib.get("addr")
+        ]
+        status = host.find("status")
+        ports = []
+        ports_node = host.find("ports")
+        if ports_node is not None:
+            for port in ports_node.findall("port"):
+                state = port.find("state")
+                service = port.find("service")
+                ports.append({
+                    "protocol": port.attrib.get("protocol"),
+                    "port": port.attrib.get("portid"),
+                    "state": state.attrib.get("state") if state is not None else None,
+                    "service": service.attrib.get("name") if service is not None else None,
+                    "product": service.attrib.get("product") if service is not None else None,
+                    "version": service.attrib.get("version") if service is not None else None,
+                })
+        hosts.append({
+            "addresses": addresses,
+            "status": status.attrib.get("state") if status is not None else None,
+            "ports": ports,
+        })
+    return {"hosts": hosts, "host_count": len(hosts)}
+
+
+
+def _run_scoped_nmap(target, spec, *, timeout=None):
+    normalized_target, scope, allowlist_hash = _validated_nmap_scope(target)
+    limit = spec["timeout"] if timeout is None else timeout
+    if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= 180:
+        raise ToolExecutionError("El timeout Nmap debe estar entre 1 y 180 segundos.")
+    binary = shutil.which(spec["binary"])
+    if not binary:
+        raise ToolExecutionError("Nmap no está instalado o no está en PATH.")
+    provenance = _hash_binary(binary)
+    allowlist_evidence = verify_tool_allowed("nmap", provenance["sha256"])
+    binary = provenance["resolved_path"]
+    env = {
+        "PATH": os.environ.get("PATH", ""),
+        "HOME": os.environ.get("HOME", ""),
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "NO_COLOR": "1",
+    }
+    version = _probe_tool_version(binary, "nmap", env)
+    if _hash_binary(binary)["sha256"] != provenance["sha256"]:
+        raise ToolExecutionError("El ejecutable Nmap cambió durante la identificación.")
+    command = _build_nmap_command(binary, normalized_target)
+    started = time.monotonic()
+    timestamp = datetime.now(timezone.utc).isoformat()
+    try:
+        result = subprocess.run(
+            command, cwd=str(PROJECT_ROOT), env=env,
+            stdin=subprocess.DEVNULL, capture_output=True,
+            text=True, timeout=limit, shell=False, check=False,
+        )
+        return_code = result.returncode
+        out_text = result.stdout[:MAX_OUTPUT_BYTES]
+        err_text = result.stderr[:MAX_OUTPUT_BYTES]
+        truncated = len(result.stdout) > MAX_OUTPUT_BYTES or len(result.stderr) > MAX_OUTPUT_BYTES
+        status = "completed"
+    except subprocess.TimeoutExpired as error:
+        return_code = None
+        out_text = str(error.stdout or "")[:MAX_OUTPUT_BYTES]
+        err_text = str(error.stderr or "")[:MAX_OUTPUT_BYTES]
+        truncated = False
+        status = "timeout"
+    except OSError as error:
+        raise ToolExecutionError("No se pudo iniciar Nmap.") from error
+    try:
+        binary_after = _hash_binary(binary)["sha256"]
+    except ToolExecutionError:
+        binary_after = None
+    binary_modified = binary_after != provenance["sha256"]
+    if binary_modified:
+        status = "integrity_error"
+    parsed = _parse_nmap_xml(out_text)
+    return {
+        "schema_version": "1.0",
+        "tool": "nmap",
+        "tool_version": version,
+        "tool_binary_path": provenance["resolved_path"],
+        "tool_binary_sha256": provenance["sha256"],
+        "tool_binary_sha256_after": binary_after,
+        "tool_binary_modified": binary_modified,
+        "tool_allowlist": allowlist_evidence,
+        "target": normalized_target,
+        "target_type": "network",
+        "target_sha256": None,
+        "target_sha256_after": None,
+        "target_modified": None,
+        "authorization_required": True,
+        "scope_validated": True,
+        "authorization_scope": scope,
+        "scope_allowlist_sha256": allowlist_hash,
+        "started_at": timestamp,
+        "elapsed_seconds": round(time.monotonic() - started, 3),
+        "status": status,
+        "return_code": return_code,
+        "tool_reported_success": (
+            status == "completed" and return_code in spec.get("accepted_exit_codes", [0])
+            and not binary_modified
+        ),
+        "findings_present": bool(parsed and any(
+            port.get("state") == "open"
+            for host in parsed["hosts"] for port in host["ports"]
+        )),
+        "output_truncated": truncated,
+        "stdout": out_text,
+        "stderr": err_text,
+        "parsed_json": parsed,
+        "command": command[1:],
+        "network_access": "authorized_active_network_scan",
+        "network_isolation_enforced": False,
+        "network_policy": "Alcance literal IP/CIDR validado contra CYBER_AI_NMAP_ALLOWED_CIDRS; el proceso host no tiene aislamiento de egress del SO.",
+        "note": "Escaneo TCP connect limitado a 100 puertos frecuentes, sin NSE, DNS, detección OS ni técnicas de evasión. Solo ejecutar con autorización explícita del propietario del rango.",
+    }
+
+
+
+def run_local_tool(tool_id, target, *, config_path=None, plugin=None, timeout=None, allow_external=False, allow_network=False):
     """Ejecuta un adaptador local; YARA/TShark se delegan al sandbox Docker."""
     if tool_id not in TOOL_SPECS:
         raise ToolExecutionError("Herramienta no registrada.")
     spec = TOOL_SPECS[tool_id]
+    if spec.get("scoped_network"):
+        if not allow_network:
+            raise ToolExecutionError("Nmap requiere --authorized-network además de la allowlist CIDR.")
+        return _run_scoped_nmap(target, spec, timeout=timeout)
     if spec.get("requires_isolation"):
         from isolated_tool_runner import run_isolated_tool
         return run_isolated_tool(
