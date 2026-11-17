@@ -87,7 +87,7 @@ class ExecutionLedger:
                     namespace TEXT NOT NULL, task_fingerprint TEXT NOT NULL,
                     task TEXT NOT NULL,
                     status TEXT NOT NULL CHECK(status IN
-                        ('started','completed','failed','timeout','denied','cancelled')),
+                        ('started','completed','failed','timeout','denied','cancelled','interrupted')),
                     tool TEXT NOT NULL, tool_version TEXT NOT NULL,
                     model TEXT NOT NULL, environment TEXT NOT NULL,
                     duration_ms INTEGER NOT NULL CHECK(duration_ms >= 0),
@@ -110,7 +110,7 @@ class ExecutionLedger:
             schema = db.execute(
                 "SELECT sql FROM sqlite_master WHERE type='table' AND name='execution_events'"
             ).fetchone()
-            if schema and "'started'" not in schema["sql"]:
+            if schema and "'interrupted'" not in schema["sql"]:
                 db.executescript("""
                     BEGIN IMMEDIATE;
                     DROP TRIGGER IF EXISTS execution_events_no_update;
@@ -149,7 +149,7 @@ class ExecutionLedger:
         for name, value in (("namespace", namespace), ("task", task), ("tool", tool)):
             if not isinstance(value, str) or not value.strip():
                 raise LedgerError(f"{name} es obligatorio.")
-        if status not in {"started", "completed", "failed", "timeout", "denied", "cancelled"}:
+        if status not in {"started", "completed", "failed", "timeout", "denied", "cancelled", "interrupted"}:
             raise LedgerError("Estado de ejecución no permitido.")
         if isinstance(duration_ms, bool) or not isinstance(duration_ms, int) or duration_ms < 0:
             raise LedgerError("duration_ms debe ser un entero no negativo.")
@@ -203,6 +203,72 @@ class ExecutionLedger:
             raise
         finally:
             db.close()
+
+    def reconcile_interrupted(self, *, namespace=None):
+        """Close orphaned starts as interrupted; never infer task success or failure.
+
+        Only lifecycle pairs carrying metadata.start_event_id are reconciled. The
+        transaction lock and deterministic event IDs make repeated calls safe.
+        """
+        db = self.connect()
+        reconciled = []
+        try:
+            db.execute("BEGIN IMMEDIATE")
+            query = "SELECT * FROM execution_events WHERE status='started'"
+            params = ()
+            if namespace is not None:
+                query += " AND namespace=?"
+                params = (namespace,)
+            query += " ORDER BY sequence"
+            starts = db.execute(query, params).fetchall()
+            rows = db.execute(
+                "SELECT status, metadata FROM execution_events WHERE status!='started'"
+            ).fetchall()
+            closed = set()
+            for row in rows:
+                try:
+                    start_id = json.loads(row["metadata"]).get("start_event_id")
+                except (TypeError, ValueError, AttributeError):
+                    start_id = None
+                if start_id:
+                    closed.add(start_id)
+            db.commit()
+        except Exception:
+            db.rollback()
+            raise
+        finally:
+            db.close()
+
+        for start in starts:
+            if start["event_id"] in closed:
+                continue
+            try:
+                result = self.append(
+                    namespace=start["namespace"],
+                    task=start["task"],
+                    status="interrupted",
+                    tool=start["tool"],
+                    tool_version=start["tool_version"],
+                    model=start["model"],
+                    environment=start["environment"],
+                    duration_ms=0,
+                    evidence={
+                        "phase": "lifecycle_reconciliation",
+                        "outcome": "unknown",
+                        "reason": "start_event_has_no_terminal_record",
+                    },
+                    metadata={
+                        "start_event_id": start["event_id"],
+                        "recovered_by": "execution_ledger.reconcile_interrupted",
+                        "original_started_at": start["created_at"],
+                    },
+                    event_id="interrupted-" + start["event_id"],
+                )
+                reconciled.append(result)
+            except sqlite3.IntegrityError:
+                # Another reconciler may have inserted the same deterministic ID.
+                continue
+        return {"reconciled": len(reconciled), "events": reconciled}
 
     def verify(self):
         with self.connect() as db:
