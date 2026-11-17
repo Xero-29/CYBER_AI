@@ -51,6 +51,9 @@ def main(argv=None):
     rollback.add_argument("--target-version", type=int, required=True)
     rollback.add_argument("--signature", required=True)
 
+    verify_history = sub.add_parser("verify-history")
+    verify_history.add_argument("--skill-id", required=True)
+
     review_due = sub.add_parser("review-due")
     review_due.add_argument("--max-age-days", type=int, default=180)
 
@@ -88,6 +91,11 @@ def main(argv=None):
             result = skillbook.rollback_skill_version(
                 args.skill_id, args.target_version, args.signature
             )
+        elif args.command == "verify-history":
+            result = skillbook.verify_skill_history(args.skill_id)
+            if not result["valid"]:
+                print(json.dumps(result, ensure_ascii=False, indent=2))
+                return 1
         elif args.command == "review-due":
             result = {"skills_due_for_review": skillbook.list_skills_due_for_review(
                 args.max_age_days
