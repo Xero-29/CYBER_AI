@@ -123,12 +123,6 @@ class LearningMemoryTests(unittest.TestCase):
     def test_without_approval_key_memory_fails_closed(self):
         self.save_lesson()
         with patch.dict(os.environ, {learning_memory.APPROVAL_KEY_ENV: ""}):
-            with patch.object(
-            learning_memory, "ExecutionLedger", return_value=FakeLedger(self.events)
-        ):
-            with patch.object(
-            learning_memory, "ExecutionLedger", return_value=FakeLedger(self.events)
-        ):
             self.assertEqual(learning_memory.read_lessons(), [])
 
     def test_direct_self_asserted_registration_is_disabled(self):
