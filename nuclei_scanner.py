@@ -183,7 +183,9 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
                   "error": "No se encontró el directorio de plantillas HTTP. Instala las plantillas o configura CYBER_AI_NUCLEI_TEMPLATES.",
                   "findings": []}
         return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)
-    if not template_root.is_dir() or not any(template_root.rglob("*.yaml")):
+    if (not template_root.is_dir()
+            or any(item.is_symlink() for item in template_root.rglob("*"))
+            or not any(template_root.rglob("*.yaml"))):
         result = {"target": target, "status": "error",
                   "error": "El directorio de plantillas no contiene archivos YAML.",
                   "findings": []}
@@ -206,7 +208,7 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
         executable, "-u", target, "-t", str(template_root),
         "-severity", selected_severity, "-type", "http",
         "-exclude-tags", "dos,intrusive,fuzz,code,headless",
-        "-disable-unsigned-templates", "-jsonl", "-stats",
+        "-disable-unsigned-templates", "-no-stdin", "-jsonl", "-stats",
         "-stats-interval", "5", "-no-interactsh",
         "-disable-update-check", "-disable-redirects",
         "-rl", str(rate_limit), "-c", str(concurrency),
