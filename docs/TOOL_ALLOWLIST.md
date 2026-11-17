@@ -32,3 +32,10 @@ La firma es HMAC-SHA256 sobre el JSON canónico sin el campo `signature`. La val
 - La política autentica la correspondencia entre herramienta y hash, pero no demuestra por sí sola que el binario provenga del editor legítimo. El enrolamiento debe verificar el origen del artefacto antes de firmarlo.
 - La comprobación por ruta no elimina por completo una carrera TOCTOU frente a un atacante local capaz de reemplazar el ejecutable entre la verificación y su inicio. No uses esta allowlist como frontera contra un administrador/atacante con control concurrente del host; usa artefactos inmutables, permisos de instalación restrictivos y aislamiento externo.
 - El hash se toma del ejecutable resuelto en el host. Esto no aísla el proceso, no impide egress y no sustituye sandbox/VM.
+
+
+## Uso desde el flujo multiagente
+
+La ruta integrada `cyber_ai.py --team` solo ejecuta adaptadores si se pasan `--execute-tools --confirm-tool-execution --tool-target`. Requiere ambos valores de entorno y fuerza `CYBER_AI_TOOL_ALLOWLIST_REQUIRED=1` durante cada ejecución. El objetivo debe ser una ruta relativa dentro del repositorio. El flujo limita la selección a tres adaptadores locales soportados; herramientas con requisitos de red o aislamiento especial siguen bloqueadas.
+
+Los resultados se validan en integridad antes de marcar el evento del ledger como completado. La validación no certifica la exactitud de los hallazgos ni aísla el proceso del host.
