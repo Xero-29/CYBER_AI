@@ -91,6 +91,8 @@ def _finalize_scan(target, result, started, authorization_id, start_event_id, re
     result.setdefault("duration_ms", max(0, int((time.monotonic() - started) * 1000)))
     validation = validate_scan_result(result, expected_target=target)
     result["independent_evidence_validation"] = validation
+    if result.get("status") == "completed" and not validation["findings_eligible"]:
+        result["status"] = "evidence_rejected"
     event_payload = {
         "evidence_schema": result["evidence_schema"],
         "scanner": result["scanner"],
@@ -111,8 +113,6 @@ def _finalize_scan(target, result, started, authorization_id, start_event_id, re
         result["ledger_error"] = "No se pudo persistir el evento terminal del escaneo."
     elif event is not None:
         result["ledger_event_id"] = event.get("event_id")
-    if result.get("status") == "completed" and not validation["findings_eligible"]:
-        result["status"] = "evidence_rejected"
     return result
 
 
