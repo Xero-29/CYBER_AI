@@ -232,5 +232,139 @@ class ToolAdapterTests(unittest.TestCase):
         runner.assert_called_once()
         self.assertEqual(runner.call_args.args, ("tshark", "sample.pcap"))
 
+    def test_osv_scanner_uses_offline_json_mode(self):
+        command = tool_adapters._build_command(
+            "osv_scanner", "/usr/bin/osv-scanner", self.root
+        )
+        self.assertEqual(
+            command,
+            [
+                "/usr/bin/osv-scanner", "--offline", "scan", "source",
+                "-r", str(self.root), "--format", "json",
+            ],
+        )
+        self.assertTrue(tool_adapters.TOOL_SPECS["osv_scanner"]["offline_only"])
+        self.assertTrue(tool_adapters.TOOL_SPECS["osv_scanner"]["local_database_required"])
+
+    def test_grype_uses_local_directory_json_mode(self):
+        command = tool_adapters._build_command(
+            "grype", "/usr/bin/grype", self.root
+        )
+        self.assertEqual(command, ["/usr/bin/grype", str(self.root), "-o", "json"])
+        self.assertTrue(tool_adapters.TOOL_SPECS["grype"]["local_database_required"])
+
+    def test_gitleaks_redacts_all_secret_values(self):
+        command = tool_adapters._build_command(
+            "gitleaks", "/usr/bin/gitleaks", self.root
+        )
+        self.assertIn("--redact=100", command)
+        self.assertIn("--report-format", command)
+        self.assertIn("json", command)
+        with self.assertRaisesRegex(ToolExecutionError, "directorio"):
+            tool_adapters._build_command(
+                "gitleaks", "/usr/bin/gitleaks", self.root / "sample.py"
+            )
+
+    def test_zeek_accepts_only_offline_capture_files(self):
+        capture = self.root / "trace.pcapng"
+        capture.write_bytes(b"pcap")
+        command = tool_adapters._build_command(
+            "zeek", "/usr/bin/zeek", capture
+        )
+        self.assertEqual(
+            command,
+            ["/usr/bin/zeek", "-r", str(capture), "LogAscii::use_json=T"],
+        )
+        with self.assertRaisesRegex(ToolExecutionError, "PCAP"):
+            tool_adapters._build_command(
+                "zeek", "/usr/bin/zeek", self.root / "sample.py"
+            )
+
+    def test_volatility_requires_allowlisted_plugin_and_offline_mode(self):
+        command = tool_adapters._build_command(
+            "volatility3", "/usr/bin/vol", self.root / "sample.py",
+            plugin="windows.info",
+        )
+        self.assertEqual(
+            command,
+            ["/usr/bin/vol", "--offline", "-f", str(self.root / "sample.py"), "windows.info"],
+        )
+        with self.assertRaisesRegex(ToolExecutionError, "allowlist"):
+            tool_adapters._build_command(
+                "volatility3", "/usr/bin/vol", self.root / "sample.py",
+                plugin="malicious.plugin",
+            )
+
+    @patch("tool_adapters.subprocess.Popen")
+    @patch("tool_adapters.shutil.which", return_value="/usr/bin/osv-scanner")
+    @patch("tool_adapters.subprocess.run")
+    def test_osv_execution_records_offline_configuration(self, version_run, which, popen):
+        version_run.return_value = subprocess.CompletedProcess(
+            ["osv-scanner", "--version"], 0, stdout="osv-scanner 2.0", stderr=""
+        )
+        process = FakeProcess(stdout=b'{"results":[]}')
+        popen.return_value = process
+        provenance = {"resolved_path": "/usr/bin/osv-scanner", "sha256": "a" * 64}
+        with (
+            patch.object(tool_adapters, "_hash_binary", return_value=provenance),
+            patch.object(tool_adapters, "verify_tool_allowed", return_value={"allowed": True}),
+        ):
+            evidence = run_local_tool("osv_scanner", ".")
+        self.assertEqual(evidence["status"], "completed")
+        self.assertTrue(evidence["tool_reported_success"])
+        self.assertEqual(evidence["network_access"], "disabled_by_tool_offline_mode")
+        self.assertFalse(evidence["network_isolation_enforced"])
+        self.assertIn("--offline", evidence["command"])
+        self.assertEqual(evidence["parsed_json"], {"results": []})
+
+    @patch("tool_adapters.subprocess.Popen")
+    @patch("tool_adapters.shutil.which", return_value="/usr/bin/gitleaks")
+    @patch("tool_adapters.subprocess.run")
+    def test_gitleaks_findings_exit_code_is_not_misreported_as_execution_failure(
+        self, version_run, which, popen
+    ):
+        version_run.return_value = subprocess.CompletedProcess(
+            ["gitleaks", "version"], 0, stdout="gitleaks 8.0", stderr=""
+        )
+        process = FakeProcess(stdout=b'[{"RuleID":"test"}]')
+        process.wait = Mock(return_value=1)
+        popen.return_value = process
+        provenance = {"resolved_path": "/usr/bin/gitleaks", "sha256": "b" * 64}
+        with (
+            patch.object(tool_adapters, "_hash_binary", return_value=provenance),
+            patch.object(tool_adapters, "verify_tool_allowed", return_value={"allowed": True}),
+        ):
+            evidence = run_local_tool("gitleaks", ".")
+        self.assertEqual(evidence["return_code"], 1)
+        self.assertTrue(evidence["tool_reported_success"])
+        self.assertTrue(evidence["findings_present"])
+
+    @patch("tool_adapters.subprocess.Popen")
+    @patch("tool_adapters.shutil.which", return_value="/usr/bin/zeek")
+    @patch("tool_adapters.subprocess.run")
+    def test_zeek_collects_json_logs_in_temporary_workspace(self, version_run, which, popen):
+        capture = self.root / "trace.pcap"
+        capture.write_bytes(b"pcap")
+        version_run.return_value = subprocess.CompletedProcess(
+            ["zeek", "--version"], 0, stdout="zeek 7.0", stderr=""
+        )
+        def start_process(command, **kwargs):
+            Path(kwargs["cwd"], "conn.log").write_text(
+                '{"id.orig_h":"192.0.2.1"}\\n', encoding="utf-8"
+            )
+            return FakeProcess()
+        popen.side_effect = start_process
+        provenance = {"resolved_path": "/usr/bin/zeek", "sha256": "c" * 64}
+        with (
+            patch.object(tool_adapters, "_hash_binary", return_value=provenance),
+            patch.object(tool_adapters, "verify_tool_allowed", return_value={"allowed": True}),
+        ):
+            evidence = run_local_tool("zeek", "trace.pcap")
+        self.assertEqual(evidence["status"], "completed")
+        self.assertEqual(
+            evidence["parsed_json"]["logs"]["conn.log"][0]["id.orig_h"],
+            "192.0.2.1",
+        )
+
 if __name__ == "__main__":
     unittest.main()
