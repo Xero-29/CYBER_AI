@@ -12,13 +12,21 @@ El informe JSON se guarda por defecto en `reports/agent_simulations/`. Se puede 
 
 ## Qué comprueba
 
+- Que el catálogo JSON tenga una estructura válida y una versión compatible.
+- Que el identificador del flujo sea seguro y exista en el catálogo.
 - Que el flujo tenga pasos y que cada paso tenga agente, objetivo y modo válido.
+- Que los límites opcionales del flujo sean enteros positivos.
+- Que las fixtures solo correspondan a agentes del flujo y sean textos no vacíos.
 - Que cada respuesta simulada cumpla el prefijo y las secciones declaradas en el contrato.
 - Que el flujo se detenga al detectar una salida inválida.
 - Que el contexto se transfiera secuencialmente entre etapas.
 - Que el informe declare expresamente cero llamadas reales a modelos y herramientas.
 
-Las pruebas pueden inyectar respuestas por agente en `simulate_workflow(workflow, task, responses)` para comprobar escenarios conformes, incompletos y adversariales.
+Las pruebas pueden inyectar respuestas por agente en `simulate_workflow(workflow, task, responses)` para comprobar escenarios conformes, incompletos y adversariales. Una secuencia de fixtures permite respuestas diferentes cuando un agente aparece en más de una etapa. Una fixture malformada no se sustituye silenciosamente por una respuesta sintética.
+
+## Validación automatizada
+
+La suite comprueba los tres flujos existentes en el catálogo: `investigacion`, `critica_corta` y `revision_tecnica`. También cubre identificadores inseguros, catálogos malformados, modos inválidos, límites incorrectos, fixtures vacías/desconocidas/no textuales, transferencia de contexto, parada ante incumplimiento y escritura del informe CLI.
 
 ## Límites
 
