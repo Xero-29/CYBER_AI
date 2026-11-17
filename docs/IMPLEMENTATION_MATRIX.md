@@ -65,7 +65,7 @@ Los paquetes editoriales, agendas y fuentes catalogadas no deben presentarse com
 | pip-audit | Registrado, bloqueado | Política de red específica pendiente |
 | YARA/TShark | Runner Docker aislado | Docker comparte kernel; amenaza hostil requiere frontera más fuerte |
 | Nuclei | Runner remoto separado | Egress allowlist y DNS pinning pendientes |
-| OSV-Scanner/Grype | Adaptadores offline | DB local, esquema y vigencia necesitan preflight |
+| OSV-Scanner/Grype | Adaptadores offline con preflight read-only obligatorio | OSV valida ZIP/ecosistemas pero frescura y esquema quedan desconocidos por límites del formato; Grype valida schemaVersion, built, ruta local y antigüedad máxima de 14 días (configurable) |
 | Nmap | CIDR/IP allowlisted y escaneo TCP limitado | Aislamiento egress de sistema operativo no impuesto |
 | Herramientas personalizadas | Registro declarativo | No se puede garantizar que no accedan a red; evidencia declara `network_access=not_enforced` |
 
@@ -106,7 +106,7 @@ Los paquetes editoriales, agendas y fuentes catalogadas no deben presentarse com
 ## Próximas acciones
 
 1. Corregir y mantener sincronizados README, estado del proyecto, inventario y matriz (Fase 0).
-2. Implementar preflight local fiable para bases OSV-Scanner y Grype; nunca descargar durante el escaneo.
+2. Extender la verificación OSV con procedencia de descarga/build cuando OSV publique metadatos verificables; el estado actual declara frescura/esquema desconocidos. Mantener Grype con preflight de metadatos y antigüedad fail-closed.
 3. Diseñar runner común aislado y separar Nmap/Nuclei en perfiles de red con enforcement de firewall/egress.
 4. Construir benchmark real de recuperación y selector de agentes; revisar contenido de los 48 dominios.
 5. Añadir firma externa e identidad al ciclo de Skills.
