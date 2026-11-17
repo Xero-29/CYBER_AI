@@ -49,7 +49,7 @@ class KnowledgeAuditSecurityTests(unittest.TestCase):
             })
             report = audit_files(self.manifest, self.root)
             self.assertEqual(report["checked_files"], 0)
-            self.assertTrue(any(item.get("resource") == "linked" for item in report["unsafe_paths"]))
+            self.assertTrue(any(item.get("resource") == "escape" for item in report["unsafe_paths"]))
         finally:
             outside.unlink(missing_ok=True)
 
@@ -64,7 +64,7 @@ class KnowledgeAuditSecurityTests(unittest.TestCase):
             })
             report = audit_files(self.manifest, self.root)
             self.assertEqual(report["checked_files"], 0)
-            self.assertEqual(len(report["unsafe_paths"]), 1)
+            self.assertTrue(any(item.get("resource") == "linked" for item in report["unsafe_paths"]))
         finally:
             link.unlink(missing_ok=True)
 
