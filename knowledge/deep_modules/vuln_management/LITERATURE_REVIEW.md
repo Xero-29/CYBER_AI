@@ -51,3 +51,4 @@ No sumar mecánicamente CVSS + EPSS + KEV. Son señales de naturaleza diferente.
 - FIRST, EPSS How It Works. https://www.first.org/epss/how-it-works
 - CISA, Known Exploited Vulnerabilities Catalog. https://www.cisa.gov/known-exploited-vulnerabilities-catalog
 - NIST, Vulnerability Management / NVD (referencia complementaria por desarrollar). https://nvd.nist.gov/
+\n\n## Identificadores del registro de fuentes\n\n- `FIRST-EPSS-FAQ`\n- `FIRST-EPSS-METHOD`\n- `CISA-KEV`\n
