@@ -1297,11 +1297,13 @@ def main(argv=None):
                 "--acceptance-criterion requiere --supervise-objectives."
             )
 
-        workflow_options = {
-            "execute_tools": args.execute_tools,
-            "confirm_tool_execution": args.confirm_tool_execution,
-            "tool_target": args.tool_target,
-        }
+        workflow_options = {}
+        if args.execute_tools:
+            workflow_options.update({
+                "execute_tools": True,
+                "confirm_tool_execution": True,
+                "tool_target": args.tool_target,
+            })
         if args.supervise_objectives:
             workflow_options.update({
                 "supervise_objectives": True,
