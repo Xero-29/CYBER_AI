@@ -311,3 +311,20 @@ No declarar el sistema completo ni certificado hasta que cada brecha tenga códi
 - **Límite de reproducibilidad:** los hashes registrados describen los artefactos obtenidos en esa ejecución/plataforma; no son todavía hashes fijados en `requirements.lock` ni aseguran equivalencia para todos los sistemas operativos/arquitecturas. No se inventaron hashes. La fijación multiplataforma requiere resolver y revisar artefactos para cada plataforma soportada.
 - **Pruebas añadidas:** cambio de binario durante ejecución, historial de Skills discontinuo/manipulado, validación de manifiestos de wheels y hashes SBOM.
 
+## Cierre de brechas implementables por código — 17-11-2026
+
+- **Hashes de ejecutables:** los adaptadores calculan SHA-256 del binario resuelto antes y después de ejecutar. La evidencia incluye ruta, versión y hashes; si cambia o desaparece, el estado pasa a `integrity_error`. El ejecutor registra los validadores de salida e integridad como fallidos, aunque el proceso devuelva código 0.
+- **Historial de Skills con hash chain:** cada snapshot versionado queda enlazado mediante SHA-256 al anterior. `verify_skill_history` comprueba continuidad de versiones, hashes de cadena, identidad de snapshots y coincidencia del estado actual. La migración convierte historiales antiguos al nuevo formato; la migración no puede demostrar que los datos previos a ella nunca hubieran sido manipulados.
+- **CLI de verificación:** `python skillbook_cli.py verify-history --skill-id ID` devuelve código distinto de cero si el historial no supera los controles.
+- **Dependencias:** el workflow Python descarga wheels correspondientes a las versiones fijadas, calcula SHA-256, verifica cobertura/versiones contra `requirements.lock` e integra hashes en el SBOM CycloneDX. Se publica el SBOM junto con el manifiesto de procedencia del build.
+- **Límite de lock:** los hashes corresponden a artefactos de la plataforma de CI de esa ejecución. No equivalen a hashes obligatorios comprometidos en el lock para todos los sistemas/arquitecturas; no se inventaron hashes ni se habilitó una falsa garantía de reproducibilidad multiplataforma.
+- **Pruebas:** CI ejecutó la suite completa, verificación de procedencia, generación SBOM con hashes y construcción/ejecución del sandbox Docker.
+
+### Evidencia CI del HEAD de código
+
+- HEAD: `defa615b7ff46bf36b3382d4396bc1082ce1ab29`.
+- Python tests + wheel manifest + SBOM: **success** — https://github.com/Xero-29/CYBER_AI/actions/runs/44106180565
+- Docker sandbox + Ruff aislado: **success** — https://github.com/Xero-29/CYBER_AI/actions/runs/44106180427
+- Artefacto SBOM/procedencia publicado: `cyber-ai-sbom-defa615b7ff46bf36b3382d4396bc1082ce1ab29`.
+- Comparación actual con `main`: 427 commits adelante, 0 detrás. PR #2 sigue abierto como draft; no se ha fusionado.
+
