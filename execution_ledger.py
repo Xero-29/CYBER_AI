@@ -210,6 +210,28 @@ class ExecutionLedger:
         reconciled = []
         try:
             db.execute("BEGIN IMMEDIATE")
+            chain_rows = db.execute(
+                "SELECT * FROM execution_events ORDER BY sequence"
+            ).fetchall()
+            previous_hash = GENESIS
+            fields = ("event_id", "created_at", "namespace", "task_fingerprint", "task",
+                      "status", "tool", "tool_version", "model", "environment",
+                      "duration_ms", "cost_microunits", "evidence_sha256", "previous_hash")
+            for expected, row in enumerate(chain_rows, 1):
+                item = dict(row)
+                if item["sequence"] != expected or item["previous_hash"] != previous_hash:
+                    raise LedgerError("No se reconcilia un ledger con una cadena rota.")
+                try:
+                    payload = {key: item[key] for key in fields}
+                    payload["validator_results"] = json.loads(item["validator_results"])
+                    payload["metadata"] = json.loads(item["metadata"])
+                    calculated = _digest(previous_hash, _canonical(payload))
+                except (KeyError, TypeError, ValueError) as error:
+                    raise LedgerError("No se puede verificar el ledger antes de reconciliar.") from error
+                if calculated != item["event_hash"]:
+                    raise LedgerError("No se reconcilia un ledger con un hash inválido.")
+                previous_hash = item["event_hash"]
+
             query = "SELECT * FROM execution_events WHERE status='started'"
             params = ()
             if namespace is not None:
