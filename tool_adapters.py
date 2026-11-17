@@ -14,6 +14,7 @@ import uuid
 import signal
 import subprocess
 import threading
+import tempfile
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -255,8 +256,6 @@ def run_local_tool(tool_id, target, *, config_path=None, plugin=None, timeout=No
     if tool_id == "grype":
         env["GRYPE_DB_AUTO_UPDATE"] = "false"
         env["GRYPE_EXTERNAL_SOURCES_ENABLE"] = "false"
-    if tool_id == "volatility3":
-        env["VOLATILITY_CACHE_PATH"] = tempfile.mkdtemp(prefix="cyber-ai-volatility-")
     tool_version = _probe_tool_version(binary, tool_id, env)
     if _hash_binary(binary)["sha256"] != binary_provenance["sha256"]:
         raise ToolExecutionError("El ejecutable cambió durante la identificación de versión.")
@@ -264,7 +263,11 @@ def run_local_tool(tool_id, target, *, config_path=None, plugin=None, timeout=No
     started = time.monotonic()
     timestamp = datetime.now(timezone.utc).isoformat()
     zeek_workspace = None
+    volatility_workspace = None
     working_directory = PROJECT_ROOT
+    if tool_id == "volatility3":
+        volatility_workspace = tempfile.TemporaryDirectory(prefix="cyber-ai-volatility-")
+        env["VOLATILITY_CACHE_PATH"] = volatility_workspace.name
     if tool_id == "zeek":
         zeek_workspace = tempfile.TemporaryDirectory(prefix="cyber-ai-zeek-")
         working_directory = Path(zeek_workspace.name)
@@ -314,6 +317,10 @@ def run_local_tool(tool_id, target, *, config_path=None, plugin=None, timeout=No
             reader.join(timeout=5)
         status = "timeout" if timed_out else "completed"
     except OSError as exc:
+        if zeek_workspace is not None:
+            zeek_workspace.cleanup()
+        if volatility_workspace is not None:
+            volatility_workspace.cleanup()
         raise ToolExecutionError("No se pudo iniciar el ejecutable.") from exc
 
     out_text = captured["stdout"].decode("utf-8", errors="replace")
@@ -348,6 +355,8 @@ def run_local_tool(tool_id, target, *, config_path=None, plugin=None, timeout=No
             log_data[log_path.name] = entries
         parsed = {"logs": log_data, "log_files": len(log_data)}
         zeek_workspace.cleanup()
+    if volatility_workspace is not None:
+        volatility_workspace.cleanup()
     target_hash_after = _hash_target(path)
     target_modified = target_hash_before != target_hash_after
     try:
