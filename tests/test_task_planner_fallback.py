@@ -29,8 +29,9 @@ class TaskPlannerFallbackTests(unittest.TestCase):
         "matched_domain_count": 1,
         "domains": [{
             "id": "network", "tool_candidates": [
-                {"id": "tshark", "name": "PCAP", "available": False,
-                 "adapter_registered": True, "adapter_status": "isolated_runner",
+                {"id": "tshark", "name": "PCAP", "available": True,
+                 "adapter_registered": True, "adapter_supported": True,
+                 "risk": "local_file_analysis", "adapter_status": "isolated_runner",
                  "execution_permitted": False}
             ]
         }],
@@ -48,6 +49,8 @@ class TaskPlannerFallbackTests(unittest.TestCase):
         self.assertEqual(plan["domain_candidate_count"], 1)
         self.assertEqual(plan["domain_tool_candidates"][0]["id"], "tshark")
         self.assertEqual(plan["domain_tool_candidates"][0]["source_domains"], ["network"])
+        self.assertEqual(plan["tool_candidates"][0]["id"], "tshark")
+        self.assertEqual(plan["tool_candidates"][0]["adapter_supported"], True)
         self.assertEqual(plan["skill_candidates"][0]["skill_id"], "skill-1")
         self.assertFalse(plan["tool_execution_started"])
 
