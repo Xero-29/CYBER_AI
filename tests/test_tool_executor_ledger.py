@@ -1,5 +1,6 @@
 import contextlib
 import io
+import json
 import unittest
 from unittest.mock import patch
 
@@ -39,6 +40,25 @@ class ToolExecutorLedgerTests(unittest.TestCase):
         self.assertEqual(ledger.statuses, ["started", "failed"])
         self.assertIn("RuntimeError", output)
         self.assertIn("terminal-1", output)
+
+    def test_binary_integrity_error_is_failed_and_validators_fail(self):
+        ledger = FakeLedger()
+        evidence = {
+            "status": "integrity_error",
+            "tool": "ruff",
+            "target": "tests/fixtures/sample.py",
+            "return_code": 0,
+            "tool_binary_modified": True,
+            "tool_binary_sha256": "a" * 64,
+            "tool_binary_sha256_after": "b" * 64,
+        }
+        result, output = self.invoke(ledger, evidence)
+        self.assertEqual(result, 1)
+        self.assertEqual(ledger.statuses, ["started", "failed"])
+        terminal = json.loads(output)["ledger_event"]
+        self.assertEqual(terminal["status"], "failed")
+        self.assertFalse(terminal["validator_results"][0]["passed"])
+        self.assertFalse(terminal["validator_results"][1]["passed"])
 
     def test_adapter_denial_is_recorded_as_terminal_denied(self):
         ledger = FakeLedger()
