@@ -188,6 +188,72 @@ def validate_env_file_permissions(root):
     return findings
 
 
+
+def validate_data_permissions(root):
+    """Exige directorios de datos privados y protege archivos locales de claves."""
+    import stat
+
+    findings = []
+    data_root = Path(root) / "data"
+    if not data_root.exists() and not data_root.is_symlink():
+        return findings
+    if data_root.is_symlink():
+        return [{"path": "data", "reason": "El directorio de datos no puede ser un enlace simbólico."}]
+    if not data_root.is_dir():
+        return [{"path": "data", "reason": "La ruta data debe ser un directorio."}]
+
+    for current, dirs, files in os.walk(data_root, followlinks=False):
+        current_path = Path(current)
+        try:
+            mode = stat.S_IMODE(current_path.stat(follow_symlinks=False).st_mode)
+            if mode & 0o077:
+                findings.append({
+                    "path": str(current_path.relative_to(root)),
+                    "reason": "Directorio de datos accesible por grupo u otros; usar chmod 700.",
+                })
+        except OSError:
+            findings.append({
+                "path": str(current_path.relative_to(root)),
+                "reason": "No se pudieron verificar los permisos del directorio de datos.",
+            })
+        for name in list(dirs):
+            child = current_path / name
+            if child.is_symlink():
+                findings.append({
+                    "path": str(child.relative_to(root)),
+                    "reason": "No se permiten enlaces simbólicos dentro de data.",
+                })
+                dirs.remove(name)
+        for name in files:
+            child = current_path / name
+            if child.is_symlink():
+                findings.append({
+                    "path": str(child.relative_to(root)),
+                    "reason": "No se permiten enlaces simbólicos dentro de data.",
+                })
+                continue
+            lowered = name.lower()
+            sensitive = (
+                child.suffix.lower() in {".key", ".p12", ".pfx", ".secret"}
+                or any(token in lowered for token in ("private", "credential", "token"))
+            )
+            if not sensitive:
+                continue
+            try:
+                mode = stat.S_IMODE(child.stat(follow_symlinks=False).st_mode)
+                if mode & 0o077:
+                    findings.append({
+                        "path": str(child.relative_to(root)),
+                        "reason": "Archivo local sensible accesible por grupo u otros; usar chmod 600.",
+                    })
+            except OSError:
+                findings.append({
+                    "path": str(child.relative_to(root)),
+                    "reason": "No se pudieron verificar los permisos del archivo sensible.",
+                })
+    return findings
+
+
 def collect_checks(root=PROJECT, python_version=None, module_lookup=None,
                    executable_lookup=None, environ=None):
     root = Path(root)
@@ -238,6 +304,13 @@ def collect_checks(root=PROJECT, python_version=None, module_lookup=None,
     for finding in validate_env_file_permissions(root):
         add(
             "env_file_permissions",
+            "error",
+            f"{finding['path']}: {finding['reason']}",
+        )
+
+    for finding in validate_data_permissions(root):
+        add(
+            "data_permissions",
             "error",
             f"{finding['path']}: {finding['reason']}",
         )
