@@ -26,7 +26,7 @@ Las pruebas pueden inyectar respuestas por agente en `simulate_workflow(workflow
 
 ## Validación automatizada
 
-La suite comprueba los tres flujos existentes en el catálogo: `investigacion`, `critica_corta` y `revision_tecnica`. También cubre identificadores inseguros, catálogos malformados, modos inválidos, límites incorrectos, fixtures vacías/desconocidas/no textuales, transferencia y recorte de contexto, parada ante incumplimiento y escritura del informe CLI.
+La suite comprueba los tres flujos existentes en el catálogo: `investigacion`, `critica_corta` y `revision_tecnica`. También cubre identificadores inseguros, catálogos malformados, modos inválidos, límites incorrectos, fixtures vacías/desconocidas/no textuales, transferencia y recorte de contexto, equivalencia del recorte frente a `team_orchestrator.build_prompt`, parada ante incumplimiento y escritura del informe CLI.
 
 ## Límites
 
