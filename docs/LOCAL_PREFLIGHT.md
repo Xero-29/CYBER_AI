@@ -33,4 +33,21 @@ El wheelhouse debe contener los wheels de las dependencias directas y transitiva
 
 ## Dependencias documentales opcionales
 
-`requirements-documents.txt` todavía declara rangos de versión sin hashes. Esas dependencias no están cubiertas por el lock base ni por el SBOM de CI. Para entornos de alta garantía, no las instales hasta generar y revisar un lock SHA-256 por plataforma, y añadir su verificación/SBOM al workflow.
+Las versiones directas están fijadas en `requirements-documents.in`; el lock transitivo `requirements-documents.lock` contiene hashes SHA-256 de wheels para CPython 3.12.x/Linux x86_64/glibc >= 2.26. Instala con:
+
+```bash
+python -m pip install --require-hashes -r requirements-documents.lock
+```
+
+CI descarga los wheels con `--require-hashes`, compara el manifiesto, genera un SBOM CycloneDX independiente y ejecuta la suite con los extractores instalados. El lock no es válido para otras arquitecturas; genera y revisa un lock separado para cada plataforma soportada. `requirements-documents.txt` se conserva solo como alias de compatibilidad y no aplica hash enforcement por sí mismo.
+
+Para regenerarlo en la plataforma de destino:
+
+```bash
+wheelhouse="$(mktemp -d)"
+python -m pip download --only-binary=:all: --dest "$wheelhouse" -r requirements-documents.in
+python wheel_lock_generator.py --wheelhouse "$wheelhouse" --requirements requirements-documents.in --output requirements-documents.lock
+rm -rf "$wheelhouse"
+```
+
+Revisa versiones, hashes y procedencia antes de aceptar el diff.
