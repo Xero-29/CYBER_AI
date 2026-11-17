@@ -3,7 +3,7 @@
 > Esta sección describe el HEAD auditado; los bloques históricos inferiores son contexto.
 
 **Rama:** `main`  
-**HEAD de implementación:** cambios posteriores a `d9337c5e46e6760ae16f14e99afba1986644ffa7`; CI del nuevo HEAD pendiente de verificación. No se extrapolan resultados de CI previos a estos cambios. Las pruebas Windows siguen aplazadas.  
+**HEAD de implementación:** `fe9b9dcf430b5fc5c826a8214bc23fe12c8bc123`. GitHub no devuelve estados de CI asociados a este SHA; las pruebas del nuevo código están pendientes. No se extrapolan resultados de CI previos. Las pruebas Windows siguen aplazadas.  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17`, sin modificar.
 
 ## Cambio reciente: perfiles y herramientas personalizadas
@@ -57,4 +57,4 @@
 - El catálogo de herramientas no garantiza instalación, adaptación ni disponibilidad operativa.
 - Custodia/rotación externa de claves, ACL Windows completas, aislamiento de parsers, KMS/HSM, RBAC/IdP/MFA, WORM/offsite, DR, MicroVM, proveedores IA reales, observabilidad, pruebas de carga y revisión independiente requieren infraestructura y validación externas.
 
-**Conclusión:** la ejecución aislada de YARA/TShark y el flujo configurable de Nuclei están implementados en código, pero la CI del nuevo HEAD, el build real de la imagen, la ejecución real de Nuclei y las pruebas E2E autorizadas aún deben verificarse. El repositorio no debe declararse certificado para producción.
+**Conclusión:** la ejecución aislada de YARA/TShark y el flujo configurable de Nuclei están implementados en código. No están comprobados el CI de este SHA, el build real de la imagen, la allowlist de imagen en el entorno de despliegue ni la ejecución real de Nuclei. El aislamiento no cubre todos los adaptadores y la salida de red de Nuclei no está filtrada a nivel de firewall. Se requieren pruebas E2E autorizadas antes de declarar el repositorio listo para producción.
