@@ -69,9 +69,15 @@ class ExecutionPolicyTests(unittest.TestCase):
         with self.assertRaisesRegex(AuthorizationError, "IP literales"):
             authorize_target("https://example.com", "nuclei_scan", "grant-001")
 
-    def test_private_address_is_denied(self):
-        with self.assertRaisesRegex(AuthorizationError, "IP pública"):
-            authorize_target("http://127.0.0.1", "nuclei_scan", "grant-001")
+    def test_explicit_private_and_loopback_grants_are_accepted(self):
+        self.grant["target"] = "http://127.0.0.1:8080"
+        self.write_policy([self.grant])
+        result = authorize_target("http://127.0.0.1:8080", "nuclei_scan", "grant-001")
+        self.assertEqual(result["target"], "http://127.0.0.1:8080")
+        self.grant["target"] = "http://192.168.10.20"
+        self.write_policy([self.grant])
+        result = authorize_target("http://192.168.10.20", "nuclei_scan", "grant-001")
+        self.assertEqual(result["target"], "http://192.168.10.20")
 
     def test_grant_file_with_insecure_permissions_is_denied(self):
         self.policy.chmod(0o644)
