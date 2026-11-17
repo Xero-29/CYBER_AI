@@ -27,3 +27,10 @@ Revisar Kubernetes Security Checklist y guías vigentes de Kubernetes; evaluar c
 - `NIST-SP-800-190`
 - `NIST-IR-8176`
 - `SLSA-v1.1`
+
+
+## Identificadores del registro de fuentes
+
+- `NIST-SP-800-190`
+- `NIST-IR-8176`
+- `SLSA-v1.1`
