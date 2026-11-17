@@ -1,70 +1,53 @@
-# Última validación — 2026-11-17
+# Estado verificado más reciente — 2026-11-17
 
-**HEAD:** `1a6d2ca20fe480e953fa6d464bd7fd957dbac239`  
-**CI en este SHA:** Python tests — success; Docker sandbox — success.  
-- Python: https://github.com/Xero-29/CYBER_AI/actions/runs/44099162589
-- Docker: https://github.com/Xero-29/CYBER_AI/actions/runs/44099170617
-
-## Endurecimiento adicional del preflight
-- Los archivos `.env*` reales se rechazan si grupo u otros tienen cualquier permiso (lectura, escritura o ejecución); solo se aceptan permisos del propietario, recomendación `chmod 600`.
-- Se rechazan symlinks para archivos `.env*`; se excluyen plantillas públicas.
-- Se mantiene detección de secretos literales y validación de referencias `api_key_env`.
-- Prueba añadida para permisos de escritura de grupo. Ambos workflows pasan en el SHA actual.
-
-El inventario detallado de brechas y límites sigue en la sección inmediatamente inferior y en el resto de este documento. No se declara certificación ni cierre operacional.
-
----
-
-# Estado verificado y brechas pendientes — 2026-11-17
-
-**HEAD de código:** `be2d7422942a8683a666d043a243cec0abbadcb6`  
+**HEAD de trabajo:** `defa615b7ff46bf36b3382d4396bc1082ce1ab29`  
 **Rama:** `codex/security-integrity-audit`  
-**Comparación con main:** 363 commits adelante, 0 detrás.  
-**PR #2:** abierto, no fusionado. `main` intacta.  
-**CI en este SHA:** Python tests — success; Docker sandbox — success.  
-- Python: https://github.com/Xero-29/CYBER_AI/actions/runs/44098838484
-- Docker: https://github.com/Xero-29/CYBER_AI/actions/runs/44098838473
+**Base:** `main` en `7b5ed033f1f6461b5780a10ac4ada67a444b93e5`  
+**Comparación:** 427 commits adelante, 0 detrás. La rama contiene el HEAD actual de `main`; no hay divergencia pendiente.  
+**PR #2:** abierto, draft, mergeable; no fusionado. `main` permanece intacta.
 
-## Cambios recientes cerrados con CI
-- `preflight.py` detecta secretos literales en campos sensibles y nombres inválidos de variables `api_key_env`; los valores secretos no se imprimen en el diagnóstico.
-- El preflight revisa archivos `.env*` locales, rechaza symlinks y permisos legibles por grupo/otros; excluye plantillas públicas `.env.example`, `.env.sample` y `.env.template`. Recomienda permisos 0600.
-- Pruebas de ambas funciones: Python tests y Docker sandbox pasan en el SHA indicado.
+## Validación del HEAD exacto
 
-## Inventario de brechas: qué falta realmente
-### Requiere infraestructura o decisiones externas (no se puede cerrar solo desde este repositorio)
-1. **Gestión de claves institucional:** KMS/HSM o gestor de secretos externo, rotación, revocación, recuperación y segregación de funciones. El código admite claves HMAC por entorno, pero no despliega ni custodia esas claves.
-2. **Identidad y acceso:** RBAC/IdP, MFA, roles de aprobador y separación real entre operadores, revisores y administradores.
-3. **Auditoría resistente a administrador hostil:** anclaje de checkpoints fuera del host, almacenamiento WORM/inmutable y retención legal. La cadena SHA-256/HMAC local no es WORM.
-4. **Protección de respaldos:** cifrado en reposo, copias offsite, gestión/rotación de claves y simulacros reales de restauración/DR. El backup actual verifica integridad y admite HMAC, pero HMAC no cifra.
-5. **Aislamiento fuerte:** microVM/VM desechable, pruebas de escape y separación para malware/herramientas hostiles. Docker comparte kernel.
-6. **Proveedores IA reales:** pruebas con cuentas y servicios reales de Ollama/OpenAI/Anthropic/Gemini, cuotas, latencia, fallos de red, costes, límites y regresiones.
-7. **Conocimiento y legalidad:** revisión experta de las 138 fuentes externas (licencia, procedencia, vigencia y exactitud); embeddings reales y evaluación experta por dominio. Las 48 guías propias offline no equivalen a corpus exhaustivo.
-8. **Operación:** pruebas de carga/estrés, RPO/RTO, pérdida de host, concurrencia multiusuario, observabilidad integrada, alertas y simulacros de respuesta.
-9. **Gobierno del release:** revisión independiente, decisión de licencia del propietario, branch protection/required checks y autorización de publicación.
+- Python tests — **success**: https://github.com/Xero-29/CYBER_AI/actions/runs/44106193284
+- Docker sandbox — **success**: https://github.com/Xero-29/CYBER_AI/actions/runs/44106193259
+- Ambos workflows terminaron correctamente para `defa615b7ff46bf36b3382d4396bc1082ce1ab29`. El workflow Python ejecuta `verify.sh`, la suite completa y genera SBOM/procedencia; Docker construye la imagen endurecida, repite la verificación y ejecuta Ruff dentro del sandbox.
 
-### Implementable en código, pero todavía requiere trabajo y CI adicional
-1. **Dependencias reproducibles:** añadir hashes de artefactos verificados a un lock multiplataforma; hoy hay versiones fijadas, no hashes de distribución. No inventar hashes.
-2. **Herramientas e imágenes:** fijar versiones/digests de cada herramienta e imagen, validar procedencia y añadir pruebas de compatibilidad por plataforma.
-3. **Biblioteca documental:** fixtures adversariales de PDF/Office, límites de extracción, OCR opcional, deduplicación/versionado y citas de fragmento.
-4. **Skillbook:** ampliar pruebas de expiración/obsolescencia, rollback, replay, revocación de aprobación y regresión automática de cada versión. La promoción ya exige evidencia y firma HMAC, pero el servicio de identidad/clave sigue externo.
-5. **Ledger y resiliencia:** ampliar pruebas de crash entre escritura de inicio/resultado, disco lleno, SQLite busy/corrupción y recuperación sin duplicación; el reconciliador existente es manual y no recupera resultados perdidos.
-6. **Preflight:** integrar comprobaciones de permisos de directorios de datos, claves locales y configuración efectiva de despliegue, sin filtrar secretos.
+## Cambios recientes implementados y cubiertos por pruebas
 
-## Capacidades presentes — no confundir con certificación
-- 48 áreas y 48 paquetes metodológicos offline; 138 fuentes externas catalogadas, aún no aprobadas/ingeridas en bloque.
-- Biblioteca SQLite, ingesta transaccional, indexación híbrida FTS5/vectorial, RRF, reindexación y evaluación sintética.
-- Memoria de lecciones y Skillbook con evidencias, versiones y aprobación HMAC.
-- Adaptadores Ollama, OpenAI-compatible, Anthropic y Gemini; plugins por entry points.
-- Inventario de herramientas con ejecución local acotada; herramientas de red no quedan habilitadas por defecto.
-- Sandbox Docker endurecido; no sustituye microVM.
-- Ledger append-only local con hash chain, cierre de ejecuciones, checkpoints HMAC y reconciliación manual.
-- Backups SQLite con manifiesto, SHA-256, restauración segura y firma HMAC opcional; no cifrados ni offsite.
-- SBOM CycloneDX y procedencia CI; lock fijado por versión, sin hashes de artefactos.
-- Auditoría de conocimiento endurecida frente a rutas absolutas, traversal y symlinks.
+- Ingestión CSV: se restaura `csv.field_size_limit` en un bloque `finally`; la configuración global del parser ya no contamina otras llamadas, incluso cuando la extracción falla.
+- Skillbook: historial de versiones encadenado con SHA-256, migración de tablas existentes, verificación de snapshots históricos y exposición de hashes en la consulta de versiones. Se añadieron pruebas de migración y manipulación de snapshots antiguos. El hash chain es tamper-evident local, no WORM ni autenticación externa.
+- Herramientas locales: evidencia con ruta, versión y SHA-256 del binario; los cambios/desapariciones del ejecutable invalidan el éxito y fallan los validadores del ledger.
+- Dependencias: el CI descarga los wheels resueltos, calcula SHA-256 y los incluye en el SBOM CycloneDX junto con procedencia del commit y del lock. Esto registra los artefactos de esa ejecución/plataforma; no equivale todavía a hashes fijados en el lock para todas las plataformas.
+- Se mantienen las mejoras ya implementadas en ledger/reconciliación, backups con manifiesto y HMAC opcional, Skillbook firmado/revocable, preflight de secretos/permisos, ingesta Office adversarial, marcadores de página PDF, adaptadores de proveedores y sandbox Docker.
 
-**Criterio:** no declarar el sistema completo/certificado hasta tener implementación, pruebas reproducibles, evidencia del SHA final y validación operacional independiente. Las brechas que requieren credenciales, infraestructura, decisiones legales o personal externo se entregan como lista de puesta en marcha; no se simulan.
+## Brechas que todavía admiten trabajo en código
+
+1. Lock de dependencias con hashes estáticos verificados para cada plataforma soportada; hoy hay versiones exactas y hashes de wheels por ejecución CI, no `--require-hashes` multiplataforma.
+2. Automatización de regresión de cada versión de Skill y políticas explícitas de expiración/revisión; ya existen verificación de historial, revisión por antigüedad, revocación firmada y rollback firmado.
+3. Mayor cobertura de fallos de proceso/almacenamiento y pruebas de concurrencia/carga del sistema completo. La reconciliación registra resultados desconocidos; no recupera resultados perdidos ni sustituye ensayos físicos.
+4. Inventario de versiones y procedencia verificable para todos los binarios externos y herramientas opcionales; el digest de la imagen Docker y los binarios del sandbox están fijados, pero no todas las herramientas de host.
+5. Mejorar la evaluación automatizada de calidad de recuperación y el versionado/deduplicación de documentos. Los benchmarks actuales son sintéticos y no demuestran calidad experta.
+
+## Bloqueos de infraestructura, operación o decisión del propietario
+
+- KMS/HSM o gestor de secretos real, rotación/revocación y segregación de funciones.
+- RBAC/IdP/MFA y separación real de roles.
+- WORM/offsite y anclaje independiente de checkpoints; el ledger local no resiste a un administrador hostil.
+- Cifrado de backups, custodia independiente de claves y simulacros reales de restauración/DR.
+- MicroVM/VM desechable y pruebas de escape; Docker comparte kernel.
+- Credenciales y pruebas reales de proveedores Ollama/OpenAI/Anthropic/Gemini, límites, costes y fallos de red.
+- Revisión humana de licencia, procedencia, exactitud y vigencia de las 138 fuentes externas; embeddings y evaluación por especialistas.
+- OCR real para documentos escaneados, si se requiere.
+- Pruebas operacionales de carga, pérdida de host, RPO/RTO, observabilidad y alertas.
+- Revisión independiente, decisión de licencia y autorización de release. La rama no tiene branch protection habilitada; required checks requieren configuración administrativa.
+
+**Conclusión:** el código y los workflows del HEAD indicado pasan, pero el proyecto todavía no está listo para declararse institucionalmente completo ni para validación final del usuario. Las brechas de código anteriores deben cerrarse primero. No se ha fusionado ni modificado `main`.
 
 ---
+
+## Registro histórico
+
+Los bloques siguientes documentan estados y validaciones de iteraciones anteriores. Si alguna cifra, pendiente o afirmación contradice esta cabecera, prevalece el estado verificado de esta sección superior.
 
 # Estado actual verificado — 2026-11-17
 
