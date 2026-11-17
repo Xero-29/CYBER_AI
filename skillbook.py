@@ -924,7 +924,7 @@ def _words(value):
     }
 
 
-def search_skills(task, limit=3):
+def search_skills(task, limit=3, *, record_usage=True):
     query = _words(task)
     if not query:
         return []
@@ -947,10 +947,11 @@ def search_skills(task, limit=3):
     selected = []
     with connect() as db:
         for score, item in ranked[:max(1, min(int(limit), 5))]:
-            db.execute(
-                "UPDATE skills SET use_count=use_count+1,last_used_at=? WHERE skill_id=?",
-                (now(), item["skill_id"]),
-            )
+            if record_usage:
+                db.execute(
+                    "UPDATE skills SET use_count=use_count+1,last_used_at=? WHERE skill_id=?",
+                    (now(), item["skill_id"]),
+                )
             selected.append({
                 "skill_id": item["skill_id"], "name": item["name"],
                 "version": item["version"], "score": round(score, 4),
