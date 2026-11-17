@@ -124,6 +124,8 @@ def audit_research_library(root: Path = ROOT) -> dict:
                 dossier_errors.append("no contiene referencias HTTPS")
             if not dossier_errors:
                 dossier_complete_count += 1
+            else:
+                errors.append(f"{area_id}: " + "; ".join(dossier_errors))
 
         area_results.append({
             "id": area_id,
