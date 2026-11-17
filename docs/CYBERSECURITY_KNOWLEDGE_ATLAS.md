@@ -97,3 +97,12 @@ Publicar por separado recursos catalogados, descargados, verificados, ingeridos,
 El catálogo ampliado contiene 48 áreas y 138 referencias. Se añadieron 44 referencias en ingeniería de software, aprendizaje automático, hardware/firmware, matemáticas y especialidades de seguridad (ASVS, WSTG, seguridad de API, SLSA, OpenSSF, SBOM, respuesta a incidentes, D3FEND y otras fuentes primarias).
 
 **Importante:** son referencias catalogadas, no conocimiento externo descargado ni ingerido. Los paquetes propios iniciales de `knowledge/packs/` sí se distribuyen offline. Las licencias permanecen como pendientes; no se ha marcado ningún recurso como descargado o verificado. El flujo de adquisición debe comprobar licencia, procedencia, fecha, hash, tamaño y formato antes de ingestión.
+
+
+## Currículos técnicos y auditoría de profundidad (2026-11-17)
+
+Se añadió `knowledge/curricula/domain_curriculum.json` con un currículo específico para cada una de las 48 áreas del manifiesto. Cada dominio define temas técnicos, niveles L0–L4, artefactos requeridos, blueprint de laboratorio, dimensiones de evaluación y política de referencias. La guía está en `knowledge/curricula/README.md`.
+
+Se añadió `knowledge_quality.py` y `tests/test_knowledge_quality.py` para comprobar consistencia del currículo con el manifiesto y medir secciones base/profundas presentes en los paquetes.
+
+**Límite explícito:** el currículo es una especificación de profundidad, no la prueba de que los 48 paquetes ya contengan libros técnicos completos. La auditoría es estructural y no certifica exactitud semántica, actualidad, licencias, ejecución de laboratorios ni competencia de una IA. Las referencias externas existentes siguen sin contar como descargadas/verificadas mientras no superen el proceso de procedencia.
