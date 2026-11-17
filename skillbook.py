@@ -241,21 +241,17 @@ def _save_version(db, skill_id, version, change_type, actor):
     )
 
 
-def verify_skill_history(skill_id):
-    """Comprueba continuidad, snapshots y coherencia de la versión actual."""
-    if not isinstance(skill_id, str) or not skill_id.strip():
-        raise ValueError("skill_id es obligatorio.")
-    initialize()
-    with connect() as db:
-        current = db.execute(
-            "SELECT * FROM skills WHERE skill_id=?", (skill_id.strip(),)
-        ).fetchone()
-        versions = db.execute(
-            """SELECT version,change_type,actor,snapshot_json,created_at,
-                      previous_hash,entry_hash
-               FROM skill_versions WHERE skill_id=? ORDER BY version""",
-            (skill_id.strip(),),
-        ).fetchall()
+def _verify_skill_history_in_db(db, skill_id):
+    """Verifica una Skill usando una conexión ya abierta."""
+    current = db.execute(
+        "SELECT * FROM skills WHERE skill_id=?", (skill_id,)
+    ).fetchone()
+    versions = db.execute(
+        """SELECT version,change_type,actor,snapshot_json,created_at,
+                  previous_hash,entry_hash
+           FROM skill_versions WHERE skill_id=? ORDER BY version""",
+        (skill_id,),
+    ).fetchall()
     if current is None:
         return {"valid": False, "skill_id": skill_id, "reason": "skill_not_found"}
     if not versions:
@@ -311,12 +307,7 @@ def verify_skill_history(skill_id):
                 }
             snapshots.append(snapshot)
     except (TypeError, ValueError, json.JSONDecodeError):
-        return {
-            "valid": False, "skill_id": skill_id,
-            "reason": "malformed_snapshot",
-        }
-    # last_used_at/use_count son contadores operacionales y no forman parte
-    # de una nueva versión metodológica.
+        return {"valid": False, "skill_id": skill_id, "reason": "malformed_snapshot"}
     mutable = {"last_used_at", "use_count"}
     latest = snapshots[-1]
     mismatches = [
@@ -335,6 +326,15 @@ def verify_skill_history(skill_id):
         "current_version": current["version"],
         "status": current["status"],
     }
+
+
+def verify_skill_history(skill_id):
+    """Comprueba continuidad, snapshots y coherencia de la versión actual."""
+    if not isinstance(skill_id, str) or not skill_id.strip():
+        raise ValueError("skill_id es obligatorio.")
+    initialize()
+    with connect() as db:
+        return _verify_skill_history_in_db(db, skill_id.strip())
 
 
 def list_skill_versions(skill_id):
@@ -931,22 +931,22 @@ def search_skills(task, limit=3, *, record_usage=True):
     initialize()
     with connect() as db:
         rows = db.execute("SELECT * FROM skills WHERE status='active'").fetchall()
+        ranked = []
+        for row in rows:
+            item = dict(row)
+            # No inyectar metodologías cuyo snapshot actual no coincida con su
+            # historial append-only o cuya cadena de versiones esté rota.
+            history_check = _verify_skill_history_in_db(db, item["skill_id"])
+            if not history_check.get("valid") or history_check.get("status") != "active":
+                continue
+            tags = json.loads(item["tags_json"])
+            corpus = " ".join([
+                item["name"], item["task_pattern"], item["description"], *tags
+            ])
+            overlap = query & _words(corpus)
+            if overlap:
+                ranked.append((len(overlap) / len(query), item))
 
-    ranked = []
-    for row in rows:
-        item = dict(row)
-        # No inyectar metodologías cuyo snapshot actual no coincida con su
-        # historial append-only o cuya cadena de versiones esté rota.
-        history_check = verify_skill_history(item["skill_id"])
-        if not history_check.get("valid") or history_check.get("status") != "active":
-            continue
-        tags = json.loads(item["tags_json"])
-        corpus = " ".join([
-            item["name"], item["task_pattern"], item["description"], *tags
-        ])
-        overlap = query & _words(corpus)
-        if overlap:
-            ranked.append((len(overlap) / len(query), item))
     ranked.sort(key=lambda pair: (-pair[0], pair[1]["name"].casefold()))
 
     selected = []
