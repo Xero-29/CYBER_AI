@@ -1,9 +1,9 @@
 # Estado actual verificado — 2026-11-17
 
-**HEAD verificado:** `6fd37146aa249aef11aee40fb56d0d578352d4f2`  
+**HEAD verificado:** `b2477cff69e72b2576656b9e2b5ae4841547b667`  
 **Rama:** `codex/security-integrity-audit`  
 **Comparación con main:** 357 commits adelante, 0 detrás (comparación directa con el HEAD de main consultado).  
-**CI de este HEAD:** Python tests — [success, 377 pruebas](https://github.com/Xero-29/CYBER_AI/actions/runs/43997173079); Docker sandbox — [success](https://github.com/Xero-29/CYBER_AI/actions/runs/43997173115).  
+**CI de este HEAD:** Python tests — [success, 377 pruebas](https://github.com/Xero-29/CYBER_AI/actions/runs/43997370392); Docker sandbox — [success](https://github.com/Xero-29/CYBER_AI/actions/runs/43997363886).  
 **PR #2:** abierto, en borrador; no fusionado. `main` no fue modificado.
 
 ## Cambio de seguridad de esta iteración
