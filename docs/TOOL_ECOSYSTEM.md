@@ -42,23 +42,23 @@ python tool_registry.py "descubrimiento de red y puertos"
 
 ## Estado real
 
-**Implementado:** inventario declarativo de 20 herramientas, detección de disponibilidad, selección explicable de candidatos y pruebas unitarias.
-
-**Adaptadores locales implementados:** Semgrep, Bandit, Ruff, Syft y Trivy. **Pendientes:** pip-audit, OSV-Scanner, Grype, Checkov, Gitleaks, detect-secrets, Hadolint, ShellCheck, actionlint, kube-linter, YARA, TShark, Zeek y Volatility. Que estén catalogadas no implica que estén instaladas ni que puedan ejecutarse.
-
-**Próximo paso:** adaptadores pequeños y tipados, cada uno con esquema de entrada/salida, timeout, límites de salida, allowlist de rutas, versión, registro de evidencia y pruebas con binarios simulados. Integrarlos al motor de autorización sin permitir que el modelo construya comandos shell arbitrarios.
+- Catálogo declarativo: **20 herramientas**.
+- Adaptadores registrados: **14**; de ellos, **11** admiten ejecución local acotada, **1** (pip-audit) se bloquea por requerir red y **2** (YARA/TShark) se bloquean en host porque requieren aislamiento. Las restantes 6 herramientas siguen solo catalogadas.
+- El inventario distingue disponibilidad del binario, adaptador registrado y bloqueo por política. Estar instalado o catalogado no concede autorización.
+- La selección de herramientas no construye comandos shell ni otorga alcance de red.
 
 ## Adaptadores locales implementados
 
-- `tool_adapters.py`: adaptadores para **Semgrep, Bandit, Ruff, Syft y Trivy**.
+Los 11 adaptadores que pueden ejecutarse directamente en el host son Semgrep, Bandit, Ruff, Syft, Trivy, Checkov, detect-secrets, Hadolint, ShellCheck, actionlint y kube-linter.
+
 - `tool_executor.py`: CLI explícita; sin `--execute` solo presenta un dry-run.
-- `tool_registry.py`: distingue adaptadores disponibles, herramientas pendientes y capacidades bloqueadas por red.
 - Cada ejecución exige una ruta existente dentro del repositorio, rechaza enlaces simbólicos, limita el objetivo a 10.000 archivos y 100 MB, fija timeout (máximo 600 s), limita la salida capturada a 2 MB, evita shell y mata el grupo de procesos al agotar el tiempo.
-- Se registra JSON de evidencia con hash SHA-256 antes/después, código de salida, tiempo, comando, salida y estado. El proceso Docker del host tiene timeout propio; al vencer, se solicita matar y eliminar el contenedor nombrado. La salida no se convierte automáticamente en hallazgos confirmados ni Skills.
-- Semgrep exige configuración local explícita; no descarga reglas.
-- Trivy se ejecuta en modo offline y no actualiza bases. Si la base local no existe, la herramienta puede fallar; no se descarga automáticamente.
-- **pip-audit permanece bloqueado**: su consulta de vulnerabilidades requiere red. No se ha habilitado acceso remoto implícito.
-- Nmap y Nuclei mantienen su ruta de autorización de red separada; este conjunto de adaptadores no les concede permisos.
+- La evidencia registra versión y SHA-256 del binario antes/después, huellas del objetivo, código de salida, duración y salida. Si el binario cambia o desaparece, el resultado queda como error de integridad y los validadores del ledger fallan.
+- Los archivos de evidencia se crean de forma exclusiva y atómica; en POSIX usan modo 0600 y directorio 0700. Pueden contener salida sensible. En Windows se deben aplicar ACL privadas en el directorio de evidencia.
+- Semgrep exige configuración local explícita; no descarga reglas. Trivy usa flags offline y no actualiza bases.
+- pip-audit se deniega porque requiere red. YARA y TShark se deniegan en el ejecutor local hasta integrarse en aislamiento. Nmap y Nuclei siguen bajo autorización de red separada.
+
+**Límite de red importante:** el ejecutor local no aplica aislamiento de egress al proceso. La evidencia declara `network_access: not_enforced` y `network_isolation_enforced: false`; que una herramienta esté marcada como no dependiente de red no impide que el binario o una dependencia intente conectarse. Para garantizar ausencia de red se debe usar el runner Docker endurecido o una política de red del sistema operativo. No se debe analizar malware ni repositorios hostiles en modo local.
 
 Ejemplos (desde la raíz del repositorio):
 
@@ -70,11 +70,6 @@ python tool_executor.py --tool syft --target .
 python tool_executor.py --tool trivy --target .
 python tool_executor.py --tool semgrep --target . --config config/semgrep.yml
 ```
-
-## Límites de seguridad pendientes
-
-Los adaptadores locales por sí solos no constituyen un sandbox del sistema operativo. Para ejecuciones aisladas se añadió `sandbox_runner.py` y `sandbox/Dockerfile`; no se debe usar el modo local directo con repositorios hostiles o muestras de malware.
-
 
 ## Sandbox Docker en GitHub Actions
 
