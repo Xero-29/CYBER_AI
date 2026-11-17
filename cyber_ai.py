@@ -100,15 +100,32 @@ def main():
     parser = argparse.ArgumentParser(description="CYBER_AI: análisis de informes de seguridad.")
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--ask", help="Enviar una tarea al flujo integrado de agentes.")
+    group.add_argument("--team", help="Enviar una tarea al flujo multiagente supervisado.")
     group.add_argument("--report", help="Analizar un archivo TXT o Markdown.")
     group.add_argument("--batch", help="Analizar todos los TXT y Markdown de una carpeta.")
     group.add_argument("--self-test", action="store_true", help="Comprobar archivos básicos.")
     group.add_argument("--scan", help="Escanear una URL HTTP/HTTPS autorizada con Nuclei.")
     parser.add_argument("--agent", help="Especialista opcional para --ask.")
+    parser.add_argument("--workflow", help="Flujo de config/workflows.json para --team.")
     parser.add_argument("--no-knowledge", action="store_true", help="Desactivar recuperación de conocimiento en --ask.")
     parser.add_argument("--confirm-authorized", action="store_true", help="Confirmación adicional del operador.")
     parser.add_argument("--authorization-id", help="ID de autorización local, vigente y limitada al destino.")
     args = parser.parse_args()
+
+    if args.team:
+        command = [
+            sys.executable,
+            str(Path(__file__).resolve().parent / "team_orchestrator.py"),
+            "--supervise-objectives",
+        ]
+        if args.workflow:
+            command.extend(["--workflow", args.workflow])
+        command.extend(args.team.split())
+        result = subprocess.run(command, cwd=Path(__file__).resolve().parent, check=False)
+        return result.returncode
+
+    if args.workflow:
+        parser.error("--workflow solo puede utilizarse junto con --team.")
 
     if args.ask:
         command = [sys.executable, str(Path(__file__).resolve().parent / "director.py"), args.ask]
