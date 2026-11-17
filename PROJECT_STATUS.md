@@ -3,9 +3,9 @@
 > Esta sección es la fuente de verdad vigente. Los bloques históricos que aparecen debajo documentan etapas anteriores y no deben interpretarse como el estado actual.
 
 **Rama:** `main`  
-**Último commit de limpieza y documentación:** `dae09fb4bbf9b584abeb4552b3ac4e8e61c10961`  
+**Último commit de código y pruebas:** `82c0dd0119c3ab25601c5345ad8cb9c7cf3b9c8b`  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17` (no modificado).  
-**CI del HEAD:** Python tests en ejecución y Docker sandbox en ejecución; resultado aún no confirmado.
+**CI:** Docker sandbox aprobado en `82c0dd0` (490 pruebas, `verify.sh`, Ruff y sandbox). Workflow Python independiente sigue pendiente de asignación de runner; smoke test Windows aún no confirmado.
 
 ## Limpieza estructural realizada
 
@@ -29,9 +29,9 @@ Se conservan `batch_analyzer.py`, `nvd_client.py`, `report_manager.py`, `ledger_
 
 ## Evidencia de CI
 
-- Docker sandbox: éxito en `12c5942a73bf21f2eb0cc2bb5b79a5826801defd`; 488 pruebas, construcción Docker y Ruff aprobados en ese SHA.
-- Python workflow y smoke test Windows de ese SHA no tenían resultado final confirmado en la última revisión.
-- Los cambios posteriores, incluido el contrato de Nuclei, **no están validados por CI todavía**. No se afirma suite verde en el HEAD actual.
+- Docker sandbox: éxito en `82c0dd0119c3ab25601c5345ad8cb9c7cf3b9c8b`; 490 pruebas, construcción Docker, `verify.sh` y Ruff aprobados en ese SHA.
+- El workflow Python independiente y el smoke test Windows no tenían resultado final confirmado en la última revisión.
+- El contrato de Nuclei y la limpieza actual sí están cubiertos por el sandbox aprobado en `82c0dd0`; no se extrapola ese resultado al smoke test Windows.
 
 ## Límites pendientes
 
