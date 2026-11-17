@@ -6,9 +6,11 @@ adaptadores ejecutables deben validar su política específica por separado.
 """
 import argparse
 import json
+import shutil
 
 from capability_inventory import TOOL_CATALOG, build_inventory
 from tool_adapters import TOOL_SPECS
+from tool_execution_profiles import get_custom_tools
 
 
 TASK_TERMS = {
@@ -60,6 +62,31 @@ def select_tools(task, *, inventory=None, limit=10):
                 else "separate_runner" if item["id"] == "nuclei"
                 else "not_implemented"
             ),
+            "status": "candidate_only",
+        })
+    for custom in get_custom_tools():
+        terms = custom.get("keywords", [])
+        matched = [term for term in terms if term.casefold() in normalized]
+        if not matched:
+            continue
+        executable = custom["executable"]
+        available = bool(shutil.which(executable) or (
+            __import__("pathlib").Path(executable).is_absolute()
+            and __import__("pathlib").Path(executable).is_file()
+        ))
+        ranked.append({
+            "id": custom["id"],
+            "name": custom.get("description", custom["id"]),
+            "category": custom.get("category", "custom"),
+            "description": custom.get("description", "Herramienta personalizada"),
+            "risk": "local",
+            "available": available,
+            "path": executable if available else None,
+            "matched_terms": matched,
+            "authorization_required": True,
+            "execution_permitted": False,
+            "adapter_supported": True,
+            "adapter_status": "custom_argv_runner",
             "status": "candidate_only",
         })
     ranked.sort(key=lambda item: (
