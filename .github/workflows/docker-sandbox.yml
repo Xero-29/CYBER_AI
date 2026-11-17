@@ -41,6 +41,12 @@ jobs:
             --tag cyber-ai-tool-sandbox:ci \
             --file sandbox/Dockerfile .
 
+      - name: Protect checked-out runtime data directories
+        run: |
+          if [[ -d data && ! -L data ]]; then
+            find data -type d -exec chmod 700 {} +
+          fi
+
       - name: Run complete local verification
         run: bash verify.sh
 
