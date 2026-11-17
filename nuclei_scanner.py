@@ -247,16 +247,20 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
             "error": str(error),
             "findings": [],
         }
-        _record_scan_event(target, result, started, authorization_id=authorization_id)
-        return result
+        return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)
 
     findings = []
+    malformed_findings_lines = 0
     if output_file.is_file():
         for line in output_file.read_text(encoding="utf-8").splitlines():
             try:
-                findings.append(json.loads(line))
+                parsed_finding = json.loads(line)
+                if isinstance(parsed_finding, dict):
+                    findings.append(parsed_finding)
+                else:
+                    malformed_findings_lines += 1
             except json.JSONDecodeError:
-                continue
+                malformed_findings_lines += 1
 
     status = "completed" if process.returncode == 0 else "scanner_error"
 
@@ -270,6 +274,7 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
         "return_code": process.returncode,
         "elapsed_seconds": elapsed,
         "findings_count": len(findings),
+        "malformed_findings_lines": malformed_findings_lines,
         "findings": findings,
         "scanner_messages": messages[-100:],
         "note": (
