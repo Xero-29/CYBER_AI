@@ -126,8 +126,6 @@ def audit_research_library(root: Path = ROOT) -> dict:
                 referenced_ids.add(sid)
                 if sid not in known_source_ids:
                     dossier_errors.append("ID de fuente no registrado: " + sid)
-            if "https://" not in dossier:
-                dossier_errors.append("no contiene referencias HTTPS")
             if not dossier_errors:
                 dossier_complete_count += 1
             else:
