@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -16,6 +17,9 @@ from typing import Any
 PROJECT = Path(__file__).resolve().parent
 DEFAULT_WORKFLOWS = PROJECT / "config" / "workflows.json"
 DEFAULT_REPORTS = PROJECT / "reports" / "agent_simulations"
+WORKFLOW_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")
+MAX_TASK_CHARS = 100_000
+MAX_RESPONSE_CHARS = 100_000
 
 
 class SimulationError(ValueError):
@@ -25,9 +29,22 @@ class SimulationError(ValueError):
 def validate_workflow_contract(workflow: dict[str, Any]) -> list[dict[str, Any]]:
     if not isinstance(workflow, dict):
         raise SimulationError("El flujo debe ser un objeto.")
+
+    workflow_mode = workflow.get("mode", "standard")
+    if not isinstance(workflow_mode, str) or workflow_mode not in {"standard", "technical"}:
+        raise SimulationError("El modo del flujo no es válido.")
+
+    for field in ("max_rounds", "max_context_chars"):
+        value = workflow.get(field)
+        if value is not None and (
+            isinstance(value, bool) or not isinstance(value, int) or value <= 0
+        ):
+            raise SimulationError(f"{field} debe ser un entero positivo.")
+
     steps = workflow.get("steps")
     if not isinstance(steps, list) or not steps:
         raise SimulationError("El flujo debe contener al menos un paso.")
+
     normalized = []
     for index, step in enumerate(steps, start=1):
         if not isinstance(step, dict):
@@ -38,9 +55,11 @@ def validate_workflow_contract(workflow: dict[str, Any]) -> list[dict[str, Any]]
             raise SimulationError(f"El paso {index} no tiene agente válido.")
         if not isinstance(objective, str) or not objective.strip():
             raise SimulationError(f"El paso {index} no tiene objetivo válido.")
-        mode = step.get("mode", workflow.get("mode", "standard"))
-        if mode not in {"standard", "technical"}:
+
+        mode = step.get("mode", workflow_mode)
+        if not isinstance(mode, str) or mode not in {"standard", "technical"}:
             raise SimulationError(f"El modo del paso {index} no es válido.")
+
         prefix = step.get("required_output_prefix", "")
         sections = step.get("required_output_sections", [])
         if not isinstance(prefix, str):
@@ -49,13 +68,14 @@ def validate_workflow_contract(workflow: dict[str, Any]) -> list[dict[str, Any]]
             not isinstance(item, str) or not item.strip() for item in sections
         ):
             raise SimulationError(f"Las secciones requeridas del paso {index} no son válidas.")
+
         normalized.append({
             "order": index,
             "agent": agent.strip(),
             "objective": objective.strip(),
             "mode": mode,
             "required_output_prefix": prefix,
-            "required_output_sections": sections,
+            "required_output_sections": list(sections),
         })
     return normalized
 
@@ -74,12 +94,13 @@ def _synthetic_response(agent: str, step: dict[str, Any]) -> str:
 
 
 def _validate_response(response: Any, step: dict[str, Any]) -> list[str]:
-    errors = []
     if not isinstance(response, str) or not response.strip():
         return ["La respuesta está vacía o no es texto."]
     text = response.strip()
-    if len(text) > 100_000:
-        errors.append("La respuesta supera el límite de 100000 caracteres.")
+    if len(text) > MAX_RESPONSE_CHARS:
+        return [f"La respuesta supera el límite de {MAX_RESPONSE_CHARS} caracteres."]
+
+    errors = []
     prefix = step["required_output_prefix"]
     if prefix and not text.startswith(prefix):
         errors.append(f"La respuesta debe comenzar con {prefix!r}.")
@@ -90,22 +111,54 @@ def _validate_response(response: Any, step: dict[str, Any]) -> list[str]:
     return errors
 
 
+def _validate_response_fixtures(
+    responses: dict[str, Any] | None, steps: list[dict[str, Any]]
+) -> dict[str, Any]:
+    if responses is None:
+        return {}
+    if not isinstance(responses, dict):
+        raise SimulationError("responses debe ser un objeto indexado por agente.")
+
+    known_agents = {step["agent"] for step in steps}
+    unknown_agents = set(responses) - known_agents
+    if unknown_agents:
+        raise SimulationError(
+            "Hay fixtures para agentes que no participan en el flujo: "
+            + ", ".join(sorted(str(item) for item in unknown_agents))
+        )
+
+    validated = {}
+    for agent, fixture in responses.items():
+        if not isinstance(agent, str) or not agent.strip():
+            raise SimulationError("Cada clave de responses debe ser un agente válido.")
+        if isinstance(fixture, list):
+            if not fixture:
+                raise SimulationError(f"La secuencia de fixtures de {agent} está vacía.")
+            if any(not isinstance(item, str) for item in fixture):
+                raise SimulationError(f"Las fixtures de {agent} deben ser textos.")
+            validated[agent] = tuple(fixture)
+        elif isinstance(fixture, str):
+            validated[agent] = fixture
+        else:
+            raise SimulationError(
+                f"La fixture de {agent} debe ser texto o una lista no vacía de textos."
+            )
+    return validated
+
+
 def simulate_workflow(
     workflow: dict[str, Any],
     task: str,
     responses: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Simula el flujo secuencial; responses permite inyectar respuestas de prueba.
-
-    No importa proveedores, no ejecuta subprocess, no accede a la red y no llama
-    al pipeline de herramientas.
-    """
+    """Simula el flujo secuencial sin proveedores, subprocess, red ni herramientas."""
     if not isinstance(task, str) or not task.strip():
         raise SimulationError("La tarea no puede estar vacía.")
+    if len(task) > MAX_TASK_CHARS:
+        raise SimulationError(f"La tarea supera el límite de {MAX_TASK_CHARS} caracteres.")
+
     steps = validate_workflow_contract(workflow)
-    responses = responses or {}
-    if not isinstance(responses, dict):
-        raise SimulationError("responses debe ser un objeto indexado por agente.")
+    fixtures = _validate_response_fixtures(responses, steps)
 
     started = time.perf_counter()
     history: list[dict[str, Any]] = []
@@ -115,8 +168,8 @@ def simulate_workflow(
 
     for step in steps:
         agent = step["agent"]
-        supplied = responses.get(agent)
-        if isinstance(supplied, list):
+        supplied = fixtures.get(agent)
+        if isinstance(supplied, tuple):
             offset = response_offsets.get(agent, 0)
             response = supplied[offset] if offset < len(supplied) else _synthetic_response(agent, step)
             response_offsets[agent] = offset + 1
@@ -177,15 +230,28 @@ def simulate_workflow(
 
 
 def load_workflow(name: str, path: Path = DEFAULT_WORKFLOWS) -> dict[str, Any]:
+    if not isinstance(name, str) or not WORKFLOW_ID_PATTERN.fullmatch(name):
+        raise SimulationError("El identificador del flujo no tiene un formato válido.")
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as error:
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
         raise SimulationError(f"No se pudo leer el catálogo de flujos: {error}") from error
-    workflows = payload.get("workflows", {})
+
+    if not isinstance(payload, dict):
+        raise SimulationError("El catálogo de flujos debe ser un objeto JSON.")
+    if payload.get("version", 1) != 1:
+        raise SimulationError("La versión del catálogo de flujos no es compatible.")
+    workflows = payload.get("workflows")
+    if not isinstance(workflows, dict):
+        raise SimulationError("El catálogo debe contener un objeto 'workflows'.")
     if name not in workflows:
         raise SimulationError(f"No existe el flujo {name!r}.")
+    if not isinstance(workflows[name], dict):
+        raise SimulationError(f"La definición del flujo {name!r} debe ser un objeto.")
+
     workflow = dict(workflows[name])
     workflow["name"] = name
+    validate_workflow_contract(workflow)
     return workflow
 
 
@@ -206,7 +272,10 @@ def main(argv: list[str] | None = None) -> int:
         DEFAULT_REPORTS / f"{args.workflow}-{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}.json"
     )
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    output.write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
     print(json.dumps({
         "status": report["status"],
         "steps": report["metrics"]["steps_executed"],
