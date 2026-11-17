@@ -1,13 +1,41 @@
 #!/usr/bin/env python3
 """Valida e indexa de forma reanudable los paquetes offline de CYBER_AI."""
 import argparse
-import fcntl
 import hashlib
 import json
+import os
+from contextlib import contextmanager
 from pathlib import Path
 
 PROJECT = Path(__file__).resolve().parent
 MANIFEST = PROJECT / "knowledge" / "packs" / "manifest.json"
+
+
+@contextmanager
+def exclusive_file_lock(lock, *, windows=None, windows_api=None):
+    """Bloqueo exclusivo portable: flock en POSIX y byte-range lock en Windows."""
+    windows = os.name == "nt" if windows is None else windows
+    if windows:
+        if windows_api is None:
+            import msvcrt as windows_api
+        lock.seek(0, os.SEEK_END)
+        if lock.tell() == 0:
+            lock.write(b"\\0")
+            lock.flush()
+        lock.seek(0)
+        windows_api.locking(lock.fileno(), windows_api.LK_LOCK, 1)
+        try:
+            yield
+        finally:
+            lock.seek(0)
+            windows_api.locking(lock.fileno(), windows_api.LK_UNLCK, 1)
+    else:
+        import fcntl
+        fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
 
 
 def load_packs(area_id=None):
@@ -145,12 +173,9 @@ def bootstrap(area_id=None, dry_run=False):
         return _bootstrap_locked(packs, dry_run=True)
     lock_path = PROJECT / "data" / "knowledge_bootstrap.lock"
     lock_path.parent.mkdir(parents=True, exist_ok=True)
-    with lock_path.open("a+") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX)
-        try:
+    with lock_path.open("a+b") as lock:
+        with exclusive_file_lock(lock):
             return _bootstrap_locked(packs)
-        finally:
-            fcntl.flock(lock, fcntl.LOCK_UN)
 
 
 def main():
