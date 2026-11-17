@@ -45,6 +45,12 @@ class ScanResultValidatorTests(unittest.TestCase):
         result = validate_scan_result(data)
         self.assertIn("scan_not_completed", result["errors"])
 
+    def test_rejects_malformed_jsonl_output(self):
+        data = self.valid_result()
+        data["malformed_findings_lines"] = 1
+        result = validate_scan_result(data)
+        self.assertIn("malformed_findings_output", result["errors"])
+
 
 if __name__ == "__main__":
     unittest.main()
