@@ -23,6 +23,12 @@ fi
 
 .venv/bin/python -m pip install -r requirements.lock
 
+# Runtime data can contain memory, execution history and local credentials.
+# Do not follow a symlinked data root; preflight will reject it.
+if [[ -d data && ! -L data ]]; then
+  find data -type d -exec chmod 700 {} +
+fi
+
 echo
 echo "Entorno preparado."
 echo "Actívalo con: source .venv/bin/activate"
