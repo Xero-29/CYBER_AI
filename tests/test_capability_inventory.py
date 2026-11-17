@@ -54,8 +54,10 @@ class CapabilityInventoryTests(unittest.TestCase):
         self.assertTrue(result["tools"]["osv_scanner"]["local_database_required"])
         self.assertFalse(result["tools"]["osv_scanner"]["execution_ready"])
         self.assertTrue(result["tools"]["gitleaks"]["execution_ready"])
-        self.assertEqual(result["summary"]["adapter_registered"], 19)
-        self.assertEqual(result["summary"]["catalog_only"], 2)
+        self.assertEqual(result["summary"]["adapter_registered"], 20)
+        self.assertEqual(result["summary"]["catalog_only"], 1)
+        self.assertTrue(result["tools"]["nmap"]["adapter_registered"])
+        self.assertFalse(result["tools"]["nmap"]["execution_ready"])
 
     def test_active_network_tools_require_scoped_authorization(self):
         active = [
