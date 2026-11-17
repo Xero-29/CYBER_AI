@@ -1,0 +1,2772 @@
+{
+  "schema_version": "1.0.0",
+  "language": "es",
+  "area_count": 48,
+  "disclaimer": "Este currículo define profundidad y criterios de aprendizaje; no declara que cada pack ya esté desarrollado en profundidad, que fuentes externas estén descargadas ni que una IA sea experta.",
+  "common_quality_standard": {
+    "learning_levels": {
+      "L0": "Vocabulario, alcance, activos, actores y límites.",
+      "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+      "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+      "L3": "Análisis experto, correlación, automatización controlada y validación.",
+      "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+    },
+    "required_artifacts": [
+      "diagrama de arquitectura y límites de confianza",
+      "inventario de activos, datos e identidades",
+      "modelo de amenazas y escenarios de abuso",
+      "matriz de controles, responsables y evidencias",
+      "procedimiento reproducible con precondiciones y rollback",
+      "laboratorio local con datos sintéticos y criterios de parada",
+      "caso práctico con hallazgo, impacto, mitigación y retest",
+      "evaluación con rúbrica y respuestas razonadas",
+      "registro de fuentes, licencia, versión, fecha y SHA-256"
+    ],
+    "quality_gates": [
+      "separar hechos, inferencias, hipótesis y recomendaciones",
+      "no presentar referencias catalogadas como descargadas o verificadas",
+      "documentar versión, fecha y obsolescencia",
+      "no ejecutar pruebas activas sin autorización y alcance",
+      "minimizar datos sensibles y sanear evidencias",
+      "incluir limitaciones, falsos positivos y no aplicabilidad"
+    ]
+  },
+  "areas": [
+    {
+      "id": "foundations",
+      "name": "Fundamentos",
+      "pack_path": "knowledge/packs/foundations/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Fundamentos; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "modelos de seguridad y confianza",
+        "inventario y clasificación de activos",
+        "superficie de ataque y modelado de amenazas",
+        "identidad, privilegios y autenticación",
+        "seguridad de redes y sistemas",
+        "gestión de vulnerabilidades",
+        "telemetría, respuesta y recuperación"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "appsec",
+      "name": "Seguridad web y aplicaciones",
+      "pack_path": "knowledge/packs/appsec/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Seguridad web y aplicaciones; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "modelado de amenazas por flujo",
+        "autenticación, sesión y recuperación",
+        "autorización BOLA/IDOR y escalada",
+        "inyección, XSS, CSRF, SSRF y deserialización",
+        "frontend, API y componentes",
+        "SAST, DAST, SCA y revisión manual",
+        "SDLC seguro y pruebas de regresión"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "api",
+      "name": "Seguridad de API",
+      "pack_path": "knowledge/packs/api/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Seguridad de API; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "REST, GraphQL, gRPC y contratos",
+        "OAuth 2.0, OIDC, JWT y tokens",
+        "BOLA, BFLA y autorización por objeto",
+        "rate limiting, cuotas y anti-automatización",
+        "validación de esquemas y mass assignment",
+        "mTLS, CORS, gateway y service mesh",
+        "inventario, versionado y retirada segura"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "network",
+      "name": "Redes",
+      "pack_path": "knowledge/packs/network/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Redes; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "OSI/TCP-IP, routing y switching",
+        "VLAN, VRF, microsegmentación y Zero Trust",
+        "firewalls, ACL, NAT y egress",
+        "DNS, DHCP, NTP, VPN, TLS e IPsec",
+        "Wi-Fi empresarial y control de acceso",
+        "PCAP, NetFlow, Zeek y detección",
+        "resiliencia y gestión fuera de banda"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "linux",
+      "name": "Linux y Unix",
+      "pack_path": "knowledge/packs/linux/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Linux y Unix; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "kernel, namespaces y capabilities",
+        "usuarios, grupos, sudo y PAM",
+        "permisos, ACL, SELinux y AppArmor",
+        "systemd, servicios y hardening",
+        "SSH, firewall, auditd y logs",
+        "paquetes, SBOM y parches",
+        "aislamiento y respuesta"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "windows_ad",
+      "name": "Windows y Active Directory",
+      "pack_path": "knowledge/packs/windows_ad/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Windows y Active Directory; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "Windows internals, procesos y servicios",
+        "AD, Kerberos, LDAP y DNS",
+        "GPO, delegación, ACL y tiering",
+        "NTLM, LAPS, gMSA y credenciales",
+        "PowerShell, Sysmon y Event Logs",
+        "Defender, ASR y hardening",
+        "abuso de identidad y recuperación AD"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "cloud",
+      "name": "Seguridad cloud",
+      "pack_path": "knowledge/packs/cloud/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Seguridad cloud; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "responsabilidad compartida y landing zones",
+        "IAM, federación y guardrails",
+        "VPC/VNet, endpoints y egress",
+        "KMS, secretos y ciclo de claves",
+        "storage, snapshots y exposición pública",
+        "audit logs y postura cloud",
+        "IaC, drift y respuesta"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "containers",
+      "name": "Contenedores y Kubernetes",
+      "pack_path": "knowledge/packs/containers/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Contenedores y Kubernetes; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "namespaces, cgroups, seccomp y capabilities",
+        "imágenes, registries, firmas y SBOM",
+        "Docker daemon y runtime",
+        "Kubernetes RBAC y admission",
+        "network policies, secrets y etcd",
+        "supply chain y control plane",
+        "detección y respuesta runtime"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "mobile",
+      "name": "Seguridad móvil",
+      "pack_path": "knowledge/packs/mobile/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Seguridad móvil; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "Android sandbox, permisos y Keystore",
+        "iOS sandbox, entitlements y Keychain",
+        "almacenamiento local y backups",
+        "TLS y confianza del dispositivo",
+        "deep links, IPC y WebView",
+        "MASVS/MSTG y análisis",
+        "MDM/MAM y respuesta"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "crypto",
+      "name": "Criptografía",
+      "pack_path": "knowledge/packs/crypto/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Criptografía; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "entropía y aleatoriedad",
+        "hash, MAC, KDF y firmas",
+        "cifrado simétrico y AEAD",
+        "intercambio de claves y criptografía asimétrica",
+        "TLS, SSH e IPsec",
+        "gestión y rotación de claves",
+        "fallos de implementación"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "identity",
+      "name": "Identidad y acceso",
+      "pack_path": "knowledge/packs/identity/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Identidad y acceso; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "IAM, IGA, PAM y ciclo de vida",
+        "MFA resistente a phishing",
+        "OAuth/OIDC, SAML y Kerberos",
+        "RBAC, ABAC y mínimo privilegio",
+        "workload identity y secretos",
+        "recertificación y separación de funciones",
+        "abuso y recuperación de cuentas"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "malware",
+      "name": "Análisis de malware",
+      "pack_path": "knowledge/packs/malware/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Análisis de malware; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "PE, ELF, Mach-O y documentos",
+        "análisis estático e indicadores",
+        "sandbox y análisis dinámico aislado",
+        "persistencia, memoria y filesystem",
+        "YARA, Sigma e IOC",
+        "ransomware, loaders y botnets",
+        "contención y reporte"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "forensics",
+      "name": "Forense digital",
+      "pack_path": "knowledge/packs/forensics/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Forense digital; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "cadena de custodia y evidencia",
+        "adquisición forense y write blockers",
+        "filesystem, artefactos y timeline",
+        "memoria volátil y procesos",
+        "logs, navegador y endpoints",
+        "PCAP, móviles y cloud",
+        "reproducibilidad y reporte"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "incident_response",
+      "name": "Respuesta a incidentes",
+      "pack_path": "knowledge/packs/incident_response/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Respuesta a incidentes; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "preparación, roles y severidad",
+        "detección, triage y validación",
+        "contención y preservación",
+        "erradicación y recuperación",
+        "comunicaciones y notificación",
+        "tabletop y simulacros",
+        "lecciones aprendidas"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "threat_intel",
+      "name": "Inteligencia de amenazas",
+      "pack_path": "knowledge/packs/threat_intel/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Inteligencia de amenazas; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "ciclo de inteligencia y PIR",
+        "OSINT, fiabilidad y sesgos",
+        "STIX/TAXII y MISP",
+        "ATT&CK, TTP y campañas",
+        "IOC, contexto y caducidad",
+        "enriquecimiento y correlación",
+        "productos estratégicos y tácticos"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "reverse",
+      "name": "Ingeniería inversa",
+      "pack_path": "knowledge/packs/reverse/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Ingeniería inversa; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "arquitecturas, ABI y calling conventions",
+        "desensamblado y depuración",
+        "control flow y data flow",
+        "formatos binarios y linking",
+        "emulación y análisis aislado",
+        "protecciones y empaquetado",
+        "reproducibilidad y divulgación"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "iot_hardware",
+      "name": "IoT y hardware",
+      "pack_path": "knowledge/packs/iot_hardware/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de IoT y hardware; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "MCU/SoC y buses",
+        "UART, SPI, I2C, JTAG y SWD",
+        "firmware, bootloader y secure boot",
+        "OTA y rollback protection",
+        "radio, sensores y gateways",
+        "debug ports y secretos",
+        "ciclo de vida y laboratorio"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "devsecops",
+      "name": "DevSecOps y supply chain",
+      "pack_path": "knowledge/packs/devsecops/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de DevSecOps y supply chain; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "SDLC y threat modeling",
+        "CI/CD, runners y secretos",
+        "SAST, SCA, DAST y gates",
+        "SBOM, provenance y SLSA",
+        "IaC y policy-as-code",
+        "artefactos y releases",
+        "supply chain response"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "ai_security",
+      "name": "Seguridad de IA",
+      "pack_path": "knowledge/packs/ai_security/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Seguridad de IA; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "datos, modelos y pipelines",
+        "RAG, embeddings y ACL",
+        "prompt injection directa e indirecta",
+        "agentes, herramientas y permisos",
+        "poisoning, extracción y privacidad",
+        "robustez, sesgo y leakage",
+        "provenance y seguridad de inferencia"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "governance",
+      "name": "GRC, privacidad y auditoría",
+      "pack_path": "knowledge/packs/governance/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de GRC, privacidad y auditoría; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "gobierno, apetito de riesgo y políticas",
+        "ISO 27001, NIST CSF y controles",
+        "inventario y propietarios",
+        "riesgo y planes de tratamiento",
+        "auditoría y evidencia",
+        "privacidad y terceros",
+        "métricas y mejora"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "vuln_management",
+      "name": "Gestión de vulnerabilidades",
+      "pack_path": "knowledge/packs/vuln_management/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Gestión de vulnerabilidades; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "descubrimiento e inventario",
+        "CVE, CWE, CVSS, EPSS y KEV",
+        "priorización contextual",
+        "validación y deduplicación",
+        "SLA, excepciones y parches",
+        "verificación y regresión",
+        "exposición y riesgo residual"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "bug_bounty",
+      "name": "Bug bounty autorizado",
+      "pack_path": "knowledge/packs/bug_bounty/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Bug bounty autorizado; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "alcance y autorización",
+        "reconocimiento pasivo y límites",
+        "validación segura",
+        "impacto mínimo y no exfiltración",
+        "reporte y evidencia saneada",
+        "triage y severidad",
+        "divulgación y retest"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "secure_arch",
+      "name": "Arquitectura segura",
+      "pack_path": "knowledge/packs/secure_arch/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Arquitectura segura; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "requisitos y atributos de calidad",
+        "contexto y límites de confianza",
+        "STRIDE, attack trees y abuse cases",
+        "Zero Trust y defensa en profundidad",
+        "identidad, datos y secretos",
+        "resiliencia y observabilidad",
+        "revisión y ADR"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "data_security",
+      "name": "Seguridad de datos",
+      "pack_path": "knowledge/packs/data_security/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Seguridad de datos; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "clasificación y linaje",
+        "cifrado en tránsito, reposo y uso",
+        "DLP, tokenización y enmascaramiento",
+        "tenant isolation y auditoría",
+        "retención y borrado verificable",
+        "data lakes y pipelines",
+        "exfiltración y respuesta"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "software_engineering",
+      "name": "Ingeniería de software y calidad",
+      "pack_path": "knowledge/packs/software_engineering/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Ingeniería de software y calidad; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "diseño modular y contratos",
+        "tipado y manejo de errores",
+        "unitarias, integración y property tests",
+        "concurrencia y rendimiento",
+        "dependencias y packaging",
+        "CI, revisión y análisis estático",
+        "observabilidad y rollback"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "machine_learning",
+      "name": "Aprendizaje automático e ingeniería de IA",
+      "pack_path": "knowledge/packs/machine_learning/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Aprendizaje automático e ingeniería de IA; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "estadística y generalización",
+        "datasets, leakage y splits",
+        "feature engineering y pipelines",
+        "robustez, drift y monitorización",
+        "privacidad y poisoning",
+        "MLOps y reproducibilidad",
+        "evaluación de modelos"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "hardware_security",
+      "name": "Hardware, firmware y sistemas embebidos",
+      "pack_path": "knowledge/packs/hardware_security/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Hardware, firmware y sistemas embebidos; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "amenazas de hardware y cadena física",
+        "secure boot y root of trust",
+        "firmware y rollback",
+        "debug interfaces y protección",
+        "side channels en laboratorio",
+        "TEE, HSM y enclaves",
+        "attestation y lifecycle"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "mathematics",
+      "name": "Matemáticas, estadística y métodos numéricos",
+      "pack_path": "knowledge/packs/mathematics/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Matemáticas, estadística y métodos numéricos; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "lógica y demostración",
+        "álgebra lineal y cálculo numérico",
+        "probabilidad e inferencia",
+        "teoría de información y entropía",
+        "grafos y optimización",
+        "series temporales y anomalías",
+        "incertidumbre y validación"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "soc_siem",
+      "name": "SOC, SIEM y SOAR",
+      "pack_path": "knowledge/packs/soc_siem/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de SOC, SIEM y SOAR; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "telemetría y normalización",
+        "SIEM y retención",
+        "correlación y detección",
+        "ATT&CK coverage",
+        "SOAR y aprobaciones",
+        "triage y gestión de casos",
+        "detección como código"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "edr_xdr",
+      "name": "EDR, XDR y endpoints",
+      "pack_path": "knowledge/packs/edr_xdr/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de EDR, XDR y endpoints; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "telemetría endpoint",
+        "procesos, memoria y filesystem",
+        "detecciones conductuales",
+        "aislamiento y respuesta controlada",
+        "integración y correlación XDR",
+        "tuning y falsos positivos",
+        "forense y recuperación"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "threat_hunting",
+      "name": "Threat hunting",
+      "pack_path": "knowledge/packs/threat_hunting/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Threat hunting; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "hipótesis basadas en TTP",
+        "calidad de telemetría",
+        "KQL, Sigma y pivots",
+        "líneas base y anomalías",
+        "validación de hipótesis",
+        "detecciones persistentes",
+        "cobertura y reproducibilidad"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "red_team",
+      "name": "Red Team autorizado",
+      "pack_path": "knowledge/packs/red_team/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Red Team autorizado; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "ROE, alcance y reglas de parada",
+        "planificación basada en amenazas",
+        "reconocimiento autorizado",
+        "validación con impacto mínimo",
+        "emulación ATT&CK",
+        "evidencia y deconfliction",
+        "retest y purple teaming"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "wireless_security",
+      "name": "Wireless, Bluetooth y NFC",
+      "pack_path": "knowledge/packs/wireless_security/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Wireless, Bluetooth y NFC; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "802.11, WPA2/3 y 802.1X",
+        "diseño RF y segmentación",
+        "Bluetooth LE y GATT",
+        "NFC y RFID",
+        "WIDS/WIPS y rogue AP",
+        "captura en laboratorio",
+        "hardening de dispositivos"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "ot_ics",
+      "name": "OT, ICS y SCADA",
+      "pack_path": "knowledge/packs/ot_ics/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de OT, ICS y SCADA; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "Purdue, zonas y conduits",
+        "PLC, RTU, HMI y SCADA",
+        "Modbus, DNP3 y OPC UA",
+        "safety y ventanas de cambio",
+        "segmentación y acceso remoto",
+        "inventario pasivo y detección",
+        "respuesta con operaciones"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "telecom_5g",
+      "name": "Telecomunicaciones y 5G",
+      "pack_path": "knowledge/packs/telecom_5g/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Telecomunicaciones y 5G; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "5G Core y RAN",
+        "slicing y service-based architecture",
+        "SIM/eSIM y AKA",
+        "señalización y roaming",
+        "virtualización y edge",
+        "monitorización y fraude",
+        "supply chain telecom"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "automotive_security",
+      "name": "Ciberseguridad automotriz y CAN",
+      "pack_path": "knowledge/packs/automotive_security/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Ciberseguridad automotriz y CAN; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "ECU, CAN, LIN y Ethernet",
+        "gateways y arquitectura zonal",
+        "UDS y actualización segura",
+        "secure boot y HSM",
+        "V2X y telemática",
+        "ISO/SAE 21434 y TARA",
+        "HIL/SIL y divulgación"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "satellite_security",
+      "name": "Satélites y sistemas espaciales",
+      "pack_path": "knowledge/packs/satellite_security/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Satélites y sistemas espaciales; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "segmentos espacial y terrestre",
+        "TT&C y telemetría",
+        "RF y espectro",
+        "firmware y estaciones terrestres",
+        "resiliencia y anti-jamming",
+        "identidad y criptografía",
+        "simulación y coordinación"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "physical_security",
+      "name": "Seguridad física ciberfísica",
+      "pack_path": "knowledge/packs/physical_security/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Seguridad física ciberfísica; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "zonificación y perímetros",
+        "acceso y visitantes",
+        "CCTV y sensores",
+        "USB y medios extraíbles",
+        "salas, racks y cableado",
+        "convergencia físico-digital",
+        "respuesta coordinada"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "email_dns_security",
+      "name": "Correo, DNS y dominios",
+      "pack_path": "knowledge/packs/email_dns_security/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Correo, DNS y dominios; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "SPF, DKIM y DMARC",
+        "DNSSEC y delegación",
+        "TLS, MTA-STS y DANE",
+        "phishing y BEC",
+        "dominios y certificados",
+        "reputación y detección",
+        "recuperación de cuentas"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "fraud_abuse",
+      "name": "Fraude digital y abuso",
+      "pack_path": "knowledge/packs/fraud_abuse/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Fraude digital y abuso; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "modelos de abuso y trust/safety",
+        "identidad sintética y bots",
+        "grafos y anomalías",
+        "account takeover",
+        "detección y fricción adaptativa",
+        "privacidad y falsos positivos",
+        "apelación y métricas"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "privacy_engineering",
+      "name": "Ingeniería de privacidad",
+      "pack_path": "knowledge/packs/privacy_engineering/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Ingeniería de privacidad; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "inventario y flujos de datos personales",
+        "privacy by design y DPIA",
+        "minimización y retención",
+        "consentimiento y derechos",
+        "pseudonimización y PET",
+        "telemetría privada",
+        "incidentes y evidencia"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "cloud_forensics",
+      "name": "Forense cloud",
+      "pack_path": "knowledge/packs/cloud_forensics/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Forense cloud; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "logging y fuentes cloud",
+        "snapshots y objetos",
+        "identidad y control plane",
+        "containers y serverless",
+        "timeline distribuido",
+        "legal hold y cadena de custodia",
+        "correlación multi-cloud"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "ai_red_team",
+      "name": "Red teaming de IA y agentes",
+      "pack_path": "knowledge/packs/ai_red_team/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Red teaming de IA y agentes; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "plan de pruebas y threat model",
+        "prompt injection",
+        "abuso de herramientas y agencia",
+        "RAG poisoning y cross-tenant",
+        "exfiltración y extracción",
+        "evaluación adversarial",
+        "retest y reporte"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "pki_hsm",
+      "name": "PKI, certificados y HSM",
+      "pack_path": "knowledge/packs/pki_hsm/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de PKI, certificados y HSM; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "X.509 y cadena de confianza",
+        "CA y políticas CP/CPS",
+        "OCSP, CRL y CT",
+        "HSM y ceremonia de claves",
+        "mTLS y code signing",
+        "rotación y expiración",
+        "compromiso de CA"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "post_quantum_crypto",
+      "name": "Criptografía poscuántica",
+      "pack_path": "knowledge/packs/post_quantum_crypto/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Criptografía poscuántica; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "harvest-now-decrypt-later",
+        "ML-KEM y ML-DSA",
+        "híbridos e interoperabilidad",
+        "inventario criptográfico",
+        "rendimiento y restricciones",
+        "cripto-agilidad",
+        "plan de migración"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "business_continuity",
+      "name": "Continuidad y recuperación",
+      "pack_path": "knowledge/packs/business_continuity/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Continuidad y recuperación; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "BIA, RTO, RPO y dependencias",
+        "continuidad y recuperación",
+        "backups inmutables",
+        "DR y failover",
+        "crisis y comunicaciones",
+        "tabletop y simulacros",
+        "mejora continua"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "database_security",
+      "name": "Seguridad de bases de datos",
+      "pack_path": "knowledge/packs/database_security/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Seguridad de bases de datos; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "relacional, NoSQL y permisos",
+        "roles y separación de funciones",
+        "cifrado y secretos",
+        "auditoría y consultas",
+        "SQLi y exposición",
+        "backup y recuperación",
+        "hardening y parches"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    },
+    {
+      "id": "vulnerability_research",
+      "name": "Investigación de vulnerabilidades",
+      "pack_path": "knowledge/packs/vulnerability_research/README.md",
+      "pack_version": "2.0.0",
+      "scope": "Currículo técnico de Investigación de vulnerabilidades; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
+      "learning_levels": {
+        "L0": "Vocabulario, alcance, activos, actores y límites.",
+        "L1": "Fundamentos, arquitectura, protocolos y modelos de confianza.",
+        "L2": "Metodologías reproducibles, controles, detección, pruebas y respuesta.",
+        "L3": "Análisis experto, correlación, automatización controlada y validación.",
+        "L4": "Investigación, papers, reproducción responsable y evaluación crítica."
+      },
+      "deep_topics": [
+        "CWE y root cause",
+        "fuzzing y sanitizers",
+        "análisis y reducción de casos",
+        "reproducción aislada",
+        "impacto y mitigación",
+        "coordinated disclosure y CVE",
+        "regresión y advisories"
+      ],
+      "required_artifacts": [
+        "diagrama de arquitectura y límites de confianza",
+        "inventario de activos, datos e identidades",
+        "modelo de amenazas y escenarios de abuso",
+        "matriz de controles, responsables y evidencias",
+        "procedimiento reproducible con precondiciones y rollback",
+        "laboratorio local con datos sintéticos y criterios de parada",
+        "caso práctico con hallazgo, impacto, mitigación y retest",
+        "evaluación con rúbrica y respuestas razonadas",
+        "registro de fuentes, licencia, versión, fecha y SHA-256"
+      ],
+      "lab_blueprint": {
+        "environment": "Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.",
+        "scenarios": [
+          "establecer baseline seguro y recoger evidencia",
+          "introducir un fallo/configuración sintética",
+          "detectar y analizar con procedimiento documentado",
+          "remediar de forma reversible y ejecutar regresión"
+        ],
+        "safety": "Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada."
+      },
+      "evaluation": {
+        "dimensions": [
+          "precisión técnica",
+          "cobertura de escenarios",
+          "reproducibilidad",
+          "calidad de evidencia",
+          "seguridad y proporcionalidad",
+          "mitigación y verificación"
+        ],
+        "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
+      },
+      "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
+      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+    }
+  ]
+}
