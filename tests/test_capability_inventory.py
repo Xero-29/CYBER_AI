@@ -19,6 +19,10 @@ class CapabilityInventoryTests(unittest.TestCase):
         self.assertTrue(result["safety"]["discovery_only"])
         self.assertFalse(result["safety"]["executes_tools"])
         self.assertFalse(result["safety"]["tool_presence_grants_permission"])
+        self.assertEqual(result["safety"]["local_host_egress_isolation"], "not_enforced")
+        self.assertTrue(result["safety"]["direct_execution_requires_explicit_execute"])
+        self.assertFalse(result["tools"]["ruff"]["host_network_isolation_enforced"])
+        self.assertTrue(result["tools"]["ruff"]["explicit_execute_required"])
 
     def test_active_network_tools_require_scoped_authorization(self):
         active = [
