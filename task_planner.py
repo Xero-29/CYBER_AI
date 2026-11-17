@@ -7,7 +7,7 @@ from pathlib import Path
 from capability_selector import select_capabilities
 from tool_registry import select_tools
 
-def create_plan(task):
+def create_plan(task, output_path=None):
     candidates = select_capabilities(task, limit=25)
     tool_plan = select_tools(task, limit=10)
     plan = {
@@ -32,7 +32,7 @@ def create_plan(task):
         "execution_started": False,
         "note": "Plan preliminar basado en reglas; requiere validar relevancia antes de ejecutar."
     }
-    output = Path("reports/task_plan.json")
+    output = Path(output_path) if output_path is not None else Path("reports/task_plan.json")
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(plan, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return plan, output
