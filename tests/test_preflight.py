@@ -246,6 +246,14 @@ class PreflightTests(unittest.TestCase):
         self.assertTrue(any("chmod 700" in item["reason"] for item in findings))
         self.assertTrue(any("chmod 600" in item["reason"] for item in findings))
 
+    def test_evidence_preflight_rejects_reports_path_that_is_a_file(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / "reports").write_text("not a directory", encoding="utf-8")
+            findings = preflight.validate_evidence_permissions(root)
+        self.assertEqual(len(findings), 1)
+        self.assertIn("reports debe ser un directorio", findings[0]["reason"])
+
     def test_private_evidence_directory_and_file_are_accepted(self):
         if os.name != "posix":
             self.skipTest("POSIX mode bits are not a Windows ACL check")
