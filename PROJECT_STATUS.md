@@ -1,3 +1,23 @@
+# Estado actual verificado — 2026-11-17
+
+**HEAD verificado:** `6fd37146aa249aef11aee40fb56d0d578352d4f2`  
+**Rama:** `codex/security-integrity-audit`  
+**Comparación con main:** 350 commits adelante, 0 detrás (según el PR abierto).  
+**CI de este HEAD:** Python tests — [success, 377 pruebas](https://github.com/Xero-29/CYBER_AI/actions/runs/43997173079); Docker sandbox — [success](https://github.com/Xero-29/CYBER_AI/actions/runs/43997173115).  
+**PR #2:** abierto, en borrador; no fusionado. `main` no fue modificado.
+
+## Cambio de seguridad de esta iteración
+
+- `knowledge_audit.py` ahora rechaza rutas absolutas, traversal y symlinks en el manifiesto; no sigue directorios raíz symlink durante el inventario.
+- Los manifiestos ausentes o inválidos producen diagnósticos en vez de interrumpir abruptamente la auditoría.
+- La auditoría SQLite abre la base en modo solo lectura y devuelve un diagnóstico si el esquema no es válido.
+- `tests/test_knowledge_audit.py` añade cobertura para rutas externas, symlinks de archivo/directorio, manifiestos inválidos y lectura SQLite.
+- Validación de este cambio: 377 pruebas Python y Docker sandbox aprobados en el SHA exacto indicado arriba.
+
+**Límite:** esto cierra una brecha del auditor local; no cierra las brechas institucionales de KMS/HSM, cifrado, WORM, RBAC, microVM, proveedores reales, evaluación experta de fuentes ni recuperación ante pérdida de host. Las secciones históricas siguientes documentan iteraciones anteriores; si contradicen este bloque, prevalece la evidencia del HEAD aquí indicado.
+
+---
+
 # Estado real y plan de cierre de CYBER_AI
 
 **Actualizado:** 2026-11-17  
