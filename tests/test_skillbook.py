@@ -1,4 +1,5 @@
 import hashlib, hmac, json, os, sqlite3, tempfile, unittest
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from unittest.mock import patch
 import skillbook
@@ -48,6 +49,31 @@ class SkillbookTests(unittest.TestCase):
   with patch.dict(os.environ,{"CYBER_AI_VERITAS_APPROVAL_KEY":key}), patch.object(skillbook,"ExecutionLedger",return_value=FakeLedger()):
    with self.assertRaisesRegex(ValueError,"Hay ejecuciones fallidas"):
     skillbook.register_skill_from_ledger(**args,approval_signature=signature)
+
+ def test_concurrent_signed_promotions_create_only_one_skill(self):
+  key="test-veritas-approval-key-with-32-bytes-minimum"
+  events=[
+   {"event_id":"concurrent-run-1","task_fingerprint":"9"*64,"status":"completed","tool":"team_orchestrator","metadata":{"objective_supervision":True},"created_at":"2026-05-01T00:00:00Z","validator_results":[{"name":"objective_review:VERITAS","reviewer":"VERITAS","passed":True,"independent":True,"evidence":["review"]}],"evidence_sha256":"a"*64},
+   {"event_id":"concurrent-run-2","task_fingerprint":"9"*64,"status":"completed","tool":"team_orchestrator","metadata":{"objective_supervision":True},"created_at":"2026-05-02T00:00:00Z","validator_results":[{"name":"objective_review:VERITAS","reviewer":"VERITAS","passed":True,"independent":True,"evidence":["review"]}],"evidence_sha256":"b"*64},
+  ]
+  class FakeLedger:
+   def verify(self): return {"valid":True}
+   def history(self,**kwargs): return events
+  args=dict(name="Skill concurrente",task_pattern="promocion concurrente unica",description="Debe evitar duplicados",prerequisites=[],methodology=["preparar fixture","verificar firma"],validation=["contar registros"],tools=[],tags=["concurrency"],source_urls=[],namespace="concurrency",event_ids=["concurrent-run-1","concurrent-run-2"])
+  with patch.object(skillbook,"ExecutionLedger",return_value=FakeLedger()):
+   payload=skillbook.skill_approval_payload(**args)
+  signature=hmac.new(key.encode(),payload.encode(),hashlib.sha256).hexdigest()
+  with patch.dict(os.environ,{"CYBER_AI_VERITAS_APPROVAL_KEY":key}), patch.object(skillbook,"ExecutionLedger",return_value=FakeLedger()):
+   with ThreadPoolExecutor(max_workers=2) as pool:
+    results=list(pool.map(
+     lambda _: skillbook.register_skill_from_ledger(**args,approval_signature=signature),
+     range(2),
+    ))
+  self.assertEqual(results[0]["skill_id"],results[1]["skill_id"])
+  with skillbook.connect() as db:
+   count=db.execute("SELECT COUNT(*) FROM skills WHERE task_pattern=?",(args["task_pattern"],)).fetchone()[0]
+  self.assertEqual(count,1)
+  self.assertEqual(len(skillbook.list_skill_versions(results[0]["skill_id"])),1)
 
  def test_started_lifecycle_events_do_not_invalidate_successful_skill_evidence(self):
   key="test-veritas-approval-key-with-32-bytes-minimum"
