@@ -77,7 +77,13 @@ python cyber_ai.py --ask "Explica este hallazgo" --agent NEXO
 python cyber_ai.py --ask "Explica este hallazgo" --no-knowledge
 ```
 
-El flujo `--team` utiliza `team_orchestrator.py`, genera un plan de capacidades y herramientas candidatas ligado al informe del flujo, y supervisa las etapas contra el objetivo global. La recuperación de conocimiento se activa por defecto en las etapas y revisiones, salvo que una etapa o el flujo la desactive expresamente en `config/workflows.json`. Esta entrada no ejecuta automáticamente herramientas de seguridad ni sustituye la autorización de objetivos. Los escáneres y adaptadores conservan sus flujos explícitos de autorización y ejecución documentados más abajo.
+El flujo `--team` utiliza `team_orchestrator.py`, genera un plan de capacidades y herramientas candidatas ligado al informe del flujo, y supervisa las etapas contra el objetivo global. Opcionalmente ejecuta hasta tres adaptadores locales con confirmación, allowlist HMAC obligatoria, evidencia estructurada y registro en el ledger: La recuperación de conocimiento se activa por defecto en las etapas y revisiones, salvo que una etapa o el flujo la desactive expresamente en `config/workflows.json`. Para activar la ejecución local, primero configura la allowlist descrita en [docs/TOOL_ALLOWLIST.md](docs/TOOL_ALLOWLIST.md) y luego ejecuta:
+
+```bash
+python cyber_ai.py --team "Revisa la calidad y seguridad del código" --execute-tools --confirm-tool-execution --tool-target src
+```
+
+Solo se consideran adaptadores locales registrados; los que requieren red o aislamiento especial siguen bloqueados. El objetivo debe estar dentro del repositorio. La ejecución no se activa por defecto. La validación automática verifica integridad de hashes, allowlist, código de salida y ausencia de modificación del objetivo/binario; no demuestra por sí sola que cada hallazgo sea verdadero. Los resultados se entregan a los agentes como datos no confiables y quedan enlazados al informe y al ledger.
 
 ## Ejecutar agentes LLM locales
 
