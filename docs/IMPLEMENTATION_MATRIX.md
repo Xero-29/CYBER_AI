@@ -63,3 +63,13 @@ Toda afirmación de CI debe indicar SHA completo y enlace a cada workflow. Si el
 5. Inspeccionar fallos y corregirlos; repetir hasta obtener evidencia verde.
 6. Actualizar esta matriz y `PROJECT_STATUS.md` con SHA, enlaces y límites residuales.
 7. Si requiere infraestructura externa, dejarlo como pendiente operativo con evidencia concreta requerida.
+
+
+## Matriz transversal de dominios
+
+| Criterio | Estado | Evidencia / límite |
+|---|---|---|
+| 48 paquetes offline ↔ 48 perfiles | Implementado en código; CI pendiente | `domain_capability_matrix.py` compara IDs exactos contra `knowledge/packs/manifest.json`; prueba de integridad de cobertura añadida. |
+| Dominio ↔ herramientas candidatas | Implementado en código; CI pendiente | Cada perfil declara IDs del catálogo; el plan informa disponibilidad, adaptador y estado de integración. La selección no autoriza ni ejecuta. |
+| Dominio ↔ Skills activas | Integrado en planificación; CI pendiente | Se consultan Skills activas por tarea/dominio sin modificar contadores; solo se sugieren, no se promueven. |
+| Cobertura operativa de las 48 áreas | Pendiente | Los perfiles de enrutamiento no sustituyen herramientas específicas, corpus experto, laboratorios, pruebas ni aceptación de resultados por dominio. |
