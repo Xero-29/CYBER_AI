@@ -302,3 +302,12 @@ No declarar el sistema completo ni certificado hasta que cada brecha tenga códi
 - Se ejecutó la verificación completa, generación de SBOM y procedencia; el workflow Docker construyó la imagen, ejecutó la verificación completa y Ruff dentro del sandbox.
 - Los tests nuevos incluidos en este HEAD cubren integridad SQLite, payload corrupto, writer ocupado, archivo SQLite ilegible, archivos Office adversariales, marcadores de página PDF, promoción concurrente de Skills y detección de Skills que requieren revisión.
 - **Alcance:** CI verde no equivale a validación operacional, auditoría externa ni certificación institucional. No se han probado KMS/HSM, WORM/offsite, microVM, OCR real, proveedores IA con credenciales ni recuperación ante pérdida de host.
+
+## Endurecimiento implementable adicional — 17-11-2026
+
+- **Procedencia de herramientas locales:** cada adaptador calcula SHA-256 del binario real resuelto, registra ruta/version/hash en la evidencia y vuelve a calcular el hash al finalizar. Si el ejecutable desaparece o cambia durante la ejecución, la evidencia queda marcada como `integrity_error` y no se considera exitosa. Esto mejora trazabilidad, pero no reemplaza firma de proveedor, verificación de origen ni aislamiento.
+- **Skillbook:** nuevo `verify_skill_history(skill_id)` y CLI `python skillbook_cli.py verify-history --skill-id ID`. Comprueba secuencia continua de versiones, identidad de snapshots y coherencia de la versión vigente con el último snapshot; excluye contadores operacionales de uso.
+- **Artefactos de dependencias:** `dependency_artifact_manifest.py` inspecciona wheels descargados, verifica que sus nombres/versiones coincidan con `requirements.lock` y calcula SHA-256. El workflow Python genera este manifiesto y lo integra en los campos `hashes` del SBOM CycloneDX para los wheels de la plataforma CI.
+- **Límite de reproducibilidad:** los hashes registrados describen los artefactos obtenidos en esa ejecución/plataforma; no son todavía hashes fijados en `requirements.lock` ni aseguran equivalencia para todos los sistemas operativos/arquitecturas. No se inventaron hashes. La fijación multiplataforma requiere resolver y revisar artefactos para cada plataforma soportada.
+- **Pruebas añadidas:** cambio de binario durante ejecución, historial de Skills discontinuo/manipulado, validación de manifiestos de wheels y hashes SBOM.
+
