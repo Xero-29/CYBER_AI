@@ -64,6 +64,11 @@ def load_execution_config(path=None):
     if not isinstance(tools, list) or len(tools) > 100:
         raise ProfileConfigError("custom_tools debe ser una lista de hasta 100 entradas.")
     seen = set()
+    reserved_ids = {
+        "semgrep", "bandit", "ruff", "syft", "trivy", "pip_audit",
+        "checkov", "detect_secrets", "hadolint", "shellcheck",
+        "actionlint", "kube_linter", "yara", "tshark",
+    }
     for tool in tools:
         if not isinstance(tool, dict):
             raise ProfileConfigError("Cada herramienta personalizada debe ser un objeto.")
@@ -73,9 +78,13 @@ def load_execution_config(path=None):
         tool_id = tool["id"]
         if not isinstance(tool_id, str) or not re.fullmatch(r"[a-z0-9_-]{1,64}", tool_id):
             raise ProfileConfigError("ID de herramienta personalizada inválido.")
-        if tool_id in seen:
-            raise ProfileConfigError("ID de herramienta personalizada duplicado.")
+        if tool_id in seen or tool_id in reserved_ids:
+            raise ProfileConfigError("ID de herramienta personalizada duplicado o reservado.")
         seen.add(tool_id)
+        if not isinstance(tool.get("description"), str) or not tool["description"].strip():
+            raise ProfileConfigError("description debe ser texto no vacío.")
+        if not isinstance(tool.get("category"), str) or not tool["category"].strip():
+            raise ProfileConfigError("category debe ser texto no vacío.")
         if not isinstance(tool["executable"], str) or not tool["executable"].strip():
             raise ProfileConfigError("executable debe ser una ruta o nombre ejecutable.")
         argv = tool["argv"]
