@@ -45,6 +45,16 @@ class PreflightTests(unittest.TestCase):
         self.assertEqual(len(findings), 1)
         self.assertIn("chmod 600", findings[0]["reason"])
 
+    def test_env_file_with_group_write_permission_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            env_file = root / ".env"
+            env_file.write_text("API_KEY=not-a-real-key\\n", encoding="utf-8")
+            env_file.chmod(0o660)
+            findings = preflight.validate_env_file_permissions(root)
+        self.assertEqual(len(findings), 1)
+        self.assertIn("grupo u otros", findings[0]["reason"])
+
     def test_env_file_with_owner_only_permissions_is_accepted(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
