@@ -167,5 +167,46 @@ class DataBackupTests(unittest.TestCase):
             '{"event":"test"}\n',
         )
 
+
+    def test_rejects_symlink_file_inside_backup(self):
+        snapshot = self.root / "backup"
+        create_backup(self.data, snapshot)
+        target = snapshot / "events.jsonl"
+        target.unlink()
+        target.symlink_to(self.root / "outside.txt")
+        (self.root / "outside.txt").write_text("outside", encoding="utf-8")
+        with self.assertRaises(BackupError):
+            verify_backup(snapshot)
+
+    def test_rejects_parent_traversal_in_manifest(self):
+        snapshot = self.root / "backup"
+        create_backup(self.data, snapshot)
+        manifest_path = snapshot / "manifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["files"][0]["path"] = "../outside"
+        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+        with self.assertRaisesRegex(BackupError, "Ruta insegura"):
+            verify_backup(snapshot)
+
+    def test_signed_manifest_tampering_is_detected(self):
+        key = "backup-signing-key-with-at-least-32-bytes"
+        snapshot = self.root / "signed-backup"
+        with patch.dict(os.environ, {"CYBER_AI_BACKUP_HMAC_KEY": key}):
+            create_backup(self.data, snapshot)
+            manifest_path = snapshot / "manifest.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest["created_at"] = "2000-01-01T00:00:00+00:00"
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            with self.assertRaisesRegex(BackupError, "HMAC"):
+                verify_backup(snapshot, require_signature=True)
+
+    def test_failed_atomic_publish_cleans_staging_directory(self):
+        destination = self.root / "backup"
+        with patch("data_backup.os.replace", side_effect=OSError("simulated publish failure")):
+            with self.assertRaisesRegex(OSError, "simulated publish failure"):
+                create_backup(self.data, destination)
+        self.assertFalse(destination.exists())
+        self.assertEqual(list(self.root.glob(".backup.tmp-*")), [])
+
 if __name__ == "__main__":
     unittest.main()
