@@ -40,7 +40,7 @@ Después llama a `register_skill_from_ledger(..., approval_signature=signature)`
 
 HMAC autentica posesión de la clave, no demuestra por sí mismo que un modelo VERITAS haya revisado el contenido. La clave debe estar bajo control de un proceso aprobador separado. Para nivel institucional se debe reemplazar o complementar esta clave local por un servicio de firma independiente, KMS/HSM, identidad del aprobador, política de doble control y registro externo inmutable.
 
-El endpoint público `register_verified_skill` está deshabilitado para impedir que un caller se autodeclare VERITAS. Las candidatas no aparecen en `search_skills` ni se inyectan al contexto del agente. El historial de versiones bloquea UPDATE/DELETE ordinarios; aún faltan rollback, regresión automática y firma independiente KMS/HSM.
+El endpoint público `register_verified_skill` está deshabilitado para impedir que un caller se autodeclare VERITAS. Las candidatas no aparecen en `search_skills` ni se inyectan al contexto del agente. La recuperación de Skills activas verifica la cadena de versiones y el snapshot actual antes de devolver una metodología; una Skill alterada o con historial roto queda excluida. El historial de versiones bloquea UPDATE/DELETE ordinarios. El rollback firmado y el benchmark de regresión ya están implementados; aún falta firma independiente KMS/HSM y validación semántica/operativa de metodologías.
 
 
 ## Rollback firmado de Skills
@@ -60,3 +60,15 @@ result = skillbook.rollback_skill_version(
 ```
 
 El rollback exige una versión objetivo que estuvo activa, con dos ejecuciones exitosas y cero fallos sin resolver. La firma queda invalidada si cambia la versión actual o cualquiera de los snapshots. La restauración crea una versión nueva con `change_type=rollback`; nunca modifica ni elimina versiones anteriores. La clave sigue siendo HMAC local y no sustituye una firma independiente KMS/HSM.
+
+## Regresión de recuperación
+
+`skill_regression.py` evalúa un dataset JSONL de consultas con IDs de Skills relevantes y calcula Recall@K, Precision@K, MRR@K y hit-rate. Comprueba la integridad y el estado activo de las Skills relevantes, no incrementa contadores de uso y devuelve código de salida distinto de cero si no alcanza los umbrales configurados. El dataset debe construirse con juicios de relevancia revisados; no se deben inventar etiquetas para inflar métricas.
+
+```bash
+python skill_regression.py --dataset /ruta/privada/skill_queries.jsonl --top-k 5 --min-recall 0.80 --min-mrr 0.70 --output reports/skill_regression.json
+```
+
+## Auditoría de ciclo
+
+`python learning_cycle_audit.py` revisa ledger, referencias de memoria, cadenas de versiones, eventos interrumpidos y Skills que requieren revisión. No altera los registros. Consulta [LEARNING_CYCLE_AUDIT.md](LEARNING_CYCLE_AUDIT.md).
