@@ -30,3 +30,12 @@ Se han creado 48 módulos, uno por cada área del manifiesto. Su estado inicial 
 4. Verificar referencias primarias y registrar procedencia.
 5. Ejecutar revisión técnica independiente y de vigencia.
 6. Cambiar la madurez solo cuando exista evidencia.
+
+
+## Investigación nivel L4/L5
+
+- Protocolo de investigación: `../research/RESEARCH_PROTOCOL.md`.
+- Registro de fuentes: `../research/source_registry.json` (solo metadatos oficiales revisados; lectura integral pendiente).
+- Agendas específicas de las 48 áreas: `../deep_modules/<area>/RESEARCH_AGENDA.md`.
+- Auditoría estructural: `python knowledge_research_audit.py` y `python -m pytest tests/test_knowledge_research_audit.py`.
+- Las agendas no son papers, revisiones sistemáticas ni experimentos ejecutados. M4/M5 solo se asignan tras evidencia empírica y reproducción independiente.
