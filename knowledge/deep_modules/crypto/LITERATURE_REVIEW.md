@@ -6,7 +6,7 @@
 
 ¿Cómo inventariar y migrar dependencias criptográficas a estándares poscuánticos sin introducir incompatibilidades, downgrade, pérdida de interoperabilidad o falsas garantías?
 
-## Evidencia primaria
+## Síntesis y evidencia primaria
 
 NIST publicó en agosto de 2024 tres estándares FIPS principales:
 - **FIPS 203 / ML-KEM:** mecanismo de encapsulación de claves para establecer un secreto compartido.
@@ -42,4 +42,10 @@ Banco: dos servicios de prueba, certificados sintéticos, implementaciones compa
 ## Brechas
 
 Revisar los estándares FIPS completos, sus erratas y requisitos de validación; estudiar protocolos TLS/PKI y perfiles de transición; ejecutar pruebas cruzadas en implementaciones reales y revisión criptográfica independiente.
-\n\n## Identificadores del registro de fuentes\n\n- `NIST-FIPS-203`\n- `NIST-FIPS-204`\n- `NIST-FIPS-205`\n
+
+
+## Identificadores del registro de fuentes
+
+- `NIST-FIPS-203`
+- `NIST-FIPS-204`
+- `NIST-FIPS-205`
