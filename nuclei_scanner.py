@@ -85,13 +85,34 @@ def _record_scan_start(target, authorization_id):
 
 
 def _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger):
+    result.setdefault("evidence_schema", "cyber-ai.remote-scan.v1")
+    result.setdefault("scanner", "nuclei")
+    result.setdefault("authorization_id", authorization_id)
+    result.setdefault("duration_ms", max(0, int((time.monotonic() - started) * 1000)))
+    validation = validate_scan_result(result, expected_target=target)
+    result["independent_evidence_validation"] = validation
+    event_payload = {
+        "evidence_schema": result["evidence_schema"],
+        "scanner": result["scanner"],
+        "target": target,
+        "authorization_id": authorization_id,
+        "status": result.get("status"),
+        "return_code": result.get("return_code"),
+        "findings_count": result.get("findings_count", len(result.get("findings", []))),
+        "validation": validation,
+        "findings": result.get("findings", []),
+    }
     event = _record_scan_event(
-        target, result, started, authorization_id=authorization_id,
+        target, event_payload, started, authorization_id=authorization_id,
         start_event_id=start_event_id,
     )
     if require_ledger and event is None:
         result["status"] = "ledger_error"
         result["ledger_error"] = "No se pudo persistir el evento terminal del escaneo."
+    elif event is not None:
+        result["ledger_event_id"] = event.get("event_id")
+    if result.get("status") == "completed" and not validation["findings_eligible"]:
+        result["status"] = "evidence_rejected"
     return result
 
 
