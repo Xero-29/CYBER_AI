@@ -161,6 +161,7 @@ def audit_research_library(root: Path = ROOT) -> dict:
         "official_methodology_page_reviewed", "official_standard_metadata_reviewed",
     }
     source_reviewed_count = sum(s.get("verification_status") in reviewed_statuses for s in sources)
+    source_metadata_only_count = sum(s.get("verification_status") == "official_metadata_verified" for s in sources)
     source_catalog_only_count = sum(
         "catalog" in s.get("verification_status", "") or "registered" in s.get("verification_status", "")
         for s in sources
@@ -180,6 +181,7 @@ def audit_research_library(root: Path = ROOT) -> dict:
         "traceable_literature_reviews": dossier_complete_count,
         "source_count": len(sources),
         "source_pages_or_documents_reviewed": source_reviewed_count,
+        "source_metadata_only_count": source_metadata_only_count,
         "catalog_references_registered_not_content_reviewed": source_catalog_only_count,
         "unique_source_ids_referenced_by_dossiers": len(referenced_ids),
         "errors": errors + source_errors,
@@ -206,6 +208,7 @@ def main() -> int:
         print(f"Agendas completas: {report['structurally_complete_agendas']}/{report['area_count']}")
         print(f"Revisiones bibliográficas: {report['traceable_literature_reviews']}/{report['area_count']}")
         print(f"Fuentes registradas: {report['source_count']}")
+        print(f"Solo metadatos revisados: {report['source_metadata_only_count']}")
         print(f"Páginas/documentos revisados: {report['source_pages_or_documents_reviewed']}")
         print(f"Referencias de catálogo sin revisión de contenido: {report['catalog_references_registered_not_content_reviewed']}")
         for item in report["errors"]:
