@@ -22,7 +22,7 @@ El informe JSON se guarda por defecto en `reports/agent_simulations/`. Se puede 
 - Que el contexto se transfiera secuencialmente entre etapas.
 - Que el informe declare expresamente cero llamadas reales a modelos y herramientas.
 
-Las pruebas pueden inyectar respuestas por agente en `simulate_workflow(workflow, task, responses)` para comprobar escenarios conformes, incompletos y adversariales. Una secuencia de fixtures permite respuestas diferentes cuando un agente aparece en más de una etapa. Una fixture malformada no se sustituye silenciosamente por una respuesta sintética.
+Las pruebas pueden inyectar respuestas por agente en `simulate_workflow(workflow, task, responses)` para comprobar escenarios conformes, incompletos y adversariales. Una secuencia de fixtures permite respuestas diferentes cuando un agente aparece en más de una etapa. Las secuencias vacías y los agentes desconocidos se rechazan como errores de configuración. Una fixture malformada no se sustituye silenciosamente por una respuesta sintética: se registra como salida inválida y detiene las etapas posteriores.
 
 ## Validación automatizada
 
