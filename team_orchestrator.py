@@ -777,7 +777,7 @@ def execute_workflow(
     workflow_started = time.monotonic()
     workflow = load_workflow(workflow_name)
     capability_plan, capability_plan_path = create_plan(
-        task, output_path=REPORT_DIR / ("team_plan_" + uuid.uuid4().hex + ".json")
+        task, output_path=REPORT_DIR / "plans" / ("team_plan_" + uuid.uuid4().hex + ".json")
     )
     steps = workflow["steps"]
     limit = int(workflow.get("max_steps", workflow.get("max_rounds", len(steps))))
