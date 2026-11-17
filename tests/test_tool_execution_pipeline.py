@@ -39,8 +39,12 @@ class ToolExecutionPipelineTests(unittest.TestCase):
         run_tool.return_value = {
             "tool": "ruff", "status": "completed",
             "tool_version": "ruff test", "duration_ms": 12,
-            "target_sha256": "a" * 64, "tool_binary_sha256": "b" * 64,
-            "findings_count": 0,
+            "target_sha256": "a" * 64, "target_sha256_after": "a" * 64,
+            "tool_binary_sha256": "b" * 64, "tool_binary_sha256_after": "b" * 64,
+            "tool_allowlist": {"enforced": True, "status": "approved"},
+            "tool_binary_modified": False, "target_modified": False,
+            "return_code": 0, "tool_reported_success": True,
+            "output_truncated": False, "findings_count": 0,
         }
         ledger.return_value.append.return_value = {"event_id": "event-123"}
         env = {
