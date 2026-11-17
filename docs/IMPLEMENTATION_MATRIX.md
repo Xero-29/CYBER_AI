@@ -37,7 +37,7 @@ Esta matriz separa implementación, verificación automatizada y validación ope
 
 ## Validación reciente de código
 
-- SHA histórico exacto: `5e2e85cec0c2f4cb3627e87617be0c244f83cd27`; no valida el HEAD actual de `main` (`eed9b81929ed25f0c63b4aede4bcb9fc841db73e`).
+- SHA histórico exacto: `5e2e85cec0c2f4cb3627e87617be0c244f83cd27`; no valida el HEAD actual de `main` (`18aa78dfc33dab5b14523dd2d653eba1abc45f78`).
 - Python tests: [success, 456 pruebas](https://github.com/Xero-29/CYBER_AI/actions/runs/44111423059).
 - Docker sandbox: [success](https://github.com/Xero-29/CYBER_AI/actions/runs/44111420579).
 - Estos resultados no validan commits posteriores ni sustituyen pruebas operacionales externas. El workflow Python ahora incluye un smoke test Windows de la allowlist y el workflow Docker se ejecuta también en pushes a `main`; los resultados de ambos workflows sobre el HEAD actual siguen sin estar disponibles.
