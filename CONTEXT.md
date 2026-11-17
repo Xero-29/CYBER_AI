@@ -1,7 +1,7 @@
 # CYBER_AI — Contexto vigente del proyecto
 
 ## Objetivo
-Sistema modular de investigación y ciberseguridad para análisis de código, informes, vulnerabilidades y evidencias, con ejecución limitada a activos propios o expresamente autorizados. La IA es intercambiable; conocimiento, memoria, Skills, políticas y ledger permanecen en el proyecto.
+Plataforma modular de investigación y operaciones de ciberseguridad asistidas por IA, extensible a todas las especialidades del catálogo y a nuevos dominios. Debe comprender tareas, identificar dominios, recuperar conocimiento con procedencia, reutilizar Skills verificadas, coordinar especialistas, seleccionar herramientas, exigir autorización, ejecutar dentro de límites técnicos, validar resultados y conservar evidencia auditable. El proveedor de IA es intercambiable; biblioteca, memoria, Skills, políticas y ledger permanecen en el proyecto. La cobertura profunda debe medirse por subtema y evidencia, no inferirse del número de paquetes.
 
 ## Restricciones de diseño
 - Mantener consumo y dependencias razonables para equipos modestos.
