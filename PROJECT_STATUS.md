@@ -154,3 +154,12 @@
 - Se ampliaron las pruebas para comprobar la matriz de requisitos y evitar validaciones sin evidencia.
 - **Alcance real:** se desarrolló la estructura de auditoría y aceptación, no se completó la investigación ni el contenido profundo de los 48 dominios. Los 61 grupos de referencia siguen siendo una selección curada, no un censo exhaustivo. No se calcula porcentaje total.
 - **CI para SHA `3457879a930ef8df23691889e167a1b17d24dbee`:** Python run `44144894444` y Docker sandbox run `44144894391` quedaron disparados; su resultado debe consultarse en GitHub Actions. No se declaran aprobados mientras estén pendientes/en ejecución.
+
+
+## Desarrollo de compendios técnicos de las 48 especialidades — 2026-11-17
+
+- Se añadieron 48 archivos `knowledge/deep_modules/<area>/TECHNICAL_COMPENDIUM.md`, uno por cada especialidad.
+- Cada cuaderno desarrolla los subtemas como unidades técnicas: fundamentos/modelo, amenazas y fallos, controles, validación, análisis crítico y entregables.
+- Cada especialidad incluye un diseño de laboratorio con cuatro casos (baseline, fallo sintético, detección y mitigación/regresión), salvaguardas, métricas, preguntas de investigación y artefactos de aceptación.
+- Se añadió el índice de los 48 compendios.
+- **Límite:** son cuadernos técnicos y planes de trabajo, no libros exhaustivos ni revisiones sistemáticas completas. Los laboratorios están diseñados, no ejecutados; no se elevó la madurez de ninguna especialidad.
