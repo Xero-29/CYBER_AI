@@ -38,13 +38,13 @@ def load_dataset(path):
     cases = []
     seen_ids = set()
     try:
+        before = os.fstat(descriptor)
+        if not stat.S_ISREG(before.st_mode):
+            raise ValueError("El dataset debe ser un archivo regular, no un symlink.")
+        if before.st_size > MAX_DATASET_BYTES:
+            raise ValueError("El dataset supera 2 MiB.")
         with os.fdopen(descriptor, "rb") as stream:
             descriptor = None
-            before = os.fstat(stream.fileno())
-            if not stat.S_ISREG(before.st_mode):
-                raise ValueError("El dataset debe ser un archivo regular, no un symlink.")
-            if before.st_size > MAX_DATASET_BYTES:
-                raise ValueError("El dataset supera 2 MiB.")
             total_bytes = 0
             for line_number, raw in enumerate(stream, 1):
                 total_bytes += len(raw)
