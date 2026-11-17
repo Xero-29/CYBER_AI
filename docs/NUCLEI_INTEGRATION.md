@@ -17,7 +17,7 @@ go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
 nuclei -update-templates
 ```
 
-Las plantillas son contenido ejecutable por un motor de escaneo y deben tratarse como código de terceros. Actualízalas desde el repositorio oficial, revísalas y conserva la verificación de firmas. CYBER_AI deshabilita plantillas sin firma y excluye etiquetas `dos`, `intrusive`, `fuzz`, `code` y `headless`; limita el protocolo a HTTP. No activa los motores de código, headless ni interacciones externas.
+Las plantillas son contenido ejecutable por un motor de escaneo y deben tratarse como código de terceros. Actualízalas desde el repositorio oficial, revísalas y conserva la verificación de firmas. CYBER_AI deshabilita plantillas sin firma y excluye etiquetas `dos`, `intrusive`, `fuzz`, `code` y `headless`; limita el protocolo a HTTP. No activa los motores de código, headless ni interacciones externas. No cargues plantillas propias o de terceros que no hayas revisado.
 
 Por defecto se usa `$HOME/nuclei-templates/http`. Si están en otra ruta:
 
