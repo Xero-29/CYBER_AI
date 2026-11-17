@@ -67,3 +67,13 @@
 - Custodia/rotación externa de claves, ACL Windows completas, aislamiento de parsers, KMS/HSM, RBAC/IdP/MFA, WORM/offsite, DR, MicroVM, proveedores IA reales, observabilidad, pruebas de carga y revisión independiente requieren infraestructura y validación externas.
 
 **Conclusión:** la ejecución aislada de YARA/TShark y el flujo configurable de Nuclei están implementados en código. No están comprobados el CI de este SHA, el build real de la imagen, la allowlist de imagen en el entorno de despliegue ni la ejecución real de Nuclei. El aislamiento no cubre todos los adaptadores y la salida de red de Nuclei no está filtrada a nivel de firewall. Se requieren pruebas E2E autorizadas antes de declarar el repositorio listo para producción.
+
+
+## Ampliación de biblioteca de conocimiento — 2026-11-17
+
+- Se incorporó un currículo técnico versionado para las 48 áreas de conocimiento en `knowledge/curricula/domain_curriculum.json`.
+- Cada área define temas especializados, niveles L0–L4, artefactos, laboratorio seguro, criterios de evaluación y política de referencias.
+- Se añadió `knowledge_quality.py` para auditar consistencia y medir cobertura estructural base/profunda; se añadieron pruebas en `tests/test_knowledge_quality.py`.
+- Se corrigió la detección de encabezados de la auditoría para aceptar espacios y texto adicional en títulos de sección.
+- El currículo no se contabiliza como contenido experto ya validado. Los paquetes actuales requieren ampliación editorial por dominio, revisión técnica independiente y referencias con licencia/procedencia verificadas.
+- CI disparado para el nuevo código; los resultados deben asociarse al SHA exacto antes de declarar las pruebas superadas.
