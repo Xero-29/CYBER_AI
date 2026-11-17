@@ -86,6 +86,7 @@ def build_inventory():
             ),
             "requires_isolation": requires_isolation,
             "offline_only": bool(TOOL_SPECS.get(tool_id, {}).get("offline_only", False)),
+            "scoped_network_required": bool(TOOL_SPECS.get(tool_id, {}).get("scoped_network", False)),
             "local_database_required": bool(TOOL_SPECS.get(tool_id, {}).get("local_database_required", False)),
             "preflight_required": bool(TOOL_SPECS.get(tool_id, {}).get("local_database_required", False)),
             "host_network_isolation_enforced": (
