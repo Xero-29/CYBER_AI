@@ -58,8 +58,9 @@ python task_planner.py "auditoria de red y analisis de PCAP"
 
 ## Brechas por cerrar
 
-- Añadir adaptadores seguros y pruebas para OSV-Scanner, Grype, Gitleaks, Zeek, Volatility 3 y Nmap.
+- Implementar aislamiento de egress obligatorio para Nmap; el adaptador actual restringe alcance, puertos y duración, pero no impone firewall/sandbox de red a nivel del sistema operativo.
 - Implementar aislamiento general para adaptadores host y herramientas personalizadas.
+- Verificar en preflight la presencia y vigencia de las bases locales OSV-Scanner/Grype antes de declarar esos escáneres listos.
 - Aplicar filtrado de egress para Nuclei y DNS pinning antes de admitir nombres DNS.
 - Ampliar los conectores de SOC/SIEM, EDR/XDR, cloud, móvil, wireless, OT/ICS, hardware/firmware, PKI/HSM y seguridad de IA.
 - Crear Skills verificadas por dominio; no generar Skills activas solo por coincidencia textual.
