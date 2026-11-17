@@ -1,47 +1,52 @@
 # Estado verificado más reciente — 2026-11-17
 
-**HEAD de trabajo:** `defa615b7ff46bf36b3382d4396bc1082ce1ab29`  
+**HEAD de código y documentación:** `73030d7991b7e35241d87db967a3842271b1f4b3`  
 **Rama:** `codex/security-integrity-audit`  
-**Base:** `main` en `7b5ed033f1f6461b5780a10ac4ada67a444b93e5`  
-**Comparación:** 427 commits adelante, 0 detrás. La rama contiene el HEAD actual de `main`; no hay divergencia pendiente.  
-**PR #2:** abierto, draft, mergeable; no fusionado. `main` permanece intacta.
+**main:** `7b5ed033f1f6461b5780a10ac4ada67a444b93e5` — sin modificar.  
+**Comparación:** 450 commits adelante, 0 detrás; la rama contiene el HEAD de `main`.  
+**PR #2:** abierto, draft, mergeable; no fusionado.  
+**Protección de rama:** `protected=false`; branch protection y required checks aún no están configurados.
 
-## Validación del HEAD exacto
+## CI del SHA exacto
 
-- Python tests — **success**: https://github.com/Xero-29/CYBER_AI/actions/runs/44106193284
-- Docker sandbox — **success**: https://github.com/Xero-29/CYBER_AI/actions/runs/44106193259
-- Ambos workflows terminaron correctamente para `defa615b7ff46bf36b3382d4396bc1082ce1ab29`. El workflow Python ejecuta `verify.sh`, la suite completa y genera SBOM/procedencia; Docker construye la imagen endurecida, repite la verificación y ejecuta Ruff dentro del sandbox.
+- Python tests — **success**: https://github.com/Xero-29/CYBER_AI/actions/runs/44108377812
+- Docker sandbox — **success**: https://github.com/Xero-29/CYBER_AI/actions/runs/44108377190
+- Ambos workflows del evento `pull_request` terminaron con conclusión `success` en `73030d7991b7e35241d87db967a3842271b1f4b3`. También finalizaron correctamente las ejecuciones `push` del mismo SHA: [Python](https://github.com/Xero-29/CYBER_AI/actions/runs/44108363761) y [Docker](https://github.com/Xero-29/CYBER_AI/actions/runs/44108363766).
+- Python ejecuta `verify.sh`, suite completa, preflight, manifiesto SHA-256 de wheels y SBOM CycloneDX. Docker construye la imagen fijada por digest, ejecuta la suite y Ruff dentro del sandbox sin red.
 
-## Cambios recientes implementados y cubiertos por pruebas
+## Cambios recientes cerrados y probados
 
-- Ingestión CSV: se restaura `csv.field_size_limit` en un bloque `finally`; la configuración global del parser ya no contamina otras llamadas, incluso cuando la extracción falla.
-- Skillbook: historial de versiones encadenado con SHA-256, migración de tablas existentes, verificación de snapshots históricos y exposición de hashes en la consulta de versiones. Se añadieron pruebas de migración y manipulación de snapshots antiguos. El hash chain es tamper-evident local, no WORM ni autenticación externa.
-- Herramientas locales: evidencia con ruta, versión y SHA-256 del binario; los cambios/desapariciones del ejecutable invalidan el éxito y fallan los validadores del ledger.
-- Dependencias: el CI descarga los wheels resueltos, calcula SHA-256 y los incluye en el SBOM CycloneDX junto con procedencia del commit y del lock. Esto registra los artefactos de esa ejecución/plataforma; no equivale todavía a hashes fijados en el lock para todas las plataformas.
-- Se mantienen las mejoras ya implementadas en ledger/reconciliación, backups con manifiesto y HMAC opcional, Skillbook firmado/revocable, preflight de secretos/permisos, ingesta Office adversarial, marcadores de página PDF, adaptadores de proveedores y sandbox Docker.
+- **Ingestión CSV:** restaura `csv.field_size_limit` en `finally`; no deja cambios globales del parser aunque falle una extracción.
+- **Skillbook:** hash chain SHA-256 por versión, migración de historiales antiguos, detección de manipulación de snapshots históricos y consulta de hashes. No sustituye firma externa ni WORM.
+- **Evidencias:** archivos publicados por rename atómico, modo 0600 y directorio 0700 en POSIX; rechaza symlinks y nombres inseguros; limpia temporales al fallar. El preflight detecta permisos públicos, symlinks y rutas `reports` inválidas.
+- **Red local:** se corrigió la afirmación falsa de aislamiento. Los adaptadores host declaran `network_access=not_enforced`; bloquear herramientas que requieren red no bloquea el egress de cualquier otro binario. La imagen Docker sí usa `--network=none` para Ruff/Bandit.
+- **Inventario:** expone que el aislamiento de red host no está aplicado y que la ejecución requiere `--execute` explícito.
+- **Procedencia:** adaptadores registran SHA-256 y versión del binario antes/después; una alteración invalida el resultado y los validadores del ledger. CI captura hashes de wheels de la plataforma y los incorpora al SBOM.
+- **Resiliencia:** reconciliación de ejecuciones interrumpidas, pruebas de terminación abrupta simulada, bloqueo/corrupción SQLite, promociones concurrentes de Skills, restauración segura y fixtures Office adversariales.
 
-## Brechas que todavía admiten trabajo en código
+## Trabajo que aún admite implementación en código
 
-1. Lock de dependencias con hashes estáticos verificados para cada plataforma soportada; hoy hay versiones exactas y hashes de wheels por ejecución CI, no `--require-hashes` multiplataforma.
-2. Automatización de regresión de cada versión de Skill y políticas explícitas de expiración/revisión; ya existen verificación de historial, revisión por antigüedad, revocación firmada y rollback firmado.
-3. Mayor cobertura de fallos de proceso/almacenamiento y pruebas de concurrencia/carga del sistema completo. La reconciliación registra resultados desconocidos; no recupera resultados perdidos ni sustituye ensayos físicos.
-4. Inventario de versiones y procedencia verificable para todos los binarios externos y herramientas opcionales; el digest de la imagen Docker y los binarios del sandbox están fijados, pero no todas las herramientas de host.
-5. Mejorar la evaluación automatizada de calidad de recuperación y el versionado/deduplicación de documentos. Los benchmarks actuales son sintéticos y no demuestran calidad experta.
+1. Lock de dependencias con hashes estáticos verificados para todas las plataformas soportadas. El CI registra hashes por ejecución/plataforma, pero `requirements.lock` aún no aplica `--require-hashes`.
+2. Regresión ejecutable por cada versión de Skill y criterios de aceptación automatizados por dominio. Existen versionado, hash chain, revisión por antigüedad, revocación y rollback firmados, pero no un motor general de replay/regresión de cada metodología.
+3. Pruebas automatizadas de estrés/concurrencia y fallos de almacenamiento más amplias. La terminación abrupta del proceso se simula; no equivale a disco lleno, pérdida física o fallo del host.
+4. Procedencia y versiones permitidas para todos los binarios host. Se registra el hash observado, pero no existe allowlist firmada de hashes/versiones aprobadas para cada herramienta externa.
+5. Deduplicación/versionado y evaluación de recuperación documental a escala, con umbrales por especialidad. Los benchmarks sintéticos no prueban calidad experta ni embeddings reales.
+6. Revisión de consistencia final de documentación de instalación y compatibilidad multiplataforma; Windows requiere ACL para evidencias y datos que no se verifican con los mode bits POSIX.
 
-## Bloqueos de infraestructura, operación o decisión del propietario
+## Dependencias externas o decisiones del propietario
 
-- KMS/HSM o gestor de secretos real, rotación/revocación y segregación de funciones.
-- RBAC/IdP/MFA y separación real de roles.
-- WORM/offsite y anclaje independiente de checkpoints; el ledger local no resiste a un administrador hostil.
-- Cifrado de backups, custodia independiente de claves y simulacros reales de restauración/DR.
+- KMS/HSM o gestor de secretos, custodia/rotación/revocación de claves y segregación de funciones.
+- RBAC/IdP/MFA y roles reales de operador, revisor y administrador.
+- WORM/offsite y anclaje de checkpoints independiente del host.
+- Cifrado de backups, claves independientes y simulacros reales de restauración/DR.
 - MicroVM/VM desechable y pruebas de escape; Docker comparte kernel.
-- Credenciales y pruebas reales de proveedores Ollama/OpenAI/Anthropic/Gemini, límites, costes y fallos de red.
-- Revisión humana de licencia, procedencia, exactitud y vigencia de las 138 fuentes externas; embeddings y evaluación por especialistas.
-- OCR real para documentos escaneados, si se requiere.
-- Pruebas operacionales de carga, pérdida de host, RPO/RTO, observabilidad y alertas.
-- Revisión independiente, decisión de licencia y autorización de release. La rama no tiene branch protection habilitada; required checks requieren configuración administrativa.
+- Cuentas/credenciales y pruebas reales de proveedores Ollama/OpenAI/Anthropic/Gemini.
+- Revisión humana de licencia, procedencia, exactitud y vigencia de las 138 fuentes externas; embeddings y evaluación experta.
+- OCR para documentos escaneados, si se requiere.
+- Pruebas operacionales de carga, pérdida de host, RPO/RTO, observabilidad, alertas y respuesta a incidentes.
+- Revisión independiente, licencia del repositorio, branch protection y autorización de release.
 
-**Conclusión:** el código y los workflows del HEAD indicado pasan, pero el proyecto todavía no está listo para declararse institucionalmente completo ni para validación final del usuario. Las brechas de código anteriores deben cerrarse primero. No se ha fusionado ni modificado `main`.
+**Conclusión:** el HEAD indicado pasa los workflows Python y Docker, pero no se declara terminado ni certificado. Aún quedan tareas de código enumeradas arriba y dependencias externas. No se ha hecho merge ni se ha modificado `main`.
 
 ---
 
