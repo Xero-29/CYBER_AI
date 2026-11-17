@@ -220,7 +220,7 @@ Cada línea del dataset debe ser un objeto JSON con exactamente `id`, `query` y 
 
 ## Conocimiento y Skills
 
-- Ingesta TXT, Markdown, HTML, CSV, JSON/JSONL y código: disponible con las dependencias base. PDF, DOCX, XLSX y PPTX requieren `pip install -r requirements-documents.txt`. Los PDF escaneados necesitan OCR externo; el importador no ejecuta OCR.
+- Ingesta TXT, Markdown, HTML, CSV, JSON/JSONL y código: disponible con las dependencias base. PDF, DOCX, XLSX y PPTX requieren `pip install -r requirements-documents.txt`; ese archivo opcional aún usa rangos de versión y no forma parte del lock hash-locked ni de su SBOM. No lo trates como instalación reproducible de alta garantía hasta generar y revisar un lock específico de plataforma. Los PDF escaneados necesitan OCR externo; el importador no ejecuta OCR.
 - Recuperación e indexación: revisa `knowledge_library.py`, `knowledge_embeddings.py` y `knowledge_reindex.py`.
 - Fuentes externas: el catálogo requiere revisión de licencia y verificación antes de habilitar descargas.
 - Skills: `propose_skill_from_ledger` crea candidatas no ejecutables; solo la promoción firmada por VERITAS las hace recuperables. El CLI `skillbook_cli.py` permite proponer desde un manifiesto ligado a dos ejecuciones, exportar el payload canónico para firma independiente, promover con firma y generar/aplicar rollback. El historial de versiones es append-only. Una coincidencia recuperada no concede permisos de ejecución.
