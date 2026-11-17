@@ -78,6 +78,10 @@ def main():
         help="Seleccionar un especialista manualmente",
     )
     parser.add_argument(
+        "--no-knowledge", action="store_true",
+        help="Desactivar la recuperación de la biblioteca de conocimiento.",
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Mostrar la selección sin ejecutar el modelo",
@@ -104,8 +108,10 @@ def main():
             str(PROJECT / "agent_runner.py"),
             "ask",
             name,
-            task,
+            "--task-text", task,
         ]
+        if not args.no_knowledge:
+            command.append("--knowledge")
         result = subprocess.run(command, cwd=PROJECT, check=False)
         return result.returncode
 
