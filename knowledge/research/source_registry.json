@@ -3,6 +3,70 @@
   "policy": "Los registros verificados se limitarán a documentos oficiales inspeccionados en la revisión editorial. Los candidatos requieren comprobación documental antes de usarse como evidencia.",
   "sources": [
     {
+      "id": "CISA-KEV",
+      "title": "Known Exploited Vulnerabilities Catalog",
+      "publisher": "Cybersecurity and Infrastructure Security Agency",
+      "type": "official_exploitation_catalog",
+      "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog",
+      "version": "Continuously updated",
+      "verification_status": "official_catalog_reference_registered",
+      "verified_scope": "Catálogo de vulnerabilidades con evidencia de explotación conocida; exige snapshots fechados para análisis reproducible.",
+      "domains": [
+        "vuln_management",
+        "threat_intel",
+        "incident_response"
+      ],
+      "review_note": "Referencia oficial registrada; la versión de catálogo debe capturarse por fecha para cualquier experimento."
+    },
+    {
+      "id": "FIRST-EPSS-FAQ",
+      "title": "Exploit Prediction Scoring System FAQ",
+      "publisher": "FIRST",
+      "type": "technical_model_documentation",
+      "url": "https://www.first.org/epss/faq",
+      "version": "Current online documentation",
+      "verification_status": "official_model_documentation_reviewed",
+      "verified_scope": "Probabilidad estimada de explotación observada en 30 días y límites del modelo como no equivalente a riesgo contextual completo.",
+      "domains": [
+        "vuln_management",
+        "threat_intel"
+      ],
+      "review_note": "Documentación oficial del modelo revisada; scores cambian diariamente y requieren snapshot con fecha."
+    },
+    {
+      "id": "FIRST-EPSS-METHOD",
+      "title": "EPSS How It Works",
+      "publisher": "FIRST / Empirical Security",
+      "type": "technical_model_documentation",
+      "url": "https://www.first.org/epss/how-it-works",
+      "version": "Current online documentation",
+      "verification_status": "official_methodology_page_reviewed",
+      "verified_scope": "Calibración de scores a probabilidades de explotación a 30 días.",
+      "domains": [
+        "vuln_management",
+        "threat_intel",
+        "machine_learning"
+      ],
+      "review_note": "Página metodológica revisada; reproducir evaluación requiere datasets/versiones y análisis de calibración."
+    },
+    {
+      "id": "NIST-CSF-REFERENCE-TOOL",
+      "title": "NIST Cybersecurity Framework 2.0 Reference Tool",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_machine_readable_resource",
+      "url": "https://csrc.nist.gov/projects/cybersecurity-framework/filters",
+      "version": "Continuously maintained online resource",
+      "verification_status": "official_resource_metadata_verified",
+      "verified_scope": "Exploración de Core, ejemplos de implementación y referencias informativas en formatos humanos y legibles por máquina.",
+      "domains": [
+        "foundations",
+        "governance",
+        "secure_arch",
+        "devsecops"
+      ],
+      "review_note": "Descripción oficial revisada; descargar dataset/versionar snapshot antes de usarlo como evidencia reproducible."
+    },
+    {
       "id": "NIST-CSWP-29-CSF-2.0",
       "title": "The NIST Cybersecurity Framework (CSF) 2.0",
       "publisher": "National Institute of Standards and Technology",
@@ -22,21 +86,72 @@
       "review_note": "Metadatos y alcance revisados en el registro oficial NIST; descargar y revisar texto completo antes de citar secciones concretas."
     },
     {
-      "id": "NIST-SP-1347",
-      "title": "NIST Cybersecurity Framework 2.0 Informative References Quick-Start Guide",
-      "publisher": "National Institute of Standards and Technology",
-      "type": "official_guidance",
-      "url": "https://doi.org/10.6028/NIST.SP.1347",
-      "version": "Final",
-      "published": "2026-08-25",
-      "verification_status": "official_metadata_verified",
-      "verified_scope": "Uso de referencias informativas y mapeos entre marcos, estándares y recursos.",
+      "id": "NIST-DEVSECOPS-IPD-2026",
+      "title": "Secure Software Development, Security, and Operations (DevSecOps) Practices",
+      "publisher": "National Institute of Standards and Technology / NCCoE",
+      "type": "official_preliminary_draft",
+      "url": "https://csrc.nist.gov/pubs/other/2026/03/24/devsecops-practices/iprd",
+      "version": "Initial Preliminary Draft",
+      "published": "2026-03-24",
+      "verification_status": "official_draft_metadata_and_announcement_reviewed",
+      "verified_scope": "Demostración de implementación de prácticas SSDF en pipelines DevSecOps modernos; borrador preliminar y documento vivo.",
       "domains": [
-        "foundations",
-        "governance",
-        "secure_arch"
+        "devsecops",
+        "software_engineering",
+        "supply_chain"
       ],
-      "review_note": "Metadatos y resumen oficial revisados; requiere lectura del documento completo para afirmaciones detalladas."
+      "review_note": "Se mantiene marcado como borrador; no tratar como estándar final."
+    },
+    {
+      "id": "NIST-FIPS-203",
+      "title": "Module-Lattice-Based Key-Encapsulation Mechanism Standard",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "federal_information_processing_standard",
+      "url": "https://doi.org/10.6028/NIST.FIPS.203",
+      "version": "Final",
+      "published": "2024-08-13",
+      "verification_status": "official_standard_metadata_reviewed",
+      "verified_scope": "Estándar ML-KEM para establecimiento de secreto compartido.",
+      "domains": [
+        "crypto",
+        "secure_arch",
+        "identity"
+      ],
+      "review_note": "Metadatos y descripción oficial revisados; lectura integral y pruebas de implementación pendientes."
+    },
+    {
+      "id": "NIST-FIPS-204",
+      "title": "Module-Lattice-Based Digital Signature Standard",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "federal_information_processing_standard",
+      "url": "https://doi.org/10.6028/NIST.FIPS.204",
+      "version": "Final",
+      "published": "2024-08-13",
+      "verification_status": "official_standard_metadata_reviewed",
+      "verified_scope": "Estándar ML-DSA para firmas digitales.",
+      "domains": [
+        "crypto",
+        "secure_arch",
+        "identity"
+      ],
+      "review_note": "Metadatos y descripción oficial revisados; lectura integral y pruebas de implementación pendientes."
+    },
+    {
+      "id": "NIST-FIPS-205",
+      "title": "Stateless Hash-Based Digital Signature Standard",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "federal_information_processing_standard",
+      "url": "https://doi.org/10.6028/NIST.FIPS.205",
+      "version": "Final",
+      "published": "2024-08-13",
+      "verification_status": "official_standard_metadata_reviewed",
+      "verified_scope": "Estándar SLH-DSA para firmas digitales basadas en hashes y sin estado.",
+      "domains": [
+        "crypto",
+        "secure_arch",
+        "identity"
+      ],
+      "review_note": "Metadatos y descripción oficial revisados; lectura integral y pruebas de implementación pendientes."
     },
     {
       "id": "NIST-SP-1308",
@@ -55,21 +170,59 @@
       "review_note": "Metadatos y resumen oficial revisados; requiere lectura del documento completo para afirmaciones detalladas."
     },
     {
-      "id": "NIST-CSF-REFERENCE-TOOL",
-      "title": "NIST Cybersecurity Framework 2.0 Reference Tool",
+      "id": "NIST-SP-1347",
+      "title": "NIST Cybersecurity Framework 2.0 Informative References Quick-Start Guide",
       "publisher": "National Institute of Standards and Technology",
-      "type": "official_machine_readable_resource",
-      "url": "https://csrc.nist.gov/projects/cybersecurity-framework/filters",
-      "version": "Continuously maintained online resource",
-      "verification_status": "official_resource_metadata_verified",
-      "verified_scope": "Exploración de Core, ejemplos de implementación y referencias informativas en formatos humanos y legibles por máquina.",
+      "type": "official_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.1347",
+      "version": "Final",
+      "published": "2026-08-25",
+      "verification_status": "official_metadata_verified",
+      "verified_scope": "Uso de referencias informativas y mapeos entre marcos, estándares y recursos.",
       "domains": [
         "foundations",
         "governance",
-        "secure_arch",
-        "devsecops"
+        "secure_arch"
       ],
-      "review_note": "Descripción oficial revisada; descargar dataset/versionar snapshot antes de usarlo como evidencia reproducible."
+      "review_note": "Metadatos y resumen oficial revisados; requiere lectura del documento completo para afirmaciones detalladas."
+    },
+    {
+      "id": "NIST-SP-800-207",
+      "title": "Zero Trust Architecture",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.800-207",
+      "version": "Final",
+      "published": "2020-08-11",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verified_scope": "Arquitectura centrada en proteger recursos, sin confianza implícita por ubicación de red o propiedad; autenticación/autorización de sujeto y dispositivo.",
+      "domains": [
+        "secure_arch",
+        "identity",
+        "network",
+        "cloud",
+        "ot_ics"
+      ],
+      "review_note": "Registro oficial y abstract revisados; no equivale a diseño de implementación completo."
+    },
+    {
+      "id": "NIST-SP-800-218",
+      "title": "Secure Software Development Framework (SSDF) Version 1.1: Recommendations for Mitigating the Risk of Software Vulnerabilities",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.800-218",
+      "version": "1.1",
+      "published": "2022-02-03",
+      "verification_status": "official_metadata_verified",
+      "verified_scope": "Prácticas de desarrollo seguro agrupadas en preparar la organización, proteger el software, producir software seguro y responder a vulnerabilidades.",
+      "domains": [
+        "software_engineering",
+        "devsecops",
+        "secure_arch",
+        "vuln_management",
+        "supply_chain"
+      ],
+      "review_note": "Metadatos y alcance revisados en página oficial NIST; comprobar perfiles complementarios y versión vigente antes de aplicación concreta."
     },
     {
       "id": "NIST-SP-800-61r3",
@@ -91,23 +244,102 @@
       "review_note": "Metadatos, fecha, alcance y supersesión revisados en página oficial NIST; leer el documento completo y registrar secciones antes de citar afirmaciones técnicas."
     },
     {
-      "id": "NIST-SP-800-218",
-      "title": "Secure Software Development Framework (SSDF) Version 1.1: Recommendations for Mitigating the Risk of Software Vulnerabilities",
+      "id": "NIST-SP-800-82r3",
+      "title": "Guide to Operational Technology (OT) Security",
       "publisher": "National Institute of Standards and Technology",
       "type": "official_guidance",
-      "url": "https://doi.org/10.6028/NIST.SP.800-218",
-      "version": "1.1",
-      "published": "2022-02-03",
-      "verification_status": "official_metadata_verified",
-      "verified_scope": "Prácticas de desarrollo seguro agrupadas en preparar la organización, proteger el software, producir software seguro y responder a vulnerabilidades.",
+      "url": "https://doi.org/10.6028/NIST.SP.800-82r3",
+      "version": "Revision 3",
+      "published": "2023-09",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verified_scope": "Alcance OT, topologías, amenazas, vulnerabilidades y controles con requisitos de rendimiento, confiabilidad y seguridad.",
       "domains": [
-        "software_engineering",
-        "devsecops",
-        "secure_arch",
-        "vuln_management",
-        "supply_chain"
+        "ot_ics",
+        "iot_hardware",
+        "hardware_security",
+        "automotive_security"
       ],
-      "review_note": "Metadatos y alcance revisados en página oficial NIST; comprobar perfiles complementarios y versión vigente antes de aplicación concreta."
+      "review_note": "Registro oficial y abstract revisados; leer el texto completo y registrar secciones antes de citar controles concretos."
+    },
+    {
+      "id": "NIST-SP-800-82r4-IPD",
+      "title": "Guide to Operational Technology (OT) Security",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_public_draft",
+      "url": "https://csrc.nist.gov/pubs/sp/800/82/r4/ipd",
+      "version": "Revision 4 Initial Public Draft",
+      "published": "2026-09-21",
+      "verification_status": "official_draft_metadata_reviewed",
+      "verified_scope": "Borrador que amplía sectores OT, alineación CSF 2.0, inventario, monitoreo y arquitectura Zero Trust; comentarios hasta 2026-11-30.",
+      "domains": [
+        "ot_ics",
+        "iot_hardware",
+        "hardware_security"
+      ],
+      "review_note": "Es borrador público inicial, no versión final ni sustituto normativo de Rev. 3."
+    },
+    {
+      "id": "OWASP-API-TOP10-2023",
+      "title": "OWASP API Security Top 10 2023",
+      "publisher": "OWASP Foundation",
+      "type": "risk_taxonomy",
+      "url": "https://owasp.org/www-project-api-security/",
+      "version": "2023",
+      "published": "2023",
+      "verification_status": "official_project_page_reviewed",
+      "verified_scope": "Diez categorías de riesgos API, incluidos autorización de objeto/propiedad/función, consumo, SSRF, inventario y consumo inseguro.",
+      "domains": [
+        "api",
+        "appsec"
+      ],
+      "review_note": "Página oficial y categorías revisadas; taxonomía no equivale a prevalencia universal ni checklist exhaustivo."
+    },
+    {
+      "id": "OWASP-API1-BOLA-2023",
+      "title": "API1:2023 Broken Object Level Authorization",
+      "publisher": "OWASP Foundation",
+      "type": "risk_guidance",
+      "url": "https://api-security.owasp.org/editions/2023/en/0xa1-broken-object-level-authorization/",
+      "version": "2023",
+      "verification_status": "official_risk_page_reviewed",
+      "verified_scope": "Riesgo de autorización a nivel de objeto y necesidad de validar controles en cada acceso basado en identificadores controlados por cliente.",
+      "domains": [
+        "api",
+        "appsec"
+      ],
+      "review_note": "Página de riesgo revisada; las pruebas específicas deben diseñarse para la aplicación evaluada."
+    },
+    {
+      "id": "OWASP-ASVS-5.0.0",
+      "title": "Application Security Verification Standard",
+      "publisher": "OWASP Foundation",
+      "type": "open_security_standard",
+      "url": "https://asvs.owasp.org/",
+      "version": "5.0.0",
+      "published": "2025-05-30",
+      "verification_status": "official_project_page_reviewed",
+      "verified_scope": "Objetivos, versión estable y forma de uso del estándar de verificación de aplicaciones web.",
+      "domains": [
+        "appsec",
+        "api"
+      ],
+      "review_note": "Página oficial de proyecto y metadatos de release revisados; no se declara lectura integral del estándar."
+    },
+    {
+      "id": "SLSA-v1.1",
+      "title": "Supply-chain Levels for Software Artifacts specification",
+      "publisher": "OpenSSF",
+      "type": "open_specification",
+      "url": "https://slsa.dev/spec/v1.1/",
+      "version": "1.1",
+      "verification_status": "official_specification_pages_reviewed",
+      "verified_scope": "Niveles y requisitos para integridad de provenance, producción y verificación de artefactos.",
+      "domains": [
+        "devsecops",
+        "supply_chain",
+        "software_engineering"
+      ],
+      "review_note": "Se revisaron páginas oficiales de especificación y provenance; no se afirma auditoría de un builder concreto."
     }
   ]
 }
