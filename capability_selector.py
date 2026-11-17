@@ -6,20 +6,45 @@ import re
 import sys
 from pathlib import Path
 
+from capability_inventory import build_inventory
+
 INVENTORY = Path("reports/capability_inventory.json")
 TEMPLATE_ROOT = Path.home() / "nuclei-templates"
 
 
+def _load_templates():
+    """Carga el inventario existente o descubre metadatos en memoria."""
+    if INVENTORY.is_symlink():
+        raise ValueError("El inventario de capacidades no puede ser un symlink.")
+
+    if INVENTORY.is_file():
+        data = json.loads(INVENTORY.read_text(encoding="utf-8"))
+    else:
+        # A clean clone must be usable without a preparatory inventory command.
+        # Discovery is local and declarative: it never executes tools or templates.
+        data = build_inventory()
+
+    if not isinstance(data, dict):
+        raise ValueError("El inventario de capacidades debe ser un objeto JSON.")
+    nuclei = data.get("nuclei_templates")
+    if not isinstance(nuclei, dict):
+        raise ValueError("El inventario no contiene metadatos de plantillas válidos.")
+    templates = nuclei.get("items", [])
+    if not isinstance(templates, list):
+        raise ValueError("La lista de plantillas del inventario no es válida.")
+    return templates
+
+
 def select_capabilities(task, limit=25):
     """Puntúa las plantillas según la tarea y su aplicabilidad general."""
-    if not INVENTORY.is_file():
-        raise FileNotFoundError(
-            "Ejecuta primero: python3 capability_inventory.py"
-        )
+    if not isinstance(task, str) or not task.strip():
+        raise ValueError("La tarea debe ser texto no vacío.")
+    if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= 100:
+        raise ValueError("limit debe ser un entero entre 1 y 100.")
 
-    data = json.loads(INVENTORY.read_text(encoding="utf-8"))
-    templates = data["nuclei_templates"]["items"]
-    task = task.lower()
+    templates = _load_templates()
+    task = task.casefold()
+    template_root = TEMPLATE_ROOT.resolve()
 
     # Detectar el objetivo solicitado.
     general_audit = any(
@@ -51,15 +76,24 @@ def select_capabilities(task, limit=25):
     ranked = []
 
     for item in templates:
-        path = Path(item["path"])
-        path_text = str(path).lower()
-        name = item.get("name", "").lower()
-
+        if not isinstance(item, dict):
+            continue
+        raw_path = item.get("path")
+        if not isinstance(raw_path, str) or not raw_path.strip():
+            continue
+        path = Path(raw_path)
+        if path.is_symlink() or not path.is_file():
+            continue
         try:
-            relative = path.relative_to(TEMPLATE_ROOT)
-        except ValueError:
+            path = path.resolve(strict=True)
+            relative = path.relative_to(template_root)
+        except (OSError, ValueError):
+            # Never use stale inventory entries to read outside the template root.
             continue
 
+        path_text = str(path).casefold()
+        raw_name = item.get("name")
+        name = raw_name.casefold() if isinstance(raw_name, str) else path.stem.casefold()
         parts = relative.parts
         category = parts[1] if len(parts) > 1 and parts[0] == "http" else ""
 
@@ -91,7 +125,7 @@ def select_capabilities(task, limit=25):
         # Leer etiquetas para distinguir detección de otras comprobaciones.
         try:
             content = path.read_text(encoding="utf-8", errors="replace")
-            header = "\n".join(content.splitlines()[:100]).lower()
+            header = "\n".join(content.splitlines()[:100]).casefold()
         except OSError:
             header = ""
 
@@ -132,7 +166,7 @@ def select_capabilities(task, limit=25):
         if score > 0:
             ranked.append((score, item))
 
-    ranked.sort(key=lambda pair: (-pair[0], pair[1]["path"]))
+    ranked.sort(key=lambda pair: (-pair[0], pair[1].get("path", "")))
 
     return [
         {"score": score, **item}
