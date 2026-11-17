@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0.0",
+  "policy": "Los registros verificados se limitarán a documentos oficiales inspeccionados en la revisión editorial. Los candidatos requieren comprobación documental antes de usarse como evidencia.",
+  "sources": [
+    {
+      "id": "NIST-CSWP-29-CSF-2.0",
+      "title": "The NIST Cybersecurity Framework (CSF) 2.0",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_framework",
+      "url": "https://doi.org/10.6028/NIST.CSWP.29",
+      "version": "2.0",
+      "published": "2024-02-26",
+      "verification_status": "official_metadata_verified",
+      "verified_scope": "Marco de resultados de gestión del riesgo; no prescribe por sí solo procedimientos técnicos.",
+      "domains": ["foundations", "governance", "vuln_management", "incident_response", "business_continuity"],
+      "review_note": "Metadatos y alcance revisados en el registro oficial NIST; descargar y revisar texto completo antes de citar secciones concretas."
+    },
+    {
+      "id": "NIST-SP-1347",
+      "title": "NIST Cybersecurity Framework 2.0 Informative References Quick-Start Guide",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.1347",
+      "version": "Final",
+      "published": "2026-08-25",
+      "verification_status": "official_metadata_verified",
+      "verified_scope": "Uso de referencias informativas y mapeos entre marcos, estándares y recursos.",
+      "domains": ["foundations", "governance", "secure_arch"],
+      "review_note": "Metadatos y resumen oficial revisados; requiere lectura del documento completo para afirmaciones detalladas."
+    },
+    {
+      "id": "NIST-SP-1308",
+      "title": "NIST Cybersecurity Framework 2.0: Cybersecurity, Enterprise Risk Management, and Workforce Management Quick-Start Guide",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.1308",
+      "version": "Final",
+      "published": "2026-03-23",
+      "verification_status": "official_metadata_verified",
+      "verified_scope": "Relación entre riesgo cibernético, riesgo empresarial y gestión de capacidades del personal.",
+      "domains": ["foundations", "governance"],
+      "review_note": "Metadatos y resumen oficial revisados; requiere lectura del documento completo para afirmaciones detalladas."
+    },
+    {
+      "id": "NIST-CSF-REFERENCE-TOOL",
+      "title": "NIST Cybersecurity Framework 2.0 Reference Tool",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_machine_readable_resource",
+      "url": "https://csrc.nist.gov/projects/cybersecurity-framework/filters",
+      "version": "Continuously maintained online resource",
+      "verification_status": "official_resource_metadata_verified",
+      "verified_scope": "Exploración de Core, ejemplos de implementación y referencias informativas en formatos humanos y legibles por máquina.",
+      "domains": ["foundations", "governance", "secure_arch", "devsecops"],
+      "review_note": "Descripción oficial revisada; descargar dataset/versionar snapshot antes de usarlo como evidencia reproducible."
+    }
+  ]
+}
