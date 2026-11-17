@@ -84,7 +84,10 @@ def _bootstrap_locked(packs, dry_run=False):
             previous = existing.get(str(pack["path"]))
             if (previous and previous.get("current_sha256") == pack["sha256"]
                     and previous.get("processing_status") == "completed"
-                    and document_chunk_count(pack["document_id"], embedding_model) > 0):
+                    and document_chunk_count(
+                pack["document_id"], embedding_model,
+                visibility=pack["visibility"], tenant_id=pack["tenant_id"],
+            ) > 0):
                 skipped.append(pack["id"])
                 continue
             registered = register_resource(
@@ -108,7 +111,10 @@ def _bootstrap_locked(packs, dry_run=False):
                 document_id=pack["document_id"],
                 expected_embedding_model=embedding_model,
             )
-            if result["chunks"] < 1 or document_chunk_count(pack["document_id"], embedding_model) < 1:
+            if result["chunks"] < 1 or document_chunk_count(
+                pack["document_id"], embedding_model,
+                visibility=pack["visibility"], tenant_id=pack["tenant_id"],
+            ) < 1:
                 raise RuntimeError("La ingestión no publicó fragmentos verificables.")
             update_resource_processing_status(resource_id, "completed")
             ingested.append({
