@@ -98,3 +98,17 @@
 - **Madurez real:** 48/48 agendas de investigación creadas. Ninguna se declara M4/M5: aún faltan revisiones bibliográficas ejecutadas, lectura integral de fuentes, experimentos, resultados, análisis y reproducción independiente.
 - Las agendas son planes de investigación específicos, no papers ni resultados. La auditoría no certifica calidad semántica, cumplimiento legal ni competencia de agentes.
 - **Pruebas:** pendientes de ejecución CI para el SHA que incorpore estos cambios. No se declara CI verde hasta revisar el run y sus logs.
+
+
+## Desarrollo de investigación y revisiones bibliográficas — actualización 2026-11-17
+
+- Se ampliaron las revisiones bibliográficas iniciales de **7 a 13 de las 48 áreas**: AppSec/API, respuesta a incidentes, DevSecOps/supply chain, gestión de vulnerabilidades, OT/ICS, arquitectura segura, criptografía, identidad, inteligencia de amenazas, SOC/SIEM, forense digital, contenedores y malware.
+- Cada revisión incorpora pregunta delimitada, síntesis de fuentes primarias, taxonomía/implicaciones técnicas, hipótesis falsables, diseño experimental propuesto, métricas, límites y brechas pendientes. Los experimentos **no se han ejecutado**.
+- El registro creció de 6 a **33 fuentes**. Distingue páginas oficiales revisadas, metadatos/abstract revisados, documentos parcialmente inspeccionados, borradores y referencias de catálogo. No se contabilizan todas como lectura integral.
+- Se inspeccionaron secciones concretas del PDF NIST SP 800-61 Rev. 3 (portada, resumen ejecutivo, ciclo de vida y fragmentos de contención); el resto de fuentes se limita al alcance de revisión declarado en cada registro. La lectura completa de estándares y documentos sigue pendiente.
+- Los 13 dossiers enlazan IDs de fuente del registro. El auditor `knowledge_research_audit.py` ahora comprueba estructura, URLs HTTPS, unicidad y existencia de IDs referenciados, y separa revisiones bibliográficas de agendas.
+- Se añadieron siete pruebas `unittest` para la auditoría. `verify.sh` ejecuta ahora el auditor antes de la suite automatizada.
+- **Cobertura documental de investigación:** 13/48 (27,1%). Las otras 35 áreas mantienen agenda de investigación, pero no revisión bibliográfica desarrollada.
+- **Madurez real:** M1 documental en los 13 dossiers; no se declara M3/M4/M5. No existen resultados experimentales ni reproducción independiente en esta ampliación.
+- **Pendiente:** completar revisiones de las 35 áreas, lectura integral y crítica de las fuentes, laboratorios seguros, resultados cuantitativos, análisis de incertidumbre, revisión por pares y reproducción externa.
+- **CI:** los cambios disparan workflows por push. No declarar aprobado hasta comprobar el resultado de los runs asociados al SHA final de esta actualización.
