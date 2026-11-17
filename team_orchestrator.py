@@ -1143,6 +1143,13 @@ def execute_workflow(
     else:
         report["status"] = "completed"
 
+    if (
+        report.get("status") == "completed"
+        and report.get("tool_execution")
+        and report["tool_execution"].get("status") != "completed"
+    ):
+        report["status"] = "completed_with_tool_failures"
+
     report["finished_at"] = datetime.now(timezone.utc).isoformat()
     save_report(report_path, report)
 
