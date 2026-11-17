@@ -20,4 +20,17 @@ La instalación principal usa `pip --require-hashes` y hashes SHA-256 fijados pa
 
 ## Dependencias del sandbox
 
-Las herramientas de análisis dentro de la imagen Docker usan `sandbox/requirements.lock`, con hashes SHA-256 de Ruff, Bandit y sus dependencias. La construcción instala con `pip --require-hashes`. El workflow descarga los wheels, valida sus hashes contra el lock y publica un SBOM CycloneDX separado para el sandbox. Para regenerar el lock: descargar wheels con `sandbox/requirements.in`, ejecutar `wheel_lock_generator.py` y revisar el diff antes de incorporarlo.
+Las herramientas de análisis dentro de la imagen Docker usan `sandbox/requirements.lock`, con hashes SHA-256 de Ruff, Bandit y sus dependencias. La construcción instala con `pip --require-hashes`. El workflow descarga los wheels, valida sus hashes contra el lock y publica un SBOM CycloneDX separado para el sandbox. Para regenerar el lock en la misma plataforma de destino:
+
+```bash
+wheelhouse="$(mktemp -d)"
+python -m pip download --only-binary=:all: --dest "$wheelhouse" -r sandbox/requirements.in
+python wheel_lock_generator.py --wheelhouse "$wheelhouse" --requirements sandbox/requirements.in --output sandbox/requirements.lock
+rm -rf "$wheelhouse"
+```
+
+El wheelhouse debe contener los wheels de las dependencias directas y transitivas para esa plataforma. Revisa versiones, hashes y procedencia antes de aceptar el diff; no generes un lock de producción desde un mirror no confiable.
+
+## Dependencias documentales opcionales
+
+`requirements-documents.txt` todavía declara rangos de versión sin hashes. Esas dependencias no están cubiertas por el lock base ni por el SBOM de CI. Para entornos de alta garantía, no las instales hasta generar y revisar un lock SHA-256 por plataforma, y añadir su verificación/SBOM al workflow.
