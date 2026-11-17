@@ -26,9 +26,16 @@ class FakeLedger:
 class ToolExecutorLedgerTests(unittest.TestCase):
     def invoke(self, ledger, runner):
         output = io.StringIO()
-        with patch.object(tool_executor, "ExecutionLedger", return_value=ledger), \
-             patch.object(tool_executor, "run_local_tool", side_effect=runner), \
-             contextlib.redirect_stdout(output), contextlib.redirect_stderr(io.StringIO()):
+        with (
+            patch.object(tool_executor, "ExecutionLedger", return_value=ledger),
+            patch.object(tool_executor, "run_local_tool") as mocked_runner,
+            contextlib.redirect_stdout(output),
+            contextlib.redirect_stderr(io.StringIO()),
+        ):
+            if isinstance(runner, dict):
+                mocked_runner.return_value = runner
+            else:
+                mocked_runner.side_effect = runner
             result = tool_executor.main([
                 "--tool", "ruff", "--target", "tests/fixtures/sample.py", "--execute",
                 "--require-ledger",
@@ -53,14 +60,18 @@ class ToolExecutorLedgerTests(unittest.TestCase):
             "tool_binary_modified": True,
             "tool_binary_sha256": "a" * 64,
             "tool_binary_sha256_after": "b" * 64,
+            "target_modified": False,
+            "target_sha256": "c" * 64,
+            "target_sha256_after": "c" * 64,
         }
         result, output = self.invoke(ledger, evidence)
         self.assertEqual(result, 1)
         self.assertEqual(ledger.statuses, ["started", "failed"])
         terminal = ledger.events[-1]
         self.assertEqual(terminal["status"], "failed")
-        self.assertFalse(terminal["validator_results"][0]["passed"])
+        self.assertTrue(terminal["validator_results"][0]["passed"])
         self.assertFalse(terminal["validator_results"][1]["passed"])
+        self.assertTrue(terminal["validator_results"][2]["passed"])
 
     def test_target_integrity_error_is_failed_and_validators_are_independent(self):
         ledger = FakeLedger()
