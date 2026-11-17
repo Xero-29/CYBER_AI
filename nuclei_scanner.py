@@ -88,6 +88,7 @@ def _record_scan_start(target, authorization_id):
 def _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger):
     result.setdefault("evidence_schema", "cyber-ai.remote-scan.v1")
     result.setdefault("scanner", "nuclei")
+    result.setdefault("network_scope_enforcement", "not_enforced_at_egress")
     result.setdefault("authorization_id", authorization_id)
     result.setdefault("duration_ms", max(0, int((time.monotonic() - started) * 1000)))
     validation = validate_scan_result(result, expected_target=target)
@@ -99,6 +100,7 @@ def _finalize_scan(target, result, started, authorization_id, start_event_id, re
         "scanner": result["scanner"],
         "target": target,
         "authorization_id": authorization_id,
+        "network_scope_enforcement": result.get("network_scope_enforcement"),
         "status": result.get("status"),
         "return_code": result.get("return_code"),
         "findings_count": result.get("findings_count", len(result.get("findings", []))),
