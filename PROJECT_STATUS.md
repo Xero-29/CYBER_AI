@@ -1,12 +1,21 @@
 # Estado canónico vigente — 2026-11-17
 
-> Esta sección describe el HEAD verificado; los bloques históricos inferiores son contexto, no estado actual.
+> Esta sección describe el HEAD auditado; los bloques históricos inferiores son contexto.
 
 **Rama:** `main`  
-**HEAD auditado:** `fa409b8ec2ded9dfdfc00e8c3a87f51b09430130` (CI Python separada de las pruebas Windows aplazadas).  
-**Árbol:** 220 archivos; 46 módulos Python de producción y 490 pruebas reportadas por la última CI.  
-**CI:** Python `unit-tests` aprobado en el HEAD auditado (run `44124048313`): instalación, sintaxis, `verify.sh`, generación SBOM y artefactos. Docker sandbox del mismo HEAD en ejecución al actualizar este estado (run `44124048343`). Las pruebas Windows se aplazan y no bloquean el CI Python.  
+**HEAD auditado:** `d9337c5e46e6760ae16f14e99afba1986644ffa7`.  
+**CI:** Python `unit-tests` aprobado en este SHA (run `44125848717`, 493 pruebas). Docker sandbox de este SHA pendiente de conclusión al actualizar este estado. Las pruebas Windows siguen aplazadas.  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17`, sin modificar.
+
+## Cambio reciente: motor de ejecución local
+
+- Eliminado el límite fijo de tres herramientas; el pipeline procesa todos los candidatos elegibles salvo que el llamador configure un límite explícito.
+- Se admite un objetivo absoluto fuera del repositorio solo cuando el operador habilita `--allow-external-targets` junto con `--execute-tools --confirm-tool-execution --tool-target`.
+- Los objetivos externos siguen sujetos a existencia, tipo archivo/directorio, comprobación de integridad, allowlist HMAC de binarios, timeout, captura limitada de salida, evidencia protegida y ledger.
+- Las rutas internas continúan siendo el comportamiento predeterminado. No se habilitó shell ni ejecución arbitraria de comandos.
+- La ampliación de herramientas personalizadas mediante perfiles configurables y el aislamiento real de procesos/red siguen pendientes; los adaptadores registrados aún son el conjunto ejecutable.
+
+
 
 ## Auditoría estructural y funcional
 
