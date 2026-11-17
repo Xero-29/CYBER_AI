@@ -1,35 +1,85 @@
+# Estado verificado de integración — 2026-11-17
+
+**Base de integración:** `main` en `12c5942a73bf21f2eb0cc2bb5b79a5826801defd`; se incorpora además el commit documental de `main` `039e6c79fcd59bdbb9891bd5e105a528ec152352`.  
+**Rama de integración:** `codex/integration-hash-locks-2026-11-17-v2`. Se mantiene separada; no se ha fusionado ni modificado `main`.  
+**Rama fuente:** `codex/security-integrity-audit`, HEAD verificado `482df7480ac547003a90e621c95c15789067c4dc`. Frente a `main` actual estaba 13 commits adelante y 84 detrás, con merge-base `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.  
+**PR #2:** fusionado en `main` mediante `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. **PR #1:** sigue abierto como draft antiguo y separado; no se ha duplicado ni integrado.
+
+## Cambios trasladados a esta rama
+
+- Dependencias principales y herramientas del sandbox fijadas con SHA-256 y `pip --require-hashes`; el instalador falla cerrado fuera de CPython 3.12.x, Linux x86_64 y glibc >= 2.26.
+- Lock separado para Ruff/Bandit en Docker, verificación de wheels contra el lock y SBOM CycloneDX independiente para ambos entornos.
+- Generador reproducible de locks desde wheelhouse y pruebas para wheels ausentes, duplicados, metadatos inválidos y rutas inseguras.
+- Evaluación de conocimiento endurecida para datasets y resultados suministrados.
+- Se preservan los cambios de `main` posteriores al merge-base: ejecución local opcional con allowlist, evidencia, validador independiente y ledger; CLI principal; cambios de orquestación y pruebas de integración.
+- Los workflows conservan el smoke test Windows de allowlist de `main`, añaden los locks verificados y disparan Docker en esta rama.
+
+## Evidencia de validación
+
+- Rama fuente `482df7480ac547003a90e621c95c15789067c4dc`: Python Tests **success, 471 pruebas** ([run 44116054953](https://github.com/Xero-29/CYBER_AI/actions/runs/44116054953)); Docker Sandbox **success** ([run 44116054989](https://github.com/Xero-29/CYBER_AI/actions/runs/44116054989)). CI generó manifiestos de 9 wheels principales y 8 wheels del sandbox, además de dos SBOM CycloneDX.
+- Main `039e6c79fcd59bdbb9891bd5e105a528ec152352`: Docker Sandbox **success** ([run 44117766473]); Python Tests seguía pendiente al preparar esta integración ([run 44117766456]). No se declara verde el conjunto de checks.
+- La rama de integración necesita sus propias ejecuciones sobre el HEAD final. Hasta entonces no se considera validada.
+
+## Límites de la implementación
+
+- El lock SHA-256 actual cubre solo CPython 3.12.x/Linux x86_64/glibc >= 2.26. Windows, macOS, ARM y otras plataformas necesitan hashes verificados propios.
+- Los hashes fijan los wheels descargados y comparados con el lock; no demuestran por sí solos la procedencia del publicador ni sustituyen firmas o attestations upstream.
+- Docker comparte el kernel del host; no equivale a una microVM.
+- La allowlist HMAC local no sustituye firma asimétrica, KMS/HSM ni custodia independiente.
+- La validación técnica de herramientas no demuestra la verdad, explotabilidad ni exhaustividad de un hallazgo.
+
+## Pendiente antes de la validación final del propietario
+
+1. Obtener Python Tests, Docker Sandbox y Windows allowlist en éxito sobre el HEAD exacto de esta rama.
+2. Ejecutar instalación, preflight, restauración y pruebas E2E en una máquina limpia.
+3. Probar Ollama, embeddings y proveedores reales con credenciales configuradas fuera del repositorio.
+4. Ejecutar estrés, concurrencia, disco lleno, corrupción y recuperación física.
+5. Conectar KMS/HSM, rotación/revocación, RBAC/IdP/MFA, WORM/offsite y backups cifrados con simulacros DR/RPO/RTO.
+6. Validar aislamiento fuerte de procesos/red y extracción/OCR en sandbox.
+7. Revisar con especialistas la calidad, licencias, vigencia, cobertura y umbrales de la biblioteca de conocimiento.
+8. Configurar branch protection/required checks, revisión independiente, observabilidad, alertas y respuesta a incidentes.
+
+**Conclusión provisional:** se preparó una rama de integración que conserva el trabajo reciente de `main` y añade locks reproducibles y SBOM de ambos entornos sin tocar `main`. No está certificada ni lista para producción. El siguiente criterio es CI verde sobre el HEAD exacto y revisión del PR; después quedan las validaciones operacionales externas enumeradas arriba.
+
+---
+
 # Estado canónico vigente — 2026-11-17
 
 > Esta sección es la fuente de verdad vigente. Los bloques históricos que aparecen debajo documentan etapas anteriores y no deben interpretarse como el estado actual.
 
 **Rama:** `main`  
-**HEAD de código/documentación revisado:** `cfcb5a4c14176b6be3958eb631c32fcec2bd332f`  
-**Último cambio funcional:** `3e0ebfcf611772b2ffa381b8603c2b04090dd8aa`  
+**Código y pruebas integradas revisados:** `12c5942a73bf21f2eb0cc2bb5b79a5826801defd`  
+**Último cambio de código:** `1e343589891232c72c518c2a60b0e534d3aeda16`  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17` (no modificado).
 
 ## Integración realizada
 
-- `cyber_ai.py --ask` conecta la entrada principal con DIRECTOR, el agente y la recuperación de conocimiento.
-- `cyber_ai.py --team` conecta el flujo multiagente supervisado con el planificador y el inventario de herramientas.
-- La ejecución local opcional se conecta mediante `--execute-tools --confirm-tool-execution --tool-target`. Exige confirmación explícita, allowlist HMAC obligatoria y rutas relativas confinadas al repositorio.
-- El pipeline solo considera hasta tres adaptadores locales instalados y registrados. Los que requieren red o aislamiento especial siguen bloqueados.
-- Cada ejecución genera evidencia estructurada, validación independiente de integridad y evento del ledger. El resultado se agrega al contexto de los agentes y al informe final.
-- Si una herramienta falla o su evidencia no supera validación, el flujo no se etiqueta como completamente exitoso.
-- El planificador degrada de forma explícita cuando el índice de capacidades no existe, en vez de interrumpir todo el orquestador.
-- Se añadieron pruebas de CLI, pipeline, validador y fallback del planificador. README, matriz y guía de allowlist documentan el flujo.
+- `cyber_ai.py --ask` conecta la entrada principal con DIRECTOR, agentes y recuperación de conocimiento.
+- `cyber_ai.py --team` conecta el flujo multiagente supervisado con planificador e inventario de herramientas.
+- La ejecución local opcional usa `--execute-tools --confirm-tool-execution --tool-target`; exige confirmación explícita, allowlist HMAC obligatoria y objetivo relativo confinado al repositorio.
+- El pipeline selecciona hasta tres adaptadores locales instalados y registrados. Adaptadores que requieren red o aislamiento especial permanecen bloqueados.
+- Cada ejecución produce evidencia estructurada, validación independiente de integridad y evento del ledger.
+- Los resultados se agregan al contexto de los agentes como datos no confiables y al informe final. Una ejecución fallida no se etiqueta como éxito total.
+- El planificador continúa en modo degradado si falta el índice de capacidades, dejando advertencia explícita.
+- Se añadieron pruebas de pipeline, validador, CLI y fallback del planificador.
 
-## Límites y verificación pendiente
+## Evidencia de CI
 
-- La validación independiente comprueba integridad de binario/objetivo, hash, allowlist, código de salida y truncamiento. No demuestra la veracidad, explotabilidad ni exhaustividad de un hallazgo.
-- Los adaptadores locales se ejecutan en el host; `network_access=not_enforced`. No se afirma aislamiento de red ni sandbox del sistema operativo.
-- El escaneo remoto Nuclei sigue en su flujo separado y conserva autorización específica.
-- La ejecución real requiere binarios instalados, manifiesto HMAC válido, clave protegida y objetivo válido.
-- CI anterior detectó fallos de integración; se corrigieron dos causas (índice no generado y opciones false innecesarias). La ejecución de CI del HEAD actual todavía debe completarse y pasar. No se declara la integración validada hasta entonces.
-- No se afirma preparación para producción ni cierre de validación operacional.
+- Docker sandbox: **éxito** en el commit `12c5942a73bf21f2eb0cc2bb5b79a5826801defd`. `verify.sh` ejecutó 488 pruebas, todas aprobadas; construcción de imagen y ejecución de Ruff dentro del sandbox también aprobadas.
+- Python tests workflow: ejecución de GitHub Actions asociada al mismo commit permanece pendiente; el smoke test de Windows aún no tiene resultado final.
+- Las ejecuciones anteriores que fallaron fueron corregidas; no se cuentan como aprobadas.
+
+## Límites pendientes
+
+- La validación comprueba integridad de binario/objetivo, hashes, allowlist, código de salida y truncamiento. No prueba veracidad, explotabilidad ni exhaustividad de los hallazgos.
+- Adaptadores locales ejecutados en host: `network_access=not_enforced`. No se afirma aislamiento de red ni sandbox del sistema operativo.
+- El escaneo remoto Nuclei sigue en flujo separado con autorización específica.
+- Ejecución real requiere binarios instalados, manifiesto HMAC válido, clave protegida y objetivo válido.
+- No se declara preparación para producción ni validación operacional completa.
 
 ## Siguiente brecha
 
-Unificar el escaneo remoto autorizado con contratos de evidencia/ledger/revisión; después ejecutar pruebas E2E con herramientas reales y verificar aislamiento de procesos. Añadir validación semántica experta de hallazgos.
+Integrar escaneo remoto autorizado con contratos comunes de evidencia/ledger/revisión; luego realizar E2E con herramientas reales y validar aislamiento de procesos y calidad semántica de hallazgos.
 
 ---
 
