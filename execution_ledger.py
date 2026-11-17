@@ -66,16 +66,20 @@ class ExecutionLedger:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.initialize()
 
-    def connect(self):
+    def connect(self, *, configure_wal=False):
         db = sqlite3.connect(str(self.path), timeout=30, isolation_level=None)
         db.row_factory = sqlite3.Row
         db.execute("PRAGMA busy_timeout=30000")
-        db.execute("PRAGMA journal_mode=WAL")
+        # WAL mode is persistent for the database. Configure it during
+        # initialization only; repeating this write-capable PRAGMA on every
+        # reader/writer connection can contend with concurrent transactions.
+        if configure_wal:
+            db.execute("PRAGMA journal_mode=WAL")
         db.execute("PRAGMA synchronous=FULL")
         return db
 
     def initialize(self):
-        with self.connect() as db:
+        with self.connect(configure_wal=True) as db:
             db.executescript("""
                 CREATE TABLE IF NOT EXISTS execution_events (
                     sequence INTEGER PRIMARY KEY AUTOINCREMENT,
