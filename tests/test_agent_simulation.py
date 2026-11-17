@@ -131,6 +131,28 @@ class TestAgentSimulation(unittest.TestCase):
         self.assertLessEqual(second["input_context_chars"], 250)
         self.assertEqual(report["metrics"]["context_steps_dropped"], 1)
 
+    def test_simulated_context_matches_real_orchestrator_trimming(self):
+        from agent_simulation import _bounded_context
+        from team_orchestrator import build_prompt
+
+        original = [
+            {"agent": "NEXO", "response": "a" * 700},
+            {"agent": "FILTRO", "response": "b" * 200},
+        ]
+        simulated_history = [dict(item) for item in original]
+        orchestrator_history = [dict(item) for item in original]
+        task = "Tarea de integración"
+        objective = "Revisión de contexto"
+        prompt = build_prompt(task, objective, orchestrator_history, 500)
+        selected, dropped, context_chars = _bounded_context(
+            task, objective, simulated_history, 500
+        )
+
+        self.assertEqual(simulated_history, orchestrator_history)
+        self.assertEqual(dropped, len(original) - len(simulated_history))
+        self.assertEqual(context_chars, len(prompt))
+        self.assertEqual(selected, simulated_history)
+
     def test_all_repository_workflows_load_and_simulate(self):
         from agent_simulation import load_workflow
 
