@@ -54,6 +54,18 @@ class LearningCycleAuditTests(unittest.TestCase):
         self.assertEqual(report["memory"]["status"], "disabled_missing_approval_key")
         self.assertIsNone(report["memory"]["rejected_or_unverifiable_records"])
 
+    def test_missing_ledger_is_reported_without_creating_it(self):
+        missing = self.root / "absent" / "ledger.sqlite3"
+        with (
+            patch.object(learning_cycle_audit, "DEFAULT_DB", missing),
+            patch.dict(os.environ, {"CYBER_AI_LEDGER_PATH": str(missing)}),
+        ):
+            report = learning_cycle_audit.audit_learning_cycle()
+        self.assertEqual(report["ledger"]["reason"], "database_missing")
+        self.assertEqual(report["status"], "degraded")
+        self.assertFalse(missing.exists())
+        self.assertFalse(missing.parent.exists())
+
     def test_orphan_started_event_is_reported_but_not_reconciled(self):
         self.ledger.append(
             namespace="audit",
