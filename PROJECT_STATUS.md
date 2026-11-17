@@ -287,3 +287,6 @@ No declarar el sistema completo ni certificado hasta que cada brecha tenga códi
 - **Skillbook:** la promoción firmada de una Skill que no tenga candidata previa ahora comprueba duplicados e inserta la Skill y su primera versión dentro de la misma transacción `BEGIN IMMEDIATE`. Evita la ventana de carrera que podía crear Skills duplicadas ante aprobaciones concurrentes.
 - **Límite de validación:** los cambios están publicados en esta rama. No se consideran aprobados hasta que terminen los workflows del HEAD final. `quick_check` detecta corrupción estructural SQLite, pero no reemplaza restauración desde backup ni un checkpoint externo contra truncamiento deliberado.
 
+- **Pruebas adicionales del ledger:** se cubre contención por bloqueo SQLite (writer ocupado) y diagnóstico ante un archivo de base de datos ilegible. Se comprueba que el intento bloqueado no deja eventos parciales y que la cadena previa permanece válida.
+- **Skillbook concurrente:** prueba con dos promociones HMAC simultáneas; ambas deben devolver el mismo ID y dejar una sola Skill y una sola versión inicial.
+- **Estado CI:** pendiente de finalización para el HEAD que incorpora estas pruebas.
