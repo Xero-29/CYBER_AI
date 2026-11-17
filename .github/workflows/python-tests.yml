@@ -35,3 +35,34 @@ jobs:
           bash -n setup.sh verify.sh
       - name: Run complete local verification
         run: bash verify.sh
+      - name: Generate CycloneDX SBOM
+        run: |
+          python sbom_generator.py --output "$RUNNER_TEMP/cyber-ai-sbom.cdx.json"
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          import hashlib
+
+          root = Path(".")
+          lock_hash = hashlib.sha256((root / "requirements.lock").read_bytes()).hexdigest()
+          provenance = {
+              "repository": os.environ["GITHUB_REPOSITORY"],
+              "commit": os.environ["GITHUB_SHA"],
+              "workflow_run_id": os.environ["GITHUB_RUN_ID"],
+              "workflow_run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
+              "sbom": "cyber-ai-sbom.cdx.json",
+              "requirements_lock_sha256": lock_hash,
+          }
+          output = Path(os.environ["RUNNER_TEMP"]) / "cyber-ai-sbom-provenance.json"
+          output.write_text(json.dumps(provenance, sort_keys=True, indent=2) + "\\n", encoding="utf-8")
+          PY
+      - name: Upload SBOM and build provenance
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        with:
+          name: cyber-ai-sbom-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/cyber-ai-sbom.cdx.json
+            ${{ runner.temp }}/cyber-ai-sbom-provenance.json
+          if-no-files-found: error
+          retention-days: 90
