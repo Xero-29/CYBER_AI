@@ -52,6 +52,39 @@ class IsolatedToolRunnerTests(unittest.TestCase):
         with self.assertRaises(Exception):
             run_isolated_tool("shell", "/tmp", allow_external=True)
 
+    def test_timeout_kills_container_by_cidfile(self):
+        class TimeoutProcess(FakeProcess):
+            def __init__(self):
+                super().__init__()
+                self.calls = 0
+            def wait(self, timeout=None):
+                self.calls += 1
+                if self.calls == 1:
+                    raise subprocess.TimeoutExpired(["docker"], timeout)
+                return -9
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            target = root / "sample.pcap"
+            target.write_bytes(b"pcap")
+            process = TimeoutProcess()
+            def fake_popen(command, **kwargs):
+                cid_path = Path(command[command.index("--cidfile") + 1])
+                cid_path.write_text("b" * 64, encoding="ascii")
+                return process
+            with patch("isolated_tool_runner.shutil.which", return_value="/usr/bin/docker"), \\
+                 patch("isolated_tool_runner.subprocess.run", return_value=subprocess.CompletedProcess(
+                     ["docker"], 0, stdout="sha256:" + "a" * 64, stderr=""
+                 )) as docker_run, \\
+                 patch("isolated_tool_runner.verify_tool_allowed", return_value={"enforced": True}), \\
+                 patch("isolated_tool_runner.subprocess.Popen", side_effect=fake_popen), \\
+                 patch("isolated_tool_runner.os.killpg") as killpg:
+                evidence = run_isolated_tool("tshark", str(target), allow_external=True, timeout=1)
+            self.assertEqual(evidence["status"], "timeout")
+            self.assertTrue(any(call.args[0][:2] == ["/usr/bin/docker", "kill"]
+                                for call in docker_run.call_args_list))
+            killpg.assert_called_once()
+
 
 if __name__ == "__main__":
     unittest.main()
