@@ -1,7 +1,9 @@
 """Pruebas del importador de documentos de CYBER_AI."""
 
+import stat
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 from unittest.mock import patch
 
@@ -60,6 +62,34 @@ class TestKnowledgeIngest(unittest.TestCase):
             json_path.write_text('{"name":"alpha","value":1}', encoding="utf-8")
             self.assertIn("alpha", ingest.extract_document_text(csv_path))
             self.assertIn('"value": 1', ingest.extract_document_text(json_path))
+
+    def test_office_archive_rejects_symlink_entries(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "malicious.docx"
+            info = zipfile.ZipInfo("word/document.xml")
+            info.create_system = 3
+            info.external_attr = (stat.S_IFLNK | 0o777) << 16
+            with zipfile.ZipFile(path, "w") as archive:
+                archive.writestr(info, "../outside.xml")
+            with self.assertRaisesRegex(ValueError, "enlaces simbólicos"):
+                ingest._validate_office_archive(path)
+
+    def test_office_archive_rejects_macro_payloads(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "macro.docx"
+            with zipfile.ZipFile(path, "w") as archive:
+                archive.writestr("word/vbaProject.bin", b"macro")
+            with self.assertRaisesRegex(ValueError, "macros"):
+                ingest._validate_office_archive(path)
+
+    def test_office_archive_rejects_duplicate_entries(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "duplicate.docx"
+            with zipfile.ZipFile(path, "w") as archive:
+                archive.writestr("word/document.xml", b"one")
+                archive.writestr("word/document.xml", b"two")
+            with self.assertRaisesRegex(ValueError, "duplicadas"):
+                ingest._validate_office_archive(path)
 
     def test_rejects_unsupported_and_oversized_documents(self):
         with tempfile.TemporaryDirectory() as temp:
