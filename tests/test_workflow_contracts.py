@@ -22,6 +22,13 @@ class WorkflowContractTests(unittest.TestCase):
                 steps = validate_workflow_definition(workflow)
                 self.assertEqual(len(steps), len(workflow["steps"]))
 
+    def test_live_orchestrator_loads_every_repository_workflow(self):
+        for name in ("investigacion", "critica_corta", "revision_tecnica"):
+            with self.subTest(workflow=name):
+                workflow = team_orchestrator.load_workflow(name)
+                self.assertTrue(workflow["steps"])
+                self.assertTrue(all(step["agent"] for step in workflow["steps"]))
+
     def test_rejects_unknown_mode_types(self):
         for mode in ([], {}, None, 1):
             with self.subTest(mode=mode):
