@@ -39,6 +39,11 @@ TOOL_SPECS = {
     "shellcheck": {"binary": "shellcheck", "network": False, "timeout": 120, "version_args": ["--version"]},
     "actionlint": {"binary": "actionlint", "network": False, "timeout": 60, "version_args": ["-version"]},
     "kube_linter": {"binary": "kube-linter", "network": False, "timeout": 120, "version_args": ["version"]},
+    "osv_scanner": {"binary": "osv-scanner", "network": False, "offline_only": True, "timeout": 240, "version_args": ["--version"], "accepted_exit_codes": [0, 1]},
+    "grype": {"binary": "grype", "network": False, "offline_only": True, "timeout": 240, "version_args": ["version"]},
+    "gitleaks": {"binary": "gitleaks", "network": False, "offline_only": True, "timeout": 180, "version_args": ["version"], "accepted_exit_codes": [0, 1]},
+    "zeek": {"binary": "zeek", "network": False, "offline_only": True, "timeout": 300, "version_args": ["--version"], "input_extensions": [".pcap", ".pcapng", ".cap"]},
+    "volatility3": {"binary": "vol", "network": False, "offline_only": True, "timeout": 300, "version_args": ["--version"], "allowed_plugins": ["windows.info", "windows.pslist", "windows.pstree", "windows.netscan", "windows.cmdline", "windows.dlllist", "linux.pslist", "linux.pstree", "linux.bash", "linux.lsmod", "linux.mount", "linux.sockstat", "mac.pslist", "mac.lsmod"]},
     "yara": {"binary": "yara", "network": False, "requires_isolation": True, "timeout": 180, "version_args": ["--version"]},
     "tshark": {"binary": "tshark", "network": False, "requires_isolation": True, "timeout": 180, "version_args": ["--version"]},
 }
@@ -92,7 +97,30 @@ def _hash_target(path):
     return digest.hexdigest()
 
 
-def _build_command(tool_id, binary, target, config_path=None):
+def _build_command(tool_id, binary, target, config_path=None, plugin=None):
+    if tool_id == "osv_scanner":
+        return [binary, "--offline", "scan", "source", "-r", str(target), "--format", "json"]
+    if tool_id == "grype":
+        return [binary, str(target), "-o", "json"]
+    if tool_id == "gitleaks":
+        if not target.is_dir():
+            raise ToolExecutionError("Gitleaks requiere un directorio de repositorio.")
+        return [
+            binary, "dir", str(target), "--report-format", "json",
+            "--redact=100", "--no-banner",
+        ]
+    if tool_id == "zeek":
+        if not target.is_file() or target.suffix.lower() not in {".pcap", ".pcapng", ".cap"}:
+            raise ToolExecutionError("Zeek requiere un archivo PCAP/PCAPNG/CAP para análisis offline.")
+        return [binary, "-r", str(target), "LogAscii::use_json=T"]
+    if tool_id == "volatility3":
+        if not target.is_file():
+            raise ToolExecutionError("Volatility 3 requiere un volcado de memoria como archivo.")
+        if not isinstance(plugin, str) or plugin not in TOOL_SPECS[tool_id]["allowed_plugins"]:
+            raise ToolExecutionError("Volatility 3 requiere un plugin explícito de la allowlist.")
+        return [binary, "--offline", "-f", str(target), plugin]
+    if plugin is not None:
+        raise ToolExecutionError("El parámetro plugin solo se admite para Volatility 3.")
     if tool_id == "semgrep":
         if not config_path:
             raise ToolExecutionError("Semgrep requiere una configuración local explícita; no se descargan reglas.")
@@ -184,7 +212,7 @@ def _probe_tool_version(binary, tool_id, env):
     return result.stdout.strip().splitlines()[0][:256]
 
 
-def run_local_tool(tool_id, target, *, config_path=None, timeout=None, allow_external=False):
+def run_local_tool(tool_id, target, *, config_path=None, plugin=None, timeout=None, allow_external=False):
     """Ejecuta un adaptador local; YARA/TShark se delegan al sandbox Docker."""
     if tool_id not in TOOL_SPECS:
         raise ToolExecutionError("Herramienta no registrada.")
@@ -214,7 +242,9 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None, allow_ext
         raise ToolExecutionError("El timeout debe estar entre 1 y 600 segundos.")
     if config_path is None and tool_id == "semgrep":
         config_path = os.environ.get("CYBER_AI_SEMGREP_CONFIG")
-    command = _build_command(tool_id, binary, path, config_path=config_path)
+    command = _build_command(
+        tool_id, binary, path, config_path=config_path, plugin=plugin
+    )
     env = {
         "PATH": os.environ.get("PATH", ""),
         "HOME": os.environ.get("HOME", ""),
@@ -222,12 +252,22 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None, allow_ext
         "LC_ALL": "C.UTF-8",
         "NO_COLOR": "1",
     }
+    if tool_id == "grype":
+        env["GRYPE_DB_AUTO_UPDATE"] = "false"
+        env["GRYPE_EXTERNAL_SOURCES_ENABLE"] = "false"
+    if tool_id == "volatility3":
+        env["VOLATILITY_CACHE_PATH"] = tempfile.mkdtemp(prefix="cyber-ai-volatility-")
     tool_version = _probe_tool_version(binary, tool_id, env)
     if _hash_binary(binary)["sha256"] != binary_provenance["sha256"]:
         raise ToolExecutionError("El ejecutable cambió durante la identificación de versión.")
     target_hash_before = _hash_target(path)
     started = time.monotonic()
     timestamp = datetime.now(timezone.utc).isoformat()
+    zeek_workspace = None
+    working_directory = PROJECT_ROOT
+    if tool_id == "zeek":
+        zeek_workspace = tempfile.TemporaryDirectory(prefix="cyber-ai-zeek-")
+        working_directory = Path(zeek_workspace.name)
     captured = {"stdout": bytearray(), "stderr": bytearray()}
     stream_truncated = {"value": False}
 
@@ -245,7 +285,7 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None, allow_ext
 
     try:
         process = subprocess.Popen(
-            command, cwd=str(PROJECT_ROOT), env=env,
+            command, cwd=str(working_directory), env=env,
             stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
             stderr=subprocess.PIPE, shell=False,
             start_new_session=(os.name == "posix"),
@@ -283,6 +323,31 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None, allow_ext
         parsed = json.loads(out_text) if out_text.strip() else None
     except json.JSONDecodeError:
         parsed = None
+    if tool_id == "zeek" and zeek_workspace is not None:
+        log_data = {}
+        total_log_bytes = 0
+        for log_path in sorted(working_directory.glob("*.log")):
+            if log_path.is_symlink() or not log_path.is_file():
+                continue
+            remaining = MAX_OUTPUT_BYTES - total_log_bytes
+            if remaining <= 0:
+                truncated = True
+                break
+            raw = log_path.read_bytes()[:remaining]
+            total_log_bytes += len(raw)
+            if log_path.stat().st_size > len(raw):
+                truncated = True
+            entries = []
+            for line in raw.decode("utf-8", errors="replace").splitlines():
+                if not line.strip():
+                    continue
+                try:
+                    entries.append(json.loads(line))
+                except json.JSONDecodeError:
+                    entries.append({"unparsed_line": line[:4096]})
+            log_data[log_path.name] = entries
+        parsed = {"logs": log_data, "log_files": len(log_data)}
+        zeek_workspace.cleanup()
     target_hash_after = _hash_target(path)
     target_modified = target_hash_before != target_hash_after
     try:
@@ -309,15 +374,29 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None, allow_ext
         "elapsed_seconds": round(time.monotonic() - started, 3),
         "status": status,
         "return_code": returncode,
-        "tool_reported_success": returncode == 0 and not binary_modified and not target_modified,
+        "tool_reported_success": (
+            returncode in spec.get("accepted_exit_codes", [0])
+            and not binary_modified and not target_modified
+        ),
+        "findings_present": (
+            bool(parsed) if isinstance(parsed, (list, dict)) else None
+        ),
         "output_truncated": truncated,
         "stdout": out_text,
         "stderr": err_text,
         "parsed_json": parsed,
         "command": command[1:],
-        "network_access": "not_enforced",
+        "network_access": (
+            "disabled_by_tool_offline_mode" if spec.get("offline_only")
+            else "not_enforced"
+        ),
         "network_isolation_enforced": False,
-        "network_policy": "Los adaptadores que requieren red se deniegan; el egress de procesos locales no está aislado por este ejecutor.",
+        "network_policy": (
+            "Modo offline solicitado al propio escáner; el proceso host no tiene "
+            "aislamiento de egress del sistema operativo."
+            if spec.get("offline_only") else
+            "Los adaptadores que requieren red se deniegan; el egress de procesos locales no está aislado por este ejecutor."
+        ),
         "note": "Salida de herramienta no confiable; requiere validación antes de generar hallazgos o Skills. La ejecución no sustituye aislamiento del sistema operativo.",
     }
     return evidence
