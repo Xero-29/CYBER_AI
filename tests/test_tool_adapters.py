@@ -65,8 +65,6 @@ class ToolAdapterTests(unittest.TestCase):
         self.assertFalse(evidence["tool_binary_modified"])
 
     @patch("tool_adapters.subprocess.Popen")
-    @patch("tool_adapters.shutil.which", return_value="/usr/bin/semgrep")
-    @patch("tool_adapters.subprocess.Popen")
     @patch("tool_adapters.shutil.which", return_value="/usr/bin/ruff")
     @patch("tool_adapters.subprocess.run")
     def test_binary_replacement_during_execution_invalidates_evidence(self, version_run, which, popen):
@@ -83,6 +81,8 @@ class ToolAdapterTests(unittest.TestCase):
         self.assertTrue(evidence["tool_binary_modified"])
         self.assertFalse(evidence["tool_reported_success"])
 
+    @patch("tool_adapters.subprocess.Popen")
+    @patch("tool_adapters.shutil.which", return_value="/usr/bin/semgrep")
     def test_semgrep_requires_local_config(self, which, popen):
         with self.assertRaisesRegex(ToolExecutionError, "configuración local"):
             run_local_tool("semgrep", "sample.py")
