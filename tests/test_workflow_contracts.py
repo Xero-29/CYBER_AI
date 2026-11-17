@@ -1,9 +1,12 @@
 """Contract tests shared by the live orchestrator and offline simulator."""
 import json
+import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from workflow_contracts import WorkflowContractError, validate_workflow_definition
+import team_orchestrator
 
 
 class WorkflowContractTests(unittest.TestCase):
@@ -77,6 +80,51 @@ class WorkflowContractTests(unittest.TestCase):
                             "agent": "NEXO", "objective": "test", field: "yes"
                         }]
                     })
+
+    def test_live_orchestrator_rejects_invalid_step_contract(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "workflows.json"
+            path.write_text(json.dumps({
+                "workflows": {
+                    "invalid": {
+                        "steps": [{
+                            "agent": "NEXO", "objective": "test", "num_predict": 20
+                        }]
+                    }
+                }
+            }), encoding="utf-8")
+            with patch.object(team_orchestrator, "WORKFLOW_FILE", path), \\
+                 patch.object(team_orchestrator, "load_config") as load_config:
+                with self.assertRaises(ValueError):
+                    team_orchestrator.load_workflow("invalid")
+                load_config.assert_not_called()
+
+    def test_live_orchestrator_loads_normalized_valid_workflow(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "workflows.json"
+            path.write_text(json.dumps({
+                "workflows": {
+                    "valid": {
+                        "mode": "technical",
+                        "steps": [{
+                            "agent": " NEXO ", "objective": " revisar ",
+                            "num_predict": 300,
+                        }]
+                    }
+                }
+            }), encoding="utf-8")
+            config = {
+                "agents": {
+                    "NEXO": {"enabled": True, "type": "reasoning"}
+                }
+            }
+            with patch.object(team_orchestrator, "WORKFLOW_FILE", path), \\
+                 patch.object(team_orchestrator, "load_config", return_value=config):
+                workflow = team_orchestrator.load_workflow("valid")
+            self.assertEqual(workflow["steps"][0]["agent"], "NEXO")
+            self.assertEqual(workflow["steps"][0]["objective"], "revisar")
+            self.assertEqual(workflow["steps"][0]["mode"], "technical")
+            self.assertEqual(workflow["steps"][0]["num_predict"], 300)
 
     def test_normalization_preserves_runtime_step_options(self):
         workflow = {
