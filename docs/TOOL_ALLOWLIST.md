@@ -30,4 +30,5 @@ La firma es HMAC-SHA256 sobre el JSON canónico sin el campo `signature`. La val
 - La allowlist es opcional para compatibilidad; en despliegues controlados debe activarse el modo obligatorio.
 - HMAC no es firma asimétrica: todos los verificadores que poseen la clave pueden firmar. La custodia, rotación y distribución de la clave requieren un gestor externo.
 - La política autentica la correspondencia entre herramienta y hash, pero no demuestra por sí sola que el binario provenga del editor legítimo. El enrolamiento debe verificar el origen del artefacto antes de firmarlo.
+- La comprobación por ruta no elimina por completo una carrera TOCTOU frente a un atacante local capaz de reemplazar el ejecutable entre la verificación y su inicio. No uses esta allowlist como frontera contra un administrador/atacante con control concurrente del host; usa artefactos inmutables, permisos de instalación restrictivos y aislamiento externo.
 - El hash se toma del ejecutable resuelto en el host. Esto no aísla el proceso, no impide egress y no sustituye sandbox/VM.
