@@ -3,13 +3,13 @@
 > Esta sección es la fuente de verdad vigente. Los bloques históricos que aparecen debajo documentan etapas anteriores y no deben interpretarse como el estado actual.
 
 **Rama:** `main`  
-**Último cambio de código y pruebas:** `39f197ea6aa96b30535d6a356084ae148756b898`  
+**Último commit de limpieza y documentación:** `dae09fb4bbf9b584abeb4552b3ac4e8e61c10961`  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17` (no modificado).  
-**CI del HEAD:** sin checks publicados/recuperables en la última consulta; queda pendiente de validación exacta.
+**CI del HEAD:** Python tests en ejecución y Docker sandbox en ejecución; resultado aún no confirmado.
 
 ## Limpieza estructural realizada
 
-Se eliminaron seis archivos sin consumidores de producción ni una función mantenida y probada:
+Se eliminaron seis archivos sin consumidores de producción ni una función mantenida y probada. El árbol quedó en 220 archivos (antes: 226):
 - `audit_target.py` y `test_api.py`: demo local aislada que simulaba un gateway de producción; no formaba parte del producto y dependía de Flask, ausente de las dependencias instaladas.
 - `agent_benchmark.py`: benchmark ad hoc contra `example.com` y una ruta local fija, sin integración ni pruebas.
 - `agent_core.py` y `tests/test_agent_core.py`: motor/prototipo independiente sustituido por el pipeline real de adaptadores, autorización y allowlist.
