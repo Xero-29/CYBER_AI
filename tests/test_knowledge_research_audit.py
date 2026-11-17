@@ -119,6 +119,16 @@ Referencia: https://example.org/source
             for error in report["areas"][0]["literature_review_errors"]
         ))
 
+
+    def test_accepts_dotted_source_identifier(self) -> None:
+        registry_path = self.root / "knowledge/research/source_registry.json"
+        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+        registry["sources"][0]["id"] = "OWASP-ASVS-5.0.0"
+        registry_path.write_text(json.dumps(registry), encoding="utf-8")
+        self.write_dossier("OWASP-ASVS-5.0.0")
+        report = audit_research_library(self.root)
+        self.assertEqual(report["traceable_literature_reviews"], 1)
+
     def test_requires_https_source_urls(self) -> None:
         registry_path = self.root / "knowledge/research/source_registry.json"
         registry = json.loads(registry_path.read_text(encoding="utf-8"))
