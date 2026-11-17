@@ -1,0 +1,1827 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-11-17",
+  "purpose": "Baseline crosswalk between CYBER_AI knowledge areas and selected authoritative cybersecurity frameworks, standards, taxonomies and technical specifications.",
+  "methodology": {
+    "scope": "Curated benchmark, not exhaustive census of all standards, laws, papers, tools, products or national requirements.",
+    "mapping": "A mapping means relevance to scope only. It does not prove that the source was read, that the pack covers it, or that a tool implements it.",
+    "depth": "All area content depth remains unassessed by this crosswalk.",
+    "types": "Workforce frameworks, control catalogs, specifications, taxonomies and research are different evidence classes and are not interchangeable.",
+    "percentage": "No total coverage percentage is calculated because no complete, weighted universe has been established."
+  },
+  "references": [
+    {
+      "id": "NIST-CSF-2",
+      "title": "NIST Cybersecurity Framework 2.0",
+      "publisher": "NIST",
+      "type": "framework",
+      "scope": "Govern, Identify, Protect, Detect, Respond, Recover.",
+      "domains": [
+        "foundations",
+        "governance",
+        "secure_arch",
+        "incident_response",
+        "business_continuity",
+        "vuln_management",
+        "soc_siem",
+        "devsecops"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "NIST-NICE-2.2",
+      "title": "NICE Framework Components 2.2.0",
+      "publisher": "NIST",
+      "type": "workforce",
+      "scope": "Work roles, competency areas and task/knowledge/skill statements; workforce mapping only.",
+      "domains": [
+        "foundations",
+        "appsec",
+        "api",
+        "network",
+        "linux",
+        "windows_ad",
+        "cloud",
+        "containers",
+        "mobile",
+        "crypto",
+        "identity",
+        "malware",
+        "forensics",
+        "incident_response",
+        "threat_intel",
+        "reverse",
+        "iot_hardware",
+        "devsecops",
+        "ai_security",
+        "governance",
+        "vuln_management",
+        "bug_bounty",
+        "secure_arch",
+        "data_security",
+        "software_engineering",
+        "machine_learning",
+        "hardware_security",
+        "mathematics",
+        "soc_siem",
+        "edr_xdr",
+        "threat_hunting",
+        "red_team",
+        "wireless_security",
+        "ot_ics",
+        "telecom_5g",
+        "automotive_security",
+        "satellite_security",
+        "physical_security",
+        "email_dns_security",
+        "fraud_abuse",
+        "privacy_engineering",
+        "cloud_forensics",
+        "ai_red_team",
+        "pki_hsm",
+        "post_quantum_crypto",
+        "business_continuity",
+        "database_security",
+        "vulnerability_research"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "NIST-800-53",
+      "title": "NIST SP 800-53 Rev. 5",
+      "publisher": "NIST",
+      "type": "controls",
+      "scope": "Security and privacy control catalog.",
+      "domains": [
+        "foundations",
+        "governance",
+        "secure_arch",
+        "identity",
+        "network",
+        "linux",
+        "windows_ad",
+        "cloud",
+        "containers",
+        "data_security",
+        "database_security",
+        "soc_siem",
+        "physical_security",
+        "business_continuity",
+        "privacy_engineering"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "NIST-800-61R3",
+      "title": "NIST SP 800-61 Rev. 3",
+      "publisher": "NIST",
+      "type": "guidance",
+      "scope": "Incident response and cybersecurity risk management.",
+      "domains": [
+        "incident_response",
+        "soc_siem",
+        "threat_hunting",
+        "edr_xdr",
+        "forensics",
+        "cloud_forensics",
+        "threat_intel",
+        "business_continuity"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "NIST-800-82R3",
+      "title": "NIST SP 800-82 Rev. 3",
+      "publisher": "NIST",
+      "type": "guidance",
+      "scope": "Operational technology security.",
+      "domains": [
+        "ot_ics",
+        "hardware_security",
+        "network",
+        "physical_security",
+        "automotive_security",
+        "satellite_security"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "NIST-800-115",
+      "title": "NIST SP 800-115",
+      "publisher": "NIST",
+      "type": "guidance",
+      "scope": "Technical security testing and assessment.",
+      "domains": [
+        "appsec",
+        "api",
+        "network",
+        "red_team",
+        "bug_bounty",
+        "vuln_management",
+        "vulnerability_research",
+        "wireless_security"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "NIST-800-207",
+      "title": "NIST SP 800-207 Zero Trust Architecture",
+      "publisher": "NIST",
+      "type": "guidance",
+      "scope": "Zero Trust architecture.",
+      "domains": [
+        "secure_arch",
+        "identity",
+        "network",
+        "cloud",
+        "containers",
+        "windows_ad"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "NIST-800-218",
+      "title": "NIST SP 800-218 SSDF",
+      "publisher": "NIST",
+      "type": "framework",
+      "scope": "Secure software development practices.",
+      "domains": [
+        "software_engineering",
+        "devsecops",
+        "appsec",
+        "api",
+        "containers",
+        "ai_security"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "NIST-800-161",
+      "title": "NIST SP 800-161 Rev. 1",
+      "publisher": "NIST",
+      "type": "guidance",
+      "scope": "Cybersecurity supply-chain risk management.",
+      "domains": [
+        "devsecops",
+        "software_engineering",
+        "cloud",
+        "hardware_security",
+        "iot_hardware",
+        "ai_security"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "NIST-800-88",
+      "title": "NIST SP 800-88 Rev. 2",
+      "publisher": "NIST",
+      "type": "guidance",
+      "scope": "Media sanitization and information disposition.",
+      "domains": [
+        "data_security",
+        "forensics",
+        "cloud_forensics",
+        "business_continuity",
+        "physical_security"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "NIST-800-86",
+      "title": "NIST SP 800-86",
+      "publisher": "NIST",
+      "type": "guidance",
+      "scope": "Integrating forensic techniques into incident response.",
+      "domains": [
+        "forensics",
+        "cloud_forensics",
+        "incident_response",
+        "malware",
+        "reverse"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "NIST-800-124",
+      "title": "NIST SP 800-124 Rev. 2",
+      "publisher": "NIST",
+      "type": "guidance",
+      "scope": "Enterprise mobile device security.",
+      "domains": [
+        "mobile",
+        "identity",
+        "data_security",
+        "incident_response"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "NIST-800-190",
+      "title": "NIST SP 800-190",
+      "publisher": "NIST",
+      "type": "guidance",
+      "scope": "Application container security.",
+      "domains": [
+        "containers",
+        "cloud",
+        "devsecops",
+        "software_engineering"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "NIST-800-63",
+      "title": "NIST SP 800-63",
+      "publisher": "NIST",
+      "type": "guidance",
+      "scope": "Digital identity proofing, authentication and federation.",
+      "domains": [
+        "identity",
+        "windows_ad",
+        "mobile",
+        "pki_hsm",
+        "api",
+        "cloud"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "NIST-800-34",
+      "title": "NIST SP 800-34 Rev. 1",
+      "publisher": "NIST",
+      "type": "guidance",
+      "scope": "Contingency planning and recovery.",
+      "domains": [
+        "business_continuity",
+        "incident_response",
+        "cloud",
+        "data_security"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "NIST-800-30",
+      "title": "NIST SP 800-30 Rev. 1",
+      "publisher": "NIST",
+      "type": "guidance",
+      "scope": "Risk assessment methodology.",
+      "domains": [
+        "governance",
+        "foundations",
+        "secure_arch",
+        "privacy_engineering",
+        "business_continuity"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "NIST-AI-RMF",
+      "title": "NIST AI Risk Management Framework",
+      "publisher": "NIST",
+      "type": "framework",
+      "scope": "AI risk governance, mapping, measurement and management.",
+      "domains": [
+        "ai_security",
+        "ai_red_team",
+        "machine_learning",
+        "governance",
+        "data_security"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "NIST-PRIVACY",
+      "title": "NIST Privacy Framework",
+      "publisher": "NIST",
+      "type": "framework",
+      "scope": "Privacy risk management outcomes.",
+      "domains": [
+        "privacy_engineering",
+        "governance",
+        "data_security",
+        "identity",
+        "fraud_abuse"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "MITRE-ATTACK-ENT",
+      "title": "MITRE ATT&CK Enterprise",
+      "publisher": "MITRE",
+      "type": "knowledge_base",
+      "scope": "Adversary tactics and techniques across enterprise platforms.",
+      "domains": [
+        "red_team",
+        "threat_intel",
+        "threat_hunting",
+        "soc_siem",
+        "edr_xdr",
+        "malware",
+        "windows_ad",
+        "linux",
+        "cloud",
+        "containers",
+        "network",
+        "identity",
+        "email_dns_security"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "MITRE-ATTACK-MOBILE",
+      "title": "MITRE ATT&CK Mobile",
+      "publisher": "MITRE",
+      "type": "knowledge_base",
+      "scope": "Adversary techniques for Android and iOS.",
+      "domains": [
+        "mobile",
+        "threat_intel",
+        "threat_hunting",
+        "edr_xdr"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "MITRE-ATTACK-ICS",
+      "title": "MITRE ATT&CK ICS",
+      "publisher": "MITRE",
+      "type": "knowledge_base",
+      "scope": "Adversary behavior in industrial control environments.",
+      "domains": [
+        "ot_ics",
+        "threat_intel",
+        "threat_hunting",
+        "red_team",
+        "hardware_security"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "MITRE-ATLAS",
+      "title": "MITRE ATLAS",
+      "publisher": "MITRE",
+      "type": "knowledge_base",
+      "scope": "Adversarial tactics and techniques targeting AI systems.",
+      "domains": [
+        "ai_security",
+        "ai_red_team",
+        "machine_learning",
+        "software_engineering",
+        "threat_intel"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "MITRE-D3FEND",
+      "title": "MITRE D3FEND",
+      "publisher": "MITRE",
+      "type": "knowledge_base",
+      "scope": "Countermeasure ontology and defensive techniques.",
+      "domains": [
+        "soc_siem",
+        "edr_xdr",
+        "threat_hunting",
+        "secure_arch",
+        "network",
+        "cloud",
+        "windows_ad",
+        "linux"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "OWASP-ASVS",
+      "title": "OWASP ASVS",
+      "publisher": "OWASP",
+      "type": "standard",
+      "scope": "Verifiable application security requirements.",
+      "domains": [
+        "appsec",
+        "software_engineering",
+        "secure_arch"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "OWASP-WSTG",
+      "title": "OWASP Web Security Testing Guide",
+      "publisher": "OWASP",
+      "type": "guide",
+      "scope": "Web application security testing methodology.",
+      "domains": [
+        "appsec",
+        "bug_bounty",
+        "red_team",
+        "vulnerability_research"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "OWASP-API",
+      "title": "OWASP API Security Top 10 (2023)",
+      "publisher": "OWASP",
+      "type": "taxonomy",
+      "scope": "API-specific security risk taxonomy, not a complete API standard.",
+      "domains": [
+        "api",
+        "appsec",
+        "cloud",
+        "identity"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "OWASP-MASVS",
+      "title": "OWASP MASVS",
+      "publisher": "OWASP",
+      "type": "standard",
+      "scope": "Mobile application security verification.",
+      "domains": [
+        "mobile",
+        "appsec",
+        "software_engineering"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "OWASP-LLM",
+      "title": "OWASP Top 10 for LLM Applications",
+      "publisher": "OWASP",
+      "type": "taxonomy",
+      "scope": "LLM application risk taxonomy, not a complete AI assurance framework.",
+      "domains": [
+        "ai_security",
+        "ai_red_team",
+        "machine_learning",
+        "appsec",
+        "api"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "CIS-CONTROLS-8.1",
+      "title": "CIS Controls v8.1",
+      "publisher": "CIS",
+      "type": "controls",
+      "scope": "Prioritized enterprise cybersecurity safeguards.",
+      "domains": [
+        "foundations",
+        "governance",
+        "network",
+        "linux",
+        "windows_ad",
+        "cloud",
+        "containers",
+        "mobile",
+        "identity",
+        "data_security",
+        "email_dns_security",
+        "soc_siem",
+        "edr_xdr",
+        "incident_response",
+        "vuln_management",
+        "devsecops"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "CIS-BENCHMARKS",
+      "title": "CIS Benchmarks",
+      "publisher": "CIS",
+      "type": "baseline",
+      "scope": "Platform-specific secure configuration baselines; pin exact benchmark and version.",
+      "domains": [
+        "linux",
+        "windows_ad",
+        "cloud",
+        "containers",
+        "database_security",
+        "network",
+        "mobile"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "ISO-27001",
+      "title": "ISO/IEC 27001:2022",
+      "publisher": "ISO/IEC",
+      "type": "standard",
+      "scope": "Information security management system requirements.",
+      "domains": [
+        "governance",
+        "foundations",
+        "secure_arch",
+        "business_continuity",
+        "incident_response",
+        "data_security",
+        "privacy_engineering"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "ISO-27002",
+      "title": "ISO/IEC 27002:2022",
+      "publisher": "ISO/IEC",
+      "type": "guidance",
+      "scope": "Information security controls guidance.",
+      "domains": [
+        "governance",
+        "foundations",
+        "identity",
+        "data_security",
+        "physical_security",
+        "network",
+        "incident_response"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "ISO-27005",
+      "title": "ISO/IEC 27005",
+      "publisher": "ISO/IEC",
+      "type": "standard",
+      "scope": "Information security risk management guidance.",
+      "domains": [
+        "governance",
+        "foundations",
+        "secure_arch",
+        "business_continuity",
+        "privacy_engineering"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "ISO-27701",
+      "title": "ISO/IEC 27701",
+      "publisher": "ISO/IEC",
+      "type": "standard",
+      "scope": "Privacy information management; check applicable edition.",
+      "domains": [
+        "privacy_engineering",
+        "governance",
+        "data_security",
+        "identity"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "ISO-42001",
+      "title": "ISO/IEC 42001:2023",
+      "publisher": "ISO/IEC",
+      "type": "standard",
+      "scope": "AI management system; does not replace technical AI testing.",
+      "domains": [
+        "ai_security",
+        "ai_red_team",
+        "machine_learning",
+        "governance",
+        "software_engineering"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "IEC-62443",
+      "title": "IEC 62443 series",
+      "publisher": "IEC",
+      "type": "standard",
+      "scope": "Industrial automation and control system cybersecurity.",
+      "domains": [
+        "ot_ics",
+        "hardware_security",
+        "iot_hardware",
+        "network",
+        "physical_security"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "ISO-22301",
+      "title": "ISO 22301",
+      "publisher": "ISO",
+      "type": "standard",
+      "scope": "Business continuity management system.",
+      "domains": [
+        "business_continuity",
+        "incident_response",
+        "cloud",
+        "telecom_5g",
+        "satellite_security"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "ISO-21434",
+      "title": "ISO/SAE 21434",
+      "publisher": "ISO/SAE",
+      "type": "standard",
+      "scope": "Cybersecurity engineering for road vehicles.",
+      "domains": [
+        "automotive_security",
+        "hardware_security",
+        "iot_hardware",
+        "software_engineering"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "UNECE-R155-R156",
+      "title": "UNECE Regulations R155/R156",
+      "publisher": "UNECE",
+      "type": "regulation",
+      "scope": "Vehicle cybersecurity and software update management; applicability is jurisdiction-specific.",
+      "domains": [
+        "automotive_security",
+        "software_engineering"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "ETSI-303645",
+      "title": "ETSI EN 303 645",
+      "publisher": "ETSI",
+      "type": "standard",
+      "scope": "Consumer IoT cybersecurity baseline.",
+      "domains": [
+        "iot_hardware",
+        "hardware_security",
+        "wireless_security"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "RFC-8446",
+      "title": "RFC 8446 TLS 1.3",
+      "publisher": "IETF",
+      "type": "specification",
+      "scope": "TLS 1.3 protocol specification.",
+      "domains": [
+        "network",
+        "crypto",
+        "pki_hsm",
+        "email_dns_security",
+        "api",
+        "cloud"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "RFC-5280",
+      "title": "RFC 5280 X.509 PKI",
+      "publisher": "IETF",
+      "type": "specification",
+      "scope": "Internet X.509 certificate and CRL profile.",
+      "domains": [
+        "pki_hsm",
+        "crypto",
+        "identity",
+        "network",
+        "email_dns_security"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "FIPS-140-3",
+      "title": "FIPS 140-3",
+      "publisher": "NIST",
+      "type": "standard",
+      "scope": "Cryptographic module security requirements.",
+      "domains": [
+        "crypto",
+        "pki_hsm",
+        "hardware_security",
+        "post_quantum_crypto"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "NIST-PQC-FIPS",
+      "title": "NIST FIPS 203/204/205",
+      "publisher": "NIST",
+      "type": "standard",
+      "scope": "ML-KEM, ML-DSA and SLH-DSA standards; migration and implementation assurance remain separate.",
+      "domains": [
+        "post_quantum_crypto",
+        "crypto",
+        "pki_hsm",
+        "secure_arch"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "CVE",
+      "title": "CVE Program",
+      "publisher": "CVE Program",
+      "type": "taxonomy",
+      "scope": "Identifiers for publicly disclosed vulnerabilities.",
+      "domains": [
+        "vuln_management",
+        "vulnerability_research",
+        "bug_bounty",
+        "appsec",
+        "api",
+        "software_engineering"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "CWE",
+      "title": "CWE Program",
+      "publisher": "MITRE",
+      "type": "taxonomy",
+      "scope": "Common software and hardware weakness taxonomy.",
+      "domains": [
+        "vuln_management",
+        "vulnerability_research",
+        "appsec",
+        "api",
+        "software_engineering",
+        "hardware_security"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "CVSS-4",
+      "title": "CVSS v4.0",
+      "publisher": "FIRST",
+      "type": "method",
+      "scope": "Vulnerability severity scoring; score is not risk by itself.",
+      "domains": [
+        "vuln_management",
+        "vulnerability_research",
+        "bug_bounty",
+        "appsec",
+        "api"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "CAPEC",
+      "title": "CAPEC",
+      "publisher": "MITRE",
+      "type": "taxonomy",
+      "scope": "Common attack pattern taxonomy.",
+      "domains": [
+        "vulnerability_research",
+        "appsec",
+        "api",
+        "red_team",
+        "malware",
+        "reverse"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "CISA-KEV",
+      "title": "CISA Known Exploited Vulnerabilities Catalog",
+      "publisher": "CISA",
+      "type": "catalog",
+      "scope": "Known exploited vulnerabilities; not an exhaustive exploitation list.",
+      "domains": [
+        "vuln_management",
+        "vulnerability_research",
+        "threat_intel",
+        "soc_siem"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "FIRST-EPSS",
+      "title": "FIRST EPSS",
+      "publisher": "FIRST",
+      "type": "model",
+      "scope": "Exploit prediction probability; not a severity score.",
+      "domains": [
+        "vuln_management",
+        "vulnerability_research",
+        "threat_intel"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "FIRST-CSIRT",
+      "title": "FIRST CSIRT Services Framework",
+      "publisher": "FIRST",
+      "type": "framework",
+      "scope": "Reference for CSIRT service capabilities.",
+      "domains": [
+        "incident_response",
+        "soc_siem",
+        "threat_intel",
+        "forensics"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "FIRST-TLP",
+      "title": "FIRST TLP 2.0",
+      "publisher": "FIRST",
+      "type": "standard",
+      "scope": "Traffic Light Protocol for information sharing.",
+      "domains": [
+        "threat_intel",
+        "incident_response",
+        "soc_siem",
+        "fraud_abuse"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "CSA-CCM",
+      "title": "CSA Cloud Controls Matrix",
+      "publisher": "CSA",
+      "type": "controls",
+      "scope": "Cloud security controls and mappings.",
+      "domains": [
+        "cloud",
+        "containers",
+        "data_security",
+        "identity",
+        "governance",
+        "cloud_forensics"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "PCI-DSS",
+      "title": "PCI DSS v4.0.1",
+      "publisher": "PCI SSC",
+      "type": "standard",
+      "scope": "Payment account data security; limited to payment-card scope.",
+      "domains": [
+        "database_security",
+        "data_security",
+        "network",
+        "appsec",
+        "api",
+        "identity",
+        "governance"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "3GPP-33501",
+      "title": "3GPP TS 33.501",
+      "publisher": "3GPP",
+      "type": "specification",
+      "scope": "Security architecture and procedures for 5G systems.",
+      "domains": [
+        "telecom_5g",
+        "network",
+        "identity",
+        "crypto",
+        "iot_hardware"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "CCSDS-SECURITY",
+      "title": "CCSDS security recommendations and Blue Books",
+      "publisher": "CCSDS",
+      "type": "reference_family",
+      "scope": "Space data-system security; select exact document and mission profile.",
+      "domains": [
+        "satellite_security",
+        "network",
+        "crypto",
+        "pki_hsm",
+        "hardware_security"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "NIST-IR-8259",
+      "title": "NISTIR 8259 series",
+      "publisher": "NIST",
+      "type": "guidance",
+      "scope": "IoT cybersecurity capabilities and manufacturer/consumer guidance.",
+      "domains": [
+        "iot_hardware",
+        "hardware_security",
+        "wireless_security"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "NIST-800-92",
+      "title": "NIST SP 800-92",
+      "publisher": "NIST",
+      "type": "guidance",
+      "scope": "Computer security log management; check revision status.",
+      "domains": [
+        "soc_siem",
+        "threat_hunting",
+        "incident_response",
+        "edr_xdr",
+        "forensics"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "NIST-800-193",
+      "title": "NIST SP 800-193",
+      "publisher": "NIST",
+      "type": "guidance",
+      "scope": "Platform firmware resiliency.",
+      "domains": [
+        "hardware_security",
+        "iot_hardware",
+        "windows_ad",
+        "linux"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "STIX-TAXII",
+      "title": "OASIS STIX 2.1 / TAXII 2.1",
+      "publisher": "OASIS",
+      "type": "specification",
+      "scope": "Structured cyber threat information representation and exchange.",
+      "domains": [
+        "threat_intel",
+        "soc_siem",
+        "incident_response",
+        "fraud_abuse"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    },
+    {
+      "id": "SLSA",
+      "title": "SLSA Supply-chain Levels for Software Artifacts",
+      "publisher": "OpenSSF",
+      "type": "framework",
+      "scope": "Software artifact supply-chain integrity; pin version/profile.",
+      "domains": [
+        "devsecops",
+        "software_engineering",
+        "containers",
+        "cloud",
+        "ai_security"
+      ],
+      "verification_status": "official_reference_catalogued_not_full_text_reviewed",
+      "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
+    }
+  ],
+  "areas": [
+    {
+      "id": "foundations",
+      "reference_ids": [
+        "NIST-CSF-2",
+        "NIST-NICE-2.2",
+        "NIST-800-53",
+        "NIST-800-30",
+        "CIS-CONTROLS-8.1",
+        "ISO-27001",
+        "ISO-27002"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "appsec",
+      "reference_ids": [
+        "OWASP-ASVS",
+        "OWASP-WSTG",
+        "OWASP-API",
+        "CWE",
+        "CAPEC",
+        "NIST-800-115",
+        "NIST-800-218"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "api",
+      "reference_ids": [
+        "OWASP-API",
+        "OWASP-ASVS",
+        "CWE",
+        "CAPEC",
+        "RFC-8446",
+        "NIST-800-63"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "network",
+      "reference_ids": [
+        "NIST-800-53",
+        "NIST-800-207",
+        "MITRE-ATTACK-ENT",
+        "MITRE-D3FEND",
+        "CIS-BENCHMARKS",
+        "RFC-8446",
+        "3GPP-33501"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "linux",
+      "reference_ids": [
+        "MITRE-ATTACK-ENT",
+        "MITRE-D3FEND",
+        "CIS-BENCHMARKS",
+        "NIST-800-53"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "windows_ad",
+      "reference_ids": [
+        "MITRE-ATTACK-ENT",
+        "MITRE-D3FEND",
+        "CIS-BENCHMARKS",
+        "NIST-800-53",
+        "NIST-800-63"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "cloud",
+      "reference_ids": [
+        "CSA-CCM",
+        "NIST-800-207",
+        "NIST-800-53",
+        "NIST-800-161",
+        "CIS-BENCHMARKS",
+        "MITRE-ATTACK-ENT",
+        "ISO-22301"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "containers",
+      "reference_ids": [
+        "NIST-800-190",
+        "CIS-BENCHMARKS",
+        "CSA-CCM",
+        "SLSA",
+        "MITRE-ATTACK-ENT"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "mobile",
+      "reference_ids": [
+        "OWASP-MASVS",
+        "NIST-800-124",
+        "MITRE-ATTACK-MOBILE",
+        "NIST-800-63"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "crypto",
+      "reference_ids": [
+        "FIPS-140-3",
+        "NIST-PQC-FIPS",
+        "RFC-8446",
+        "RFC-5280"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "identity",
+      "reference_ids": [
+        "NIST-800-63",
+        "NIST-800-53",
+        "RFC-5280",
+        "NIST-800-207",
+        "MITRE-ATTACK-ENT"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "malware",
+      "reference_ids": [
+        "MITRE-ATTACK-ENT",
+        "MITRE-D3FEND",
+        "CAPEC",
+        "NIST-800-86"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "forensics",
+      "reference_ids": [
+        "NIST-800-86",
+        "NIST-800-61R3",
+        "FIRST-CSIRT",
+        "NIST-800-88"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "incident_response",
+      "reference_ids": [
+        "NIST-800-61R3",
+        "FIRST-CSIRT",
+        "NIST-CSF-2",
+        "MITRE-ATTACK-ENT",
+        "FIRST-TLP"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "threat_intel",
+      "reference_ids": [
+        "MITRE-ATTACK-ENT",
+        "MITRE-ATTACK-MOBILE",
+        "MITRE-ATTACK-ICS",
+        "STIX-TAXII",
+        "FIRST-TLP",
+        "CISA-KEV",
+        "FIRST-EPSS"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "reverse",
+      "reference_ids": [
+        "CWE",
+        "CAPEC",
+        "MITRE-ATTACK-ENT",
+        "NIST-800-86"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "iot_hardware",
+      "reference_ids": [
+        "NIST-IR-8259",
+        "ETSI-303645",
+        "IEC-62443",
+        "NIST-800-193"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "devsecops",
+      "reference_ids": [
+        "NIST-800-218",
+        "NIST-800-161",
+        "SLSA",
+        "CIS-CONTROLS-8.1",
+        "CWE"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "ai_security",
+      "reference_ids": [
+        "NIST-AI-RMF",
+        "MITRE-ATLAS",
+        "OWASP-LLM",
+        "ISO-42001",
+        "NIST-800-218"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "Model supply chain, training data, inference, agents, RAG, extraction, privacy, evaluation and deployment need threat-model-specific coverage."
+      ]
+    },
+    {
+      "id": "governance",
+      "reference_ids": [
+        "NIST-CSF-2",
+        "NIST-800-53",
+        "NIST-800-30",
+        "ISO-27001",
+        "ISO-27005",
+        "NIST-PRIVACY"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "vuln_management",
+      "reference_ids": [
+        "CVE",
+        "CWE",
+        "CVSS-4",
+        "CISA-KEV",
+        "FIRST-EPSS",
+        "NIST-800-115"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "bug_bounty",
+      "reference_ids": [
+        "OWASP-WSTG",
+        "CVE",
+        "CWE",
+        "CVSS-4",
+        "NIST-800-115",
+        "CAPEC"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "secure_arch",
+      "reference_ids": [
+        "NIST-800-207",
+        "NIST-800-53",
+        "NIST-CSF-2",
+        "ISO-27005",
+        "NIST-800-218"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "data_security",
+      "reference_ids": [
+        "NIST-800-88",
+        "NIST-800-53",
+        "ISO-27002",
+        "ISO-27701",
+        "NIST-PRIVACY",
+        "PCI-DSS"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "software_engineering",
+      "reference_ids": [
+        "NIST-800-218",
+        "SLSA",
+        "CWE",
+        "OWASP-ASVS",
+        "ISO-21434"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "machine_learning",
+      "reference_ids": [
+        "NIST-AI-RMF",
+        "MITRE-ATLAS",
+        "OWASP-LLM",
+        "ISO-42001"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "hardware_security",
+      "reference_ids": [
+        "NIST-800-193",
+        "FIPS-140-3",
+        "IEC-62443",
+        "NIST-800-82R3",
+        "NIST-IR-8259"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "mathematics",
+      "reference_ids": [
+        "NIST-AI-RMF",
+        "FIPS-140-3",
+        "NIST-PQC-FIPS"
+      ],
+      "coverage_status": "partial_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "No dedicated cybersecurity mathematical curriculum is established; formal methods, statistics, optimization, cryptanalysis and measurement need primary academic sources."
+      ]
+    },
+    {
+      "id": "soc_siem",
+      "reference_ids": [
+        "NIST-800-61R3",
+        "NIST-800-92",
+        "MITRE-ATTACK-ENT",
+        "MITRE-D3FEND",
+        "FIRST-CSIRT"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "edr_xdr",
+      "reference_ids": [
+        "MITRE-ATTACK-ENT",
+        "MITRE-ATTACK-MOBILE",
+        "MITRE-D3FEND",
+        "NIST-800-61R3",
+        "CIS-CONTROLS-8.1"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "threat_hunting",
+      "reference_ids": [
+        "MITRE-ATTACK-ENT",
+        "MITRE-ATTACK-MOBILE",
+        "MITRE-ATTACK-ICS",
+        "MITRE-D3FEND",
+        "NIST-800-92"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "red_team",
+      "reference_ids": [
+        "MITRE-ATTACK-ENT",
+        "MITRE-ATTACK-ICS",
+        "NIST-800-115",
+        "OWASP-WSTG",
+        "CAPEC"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "wireless_security",
+      "reference_ids": [
+        "NIST-800-115",
+        "CIS-BENCHMARKS",
+        "ETSI-303645",
+        "NIST-IR-8259"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "Bluetooth LE, NFC, UWB, Zigbee/Thread, Wi-Fi generations, SDR and RF test suites need protocol-specific specifications."
+      ]
+    },
+    {
+      "id": "ot_ics",
+      "reference_ids": [
+        "IEC-62443",
+        "NIST-800-82R3",
+        "MITRE-ATTACK-ICS",
+        "NIST-CSF-2"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "SIS safety lifecycle, PLC/DCS/SCADA protocols, engineering workstations and process-specific threat models need asset/vendor-specific evidence."
+      ]
+    },
+    {
+      "id": "telecom_5g",
+      "reference_ids": [
+        "3GPP-33501",
+        "ISO-22301",
+        "NIST-800-53",
+        "RFC-8446"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "RAN/core, slicing, Open RAN, SIM/eSIM, lawful intercept controls and 6G research need detailed 3GPP/ETSI releases."
+      ]
+    },
+    {
+      "id": "automotive_security",
+      "reference_ids": [
+        "ISO-21434",
+        "UNECE-R155-R156",
+        "NIST-800-82R3",
+        "IEC-62443"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "Vehicle lifecycle, ECU/OTA, V2X, CAN/Ethernet, safety-security co-engineering and supplier evidence need jurisdiction-specific work."
+      ]
+    },
+    {
+      "id": "satellite_security",
+      "reference_ids": [
+        "CCSDS-SECURITY",
+        "NIST-800-82R3",
+        "ISO-22301",
+        "FIPS-140-3"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "Mission-specific space standards, ground segment, TT&C, RF, orbital/physical threats, supply chain and mission assurance need a deeper CCSDS/agency crosswalk."
+      ]
+    },
+    {
+      "id": "physical_security",
+      "reference_ids": [
+        "NIST-800-53",
+        "ISO-27002",
+        "IEC-62443",
+        "NIST-800-82R3"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "Facility access, tamper resistance, insider threat, environmental controls and cyber-physical safety need site-specific standards and assessment."
+      ]
+    },
+    {
+      "id": "email_dns_security",
+      "reference_ids": [
+        "RFC-8446",
+        "RFC-5280",
+        "MITRE-ATTACK-ENT",
+        "CIS-CONTROLS-8.1"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "DNSSEC, SPF, DKIM, DMARC, MTA-STS, DANE, BIMI, registrar security and BGP dependencies need protocol-by-protocol mapping."
+      ]
+    },
+    {
+      "id": "fraud_abuse",
+      "reference_ids": [
+        "NIST-PRIVACY",
+        "FIRST-TLP",
+        "STIX-TAXII",
+        "NIST-CSF-2"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "Fraud typologies, payment fraud, account takeover, bot abuse, trust and safety, and financial-crime regulation need specialist sources."
+      ]
+    },
+    {
+      "id": "privacy_engineering",
+      "reference_ids": [
+        "NIST-PRIVACY",
+        "ISO-27701",
+        "ISO-27001",
+        "NIST-800-53"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "Jurisdiction-specific legal bases, rights, DPIAs, cross-border transfers and privacy engineering need legal and technical review."
+      ]
+    },
+    {
+      "id": "cloud_forensics",
+      "reference_ids": [
+        "NIST-800-86",
+        "NIST-800-61R3",
+        "CSA-CCM",
+        "NIST-800-88"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "Provider-specific evidence acquisition, ephemeral workloads, multi-tenant boundaries, retention, legal hold and chain of custody need cloud procedures."
+      ]
+    },
+    {
+      "id": "ai_red_team",
+      "reference_ids": [
+        "MITRE-ATLAS",
+        "OWASP-LLM",
+        "NIST-AI-RMF",
+        "ISO-42001"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "Agent autonomy, tool permissions, prompt injection, multi-agent trust, memory poisoning, sandbox escape and evaluation benchmarks need current research."
+      ]
+    },
+    {
+      "id": "pki_hsm",
+      "reference_ids": [
+        "RFC-5280",
+        "FIPS-140-3",
+        "NIST-800-63",
+        "NIST-PQC-FIPS"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "Key ceremonies, HSM assurance, cloud KMS, lifecycle, revocation, transparency logs and crypto agility need product/architecture-specific evidence."
+      ]
+    },
+    {
+      "id": "post_quantum_crypto",
+      "reference_ids": [
+        "NIST-PQC-FIPS",
+        "FIPS-140-3",
+        "RFC-5280"
+      ],
+      "coverage_status": "partial_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "Crypto inventory, agility, hybrid protocols, interoperability, side-channel resistance and migration planning are not proven by listing algorithms."
+      ]
+    },
+    {
+      "id": "business_continuity",
+      "reference_ids": [
+        "ISO-22301",
+        "NIST-800-34",
+        "NIST-CSF-2",
+        "NIST-800-53"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "RTO/RPO, immutable recovery, ransomware recovery, crisis communications, exercises and third-party continuity need scenario evidence."
+      ]
+    },
+    {
+      "id": "database_security",
+      "reference_ids": [
+        "CIS-BENCHMARKS",
+        "NIST-800-53",
+        "PCI-DSS",
+        "CWE"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    },
+    {
+      "id": "vulnerability_research",
+      "reference_ids": [
+        "CVE",
+        "CWE",
+        "CAPEC",
+        "CVSS-4",
+        "CISA-KEV",
+        "FIRST-EPSS",
+        "NIST-800-115"
+      ],
+      "coverage_status": "mapped_scope_only",
+      "content_depth_status": "not_assessed_by_this_crosswalk",
+      "known_gaps": [
+        "The crosswalk only identifies relevant reference families. Domain-specific subtopics, versions, procedures, tools, evidence and independent review remain to be assessed."
+      ]
+    }
+  ],
+  "cross_cutting_gaps": [
+    {
+      "id": "GAP-01",
+      "topic": "National and sector regulation",
+      "detail": "No jurisdiction-by-jurisdiction inventory for privacy, finance, healthcare, critical infrastructure, telecom, export controls and breach notification.",
+      "priority": "critical"
+    },
+    {
+      "id": "GAP-02",
+      "topic": "Academic literature",
+      "detail": "No systematic search, inclusion/exclusion protocol, quality appraisal or full-text synthesis across all domains.",
+      "priority": "critical"
+    },
+    {
+      "id": "GAP-03",
+      "topic": "Tool and product landscape",
+      "detail": "No verified living catalog of OSS/commercial tools, licenses, versions, maintenance, adapters and operational test evidence.",
+      "priority": "high"
+    },
+    {
+      "id": "GAP-04",
+      "topic": "Protocol and technology versions",
+      "detail": "No exhaustive protocol/platform inventory with editions, deprecations, interoperability profiles and conformance suites.",
+      "priority": "high"
+    },
+    {
+      "id": "GAP-05",
+      "topic": "Experimental evidence",
+      "detail": "No cross-domain experiments, statistical synthesis or independent replication evidenced by this audit.",
+      "priority": "critical"
+    },
+    {
+      "id": "GAP-06",
+      "topic": "Safety-critical systems",
+      "detail": "OT, automotive, medical, aerospace, satellite and physical systems require safety cases and authorized test facilities.",
+      "priority": "critical"
+    },
+    {
+      "id": "GAP-07",
+      "topic": "Regional and language coverage",
+      "detail": "No complete coverage of national standards, local regulations or authoritative Spanish-language sources in every specialty.",
+      "priority": "medium"
+    },
+    {
+      "id": "GAP-08",
+      "topic": "Emerging technology surveillance",
+      "detail": "No continuous change-detection for standards, advisories, vulnerabilities, papers and tool releases.",
+      "priority": "high"
+    }
+  ]
+}
