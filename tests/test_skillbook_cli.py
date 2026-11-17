@@ -53,6 +53,16 @@ class SkillbookCliTests(unittest.TestCase):
 
 
 
+    def test_review_due_command_calls_review_report(self):
+        with patch.object(
+            skillbook_cli.skillbook,
+            "list_skills_due_for_review",
+            return_value=[{"skill_id": "skill-1"}],
+        ) as review, patch("builtins.print"):
+            result = skillbook_cli.main(["review-due", "--max-age-days", "90"])
+        self.assertEqual(result, 0)
+        review.assert_called_once_with(90)
+
     def test_deprecate_payload_calls_signed_revocation_api(self):
         with patch.object(
             skillbook_cli.skillbook,
