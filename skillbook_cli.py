@@ -51,6 +51,9 @@ def main(argv=None):
     rollback.add_argument("--target-version", type=int, required=True)
     rollback.add_argument("--signature", required=True)
 
+    review_due = sub.add_parser("review-due")
+    review_due.add_argument("--max-age-days", type=int, default=180)
+
     deprecate_payload = sub.add_parser("deprecate-payload")
     deprecate_payload.add_argument("--skill-id", required=True)
     deprecate_payload.add_argument("--reason", required=True)
@@ -85,6 +88,10 @@ def main(argv=None):
             result = skillbook.rollback_skill_version(
                 args.skill_id, args.target_version, args.signature
             )
+        elif args.command == "review-due":
+            result = {"skills_due_for_review": skillbook.list_skills_due_for_review(
+                args.max_age_days
+            )}
         elif args.command == "deprecate-payload":
             result = {"deprecation_payload": skillbook.skill_deprecation_payload(
                 args.skill_id, args.reason
