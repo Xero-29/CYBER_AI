@@ -29,3 +29,11 @@ Revisar el borrador Rev. 1 completo y su estado actual antes de fijar política;
 - `NIST-SP-800-92R1-IPD`
 - `NIST-LOG-MANAGEMENT-PROJECT`
 - `NIST-SP-800-61r3`
+
+
+## Identificadores del registro de fuentes
+
+- `NIST-SP-800-92`
+- `NIST-SP-800-92R1-IPD`
+- `NIST-LOG-MANAGEMENT-PROJECT`
+- `NIST-SP-800-61r3`
