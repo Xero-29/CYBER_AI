@@ -156,6 +156,38 @@ def validate_secret_hygiene(config):
     return findings
 
 
+def validate_env_file_permissions(root):
+    """Rechaza archivos .env reales que sean legibles por grupo/otros o symlinks."""
+    import stat
+
+    findings = []
+    root = Path(root)
+    for path in sorted(root.glob(".env*")):
+        if path.name in {".env.example", ".env.sample", ".env.template"}:
+            continue
+        try:
+            if path.is_symlink():
+                findings.append({
+                    "path": path.name,
+                    "reason": "El archivo de entorno no debe ser un enlace simbólico.",
+                })
+                continue
+            if not path.is_file():
+                continue
+            mode = stat.S_IMODE(path.stat(follow_symlinks=False).st_mode)
+            if mode & (stat.S_IRGRP | stat.S_IROTH):
+                findings.append({
+                    "path": path.name,
+                    "reason": "Permisos inseguros: el archivo .env es legible por grupo u otros; usar chmod 600.",
+                })
+        except OSError:
+            findings.append({
+                "path": path.name,
+                "reason": "No se pudieron verificar los permisos del archivo de entorno.",
+            })
+    return findings
+
+
 def collect_checks(root=PROJECT, python_version=None, module_lookup=None,
                    executable_lookup=None, environ=None):
     root = Path(root)
@@ -202,6 +234,13 @@ def collect_checks(root=PROJECT, python_version=None, module_lookup=None,
                     add(route["name"], route["status"], route["detail"])
         except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
             add("model_config", "error", f"Configuración ilegible: {error}")
+
+    for finding in validate_env_file_permissions(root):
+        add(
+            "env_file_permissions",
+            "error",
+            f"{finding['path']}: {finding['reason']}",
+        )
 
     for module in REQUIRED_MODULES:
         try:
