@@ -320,3 +320,12 @@ No declarar el sistema completo ni certificado hasta que cada brecha tenga códi
   - Docker build, suite completa y Ruff dentro del sandbox: **success** — https://github.com/Xero-29/CYBER_AI/actions/runs/44107141220
 - Comparación con `main`: 435 commits adelante, 0 detrás. PR #2 abierto como draft, no fusionado.
 
+## Aclaraciones finales de seguridad de ejecución — 17-11-2026
+
+- **Egress local:** los adaptadores host no aíslan la red del proceso. La evidencia lo declara explícitamente como `network_access: not_enforced` y `network_isolation_enforced: false`. Bloquear adaptadores que requieren red no impide que un binario local intente conexiones. El runner Docker usa `--network=none` para las herramientas instaladas en esa imagen (actualmente Ruff y Bandit); no generalizar ese aislamiento a los adaptadores ejecutados directamente en host.
+- **Publicación de evidencia:** escritura en archivo temporal privado, flush/fsync, publicación por reemplazo atómico y fsync del directorio en POSIX. Archivos 0600 y directorios 0700 en POSIX; Windows requiere ACL privadas que el código no configura por sí solo.
+- **HEAD de código y documentación validado:** `7fab89000660664a3fe16d61ca43f0fdda5efda8`.
+  - Python suite + preflight + hashes de wheels + SBOM: **success** — https://github.com/Xero-29/CYBER_AI/actions/runs/44107553414
+  - Docker build + suite completa + Ruff en sandbox sin red: **success** — https://github.com/Xero-29/CYBER_AI/actions/runs/44107553436
+- **Límite:** el runner Docker solo cubre herramientas incluidas en la imagen. Los demás adaptadores no heredan automáticamente aislamiento de red ni microVM.
+
