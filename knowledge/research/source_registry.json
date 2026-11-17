@@ -325,7 +325,7 @@
       "url": "https://doi.org/10.6028/NIST.SP.800-61r3",
       "version": "Revision 3",
       "published": "2025-04-03",
-      "verification_status": "official_metadata_verified",
+      "verification_status": "official_pdf_sections_inspected",
       "verified_scope": "Integra recomendaciones de respuesta a incidentes en actividades de gestión del riesgo alineadas con CSF 2.0; sustituye SP 800-61 Rev. 2.",
       "domains": [
         "incident_response",
@@ -334,7 +334,7 @@
         "business_continuity",
         "forensics"
       ],
-      "review_note": "Metadatos, fecha, alcance y supersesión revisados en página oficial NIST; leer el documento completo y registrar secciones antes de citar afirmaciones técnicas."
+      "review_note": "Se inspeccionaron portada, Executive Summary, modelo de ciclo de vida en páginas impresas 4–6 y fragmentos de contención/respuesta en páginas 31–32 del PDF oficial. No se declara lectura exhaustiva de todo el documento."
     },
     {
       "id": "NIST-SP-800-63-4",
