@@ -3,7 +3,7 @@
 > Esta sección describe el HEAD auditado; los bloques históricos inferiores son contexto.
 
 **Rama:** `main`  
-**Último cambio funcional de integración:** `d560a11cc890a02a0388ebbb27c36044832f8d02` (matriz de dominios, planificación y pruebas de regresión). Docker sandbox CI: aprobado en run `44130731532`, con 510 pruebas, build del sandbox YARA/TShark y smoke Ruff aprobados sobre este SHA. El workflow Python independiente `44130731618` seguía pendiente al actualizar este estado. Las pruebas Windows siguen aplazadas.  
+**Último cambio funcional de integración:** `d560a11cc890a02a0388ebbb27c36044832f8d02` (matriz de dominios, planificación y pruebas de regresión). Docker sandbox CI: aprobado en run `44130731532`, con 510 pruebas, build del sandbox YARA/TShark y smoke Ruff aprobados sobre este SHA. El workflow Python independiente `44130731618` fue cancelado por commits posteriores mientras esperaba runner; no aporta un resultado de pruebas. Las pruebas Windows siguen aplazadas.  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17`, sin modificar.
 
 ## Integración de dominios, herramientas y Skills
