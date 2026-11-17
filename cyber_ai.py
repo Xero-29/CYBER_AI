@@ -116,6 +116,11 @@ def main():
     parser.add_argument("--no-knowledge", action="store_true", help="Desactivar recuperación de conocimiento en --ask.")
     parser.add_argument("--confirm-authorized", action="store_true", help="Confirmación adicional del operador.")
     parser.add_argument("--authorization-id", help="ID de autorización local, vigente y limitada al destino.")
+    parser.add_argument("--nuclei-templates", help="Directorio local de plantillas HTTP de Nuclei.")
+    parser.add_argument("--scan-severity", default="info,low,medium,high,critical", help="Severidades Nuclei separadas por coma.")
+    parser.add_argument("--scan-timeout", type=int, default=300, help="Tiempo máximo del escaneo Nuclei (5-3600 s).")
+    parser.add_argument("--scan-rate-limit", type=int, default=2, help="Máximo de solicitudes Nuclei por segundo (1-20).")
+    parser.add_argument("--scan-concurrency", type=int, default=2, help="Concurrencia Nuclei (1-10).")
     args = parser.parse_args()
 
     if args.team:
@@ -174,8 +179,14 @@ def main():
         try:
             result = scan_target(
                 args.scan,
+                timeout=args.scan_timeout,
                 authorized=args.confirm_authorized,
                 authorization_id=args.authorization_id,
+                require_ledger=True,
+                templates_path=args.nuclei_templates,
+                severity=args.scan_severity,
+                rate_limit=args.scan_rate_limit,
+                concurrency=args.scan_concurrency,
             )
             output_dir = Path("reports")
             output_dir.mkdir(parents=True, exist_ok=True)
@@ -204,6 +215,12 @@ def main():
             print(f"Objetivo inválido: {exc}", file=sys.stderr)
             return 2
 
+    if (args.nuclei_templates or args.authorization_id or args.confirm_authorized
+            or args.scan_severity != "info,low,medium,high,critical"
+            or args.scan_timeout != 300 or args.scan_rate_limit != 2
+            or args.scan_concurrency != 2) and not args.scan:
+        parser.error("Las opciones de Nuclei requieren --scan.")
+ 
     if args.self_test:
         required = [
             "report_analyzer.py", "nvd_client.py", "report_manager.py",
