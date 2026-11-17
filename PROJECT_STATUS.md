@@ -3,7 +3,7 @@
 > Esta sección describe el HEAD auditado; los bloques históricos inferiores son contexto.
 
 **Rama:** `main`  
-**Último cambio funcional de integración:** `d560a11cc890a02a0388ebbb27c36044832f8d02` (matriz de dominios, planificación y pruebas de regresión). Docker sandbox CI: aprobado en run `44130731532`, con 510 pruebas, build del sandbox YARA/TShark y smoke Ruff aprobados sobre este SHA. El workflow Python independiente `44130731618` fue cancelado por commits posteriores mientras esperaba runner; no aporta un resultado de pruebas. Las pruebas Windows siguen aplazadas.  
+**Último cambio funcional de integración:** `31726b15a8555f558bfcb739fb04b9e51d357908` (auditoría de investigación, trazabilidad de fuentes y equivalencias de estructura). Validación CI aprobada en Python run `44140837562` (522 pruebas, SBOM/provenance generados) y Docker run `44140837454` (imágenes base y análisis YARA/TShark, verificación completa y Ruff en sandbox). Las pruebas Windows siguen aplazadas.  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17`, sin modificar.
 
 ## Integración de dominios, herramientas y Skills
@@ -112,3 +112,12 @@
 - **Madurez real:** M1 documental en los 13 dossiers; no se declara M3/M4/M5. No existen resultados experimentales ni reproducción independiente en esta ampliación.
 - **Pendiente:** completar revisiones de las 35 áreas, lectura integral y crítica de las fuentes, laboratorios seguros, resultados cuantitativos, análisis de incertidumbre, revisión por pares y reproducción externa.
 - **CI:** los cambios disparan workflows por push. No declarar aprobado hasta comprobar el resultado de los runs asociados al SHA final de esta actualización.
+
+
+## Validación CI de la ampliación de investigación — 2026-11-17
+
+- SHA validado: `31726b15a8555f558bfcb739fb04b9e51d357908`.
+- Python workflow `44140837562`: **success**. `verify.sh` completó preflight, compilación, self-test, procedencia, auditoría de investigación y suite de **522 pruebas**. Se generaron SBOM CycloneDX y metadatos de provenance, y se subieron como artefactos.
+- Docker workflow `44140837454`: **success**. Construyó el sandbox general y la imagen de análisis YARA/TShark; ejecutó `verify.sh` con pruebas Docker habilitadas y Ruff dentro del sandbox endurecido; evidencia subida como artefacto.
+- La auditoría de investigación confirmó 48/48 agendas estructuralmente completas, 13/48 revisiones bibliográficas trazables y 33 registros de fuentes. Las 35 revisiones faltantes siguen pendientes; la auditoría no convierte agendas ni revisiones documentales en investigación empírica.
+- Estos resultados corresponden al SHA indicado. Este commit añade únicamente el registro documental de esos resultados.
