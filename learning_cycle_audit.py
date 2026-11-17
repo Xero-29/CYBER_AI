@@ -26,6 +26,12 @@ def _memory_line_count(path: Path) -> int:
 
 def audit_learning_cycle(*, max_review_age_days: int = 180) -> dict:
     """Inspecciona integridad y coherencia sin modificar eventos ni Skills."""
+    if (
+        isinstance(max_review_age_days, bool)
+        or not isinstance(max_review_age_days, int)
+        or not 1 <= max_review_age_days <= 3650
+    ):
+        raise ValueError("max_review_age_days debe estar entre 1 y 3650.")
     ledger_path = Path(os.environ.get("CYBER_AI_LEDGER_PATH", DEFAULT_DB))
     if ledger_path.is_symlink():
         raise OSError("El archivo del ledger no puede ser un enlace simbólico.")
@@ -148,7 +154,12 @@ def audit_learning_cycle(*, max_review_age_days: int = 180) -> dict:
             and memory.get("records_on_disk") == 0
         )
     )
-    status = "ok" if ledger_ok and skills_ok and memory_ok and not orphaned_starts else "degraded"
+    status = (
+        "ok"
+        if ledger_ok and skills_ok and memory_ok
+        and not orphaned_starts and not history_truncated
+        else "degraded"
+    )
 
     return {
         "schema": "cyber-ai-learning-cycle-audit-v1",
