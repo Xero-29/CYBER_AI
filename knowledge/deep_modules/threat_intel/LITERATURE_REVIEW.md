@@ -27,3 +27,10 @@ Leer ATT&CK Data Model y Detection Strategies en versión fijada; estudiar STIX/
 - `MITRE-ATTACK-VERSION-HISTORY`
 - `MITRE-ATTACK-V18-RELEASE`
 - `MITRE-ATTACK-STIX-DATA`
+
+
+## Identificadores del registro de fuentes
+
+- `MITRE-ATTACK-VERSION-HISTORY`
+- `MITRE-ATTACK-V18-RELEASE`
+- `MITRE-ATTACK-STIX-DATA`
