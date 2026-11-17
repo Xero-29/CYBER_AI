@@ -20,6 +20,43 @@ class KnowledgeEvaluationTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "query inválida"):
                 knowledge_eval.load_dataset(path)
 
+    def test_rejects_duplicate_case_ids(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "cases.jsonl"
+            row = {"id": "same", "query": "api", "relevant_categories": ["api"]}
+            path.write_text(json.dumps(row) + "\\n" + json.dumps(row) + "\\n", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "duplicado"):
+                knowledge_eval.load_dataset(path)
+
+    def test_rejects_symlink_dataset(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "cases.jsonl"
+            link = Path(temp) / "link.jsonl"
+            path.write_text(json.dumps({
+                "id": "one", "query": "api",
+                "relevant_categories": ["api"],
+            }) + "\\n", encoding="utf-8")
+            link.symlink_to(path)
+            with self.assertRaisesRegex(ValueError, "symlink"):
+                knowledge_eval.load_dataset(link)
+
+    def test_rejects_unknown_dataset_fields(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "cases.jsonl"
+            path.write_text(json.dumps({
+                "id": "one", "query": "api",
+                "relevant_categories": ["api"], "untrusted": True,
+            }) + "\\n", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "exactamente"):
+                knowledge_eval.load_dataset(path)
+
+    def test_rejects_oversized_dataset(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "cases.jsonl"
+            path.write_bytes(b" " * (knowledge_eval.MAX_DATASET_BYTES + 1))
+            with self.assertRaisesRegex(ValueError, "2 MiB"):
+                knowledge_eval.load_dataset(path)
+
     def test_metrics_measure_hits_and_ranking(self):
         cases = [
             {"id": "one", "query": "api", "relevant_categories": ["api"]},
