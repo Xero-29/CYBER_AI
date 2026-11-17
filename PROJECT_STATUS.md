@@ -3,7 +3,7 @@
 > Esta sección describe el HEAD auditado; los bloques históricos inferiores son contexto.
 
 **Rama:** `main`  
-**Último cambio funcional de integración:** `decfae411dc1d9871a4b646087b821408d118239` (matriz de dominios, inventario y planificación); documentación actualizada hasta `29bdf7583e5b14ba51da072bcf0e18418e5a4608`. CI de estos cambios no tiene ejecuciones registradas para el SHA auditado; no se declara aprobado. Las pruebas Windows siguen aplazadas.  
+**Último cambio funcional de integración:** `d560a11cc890a02a0388ebbb27c36044832f8d02` (matriz de dominios, planificación y pruebas de regresión). Docker sandbox CI: aprobado en run `44130731532`, con 510 pruebas, build del sandbox YARA/TShark y smoke Ruff aprobados sobre este SHA. El workflow Python independiente `44130731618` seguía pendiente al actualizar este estado. Las pruebas Windows siguen aplazadas.  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17`, sin modificar.
 
 ## Integración de dominios, herramientas y Skills
@@ -12,7 +12,7 @@
 - Cada perfil enlaza el paquete de conocimiento con las herramientas declaradas para esa especialidad. La matriz diferencia herramientas disponibles, adaptadores registrados, runners separados y herramientas solo catalogadas.
 - `task_planner.py` añade dominios coincidentes, herramientas candidatas por dominio y Skills activas potencialmente relacionadas. La consulta de Skills usa `record_usage=False`; planificar no altera sus métricas de uso.
 - `capability_inventory.py` informa la consistencia de los 48 perfiles y deja explícito que esto no acredita cobertura operativa.
-- Nuevas pruebas: `tests/test_domain_capability_matrix.py` y ampliación de `tests/test_task_planner_fallback.py` y `tests/test_capability_inventory.py`.
+- Nuevas pruebas: `tests/test_domain_capability_matrix.py` y ampliación de `tests/test_task_planner_fallback.py` y `tests/test_capability_inventory.py`. La matriz pasó la comprobación exacta 48/48 en CI; el workflow Docker ejecutó 510 pruebas con éxito en SHA `d560a11cc890a02a0388ebbb27c36044832f8d02`.
 - **Límite:** la matriz conecta y enruta; no implementa adaptadores ausentes, no descarga conocimiento externo y no convierte automáticamente Skills candidatas en Skills verificadas.
 
 ## Cambio reciente: perfiles y herramientas personalizadas
