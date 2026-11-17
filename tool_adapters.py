@@ -48,7 +48,7 @@ class ToolExecutionError(RuntimeError):
     """A safe tool execution could not be completed."""
 
 
-def _confined_path(target):
+def _confined_path(target, *, allow_external=False):
     candidate = Path(target)
     if candidate.is_symlink():
         raise ToolExecutionError("No se permiten enlaces simbólicos como objetivo.")
@@ -56,9 +56,11 @@ def _confined_path(target):
         candidate = PROJECT_ROOT / candidate
     try:
         resolved = candidate.resolve(strict=True)
-        resolved.relative_to(PROJECT_ROOT.resolve())
+        if not allow_external:
+            resolved.relative_to(PROJECT_ROOT.resolve())
     except (OSError, ValueError) as exc:
-        raise ToolExecutionError("La ruta debe existir y permanecer dentro del repositorio.") from exc
+        message = "La ruta debe existir y permanecer dentro del repositorio." if not allow_external else "La ruta externa debe existir y ser accesible."
+        raise ToolExecutionError(message) from exc
     if not (resolved.is_file() or resolved.is_dir()):
         raise ToolExecutionError("El objetivo debe ser un archivo o directorio.")
     return resolved
@@ -182,7 +184,7 @@ def _probe_tool_version(binary, tool_id, env):
     return result.stdout.strip().splitlines()[0][:256]
 
 
-def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
+def run_local_tool(tool_id, target, *, config_path=None, timeout=None, allow_external=False):
     """Ejecuta un adaptador local; no aplica aislamiento de red al proceso."""
     if tool_id not in TOOL_SPECS:
         raise ToolExecutionError("Herramienta no registrada.")
@@ -197,7 +199,7 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
             "pip-audit requiere consultar un servicio remoto; ejecución bloqueada "
             "hasta disponer de autorización de red específica y auditable."
         )
-    path = _confined_path(target)
+    path = _confined_path(target, allow_external=allow_external)
     binary = shutil.which(spec["binary"])
     if not binary:
         raise ToolExecutionError("La herramienta no está instalada o no está en PATH.")
@@ -294,7 +296,7 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
         "tool_binary_sha256_after": binary_hash_after,
         "tool_binary_modified": binary_modified,
         "tool_allowlist": allowlist_evidence,
-        "target": str(path.relative_to(PROJECT_ROOT)),
+        "target": str(path.relative_to(PROJECT_ROOT)) if path.is_relative_to(PROJECT_ROOT) else str(path),
         "target_sha256": target_hash_before,
         "target_sha256_after": target_hash_after,
         "target_modified": target_modified,
