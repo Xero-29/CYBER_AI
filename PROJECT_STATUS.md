@@ -272,3 +272,10 @@ No declarar el sistema completo ni certificado hasta que cada brecha tenga códi
 - Se añadieron pruebas para permisos de directorios de datos, subdirectorios y claves locales.
 - La primera ejecución CI detectó que los directorios de datos del checkout tenían permisos 0755; se corrigió el flujo de instalación/CI para aplicar 0700 antes del preflight. En el HEAD `7a09cb065309f6a13982268505116a45d7dd5596`, Python tests y Docker sandbox finalizaron correctamente: [Python CI](https://github.com/Xero-29/CYBER_AI/actions/runs/44101897656) y [Docker CI](https://github.com/Xero-29/CYBER_AI/actions/runs/44101883529).
 - Persisten las brechas externas: KMS/HSM, RBAC/IdP/MFA, almacenamiento WORM/offsite, cifrado y recuperación real de backups, microVM, proveedores IA reales, revisión de licencias/corpus, carga/DR y revisión independiente.
+
+
+## Cobertura adicional de resiliencia y operación de Skills — 2026-11-17
+
+- Skill revocation también está disponible desde `skillbook_cli.py` mediante `deprecate-payload` y `deprecate`; la aprobación se vincula a la versión actual y al motivo, y una aprobación obsoleta no se puede reutilizar.
+- Ledger: se añadieron pruebas de fallo SQLite después del intento de inserción y de IDs duplicados; ambas verifican rollback sin eventos parciales y preservación de la cadena SHA-256.
+- Estas pruebas simulan fallos transaccionales; no equivalen a ensayos físicos de disco lleno, corrupción del sistema de archivos o pérdida de host.
