@@ -123,7 +123,7 @@ class ExecutionLedger:
                         namespace TEXT NOT NULL, task_fingerprint TEXT NOT NULL,
                         task TEXT NOT NULL,
                         status TEXT NOT NULL CHECK(status IN
-                            ('started','completed','failed','timeout','denied','cancelled')),
+                            ('started','completed','failed','timeout','denied','cancelled','interrupted')),
                         tool TEXT NOT NULL, tool_version TEXT NOT NULL,
                         model TEXT NOT NULL, environment TEXT NOT NULL,
                         duration_ms INTEGER NOT NULL CHECK(duration_ms >= 0),
