@@ -12,6 +12,7 @@ import tempfile
 import threading
 import uuid
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 from tool_adapters import ToolExecutionError, _confined_path, _hash_target
