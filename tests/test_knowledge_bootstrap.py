@@ -27,6 +27,8 @@ class KnowledgeBootstrapTests(unittest.TestCase):
             self.assertEqual(result["selected"], 1)
             self.assertEqual(result["ingested"], [])
             self.assertEqual(len(result["items"][0]["sha256"]), 64)
+            self.assertEqual(result["items"][0]["visibility"], "shared")
+            self.assertIsNone(result["items"][0]["tenant_id"])
 
     def test_rejects_path_escape(self):
         with tempfile.TemporaryDirectory() as temp:
