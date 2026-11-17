@@ -61,4 +61,9 @@ La revisión del PDF oficial cubrió portada y secciones ejecutivas/operativas r
 
 - Nelson et al., NIST SP 800-61 Rev. 3, abril 2025. https://doi.org/10.6028/NIST.SP.800-61r3
 - NIST, Cybersecurity Framework 2.0, febrero 2024. https://doi.org/10.6028/NIST.CSWP.29
-\n\n## Identificadores del registro de fuentes\n\n- `NIST-SP-800-61r3`\n- `NIST-CSWP-29-CSF-2.0`\n
+
+
+## Identificadores del registro de fuentes
+
+- `NIST-SP-800-61r3`
+- `NIST-CSWP-29-CSF-2.0`
