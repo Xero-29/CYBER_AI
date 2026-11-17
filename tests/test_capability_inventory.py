@@ -41,6 +41,22 @@ class CapabilityInventoryTests(unittest.TestCase):
             "docker_network_none_for_yara_tshark_only",
         )
 
+    def test_offline_adapters_are_distinguished_from_database_readiness(self):
+        expected = {"osv_scanner", "grype", "gitleaks", "zeek", "volatility3"}
+        self.assertTrue(expected <= set(capability_inventory.TOOL_SPECS))
+        with patch("capability_inventory.shutil.which", return_value="/usr/bin/tool"):
+            result = capability_inventory.build_inventory()
+        for tool_id in expected:
+            item = result["tools"][tool_id]
+            self.assertTrue(item["adapter_registered"])
+            self.assertTrue(item["offline_only"])
+            self.assertFalse(item["host_network_isolation_enforced"])
+        self.assertTrue(result["tools"]["osv_scanner"]["local_database_required"])
+        self.assertFalse(result["tools"]["osv_scanner"]["execution_ready"])
+        self.assertTrue(result["tools"]["gitleaks"]["execution_ready"])
+        self.assertEqual(result["summary"]["adapter_registered"], 19)
+        self.assertEqual(result["summary"]["catalog_only"], 2)
+
     def test_active_network_tools_require_scoped_authorization(self):
         active = [
             item for item in capability_inventory.TOOL_CATALOG
