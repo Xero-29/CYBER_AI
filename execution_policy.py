@@ -79,6 +79,8 @@ def authorize_target(target, action, authorization_id):
     if not isinstance(authorization_id, str) or not authorization_id.strip():
         raise AuthorizationError("Se requiere un identificador de autorización.")
     canonical, address = _canonical_target(target)
+    if address.is_multicast or address.is_unspecified or address.is_link_local or address.is_reserved:
+        raise AuthorizationError("La dirección IP es reservada, multicast, no especificada o link-local.")
     if not (address.is_global or address.is_private or address.is_loopback):
         raise AuthorizationError("La dirección IP no es global, privada ni loopback; destino rechazado.")
     now = datetime.now(timezone.utc)
