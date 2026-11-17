@@ -51,7 +51,7 @@ class SkillbookTests(unittest.TestCase):
  def test_skill_history_detects_missing_version(self):
   skill=self.add()
   with skillbook.connect() as db:
-   db.execute("UPDATE skills SET version=2 WHERE skill_id=?",(skill["skill_id"],))
+   db.execute("UPDATE skills SET version=3 WHERE skill_id=?",(skill["skill_id"],))
   result=skillbook.verify_skill_history(skill["skill_id"])
   self.assertFalse(result["valid"])
   self.assertEqual(result["reason"],"version_sequence")
