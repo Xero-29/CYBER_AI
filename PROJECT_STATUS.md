@@ -1,29 +1,36 @@
-# Estado verificado — 2026-11-17 (main)
+# Estado actual verificado — 2026-11-17
 
-**Rama principal:** `main`  
-**Respaldo:** `backup/main-before-cyber-ai-2026-11-17`, verificado idéntico al HEAD previo `7b5ed033f1f6461b5780a10ac4ada67a444b93e5`.  
-**Integración:** PR #2 fusionado en merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`.  
-**Último commit de código antes de esta actualización documental:** `a902c448bc5e110a1630abd7053cafb11527d469`.  
-**CI:** PR #2 tenía Python (456 pruebas) y Docker aprobados sobre `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`; esos resultados no validan los cambios posteriores en `main`. El conector disponible no devolvió status checks para los commits directos recientes. No declarar CI verde en el HEAD actual.
+**Rama activa:** `main`  
+**HEAD consultado:** `eed9b81929ed25f0c63b4aede4bcb9fc841db73e`  
+**Respaldo:** `backup/main-before-cyber-ai-2026-11-17`, idéntico al main anterior a la integración (`7b5ed033f1f6461b5780a10ac4ada67a444b93e5`).  
+**Integración principal:** PR #2 integrado en merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`.  
+**Diferencia contra el respaldo:** 509 commits adelante, 0 detrás.
 
-## Cambios directos posteriores al merge
+## Cambios recientes aplicados directamente en main
 
-- Allowlist HMAC-SHA256 para binarios locales, validación de esquema exacto, clave mínima de 32 bytes, límites de archivo, rechazo de symlinks y claves JSON duplicadas.
-- Integración en `tool_adapters.py`: cuando la política se configura, el ejecutable debe coincidir con el hash autorizado. `CYBER_AI_TOOL_ALLOWLIST_REQUIRED=1` activa fail-closed si la política no está configurada.
-- Pruebas unitarias para firma válida, manipulación, clave débil, symlink, claves JSON duplicadas, política obligatoria y binarios no autorizados.
-- Guía: `docs/TOOL_ALLOWLIST.md`.
+- Allowlist HMAC-SHA256 para ejecutables locales, validación estricta de IDs y hashes, rechazo de claves JSON duplicadas, symlinks, puntos de reanálisis Windows, archivos no regulares y manifiestos mayores de 64 KiB.
+- Integración de la allowlist antes de ejecutar adaptadores; modo obligatorio fail-closed mediante `CYBER_AI_TOOL_ALLOWLIST_REQUIRED=1`.
+- Pruebas para firmas, manipulación, entradas inválidas, límites, symlinks y denegación de binarios no autorizados.
+- Workflow Docker ahora se dispara también con `push` a `main`.
+- Workflow Python incorpora un smoke test de allowlist en `windows-latest`; no equivale a validar ACL de los directorios de datos, secretos o evidencias.
+- README actualizado para clonar `main` y configurar la allowlist.
 
-## Brechas restantes
+## Evidencia CI
 
-1. Lock de dependencias con hashes oficiales y `--require-hashes` para cada plataforma. No se inventan hashes; el SBOM actual registra wheels descargados por CI, no un lock estático universal.
-2. Enrolamiento de binarios desde fuentes verificadas y custodia/rotación externa de la clave HMAC. HMAC no es firma asimétrica y no reemplaza KMS/HSM.
-3. ACL Windows reales mediante APIs nativas y runner Windows; el control POSIX 0700/0600 no acredita ACL.
-4. Estrés prolongado, disco lleno, corrupción física y recuperación ante pérdida de host.
-5. Corpus experto etiquetado, embeddings reales y umbrales de recuperación por especialidad.
-6. OCR e aislamiento de parsers documentales.
-7. KMS/HSM, RBAC/IdP/MFA, WORM/offsite, backups cifrados/DR, MicroVM, proveedores IA reales, revisión humana de las 138 fuentes, observabilidad y revisión independiente.
+Los resultados históricos de PR #2 (456 pruebas Python y Docker) solo validan el SHA de esa rama, no este HEAD. No he podido recuperar checks ni ejecuciones de Actions asociados al SHA actual mediante la integración disponible. **CI del HEAD actual: no verificado.** No se afirma que los nuevos tests hayan pasado.
 
-**Conclusión:** los cambios de la rama auditada ya están en `main` y se creó respaldo verificable. La allowlist está implementada, pero no se considera validada hasta CI sobre el HEAD final. No se declara CYBER_AI terminado ni certificado para producción.
+## Brechas que siguen abiertas
+
+1. Lock con hashes oficiales estáticos y `--require-hashes` para plataformas/arquitecturas soportadas.
+2. Enrolamiento confiable de binarios y custodia/rotación externa de la clave HMAC.
+3. ACL Windows reales para datos, secretos y evidencias.
+4. Estrés prolongado, disco lleno, corrupción física y recuperación tras pérdida del host.
+5. Corpus experto, embeddings reales y umbrales por especialidad.
+6. OCR y aislamiento real de parsers documentales.
+7. Infraestructura operativa: KMS/HSM, RBAC/IdP/MFA, WORM/offsite, backup cifrado/DR, MicroVM, pruebas con proveedores reales, revisión humana de fuentes, observabilidad y revisión independiente.
+
+**Estado:** cambios implementados en `main`; no terminado ni certificado para producción. Las brechas externas requieren infraestructura, credenciales, decisiones del propietario o pruebas en entornos reales.
+
 
 ---
 
