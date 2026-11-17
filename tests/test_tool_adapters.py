@@ -1,5 +1,6 @@
 import io
 import json
+import stat
 import subprocess
 import tempfile
 import unittest
@@ -114,12 +115,25 @@ class ToolAdapterTests(unittest.TestCase):
         self.assertEqual(evidence["status"], "timeout")
         self.assertIsNone(evidence["return_code"])
 
-    def test_evidence_is_written_inside_repository(self):
+    def test_evidence_is_written_inside_repository_with_private_permissions(self):
         evidence = {"tool": "ruff", "status": "completed"}
         path = write_evidence(evidence)
         self.assertTrue(path.is_file())
         self.assertEqual(json.loads(path.read_text())["tool"], "ruff")
         self.assertTrue(path.resolve().is_relative_to(self.root))
+        if os.name == "posix":
+            self.assertEqual(stat.S_IMODE(path.stat().st_mode), 0o600)
+            self.assertEqual(stat.S_IMODE(path.parent.stat().st_mode), 0o700)
+
+    def test_evidence_rejects_symlink_destination_and_unsafe_tool_name(self):
+        outside = self.root.parent / (self.root.name + "-outside")
+        outside.mkdir()
+        link = self.root / "linked-evidence"
+        link.symlink_to(outside, target_is_directory=True)
+        with self.assertRaisesRegex(ToolExecutionError, "enlace simbólico"):
+            write_evidence({"tool": "ruff"}, link)
+        with self.assertRaisesRegex(ToolExecutionError, "Identificador"):
+            write_evidence({"tool": "../escape"}, "reports/unsafe")
 
 
 
