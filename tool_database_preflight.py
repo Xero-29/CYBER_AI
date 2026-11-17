@@ -37,7 +37,10 @@ def _osv_database_directory(environ: dict, home: Path, temp: Path) -> Path:
     if configured:
         base = Path(configured).expanduser()
         return base if base.name == "osv-scalibr" else base / "osv-scalibr"
-    return home / ".cache" / "osv-scalibr"
+    user_cache = home / ".cache" / "osv-scalibr"
+    if user_cache.exists():
+        return user_cache
+    return temp / "osv-scalibr"
 
 
 def inspect_osv_database(*, environ=None, home=None, temp_dir=None) -> dict:
