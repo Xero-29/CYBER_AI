@@ -54,18 +54,22 @@ jobs:
           mkdir -p "$RUNNER_TEMP/sandbox-wheelhouse"
           python -m pip download --require-hashes --only-binary=:all: --dest "$RUNNER_TEMP/sandbox-wheelhouse" -r sandbox/requirements.lock
           python dependency_artifact_manifest.py --lock-file sandbox/requirements.lock --wheelhouse "$RUNNER_TEMP/sandbox-wheelhouse" --output "$RUNNER_TEMP/sandbox-dependency-artifacts.json"
-      - name: Generate optional document lock candidate
+      - name: Verify optional document dependency lock
         run: |
           mkdir -p "$RUNNER_TEMP/document-wheelhouse"
-          python -m pip download --only-binary=:all: --dest "$RUNNER_TEMP/document-wheelhouse" -r requirements-documents.in
-          python wheel_lock_generator.py --wheelhouse "$RUNNER_TEMP/document-wheelhouse" --requirements requirements-documents.in --output "$RUNNER_TEMP/requirements-documents.lock"
-          cat "$RUNNER_TEMP/requirements-documents.lock"
+          python -m pip download --require-hashes --only-binary=:all: --dest "$RUNNER_TEMP/document-wheelhouse" -r requirements-documents.lock
+          python dependency_artifact_manifest.py --lock-file requirements-documents.lock --wheelhouse "$RUNNER_TEMP/document-wheelhouse" --output "$RUNNER_TEMP/document-dependency-artifacts.json"
+      - name: Install optional document dependencies
+        run: python -m pip install --require-hashes -r requirements-documents.lock
+      - name: Verify full suite with document extractors enabled
+        run: bash verify.sh
       - name: Generate CycloneDX SBOM
         run: |
           python sbom_generator.py \
             --artifact-manifest "$RUNNER_TEMP/cyber-ai-dependency-artifacts.json" \
             --output "$RUNNER_TEMP/cyber-ai-sbom.cdx.json"
           python sbom_generator.py --lock-file sandbox/requirements.lock --direct-requirements sandbox/requirements.in --artifact-manifest "$RUNNER_TEMP/sandbox-dependency-artifacts.json" --output "$RUNNER_TEMP/sandbox-sbom.cdx.json"
+          python sbom_generator.py --lock-file requirements-documents.lock --direct-requirements requirements-documents.in --artifact-manifest "$RUNNER_TEMP/document-dependency-artifacts.json" --output "$RUNNER_TEMP/document-sbom.cdx.json"
           python - <<'PY'
           import json
           import os
@@ -74,13 +78,22 @@ jobs:
 
           root = Path(".")
           lock_hash = hashlib.sha256((root / "requirements.lock").read_bytes()).hexdigest()
+          sandbox_lock_hash = hashlib.sha256((root / "sandbox/requirements.lock").read_bytes()).hexdigest()
+          document_lock_hash = hashlib.sha256((root / "requirements-documents.lock").read_bytes()).hexdigest()
           provenance = {
               "repository": os.environ["GITHUB_REPOSITORY"],
               "commit": os.environ["GITHUB_SHA"],
               "workflow_run_id": os.environ["GITHUB_RUN_ID"],
               "workflow_run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
               "sbom": "cyber-ai-sbom.cdx.json",
+              "sboms": [
+                  "cyber-ai-sbom.cdx.json",
+                  "sandbox-sbom.cdx.json",
+                  "document-sbom.cdx.json",
+              ],
               "requirements_lock_sha256": lock_hash,
+              "sandbox_requirements_lock_sha256": sandbox_lock_hash,
+              "document_requirements_lock_sha256": document_lock_hash,
           }
           output = Path(os.environ["RUNNER_TEMP"]) / "cyber-ai-sbom-provenance.json"
           output.write_text(json.dumps(provenance, sort_keys=True, indent=2) + "\n", encoding="utf-8")
@@ -95,6 +108,8 @@ jobs:
             ${{ runner.temp }}/cyber-ai-dependency-artifacts.json
             ${{ runner.temp }}/sandbox-dependency-artifacts.json
             ${{ runner.temp }}/sandbox-sbom.cdx.json
+            ${{ runner.temp }}/document-dependency-artifacts.json
+            ${{ runner.temp }}/document-sbom.cdx.json
           if-no-files-found: error
           retention-days: 90
 
