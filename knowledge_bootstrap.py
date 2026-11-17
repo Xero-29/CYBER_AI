@@ -20,7 +20,7 @@ def exclusive_file_lock(lock, *, windows=None, windows_api=None):
             import msvcrt as windows_api
         lock.seek(0, os.SEEK_END)
         if lock.tell() == 0:
-            lock.write(b"\\0")
+            lock.write(bytes(1))
             lock.flush()
         lock.seek(0)
         windows_api.locking(lock.fileno(), windows_api.LK_LOCK, 1)
