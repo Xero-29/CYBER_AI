@@ -25,7 +25,7 @@ DEEP = {
 }
 
 def has_heading(content: str, alternatives: tuple[str, ...]) -> bool:
-    return any(re.search(r"(?im)^" + re.escape(item) + r"(?:\\s|$)", content) for item in alternatives)
+    return any(re.search(r"(?im)^" + re.escape(item) + r"(?:\s|$)", content) for item in alternatives)
 
 def audit_library(root: Path = ROOT) -> dict:
     try:
