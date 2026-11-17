@@ -42,6 +42,8 @@ def build_inventory():
             "adapter_registered": item["id"] in TOOL_SPECS,
             "execution_ready": item["id"] in TOOL_SPECS and not TOOL_SPECS[item["id"]].get("network") and not TOOL_SPECS[item["id"]].get("requires_isolation", False),
             "requires_isolation": bool(TOOL_SPECS.get(item["id"], {}).get("requires_isolation", False)),
+            "host_network_isolation_enforced": False,
+            "explicit_execute_required": item["id"] in TOOL_SPECS,
         }
         for item in TOOL_CATALOG
     }
@@ -74,6 +76,8 @@ def build_inventory():
             "discovery_only": True, "executes_tools": False,
             "tool_presence_grants_permission": False,
             "active_network_requires_scoped_authorization": True,
+            "local_host_egress_isolation": "not_enforced",
+            "direct_execution_requires_explicit_execute": True,
         },
         "note": "Inventario de presencia; no ejecuta, instala ni autoriza herramientas.",
     }
