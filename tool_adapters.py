@@ -190,9 +190,12 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None, allow_ext
         raise ToolExecutionError("Herramienta no registrada.")
     spec = TOOL_SPECS[tool_id]
     if spec.get("requires_isolation"):
-        raise ToolExecutionError(
-            "La herramienta analiza muestras o capturas y requiere un sandbox aislado; "
-            "la ejecución directa en el host está bloqueada."
+        from isolated_tool_runner import run_isolated_tool
+        return run_isolated_tool(
+            tool_id, target,
+            config_path=config_path or os.environ.get("CYBER_AI_YARA_RULES"),
+            timeout=timeout or spec["timeout"],
+            allow_external=allow_external,
         )
     if spec["network"]:
         raise ToolExecutionError(
