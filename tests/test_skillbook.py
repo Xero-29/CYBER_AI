@@ -184,4 +184,30 @@ class SkillbookTests(unittest.TestCase):
    with self.assertRaisesRegex(ValueError,"Firma VERITAS"):
     skillbook.rollback_skill_version(skill["skill_id"],1,signature)
 
+
+ def test_signed_revocation_deprecates_skill_and_removes_it_from_retrieval(self):
+  key="veritas-revocation-key-with-at-least-32-bytes"
+  skill=self.add()
+  payload=skillbook.skill_deprecation_payload(skill["skill_id"],"Método obsoleto")
+  signature=hmac.new(key.encode(),payload.encode(),hashlib.sha256).hexdigest()
+  with patch.dict(os.environ,{"CYBER_AI_VERITAS_APPROVAL_KEY":key}):
+   result=skillbook.deprecate_skill(skill["skill_id"],"Método obsoleto",signature)
+  self.assertEqual(result["status"],"deprecated")
+  self.assertEqual(result["version"],2)
+  self.assertEqual(skillbook.search_skills("auditoria web cabeceras"),[])
+  versions=skillbook.list_skill_versions(skill["skill_id"])
+  self.assertEqual([item["change_type"] for item in versions],["created","revoked"])
+
+ def test_revocation_rejects_invalid_signature_and_stale_approval(self):
+  key="veritas-revocation-key-with-at-least-32-bytes"
+  skill=self.add()
+  payload=skillbook.skill_deprecation_payload(skill["skill_id"],"Revocación")
+  signature=hmac.new(key.encode(),payload.encode(),hashlib.sha256).hexdigest()
+  with patch.dict(os.environ,{"CYBER_AI_VERITAS_APPROVAL_KEY":key}):
+   with self.assertRaisesRegex(ValueError,"Firma VERITAS"):
+    skillbook.deprecate_skill(skill["skill_id"],"Revocación","0"*64)
+   skillbook.deprecate_skill(skill["skill_id"],"Revocación",signature)
+   with self.assertRaisesRegex(ValueError,"cambió|Solo se puede revocar"):
+    skillbook.deprecate_skill(skill["skill_id"],"Revocación",signature)
+
 if __name__=="__main__": unittest.main()
