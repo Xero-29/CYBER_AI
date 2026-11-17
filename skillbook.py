@@ -30,6 +30,48 @@ def connect():
     return db
 
 
+VERSION_HASH_GENESIS = "0" * 64
+
+
+def _version_hash(previous_hash, *, skill_id, version, change_type, actor,
+                  snapshot_json, created_at):
+    payload = {
+        "skill_id": skill_id,
+        "version": version,
+        "change_type": change_type,
+        "actor": actor,
+        "snapshot_json": snapshot_json,
+        "created_at": created_at,
+        "previous_hash": previous_hash,
+    }
+    canonical = json.dumps(
+        payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    )
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def _insert_version_row(db, *, skill_id, version, change_type, actor,
+                        snapshot_json, created_at):
+    previous = db.execute(
+        "SELECT entry_hash FROM skill_versions WHERE skill_id=? ORDER BY version DESC LIMIT 1",
+        (skill_id,),
+    ).fetchone()
+    previous_hash = previous["entry_hash"] if previous else VERSION_HASH_GENESIS
+    entry_hash = _version_hash(
+        previous_hash, skill_id=skill_id, version=version,
+        change_type=change_type, actor=actor,
+        snapshot_json=snapshot_json, created_at=created_at,
+    )
+    db.execute(
+        """INSERT INTO skill_versions
+           (skill_id,version,change_type,actor,snapshot_json,created_at,
+            previous_hash,entry_hash)
+           VALUES(?,?,?,?,?,?,?,?)""",
+        (skill_id, version, change_type, actor, snapshot_json, created_at,
+         previous_hash, entry_hash),
+    )
+
+
 def initialize():
     with connect() as db:
         db.executescript("""
@@ -65,6 +107,8 @@ def initialize():
             actor TEXT NOT NULL,
             snapshot_json TEXT NOT NULL,
             created_at TEXT NOT NULL,
+            previous_hash TEXT NOT NULL,
+            entry_hash TEXT NOT NULL,
             PRIMARY KEY(skill_id, version)
         );
         CREATE INDEX IF NOT EXISTS idx_skill_versions_skill
@@ -76,6 +120,65 @@ def initialize():
         BEFORE DELETE ON skill_versions
         BEGIN SELECT RAISE(ABORT, 'skill version history is append-only'); END;
         """)
+
+        # Migra historiales existentes una sola vez, encadenando sus snapshots
+        # actuales antes de volver a activar las restricciones append-only.
+        columns = {
+            row["name"] for row in db.execute("PRAGMA table_info(skill_versions)")
+        }
+        if not {"previous_hash", "entry_hash"}.issubset(columns):
+            db.execute("BEGIN IMMEDIATE")
+            try:
+                db.execute("DROP TRIGGER IF EXISTS skill_versions_no_update")
+                db.execute("DROP TRIGGER IF EXISTS skill_versions_no_delete")
+                if "previous_hash" not in columns:
+                    db.execute(
+                        "ALTER TABLE skill_versions ADD COLUMN previous_hash TEXT NOT NULL "
+                        f"DEFAULT '{VERSION_HASH_GENESIS}'"
+                    )
+                if "entry_hash" not in columns:
+                    db.execute(
+                        "ALTER TABLE skill_versions ADD COLUMN entry_hash TEXT NOT NULL DEFAULT ''"
+                    )
+                previous_by_skill = {}
+                rows = db.execute(
+                    "SELECT * FROM skill_versions ORDER BY skill_id,version"
+                ).fetchall()
+                for version_row in rows:
+                    previous_hash = previous_by_skill.get(
+                        version_row["skill_id"], VERSION_HASH_GENESIS
+                    )
+                    entry_hash = _version_hash(
+                        previous_hash,
+                        skill_id=version_row["skill_id"],
+                        version=version_row["version"],
+                        change_type=version_row["change_type"],
+                        actor=version_row["actor"],
+                        snapshot_json=version_row["snapshot_json"],
+                        created_at=version_row["created_at"],
+                    )
+                    db.execute(
+                        """UPDATE skill_versions SET previous_hash=?,entry_hash=?
+                           WHERE skill_id=? AND version=?""",
+                        (previous_hash, entry_hash,
+                         version_row["skill_id"], version_row["version"]),
+                    )
+                    previous_by_skill[version_row["skill_id"]] = entry_hash
+                db.execute("""
+                    CREATE TRIGGER skill_versions_no_update
+                    BEFORE UPDATE ON skill_versions
+                    BEGIN SELECT RAISE(ABORT, 'skill version history is append-only'); END
+                """)
+                db.execute("""
+                    CREATE TRIGGER skill_versions_no_delete
+                    BEFORE DELETE ON skill_versions
+                    BEGIN SELECT RAISE(ABORT, 'skill version history is append-only'); END
+                """)
+                db.commit()
+            except Exception:
+                db.rollback()
+                raise
+
         # Snapshot inicial para Skills creadas antes de la migración.
         for row in db.execute("SELECT * FROM skills").fetchall():
             exists = db.execute(
@@ -83,16 +186,11 @@ def initialize():
                 (row["skill_id"], row["version"]),
             ).fetchone()
             if not exists:
-                db.execute(
-                    """INSERT INTO skill_versions
-                       (skill_id,version,change_type,actor,snapshot_json,created_at)
-                       VALUES(?,?,?,?,?,?)""",
-                    (
-                        row["skill_id"], row["version"], "legacy_import",
-                        row["verified_by"] or "MIGRATION",
-                        json.dumps(dict(row), ensure_ascii=False, sort_keys=True),
-                        row["updated_at"],
-                    ),
+                _insert_version_row(
+                    db, skill_id=row["skill_id"], version=row["version"],
+                    change_type="legacy_import", actor=row["verified_by"] or "MIGRATION",
+                    snapshot_json=json.dumps(dict(row), ensure_ascii=False, sort_keys=True),
+                    created_at=row["updated_at"],
                 )
 
 
@@ -137,11 +235,9 @@ def _save_version(db, skill_id, version, change_type, actor):
     if row is None:
         raise ValueError("No existe la Skill que se intenta versionar.")
     snapshot = json.dumps(dict(row), ensure_ascii=False, sort_keys=True)
-    db.execute(
-        """INSERT INTO skill_versions
-           (skill_id, version, change_type, actor, snapshot_json, created_at)
-           VALUES (?, ?, ?, ?, ?, ?)""",
-        (skill_id, version, change_type, actor, snapshot, now()),
+    _insert_version_row(
+        db, skill_id=skill_id, version=version, change_type=change_type,
+        actor=actor, snapshot_json=snapshot, created_at=now(),
     )
 
 
@@ -155,7 +251,8 @@ def verify_skill_history(skill_id):
             "SELECT * FROM skills WHERE skill_id=?", (skill_id.strip(),)
         ).fetchone()
         versions = db.execute(
-            """SELECT version,change_type,actor,snapshot_json,created_at
+            """SELECT version,change_type,actor,snapshot_json,created_at,
+                      previous_hash,entry_hash
                FROM skill_versions WHERE skill_id=? ORDER BY version""",
             (skill_id.strip(),),
         ).fetchall()
@@ -171,6 +268,34 @@ def verify_skill_history(skill_id):
             "reason": "version_sequence", "expected": expected_versions,
             "actual": actual_versions,
         }
+    previous_hash = VERSION_HASH_GENESIS
+    for row in versions:
+        stored_previous = row["previous_hash"]
+        stored_entry = row["entry_hash"]
+        if not isinstance(stored_previous, str) or not isinstance(stored_entry, str):
+            return {
+                "valid": False, "skill_id": skill_id,
+                "reason": "history_hash_chain", "failed_version": row["version"],
+            }
+        expected_entry = _version_hash(
+            previous_hash,
+            skill_id=skill_id,
+            version=row["version"],
+            change_type=row["change_type"],
+            actor=row["actor"],
+            snapshot_json=row["snapshot_json"],
+            created_at=row["created_at"],
+        )
+        if (
+            not hmac.compare_digest(stored_previous, previous_hash)
+            or not hmac.compare_digest(stored_entry, expected_entry)
+        ):
+            return {
+                "valid": False, "skill_id": skill_id,
+                "reason": "history_hash_chain", "failed_version": row["version"],
+            }
+        previous_hash = stored_entry
+
     snapshots = []
     try:
         for row in versions:
