@@ -58,6 +58,7 @@ class CapabilityInventoryTests(unittest.TestCase):
         self.assertEqual(result["summary"]["catalog_only"], 1)
         self.assertTrue(result["tools"]["nmap"]["adapter_registered"])
         self.assertFalse(result["tools"]["nmap"]["execution_ready"])
+        self.assertTrue(result["tools"]["nmap"]["scoped_network_required"])
 
     def test_active_network_tools_require_scoped_authorization(self):
         active = [
