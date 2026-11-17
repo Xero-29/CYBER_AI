@@ -48,3 +48,4 @@ A fecha de corte existe un **borrador público inicial de SP 800-82 Rev. 4**, pu
 ## Brechas
 
 Leer el texto íntegro de Rev. 3 y el borrador Rev. 4, comparar cambios por sección, añadir IEC 62443 con licencia/procedencia verificada y fuentes sectoriales, ejecutar un testbed y someter el protocolo a revisión de un especialista OT/seguridad funcional.
+\n\n## Identificadores del registro de fuentes\n\n- `NIST-SP-800-82r3`\n- `NIST-SP-800-82r4-IPD`\n- `NIST-SP-800-207`\n
