@@ -27,3 +27,10 @@ Leer SP 800-63-4 y sus tres volúmenes completos; mapear OIDC/OAuth2/SAML a requ
 - `NIST-SP-800-63-4`
 - `NIST-SP-800-63B-4`
 - `NIST-SP-800-63C-4`
+
+
+## Identificadores del registro de fuentes
+
+- `NIST-SP-800-63-4`
+- `NIST-SP-800-63B-4`
+- `NIST-SP-800-63C-4`
