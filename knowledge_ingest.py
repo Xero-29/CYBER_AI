@@ -167,11 +167,16 @@ def extract_document_text(file_path):
             with path.open("r", encoding="utf-8-sig", newline="") as stream:
                 rows = []
                 total = 0
-                csv.field_size_limit(MAX_EXTRACTED_CHARS)
-                for index, row in enumerate(csv.reader(stream), 1):
-                    if index > 200_000:
-                        raise ValueError("El CSV supera el límite de 200.000 filas.")
-                    total = _append_bounded(rows, "\t".join(cell for cell in row), total)
+                previous_field_size_limit = csv.field_size_limit()
+                try:
+                    csv.field_size_limit(MAX_EXTRACTED_CHARS)
+                    for index, row in enumerate(csv.reader(stream), 1):
+                        if index > 200_000:
+                            raise ValueError("El CSV supera el límite de 200.000 filas.")
+                        total = _append_bounded(rows, "\t".join(cell for cell in row), total)
+                finally:
+                    # csv.field_size_limit is process-global; do not leak policy to callers.
+                    csv.field_size_limit(previous_field_size_limit)
             text = "\n".join(rows)
         except UnicodeDecodeError as error:
             raise ValueError("El CSV debe estar codificado en UTF-8.") from error
