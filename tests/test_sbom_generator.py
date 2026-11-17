@@ -89,7 +89,7 @@ class SbomGeneratorTests(unittest.TestCase):
             "lock_sha256": "0" * 64,
             "artifacts": [],
         }), encoding="utf-8")
-        with self.assertRaisesRegex(LockfileError, "otro requirements.lock"):
+        with self.assertRaisesRegex(LockfileError, "no corresponde al lock seleccionado"):
             build_sbom(self.root, artifact_manifest=manifest_path)
 
     def test_rejects_incomplete_artifact_manifest(self):
