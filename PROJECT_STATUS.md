@@ -1,3 +1,32 @@
+# Estado verificado — 2026-11-17 (actualización en main)
+
+**Rama principal:** `main`  
+**Respaldo previo:** `backup/main-before-cyber-ai-2026-11-17` (creado antes de integrar cambios; idéntico al HEAD previo de main `7b5ed033f1f6461b5780a10ac4ada67a444b93e5`).  
+**Integración:** PR #2 fusionado mediante merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`.  
+**Cambios adicionales directos en main:** allowlist HMAC de ejecutables, pruebas y documentación.  
+**CI:** la evidencia verde de PR #2 corresponde al HEAD de rama `cae816d6037b56f017c2fbdbb3e98ef00df58c1d` (456 pruebas Python y Docker sandbox). No valida el merge commit ni los cambios directos posteriores. El CI del HEAD actual debe verificarse antes de declarar aprobado.
+
+## Trabajo adicional en main
+
+- `tool_allowlist.py`: valida manifiestos JSON HMAC-SHA256, esquema exacto, límites, symlinks y hashes SHA-256 de binarios aprobados.
+- `tool_adapters.py`: consulta la allowlist antes de ejecutar un adaptador local. Si se configura una política parcial o inválida, bloquea; con `CYBER_AI_TOOL_ALLOWLIST_REQUIRED=1`, la ausencia de configuración también bloquea.
+- `tests/test_tool_allowlist.py`: pruebas de firma válida, manipulación, clave débil, symlink, política obligatoria y binarios no aprobados.
+- `docs/TOOL_ALLOWLIST.md`: configuración y límites.
+
+## Brechas aún abiertas
+
+- Generar y revisar hashes de dependencias oficiales para cada plataforma; no inventar hashes ni afirmar que el SBOM equivale a `--require-hashes`.
+- Enrolamiento confiable y custodia/rotación externa de la clave HMAC de allowlist.
+- ACL Windows reales mediante APIs nativas y runner Windows.
+- Pruebas prolongadas de estrés, disco lleno y recuperación física.
+- Corpus de evaluación etiquetado por expertos, embeddings reales y umbrales por especialidad.
+- OCR e aislamiento real de parsers documentales.
+- KMS/HSM, RBAC/IdP/MFA, WORM/offsite, backups cifrados y DR, MicroVM, proveedores reales, revisión humana de las 138 fuentes, observabilidad y revisión independiente.
+
+No se declara certificación institucional ni preparación para producción. Los cambios directos en main requieren CI sobre su SHA final; la validación operacional continúa pendiente.
+
+---
+
 # Estado verificado más reciente — 2026-11-17
 
 **HEAD de código validado:** `5e2e85cec0c2f4cb3627e87617be0c244f83cd27`  
