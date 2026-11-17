@@ -7,6 +7,16 @@
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17` (no modificado).  
 **CI del HEAD:** sin checks publicados/recuperables en la última consulta; queda pendiente de validación exacta.
 
+## Limpieza estructural realizada
+
+Se eliminaron seis archivos sin consumidores de producción ni una función mantenida y probada:
+- `audit_target.py` y `test_api.py`: demo local aislada que simulaba un gateway de producción; no formaba parte del producto y dependía de Flask, ausente de las dependencias instaladas.
+- `agent_benchmark.py`: benchmark ad hoc contra `example.com` y una ruta local fija, sin integración ni pruebas.
+- `agent_core.py` y `tests/test_agent_core.py`: motor/prototipo independiente sustituido por el pipeline real de adaptadores, autorización y allowlist.
+- `verifier.py`: verificador NVD inicial sin consumidores ni pruebas; la ruta mantenida de informes usa `nvd_client.py`.
+
+Se conservan `batch_analyzer.py`, `nvd_client.py`, `report_manager.py`, `ledger_cli.py` y `skillbook_cli.py`: tienen consumidores o funciones CLI diferenciadas. `tests/final_smoke_test.txt` se conserva como muestra de informe, no como resultado de ejecución.
+
 ## Integración realizada
 
 - `cyber_ai.py --ask` conecta la entrada principal con DIRECTOR, agentes y recuperación de conocimiento.
