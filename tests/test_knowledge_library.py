@@ -216,6 +216,45 @@ class TestKnowledgeLibrary(unittest.TestCase):
             1,
         )
 
+    def test_document_chunk_count_respects_visibility_and_tenant_scope(self):
+        library.store_chunks([
+            {
+                "title": "Shared", "source": "source", "category": "test",
+                "content": "shared", "embedding": [1.0, 0.0],
+                "embedding_model": "test-space", "document_id": "same-id",
+                "visibility": "shared",
+            },
+            {
+                "title": "Tenant A", "source": "source", "category": "test",
+                "content": "private a", "embedding": [1.0, 0.0],
+                "embedding_model": "test-space", "document_id": "same-id",
+                "visibility": "tenant", "tenant_id": "tenant-a",
+            },
+            {
+                "title": "Tenant B", "source": "source", "category": "test",
+                "content": "private b", "embedding": [1.0, 0.0],
+                "embedding_model": "test-space", "document_id": "same-id",
+                "visibility": "tenant", "tenant_id": "tenant-b",
+            },
+        ])
+        self.assertEqual(
+            library.document_chunk_count("same-id", visibility="shared"), 1
+        )
+        self.assertEqual(
+            library.document_chunk_count(
+                "same-id", visibility="tenant", tenant_id="tenant-a"
+            ), 1
+        )
+        self.assertEqual(
+            library.document_chunk_count(
+                "same-id", visibility="tenant", tenant_id="tenant-b"
+            ), 1
+        )
+
+    def test_document_chunk_count_requires_tenant_for_private_scope(self):
+        with self.assertRaisesRegex(ValueError, "tenant_id"):
+            library.document_chunk_count("doc", visibility="tenant")
+
     def test_document_chunk_count_rejects_empty_model_filter(self):
         with self.assertRaisesRegex(ValueError, "embedding_model"):
             library.document_chunk_count("stable-doc", " ")
