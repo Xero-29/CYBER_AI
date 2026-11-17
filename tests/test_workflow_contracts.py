@@ -1,6 +1,5 @@
 """Contract tests shared by the live orchestrator and offline simulator."""
 import json
-import tempfile
 import unittest
 from pathlib import Path
 
