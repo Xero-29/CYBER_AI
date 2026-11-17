@@ -11,9 +11,14 @@ class SbomGeneratorTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.root = Path(self.temp.name)
-        (self.root / "requirements.txt").write_text("Requests==2.34.2\n", encoding="utf-8")
+        (self.root / "requirements.txt").write_text(
+            "Requests==2.34.2 " + chr(92) + "\\n    --hash=sha256:" + "a" * 64 + "\\n",
+            encoding="utf-8",
+        )
         (self.root / "requirements.lock").write_text(
-            "-r requirements.txt\ncertifi==2026.10.23\n", encoding="utf-8"
+            "-r requirements.txt\\ncertifi==2026.10.23 " + chr(92)
+            + "\\n    --hash=sha256:" + "b" * 64 + "\\n",
+            encoding="utf-8",
         )
 
     def tearDown(self):
@@ -75,6 +80,24 @@ class SbomGeneratorTests(unittest.TestCase):
         (self.root / "requirements.lock").write_text("requests>=2.0\n", encoding="utf-8")
         with self.assertRaises(LockfileError):
             build_sbom(self.root)
+
+    def test_rejects_hashless_dependency(self):
+        (self.root / "requirements.txt").write_text("requests==2.34.2\\n", encoding="utf-8")
+        with self.assertRaisesRegex(LockfileError, "sin hash SHA-256"):
+            build_sbom(self.root)
+
+    def test_rejects_artifact_hash_not_pinned_in_lock(self):
+        lock_hash = hashlib.sha256((self.root / "requirements.lock").read_bytes()).hexdigest()
+        manifest_path = self.root / "artifacts.json"
+        manifest_path.write_text(json.dumps({
+            "lock_sha256": lock_hash,
+            "artifacts": [
+                {"name": "requests", "version": "2.34.2", "sha256": "c" * 64},
+                {"name": "certifi", "version": "2026.10.23", "sha256": "b" * 64},
+            ],
+        }), encoding="utf-8")
+        with self.assertRaisesRegex(LockfileError, "no coincide"):
+            build_sbom(self.root, artifact_manifest=manifest_path)
 
     def test_rejects_traversal_include(self):
         (self.root / "requirements.lock").write_text("-r ../outside.txt\n", encoding="utf-8")

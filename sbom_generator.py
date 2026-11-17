@@ -10,6 +10,7 @@ from pathlib import Path
 
 PROJECT = Path(__file__).resolve().parent
 PACKAGE_LINE = re.compile(r"^([A-Za-z0-9][A-Za-z0-9._-]*)==([A-Za-z0-9][A-Za-z0-9.!+_-]*)$")
+HASH_LINE = re.compile(r"^--hash=sha256:([a-f0-9]{64})$")
 NAME_NORMALIZE = re.compile(r"[-_.]+")
 
 
@@ -19,6 +20,29 @@ class LockfileError(ValueError):
 
 def _normalize(name):
     return NAME_NORMALIZE.sub("-", name).lower()
+
+
+def _logical_requirement_lines(path):
+    pending = ""
+    start_line = None
+    for number, raw in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        if pending:
+            if line.endswith("\\\\"):
+                pending += " " + line[:-1].strip()
+                continue
+            yield start_line, pending + " " + line
+            pending = ""
+            start_line = None
+        elif line.endswith("\\\\"):
+            pending = line[:-1].strip()
+            start_line = number
+        else:
+            yield number, line
+    if pending:
+        raise LockfileError(f"Continuación incompleta en {path.name}:{start_line}.")
 
 
 def _read_requirements(path, root, seen=None, depth=0):
@@ -40,10 +64,7 @@ def _read_requirements(path, root, seen=None, depth=0):
         raise LockfileError("Archivo requirements inexistente o inválido.")
     seen.add(resolved)
     packages = {}
-    for number, raw in enumerate(resolved.read_text(encoding="utf-8").splitlines(), 1):
-        line = raw.strip()
-        if not line or line.startswith("#"):
-            continue
+    for number, line in _logical_requirement_lines(resolved):
         if line.startswith("-r "):
             include = line[3:].strip()
             if not include or Path(include).is_absolute() or ".." in Path(include).parts:
@@ -54,18 +75,39 @@ def _read_requirements(path, root, seen=None, depth=0):
                 existing = packages.get(package_name)
                 if existing and existing["version"] != package["version"]:
                     raise LockfileError(f"Versiones incompatibles para {package_name}.")
-                packages[package_name] = package
+                if existing:
+                    existing["hashes"] = sorted(set(existing["hashes"]) | set(package["hashes"]))
+                else:
+                    packages[package_name] = package
             continue
-        match = PACKAGE_LINE.fullmatch(line)
+        tokens = line.split()
+        match = PACKAGE_LINE.fullmatch(tokens[0]) if tokens else None
         if not match:
             raise LockfileError(
                 f"Dependencia no fijada o sintaxis no soportada en {resolved.name}:{number}: {line[:120]}"
             )
         name, version = match.groups()
+        hashes = []
+        for token in tokens[1:]:
+            hash_match = HASH_LINE.fullmatch(token)
+            if not hash_match:
+                raise LockfileError(f"Hash SHA-256 inválido en {resolved.name}:{number}.")
+            hashes.append(hash_match.group(1))
+        if not hashes:
+            raise LockfileError(
+                f"Dependencia sin hash SHA-256 en {resolved.name}:{number}: {name}=={version}."
+            )
         normalized = _normalize(name)
-        if normalized in packages and packages[normalized]["version"] != version:
+        existing = packages.get(normalized)
+        if existing and existing["version"] != version:
             raise LockfileError(f"Versiones incompatibles para {normalized}.")
-        packages[normalized] = {"name": normalized, "version": version, "source": resolved.name}
+        if existing:
+            existing["hashes"] = sorted(set(existing["hashes"]) | set(hashes))
+        else:
+            packages[normalized] = {
+                "name": normalized, "version": version,
+                "source": resolved.name, "hashes": sorted(set(hashes)),
+            }
     return packages
 
 
@@ -111,6 +153,10 @@ def build_sbom(root=PROJECT, artifact_manifest=None):
                 or name in artifact_hashes
             ):
                 raise LockfileError("El manifiesto contiene un artefacto no fijado o inválido.")
+            if digest not in locked[name]["hashes"]:
+                raise LockfileError(
+                    f"El hash del artefacto de {name} no coincide con requirements.lock."
+                )
             artifact_hashes[name] = digest
         if set(artifact_hashes) != set(locked):
             raise LockfileError("El manifiesto no cubre todas las dependencias fijadas.")

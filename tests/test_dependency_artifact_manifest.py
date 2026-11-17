@@ -1,3 +1,4 @@
+import hashlib
 import tempfile
 import unittest
 import zipfile
@@ -12,9 +13,17 @@ class DependencyArtifactManifestTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.wheelhouse = self.root / "wheelhouse"
         self.wheelhouse.mkdir()
-        (self.root / "requirements.txt").write_text("requests==2.0\n", encoding="utf-8")
+        self.write_lock("a" * 64, "b" * 64)
+
+    def write_lock(self, requests_hash, certifi_hash):
+        (self.root / "requirements.txt").write_text(
+            "requests==2.0 " + chr(92) + "\\n    --hash=sha256:" + requests_hash + "\\n",
+            encoding="utf-8",
+        )
         (self.root / "requirements.lock").write_text(
-            "-r requirements.txt\ncertifi==1.0\n", encoding="utf-8"
+            "-r requirements.txt\\ncertifi==1.0 " + chr(92)
+            + "\\n    --hash=sha256:" + certifi_hash + "\\n",
+            encoding="utf-8",
         )
 
     def tearDown(self):
@@ -29,9 +38,21 @@ class DependencyArtifactManifestTests(unittest.TestCase):
             )
         return path
 
+    def pin_created_wheels(self, requests_wheel=None, certifi_wheel=None):
+        requests_hash = (
+            hashlib.sha256(requests_wheel.read_bytes()).hexdigest()
+            if requests_wheel else "a" * 64
+        )
+        certifi_hash = (
+            hashlib.sha256(certifi_wheel.read_bytes()).hexdigest()
+            if certifi_wheel else "b" * 64
+        )
+        self.write_lock(requests_hash, certifi_hash)
+
     def test_manifest_hashes_exact_locked_wheels_and_binds_lock_hash(self):
-        self.wheel("requests-2.0-py3-none-any.whl", "requests", "2.0")
-        self.wheel("certifi-1.0-py3-none-any.whl", "certifi", "1.0")
+        requests_wheel = self.wheel("requests-2.0-py3-none-any.whl", "requests", "2.0")
+        certifi_wheel = self.wheel("certifi-1.0-py3-none-any.whl", "certifi", "1.0")
+        self.pin_created_wheels(requests_wheel, certifi_wheel)
         result = build_manifest(self.root, self.wheelhouse)
         self.assertEqual(len(result["artifacts"]), 2)
         self.assertEqual(
@@ -40,7 +61,13 @@ class DependencyArtifactManifestTests(unittest.TestCase):
         )
         self.assertTrue(all(len(item["sha256"]) == 64 for item in result["artifacts"]))
         self.assertEqual(len(result["lock_sha256"]), 64)
-        self.assertIn("no son hashes fijados", result["scope"])
+        self.assertIn("verificados contra hashes", result["scope"])
+
+    def test_manifest_rejects_wheel_hash_not_pinned(self):
+        self.wheel("requests-2.0-py3-none-any.whl", "requests", "2.0")
+        self.wheel("certifi-1.0-py3-none-any.whl", "certifi", "1.0")
+        with self.assertRaisesRegex(ArtifactManifestError, "no coincide con requirements.lock"):
+            build_manifest(self.root, self.wheelhouse)
 
     def test_manifest_rejects_missing_locked_wheel(self):
         self.wheel("requests-2.0-py3-none-any.whl", "requests", "2.0")

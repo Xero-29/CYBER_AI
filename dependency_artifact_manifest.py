@@ -69,12 +69,17 @@ def build_manifest(root, wheelhouse):
         with wheel.open("rb") as stream:
             for chunk in iter(lambda: stream.read(1024 * 1024), b""):
                 digest.update(chunk)
+        digest_value = digest.hexdigest()
+        if digest_value not in direct[normalized]["hashes"]:
+            raise ArtifactManifestError(
+                f"El hash del wheel no coincide con requirements.lock: {wheel.name}."
+            )
         found[normalized] = {
             "name": normalized,
             "version": version,
             "filename": wheel.name,
             "size_bytes": wheel.stat().st_size,
-            "sha256": digest.hexdigest(),
+            "sha256": digest_value,
         }
     missing = sorted(set(direct) - set(found))
     if missing:
@@ -88,7 +93,7 @@ def build_manifest(root, wheelhouse):
         "python": platform.python_version(),
         "platform": platform.platform(),
         "artifacts": [found[name] for name in sorted(found)],
-        "scope": "Wheels descargados y hasheados en esta ejecución/plataforma; no son hashes fijados en requirements.lock.",
+        "scope": "Wheels descargados y verificados contra hashes SHA-256 fijados en requirements.lock para esta plataforma.",
     }
 
 
