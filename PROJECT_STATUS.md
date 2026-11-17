@@ -1,21 +1,22 @@
 # Estado canónico vigente — 2026-11-17
 
-> Esta sección describe el HEAD auditado; los bloques históricos inferiores son contexto.
+> Esta sección registra el último código funcional verificado; los bloques históricos inferiores son contexto.
 
 **Rama:** `main`  
-**Código funcional más reciente verificado:** `1e299f7b9850e8ded9b52a8aec7d61c2b836a6aa`. Incluye endurecimiento del simulador multiagente, validación de los tres flujos del catálogo, pruebas de CLI y límites de contexto.  
-**CI del código verificado:** Python run `44152426235` — **553 pruebas, OK (1 omitida)**; Docker sandbox run `44152426130` — **success**, incluyendo build de ambas imágenes, suite completa y Ruff en sandbox.  
+**Código funcional verificado:** `db0710c87a6e8de58686b86454729f0c8cebd350`. Se endureció la simulación y se unificó el contrato de workflows entre el simulador y el orquestador real.  
+**CI del código verificado:** Python run `44154159852` — **564 pruebas, OK (1 omitida)**; Docker sandbox run `44154159866` — **success**, incluyendo build de ambas imágenes, suite completa y Ruff en sandbox.  
 **Alcance:** estas pruebas no conectan proveedores LLM reales ni demuestran exactitud semántica o eficacia de herramientas. Las pruebas Windows siguen aplazadas.  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17`, sin modificar.
 
-## Último cambio: simulación multiagente endurecida — 2026-11-17
+## Último cambio: contratos compartidos y simulación multiagente — 2026-11-17
 
-- `agent_simulation.py` ahora valida el esquema del catálogo, versión, identificadores seguros, estructura de flujos, modos y límites positivos.
-- Las fixtures de agentes desconocidos y secuencias vacías se rechazan como errores de configuración. Las respuestas no textuales o malformadas se conservan como casos adversariales: el paso falla por contrato y el flujo se detiene.
-- La simulación reproduce el límite `max_context_chars` del orquestador, descarta primero el contexto más antiguo y registra cuántas etapas se descartaron.
-- Se añadió cobertura para los tres flujos reales (`investigacion`, `critica_corta`, `revision_tecnica`), el CLI, entradas inválidas, fixtures adversariales y recorte de contexto.
-- Documentación actualizada en `docs/AGENT_SIMULATION.md`.
-- **Límite:** sigue siendo simulación determinista. No prueba la calidad de los modelos, su coordinación semántica ni la ejecución de herramientas reales.
+- Se añadió `workflow_contracts.py` como contrato estructural común para `team_orchestrator.py` y `agent_simulation.py`; ya no mantienen validadores divergentes.
+- Se validan modo, agentes, objetivos, etapas, límites de contexto, rondas, reintentos, presupuestos de tokens, parámetros de recuperación de conocimiento y flags booleanos.
+- El orquestador real valida el contrato antes de cargar/configurar agentes; conserva las opciones de ejecución y normaliza los campos estructurales.
+- El simulador valida los tres flujos reales (`investigacion`, `critica_corta`, `revision_tecnica`), el CLI, entradas inválidas y fixtures adversariales.
+- La transferencia simulada reproduce el recorte FIFO de `team_orchestrator.build_prompt`; una prueba de integración compara ambos comportamientos.
+- Los informes registran etapas de contexto descartadas. La documentación está en `docs/AGENT_SIMULATION.md`.
+- **Límite:** sigue siendo simulación determinista. No prueba razonamiento real, coordinación semántica entre LLMs ni ejecución de herramientas reales.
 
 ## Integración de dominios, herramientas y Skills
 
