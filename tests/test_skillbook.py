@@ -56,6 +56,20 @@ class SkillbookTests(unittest.TestCase):
   self.assertFalse(result["valid"])
   self.assertEqual(result["reason"],"version_sequence")
 
+ def test_skill_history_detects_tampered_historical_snapshot(self):
+  skill=self.add()
+  with skillbook.connect() as db:
+   db.execute("UPDATE skills SET version=2,description=? WHERE skill_id=?",("Nueva descripción",skill["skill_id"]))
+   skillbook._save_version(db,skill["skill_id"],2,"updated","VERITAS")
+  self.assertTrue(skillbook.verify_skill_history(skill["skill_id"])["valid"])
+  with skillbook.connect() as db:
+   db.execute("DROP TRIGGER skill_versions_no_update")
+   db.execute("UPDATE skill_versions SET snapshot_json=? WHERE skill_id=? AND version=1",("{}",skill["skill_id"]))
+  result=skillbook.verify_skill_history(skill["skill_id"])
+  self.assertFalse(result["valid"])
+  self.assertEqual(result["reason"],"history_hash_chain")
+  self.assertEqual(result["failed_version"],1)
+
  def test_public_registration_cannot_self_assert_veritas(self):
   with self.assertRaisesRegex(ValueError,"(?i)registro directo deshabilitado"):
    skillbook.register_verified_skill(verified_by="VERITAS",verifier_verdict="CONFIRMADA")
