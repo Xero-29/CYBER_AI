@@ -185,7 +185,7 @@ def _probe_tool_version(binary, tool_id, env):
 
 
 def run_local_tool(tool_id, target, *, config_path=None, timeout=None, allow_external=False):
-    """Ejecuta un adaptador local; no aplica aislamiento de red al proceso."""
+    """Ejecuta un adaptador local; YARA/TShark se delegan al sandbox Docker."""
     if tool_id not in TOOL_SPECS:
         raise ToolExecutionError("Herramienta no registrada.")
     spec = TOOL_SPECS[tool_id]
