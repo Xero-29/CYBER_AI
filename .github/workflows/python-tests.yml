@@ -40,9 +40,20 @@ jobs:
           fi
       - name: Run complete local verification
         run: bash verify.sh
+      - name: Capture hashes for resolved dependency wheels
+        run: |
+          mkdir -p "$RUNNER_TEMP/cyber-ai-wheelhouse"
+          python -m pip download --only-binary=:all: \
+            --dest "$RUNNER_TEMP/cyber-ai-wheelhouse" \
+            -r requirements.lock
+          python dependency_artifact_manifest.py \
+            --wheelhouse "$RUNNER_TEMP/cyber-ai-wheelhouse" \
+            --output "$RUNNER_TEMP/cyber-ai-dependency-artifacts.json"
       - name: Generate CycloneDX SBOM
         run: |
-          python sbom_generator.py --output "$RUNNER_TEMP/cyber-ai-sbom.cdx.json"
+          python sbom_generator.py \
+            --artifact-manifest "$RUNNER_TEMP/cyber-ai-dependency-artifacts.json" \
+            --output "$RUNNER_TEMP/cyber-ai-sbom.cdx.json"
           python - <<'PY'
           import json
           import os
@@ -69,5 +80,6 @@ jobs:
           path: |
             ${{ runner.temp }}/cyber-ai-sbom.cdx.json
             ${{ runner.temp }}/cyber-ai-sbom-provenance.json
+            ${{ runner.temp }}/cyber-ai-dependency-artifacts.json
           if-no-files-found: error
           retention-days: 90
