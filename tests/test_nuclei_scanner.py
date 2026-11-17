@@ -176,8 +176,8 @@ class NucleiScannerTests(unittest.TestCase):
                 output = Path(command[command.index("-o") + 1])
                 output.write_text("", encoding="utf-8")
                 return FakeProcess()
-            with patch("nuclei_scanner.shutil.which", return_value="/usr/bin/nuclei"), \\
-                 patch("nuclei_scanner.subprocess.Popen", side_effect=fake_popen), \\
+            with patch("nuclei_scanner.shutil.which", return_value="/usr/bin/nuclei"), \
+                 patch("nuclei_scanner.subprocess.Popen", side_effect=fake_popen), \
                  patch("nuclei_scanner.time.sleep"):
                 result = scan_target(
                     "http://127.0.0.1:8765", authorized=True,
