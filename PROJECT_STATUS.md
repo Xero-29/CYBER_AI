@@ -3,7 +3,7 @@
 > Esta sección describe el HEAD auditado; los bloques históricos inferiores son contexto.
 
 **Rama:** `main`  
-**HEAD de implementación:** `88c68a79755c583f80921af41b86e4864333818e`. CI de este HEAD pendiente de resultado; no se extrapolan resultados de CI previos. Las pruebas Windows siguen aplazadas.  
+**Último cambio funcional:** `88c68a79755c583f80921af41b86e4864333818e` (el commit `59a5254b30b7bb5d6170fdface07d1142b646de6` actualiza este estado). CI de estos cambios pendiente de resultado; no se extrapolan resultados de CI previos. Las pruebas Windows siguen aplazadas.  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17`, sin modificar.
 
 ## Cambio reciente: perfiles y herramientas personalizadas
@@ -38,7 +38,7 @@
 - La revisión detectó un fallo real de portabilidad: `knowledge_downloader.py` importaba `fcntl` incondicionalmente, por lo que el comando no podía arrancar en Windows. La corrección reutiliza el bloqueo POSIX/Windows de `knowledge_bootstrap.py` y la comprobación Windows se conserva como tarea aplazada y se ejecutará en una ronda posterior.
 - Se detectó además que el downloader confiaba en el estado `downloaded` del manifiesto y omitía el recurso sin verificar el archivo. La corrección fuerza la comprobación SHA-256 y permite recuperar archivos ausentes o alterados; se añadió una prueba de regresión.
 - No se eliminan los `pass` encontrados de forma automática: los observados pertenecen a limpieza de temporales o manejo de fallos secundarios, no a implementaciones vacías.
-- Los resultados de CI se deben asociar al SHA exacto. El workflow Python del HEAD actual está verde. El sandbox Docker se verifica por separado; no se declara verificación completa hasta confirmar también ese run.
+- Los resultados de CI se deben asociar al SHA exacto. El último CI Python confirmado corresponde al SHA anterior `cd5a3b1c84448c4365c773100414b919250e4a23` (run `44125948782`); no valida los cambios posteriores. El nuevo workflow Docker incluye pruebas adicionales y su resultado para este HEAD aún no está confirmado.
 
 ## Funciones mantenidas
 
