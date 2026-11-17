@@ -81,3 +81,57 @@ Cada especialidad dispone de una agenda de investigación en `./<area>/RESEARCH_
 - [Continuidad y recuperación](./business_continuity/README.md) — `business_continuity` · [Agenda de investigación](./business_continuity/RESEARCH_AGENDA.md) · [Revisión bibliográfica](./business_continuity/LITERATURE_REVIEW.md)
 - [Seguridad de bases de datos](./database_security/README.md) — `database_security` · [Agenda de investigación](./database_security/RESEARCH_AGENDA.md) · [Revisión bibliográfica](./database_security/LITERATURE_REVIEW.md)
 - [Investigación de vulnerabilidades](./vulnerability_research/README.md) — `vulnerability_research` · [Agenda de investigación](./vulnerability_research/RESEARCH_AGENDA.md) · [Revisión bibliográfica](./vulnerability_research/LITERATURE_REVIEW.md)
+
+
+## Compendios técnicos por especialidad
+
+Se añadieron cuadernos técnicos para las 48 áreas. Son planes técnicos estructurados; no equivalen a experimentos ejecutados ni revisión experta.
+
+- [Fundamentos](./foundations/TECHNICAL_COMPENDIUM.md) — `foundations`
+- [Seguridad web y aplicaciones](./appsec/TECHNICAL_COMPENDIUM.md) — `appsec`
+- [Seguridad de API](./api/TECHNICAL_COMPENDIUM.md) — `api`
+- [Redes](./network/TECHNICAL_COMPENDIUM.md) — `network`
+- [Linux y Unix](./linux/TECHNICAL_COMPENDIUM.md) — `linux`
+- [Windows y Active Directory](./windows_ad/TECHNICAL_COMPENDIUM.md) — `windows_ad`
+- [Seguridad cloud](./cloud/TECHNICAL_COMPENDIUM.md) — `cloud`
+- [Contenedores y Kubernetes](./containers/TECHNICAL_COMPENDIUM.md) — `containers`
+- [Seguridad móvil](./mobile/TECHNICAL_COMPENDIUM.md) — `mobile`
+- [Criptografía](./crypto/TECHNICAL_COMPENDIUM.md) — `crypto`
+- [Identidad y acceso](./identity/TECHNICAL_COMPENDIUM.md) — `identity`
+- [Análisis de malware](./malware/TECHNICAL_COMPENDIUM.md) — `malware`
+- [Forense digital](./forensics/TECHNICAL_COMPENDIUM.md) — `forensics`
+- [Respuesta a incidentes](./incident_response/TECHNICAL_COMPENDIUM.md) — `incident_response`
+- [Inteligencia de amenazas](./threat_intel/TECHNICAL_COMPENDIUM.md) — `threat_intel`
+- [Ingeniería inversa](./reverse/TECHNICAL_COMPENDIUM.md) — `reverse`
+- [IoT y hardware](./iot_hardware/TECHNICAL_COMPENDIUM.md) — `iot_hardware`
+- [DevSecOps y supply chain](./devsecops/TECHNICAL_COMPENDIUM.md) — `devsecops`
+- [Seguridad de IA](./ai_security/TECHNICAL_COMPENDIUM.md) — `ai_security`
+- [GRC, privacidad y auditoría](./governance/TECHNICAL_COMPENDIUM.md) — `governance`
+- [Gestión de vulnerabilidades](./vuln_management/TECHNICAL_COMPENDIUM.md) — `vuln_management`
+- [Bug bounty autorizado](./bug_bounty/TECHNICAL_COMPENDIUM.md) — `bug_bounty`
+- [Arquitectura segura](./secure_arch/TECHNICAL_COMPENDIUM.md) — `secure_arch`
+- [Seguridad de datos](./data_security/TECHNICAL_COMPENDIUM.md) — `data_security`
+- [Ingeniería de software y calidad](./software_engineering/TECHNICAL_COMPENDIUM.md) — `software_engineering`
+- [Aprendizaje automático e ingeniería de IA](./machine_learning/TECHNICAL_COMPENDIUM.md) — `machine_learning`
+- [Hardware, firmware y sistemas embebidos](./hardware_security/TECHNICAL_COMPENDIUM.md) — `hardware_security`
+- [Matemáticas, estadística y métodos numéricos](./mathematics/TECHNICAL_COMPENDIUM.md) — `mathematics`
+- [SOC, SIEM y SOAR](./soc_siem/TECHNICAL_COMPENDIUM.md) — `soc_siem`
+- [EDR, XDR y endpoints](./edr_xdr/TECHNICAL_COMPENDIUM.md) — `edr_xdr`
+- [Threat hunting](./threat_hunting/TECHNICAL_COMPENDIUM.md) — `threat_hunting`
+- [Red Team autorizado](./red_team/TECHNICAL_COMPENDIUM.md) — `red_team`
+- [Wireless, Bluetooth y NFC](./wireless_security/TECHNICAL_COMPENDIUM.md) — `wireless_security`
+- [OT, ICS y SCADA](./ot_ics/TECHNICAL_COMPENDIUM.md) — `ot_ics`
+- [Telecomunicaciones y 5G](./telecom_5g/TECHNICAL_COMPENDIUM.md) — `telecom_5g`
+- [Ciberseguridad automotriz y CAN](./automotive_security/TECHNICAL_COMPENDIUM.md) — `automotive_security`
+- [Satélites y sistemas espaciales](./satellite_security/TECHNICAL_COMPENDIUM.md) — `satellite_security`
+- [Seguridad física ciberfísica](./physical_security/TECHNICAL_COMPENDIUM.md) — `physical_security`
+- [Correo, DNS y dominios](./email_dns_security/TECHNICAL_COMPENDIUM.md) — `email_dns_security`
+- [Fraude digital y abuso](./fraud_abuse/TECHNICAL_COMPENDIUM.md) — `fraud_abuse`
+- [Ingeniería de privacidad](./privacy_engineering/TECHNICAL_COMPENDIUM.md) — `privacy_engineering`
+- [Forense cloud](./cloud_forensics/TECHNICAL_COMPENDIUM.md) — `cloud_forensics`
+- [Red teaming de IA y agentes](./ai_red_team/TECHNICAL_COMPENDIUM.md) — `ai_red_team`
+- [PKI, certificados y HSM](./pki_hsm/TECHNICAL_COMPENDIUM.md) — `pki_hsm`
+- [Criptografía poscuántica](./post_quantum_crypto/TECHNICAL_COMPENDIUM.md) — `post_quantum_crypto`
+- [Continuidad y recuperación](./business_continuity/TECHNICAL_COMPENDIUM.md) — `business_continuity`
+- [Seguridad de bases de datos](./database_security/TECHNICAL_COMPENDIUM.md) — `database_security`
+- [Investigación de vulnerabilidades](./vulnerability_research/TECHNICAL_COMPENDIUM.md) — `vulnerability_research`
