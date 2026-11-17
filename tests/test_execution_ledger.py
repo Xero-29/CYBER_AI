@@ -1,4 +1,6 @@
 import os
+import subprocess
+import sys
 from concurrent.futures import ThreadPoolExecutor
 import sqlite3
 import tempfile
@@ -127,6 +129,42 @@ class ExecutionLedgerTests(unittest.TestCase):
         self.append(namespace="beta")
         self.assertEqual(len(self.ledger.history(namespace="alpha")), 1)
         self.assertEqual(len(self.ledger.history(namespace="beta")), 1)
+
+    def test_real_subprocess_crash_is_reconciled_after_restart(self):
+        path = Path(self.tmp.name) / "crash-ledger.sqlite3"
+        code = """
+import os
+import sys
+from execution_ledger import ExecutionLedger
+ledger = ExecutionLedger(sys.argv[1])
+ledger.append(
+    namespace="crash-test", task="crash between start and result",
+    status="started", tool="subprocess-fixture",
+    evidence={"phase": "start"}, duration_ms=0,
+    metadata={"task_id": "abrupt-exit-fixture"},
+)
+os._exit(0)
+"""
+        subprocess.run(
+            [sys.executable, "-c", code, str(path)],
+            cwd=str(Path(__file__).resolve().parents[1]),
+            check=True,
+            timeout=15,
+        )
+        recovered = ExecutionLedger(path)
+        result = recovered.reconcile_interrupted(stale_after_seconds=0)
+        self.assertEqual(result["reconciled"], 1)
+        history = recovered.history(namespace="crash-test")
+        self.assertEqual(
+            [event["status"] for event in history],
+            ["started", "interrupted"],
+        )
+        self.assertEqual(
+            history[-1]["metadata"]["start_event_id"],
+            history[0]["event_id"],
+        )
+        self.assertTrue(recovered.verify()["valid"])
+        self.assertEqual(recovered.reconcile_interrupted()["reconciled"], 0)
 
     def test_reconcile_marks_orphaned_start_as_interrupted_and_is_idempotent(self):
         started = self.append(
