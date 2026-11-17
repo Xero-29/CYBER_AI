@@ -366,5 +366,70 @@ class ToolAdapterTests(unittest.TestCase):
             "192.0.2.1",
         )
 
+    def test_nmap_requires_explicit_authorization_and_cidr_allowlist(self):
+        with patch.dict(os.environ, {"CYBER_AI_NMAP_ALLOWED_CIDRS": ""}):
+            with self.assertRaisesRegex(ToolExecutionError, "allowlist CIDR"):
+                run_local_tool("nmap", "192.0.2.10", allow_network=True)
+        with patch.dict(os.environ, {"CYBER_AI_NMAP_ALLOWED_CIDRS": "192.0.2.0/28"}):
+            with self.assertRaisesRegex(ToolExecutionError, "16 direcciones"):
+                run_local_tool("nmap", "192.0.2.0/24", allow_network=True)
+            with self.assertRaisesRegex(ToolExecutionError, "no está contenido"):
+                run_local_tool("nmap", "198.51.100.10", allow_network=True)
+        with self.assertRaisesRegex(ToolExecutionError, "authorized-network"):
+            run_local_tool("nmap", "192.0.2.10")
+
+    def test_nmap_command_is_limited_to_tcp_top_ports_without_scripts(self):
+        command = tool_adapters._build_nmap_command(
+            "/usr/bin/nmap", "192.0.2.10"
+        )
+        self.assertEqual(
+            command,
+            [
+                "/usr/bin/nmap", "-sT", "-Pn", "-n", "--top-ports", "100",
+                "--max-retries", "1", "--host-timeout", "60s",
+                "--max-rate", "25", "-oX", "-", "192.0.2.10",
+            ],
+        )
+        self.assertNotIn("-sV", command)
+        self.assertNotIn("--script", command)
+
+    @patch("tool_adapters.shutil.which", return_value="/usr/bin/nmap")
+    @patch("tool_adapters.subprocess.run")
+    def test_authorized_nmap_scan_returns_scope_and_xml_evidence(self, run, which):
+        xml = (
+            '<nmaprun><host><status state="up"/>'
+            '<address addr="192.0.2.10" addrtype="ipv4"/>'
+            '<ports><port protocol="tcp" portid="22">'
+            '<state state="open"/><service name="ssh"/></port></ports>'
+            '</host></nmaprun>'
+        )
+        run.side_effect = [
+            subprocess.CompletedProcess(
+                ["nmap", "--version"], 0, stdout="Nmap version 7.95", stderr=""
+            ),
+            subprocess.CompletedProcess(
+                ["nmap", "-sT"], 0, stdout=xml, stderr=""
+            ),
+        ]
+        provenance = {"resolved_path": "/usr/bin/nmap", "sha256": "d" * 64}
+        with (
+            patch.dict(os.environ, {"CYBER_AI_NMAP_ALLOWED_CIDRS": "192.0.2.0/28"}),
+            patch.object(tool_adapters, "_hash_binary", return_value=provenance),
+            patch.object(tool_adapters, "verify_tool_allowed", return_value={"allowed": True}),
+        ):
+            evidence = run_local_tool(
+                "nmap", "192.0.2.10", allow_network=True
+            )
+        self.assertEqual(evidence["status"], "completed")
+        self.assertTrue(evidence["scope_validated"])
+        self.assertEqual(evidence["authorization_scope"], "192.0.2.10/32")
+        self.assertFalse(evidence["network_isolation_enforced"])
+        self.assertTrue(evidence["tool_reported_success"])
+        self.assertTrue(evidence["findings_present"])
+        self.assertEqual(
+            evidence["parsed_json"]["hosts"][0]["ports"][0]["service"],
+            "ssh",
+        )
+
 if __name__ == "__main__":
     unittest.main()
