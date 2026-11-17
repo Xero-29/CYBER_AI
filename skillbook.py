@@ -597,6 +597,71 @@ def register_skill_from_ledger(
     )
 
 
+
+def skill_deprecation_payload(skill_id, reason):
+    """Documento canónico para revocar una Skill activa con aprobación VERITAS."""
+    if not isinstance(skill_id, str) or not skill_id.strip():
+        raise ValueError("skill_id es obligatorio.")
+    if not isinstance(reason, str) or not reason.strip() or len(reason.strip()) > 2000:
+        raise ValueError("La razón de revocación es obligatoria y debe tener máximo 2000 caracteres.")
+    initialize()
+    with connect() as db:
+        current = db.execute(
+            "SELECT skill_id,version,status FROM skills WHERE skill_id=?",
+            (skill_id.strip(),),
+        ).fetchone()
+    if current is None:
+        raise ValueError("No existe la Skill solicitada.")
+    if current["status"] != "active":
+        raise ValueError("Solo se puede revocar una Skill activa.")
+    document = {
+        "schema": "cyber-ai-skill-status-v1",
+        "action": "deprecate",
+        "skill_id": current["skill_id"],
+        "current_version": current["version"],
+        "reason": reason.strip(),
+    }
+    return json.dumps(document, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def deprecate_skill(skill_id, reason, approval_signature):
+    """Revoca una Skill activa con HMAC VERITAS y conserva historial append-only."""
+    key = os.environ.get("CYBER_AI_VERITAS_APPROVAL_KEY", "")
+    if len(key.encode("utf-8")) < 32:
+        raise ValueError("CYBER_AI_VERITAS_APPROVAL_KEY debe tener al menos 32 bytes.")
+    if not isinstance(approval_signature, str) or not re.fullmatch(r"[a-f0-9]{64}", approval_signature):
+        raise ValueError("Firma VERITAS de revocación inválida.")
+    payload = skill_deprecation_payload(skill_id, reason)
+    expected = hmac.new(key.encode("utf-8"), payload.encode("utf-8"), hashlib.sha256).hexdigest()
+    if not hmac.compare_digest(expected, approval_signature):
+        raise ValueError("Firma VERITAS de revocación inválida.")
+    document = json.loads(payload)
+    stamp = now()
+    initialize()
+    with connect() as db:
+        db.execute("BEGIN IMMEDIATE")
+        current = db.execute(
+            "SELECT * FROM skills WHERE skill_id=?",
+            (document["skill_id"],),
+        ).fetchone()
+        if current is None or current["status"] != "active" or current["version"] != document["current_version"]:
+            raise ValueError("La Skill cambió desde que se generó la aprobación; vuelve a revisar.")
+        version = current["version"] + 1
+        evidence = json.loads(current["evidence_json"])
+        evidence.extend([
+            "revocation_reason:" + document["reason"],
+            "revocation_payload_sha256:" + hashlib.sha256(payload.encode("utf-8")).hexdigest(),
+        ])
+        db.execute(
+            """UPDATE skills SET status='deprecated',version=?,evidence_json=?,
+               verified_by='VERITAS',verifier_verdict='REVOKED',updated_at=?
+               WHERE skill_id=? AND status='active' AND version=?""",
+            (version, json.dumps(evidence), stamp, document["skill_id"], document["current_version"]),
+        )
+        _save_version(db, document["skill_id"], version, "revoked", "VERITAS")
+    return {"skill_id": document["skill_id"], "status": "deprecated", "version": version}
+
+
 def _words(value):
     return {
         word for word in re.findall(
