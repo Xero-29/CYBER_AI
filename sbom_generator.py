@@ -161,7 +161,7 @@ def build_sbom(
         except (OSError, json.JSONDecodeError) as error:
             raise LockfileError("No se pudo leer el manifiesto de artefactos.") from error
         if not isinstance(manifest, dict) or manifest.get("lock_sha256") != lock_hash:
-            raise LockfileError("El manifiesto corresponde a otro lock o tiene formato inválido.")
+            raise LockfileError("El manifiesto no corresponde al lock seleccionado o tiene formato inválido.")
         artifacts = manifest.get("artifacts")
         if not isinstance(artifacts, list):
             raise LockfileError("La lista de artefactos del manifiesto es inválida.")
