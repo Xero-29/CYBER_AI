@@ -119,6 +119,43 @@ def validate_provider_routes(config, environ=None, plugin_protocols=None):
     return results
 
 
+
+def validate_secret_hygiene(config):
+    """Detecta secretos incrustados y referencias inseguras a variables de entorno."""
+    import re
+
+    findings = []
+    secret_fields = {
+        "api_key", "api_secret", "access_token", "refresh_token",
+        "client_secret", "password", "private_key", "secret_key",
+    }
+    env_pattern = re.compile(r"^[A-Z][A-Z0-9_]{2,127}$")
+
+    def walk(value, path="$"):
+        if isinstance(value, dict):
+            for key, child in value.items():
+                key_text = str(key).lower()
+                child_path = f"{path}.{key}"
+                if key_text in secret_fields and isinstance(child, str) and child.strip():
+                    findings.append({
+                        "path": child_path,
+                        "reason": "Secreto literal en configuración; usar un gestor de secretos o variable de entorno.",
+                    })
+                if key_text == "api_key_env":
+                    if not isinstance(child, str) or not env_pattern.fullmatch(child):
+                        findings.append({
+                            "path": child_path,
+                            "reason": "api_key_env debe ser el nombre de una variable de entorno en mayúsculas.",
+                        })
+                walk(child, child_path)
+        elif isinstance(value, list):
+            for index, child in enumerate(value):
+                walk(child, f"{path}[{index}]")
+
+    walk(config)
+    return findings
+
+
 def collect_checks(root=PROJECT, python_version=None, module_lookup=None,
                    executable_lookup=None, environ=None):
     root = Path(root)
@@ -149,6 +186,18 @@ def collect_checks(root=PROJECT, python_version=None, module_lookup=None,
             add("model_config", "ok" if valid else "error",
                 "JSON válido." if valid else "La raíz de configuración debe ser un objeto JSON.")
             if valid:
+                secret_findings = validate_secret_hygiene(parsed)
+                for finding in secret_findings:
+                    add(
+                        "secret_hygiene",
+                        "error",
+                        f"{finding['path']}: {finding['reason']}",
+                    )
+                if not secret_findings:
+                    add(
+                        "secret_hygiene", "ok",
+                        "No se detectaron secretos literales ni referencias api_key_env inválidas.",
+                    )
                 for route in validate_provider_routes(parsed, environ=environ):
                     add(route["name"], route["status"], route["detail"])
         except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
