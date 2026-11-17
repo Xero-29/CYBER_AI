@@ -1,82 +1,117 @@
-# Matriz de cierre verificable — CYBER_AI
+# Matriz vigente de implementación y cierre — CYBER_AI
 
-Esta matriz separa implementación, verificación automatizada y validación operacional. Una capacidad no se considera cerrada solo por existir en el código.
+**Corte:** 2026-11-17  
+**Rama:** `main`  
+**Referencia de código y CI anterior a esta actualización documental:** `0767cd68d418f7bfbb69bbe336106a9e869de563`.  
+**Regla:** los estados de CI solo validan el SHA indicado; los estados de catálogo, simulación y pruebas unitarias no equivalen a validación operacional.
 
-## Reglas de estado
+## Definiciones de estado
 
-- **Implementado:** código y pruebas versionados.
-- **CI aprobado:** workflows verdes sobre el SHA exacto que contiene el cambio.
-- **Operacional pendiente:** requiere host, proveedor, credenciales, red, infraestructura o revisión humana.
-- **Bloqueado por decisión:** requiere autorización del propietario o una política organizacional.
+- **Implementado:** existe código versionado para la función.
+- **Integrado:** existe un consumidor real en el flujo del producto; una entrada de catálogo no basta.
+- **CI aprobado:** el workflow pasó sobre el SHA exacto.
+- **Validación operacional pendiente:** requiere binarios, proveedores, credenciales, datos, infraestructura o revisión independiente.
+- **Bloqueado:** una política de seguridad o una dependencia no satisfecha impide ejecutar la capacidad.
 
-## Integración del flujo principal
+## Resumen ejecutivo
 
-| Área | Estado | Evidencia / criterio de aceptación |
+| Subsistema | Estado comprobable | Límite principal |
 |---|---|---|
-| Entrada principal → DIRECTOR → agente → Skills/memoria/conocimiento | Implementación añadida; CI pendiente | `cyber_ai.py --ask` delega en `director.py`; DIRECTOR enruta la tarea y activa `agent_runner.py --knowledge` por defecto. La entrada principal ofrece `--no-knowledge` como exclusión explícita. `cyber_ai.py --team` delega en `team_orchestrator.py` con supervisión de objetivos; el orquestador genera y adjunta al informe un plan de capacidades y herramientas candidatas, y recupera conocimiento por defecto en las etapas y revisiones, con exclusión por configuración explícita. El plan no ejecuta herramientas. El runner recupera Skills y lecciones aprobadas y, cuando ECO/embeddings están configurados, fragmentos de la biblioteca. `--no-knowledge` permite desactivar explícitamente la recuperación. Tests de enrutamiento añadidos; falta CI sobre el HEAD y prueba local con proveedor/índice reales. La ejecución local es opt-in, exige confirmación y allowlist HMAC, y no habilita escaneo remoto. |
+| CLI y flujo de agentes | Implementado e integrado | Calidad semántica con modelos reales no evaluada |
+| Proveedores LLM | Cuatro familias integradas más plugins | Pruebas reales de cuotas, latencia, coste, fallos y privacidad pendientes |
+| Conocimiento | 48 paquetes offline y 48 perfiles de dominio | Profundidad no validada; no es corpus experto exhaustivo |
+| Investigación | 48 agendas y 48 dossiers exploratorios M1 | No son revisiones sistemáticas ni investigación empírica |
+| Recuperación | SQLite/FTS, embeddings y recuperación híbrida | Benchmark experto de relevancia y embeddings reales pendiente |
+| Herramientas | 21 declaradas; 20 IDs TOOL_SPECS; Nuclei separado | Binarios/bases no garantizados; aislamiento host general pendiente |
+| Memoria y Skills | Ledger, memoria verificada, Skillbook y auditoría | Firmante KMS/HSM, identidad y doble control pendientes |
+| Pruebas automatizadas | 594 pruebas, 1 omitida en Python CI del SHA citado | No demuestran eficacia semántica ni seguridad operacional |
+| Sandbox | YARA/TShark con Docker endurecido | Docker comparte kernel; no es una microVM |
+| Operación institucional | Backups, preflight, SBOM y evidencia local implementados parcialmente | DR, WORM, RBAC/MFA, KMS/HSM, carga y revisión independiente pendientes |
 
-| Escaneo remoto autorizado → Nuclei → evidencia común → validador → ledger | Implementación añadida; CI pendiente | `nuclei_scanner.py` normaliza el contrato `cyber-ai.remote-scan.v1`, conserva el ID de autorización y del evento de ledger, rechaza salida JSONL malformada, exige estado/código de salida correctos y comprueba que cada `matched-at` permanezca en el origen autorizado. La validación estructural no certifica veracidad ni explotabilidad. Sigue siendo una ruta explícita y separada: no se activa desde el planificador multiagente ni hereda permisos de herramientas locales. |\n| Orquestador → planificador → adaptadores locales → evidencia → validador → ledger → agentes | Implementación añadida; CI pendiente | `--team --execute-tools --confirm-tool-execution --tool-target` ejecuta hasta tres adaptadores locales elegibles; exige allowlist HMAC, limita el objetivo al repositorio, guarda evidencia estructurada y referencia eventos del ledger. El validador independiente rechaza hashes inconsistentes, binarios/objetivos modificados, salida truncada, código distinto de cero o allowlist no aplicada. Los resultados se incluyen en el contexto de los agentes y en el informe final. No valida la veracidad del hallazgo ni impone aislamiento de red del host. |
+## Flujo principal
 
-## Brechas que admiten trabajo en el repositorio
-
-| Área | Estado | Evidencia / criterio de aceptación |
+| Capacidad | Estado | Evidencia y límite |
 |---|---|---|
-| Regresión de Skills | Implementada; CI aprobado en SHA `5e2e85c` | `skill_regression.py` evalúa Recall@K, Precision@K, MRR@K y hit rate; verifica hash-chain y estado activo de cada Skill esperada; no altera contadores de uso. Suite Python de 456 pruebas aprobada en el SHA exacto. Falta dataset curado con Skills reales y umbrales aprobados por dominio. |
-| Dependencias reproducibles | Parcial | `requirements.lock` fija versiones; CI calcula hashes de wheels y los publica en SBOM por plataforma. Falta lock con `--require-hashes` y hashes oficiales verificados para cada plataforma/arquitectura soportada. No inventar hashes. |
-| Procedencia e integridad de herramientas | Parcial; allowlist HMAC implementada | Se registra ruta, versión y SHA-256 antes/después; `tool_allowlist.py` valida manifiesto HMAC y SHA-256 aprobado antes de ejecutar cuando se configura. `CYBER_AI_TOOL_ALLOWLIST_REQUIRED=1` fuerza modo fail-closed. Falta enrolamiento confiable, custodia/rotación externa de clave, mitigación TOCTOU mediante artefactos inmutables y CI del HEAD actual. |
-| Permisos Windows | Pendiente; smoke test de allowlist añadido | El workflow ejecuta pruebas de lectura/validación de allowlist en `windows-latest`; esto no verifica ACL de datos, secretos ni evidencias. Los controles POSIX 0700/0600 no prueban ACL Windows. Falta aplicar y verificar DACL mediante APIs nativas y runner Windows. |
-| Resiliencia del almacenamiento | Parcial | Hay pruebas de transacciones, bloqueo, corrupción lógica y crash de proceso simulado. Faltan pruebas de estrés prolongado, disco lleno, terminación del host y recuperación desde almacenamiento real. |
-| Evaluación de conocimiento | Parcial; entradas endurecidas y CI aprobado en SHA `5e2e85c` | El benchmark valida JSONL y listas en memoria, normaliza IDs/categorías, limita recursos, valida vectores finitos y forma de resultados; mide Recall@K, Precision@K y MRR@K. Falta corpus etiquetado revisado por expertos, embeddings reales y umbrales de aceptación por área. |
-| Extracción documental | Parcial | Extracción de formatos soportados con límites y marcadores de página PDF. OCR y ejecución aislada de parsers no están integrados. |
-| Integración de proveedores | Parcial | Adaptadores y tests simulados. Faltan pruebas con cuentas reales, cuotas, latencia, errores, costes y políticas de datos de cada proveedor. |
+| `cyber_ai.py --ask` → DIRECTOR → especialista | Implementado e integrado | Enrutamiento y recuperación por defecto; selección semántica avanzada y calidad real no medidas |
+| `cyber_ai.py --team` → planificador → orquestador | Implementado e integrado | Orquestación, supervisión, plan de capacidades y simulación determinista; simulación no prueba razonamiento real |
+| Proveedor LLM intercambiable | Parcialmente integrado | Ollama, OpenAI-compatible, Anthropic y Gemini; otros proveedores requieren plugin compatible. Fallback actual es por capacidad/configuración, no reintento robusto de fallos transitorios |
+| Recuperación de conocimiento y Skills | Integrada | Requiere configurar proveedor de embeddings e indexar; calidad de recuperación no validada con dataset experto |
+| Herramientas → evidencia → validación → ledger | Parcialmente integrado | Ejecución opt-in; la salida de la herramienta es evidencia no confiable y la validación estructural no demuestra verdad del hallazgo |
+| Escaneo remoto Nuclei | Runner independiente | Autorización explícita y ledger; DNS bloqueado hasta pinning y control de egress adecuados |
 
-## Validación externa u operativa
+## Conocimiento e investigación
 
-| Área | Evidencia necesaria | Responsable |
+| Elemento | Estado | Criterio que falta |
 |---|---|---|
-| Secretos y claves | KMS/HSM/gestor externo, rotación, revocación, recuperación y segregación de funciones probadas | Propietario/operaciones |
-| Identidad y acceso | RBAC, IdP, MFA, roles y auditoría de acceso demostrados | Propietario/seguridad |
-| Integridad externa | Checkpoints fuera del host y almacenamiento WORM/offsite administrado independientemente | Operaciones |
-| Backups y DR | Cifrado, claves independientes, restauración, RPO/RTO y simulacro de pérdida de host | Operaciones |
-| Aislamiento | MicroVM/VM desechable y pruebas de escape; Docker no sustituye una frontera de VM | Plataforma/seguridad |
-| Calidad del conocimiento | Licencia, procedencia, vigencia y exactitud revisadas para cada fuente externa | Especialistas |
-| Producción | Carga, soak, alertas, observabilidad, respuesta a incidentes y aceptación de riesgos | Propietario |
-| Release | Revisión independiente, protección de rama, required checks, licencia y autorización de publicación | Propietario |
+| Paquetes offline | 48/48 presentes | Revisión técnica específica por subtema y actualización continua |
+| Perfiles de dominio | 48/48 conectados al manifiesto | No prueban cobertura operativa |
+| Módulos de profundización | 48/48 con estructura y compendio | Contenido específico, fuentes leídas y validación experta |
+| Agendas de investigación | 48/48 | Ejecutar estudios y publicar resultados reproducibles |
+| Dossiers bibliográficos | 48/48 exploratorios M1 | No elevar a revisión sistemática sin protocolo ejecutado |
+| Matriz de cobertura global | 48 áreas y 61 familias de referencia mapeadas | La profundidad permanece `not_assessed_by_this_crosswalk` |
+| Registro de fuentes de investigación | 138 fuentes observadas en el último preflight | 0 revisadas; 276 verificaciones pendientes según auditoría de procedencia de ese SHA; licencias y lectura integral sin aprobar |
+| Recuperación semántica | Código implementado | Benchmark etiquetado por especialistas, métricas y umbrales por dominio |
+| Extracción documental | Formatos soportados parcialmente | OCR y parsers aislados; fixtures reales PDF/Office y validación de documentos hostiles |
 
-## Validación reciente de código
+Los paquetes editoriales, agendas y fuentes catalogadas no deben presentarse como conocimiento experto exhaustivo. La descarga externa continúa deshabilitada hasta aprobar procedencia, licencia, integridad y política de egreso.
 
-- SHA histórico exacto: `5e2e85cec0c2f4cb3627e87617be0c244f83cd27`; no valida el HEAD actual de `main` (`18aa78dfc33dab5b14523dd2d653eba1abc45f78`).
-- Python tests: [success, 456 pruebas](https://github.com/Xero-29/CYBER_AI/actions/runs/44111423059).
-- Docker sandbox: [success](https://github.com/Xero-29/CYBER_AI/actions/runs/44111420579).
-- Estos resultados no validan commits posteriores ni sustituyen pruebas operacionales externas. El workflow Python ahora incluye un smoke test Windows de la allowlist y el workflow Docker se ejecuta también en pushes a `main`; los resultados de ambos workflows sobre el HEAD actual siguen sin estar disponibles.
+## Herramientas y aislamiento
 
-## Evidencia por commit
-
-Toda afirmación de CI debe indicar SHA completo y enlace a cada workflow. Si el HEAD cambia, la evidencia del commit anterior no valida el nuevo HEAD. Los estados **pendiente**, **en curso** o sin ejecución asociada nunca se describen como aprobados.
-
-## Protocolo de cierre
-
-1. Identificar una brecha y su criterio de aceptación.
-2. Implementar el cambio en la rama autorizada por el propietario. En esta etapa, el alcance solicitado incluye directamente `main`; conservar el respaldo previo y registrar cada cambio.
-3. Añadir pruebas negativas, límites y regresiones.
-4. Ejecutar CI sobre el SHA resultante.
-5. Inspeccionar fallos y corregirlos; repetir hasta obtener evidencia verde.
-6. Actualizar esta matriz y `PROJECT_STATUS.md` con SHA, enlaces y límites residuales.
-7. Si requiere infraestructura externa, dejarlo como pendiente operativo con evidencia concreta requerida.
-
-
-## Matriz transversal de dominios
-
-| Criterio | Estado | Evidencia / límite |
+| Grupo | Recuento/estado | Límite |
 |---|---|---|
-| 48 paquetes offline ↔ 48 perfiles | CI aprobado en SHA `d560a11cc890a02a0388ebbb27c36044832f8d02` | `domain_capability_matrix.py` compara IDs exactos contra `knowledge/packs/manifest.json`; 510 pruebas pasaron en el workflow Docker run `44130731532`. |
-| Dominio ↔ herramientas candidatas | CI aprobado en SHA `d560a11cc890a02a0388ebbb27c36044832f8d02` | Cada perfil declara IDs del catálogo; el plan informa disponibilidad, adaptador y estado de integración y añade candidatas al plan de ejecución. La selección no autoriza ni ejecuta. |
-| Dominio ↔ Skills activas | Integrado en planificación; CI aprobado para la ruta de planificación | Se consultan Skills activas por tarea/dominio sin modificar contadores; solo se sugieren, no se promueven. La recuperación semántica real con corpus/Skills expertas sigue requiriendo validación de calidad. |
-| Cobertura operativa de las 48 áreas | Pendiente | Los perfiles de enrutamiento no sustituyen herramientas específicas, corpus experto, laboratorios, pruebas ni aceptación de resultados por dominio. La cobertura operativa integral sigue pendiente. |
+| Catálogo | 21 herramientas declaradas | Catálogo no significa instalación |
+| Registro local | 20 IDs en `TOOL_SPECS` | Adaptador no significa ejecución lista |
+| Adaptadores host | 17: 16 local/offline y Nmap scoped | No hay sandbox general de host |
+| pip-audit | Registrado, bloqueado | Política de red específica pendiente |
+| YARA/TShark | Runner Docker aislado | Docker comparte kernel; amenaza hostil requiere frontera más fuerte |
+| Nuclei | Runner remoto separado | Egress allowlist y DNS pinning pendientes |
+| OSV-Scanner/Grype | Adaptadores offline | DB local, esquema y vigencia necesitan preflight |
+| Nmap | CIDR/IP allowlisted y escaneo TCP limitado | Aislamiento egress de sistema operativo no impuesto |
+| Herramientas personalizadas | Registro declarativo | No se puede garantizar que no accedan a red; evidencia declara `network_access=not_enforced` |
 
-## CI de la integración transversal
+## Memoria, Skills y evidencia
 
-- SHA de código: `d560a11cc890a02a0388ebbb27c36044832f8d02`.
-- Docker sandbox: [run 44130731532 — success](https://github.com/Xero-29/CYBER_AI/actions/runs/44130731532). Ejecutó 510 pruebas, construyó el sandbox de YARA/TShark y completó el smoke de Ruff.
-- Python tests independiente: run 44130731618 estaba pendiente al registrar este estado; no se marca como aprobado.
-- Los resultados CI no prueban que todas las herramientas estén instaladas ni que las 48 áreas tengan cobertura operativa.
+| Capacidad | Estado | Límite |
+|---|---|---|
+| Ledger de ejecuciones | Implementado | Checkpoints externos inmutables y restauración independiente pendientes |
+| Memoria de lecciones | Verifica firma/evidencia contra ledger | Custodia y rotación de claves externas pendientes |
+| Skillbook | Verifica historial append-only y snapshot vigente | Dataset real de regresión con juicios independientes pendiente |
+| Promoción de Skills | Flujo controlado con aprobación HMAC | HMAC no ofrece identidad individual, KMS/HSM ni doble control |
+| Auditoría del ciclo | Read-only, con diagnóstico de memoria, ledger y Skills | No sustituye monitorización continua ni revisión humana |
+
+## Seguridad, resiliencia y gobierno
+
+| Control | Estado | Cierre requerido |
+|---|---|---|
+| Autorización de herramientas | Parcial, opt-in y alcance explícito | Política común fail-closed e identidad/roles |
+| Allowlist ejecutables | HMAC opcional por compatibilidad; modo obligatorio configurable | Enrolamiento confiable, rotación, revocación y mitigación TOCTOU |
+| Aislamiento de ejecución | YARA/TShark en Docker | Runner común host, microVM/VM para cargas no confiables |
+| Aislamiento de red | Docker network none para YARA/TShark | Firewall/namespace para Nmap y Nuclei, DNS pinning |
+| Secretos | Variables externas y recomendaciones documentadas | Secret manager/KMS, rotación y revocación demostradas |
+| Backups | Integridad y restauración local implementadas | Cifrado, off-host, DR y simulacro de pérdida |
+| Identidad y acceso | No demostrado end-to-end | RBAC, IdP, MFA, segregación de funciones |
+| Observabilidad | Logs/evidencia local | Métricas, trazas, alertas, retención y redacción |
+| Resiliencia | Pruebas unitarias/transacciones parciales | Load, soak, concurrencia, disco lleno, pérdida de host y RPO/RTO |
+| Gobernanza | Threat model y release gates documentados | Revisión independiente, protección de rama y aceptación formal de riesgos |
+
+## Evidencia CI por SHA
+
+| SHA | Workflow | Resultado | Qué demuestra |
+|---|---|---|---|
+| `0767cd68d418f7bfbb69bbe336106a9e869de563` | [Python tests #44181807943](https://github.com/Xero-29/CYBER_AI/actions/runs/44181807943) | Success; 594 pruebas, 1 omitida | Suite Python, preflight, verificaciones y artefacto SBOM del workflow |
+| `0767cd68d418f7bfbb69bbe336106a9e869de563` | [Docker sandbox #44181807961](https://github.com/Xero-29/CYBER_AI/actions/runs/44181807961) | Success | Build/smoke del sandbox y artefacto de evidencia |
+| `125f6a21fa08c38188b2d4ce8fe52ceb95fe7c05` | [Python #44179945373](https://github.com/Xero-29/CYBER_AI/actions/runs/44179945373) | Success | Suite del commit anterior |
+| `125f6a21fa08c38188b2d4ce8fe52ceb95fe7c05` | [Docker #44179945273](https://github.com/Xero-29/CYBER_AI/actions/runs/44179945273) | Success | Sandbox del commit anterior |
+
+## Próximas acciones
+
+1. Corregir y mantener sincronizados README, estado del proyecto, inventario y matriz (Fase 0).
+2. Implementar preflight local fiable para bases OSV-Scanner y Grype; nunca descargar durante el escaneo.
+3. Diseñar runner común aislado y separar Nmap/Nuclei en perfiles de red con enforcement de firewall/egress.
+4. Construir benchmark real de recuperación y selector de agentes; revisar contenido de los 48 dominios.
+5. Añadir firma externa e identidad al ciclo de Skills.
+6. Ejecutar validación operacional, DR, carga y revisión independiente antes de piloto.
+
+## Regla de actualización
+
+Cada cambio de estado debe enlazar al código, pruebas y SHA exacto. No se marca como validado por existir un archivo, una entrada de catálogo, un mock o una simulación. Los estados que dependen de infraestructura deben permanecer abiertos hasta adjuntar evidencia operacional.
