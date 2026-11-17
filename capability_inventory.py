@@ -84,6 +84,8 @@ def build_inventory():
                 and not TOOL_SPECS[tool_id].get("network", False)
             ),
             "requires_isolation": requires_isolation,
+            "offline_only": bool(TOOL_SPECS.get(tool_id, {}).get("offline_only", False)),
+            "local_database_required": bool(TOOL_SPECS.get(tool_id, {}).get("local_database_required", False)),
             "host_network_isolation_enforced": (
                 requires_isolation and isolated_available
             ),
@@ -140,7 +142,7 @@ def build_inventory():
             ),
             "direct_execution_requires_explicit_execute": True,
         },
-        "note": "Inventario de presencia; no ejecuta, instala ni autoriza herramientas. YARA/TShark requieren imagen Docker y allowlist HMAC. La matriz de dominios enlaza paquetes y candidatas, no acredita cobertura operativa.",
+        "note": "Inventario de presencia; no ejecuta, instala ni autoriza herramientas. OSV-Scanner/Grype requieren bases locales previamente aprovisionadas; offline_only es una opción del propio escáner, no aislamiento de egress del SO. YARA/TShark requieren imagen Docker y allowlist HMAC. La matriz de dominios enlaza paquetes y candidatas, no acredita cobertura operativa.",
     }
 
 
