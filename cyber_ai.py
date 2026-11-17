@@ -107,6 +107,9 @@ def main():
     group.add_argument("--scan", help="Escanear una URL HTTP/HTTPS autorizada con Nuclei.")
     parser.add_argument("--agent", help="Especialista opcional para --ask.")
     parser.add_argument("--workflow", help="Flujo de config/workflows.json para --team.")
+    parser.add_argument("--execute-tools", action="store_true", help="Ejecutar adaptadores locales planificados.")
+    parser.add_argument("--confirm-tool-execution", action="store_true", help="Confirmación explícita para ejecutar adaptadores.")
+    parser.add_argument("--tool-target", help="Ruta relativa al repositorio que se analizará.")
     parser.add_argument("--no-knowledge", action="store_true", help="Desactivar recuperación de conocimiento en --ask.")
     parser.add_argument("--confirm-authorized", action="store_true", help="Confirmación adicional del operador.")
     parser.add_argument("--authorization-id", help="ID de autorización local, vigente y limitada al destino.")
@@ -115,6 +118,14 @@ def main():
     if args.team:
         if args.agent or args.no_knowledge:
             parser.error("--agent y --no-knowledge no se aplican al flujo --team.")
+        if args.execute_tools and (
+            not args.confirm_tool_execution or not args.tool_target
+        ):
+            parser.error("--execute-tools requiere --confirm-tool-execution y --tool-target.")
+        if not args.execute_tools and (
+            args.confirm_tool_execution or args.tool_target
+        ):
+            parser.error("--confirm-tool-execution y --tool-target requieren --execute-tools.")
         command = [
             sys.executable,
             str(Path(__file__).resolve().parent / "team_orchestrator.py"),
@@ -122,12 +133,17 @@ def main():
         ]
         if args.workflow:
             command.extend(["--workflow", args.workflow])
+        if args.execute_tools:
+            command.extend([
+                "--execute-tools", "--confirm-tool-execution",
+                "--tool-target", args.tool_target,
+            ])
         command.append(args.team)
         result = subprocess.run(command, cwd=Path(__file__).resolve().parent, check=False)
         return result.returncode
 
-    if args.workflow:
-        parser.error("--workflow solo puede utilizarse junto con --team.")
+    if args.workflow or args.execute_tools or args.confirm_tool_execution or args.tool_target:
+        parser.error("--workflow y las opciones de ejecución solo pueden utilizarse junto con --team.")
 
     if args.ask:
         command = [sys.executable, str(Path(__file__).resolve().parent / "director.py"), args.ask]
