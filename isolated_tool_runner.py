@@ -5,6 +5,7 @@ al host. El objetivo y las reglas se montan en solo lectura.
 """
 import hashlib
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -31,7 +32,7 @@ def _docker_image_id(docker, image):
             "No está construida la imagen aislada. Ejecuta sh build-analysis-sandbox.sh."
         )
     value = result.stdout.strip()
-    if not value.startswith("sha256:") or len(value) != 71:
+    if not re.fullmatch(r"sha256:[0-9a-f]{64}", value):
         raise ToolExecutionError("Docker devolvió un identificador de imagen inválido.")
     return value.removeprefix("sha256:")
 
@@ -82,7 +83,7 @@ def run_isolated_tool(tool_id, target, *, config_path=None, timeout=180,
         command.extend([
             "--mount", "type=bind,src=" + str(rules) + ",dst=/rules/rules.yar,readonly",
         ])
-    command.append(image)
+    command.append("sha256:" + image_id)
     if tool_id == "yara":
         command.extend(["yara", "-r", "/rules/rules.yar", "/input"])
     else:
