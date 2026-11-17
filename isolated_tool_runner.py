@@ -7,7 +7,9 @@ import hashlib
 import os
 import shutil
 import subprocess
+import tempfile
 import threading
+import uuid
 import time
 from pathlib import Path
 
@@ -66,8 +68,9 @@ def run_isolated_tool(tool_id, target, *, config_path=None, timeout=180,
         container_user = f"{os.getuid()}:{os.getgid()}"
     else:
         container_user = "65532:65532"
+    cidfile = Path(tempfile.gettempdir()) / ("cyber-ai-sandbox-" + uuid.uuid4().hex + ".cid")
     command = [
-        docker, "run", "--rm", "--pull=never",
+        docker, "run", "--rm", "--pull=never", "--cidfile", str(cidfile),
         "--network=none", "--read-only", "--cap-drop=ALL",
         "--security-opt=no-new-privileges", "--pids-limit=64",
         "--memory=1g", "--cpus=1.0", "--user=" + container_user,
@@ -117,6 +120,16 @@ def run_isolated_tool(tool_id, target, *, config_path=None, timeout=180,
             return_code = process.wait(timeout=timeout)
         except subprocess.TimeoutExpired:
             timed_out = True
+            try:
+                container_id = cidfile.read_text(encoding="ascii").strip()
+                if len(container_id) == 64 and all(c in "0123456789abcdef" for c in container_id):
+                    subprocess.run(
+                        [docker, "kill", container_id], stdin=subprocess.DEVNULL,
+                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                        timeout=10, check=False,
+                    )
+            except (OSError, subprocess.TimeoutExpired, UnicodeError):
+                pass
             if os.name == "posix":
                 import signal
                 try:
@@ -131,6 +144,11 @@ def run_isolated_tool(tool_id, target, *, config_path=None, timeout=180,
             reader.join(timeout=5)
     except OSError as exc:
         raise ToolExecutionError("No se pudo iniciar Docker para el análisis aislado.") from exc
+    finally:
+        try:
+            cidfile.unlink(missing_ok=True)
+        except OSError:
+            pass
 
     after = _hash_target(path)
     modified = before != after
