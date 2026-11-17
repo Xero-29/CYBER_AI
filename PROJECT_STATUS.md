@@ -3,19 +3,19 @@
 > Esta sección describe el HEAD verificado; los bloques históricos inferiores son contexto, no estado actual.
 
 **Rama:** `main`  
-**HEAD auditado:** `71bab12b35690ada40e3f6bbc6e4e7bcfd0d88cb` (antes de esta ronda de correcciones).  
+**HEAD auditado:** `c51bfe087bcd533a1ff1bc42268cade2b7c9a21b` (correcciones funcionales de esta ronda).  
 **Árbol:** 220 archivos; 46 módulos Python de producción y 490 pruebas reportadas por la última CI.  
-**CI en HEAD auditado:** Python tests y Docker sandbox completados con éxito (run IDs `44120967805` y `44120967821`).  
+**CI:** Docker sandbox aprobado en el HEAD auditado (run `44122739051`); el workflow Python está pendiente de asignación de runner (run `44122739059`).  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17`, sin modificar.
 
 ## Auditoría estructural y funcional
 
 - La limpieza anterior retiró seis prototipos/demos sin consumidores de producción: `audit_target.py`, `test_api.py`, `agent_benchmark.py`, `agent_core.py`, `tests/test_agent_core.py` y `verifier.py`.
 - Se conservaron herramientas CLI y subsistemas independientes con finalidad concreta, aunque no sean imports directos del orquestador.
-- La revisión detectó un fallo real de portabilidad: `knowledge_downloader.py` importaba `fcntl` incondicionalmente, por lo que el comando no podía arrancar en Windows. La corrección en curso reutiliza el bloqueo POSIX/Windows ya probado de `knowledge_bootstrap.py`.
-- Se detectó además que el downloader confiaba en el estado `downloaded` del manifiesto y omitía el recurso sin verificar el archivo. La corrección en curso fuerza la comprobación SHA-256 y permite recuperar archivos ausentes o alterados.
+- La revisión detectó un fallo real de portabilidad: `knowledge_downloader.py` importaba `fcntl` incondicionalmente, por lo que el comando no podía arrancar en Windows. La corrección reutiliza el bloqueo POSIX/Windows de `knowledge_bootstrap.py` y se añadió su ejecución a la comprobación Windows.
+- Se detectó además que el downloader confiaba en el estado `downloaded` del manifiesto y omitía el recurso sin verificar el archivo. La corrección fuerza la comprobación SHA-256 y permite recuperar archivos ausentes o alterados; se añadió una prueba de regresión.
 - No se eliminan los `pass` encontrados de forma automática: los observados pertenecen a limpieza de temporales o manejo de fallos secundarios, no a implementaciones vacías.
-- Los resultados de CI se deben asociar al SHA exacto. Los dos workflows del HEAD anterior están verdes; los cambios de esta ronda requieren nueva CI antes de considerarse verificados.
+- Los resultados de CI se deben asociar al SHA exacto. El sandbox Docker del HEAD actual está verde, incluyendo `verify.sh` y Ruff. El workflow Python independiente sigue pendiente, por lo que no se declara verificación completa.
 
 ## Funciones mantenidas
 
