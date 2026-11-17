@@ -1,22 +1,36 @@
 # Estado canónico vigente — 2026-11-17
 
-> Esta sección registra el último código funcional verificado; los bloques históricos inferiores son contexto.
+> Esta sección registra el último código funcional verificado; los bloques inferiores conservan el historial.
 
 **Rama:** `main`  
-**Código funcional verificado:** `db0710c87a6e8de58686b86454729f0c8cebd350`. Se endureció la simulación y se unificó el contrato de workflows entre el simulador y el orquestador real.  
-**CI del código verificado:** Python run `44154159852` — **564 pruebas, OK (1 omitida)**; Docker sandbox run `44154159866` — **success**, incluyendo build de ambas imágenes, suite completa y Ruff en sandbox.  
-**Alcance:** estas pruebas no conectan proveedores LLM reales ni demuestran exactitud semántica o eficacia de herramientas. Las pruebas Windows siguen aplazadas.  
+**Código funcional verificado:** `6fa5da29c23f2d39c79ea93adb3a1fbb1018a0bf`.  
+**CI Python:** run `44179766971` — **594 pruebas aprobadas, 1 omitida**.  
+**CI Docker sandbox:** run `44179766961` — **success**, build de ambas imágenes, verificación completa y Ruff en el sandbox.  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17`, sin modificar.
 
-## Último cambio: contratos compartidos y simulación multiagente — 2026-11-17
+## Último cambio: memoria, Skills, diagnóstico y herramientas — 2026-11-17
 
-- Se añadió `workflow_contracts.py` como contrato estructural común para `team_orchestrator.py` y `agent_simulation.py`; ya no mantienen validadores divergentes.
-- Se validan modo, agentes, objetivos, etapas, límites de contexto, rondas, reintentos, presupuestos de tokens, parámetros de recuperación de conocimiento y flags booleanos.
-- El orquestador real valida el contrato antes de cargar/configurar agentes; conserva las opciones de ejecución y normaliza los campos estructurales.
-- El simulador valida los tres flujos reales (`investigacion`, `critica_corta`, `revision_tecnica`), el CLI, entradas inválidas y fixtures adversariales.
-- La transferencia simulada reproduce el recorte FIFO de `team_orchestrator.build_prompt`; una prueba de integración compara ambos comportamientos.
-- Los informes registran etapas de contexto descartadas. La documentación está en `docs/AGENT_SIMULATION.md`.
-- **Límite:** sigue siendo simulación determinista. No prueba razonamiento real, coordinación semántica entre LLMs ni ejecución de herramientas reales.
+### Ciclo de aprendizaje
+- `learning_memory.read_lessons` verifica la firma VERITAS y vuelve a contrastar IDs, hashes, namespace, estado de las ejecuciones y revisiones independientes contra el ledger actual. Si la evidencia falta, cambia o el ledger no es íntegro, la lección no se inyecta.
+- `skillbook.search_skills` verifica la cadena append-only y el snapshot vigente de cada Skill antes de recuperarla. Una Skill alterada o con historial roto queda excluida del contexto.
+- `learning_cycle_audit.py` inspecciona ledger, memoria, versiones de Skills, ejecuciones interrumpidas y revisiones pendientes. No modifica eventos ni Skills; admite informe JSON privado.
+- `ExecutionLedger(..., initialize=False)` permite auditorías sin crear ni migrar el ledger.
+- Se añadieron pruebas de evidencia ausente, hash alterado, ledger corrupto, historial de Skill manipulado, eventos huérfanos, escritura segura y modo de solo lectura.
+
+### Herramientas
+- Se agregaron adaptadores locales para OSV-Scanner (`--offline`), Grype (actualización automática y fuentes externas deshabilitadas), Gitleaks (redacción total), Zeek (solo PCAP/PCAPNG/CAP y workspace temporal) y Volatility 3 (modo offline, plugin allowlisted y caché temporal).
+- Se añadió Nmap con autorización explícita `--authorized-network`, IP/CIDR literal de máximo 16 direcciones, allowlist `CYBER_AI_NMAP_ALLOWED_CIDRS`, TCP connect limitado a 100 puertos, sin NSE, DNS ni evasión.
+- El inventario ahora registra **21 herramientas declaradas, 20 IDs en TOOL_SPECS y 1 herramienta con runner separado/catalogación fuera de TOOL_SPECS (Nuclei)**. pip-audit continúa registrado pero bloqueado por política de red.
+- Se corrigió el registro de códigos de salida con hallazgos: Gitleaks puede terminar con código 1 y seguir siendo un escaneo completado, sin confundir hallazgos con fallo del proceso.
+
+### Límites pendientes
+- OSV-Scanner y Grype requieren bases locales; falta un preflight que compruebe su presencia, esquema y vigencia antes de declarar disponibilidad.
+- Nmap tiene alcance limitado por software, pero **no** aislamiento de egress a nivel del sistema operativo. Falta aplicar firewall/sandbox de red obligatorio.
+- Los adaptadores host no tienen sandbox general. pip-audit sigue bloqueado y Nuclei requiere completar filtrado de egress y DNS pinning.
+- La memoria y promoción de Skills siguen dependiendo de una clave HMAC externa; falta firma independiente KMS/HSM, identidad del aprobador y doble control.
+- El benchmark de regresión requiere consultas y juicios de relevancia revisados sobre Skills reales; no se fabricaron etiquetas ni resultados.
+- No se han ejecutado modelos LLM reales, escáneres reales, laboratorios de explotación/forense ni pruebas locales del usuario. CI valida código, no eficacia semántica ni exactitud de hallazgos.
+- Windows sigue aplazado. La adquisición externa de conocimiento continúa con descargas deshabilitadas y licencias pendientes de revisión por documento.
 
 ## Integración de dominios, herramientas y Skills
 
