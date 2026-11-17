@@ -42,6 +42,9 @@ jobs:
             --tag cyber-ai-tool-sandbox:ci \
             --file sandbox/Dockerfile .
 
+      - name: Build isolated YARA and TShark analysis image
+        run: sh build-analysis-sandbox.sh
+
       - name: Protect checked-out runtime data directories
         run: |
           if [[ -d data && ! -L data ]]; then
@@ -49,6 +52,8 @@ jobs:
           fi
 
       - name: Run complete local verification
+        env:
+          CYBER_AI_RUN_DOCKER_SANDBOX_TESTS: "1"
         run: bash verify.sh
 
       - name: Run Ruff inside hardened sandbox
