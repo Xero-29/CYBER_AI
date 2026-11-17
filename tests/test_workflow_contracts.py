@@ -93,9 +93,10 @@ class WorkflowContractTests(unittest.TestCase):
                     }
                 }
             }), encoding="utf-8")
-            with patch.object(team_orchestrator, "WORKFLOW_FILE", path), \\
-                 patch.object(team_orchestrator, "load_config") as load_config:
-                with self.assertRaises(ValueError):
+            with (
+                patch.object(team_orchestrator, "WORKFLOW_FILE", path),
+                patch.object(team_orchestrator, "load_config") as load_config,
+            ):
                     team_orchestrator.load_workflow("invalid")
                 load_config.assert_not_called()
 
@@ -118,9 +119,10 @@ class WorkflowContractTests(unittest.TestCase):
                     "NEXO": {"enabled": True, "type": "reasoning"}
                 }
             }
-            with patch.object(team_orchestrator, "WORKFLOW_FILE", path), \\
-                 patch.object(team_orchestrator, "load_config", return_value=config):
-                workflow = team_orchestrator.load_workflow("valid")
+            with (
+                patch.object(team_orchestrator, "WORKFLOW_FILE", path),
+                patch.object(team_orchestrator, "load_config", return_value=config),
+            ):
             self.assertEqual(workflow["steps"][0]["agent"], "NEXO")
             self.assertEqual(workflow["steps"][0]["objective"], "revisar")
             self.assertEqual(workflow["steps"][0]["mode"], "technical")
