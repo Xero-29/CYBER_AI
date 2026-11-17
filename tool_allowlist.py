@@ -96,6 +96,10 @@ def load_signed_tool_allowlist(path, key):
 
 
 def verify_tool_allowed(tool_id, binary_sha256):
+    if not isinstance(tool_id, str) or not re.fullmatch(r"[a-z0-9_-]{1,64}", tool_id):
+        raise ToolAllowlistError("Identificador de herramienta inválido.")
+    if not isinstance(binary_sha256, str) or not re.fullmatch(r"[0-9a-f]{64}", binary_sha256):
+        raise ToolAllowlistError("SHA-256 de ejecutable inválido.")
     path = os.environ.get("CYBER_AI_TOOL_ALLOWLIST_PATH")
     key_text = os.environ.get("CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY")
     required = os.environ.get("CYBER_AI_TOOL_ALLOWLIST_REQUIRED", "").strip().lower() in {"1", "true", "yes"}
