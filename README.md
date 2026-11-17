@@ -280,3 +280,14 @@ python ledger_cli.py history --namespace local-tools
 - `reports/`: resultados y evidencias generadas.
 
 Al informar un fallo, conserva el comando, versión de Python, salida completa y el identificador de ejecución de CI si aplica.
+
+
+## Simulación de coordinación multiagente
+
+Antes de conectar o validar proveedores reales, puedes probar los contratos formales y el traspaso secuencial de contexto sin invocar modelos ni herramientas:
+
+```bash
+python agent_simulation.py --workflow investigacion --task "Simular una revisión técnica"
+```
+
+El informe se guarda en `reports/agent_simulations/`. Esta simulación comprueba estructura, prefijos, secciones y detención ante salidas inválidas; **no demuestra razonamiento ni calidad técnica de agentes reales**. Consulta `docs/AGENT_SIMULATION.md` para sus límites y uso desde pruebas.
