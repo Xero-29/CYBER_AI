@@ -12,7 +12,13 @@
       "published": "2024-02-26",
       "verification_status": "official_metadata_verified",
       "verified_scope": "Marco de resultados de gestión del riesgo; no prescribe por sí solo procedimientos técnicos.",
-      "domains": ["foundations", "governance", "vuln_management", "incident_response", "business_continuity"],
+      "domains": [
+        "foundations",
+        "governance",
+        "vuln_management",
+        "incident_response",
+        "business_continuity"
+      ],
       "review_note": "Metadatos y alcance revisados en el registro oficial NIST; descargar y revisar texto completo antes de citar secciones concretas."
     },
     {
@@ -25,7 +31,11 @@
       "published": "2026-08-25",
       "verification_status": "official_metadata_verified",
       "verified_scope": "Uso de referencias informativas y mapeos entre marcos, estándares y recursos.",
-      "domains": ["foundations", "governance", "secure_arch"],
+      "domains": [
+        "foundations",
+        "governance",
+        "secure_arch"
+      ],
       "review_note": "Metadatos y resumen oficial revisados; requiere lectura del documento completo para afirmaciones detalladas."
     },
     {
@@ -38,7 +48,10 @@
       "published": "2026-03-23",
       "verification_status": "official_metadata_verified",
       "verified_scope": "Relación entre riesgo cibernético, riesgo empresarial y gestión de capacidades del personal.",
-      "domains": ["foundations", "governance"],
+      "domains": [
+        "foundations",
+        "governance"
+      ],
       "review_note": "Metadatos y resumen oficial revisados; requiere lectura del documento completo para afirmaciones detalladas."
     },
     {
@@ -50,8 +63,51 @@
       "version": "Continuously maintained online resource",
       "verification_status": "official_resource_metadata_verified",
       "verified_scope": "Exploración de Core, ejemplos de implementación y referencias informativas en formatos humanos y legibles por máquina.",
-      "domains": ["foundations", "governance", "secure_arch", "devsecops"],
+      "domains": [
+        "foundations",
+        "governance",
+        "secure_arch",
+        "devsecops"
+      ],
       "review_note": "Descripción oficial revisada; descargar dataset/versionar snapshot antes de usarlo como evidencia reproducible."
+    },
+    {
+      "id": "NIST-SP-800-61r3",
+      "title": "Incident Response Recommendations and Considerations for Cybersecurity Risk Management: A CSF 2.0 Community Profile",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.800-61r3",
+      "version": "Revision 3",
+      "published": "2025-04-03",
+      "verification_status": "official_metadata_verified",
+      "verified_scope": "Integra recomendaciones de respuesta a incidentes en actividades de gestión del riesgo alineadas con CSF 2.0; sustituye SP 800-61 Rev. 2.",
+      "domains": [
+        "incident_response",
+        "soc_siem",
+        "threat_hunting",
+        "business_continuity",
+        "forensics"
+      ],
+      "review_note": "Metadatos, fecha, alcance y supersesión revisados en página oficial NIST; leer el documento completo y registrar secciones antes de citar afirmaciones técnicas."
+    },
+    {
+      "id": "NIST-SP-800-218",
+      "title": "Secure Software Development Framework (SSDF) Version 1.1: Recommendations for Mitigating the Risk of Software Vulnerabilities",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.800-218",
+      "version": "1.1",
+      "published": "2022-02-03",
+      "verification_status": "official_metadata_verified",
+      "verified_scope": "Prácticas de desarrollo seguro agrupadas en preparar la organización, proteger el software, producir software seguro y responder a vulnerabilidades.",
+      "domains": [
+        "software_engineering",
+        "devsecops",
+        "secure_arch",
+        "vuln_management",
+        "supply_chain"
+      ],
+      "review_note": "Metadatos y alcance revisados en página oficial NIST; comprobar perfiles complementarios y versión vigente antes de aplicación concreta."
     }
   ]
 }
