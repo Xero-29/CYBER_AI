@@ -68,7 +68,7 @@ Ejemplo para incorporar esos dos IDs a una allowlist existente sin perder las en
 IMAGE_ID="$(docker image inspect --format '{{.Id}}' cyber-ai-analysis-sandbox:1.0)"
 export CYBER_AI_SANDBOX_IMAGE_SHA256="${IMAGE_ID#sha256:}"
 python - <<'PY'
-import json, os, tempfile
+import json, os
 from pathlib import Path
 from tool_allowlist import load_signed_tool_allowlist, sign_tool_allowlist
 
