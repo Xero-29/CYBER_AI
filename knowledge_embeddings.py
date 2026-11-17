@@ -3,14 +3,23 @@
 
 import fcntl
 
-from agent_runner import (
-    LOCK_FILE,
-    installed_models,
-    unload_other_models,
-    request_json,
-)
+from agent_runner import LOCK_FILE, unload_other_models
 from model_memory_manager import load_config, resolve_agent
+from llm_providers import resolve_provider, resolve_model, request as provider_request, installed_models as provider_models, provider_capabilities
 from knowledge_library import validate_vector
+
+
+def expected_embedding_space(agent_name="ECO"):
+    """Resuelve el espacio vectorial configurado sin iniciar llamadas de red."""
+    config = load_config()
+    name, agent = resolve_agent(agent_name, config)
+    if agent.get("type") != "embeddings":
+        raise ValueError(f"{name} no es un especialista de embeddings.")
+    provider = resolve_provider(config, agent, capability="embeddings")
+    if "embeddings" not in provider_capabilities(provider):
+        raise ValueError(f"El proveedor {provider.get('name')} no ofrece embeddings.")
+    model = resolve_model(provider, agent, name)
+    return model if provider["protocol"] == "ollama" else f"{provider['name']}::{model}"
 
 
 def generate_embeddings(texts, agent_name="ECO"):
@@ -31,9 +40,11 @@ def generate_embeddings(texts, agent_name="ECO"):
     if agent.get("type") != "embeddings":
         raise ValueError(f"{name} no es un especialista de embeddings.")
 
-    model = agent["model"]
+    provider = resolve_provider(config, agent)
+    model = resolve_model(provider, agent, name)
+    available_models = provider_models(provider)
 
-    if model not in installed_models():
+    if available_models is not None and model not in available_models:
         raise ValueError(f"El modelo de embeddings no está instalado: {model}")
 
     LOCK_FILE.parent.mkdir(parents=True, exist_ok=True)
@@ -42,9 +53,11 @@ def generate_embeddings(texts, agent_name="ECO"):
         fcntl.flock(lock, fcntl.LOCK_EX)
 
         try:
-            unload_other_models(model)
+            if provider["protocol"] == "ollama":
+                unload_other_models(model)
 
-            result = request_json(
+            result = provider_request(
+                provider,
                 "api/embed",
                 {
                     "model": model,
@@ -57,7 +70,7 @@ def generate_embeddings(texts, agent_name="ECO"):
 
             if len(raw_vectors) != len(texts):
                 raise RuntimeError(
-                    "Ollama devolvió una cantidad de embeddings distinta "
+                    "El proveedor devolvió una cantidad de embeddings distinta "
                     "de la cantidad de textos enviados."
                 )
 
@@ -66,12 +79,18 @@ def generate_embeddings(texts, agent_name="ECO"):
 
             if any(len(vector) != dimensions for vector in vectors):
                 raise RuntimeError(
-                    "Ollama devolvió embeddings con dimensiones diferentes."
+                    "El proveedor devolvió embeddings con dimensiones diferentes."
                 )
 
+            embedding_space = (
+                model if provider["protocol"] == "ollama"
+                else f"{provider['name']}::{model}"
+            )
             return {
                 "agent": name,
                 "model": model,
+                "embedding_space": embedding_space,
+                "provider": provider["name"],
                 "embeddings": vectors,
                 "dimensions": dimensions,
             }
@@ -88,6 +107,8 @@ def generate_embedding(text, agent_name="ECO"):
     return {
         "agent": result["agent"],
         "model": result["model"],
+        "embedding_space": result["embedding_space"],
+        "provider": result["provider"],
         "embedding": result["embeddings"][0],
         "dimensions": result["dimensions"],
     }

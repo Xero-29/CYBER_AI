@@ -2,14 +2,268 @@
 """Importa documentos de texto a la biblioteca indexada de CYBER_AI."""
 
 import argparse
+import csv
 import hashlib
-import uuid
+import json
+import stat
+import zipfile
+from html.parser import HTMLParser
 from pathlib import Path
 
 from knowledge_embeddings import generate_embeddings
-from knowledge_library import store_chunk
+from knowledge_library import store_chunks, document_chunk_count
 
 PROJECT = Path(__file__).resolve().parent
+MAX_INPUT_BYTES = 100 * 1024 * 1024
+MAX_ARCHIVE_UNCOMPRESSED_BYTES = 256 * 1024 * 1024
+MAX_EXTRACTED_CHARS = 10_000_000
+MAX_JSON_INPUT_BYTES = 20 * 1024 * 1024
+TEXT_EXTENSIONS = {
+    ".txt", ".md", ".rst", ".py", ".js", ".ts", ".tsx", ".jsx",
+    ".java", ".go", ".rs", ".c", ".h", ".cpp", ".hpp", ".sh",
+    ".yaml", ".yml", ".toml", ".ini", ".cfg", ".conf", ".log", ".sql",
+    ".xml",
+}
+
+
+class _VisibleHTMLText(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.parts = []
+        self.hidden_depth = 0
+        self.total_chars = 0
+
+    def _append(self, value):
+        if self.total_chars + len(value) > MAX_EXTRACTED_CHARS:
+            raise ValueError("El texto HTML supera el límite de extracción.")
+        self.parts.append(value)
+        self.total_chars += len(value)
+
+    def handle_starttag(self, tag, attrs):
+        if tag.lower() in {"script", "style", "noscript", "template"}:
+            self.hidden_depth += 1
+        elif tag.lower() in {"p", "div", "br", "li", "tr", "h1", "h2", "h3", "section"}:
+            self._append("\n")
+
+    def handle_endtag(self, tag):
+        if tag.lower() in {"script", "style", "noscript", "template"} and self.hidden_depth:
+            self.hidden_depth -= 1
+        elif tag.lower() in {"p", "div", "li", "tr", "h1", "h2", "h3", "section"}:
+            self._append("\n")
+
+    def handle_data(self, data):
+        if not self.hidden_depth and data.strip():
+            self._append(data.strip())
+            self._append(" ")
+
+
+def _append_bounded(parts, value, total_chars):
+    value = str(value)
+    next_total = total_chars + len(value) + 1
+    if next_total > MAX_EXTRACTED_CHARS:
+        raise ValueError("El texto extraído supera el límite de 10 millones de caracteres.")
+    parts.append(value)
+    return next_total
+
+
+def _validate_office_archive(path):
+    try:
+        with zipfile.ZipFile(path) as archive:
+            items = archive.infolist()
+            if len(items) > 10_000:
+                raise ValueError("El documento Office contiene demasiadas entradas.")
+            total = 0
+            seen_names = set()
+            for item in items:
+                name = item.filename.replace("\\", "/")
+                normalized = str(Path(name))
+                if (
+                    not name or name.startswith("/")
+                    or ".." in Path(name).parts
+                    or normalized in seen_names
+                ):
+                    raise ValueError("El documento Office contiene rutas internas inválidas o duplicadas.")
+                seen_names.add(normalized)
+                mode = item.external_attr >> 16
+                if stat.S_ISLNK(mode):
+                    raise ValueError("No se permiten enlaces simbólicos dentro del documento Office.")
+                if item.flag_bits & 0x1:
+                    raise ValueError("No se admiten entradas cifradas en documentos Office.")
+                if name.lower().endswith("vbaproject.bin"):
+                    raise ValueError("No se admiten proyectos VBA/macros en documentos Office.")
+                total += item.file_size
+                if total > MAX_ARCHIVE_UNCOMPRESSED_BYTES:
+                    raise ValueError("El contenido descomprimido supera el límite permitido.")
+                if item.file_size / max(1, item.compress_size) > 500:
+                    raise ValueError("Ratio de compresión sospechoso en el documento Office.")
+    except zipfile.BadZipFile as error:
+        raise ValueError("El documento Office no es un paquete ZIP válido.") from error
+
+
+def extract_document_text(file_path):
+    """Extrae texto de formatos comunes con límites de tamaño y expansión."""
+    raw_path = Path(file_path).expanduser()
+    if raw_path.is_symlink():
+        raise ValueError("No se permiten enlaces simbólicos como documentos de entrada.")
+    path = raw_path.resolve()
+    if not path.is_file():
+        raise FileNotFoundError(f"No existe el archivo: {path}")
+    if path.stat().st_size > MAX_INPUT_BYTES:
+        raise ValueError("El documento supera el límite de 100 MiB.")
+    suffix = path.suffix.lower()
+
+    if suffix in TEXT_EXTENSIONS:
+        try:
+            with path.open(encoding="utf-8-sig") as stream:
+                text = stream.read(MAX_EXTRACTED_CHARS + 1)
+                if len(text) > MAX_EXTRACTED_CHARS or stream.read(1):
+                    raise ValueError("El documento de texto supera el límite de extracción.")
+        except UnicodeDecodeError as error:
+            raise ValueError("El documento de texto debe estar codificado en UTF-8.") from error
+    elif suffix == ".json":
+        try:
+            if path.stat().st_size > MAX_JSON_INPUT_BYTES:
+                raise ValueError("El JSON supera el límite de 20 MiB de entrada.")
+            data = json.loads(path.read_text(encoding="utf-8-sig"))
+        except (UnicodeDecodeError, json.JSONDecodeError) as error:
+            raise ValueError("El JSON no es válido o no está codificado en UTF-8.") from error
+        text = json.dumps(data, ensure_ascii=False, indent=2)
+        if len(text) > MAX_EXTRACTED_CHARS:
+            raise ValueError("El JSON extraído supera el límite de 10 millones de caracteres.")
+    elif suffix == ".jsonl":
+        try:
+            parts = []
+            total = 0
+            with path.open(encoding="utf-8-sig") as stream:
+                for index in range(1, 200_002):
+                    line = stream.readline(MAX_EXTRACTED_CHARS + 1)
+                    if not line:
+                        break
+                    if index > 200_000:
+                        raise ValueError("El JSONL supera el límite de 200.000 registros.")
+                    if len(line) > MAX_EXTRACTED_CHARS:
+                        raise ValueError("El JSONL supera el límite de 10 millones de caracteres.")
+                    if line.strip():
+                        record = json.loads(line)
+                        total = _append_bounded(
+                            parts, json.dumps(record, ensure_ascii=False, sort_keys=True), total
+                        )
+        except (UnicodeDecodeError, json.JSONDecodeError) as error:
+            raise ValueError("El JSONL contiene una línea inválida o no está codificado en UTF-8.") from error
+        text = "\n".join(parts)
+    elif suffix in {".html", ".htm"}:
+        try:
+            parser = _VisibleHTMLText()
+            with path.open(encoding="utf-8-sig") as stream:
+                for chunk in iter(lambda: stream.read(64 * 1024), ""):
+                    parser.feed(chunk)
+            parser.close()
+            text = "".join(parser.parts)
+        except UnicodeDecodeError as error:
+            raise ValueError("El HTML debe estar codificado en UTF-8.") from error
+    elif suffix == ".csv":
+        try:
+            with path.open("r", encoding="utf-8-sig", newline="") as stream:
+                rows = []
+                total = 0
+                previous_field_size_limit = csv.field_size_limit()
+                try:
+                    csv.field_size_limit(MAX_EXTRACTED_CHARS)
+                    for index, row in enumerate(csv.reader(stream), 1):
+                        if index > 200_000:
+                            raise ValueError("El CSV supera el límite de 200.000 filas.")
+                        total = _append_bounded(rows, "\t".join(cell for cell in row), total)
+                finally:
+                    # csv.field_size_limit is process-global; do not leak policy to callers.
+                    csv.field_size_limit(previous_field_size_limit)
+            text = "\n".join(rows)
+        except UnicodeDecodeError as error:
+            raise ValueError("El CSV debe estar codificado en UTF-8.") from error
+    elif suffix == ".pdf":
+        try:
+            from pypdf import PdfReader
+        except ImportError as error:
+            raise RuntimeError("Para PDF instala las dependencias opcionales: pip install -r requirements-documents.txt") from error
+        reader = PdfReader(str(path), strict=True)
+        if reader.is_encrypted:
+            raise ValueError("No se ingieren PDF cifrados.")
+        if len(reader.pages) > 5000:
+            raise ValueError("El PDF supera el límite de 5.000 páginas.")
+        parts = []
+        total = 0
+        for page_number, page in enumerate(reader.pages, 1):
+            page_text = page.extract_text() or ""
+            total = _append_bounded(
+                parts, f"[PDF page {page_number}]\n{page_text}", total
+            )
+        text = "\n\n".join(parts)
+        if not text.strip():
+            raise ValueError("El PDF no contiene texto extraíble; requiere OCR externo.")
+    elif suffix == ".docx":
+        _validate_office_archive(path)
+        try:
+            from docx import Document
+        except ImportError as error:
+            raise RuntimeError("Para DOCX instala requirements-documents.txt.") from error
+        document = Document(str(path))
+        parts = []
+        total = 0
+        for paragraph in document.paragraphs:
+            if paragraph.text.strip():
+                total = _append_bounded(parts, paragraph.text, total)
+        for table in document.tables:
+            for row in table.rows:
+                total = _append_bounded(parts, " | ".join(cell.text for cell in row.cells), total)
+        text = "\n".join(parts)
+    elif suffix == ".xlsx":
+        _validate_office_archive(path)
+        try:
+            from openpyxl import load_workbook
+        except ImportError as error:
+            raise RuntimeError("Para XLSX instala requirements-documents.txt.") from error
+        workbook = load_workbook(path, read_only=True, data_only=True)
+        parts = []
+        total = 0
+        count = 0
+        try:
+            for sheet in workbook.worksheets:
+                total = _append_bounded(parts, f"[Hoja: {sheet.title}]", total)
+                for row in sheet.iter_rows(values_only=True):
+                    count += 1
+                    if count > 200_000:
+                        raise ValueError("El XLSX supera el límite de 200.000 filas.")
+                    total = _append_bounded(parts, " | ".join("" if value is None else str(value) for value in row), total)
+        finally:
+            workbook.close()
+        text = "\n".join(parts)
+    elif suffix == ".pptx":
+        _validate_office_archive(path)
+        try:
+            from pptx import Presentation
+        except ImportError as error:
+            raise RuntimeError("Para PPTX instala requirements-documents.txt.") from error
+        presentation = Presentation(str(path))
+        if len(presentation.slides) > 5000:
+            raise ValueError("La presentación supera el límite de 5.000 diapositivas.")
+        parts = []
+        total = 0
+        for index, slide in enumerate(presentation.slides, 1):
+            total = _append_bounded(parts, f"[Diapositiva {index}]", total)
+            for shape in slide.shapes:
+                if getattr(shape, "has_text_frame", False) and shape.text.strip():
+                    total = _append_bounded(parts, shape.text, total)
+                if getattr(shape, "has_table", False):
+                    for row in shape.table.rows:
+                        total = _append_bounded(parts, " | ".join(cell.text for cell in row.cells), total)
+        text = "\n".join(parts)
+    else:
+        raise ValueError(f"Formato no soportado: {suffix or '(sin extensión)'}.")
+
+    if len(text) > MAX_EXTRACTED_CHARS:
+        raise ValueError("El texto extraído supera el límite de 10 millones de caracteres.")
+    if not text.strip():
+        raise ValueError("No se pudo extraer texto útil del documento.")
+    return text
 
 
 def split_text(text, max_chars=1200, overlap=150):
@@ -83,6 +337,27 @@ def split_text(text, max_chars=1200, overlap=150):
     return chunks
 
 
+def _default_document_id(*, document_sha256, title, category, source, license,
+                         visibility, tenant_id, tags, expected_embedding_model):
+    """Identificador estable por contenido, procedencia y ámbito de acceso."""
+    identity = {
+        "schema_version": 1,
+        "document_sha256": document_sha256,
+        "title": title,
+        "category": category,
+        "source": source,
+        "license": license,
+        "visibility": visibility,
+        "tenant_id": tenant_id,
+        "tags": sorted(tags),
+        "expected_embedding_model": expected_embedding_model,
+    }
+    canonical = json.dumps(
+        identity, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    )
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
 def ingest_document(
     file_path,
     *,
@@ -95,37 +370,88 @@ def ingest_document(
     tags=None,
     batch_size=8,
     max_chars=1200,
+    document_id=None,
+    expected_embedding_model=None,
 ):
-    """Lee un documento, genera sus embeddings y almacena los fragmentos."""
-    file_path = Path(file_path).expanduser().resolve()
+    """Lee e indexa un documento con soporte para reintentos idempotentes."""
+    raw_file_path = Path(file_path).expanduser()
+    if raw_file_path.is_symlink():
+        raise ValueError("No se permiten enlaces simbólicos como documentos de entrada.")
+    file_path = raw_file_path.resolve()
 
     if not file_path.is_file():
         raise FileNotFoundError(f"No existe el archivo: {file_path}")
 
-    if file_path.suffix.lower() not in {".txt", ".md"}:
-        raise ValueError("Esta versión admite únicamente archivos .txt y .md.")
-
     if not 1 <= batch_size <= 32:
         raise ValueError("batch_size debe estar entre 1 y 32.")
 
-    try:
-        text = file_path.read_text(encoding="utf-8")
-    except UnicodeDecodeError as error:
-        raise ValueError(
-            "El archivo no está codificado en UTF-8. "
-            "Convierte su texto a UTF-8 e inténtalo de nuevo."
-        ) from error
-
+    text = extract_document_text(file_path)
     chunks = split_text(text, max_chars=max_chars)
-    document_id = uuid.uuid4().hex
-    source = source or file_path.name
 
-    # La huella permite identificar el documento importado en el informe.
-    document_sha256 = hashlib.sha256(
-        text.encode("utf-8")
-    ).hexdigest()
+    source = file_path.name if source is None else source
+    for field, value in (
+        ("title", title), ("category", category), ("source", source),
+        ("license", license),
+    ):
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError(f"{field} es obligatorio y debe ser texto.")
+    title, category, source, license = (
+        title.strip(), category.strip(), source.strip(), license.strip()
+    )
+    if not isinstance(visibility, str) or visibility not in {"shared", "tenant"}:
+        raise ValueError("visibility debe ser 'shared' o 'tenant'.")
+    if visibility == "tenant":
+        if not isinstance(tenant_id, str) or not tenant_id.strip():
+            raise ValueError("Los conocimientos privados requieren tenant_id.")
+        tenant_id = tenant_id.strip()
+    elif tenant_id is not None:
+        raise ValueError("Los conocimientos compartidos no deben tener tenant_id.")
+    if tags is None:
+        normalized_tags = []
+    elif isinstance(tags, (list, tuple)) and all(
+        isinstance(tag, str) and tag.strip() for tag in tags
+    ):
+        normalized_tags = sorted(set(tag.strip() for tag in tags))
+    else:
+        raise ValueError("tags debe ser una lista de textos no vacíos.")
 
-    stored = []
+    if expected_embedding_model is not None and (
+        not isinstance(expected_embedding_model, str)
+        or not expected_embedding_model.strip()
+    ):
+        raise ValueError("expected_embedding_model debe ser texto no vacío.")
+    if expected_embedding_model is not None:
+        expected_embedding_model = expected_embedding_model.strip()
+
+    # La huella se calcula sobre el texto normalizado extraído.
+    document_sha256 = hashlib.sha256(text.encode("utf-8")).hexdigest()
+    if document_id is None:
+        document_id = _default_document_id(
+            document_sha256=document_sha256, title=title, category=category,
+            source=source, license=license, visibility=visibility,
+            tenant_id=tenant_id, tags=normalized_tags,
+            expected_embedding_model=expected_embedding_model,
+        )
+    elif not isinstance(document_id, str) or not document_id.strip() or len(document_id) > 128:
+        raise ValueError("document_id debe ser texto no vacío de hasta 128 caracteres.")
+    else:
+        document_id = document_id.strip()
+
+    # El ID estable hace idempotentes también los reintentos sin ID explícito.
+    existing_chunks = document_chunk_count(
+        document_id, expected_embedding_model,
+        visibility=visibility, tenant_id=tenant_id,
+    )
+    if existing_chunks:
+        return {
+            "document_id": document_id, "document_sha256": document_sha256,
+            "title": title, "source": source, "license": license,
+            "category": category, "visibility": visibility,
+            "tenant_id": tenant_id, "chunks": existing_chunks,
+            "chunk_ids": [], "already_present": True,
+        }
+
+    pending_chunks = []
     total = len(chunks)
 
     for start in range(0, total, batch_size):
@@ -133,6 +459,10 @@ def ingest_document(
 
         # ECO genera un vector por fragmento en una petición por lote.
         result = generate_embeddings(batch, agent_name="ECO")
+
+        actual_embedding_model = result.get("embedding_space", result["model"])
+        if expected_embedding_model is not None and actual_embedding_model != expected_embedding_model:
+            raise RuntimeError("El proveedor de embeddings cambió de espacio vectorial durante la ingestión.")
 
         if len(result["embeddings"]) != len(batch):
             raise RuntimeError(
@@ -144,27 +474,30 @@ def ingest_document(
         ):
             index = start + offset
 
-            item = store_chunk(
-                title=title,
-                source=source,
-                license=license,
-                category=category,
-                content=chunk,
-                embedding=vector,
-                embedding_model=result["model"],
-                document_id=document_id,
-                chunk_index=index,
-                tags=tags,
-                visibility=visibility,
-                tenant_id=tenant_id,
-            )
-            stored.append(item["id"])
+            pending_chunks.append({
+                "title": title,
+                "source": source,
+                "license": license,
+                "category": category,
+                "content": chunk,
+                "embedding": vector,
+                "embedding_model": actual_embedding_model,
+                "document_id": document_id,
+                "chunk_index": index,
+                "tags": normalized_tags,
+                "visibility": visibility,
+                "tenant_id": tenant_id,
+            })
 
         print(
-            f"Procesados {min(start + len(batch), total)}/{total} "
+            f"Generados embeddings {min(start + len(batch), total)}/{total} "
             "fragmentos.",
             flush=True,
         )
+
+    # Publica todos los fragmentos juntos: si falla cualquier lote de embeddings,
+    # la biblioteca no queda con una versión parcial del documento.
+    stored = store_chunks(pending_chunks)
 
     return {
         "document_id": document_id,
@@ -182,7 +515,7 @@ def ingest_document(
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("file", help="Archivo .txt o .md que se importará")
+    parser.add_argument("file", help="Documento TXT, MD, HTML, CSV, JSON, código, PDF, DOCX, XLSX o PPTX")
     parser.add_argument("--title", required=True, help="Título del documento")
     parser.add_argument("--category", required=True, help="Categoría del conocimiento")
     parser.add_argument("--source", default=None, help="Nombre de la fuente")

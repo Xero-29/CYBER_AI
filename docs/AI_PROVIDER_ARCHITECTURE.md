@@ -1,0 +1,155 @@
+# Conexión de IA sin modificar el núcleo
+
+## Objetivo
+
+CYBER_AI conserva la memoria, la biblioteca de conocimiento, el Skillbook,
+las herramientas, las políticas y los historiales. El proveedor de IA es un
+servicio intercambiable: cambiarlo no migra ni elimina esos datos.
+
+La interfaz de proveedores normaliza las respuestas de chat y embeddings al
+contrato que ya utiliza `agent_runner.py`. Los adaptadores no deben escribir
+directamente en las bases de datos de memoria ni cambiar las Skills.
+
+## Estado de los adaptadores
+
+- `ollama`: proveedor local mediante su API HTTP.
+- `openai`: proveedores remotos que implementan la API compatible de Chat
+  Completions y Embeddings.
+- `anthropic`: API nativa Messages para chat. Anthropic no proporciona
+  embeddings nativos en este adaptador; ECO debe usar otro proveedor/modelo.
+- `gemini`: API nativa Gemini para generación de contenido y embeddings.
+- Un proveedor con API nativa incompatible puede añadirse como plugin instalado mediante el entry point `cyber_ai.providers`; no requiere modificar el núcleo. No se debe
+  fingir compatibilidad con solo cambiar una URL.
+
+## Plugins de proveedores sin modificar el núcleo
+
+Los proveedores adicionales pueden instalarse como paquetes Python que publiquen
+un entry point en el grupo `cyber_ai.providers`. El nombre del entry point es
+el valor de `protocol` en `config/model_roles.json`; su objeto exportado debe
+implementar:
+
+- `request(provider, endpoint, payload, timeout)`: devuelve el contrato interno normalizado:
+  - `api/chat`: `{"message":{"content":"...","thinking":""},"done_reason":"stop"}`.
+  - `api/embed`: `{"embeddings":[[0.1,0.2,...]]}`; vectores numéricos, finitos y de dimensiones consistentes.
+  - `api/ps`: `{"models":[]}`.
+  Las respuestas se validan antes de llegar a los agentes.
+- `capabilities(provider)`: obligatorio; devuelve únicamente capacidades reales entre `chat`, `embeddings` y `model_listing`.
+- `installed_models(provider)`: opcional; devuelve un conjunto de modelos o `None`.
+
+Ejemplo de registro en el `pyproject.toml` del paquete externo:
+
+```toml
+[project.entry-points."cyber_ai.providers"]
+mi_proveedor = "mi_paquete.cyber_ai:adapter"
+```
+
+El objeto `adapter` exportado debe exponer los métodos descritos. En la
+configuración local se usa `"protocol": "mi_proveedor"`; no se modifica
+`llm_providers.py` ni los módulos de negocio.
+
+Instala únicamente plugins confiables: el código del plugin se ejecuta con los
+permisos del proceso CYBER_AI y puede acceder a su entorno. Si gestiona
+credenciales o conexiones HTTP, debe aplicar TLS, timeouts, no seguir
+redirecciones hacia otros hosts, no registrar secretos y probar su contrato.
+El núcleo exige HTTPS para endpoints remotos y limita HTTP a loopback cuando
+se declara `base_url`.
+
+## Configuración sin tocar código
+
+1. Copia o edita `config/model_roles.json` en la instalación local.
+2. En `default_provider`, selecciona el identificador del proveedor habilitado.
+3. Configura `base_url`, `protocol`, `default_model` y, cuando corresponda,
+   `embedding_model` o el mapa `models`.
+4. Guarda la clave API en la variable de entorno indicada por `api_key_env`.
+   Nunca la guardes en Git, JSON de configuración compartido ni archivos de Skills.
+5. Ejecuta las pruebas y una tarea inocua de diagnóstico antes de usarlo.
+
+Ejemplo de configuración para un endpoint compatible con OpenAI:
+
+```json
+{
+  "default_provider": "openai_compatible",
+  "llm_providers": {
+    "openai_compatible": {
+      "enabled": true,
+      "protocol": "openai",
+      "base_url": "https://api.example/v1",
+      "api_key_env": "CYBER_AI_LLM_API_KEY",
+      "requires_api_key": true,
+      "default_model": "modelo-chat",
+      "embedding_model": "modelo-embeddings",
+      "models": {
+        "NEXO": "modelo-razonamiento",
+        "FORJA": "modelo-codigo",
+        "FILTRO": "modelo-chat",
+        "VERITAS": "modelo-revision",
+        "FARO": "modelo-chat",
+        "ECO": "modelo-embeddings"
+      }
+    }
+  }
+}
+```
+
+Los nombres de modelo son identificadores que el proveedor remoto reconoce;
+el ejemplo no presupone que esos modelos existan. Si no se especifica un modelo
+por especialista, se utiliza `default_model`. Para ECO se prioriza su entrada
+en `models`, después `embedding_model`, y luego `default_model`.
+
+En Linux, configura la clave en el entorno de ejecución, por ejemplo:
+
+```bash
+export CYBER_AI_LLM_API_KEY="tu-clave"
+```
+
+No escribas la clave en este documento ni en el repositorio.
+
+## Precedencia de selección de modelo
+
+Para cada especialista:
+
+1. `llm_providers[proveedor].models[NombreEspecialista]`
+2. `llm_providers[proveedor].models[id]`
+3. Para agentes de embeddings, `embedding_model`
+4. `default_model` del proveedor
+5. El modelo declarado originalmente en el agente (compatibilidad local)
+
+El proveedor se elige por `agent.provider` si existe; si no, por
+`default_provider`. Un agente puede usar un proveedor distinto sin cambiar
+su memoria ni sus permisos.
+
+## Datos que permanecen en CYBER_AI
+
+- SQLite y archivos de la biblioteca de conocimiento.
+- Índices y metadatos de documentos.
+- Historial de tareas, evidencias y checkpoints.
+- Lecciones verificadas.
+- Skillbook y versiones de metodologías.
+- Políticas, autorizaciones y auditoría.
+
+Los embeddings sí dependen del modelo de embeddings: al cambiarlo, los vectores
+antiguos pueden no ser comparables con los nuevos. La migración correcta es
+mantener el identificador del modelo y sus dimensiones por vector, y reindexar
+solo cuando se cambie el modelo o espacio vectorial. No se deben mezclar vectores
+de modelos distintos en una misma búsqueda.
+
+## Condiciones de aceptación para futuros adaptadores
+
+- Implementar chat y, si se ofrece, embeddings con un contrato normalizado.
+- Declarar capacidades y límites reales del proveedor.
+- No solicitar ni persistir credenciales fuera del entorno seguro.
+- No cambiar memoria, Skills, permisos ni evidencias.
+- Errores de red, límites y respuestas incompatibles deben ser explícitos.
+- Tener pruebas unitarias con respuestas simuladas.
+- Permitir cambiar proveedor sin modificar módulos de negocio.
+- Mantener una vía de ejecución local sin proveedor remoto.
+
+## Limitaciones actuales
+
+Los adaptadores nativos incluidos cubren Anthropic Messages y Gemini
+generateContent/embedContent. Anthropic no tiene embeddings nativos en este
+adaptador, por lo que se debe asignar ECO a Gemini, Ollama u otro proveedor
+compatible con embeddings. Las APIs, nombres de modelos, cuotas y disponibilidad
+pueden cambiar; hay que verificar la documentación del proveedor y ejecutar
+pruebas de conectividad antes de usarlo. Otros proveedores con protocolos propios pueden añadirse mediante plugins instalables que mantengan el mismo contrato interno. Esta ampliación no requiere modificar el Skillbook,
+la biblioteca ni los módulos de ciberseguridad.

@@ -3,10 +3,15 @@
 
 import argparse
 import json
+import os
+import platform
 import subprocess
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
+
+from execution_ledger import ExecutionLedger
 
 from model_memory_manager import load_config
 import experiment_engine
@@ -620,11 +625,143 @@ def supervise_step(
         correction_count += 1
 
 
+def _objective_validator_results(report):
+    """Extrae únicamente revisiones independientes conformes y fundamentadas."""
+    validators = []
+    for step in report.get("steps", []):
+        supervision = step.get("objective_supervision")
+        if not isinstance(supervision, dict) or supervision.get("status") != "compliant":
+            continue
+        reviews = [
+            item for item in supervision.get("reviews", [])
+            if isinstance(item, dict) and isinstance(item.get("review"), dict)
+        ]
+        if not reviews:
+            continue
+        final = reviews[-1]
+        reviewer = final.get("reviewer")
+        review = final["review"]
+        passed = (
+            reviewer in {"VERITAS", "FILTRO"}
+            and reviewer != step.get("agent")
+            and review.get("status") == "compliant"
+            and review.get("deviations") == []
+            and review.get("corrections") == []
+            and isinstance(review.get("evidence"), list)
+            and bool(review["evidence"])
+        )
+        validators.append({
+            "name": f"objective_review:{reviewer}",
+            "passed": passed,
+            "independent": reviewer in {"VERITAS", "FILTRO"} and reviewer != step.get("agent"),
+            "reviewer": reviewer,
+            "evidence": review.get("evidence", []),
+        })
+    return validators
+
+
+def _record_workflow_ledger(report, task, duration_ms):
+    """Registra el flujo y sus revisiones separadas en el ledger de ejecución."""
+    namespace = os.environ.get("CYBER_AI_NAMESPACE", "shared").strip() or "shared"
+    validators = _objective_validator_results(report)
+    status = "completed" if report.get("status") == "completed" else "failed"
+    return ExecutionLedger().append(
+        namespace=namespace,
+        task=task,
+        status=status,
+        tool="team_orchestrator",
+        tool_version="1",
+        model="multi-agent",
+        environment=f"python-{platform.python_version()}",
+        evidence=report,
+        duration_ms=max(0, int(duration_ms)),
+        validator_results=validators,
+        metadata={
+            "workflow": report.get("workflow"),
+            "objective_supervision": bool(report.get("objective_contract")),
+            "start_event_id": report.get("ledger_start_event_id"),
+        },
+    )
+
+
+def _auto_propose_skill_candidate(report, workflow, task, namespace, ledger_event_id):
+    """Propone una Skill candidata tras dos ejecuciones supervisadas del mismo flujo."""
+    if report.get("status") != "completed" or not report.get("objective_contract"):
+        return None
+    ledger = ExecutionLedger()
+    if not ledger.verify().get("valid"):
+        return None
+    history = ledger.history(namespace=namespace, limit=1000)
+    if len(history) >= 1000:
+        return None
+    current = next((item for item in history if item.get("event_id") == ledger_event_id), None)
+    if not current or current.get("status") != "completed":
+        return None
+    related = [
+        item for item in history
+        if item.get("task_fingerprint") == current.get("task_fingerprint")
+        and item.get("status") != "started"
+    ]
+    if len(related) != 2 or any(
+        item.get("status") != "completed"
+        or item.get("tool") != "team_orchestrator"
+        or not (item.get("metadata") or {}).get("objective_supervision")
+        for item in related
+    ):
+        return None
+
+    methodology = [
+        f"Etapa {index}: {step.get('agent', 'especialista')} debe completar: {step.get('objective', '')}"
+        for index, step in enumerate(report.get("steps") or [], 1)
+        if isinstance(step, dict) and isinstance(step.get("objective"), str)
+        and step.get("objective").strip()
+    ]
+    if len(methodology) < 2:
+        return None
+    validation = workflow.get("acceptance_criteria") or [
+        "Completar todas las etapas sin ampliar alcance ni permisos.",
+        "Distinguir evidencia observada de inferencias.",
+        "Superar revisión objetiva independiente.",
+    ]
+    if not isinstance(validation, list) or not validation:
+        return None
+    tools = []
+    for step in workflow.get("steps", []):
+        declared = step.get("tools", []) if isinstance(step, dict) else []
+        if isinstance(declared, str):
+            declared = [declared]
+        if isinstance(declared, list):
+            tools.extend(value for value in declared if isinstance(value, str) and value.strip())
+    agents = [step.get("agent", "") for step in report.get("steps", [])
+              if isinstance(step, dict) and isinstance(step.get("agent"), str) and step.get("agent").strip()]
+    workflow_name = str(report.get("workflow") or "Flujo")
+    from skillbook import propose_skill_from_ledger
+    return propose_skill_from_ledger(
+        name=f"{workflow_name.replace('_', ' ').title()} — procedimiento supervisado",
+        task_pattern=task,
+        description=str(workflow.get("description") or "Metodología generada desde dos ejecuciones supervisadas y verificadas."),
+        prerequisites=[
+            "Alcance, autorización y entorno equivalentes a las ejecuciones verificadas.",
+            "Versiones compatibles de agentes, herramientas y configuración.",
+        ],
+        methodology=methodology,
+        validation=validation,
+        tools=sorted(set(tools)) or ["team_orchestrator"],
+        tags=sorted(set(["team_orchestrator", "supervised", workflow_name, *agents])),
+        source_urls=[],
+        namespace=namespace,
+        event_ids=[
+            item["event_id"] for item in sorted(related, key=lambda value: value["created_at"])
+        ],
+    )
+
+
 def execute_workflow(
     task, workflow_name, dry_run=False, *,
     supervise_objectives=False, acceptance_criteria=None, review_rounds=2
 ):
     """Ejecuta el flujo de forma secuencial y registra cada respuesta."""
+    workflow_started = time.monotonic()
     workflow = load_workflow(workflow_name)
     steps = workflow["steps"]
     limit = int(workflow.get("max_steps", workflow.get("max_rounds", len(steps))))
@@ -668,6 +805,19 @@ def execute_workflow(
         print("\nSimulación completada: no se cargó ningún modelo.")
         return 0
 
+    namespace = os.environ.get("CYBER_AI_NAMESPACE", "shared").strip() or "shared"
+    try:
+        start_event = ExecutionLedger().append(
+            namespace=namespace, task=task, status="started",
+            tool="team_orchestrator", tool_version="1", model="multi-agent",
+            environment=f"python-{platform.python_version()}",
+            evidence={"phase": "workflow_start", "workflow": workflow_name},
+            duration_ms=0, metadata={"workflow": workflow_name},
+        )
+    except Exception as error:
+        print(f"ERROR: no se pudo registrar el inicio del flujo: {error}", file=sys.stderr)
+        return 3
+
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     report_path = REPORT_DIR / f"team_{timestamp}.json"
     history = []
@@ -677,6 +827,7 @@ def execute_workflow(
         "started_at": datetime.now(timezone.utc).isoformat(),
         "status": "running",
         "steps": [],
+        "ledger_start_event_id": start_event["event_id"],
     }
     if objective_contract is not None:
         report["objective_contract"] = objective_contract.to_dict()
@@ -935,6 +1086,29 @@ def execute_workflow(
         report["status"] = "completed"
 
     report["finished_at"] = datetime.now(timezone.utc).isoformat()
+    save_report(report_path, report)
+
+    try:
+        ledger_event = _record_workflow_ledger(
+            report, task, (time.monotonic() - workflow_started) * 1000
+        )
+        report["ledger_event_id"] = ledger_event["event_id"]
+        try:
+            candidate = _auto_propose_skill_candidate(
+                report, workflow, task, namespace, ledger_event["event_id"]
+            )
+            if candidate:
+                report["skill_candidate"] = candidate
+        except Exception as skill_error:
+            report["skill_candidate_warning"] = str(skill_error)[:500]
+    except Exception as error:
+        report["ledger_error"] = str(error)
+        save_report(report_path, report)
+        print(
+            f"ERROR: no se pudo registrar el flujo en el ledger: {error}",
+            file=sys.stderr,
+        )
+        return 3
     save_report(report_path, report)
 
     print(f"\nEstado del flujo: {report['status']}")

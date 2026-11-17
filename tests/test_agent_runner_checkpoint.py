@@ -60,7 +60,7 @@ class TestAutomaticContinuation(unittest.TestCase):
                 ]
                 requests = []
 
-                def fake_response(endpoint, payload=None, timeout=600):
+                def fake_response(endpoint, payload=None, timeout=600, provider=None):
                     self.assertEqual(endpoint, "api/chat")
                     requests.append(payload)
                     if not responses:
@@ -75,6 +75,18 @@ class TestAutomaticContinuation(unittest.TestCase):
                     patch.object(
                         runner, "resolve_agent",
                         return_value=("TEST", agent),
+                    ),
+                    patch.object(
+                        runner,
+                        "resolve_provider",
+                        return_value={
+                            "name": "test",
+                            "protocol": "ollama",
+                            "base_url": "http://127.0.0.1:11434",
+                        },
+                    ),
+                    patch.object(
+                        runner, "provider_models", return_value={"test-model"}
                     ),
                     patch.object(
                         runner, "installed_models",
@@ -196,7 +208,7 @@ class TestAutomaticContinuation(unittest.TestCase):
 
                 requests = []
 
-                def fake_response(endpoint, payload=None, timeout=600):
+                def fake_response(endpoint, payload=None, timeout=600, provider=None):
                     self.assertEqual(endpoint, "api/chat")
                     requests.append(payload)
                     if not responses:
@@ -213,6 +225,18 @@ class TestAutomaticContinuation(unittest.TestCase):
                         runner,
                         "resolve_agent",
                         return_value=("TEST", agent),
+                    ),
+                    patch.object(
+                        runner,
+                        "resolve_provider",
+                        return_value={
+                            "name": "test",
+                            "protocol": "ollama",
+                            "base_url": "http://127.0.0.1:11434",
+                        },
+                    ),
+                    patch.object(
+                        runner, "provider_models", return_value={"test-model"}
                     ),
                     patch.object(
                         runner,

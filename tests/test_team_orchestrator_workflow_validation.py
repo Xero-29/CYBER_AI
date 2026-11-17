@@ -1,6 +1,7 @@
 """Prueba que una revisión inválida detiene el flujo."""
 
 import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -11,6 +12,86 @@ import team_orchestrator as coordinator
 
 
 class TestWorkflowValidation(unittest.TestCase):
+    def test_completed_supervised_workflow_emits_independent_validator(self):
+        report = {
+            "status": "completed",
+            "workflow": "reviewed",
+            "objective_contract": {"global_objective": "test"},
+            "steps": [{
+                "agent": "NEXO",
+                "objective_supervision": {
+                    "status": "compliant",
+                    "reviews": [{
+                        "reviewer": "VERITAS",
+                        "review": {
+                            "status": "compliant",
+                            "deviations": [],
+                            "corrections": [],
+                            "evidence": ["La respuesta cita el criterio original."],
+                        },
+                    }],
+                },
+            }],
+        }
+        validators = coordinator._objective_validator_results(report)
+        self.assertEqual(len(validators), 1)
+        self.assertTrue(validators[0]["passed"])
+        self.assertTrue(validators[0]["independent"])
+        self.assertEqual(validators[0]["reviewer"], "VERITAS")
+
+    def test_self_review_cannot_be_marked_independent(self):
+        report = {
+            "steps": [{
+                "agent": "VERITAS",
+                "objective_supervision": {
+                    "status": "compliant",
+                    "reviews": [{
+                        "reviewer": "VERITAS",
+                        "review": {
+                            "status": "compliant",
+                            "deviations": [],
+                            "evidence": ["Cita"],
+                        },
+                    }],
+                },
+            }],
+        }
+        validators = coordinator._objective_validator_results(report)
+        self.assertEqual(len(validators), 1)
+        self.assertFalse(validators[0]["passed"])
+        self.assertFalse(validators[0]["independent"])
+
+    def test_workflow_is_appended_to_execution_ledger(self):
+        report = {
+            "status": "completed",
+            "workflow": "reviewed",
+            "objective_contract": {"global_objective": "test"},
+            "steps": [{
+                "agent": "NEXO",
+                "objective_supervision": {
+                    "status": "compliant",
+                    "reviews": [{
+                        "reviewer": "VERITAS",
+                        "review": {
+                            "status": "compliant",
+                            "deviations": [],
+                            "corrections": [],
+                            "evidence": ["Criterio validado."],
+                        },
+                    }],
+                },
+            }],
+        }
+        with patch.dict(os.environ, {"CYBER_AI_NAMESPACE": "forja"}), \
+             patch.object(coordinator, "ExecutionLedger") as ledger:
+            ledger.return_value.append.return_value = {"event_id": "ledger-event-1"}
+            result = coordinator._record_workflow_ledger(report, "tarea supervisada", 12.5)
+        self.assertEqual(result["event_id"], "ledger-event-1")
+        args = ledger.return_value.append.call_args.kwargs
+        self.assertEqual(args["namespace"], "forja")
+        self.assertEqual(args["status"], "completed")
+        self.assertTrue(args["validator_results"][0]["independent"])
+
     def test_invalid_veritas_review_stops_before_final_nexo(self):
         workflow = {
             "workflows": {
@@ -104,6 +185,7 @@ class TestWorkflowValidation(unittest.TestCase):
                     coordinator.subprocess, "run",
                     side_effect=fake_run,
                 ),
+                patch.dict(os.environ, {"CYBER_AI_LEDGER_PATH": str(root / "ledger.sqlite3")}),
             ):
                 result = coordinator.execute_workflow(
                     "Tarea de prueba", "validation_test"
@@ -215,6 +297,7 @@ class TestWorkflowValidation(unittest.TestCase):
                 patch.object(
                     coordinator.subprocess, "run", side_effect=fake_run
                 ),
+                patch.dict(os.environ, {"CYBER_AI_LEDGER_PATH": str(root / "ledger.sqlite3")}),
             ):
                 result = coordinator.execute_workflow(
                     "Prueba de argumentos", "knowledge_test"

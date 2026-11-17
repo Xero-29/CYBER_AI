@@ -1,0 +1,48 @@
+{"id":"domain-01-foundations","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Fundamentos","relevant_categories":["cybersecurity:foundations"]}
+{"id":"domain-02-appsec","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Seguridad web y aplicaciones","relevant_categories":["cybersecurity:appsec"]}
+{"id":"domain-03-api","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Seguridad de API","relevant_categories":["cybersecurity:api"]}
+{"id":"domain-04-network","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Redes","relevant_categories":["cybersecurity:network"]}
+{"id":"domain-05-linux","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Linux y Unix","relevant_categories":["cybersecurity:linux"]}
+{"id":"domain-06-windows_ad","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Windows y Active Directory","relevant_categories":["cybersecurity:windows_ad"]}
+{"id":"domain-07-cloud","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Seguridad cloud","relevant_categories":["cybersecurity:cloud"]}
+{"id":"domain-08-containers","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Contenedores y Kubernetes","relevant_categories":["cybersecurity:containers"]}
+{"id":"domain-09-mobile","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Seguridad móvil","relevant_categories":["cybersecurity:mobile"]}
+{"id":"domain-10-crypto","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Criptografía","relevant_categories":["cybersecurity:crypto"]}
+{"id":"domain-11-identity","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Identidad y acceso","relevant_categories":["cybersecurity:identity"]}
+{"id":"domain-12-malware","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Análisis de malware","relevant_categories":["cybersecurity:malware"]}
+{"id":"domain-13-forensics","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Forense digital","relevant_categories":["cybersecurity:forensics"]}
+{"id":"domain-14-incident_response","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Respuesta a incidentes","relevant_categories":["cybersecurity:incident_response"]}
+{"id":"domain-15-threat_intel","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Inteligencia de amenazas","relevant_categories":["cybersecurity:threat_intel"]}
+{"id":"domain-16-reverse","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Ingeniería inversa","relevant_categories":["cybersecurity:reverse"]}
+{"id":"domain-17-iot_hardware","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para IoT y hardware","relevant_categories":["cybersecurity:iot_hardware"]}
+{"id":"domain-18-devsecops","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para DevSecOps y supply chain","relevant_categories":["cybersecurity:devsecops"]}
+{"id":"domain-19-ai_security","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Seguridad de IA","relevant_categories":["cybersecurity:ai_security"]}
+{"id":"domain-20-governance","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para GRC, privacidad y auditoría","relevant_categories":["cybersecurity:governance"]}
+{"id":"domain-21-vuln_management","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Gestión de vulnerabilidades","relevant_categories":["cybersecurity:vuln_management"]}
+{"id":"domain-22-bug_bounty","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Bug bounty autorizado","relevant_categories":["cybersecurity:bug_bounty"]}
+{"id":"domain-23-secure_arch","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Arquitectura segura","relevant_categories":["cybersecurity:secure_arch"]}
+{"id":"domain-24-data_security","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Seguridad de datos","relevant_categories":["cybersecurity:data_security"]}
+{"id":"domain-25-software_engineering","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Ingeniería de software y calidad","relevant_categories":["cybersecurity:software_engineering"]}
+{"id":"domain-26-machine_learning","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Aprendizaje automático e ingeniería de IA","relevant_categories":["cybersecurity:machine_learning"]}
+{"id":"domain-27-hardware_security","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Hardware, firmware y sistemas embebidos","relevant_categories":["cybersecurity:hardware_security"]}
+{"id":"domain-28-mathematics","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Matemáticas, estadística y métodos numéricos","relevant_categories":["cybersecurity:mathematics"]}
+{"id":"domain-29-soc_siem","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para SOC, SIEM y SOAR","relevant_categories":["cybersecurity:soc_siem"]}
+{"id":"domain-30-edr_xdr","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para EDR, XDR y endpoints","relevant_categories":["cybersecurity:edr_xdr"]}
+{"id":"domain-31-threat_hunting","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Threat hunting","relevant_categories":["cybersecurity:threat_hunting"]}
+{"id":"domain-32-red_team","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Red Team autorizado","relevant_categories":["cybersecurity:red_team"]}
+{"id":"domain-33-wireless_security","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Wireless, Bluetooth y NFC","relevant_categories":["cybersecurity:wireless_security"]}
+{"id":"domain-34-ot_ics","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para OT, ICS y SCADA","relevant_categories":["cybersecurity:ot_ics"]}
+{"id":"domain-35-telecom_5g","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Telecomunicaciones y 5G","relevant_categories":["cybersecurity:telecom_5g"]}
+{"id":"domain-36-automotive_security","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Ciberseguridad automotriz y CAN","relevant_categories":["cybersecurity:automotive_security"]}
+{"id":"domain-37-satellite_security","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Satélites y sistemas espaciales","relevant_categories":["cybersecurity:satellite_security"]}
+{"id":"domain-38-physical_security","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Seguridad física ciberfísica","relevant_categories":["cybersecurity:physical_security"]}
+{"id":"domain-39-email_dns_security","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Correo, DNS y dominios","relevant_categories":["cybersecurity:email_dns_security"]}
+{"id":"domain-40-fraud_abuse","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Fraude digital y abuso","relevant_categories":["cybersecurity:fraud_abuse"]}
+{"id":"domain-41-privacy_engineering","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Ingeniería de privacidad","relevant_categories":["cybersecurity:privacy_engineering"]}
+{"id":"domain-42-cloud_forensics","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Forense cloud","relevant_categories":["cybersecurity:cloud_forensics"]}
+{"id":"domain-43-ai_red_team","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Red teaming de IA y agentes","relevant_categories":["cybersecurity:ai_red_team"]}
+{"id":"domain-44-pki_hsm","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para PKI, certificados y HSM","relevant_categories":["cybersecurity:pki_hsm"]}
+{"id":"domain-45-post_quantum_crypto","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Criptografía poscuántica","relevant_categories":["cybersecurity:post_quantum_crypto"]}
+{"id":"domain-46-business_continuity","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Continuidad y recuperación","relevant_categories":["cybersecurity:business_continuity"]}
+{"id":"domain-47-database_security","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Seguridad de bases de datos","relevant_categories":["cybersecurity:database_security"]}
+{"id":"domain-48-vulnerability_research","query":"Metodología, amenazas, controles, pruebas y criterios de evaluación para Investigación de vulnerabilidades","relevant_categories":["cybersecurity:vulnerability_research"]}

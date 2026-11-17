@@ -5,6 +5,9 @@ from collections import deque
 import argparse
 import fcntl
 import json
+import os
+import time
+import sys
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -12,7 +15,13 @@ from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
 
 from model_memory_manager import load_config, resolve_agent, record
+from execution_ledger import ExecutionLedger
 from learning_memory import build_memory_context
+from skillbook import build_skill_context
+from llm_providers import (
+    resolve_provider, resolve_model,
+    request as provider_request, installed_models as provider_models,
+)
 from compressed_checkpoint import (
     save_partial_chunk,
     restore_partial_tail,
@@ -133,8 +142,10 @@ def contains_repeated_paragraph(
     )
 
 
-def request_json(endpoint, payload=None, timeout=600):
-    """Realiza peticiones a la API local de Ollama."""
+def request_json(endpoint, payload=None, timeout=600, provider=None):
+    """Realiza peticiones mediante el proveedor seleccionado."""
+    if provider is not None:
+        return provider_request(provider, endpoint, payload, timeout)
     data = None if payload is None else json.dumps(payload).encode("utf-8")
     request = Request(
         f"{API}/{endpoint}",
@@ -397,15 +408,16 @@ def retrieve_knowledge_context(
 ):
     """Recupera fragmentos compartidos relevantes para una tarea."""
     from knowledge_embeddings import generate_embedding
-    from knowledge_library import search_knowledge
+    from knowledge_library import search_knowledge_hybrid
 
     if not 1 <= int(top_k) <= 5:
         raise ValueError("knowledge_top_k debe estar entre 1 y 5.")
 
     vector = generate_embedding(query, agent_name="ECO")
-    results = search_knowledge(
+    results = search_knowledge_hybrid(
+        query_text=query,
         query_embedding=vector["embedding"],
-        embedding_model=vector["model"],
+        embedding_model=vector.get("embedding_space", vector["model"]),
         top_k=top_k,
         min_score=min_score,
         categories=categories,
@@ -421,13 +433,16 @@ def retrieve_knowledge_context(
             "title": item["title"],
             "source": item["source"],
             "category": item["category"],
-            "similarity": item["similarity"],
+            "similarity": item.get("similarity", 0.0),
+            "hybrid_score": item.get("hybrid_score", 0.0),
+            "text_rank": item.get("text_rank"),
         })
         sections.append(
             f"[K{number}] {item['title']}\\n"
             f"Fuente: {item['source']} | "
             f"Categoría: {item['category']} | "
-            f"Similitud: {item['similarity']:.4f}\\n"
+            f"Similitud vectorial: {item.get('similarity', 0.0):.4f} | "
+            f"RRF híbrido: {item.get('hybrid_score', 0.0):.4f}\\n"
             f"{item['content']}"
         )
 
@@ -446,7 +461,7 @@ def retrieve_knowledge_context(
     return context, metadata
 
 
-def run_agent(
+def _run_agent_impl(
     agent_name, prompt, think_override=None, num_predict_override=None,
     task_id=None, session_id=None, context_task_ids=None, mode=None,
     use_knowledge=False, knowledge_top_k=3,
@@ -455,12 +470,12 @@ def run_agent(
     knowledge_tags=None, structured_output=False,
 ):
     """Ejecuta un especialista conversacional y libera el modelo al terminar."""
+    execution_started = time.monotonic()
     explicit_task_id = bool(task_id and str(task_id).strip())
     task_id = str(task_id).strip() if explicit_task_id else uuid.uuid4().hex
 
     config = load_config()
     name, agent = resolve_agent(agent_name, config)
-
     # Recuperar la sesión anterior al reanudar una tarea existente.
     existing_checkpoint = get_checkpoint(task_id) if explicit_task_id else None
 
@@ -484,6 +499,23 @@ def run_agent(
             )
     else:
         session_id = create_session(f"{name}: {prompt[:60]}")
+
+    memory_config = agent.get("memory") or {}
+    ledger_namespace = str(memory_config.get("namespace") or name)
+    ledger_required = os.environ.get("CYBER_AI_LEDGER_REQUIRED") == "1"
+    ledger_start_event = None
+    try:
+        ledger_start_event = ExecutionLedger().append(
+            namespace=ledger_namespace, task=str(prompt), status="started",
+            tool="agent_runner", tool_version="1", model="pending",
+            environment=f"python:{sys.version_info.major}.{sys.version_info.minor}",
+            evidence={"phase": "agent_start", "task_id": task_id},
+            duration_ms=0, metadata={"task_id": task_id, "session_id": session_id},
+        )
+    except Exception as ledger_error:
+        print(f"AVISO: no se pudo registrar el inicio del agente en el ledger: {ledger_error}", flush=True)
+        if ledger_required:
+            raise RuntimeError("Ejecución bloqueada: no se pudo registrar el inicio en el ledger.") from ledger_error
 
     # Toda consulta de historial queda delimitada por esta sesión.
     isolate_history = True
@@ -545,8 +577,10 @@ def run_agent(
     if agent.get("type") == "embeddings":
         raise ValueError("Este agente es de embeddings. Utiliza el comando embed.")
 
-    model = agent["model"]
-    if model not in installed_models():
+    provider = resolve_provider(config, agent, capability="chat")
+    model = resolve_model(provider, agent, name)
+    available_models = provider_models(provider)
+    if available_models is not None and model not in available_models:
         raise ValueError(f"El modelo no está instalado: {model}")
 
     policy = config.get("resource_policy", {})
@@ -577,6 +611,11 @@ def run_agent(
     # La recuperación se realiza antes del bloqueo de generación, porque
     # ECO también utiliza ese bloqueo para cargar su modelo.
     effective_prompt = build_execution_prompt(prompt, mode)
+    # Consultar primero el libro de metodologías ya verificadas.
+    skill_context, matched_skills = build_skill_context(original_task)
+    if matched_skills:
+        print(f"Skills verificadas recuperadas: {len(matched_skills)}", flush=True)
+        effective_prompt += "\\n\\n" + skill_context
     retrieved_knowledge = []
     if use_knowledge:
         knowledge_context, retrieved_knowledge = retrieve_knowledge_context(
@@ -599,7 +638,8 @@ def run_agent(
     with LOCK_FILE.open("a+") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         try:
-            unload_other_models(model)
+            if provider["protocol"] == "ollama":
+                unload_other_models(model)
             print(f"Especialista: {name} | Modelo: {model}", flush=True)
 
             payload = {
@@ -698,7 +738,7 @@ def run_agent(
                 ]
 
             while True:
-                result = request_json("api/chat", chat_payload)
+                result = request_json("api/chat", chat_payload, provider=provider)
                 generation_requests += 1
 
                 message = result.get("message") or {}
@@ -910,6 +950,33 @@ def run_agent(
                 "response_chars_this_run": len(generated_this_run),
             }
             save_jsonl(TASK_LOG, event)
+            # Registrar el resultado del agente como evidencia auditable.
+            try:
+                ledger_status = "completed" if finished else "failed"
+                ledger_result = ExecutionLedger().append(
+                    namespace=ledger_namespace, task=original_task,
+                    status=ledger_status, tool="agent_runner",
+                    tool_version="1", model=f"{provider['name']}::{model}",
+                    environment=f"python:{sys.version_info.major}.{sys.version_info.minor}",
+                    duration_ms=max(0, int((time.monotonic() - execution_started) * 1000)),
+                    evidence={"task_id": task_id, "session_id": session_id,
+                              "response": answer, "response_this_run": generated_this_run,
+                              "done_reason": done_reason, "generation_status": status},
+                    validator_results=[{"name": "generation_completion", "passed": finished, "independent": False}],
+                    metadata={"task_id": task_id, "session_id": session_id,
+                              "provider": provider["name"], "mode": mode,
+                              "prompt_tokens": usage_totals["prompt_eval_count"],
+                              "completion_tokens": usage_totals["eval_count"],
+                              "generation_requests": generation_requests,
+                              "matched_skills": matched_skills,
+                              "retrieved_knowledge": retrieved_knowledge,
+                              "start_event_id": ledger_start_event["event_id"] if ledger_start_event else None},
+                )
+                print(f"Ledger: evento {ledger_result['sequence']} registrado", flush=True)
+            except Exception as ledger_error:
+                print(f"AVISO: no se pudo registrar la ejecución en el ledger: {ledger_error}", flush=True)
+                if ledger_required:
+                    raise RuntimeError("Ejecución no aceptada: no se pudo registrar el resultado en el ledger.") from ledger_error
             try:
                 save_checkpoint(
                     task_id=task_id,
@@ -939,7 +1006,7 @@ def run_agent(
                     flush=True,
                 )
 
-            record(name, prompt[:300])
+            record(name, prompt[:300], model=model, provider=provider["name"])
 
             if thinking:
                 print("\n=== ANÁLISIS VISIBLE DEL MODELO ===\n")
@@ -958,6 +1025,78 @@ def run_agent(
             fcntl.flock(lock, fcntl.LOCK_UN)
 
 
+def run_agent(*args, **kwargs):
+    """Cierra en el ledger cualquier ejecución que falle fuera del flujo normal."""
+    # Asigna un identificador antes de entrar para correlacionar exactamente el
+    # evento inicial, incluso con tareas concurrentes o prompts redactados.
+    positional = list(args)
+    if len(positional) > 4:
+        invocation_task_id = positional[4] or uuid.uuid4().hex
+        positional[4] = invocation_task_id
+        args = tuple(positional)
+    else:
+        invocation_task_id = kwargs.get("task_id") or uuid.uuid4().hex
+        kwargs["task_id"] = invocation_task_id
+
+    agent_name = args[0] if args else kwargs.get("agent_name")
+    try:
+        return _run_agent_impl(*args, **kwargs)
+    except Exception as execution_error:
+        ledger_required = os.environ.get("CYBER_AI_LEDGER_REQUIRED") == "1"
+        try:
+            config = load_config()
+            resolved_name, agent = resolve_agent(agent_name, config)
+            memory_config = agent.get("memory") or {}
+            namespace = str(memory_config.get("namespace") or resolved_name)
+            ledger = ExecutionLedger()
+            history = ledger.history(namespace=namespace, limit=1000)
+            starts = [
+                item for item in history
+                if item.get("status") == "started"
+                and item.get("tool") == "agent_runner"
+                and (item.get("metadata") or {}).get("task_id") == invocation_task_id
+            ]
+            if starts:
+                start_event = max(starts, key=lambda item: item["sequence"])
+                start_event_id = start_event["event_id"]
+                already_finalized = any(
+                    item.get("status") != "started"
+                    and (item.get("metadata") or {}).get("start_event_id") == start_event_id
+                    for item in history
+                )
+                if not already_finalized:
+                    ledger.append(
+                        namespace=namespace,
+                        task=start_event["task"],
+                        status="failed",
+                        tool="agent_runner",
+                        tool_version="1",
+                        model="unknown",
+                        environment=f"python:{sys.version_info.major}.{sys.version_info.minor}",
+                        duration_ms=0,
+                        evidence={
+                            "phase": "uncaught_agent_exception",
+                            "error_type": type(execution_error).__name__,
+                            "error": str(execution_error),
+                        },
+                        metadata={
+                            "task_id": invocation_task_id,
+                            "start_event_id": start_event_id,
+                            "recovered_by": "run_agent_exception_guard",
+                        },
+                    )
+        except Exception as ledger_error:
+            print(
+                f"AVISO: no se pudo cerrar el evento fallido del agente: {ledger_error}",
+                file=sys.stderr,
+            )
+            if ledger_required:
+                raise RuntimeError(
+                    "La ejecución falló y no se pudo cerrar su evento en el ledger."
+                ) from execution_error
+        raise
+
+
 def embed_text(agent_name, text):
     """Convierte un texto en un vector con un modelo de embeddings."""
     config = load_config()
@@ -966,32 +1105,38 @@ def embed_text(agent_name, text):
     if agent.get("type") != "embeddings":
         raise ValueError(f"{name} no es un especialista de embeddings.")
 
-    model = agent["model"]
-    if model not in installed_models():
+    provider = resolve_provider(config, agent, capability="embeddings")
+    model = resolve_model(provider, agent, name)
+    available_models = provider_models(provider)
+    if available_models is not None and model not in available_models:
         raise ValueError(f"El modelo no está instalado: {model}")
 
     LOCK_FILE.parent.mkdir(parents=True, exist_ok=True)
     with LOCK_FILE.open("a+") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         try:
-            unload_other_models(model)
+            if provider["protocol"] == "ollama":
+                unload_other_models(model)
             result = request_json(
                 "api/embed",
-                {"model": model, "input": text, "keep_alive": 0},
+                {"model": model, "input": [text], "keep_alive": 0},
+                provider=provider,
             )
             vectors = result.get("embeddings", [])
-            if not vectors:
-                raise RuntimeError("Ollama no devolvió ningún vector.")
+            if len(vectors) != 1:
+                raise RuntimeError("El proveedor no devolvió exactamente un embedding.")
 
             event = {
                 "timestamp": datetime.now(timezone.utc).isoformat(),
                 "agent": name,
                 "model": model,
+                "provider": provider["name"],
+                "embedding_space": (model if provider["protocol"] == "ollama" else f"{provider['name']}::{model}"),
                 "text": text,
                 "embedding": vectors[0],
             }
             save_jsonl(EMBED_LOG, event)
-            record(name, "crear embedding: " + text[:250])
+            record(name, "crear embedding: " + text[:250], model=model, provider=provider["name"])
 
             print(f"Especialista: {name}")
             print(f"Dimensiones del vector: {len(vectors[0])}")

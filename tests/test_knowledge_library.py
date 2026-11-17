@@ -2,6 +2,7 @@
 
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 import knowledge_library as library
@@ -134,6 +135,53 @@ class TestKnowledgeLibrary(unittest.TestCase):
                 [1.0, 0.0], visibility="tenant",
             )
 
+    def test_bulk_store_validates_all_chunks_before_publishing(self):
+        valid = {
+            "title": "Documento", "source": "fixture", "category": "test",
+            "content": "contenido", "embedding": [1.0, 0.0],
+            "embedding_model": "test-embeddings", "document_id": "bulk-doc",
+            "chunk_index": 0,
+        }
+        invalid = dict(valid, chunk_index=1, content="")
+        with self.assertRaises(ValueError):
+            library.store_chunks([valid, invalid])
+        results = library.search_knowledge(
+            query_embedding=[1.0, 0.0],
+            embedding_model="test-embeddings",
+            top_k=10,
+        )
+        self.assertEqual(results, [])
+
+    def test_oversized_fragment_is_rejected_before_storage(self):
+        with patch.object(library, "MAX_CHUNK_BYTES", 3):
+            with self.assertRaisesRegex(ValueError, "2 MiB"):
+                self.store("Grande", "cuatro", [1.0, 0.0])
+
+    def test_read_rejects_oversized_declared_content_before_decompression(self):
+        saved = self.store("Documento", "contenido válido", [1.0, 0.0])
+        library.initialize()
+        with library.database() as db:
+            db.execute(
+                "UPDATE knowledge_chunks SET original_bytes = ? WHERE id = ?",
+                (library.MAX_CHUNK_BYTES + 1, saved["id"]),
+            )
+        with self.assertRaisesRegex(ValueError, "tamaño declarado"):
+            library.read_chunk(saved["id"])
+
+    def test_search_rejects_malformed_filters(self):
+        with self.assertRaisesRegex(ValueError, "categories"):
+            library.search_knowledge(
+                query_embedding=[1.0, 0.0],
+                embedding_model="test-embeddings",
+                categories="linux",
+            )
+        with self.assertRaisesRegex(ValueError, "min_score"):
+            library.search_knowledge(
+                query_embedding=[1.0, 0.0],
+                embedding_model="test-embeddings",
+                min_score="invalid",
+            )
+
     def test_invalid_embedding_is_rejected(self):
         with self.assertRaises(ValueError):
             self.store(
@@ -141,6 +189,145 @@ class TestKnowledgeLibrary(unittest.TestCase):
                 [0.0, 0.0],
             )
 
+
+
+    def test_document_chunk_count_can_filter_embedding_space(self):
+        library.store_chunks([
+            {
+                "title": "Paquete", "source": "offline", "category": "test",
+                "content": "contenido v1", "embedding": [1.0, 0.0],
+                "embedding_model": "provider-a::model-a",
+                "document_id": "stable-doc", "chunk_index": 0,
+            },
+            {
+                "title": "Paquete", "source": "offline", "category": "test",
+                "content": "contenido v2", "embedding": [0.0, 1.0],
+                "embedding_model": "provider-b::model-b",
+                "document_id": "stable-doc", "chunk_index": 0,
+            },
+        ])
+        self.assertEqual(library.document_chunk_count("stable-doc"), 2)
+        self.assertEqual(
+            library.document_chunk_count("stable-doc", "provider-a::model-a"),
+            1,
+        )
+        self.assertEqual(
+            library.document_chunk_count("stable-doc", "provider-b::model-b"),
+            1,
+        )
+
+    def test_document_chunk_count_respects_visibility_and_tenant_scope(self):
+        library.store_chunks([
+            {
+                "title": "Shared", "source": "source", "category": "test",
+                "content": "shared", "embedding": [1.0, 0.0],
+                "embedding_model": "test-space", "document_id": "same-id",
+                "visibility": "shared",
+            },
+            {
+                "title": "Tenant A", "source": "source", "category": "test",
+                "content": "private a", "embedding": [1.0, 0.0],
+                "embedding_model": "test-space", "document_id": "same-id",
+                "visibility": "tenant", "tenant_id": "tenant-a",
+            },
+            {
+                "title": "Tenant B", "source": "source", "category": "test",
+                "content": "private b", "embedding": [1.0, 0.0],
+                "embedding_model": "test-space", "document_id": "same-id",
+                "visibility": "tenant", "tenant_id": "tenant-b",
+            },
+        ])
+        self.assertEqual(
+            library.document_chunk_count("same-id", visibility="shared"), 1
+        )
+        self.assertEqual(
+            library.document_chunk_count(
+                "same-id", visibility="tenant", tenant_id="tenant-a"
+            ), 1
+        )
+        self.assertEqual(
+            library.document_chunk_count(
+                "same-id", visibility="tenant", tenant_id="tenant-b"
+            ), 1
+        )
+
+    def test_document_chunk_count_requires_tenant_for_private_scope(self):
+        with self.assertRaisesRegex(ValueError, "tenant_id"):
+            library.document_chunk_count("doc", visibility="tenant")
+
+    def test_document_chunk_count_rejects_empty_model_filter(self):
+        with self.assertRaisesRegex(ValueError, "embedding_model"):
+            library.document_chunk_count("stable-doc", " ")
+
+
+    def test_text_index_and_hybrid_search_retrieve_lexical_hit(self):
+        if not library.text_index_available():
+            self.skipTest("SQLite FTS5 no está disponible.")
+        library.store_chunks([{
+            "title": "Control de acceso API", "source": "offline-pack",
+            "category": "cybersecurity:api",
+            "content": "La autorización evita acceso cruzado entre usuarios.",
+            "embedding": [1.0, 0.0], "embedding_model": "test-space",
+            "document_id": "api-doc", "chunk_index": 0,
+        }])
+        result = library.search_knowledge_hybrid(
+            query_text="autorización acceso cruzado usuarios",
+            query_embedding=[0.0, 1.0], embedding_model="test-space", top_k=3,
+        )
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["category"], "cybersecurity:api")
+        self.assertIsNotNone(result[0]["text_rank"])
+        self.assertGreater(result[0]["hybrid_score"], 0)
+
+    def test_rebuild_text_index_reindexes_and_verifies_existing_chunks(self):
+        if not library.text_index_available():
+            self.skipTest("SQLite FTS5 no está disponible.")
+        library.store_chunks([{
+            "title": "Documento previo", "source": "fixture", "category": "test",
+            "content": "texto de referencia", "embedding": [1.0, 0.0],
+            "embedding_model": "test-space", "document_id": "prior-doc",
+            "chunk_index": 0,
+        }])
+        result = library.rebuild_text_index()
+        self.assertTrue(result["available"])
+        self.assertEqual(result["indexed"], 1)
+
+
+    def test_hybrid_text_search_respects_tenant_isolation(self):
+        if not library.text_index_available():
+            self.skipTest("SQLite FTS5 no está disponible.")
+        library.store_chunks([
+            {
+                "title": "Compartido", "source": "shared",
+                "category": "security", "content": "manual de acceso compartido",
+                "embedding": [1.0, 0.0], "embedding_model": "test-space",
+                "document_id": "shared-doc", "chunk_index": 0,
+                "visibility": "shared",
+            },
+            {
+                "title": "Privado A", "source": "tenant-a",
+                "category": "security", "content": "informe reservado alpha",
+                "embedding": [1.0, 0.0], "embedding_model": "test-space",
+                "document_id": "tenant-a-doc", "chunk_index": 0,
+                "visibility": "tenant", "tenant_id": "tenant-a",
+            },
+            {
+                "title": "Privado B", "source": "tenant-b",
+                "category": "security", "content": "informe reservado beta",
+                "embedding": [1.0, 0.0], "embedding_model": "test-space",
+                "document_id": "tenant-b-doc", "chunk_index": 0,
+                "visibility": "tenant", "tenant_id": "tenant-b",
+            },
+        ])
+        result = library.search_knowledge_hybrid(
+            query_text="informe reservado beta",
+            query_embedding=[1.0, 0.0], embedding_model="test-space",
+            tenant_id="tenant-a", top_k=10,
+        )
+        sources = {item["source"] for item in result}
+        self.assertIn("shared", sources)
+        self.assertIn("tenant-a", sources)
+        self.assertNotIn("tenant-b", sources)
 
 if __name__ == "__main__":
     unittest.main()

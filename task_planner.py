@@ -5,14 +5,19 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 from capability_selector import select_capabilities
+from tool_registry import select_tools
 
 def create_plan(task):
     candidates = select_capabilities(task, limit=25)
+    tool_plan = select_tools(task, limit=10)
     plan = {
         "task": task,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "status": "planned",
         "candidate_count": len(candidates),
+        "tool_candidates": tool_plan["candidates"],
+        "tool_candidate_count": tool_plan["candidate_count"],
+        "tool_execution_started": False,
         "steps": [
             {
                 "order": i,

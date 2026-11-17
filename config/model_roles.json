@@ -289,5 +289,40 @@
         "recuerdo de investigaciones"
       ]
     }
+  },
+  "default_provider": "ollama",
+  "llm_providers": {
+    "ollama": {
+      "enabled": true,
+      "protocol": "ollama",
+      "base_url": "http://127.0.0.1:11434",
+      "requires_api_key": false
+    },
+    "openai_compatible": {
+      "enabled": false,
+      "protocol": "openai",
+      "base_url": "",
+      "api_key_env": "CYBER_AI_LLM_API_KEY",
+      "requires_api_key": true
+    },
+    "anthropic": {
+      "enabled": false,
+      "protocol": "anthropic",
+      "base_url": "https://api.anthropic.com/v1",
+      "api_key_env": "CYBER_AI_ANTHROPIC_API_KEY",
+      "requires_api_key": true,
+      "default_model": "",
+      "models": {}
+    },
+    "gemini": {
+      "enabled": false,
+      "protocol": "gemini",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta",
+      "api_key_env": "CYBER_AI_GEMINI_API_KEY",
+      "requires_api_key": true,
+      "default_model": "",
+      "embedding_model": "",
+      "models": {}
+    }
   }
 }

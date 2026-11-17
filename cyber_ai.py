@@ -2,8 +2,10 @@
 """Entrada principal de CYBER_AI."""
 
 import argparse
+import hashlib
 import json
 import sys
+import uuid
 from pathlib import Path
 
 from report_analyzer import analyze_report, analyze_scan
@@ -25,7 +27,9 @@ def process_one(filename):
         result = enrich_analysis(analyze_report(text))
         output_dir = Path("reports")
         output_dir.mkdir(parents=True, exist_ok=True)
-        output = output_dir / f"{source.stem}_analysis.json"
+        source_identity = str(source.resolve()).encode("utf-8")
+        source_suffix = hashlib.sha256(source_identity).hexdigest()[:12]
+        output = output_dir / f"{source.stem}_{source_suffix}_analysis.json"
 
         duplicate = register_report(text, output)
         result["duplicate_check"] = duplicate
@@ -98,16 +102,23 @@ def main():
     group.add_argument("--batch", help="Analizar todos los TXT y Markdown de una carpeta.")
     group.add_argument("--self-test", action="store_true", help="Comprobar archivos básicos.")
     group.add_argument("--scan", help="Escanear una URL HTTP/HTTPS autorizada con Nuclei.")
+    parser.add_argument("--confirm-authorized", action="store_true", help="Confirmación adicional del operador.")
+    parser.add_argument("--authorization-id", help="ID de autorización local, vigente y limitada al destino.")
     args = parser.parse_args()
 
     if args.scan:
         try:
-            result = scan_target(args.scan)
+            result = scan_target(
+                args.scan,
+                authorized=args.confirm_authorized,
+                authorization_id=args.authorization_id,
+            )
             output_dir = Path("reports")
             output_dir.mkdir(parents=True, exist_ok=True)
 
             # Guardamos el resultado completo de Nuclei sin perder evidencias.
-            output = output_dir / "nuclei_scan_analysis.json"
+            scan_id = uuid.uuid4().hex
+            output = output_dir / f"nuclei_scan_{scan_id}_analysis.json"
             output.write_text(
                 json.dumps(result, ensure_ascii=False, indent=2) + "\n",
                 encoding="utf-8",
@@ -115,7 +126,7 @@ def main():
 
             # Generamos un segundo informe agrupado por plantilla y severidad.
             summary = analyze_scan(result)
-            summary_output = output_dir / "nuclei_scan_summary.json"
+            summary_output = output_dir / f"nuclei_scan_{scan_id}_summary.json"
             summary_output.write_text(
                 json.dumps(summary, ensure_ascii=False, indent=2) + "\n",
                 encoding="utf-8",
@@ -131,14 +142,15 @@ def main():
 
     if args.self_test:
         required = [
-            "verifier.py", "report_analyzer.py", "nvd_client.py",
-            "report_manager.py", "batch_analyzer.py", "nuclei_scanner.py", "CONTEXT.md",
+            "report_analyzer.py", "nvd_client.py", "report_manager.py",
+            "batch_analyzer.py", "nuclei_scanner.py", "CONTEXT.md",
         ]
         missing = [name for name in required if not Path(name).is_file()]
         if missing:
             print("Faltan archivos: " + ", ".join(missing))
             return 1
         print("Comprobación básica correcta.")
+        print("Para ejecutar la suite completa usa: python -m unittest discover -s tests -v")
         return 0
 
     if args.report:

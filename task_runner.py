@@ -5,11 +5,39 @@ import argparse
 import json
 import shutil
 import subprocess
+import sys
 import time
+import uuid
 from pathlib import Path
 from urllib.parse import urlparse
 
 from capability_selector import select_capabilities
+from execution_policy import AuthorizationError, authorize_target
+from execution_ledger import ExecutionLedger
+
+
+def _record_task_scan(task, target, report, started, authorization_id=None, start_event_id=None):
+    """Registra ejecuciones del runner de plantillas Nuclei."""
+    status = report.get("status")
+    ledger_status = (
+        "denied" if status == "authorization_denied"
+        else "timeout" if status == "timeout"
+        else "completed" if status == "completed"
+        else "failed"
+    )
+    try:
+        event = ExecutionLedger().append(
+            namespace="security-scans", task=f"{task} :: {target}",
+            status=ledger_status, tool="nuclei_task_runner",
+            evidence=report,
+            duration_ms=max(0, int((time.monotonic() - started) * 1000)),
+            metadata={"authorization_id": authorization_id, "scanner_status": status,
+                      "start_event_id": start_event_id},
+        )
+        return event
+    except Exception as error:
+        print(f"AVISO: no se pudo registrar el escaneo en el ledger: {error}", file=sys.stderr)
+        return None
 
 
 def main():
@@ -20,11 +48,18 @@ def main():
     parser.add_argument(
         "--confirm-authorized",
         action="store_true",
-        help="Confirmar autorización para analizar el objetivo",
+        help="Confirmación interactiva adicional del operador",
     )
+    parser.add_argument(
+        "--authorization-id",
+        help="ID de una autorización local vigente y limitada al destino",
+    )
+    parser.add_argument("--require-ledger", action="store_true",
+                        help="No inicia el escaneo si el ledger no registra inicio y resultado")
     args = parser.parse_args()
 
     parsed = urlparse(args.target)
+    task_started = time.monotonic()
     if (
         parsed.scheme not in ("http", "https")
         or not parsed.hostname
@@ -60,8 +95,6 @@ def main():
         "http/misconfiguration/cookies-without-secure.yaml",
         "http/misconfiguration/cookies-without-httponly.yaml",
         "http/misconfiguration/missing-cookie-samesite-strict.yaml",
-        "http/miscellaneous/robots-txt.yaml",
-        "http/vulnerabilities/generic/cors-misconfig.yaml",
     ]
 
     by_relative_path = {}
@@ -94,77 +127,138 @@ def main():
         print("Revisa las plantillas antes de autorizar su ejecución.")
         return 0
 
-    if not args.confirm_authorized:
-        print("ERROR: confirma que tienes autorización con --confirm-authorized.")
-        return 2
+    if not args.confirm_authorized or not args.authorization_id:
+        print("ERROR: se requiere --confirm-authorized y --authorization-id.")
+        recorded = _record_task_scan(
+            args.task, args.target,
+            {"task": args.task, "target": args.target,
+             "status": "authorization_denied",
+             "reason": "missing_operator_confirmation_or_authorization_id"},
+            task_started, args.authorization_id,
+        )
+        return 3 if args.require_ledger and recorded is None else 2
+
+    try:
+        grant = authorize_target(args.target, "nuclei_scan", args.authorization_id)
+    except AuthorizationError as error:
+        print("ERROR: autorización denegada:", error)
+        recorded = _record_task_scan(args.task, args.target,
+                                     {"task": args.task, "target": args.target,
+                                      "status": "authorization_denied", "error": str(error)},
+                                     task_started, args.authorization_id)
+        return 3 if args.require_ledger and recorded is None else 2
 
     nuclei = shutil.which("nuclei")
     if not nuclei:
         print("ERROR: Nuclei no está instalado o no está en PATH.")
-        return 1
+        recorded = _record_task_scan(args.task, args.target,
+                                     {"task": args.task, "target": args.target,
+                                      "status": "scanner_missing", "findings": []},
+                                     task_started, args.authorization_id)
+        return 3 if args.require_ledger and recorded is None else 1
 
     output_dir = Path("reports")
     output_dir.mkdir(parents=True, exist_ok=True)
-    results_file = output_dir / "task_scan_results.jsonl"
-    report_file = output_dir / "task_scan_report.json"
+    scan_id = uuid.uuid4().hex
+    results_file = output_dir / f"task_scan_{scan_id}.jsonl"
+    report_file = output_dir / f"task_scan_{scan_id}_report.json"
 
-    command = [
-        nuclei, "-u", args.target,
-        "-jsonl", "-o", str(results_file.resolve()),
-        "-no-interactsh", "-disable-update-check",
-        "-rl", "2", "-c", "2", "-timeout", "5", "-retries", "0",
-    ]
-    for item in selected:
-        command.extend(["-t", item["path"]])
-
-    print("\nIniciando comprobaciones limitadas...")
-    started = time.monotonic()
+    start_event_id = None
     try:
-        process = subprocess.run(
-            command, capture_output=True, text=True, timeout=90
+        start_event = ExecutionLedger().append(
+            namespace="security-scans", task=f"{args.task} :: {args.target}",
+            status="started", tool="nuclei_task_runner",
+            evidence={"phase": "scan_start", "selected_templates": len(selected)},
+            duration_ms=0, metadata={"authorization_id": args.authorization_id},
         )
-        elapsed = round(time.monotonic() - started, 2)
-    except subprocess.TimeoutExpired:
+        start_event_id = start_event["event_id"]
+    except Exception as ledger_error:
+        print("AVISO: no se pudo registrar el inicio:", ledger_error, file=sys.stderr)
+        if args.require_ledger:
+            return 3
+
+    try:
+        command = [
+            nuclei, "-u", args.target,
+            "-jsonl", "-o", str(results_file.resolve()),
+            "-no-interactsh", "-disable-update-check", "-disable-redirects",
+            "-rl", "2", "-c", "2", "-timeout", "5", "-retries", "0",
+        ]
+        for item in selected:
+            command.extend(["-t", item["path"]])
+    
+        print("\nIniciando comprobaciones limitadas...")
+        started = time.monotonic()
+        try:
+            process = subprocess.run(
+                command, capture_output=True, text=True, timeout=90
+            )
+            elapsed = round(time.monotonic() - started, 2)
+        except subprocess.TimeoutExpired:
+            report = {
+                "task": args.task, "target": args.target,
+                "status": "timeout", "elapsed_seconds": 90,
+                "findings": [],
+            }
+            report_file.write_text(
+                json.dumps(report, indent=2, ensure_ascii=False) + "\n",
+                encoding="utf-8",
+            )
+            recorded = _record_task_scan(args.task, args.target, report, task_started, args.authorization_id, start_event_id)
+            if args.require_ledger and recorded is None:
+                return 3
+            print("Tiempo agotado. Informe:", report_file)
+            return 1
+    
+        findings = []
+        if results_file.is_file():
+            for line in results_file.read_text(encoding="utf-8").splitlines():
+                try:
+                    findings.append(json.loads(line))
+                except json.JSONDecodeError:
+                    pass
+    
         report = {
-            "task": args.task, "target": args.target,
-            "status": "timeout", "elapsed_seconds": 90,
-            "findings": [],
+            "task": args.task,
+            "target": args.target,
+            "authorization": grant,
+            "status": "completed" if process.returncode == 0 else "scanner_error",
+            "elapsed_seconds": elapsed,
+            "templates_used": [item["path"] for item in selected],
+            "findings_count": len(findings),
+            "findings": findings,
+            "scanner_output": (process.stdout + "\n" + process.stderr)[-12000:],
+            "note": "Los resultados son indicios y requieren validación.",
         }
         report_file.write_text(
             json.dumps(report, indent=2, ensure_ascii=False) + "\n",
             encoding="utf-8",
         )
-        print("Tiempo agotado. Informe:", report_file)
+        recorded = _record_task_scan(args.task, args.target, report, task_started, args.authorization_id, start_event_id)
+        if args.require_ledger and recorded is None:
+            return 3
+        print("\nEstado:", report["status"])
+        print("Tiempo:", elapsed, "segundos")
+        print("Hallazgos:", len(findings))
+        print("Informe:", report_file)
+        return 0 if process.returncode == 0 else 1
+    except Exception as error:
+        report = {
+            "task": args.task,
+            "target": args.target,
+            "status": "failed",
+            "error_type": type(error).__name__,
+            "error": str(error),
+            "findings": [],
+        }
+        recorded = _record_task_scan(
+            args.task, args.target, report, task_started,
+            args.authorization_id, start_event_id,
+        )
+        if args.require_ledger and recorded is None:
+            return 3
+        print("ERROR: la ejecución terminó inesperadamente:", error, file=sys.stderr)
         return 1
-
-    findings = []
-    if results_file.is_file():
-        for line in results_file.read_text(encoding="utf-8").splitlines():
-            try:
-                findings.append(json.loads(line))
-            except json.JSONDecodeError:
-                pass
-
-    report = {
-        "task": args.task,
-        "target": args.target,
-        "status": "completed" if process.returncode == 0 else "scanner_error",
-        "elapsed_seconds": elapsed,
-        "templates_used": [item["path"] for item in selected],
-        "findings_count": len(findings),
-        "findings": findings,
-        "scanner_output": (process.stdout + "\n" + process.stderr)[-12000:],
-        "note": "Los resultados son indicios y requieren validación.",
-    }
-    report_file.write_text(
-        json.dumps(report, indent=2, ensure_ascii=False) + "\n",
-        encoding="utf-8",
-    )
-    print("\nEstado:", report["status"])
-    print("Tiempo:", elapsed, "segundos")
-    print("Hallazgos:", len(findings))
-    print("Informe:", report_file)
-    return 0 if process.returncode == 0 else 1
 
 
 if __name__ == "__main__":
