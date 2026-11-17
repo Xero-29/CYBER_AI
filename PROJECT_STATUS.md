@@ -1,10 +1,10 @@
 # Estado actual verificado — 2026-11-17
 
 **Rama activa:** `main`  
-**HEAD consultado:** `eed9b81929ed25f0c63b4aede4bcb9fc841db73e`  
+**HEAD consultado:** `18aa78dfc33dab5b14523dd2d653eba1abc45f78`  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17`, idéntico al main anterior a la integración (`7b5ed033f1f6461b5780a10ac4ada67a444b93e5`).  
 **Integración principal:** PR #2 integrado en merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`.  
-**Diferencia contra el respaldo:** 509 commits adelante, 0 detrás.
+**Diferencia contra el respaldo:** 514 commits adelante, 0 detrás.
 
 ## Cambios recientes aplicados directamente en main
 
