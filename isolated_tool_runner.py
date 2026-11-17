@@ -26,7 +26,7 @@ def _docker_image_id(docker, image):
     )
     if result.returncode != 0:
         raise ToolExecutionError(
-            "No está construida la imagen aislada. Ejecuta scripts/build-analysis-sandbox.sh."
+            "No está construida la imagen aislada. Ejecuta sh build-analysis-sandbox.sh."
         )
     value = result.stdout.strip()
     if not value.startswith("sha256:") or len(value) != 71:
