@@ -8,10 +8,12 @@ import platform
 import subprocess
 import sys
 import time
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
 from execution_ledger import ExecutionLedger
+from task_planner import create_plan
 
 from model_memory_manager import load_config
 import experiment_engine
@@ -772,6 +774,9 @@ def execute_workflow(
     """Ejecuta el flujo de forma secuencial y registra cada respuesta."""
     workflow_started = time.monotonic()
     workflow = load_workflow(workflow_name)
+    capability_plan, capability_plan_path = create_plan(
+        task, output_path=REPORT_DIR / ("team_plan_" + uuid.uuid4().hex + ".json")
+    )
     steps = workflow["steps"]
     limit = int(workflow.get("max_steps", workflow.get("max_rounds", len(steps))))
     steps = steps[:max(1, min(limit, len(steps)))]
@@ -799,6 +804,9 @@ def execute_workflow(
     print(f"Flujo: {workflow_name}")
     print(f"Descripción: {workflow.get('description', '')}")
     print(f"Etapas: {len(steps)}")
+    print("Capacidades candidatas:", capability_plan["candidate_count"])
+    print("Herramientas candidatas:", capability_plan["tool_candidate_count"])
+    print("Plan de capacidades:", capability_plan_path)
 
     for number, step in enumerate(steps, start=1):
         print(f"  {number}. {step['agent']}: {step['objective']}")
@@ -820,7 +828,9 @@ def execute_workflow(
             namespace=namespace, task=task, status="started",
             tool="team_orchestrator", tool_version="1", model="multi-agent",
             environment=f"python-{platform.python_version()}",
-            evidence={"phase": "workflow_start", "workflow": workflow_name},
+            evidence={"phase": "workflow_start", "workflow": workflow_name,
+                      "capability_plan": str(capability_plan_path),
+                      "tool_execution_started": False},
             duration_ms=0, metadata={"workflow": workflow_name},
         )
     except Exception as error:
@@ -837,6 +847,14 @@ def execute_workflow(
         "status": "running",
         "steps": [],
         "ledger_start_event_id": start_event["event_id"],
+        "capability_plan": {
+            "path": str(capability_plan_path),
+            "candidate_count": capability_plan["candidate_count"],
+            "tool_candidate_count": capability_plan["tool_candidate_count"],
+            "steps": capability_plan["steps"],
+            "tool_candidates": capability_plan["tool_candidates"],
+            "tool_execution_started": False,
+        },
     }
     if objective_contract is not None:
         report["objective_contract"] = objective_contract.to_dict()
