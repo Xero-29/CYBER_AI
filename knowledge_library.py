@@ -404,21 +404,46 @@ def search_knowledge_hybrid(
     return output
 
 
-def document_chunk_count(document_id, embedding_model=None):
-    """Cuenta fragmentos publicados para reconocer reintentos idempotentes."""
+def document_chunk_count(
+    document_id, embedding_model=None, *, visibility=None, tenant_id=None
+):
+    """Cuenta fragmentos publicados, opcionalmente dentro de un ámbito autorizado."""
     if not isinstance(document_id, str) or not document_id.strip():
         raise ValueError("document_id es obligatorio.")
+    if embedding_model is not None and (
+        not isinstance(embedding_model, str) or not embedding_model.strip()
+    ):
+        raise ValueError("embedding_model debe ser texto no vacío.")
+    if visibility is not None:
+        if not isinstance(visibility, str) or visibility not in {"shared", "tenant"}:
+            raise ValueError("visibility debe ser 'shared' o 'tenant'.")
+        if visibility == "tenant" and (
+            not isinstance(tenant_id, str) or not tenant_id.strip()
+        ):
+            raise ValueError("tenant_id es obligatorio para contar conocimiento privado.")
+        if visibility == "shared" and tenant_id is not None:
+            raise ValueError("El ámbito shared no admite tenant_id.")
+    elif tenant_id is not None:
+        raise ValueError("tenant_id requiere un filtro visibility.")
+
     initialize()
+    filters = ["document_id = ?"]
+    parameters = [document_id.strip()]
     if embedding_model is not None:
-        if not isinstance(embedding_model, str) or not embedding_model.strip():
-            raise ValueError("embedding_model debe ser texto no vacío.")
-        query = "SELECT COUNT(*) AS total FROM knowledge_chunks WHERE document_id = ? AND embedding_model = ?"
-        parameters = (document_id.strip(), embedding_model.strip())
-    else:
-        query = "SELECT COUNT(*) AS total FROM knowledge_chunks WHERE document_id = ?"
-        parameters = (document_id.strip(),)
+        filters.append("embedding_model = ?")
+        parameters.append(embedding_model.strip())
+    if visibility is not None:
+        filters.append("visibility = ?")
+        parameters.append(visibility)
+        if visibility == "tenant":
+            filters.append("tenant_id = ?")
+            parameters.append(tenant_id.strip())
+    query = (
+        "SELECT COUNT(*) AS total FROM knowledge_chunks WHERE "
+        + " AND ".join(filters)
+    )
     with database() as db:
-        row = db.execute(query, parameters).fetchone()
+        row = db.execute(query, tuple(parameters)).fetchone()
     return int(row["total"])
 
 
