@@ -587,14 +587,31 @@ def register_skill_from_ledger(
                 "reused": True,
             }
 
-    return _insert_verified_skill(
-        name=name, task_pattern=task_pattern, description=description,
-        prerequisites=prerequisites, methodology=methodology,
-        validation=validation, tools=tools, tags=tags,
-        evidence=approved_evidence, source_urls=source_urls,
-        success_runs=len(selected), failure_runs=0,
-        verified_by="VERITAS", verifier_verdict="CONFIRMADA",
-    )
+        # Insertar dentro del mismo BEGIN IMMEDIATE evita duplicados cuando
+        # dos aprobaciones idénticas llegan simultáneamente.
+        document = json.loads(payload)
+        skill_id = uuid.uuid4().hex
+        db.execute(
+            """INSERT INTO skills(
+                skill_id,name,task_pattern,description,prerequisites_json,
+                methodology_json,validation_json,tools_json,tags_json,
+                evidence_json,source_urls_json,success_runs,failure_runs,
+                status,version,verified_by,verifier_verdict,created_at,updated_at
+            ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,'active',1,'VERITAS','CONFIRMADA',?,?)""",
+            (
+                skill_id, document["name"], document["task_pattern"],
+                document["description"], json.dumps(document["prerequisites"]),
+                json.dumps(document["methodology"]), json.dumps(document["validation"]),
+                json.dumps(document["tools"]), json.dumps(document["tags"]),
+                json.dumps(approved_evidence), json.dumps(document["source_urls"]),
+                len(selected), 0, stamp, stamp,
+            ),
+        )
+        _save_version(db, skill_id, 1, "created", "VERITAS")
+        return {
+            "skill_id": skill_id, "status": "active", "version": 1,
+            "promoted_candidate": False, "reused": False,
+        }
 
 
 
