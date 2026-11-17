@@ -40,7 +40,7 @@ class DependencyArtifactManifestTests(unittest.TestCase):
         )
         self.assertTrue(all(len(item["sha256"]) == 64 for item in result["artifacts"]))
         self.assertEqual(len(result["lock_sha256"]), 64)
-        self.assertIn("not hashes fixed", result["scope"])
+        self.assertIn("no son hashes fijados", result["scope"])
 
     def test_manifest_rejects_missing_locked_wheel(self):
         self.wheel("requests-2.0-py3-none-any.whl", "requests", "2.0")
