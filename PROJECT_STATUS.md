@@ -144,3 +144,13 @@
 - Fuentes y versiones deben leerse y fijarse antes de afirmar cumplimiento. El registro actual es una línea base de referencias catalogadas, no lectura integral.
 - Informe: `knowledge/research/GLOBAL_COVERAGE_AUDIT.md`; matriz: `knowledge/research/global_coverage_matrix.json`.
 - **Límite:** esta auditoría demuestra que el cruce de 48 áreas y 61 referencias es estructuralmente consistente; no demuestra que CYBER_AI abarque todo el conocimiento existente, que los módulos estén completos ni que herramientas/laboratorios funcionen.
+
+
+## Matriz de cobertura y validación por especialidad — 2026-11-17
+
+- Se amplió `knowledge/research/global_coverage_matrix.json` a esquema 1.1.0. La matriz ahora deriva requisitos de los 48 currículos y enumera **336 requisitos temáticos**, **432 artefactos** y **336 puertas de validación** (7 por especialidad).
+- Cada requisito tiene estado explícito, referencias de evidencia, revisor y fecha. Los estados iniciales permanecen en `not_assessed`; no se ha marcado ninguna especialidad como validada.
+- `knowledge_global_coverage_audit.py` ahora comprueba la correspondencia exacta manifiesto–currículo–matriz, la conservación de temas y artefactos, los estados permitidos y la evidencia mínima exigida para declarar algo validado.
+- Se ampliaron las pruebas para comprobar la matriz de requisitos y evitar validaciones sin evidencia.
+- **Alcance real:** se desarrolló la estructura de auditoría y aceptación, no se completó la investigación ni el contenido profundo de los 48 dominios. Los 61 grupos de referencia siguen siendo una selección curada, no un censo exhaustivo. No se calcula porcentaje total.
+- **CI para SHA `3457879a930ef8df23691889e167a1b17d24dbee`:** Python run `44144894444` y Docker sandbox run `44144894391` quedaron disparados; su resultado debe consultarse en GitHub Actions. No se declaran aprobados mientras estén pendientes/en ejecución.
