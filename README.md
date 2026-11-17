@@ -66,6 +66,8 @@ La entrada principal ya permite enviar una tarea al flujo de agentes:
 
 ```bash
 python cyber_ai.py --ask "Audita la configuración de seguridad de mi aplicación"
+# Flujo multiagente con supervisión independiente:
+python cyber_ai.py --team "Investiga la arquitectura de seguridad de mi aplicación"
 ```
 
 La ruta pasa por DIRECTOR y después por `agent_runner.py`. La recuperación de Skills y lecciones aprobadas se incorpora durante la ejecución; la biblioteca de conocimiento se consulta por defecto mediante ECO. Para usar esta ruta, configura un proveedor de chat y un proveedor de embeddings compatibles e indexa primero la biblioteca. Si necesitas ejecutar una consulta sin recuperación de conocimiento:
@@ -75,7 +77,7 @@ python cyber_ai.py --ask "Explica este hallazgo" --agent NEXO
 python cyber_ai.py --ask "Explica este hallazgo" --no-knowledge
 ```
 
-Esta entrada no ejecuta automáticamente herramientas de seguridad ni sustituye la autorización de objetivos. Los escáneres y adaptadores conservan sus flujos explícitos de autorización y ejecución documentados más abajo.
+El flujo `--team` utiliza `team_orchestrator.py` y supervisa las etapas contra el objetivo global. La recuperación de conocimiento se activa por defecto en las etapas y revisiones, salvo que una etapa o el flujo la desactive expresamente en `config/workflows.json`. Esta entrada no ejecuta automáticamente herramientas de seguridad ni sustituye la autorización de objetivos. Los escáneres y adaptadores conservan sus flujos explícitos de autorización y ejecución documentados más abajo.
 
 ## Ejecutar agentes LLM locales
 
