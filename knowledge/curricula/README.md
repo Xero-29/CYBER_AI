@@ -43,4 +43,9 @@ Se han creado 48 módulos, uno por cada área del manifiesto. Su estado inicial 
 
 ## Revisiones bibliográficas iniciales
 
-Trece dominios cuentan con síntesis de fuentes primarias, hipótesis y protocolos experimentales propuestos (aún no ejecutados): AppSec/API, respuesta a incidentes, DevSecOps/supply chain, gestión de vulnerabilidades, OT/ICS, arquitectura segura y criptografía. Consulta el índice en `../deep_modules/README.md`. El auditor `knowledge_research_audit.py` verifica que los IDs de fuente citados existan en el registro; no certifica que el documento completo haya sido leído ni que las conclusiones sean científicamente válidas.
+Las 48 áreas cuentan con revisiones exploratorias iniciales, hipótesis y protocolos experimentales propuestos (aún no ejecutados): AppSec/API, respuesta a incidentes, DevSecOps/supply chain, gestión de vulnerabilidades, OT/ICS, arquitectura segura y criptografía. Consulta el índice en `../deep_modules/README.md`. El auditor `knowledge_research_audit.py` verifica que los IDs de fuente citados existan en el registro; no certifica que el documento completo haya sido leído ni que las conclusiones sean científicamente válidas.
+
+
+## Cobertura de revisiones exploratorias — 2026-11-17
+
+Las 48 áreas tienen un dossier `LITERATURE_REVIEW.md` con pregunta, síntesis, taxonomía, hipótesis, protocolo propuesto, métricas, límites y brechas. Las 35 referencias añadidas están registradas como `official_reference_catalogued_not_content_reviewed`: localizadas en el emisor, no leídas íntegramente. No equivale a 48 revisiones sistemáticas ni a investigación empírica.

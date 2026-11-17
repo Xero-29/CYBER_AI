@@ -121,3 +121,14 @@
 - Docker workflow `44140837454`: **success**. Construyó el sandbox general y la imagen de análisis YARA/TShark; ejecutó `verify.sh` con pruebas Docker habilitadas y Ruff dentro del sandbox endurecido; evidencia subida como artefacto.
 - La auditoría de investigación confirmó 48/48 agendas estructuralmente completas, 13/48 revisiones bibliográficas trazables y 33 registros de fuentes. Las 35 revisiones faltantes siguen pendientes; la auditoría no convierte agendas ni revisiones documentales en investigación empírica.
 - Estos resultados corresponden al SHA indicado. Este commit añade únicamente el registro documental de esos resultados.
+
+
+## Ampliación de las 35 revisiones restantes — 2026-11-17
+
+- Se añadieron 35 dossiers exploratorios: IA red team, seguridad IA, API, automoción, bug bounty/VDP, continuidad, cloud, forense cloud, datos, bases de datos, EDR/XDR, correo/DNS, fundamentos, fraude, gobierno, hardware, IoT, Linux, ML, matemáticas, móvil, redes, seguridad física, PKI/HSM, PQC, privacidad, Red Team, ingeniería inversa, satélites, ingeniería de software, 5G, threat hunting, investigación de vulnerabilidades, Windows/AD y wireless.
+- Cada dossier contiene pregunta, síntesis preliminar, taxonomía, hipótesis, protocolo experimental, métricas, amenazas a la validez, brechas y trazabilidad de una referencia institucional.
+- Se incorporaron 35 referencias nuevas con estado `official_reference_catalogued_not_content_reviewed`: localizadas en sitios de emisores, no leídas íntegramente.
+- Cobertura editorial: **48/48 dossiers exploratorios** y 48/48 agendas. No significa 48 revisiones sistemáticas, 48 documentos leídos ni investigaciones empíricas completadas.
+- Madurez: M1; no se declara M3/M4/M5. Los experimentos propuestos no se han ejecutado.
+- Pendiente: lectura integral, revisión sistemática de literatura académica, síntesis de evidencia, laboratorios, análisis estadístico, revisión experta y reproducción independiente.
+- CI del nuevo SHA pendiente; resultados de commits anteriores no validan estos cambios.

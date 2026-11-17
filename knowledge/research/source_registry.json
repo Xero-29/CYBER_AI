@@ -528,6 +528,531 @@
       "review_note": "Página oficial de proyecto y metadatos de release revisados; no se declara lectura integral del estándar."
     },
     {
+      "id": "RESEARCH-AI-RED-TEAM",
+      "title": "MITRE ATLAS",
+      "publisher": "MITRE",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://atlas.mitre.org/",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "ai_red_team"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-AI-SECURITY",
+      "title": "NIST AI Risk Management Framework 1.0",
+      "publisher": "NIST",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://doi.org/10.6028/NIST.AI.100-1",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "ai_security"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-API",
+      "title": "OWASP API Security Top 10 2023",
+      "publisher": "OWASP Foundation",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://owasp.org/www-project-api-security/",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "api"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-AUTOMOTIVE-SECURITY",
+      "title": "NHTSA Cybersecurity Best Practices for Modern Vehicles",
+      "publisher": "NHTSA",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://www.nhtsa.gov/technology-innovation/vehicle-cybersecurity",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "automotive_security"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-BUG-BOUNTY",
+      "title": "CISA Vulnerability Disclosure Policy resources",
+      "publisher": "CISA",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://www.cisa.gov/vulnerability-disclosure-policy-template",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "bug_bounty"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-BUSINESS-CONTINUITY",
+      "title": "NIST Guide for Cybersecurity Event Recovery (SP 800-184)",
+      "publisher": "NIST",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://doi.org/10.6028/NIST.SP.800-184",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "business_continuity"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-CLOUD",
+      "title": "NIST Guidelines on Security and Privacy in Public Cloud Computing",
+      "publisher": "NIST",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://doi.org/10.6028/NIST.SP.800-144",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "cloud"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-CLOUD-FORENSICS",
+      "title": "NIST Cloud Computing Forensic Reference Architecture (SP 800-201)",
+      "publisher": "NIST",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://doi.org/10.6028/NIST.SP.800-201",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "cloud_forensics"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-DATA-SECURITY",
+      "title": "NIST SP 1800-28 Data Confidentiality: Identifying and Protecting Assets",
+      "publisher": "NIST NCCoE",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://csrc.nist.gov/pubs/sp/1800/28/final",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "data_security"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-DATABASE-SECURITY",
+      "title": "NIST IR 8611 m-NGAC Database Security Models",
+      "publisher": "NIST",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://csrc.nist.gov/pubs/ir/8611/final",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "database_security"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-EDR-XDR",
+      "title": "NIST Guide to Intrusion Detection and Prevention Systems (SP 800-94)",
+      "publisher": "NIST",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://doi.org/10.6028/NIST.SP.800-94",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "edr_xdr"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-EMAIL-DNS-SECURITY",
+      "title": "RFC 7208 Sender Policy Framework",
+      "publisher": "IETF RFC Editor",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://www.rfc-editor.org/rfc/rfc7208",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "email_dns_security"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-FOUNDATIONS",
+      "title": "NIST Risk Management Framework (SP 800-37 Rev. 2)",
+      "publisher": "NIST",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://doi.org/10.6028/NIST.SP.800-37r2",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "foundations"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-FRAUD-ABUSE",
+      "title": "OWASP Automated Threats to Web Applications",
+      "publisher": "OWASP Foundation",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://owasp.org/www-project-automated-threats-to-web-applications/",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "fraud_abuse"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-GOVERNANCE",
+      "title": "NIST SP 800-18 Rev. 2 System Security, Privacy and C-SCRM Plans",
+      "publisher": "NIST",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://doi.org/10.6028/NIST.SP.800-18r2",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "governance"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-HARDWARE-SECURITY",
+      "title": "NIST SP 800-193 Platform Firmware Resiliency Guidelines",
+      "publisher": "NIST",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://doi.org/10.6028/NIST.SP.800-193",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "hardware_security"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-IOT-HARDWARE",
+      "title": "NIST IR 8259 Rev. 1 IoT Product Manufacturers",
+      "publisher": "NIST",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://doi.org/10.6028/NIST.IR.8259r1",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "iot_hardware"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-LINUX",
+      "title": "CIS Benchmarks for Linux",
+      "publisher": "Center for Internet Security",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://www.cisecurity.org/cis-benchmarks",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "linux"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-MACHINE-LEARNING",
+      "title": "NIST Adversarial Machine Learning Taxonomy (AI 100-2e2025)",
+      "publisher": "NIST",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://doi.org/10.6028/NIST.AI.100-2e2025",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "machine_learning"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-MATHEMATICS",
+      "title": "NIST SP 800-55 Vol. 1 Measurement Guide for Information Security",
+      "publisher": "NIST",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://csrc.nist.gov/pubs/sp/800/55/v1/final",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "mathematics"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-MOBILE",
+      "title": "OWASP Mobile Application Security Verification Standard",
+      "publisher": "OWASP Foundation",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://mas.owasp.org/MASVS/",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "mobile"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-NETWORK",
+      "title": "NIST SP 800-41 Rev. 1 Firewalls and Firewall Policy",
+      "publisher": "NIST",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://doi.org/10.6028/NIST.SP.800-41r1",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "network"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-PHYSICAL-SECURITY",
+      "title": "NIST SP 800-53 Rev. 5 Security and Privacy Controls",
+      "publisher": "NIST",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://doi.org/10.6028/NIST.SP.800-53r5",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "physical_security"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-PKI-HSM",
+      "title": "RFC 5280 X.509 PKI Certificate and CRL Profile",
+      "publisher": "IETF RFC Editor",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://www.rfc-editor.org/rfc/rfc5280",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "pki_hsm"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-POST-QUANTUM-CRYPTO",
+      "title": "NIST IR 8547 Transition to Post-Quantum Cryptography Standards",
+      "publisher": "NIST",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://csrc.nist.gov/pubs/ir/8547/final",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "post_quantum_crypto"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-PRIVACY-ENGINEERING",
+      "title": "NIST Privacy Framework",
+      "publisher": "NIST",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://www.nist.gov/privacy-framework",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "privacy_engineering"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-RED-TEAM",
+      "title": "NIST SP 800-115 Technical Guide to Information Security Testing",
+      "publisher": "NIST",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://doi.org/10.6028/NIST.SP.800-115",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "red_team"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-REVERSE",
+      "title": "Ghidra Software Reverse Engineering Framework",
+      "publisher": "National Security Agency",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://github.com/NationalSecurityAgency/ghidra",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "reverse"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-SATELLITE-SECURITY",
+      "title": "NIST IR 8401 Cybersecurity for the Space Domain",
+      "publisher": "NIST",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://doi.org/10.6028/NIST.IR.8401",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "satellite_security"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-SOFTWARE-ENGINEERING",
+      "title": "NIST SP 800-218 Secure Software Development Framework",
+      "publisher": "NIST",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://doi.org/10.6028/NIST.SP.800-218",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "software_engineering"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-TELECOM-5G",
+      "title": "3GPP TS 33.501 Security architecture for 5G System",
+      "publisher": "3GPP",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://www.3gpp.org/dynareport/33501.htm",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "telecom_5g"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-THREAT-HUNTING",
+      "title": "Sigma Rule Specification",
+      "publisher": "SigmaHQ",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://github.com/SigmaHQ/sigma-specification",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "threat_hunting"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-VULNERABILITY-RESEARCH",
+      "title": "FIRST CVSS v4.0 Specification",
+      "publisher": "FIRST",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://www.first.org/cvss/v4.0/specification-document",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "vulnerability_research"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-WINDOWS-AD",
+      "title": "Microsoft Windows Security Baselines",
+      "publisher": "Microsoft",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://learn.microsoft.com/en-us/windows/security/operating-system-security/device-management/windows-security-configuration-framework/windows-security-baselines",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "windows_ad"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
+      "id": "RESEARCH-WIRELESS-SECURITY",
+      "title": "NIST SP 800-153 Guidelines for Securing WLANs",
+      "publisher": "NIST",
+      "type": "primary_or_authoritative_reference",
+      "url": "https://doi.org/10.6028/NIST.SP.800-153",
+      "version": "Consultar edición vigente en el emisor",
+      "published": "Ver registro del emisor",
+      "verification_status": "official_reference_catalogued_not_content_reviewed",
+      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "domains": [
+        "wireless_security"
+      ],
+      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+    },
+    {
       "id": "SLSA-v1.1",
       "title": "Supply-chain Levels for Software Artifacts specification",
       "publisher": "OpenSSF",
@@ -543,5 +1068,6 @@
       ],
       "review_note": "Se revisaron páginas oficiales de especificación y provenance; no se afirma auditoría de un builder concreto."
     }
-  ]
+  ],
+  "last_updated": "2026-11-17"
 }
