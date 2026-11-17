@@ -1,11 +1,14 @@
 import io
+import json
+import os
 import subprocess
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from isolated_tool_runner import run_isolated_tool
+from isolated_tool_runner import run_isolated_tool, _docker_image_id
+from tool_allowlist import sign_tool_allowlist
 
 
 class FakeProcess:
@@ -84,6 +87,46 @@ class IsolatedToolRunnerTests(unittest.TestCase):
             self.assertTrue(any(call.args[0][:2] == ["/usr/bin/docker", "kill"]
                                 for call in docker_run.call_args_list))
             killpg.assert_called_once()
+
+    @unittest.skipUnless(
+        os.environ.get("CYBER_AI_RUN_DOCKER_SANDBOX_TESTS") == "1",
+        "Docker sandbox integration is enabled only in the Docker CI job.",
+    )
+    def test_real_yara_execution_in_hardened_docker_image(self):
+        docker = __import__("shutil").which("docker")
+        self.assertTrue(docker)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            target = root / "samples"
+            target.mkdir()
+            (target / "sample.bin").write_bytes(b"sample-data")
+            rules = root / "rules.yar"
+            rules.write_text(
+                'rule cyber_ai_test { strings: $sample = "sample-data" condition: $sample }',
+                encoding="utf-8",
+            )
+            image = os.environ.get(
+                "CYBER_AI_ANALYSIS_SANDBOX_IMAGE", "cyber-ai-analysis-sandbox:1.0"
+            )
+            image_id = _docker_image_id(docker, image)
+            key = "integration-test-key-material-32-bytes-minimum"
+            allowlist = sign_tool_allowlist({"yara": {"sha256": image_id}}, key.encode())
+            allowlist_path = root / "tool-allowlist.json"
+            allowlist_path.write_text(json.dumps(allowlist), encoding="utf-8")
+            allowlist_path.chmod(0o600)
+            with patch.dict(os.environ, {
+                "CYBER_AI_TOOL_ALLOWLIST_PATH": str(allowlist_path),
+                "CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY": key,
+                "CYBER_AI_TOOL_ALLOWLIST_REQUIRED": "1",
+                "CYBER_AI_ANALYSIS_SANDBOX_IMAGE": image,
+            }, clear=False):
+                evidence = run_isolated_tool(
+                    "yara", str(target), config_path=str(rules),
+                    allow_external=True, timeout=30,
+                )
+            self.assertEqual(evidence["status"], "completed", evidence.get("stderr"))
+            self.assertTrue(evidence["network_isolation_enforced"])
+            self.assertIn("cyber_ai_test", evidence["stdout"])
 
 
 if __name__ == "__main__":
