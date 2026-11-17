@@ -56,6 +56,28 @@ class SkillbookTests(unittest.TestCase):
   self.assertFalse(result["valid"])
   self.assertEqual(result["reason"],"version_sequence")
 
+ def test_skill_history_migrates_legacy_version_table(self):
+  skill=self.add()
+  with skillbook.connect() as db:
+   db.execute("DROP TRIGGER skill_versions_no_update")
+   db.execute("DROP TRIGGER skill_versions_no_delete")
+   db.execute("DROP INDEX idx_skill_versions_skill")
+   db.execute("ALTER TABLE skill_versions RENAME TO skill_versions_legacy")
+   db.execute("""CREATE TABLE skill_versions(
+    skill_id TEXT NOT NULL,version INTEGER NOT NULL,change_type TEXT NOT NULL,
+    actor TEXT NOT NULL,snapshot_json TEXT NOT NULL,created_at TEXT NOT NULL,
+    PRIMARY KEY(skill_id,version))""")
+   db.execute("""INSERT INTO skill_versions
+    SELECT skill_id,version,change_type,actor,snapshot_json,created_at
+    FROM skill_versions_legacy""")
+   db.execute("DROP TABLE skill_versions_legacy")
+  result=skillbook.verify_skill_history(skill["skill_id"])
+  self.assertTrue(result["valid"],result)
+  with skillbook.connect() as db:
+   row=db.execute("SELECT previous_hash,entry_hash FROM skill_versions WHERE skill_id=?",(skill["skill_id"],)).fetchone()
+  self.assertEqual(row["previous_hash"],skillbook.VERSION_HASH_GENESIS)
+  self.assertEqual(len(row["entry_hash"]),64)
+
  def test_skill_history_detects_tampered_historical_snapshot(self):
   skill=self.add()
   with skillbook.connect() as db:
