@@ -1,2 +1,4 @@
-ddgs==9.16.0
-requests==2.34.2
+ddgs==9.16.0 \
+    --hash=sha256:175d9198c958a263f51a06a54368ba0b41294942c0cd29f4aa71be03dbcd5f4a
+requests==2.34.2 \
+    --hash=sha256:2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0
