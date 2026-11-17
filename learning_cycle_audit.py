@@ -81,19 +81,18 @@ def audit_learning_cycle(*, max_review_age_days: int = 180) -> dict:
         rows = db.execute(
             "SELECT skill_id,name,status,version,updated_at FROM skills ORDER BY skill_id"
         ).fetchall()
-
-    skill_counts = Counter(row["status"] for row in rows)
-    invalid_skills = []
-    for row in rows:
-        result = skillbook.verify_skill_history(row["skill_id"])
-        if not result.get("valid") or result.get("status") != row["status"]:
-            invalid_skills.append({
-                "skill_id": row["skill_id"],
-                "name": row["name"],
-                "status": row["status"],
-                "reason": result.get("reason", "status_mismatch"),
-                "fields": result.get("fields", []),
-            })
+        skill_counts = Counter(row["status"] for row in rows)
+        invalid_skills = []
+        for row in rows:
+            result = skillbook._verify_skill_history_in_db(db, row["skill_id"])
+            if not result.get("valid") or result.get("status") != row["status"]:
+                invalid_skills.append({
+                    "skill_id": row["skill_id"],
+                    "name": row["name"],
+                    "status": row["status"],
+                    "reason": result.get("reason", "status_mismatch"),
+                    "fields": result.get("fields", []),
+                })
 
     due_for_review = skillbook.list_skills_due_for_review(
         max_age_days=max_review_age_days
