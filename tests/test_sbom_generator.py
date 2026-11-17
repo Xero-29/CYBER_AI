@@ -86,7 +86,9 @@ class SbomGeneratorTests(unittest.TestCase):
             build_sbom(self.root)
 
     def test_rejects_hashless_dependency(self):
-        (self.root / "requirements.txt").write_text("requests==2.34.2\\n", encoding="utf-8")
+        (self.root / "requirements.txt").write_text(
+            "requests==2.34.2" + chr(10), encoding="utf-8"
+        )
         with self.assertRaisesRegex(LockfileError, "sin hash SHA-256"):
             build_sbom(self.root)
 
@@ -110,13 +112,20 @@ class SbomGeneratorTests(unittest.TestCase):
 
     def test_rejects_conflicting_versions_across_included_files(self):
         (self.root / "requirements.lock").write_text(
-            "-r requirements.txt\nrequests==2.33.0\n", encoding="utf-8"
+            "-r requirements.txt" + chr(10)
+            + "requests==2.33.0 " + chr(92) + chr(10)
+            + "    --hash=sha256:" + "c" * 64 + chr(10),
+            encoding="utf-8",
         )
         with self.assertRaises(LockfileError):
             build_sbom(self.root)
 
     def test_rejects_missing_direct_dependency_from_lock(self):
-        (self.root / "requirements.lock").write_text("certifi==2026.10.23\n", encoding="utf-8")
+        (self.root / "requirements.lock").write_text(
+            "certifi==2026.10.23 " + chr(92) + chr(10)
+            + "    --hash=sha256:" + "b" * 64 + chr(10),
+            encoding="utf-8",
+        )
         with self.assertRaises(LockfileError):
             build_sbom(self.root)
 
