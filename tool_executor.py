@@ -19,7 +19,7 @@ def _terminal_status(evidence):
         return "timeout"
     if status == "denied":
         return "denied"
-    if status == "completed" and evidence.get("return_code") == 0:
+    if status == "completed" and evidence.get("tool_reported_success") is True:
         return "completed"
     return "failed"
 
@@ -57,6 +57,7 @@ def main(argv=None):
     parser.add_argument("--tool", required=True, choices=sorted(TOOL_SPECS))
     parser.add_argument("--target", required=True, help="Ruta relativa dentro del repositorio")
     parser.add_argument("--config", help="Configuración local para Semgrep")
+    parser.add_argument("--plugin", help="Plugin explícito de Volatility 3 (allowlist del adaptador)")
     parser.add_argument("--timeout", type=int)
     parser.add_argument("--execute", action="store_true", help="Confirma la ejecución local")
     parser.add_argument("--require-ledger", action="store_true",
@@ -97,7 +98,8 @@ def main(argv=None):
     artifact_sha256 = None
     try:
         evidence = run_local_tool(
-            args.tool, args.target, config_path=args.config, timeout=args.timeout
+            args.tool, args.target, config_path=args.config,
+            plugin=args.plugin, timeout=args.timeout
         )
         if not isinstance(evidence, dict):
             raise TypeError("El adaptador debe devolver un objeto de evidencia.")
@@ -182,7 +184,7 @@ def main(argv=None):
     print(json.dumps(evidence, ensure_ascii=False, indent=2))
     if evidence.get("status") == "denied":
         return 2
-    return 0 if evidence.get("status") == "completed" and evidence.get("return_code") == 0 else 1
+    return 0 if evidence.get("status") == "completed" and evidence.get("tool_reported_success") is True else 1
 
 
 if __name__ == "__main__":
