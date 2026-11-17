@@ -53,6 +53,16 @@ class SkillbookCliTests(unittest.TestCase):
 
 
 
+    def test_verify_history_command_returns_failure_for_invalid_history(self):
+        with patch.object(
+            skillbook_cli.skillbook,
+            "verify_skill_history",
+            return_value={"valid": False, "reason": "version_sequence"},
+        ) as verify, patch("builtins.print"):
+            result = skillbook_cli.main(["verify-history", "--skill-id", "skill-1"])
+        self.assertEqual(result, 1)
+        verify.assert_called_once_with("skill-1")
+
     def test_review_due_command_calls_review_report(self):
         with patch.object(
             skillbook_cli.skillbook,
