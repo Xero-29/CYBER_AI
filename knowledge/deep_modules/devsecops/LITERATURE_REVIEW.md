@@ -68,3 +68,4 @@ Prioridad de implementación:
 - NIST NCCoE, DevSecOps Practices, initial preliminary draft, 2026-03-24. https://csrc.nist.gov/pubs/other/2026/03/24/devsecops-practices/iprd
 - SLSA, Specification v1.1. https://slsa.dev/spec/v1.1/
 - SLSA, Provenance. https://slsa.dev/spec/v1.1/provenance
+\n\n## Identificadores del registro de fuentes\n\n- `NIST-SP-800-218`\n- `NIST-DEVSECOPS-IPD-2026`\n- `SLSA-v1.1`\n
