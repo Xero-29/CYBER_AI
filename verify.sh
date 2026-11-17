@@ -30,9 +30,9 @@ echo
 echo "== Procedencia y vigencia de la biblioteca =="
 "$PYTHON_BIN" knowledge_provenance.py
 
- echo
- echo "== Auditoría de investigación y trazabilidad =="
- "$PYTHON_BIN" knowledge_research_audit.py
+echo
+echo "== Auditoría de investigación y trazabilidad =="
+"$PYTHON_BIN" knowledge_research_audit.py
 
 echo
 echo "== Suite automatizada =="
