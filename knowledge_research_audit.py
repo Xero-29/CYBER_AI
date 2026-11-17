@@ -18,7 +18,7 @@ REQUIRED_DOSSIER_MARKERS = (
     "## brechas",
     "## identificadores del registro de fuentes",
 )
-SOURCE_ID_PATTERN = re.compile(r"^- `([A-Z0-9-]+)`$", re.MULTILINE)
+SOURCE_ID_PATTERN = re.compile(r"^- `([A-Za-z0-9-]+)`$", re.MULTILINE)
 
 
 def _read_text(path: Path) -> str:
