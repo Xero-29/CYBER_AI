@@ -935,6 +935,11 @@ def search_skills(task, limit=3, *, record_usage=True):
     ranked = []
     for row in rows:
         item = dict(row)
+        # No inyectar metodologías cuyo snapshot actual no coincida con su
+        # historial append-only o cuya cadena de versiones esté rota.
+        history_check = verify_skill_history(item["skill_id"])
+        if not history_check.get("valid") or history_check.get("status") != "active":
+            continue
         tags = json.loads(item["tags_json"])
         corpus = " ".join([
             item["name"], item["task_pattern"], item["description"], *tags
