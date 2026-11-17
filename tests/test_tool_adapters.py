@@ -350,7 +350,7 @@ class ToolAdapterTests(unittest.TestCase):
         )
         def start_process(command, **kwargs):
             Path(kwargs["cwd"], "conn.log").write_text(
-                '{"id.orig_h":"192.0.2.1"}\\n', encoding="utf-8"
+                '{"id.orig_h":"192.0.2.1"}\n', encoding="utf-8"
             )
             return FakeProcess()
         popen.side_effect = start_process
