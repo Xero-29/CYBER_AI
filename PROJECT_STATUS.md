@@ -1,52 +1,50 @@
 # Estado verificado más reciente — 2026-11-17
 
-**HEAD de código y documentación:** `73030d7991b7e35241d87db967a3842271b1f4b3`  
+**HEAD de código:** `a2ddbc5ba981181dc376814ca09ac4db37b9f600`  
 **Rama:** `codex/security-integrity-audit`  
 **main:** `7b5ed033f1f6461b5780a10ac4ada67a444b93e5` — sin modificar.  
-**Comparación:** 450 commits adelante, 0 detrás; la rama contiene el HEAD de `main`.  
+**Comparación:** 467 commits adelante, 0 detrás.  
 **PR #2:** abierto, draft, mergeable; no fusionado.  
 **Protección de rama:** `protected=false`; branch protection y required checks aún no están configurados.
 
-## CI del SHA exacto
+## Estado de CI y correcciones
 
-- Python tests — **success**: https://github.com/Xero-29/CYBER_AI/actions/runs/44108377812
-- Docker sandbox — **success**: https://github.com/Xero-29/CYBER_AI/actions/runs/44108377190
-- Ambos workflows del evento `pull_request` terminaron con conclusión `success` en `73030d7991b7e35241d87db967a3842271b1f4b3`. También finalizaron correctamente las ejecuciones `push` del mismo SHA: [Python](https://github.com/Xero-29/CYBER_AI/actions/runs/44108363761) y [Docker](https://github.com/Xero-29/CYBER_AI/actions/runs/44108363766).
-- Python ejecuta `verify.sh`, suite completa, preflight, manifiesto SHA-256 de wheels y SBOM CycloneDX. Docker construye la imagen fijada por digest, ejecuta la suite y Ruff dentro del sandbox sin red.
+- Último commit previo a esta tanda con ambos workflows aprobados: `5ae51fa26a400df3ac57659f74885562d8f983be` — Python run 44108665999 y Docker run 44108666075.
+- En `78ff1cd1e6ce133f35f33883459fe89829f59da3`, Python y Docker fallaron durante `verify.sh`. Los logs identificaron dos fallos de bootstrap: los paquetes offline no incluían metadatos `visibility` y `tenant_id`, requeridos por el nuevo conteo de fragmentos con ámbito.
+- Corrección aplicada en `knowledge_bootstrap.py`: cada paquete offline declara explícitamente `visibility="shared"` y `tenant_id=None`; se añadieron aserciones en `tests/test_knowledge_bootstrap.py`.
+- El HEAD actual `a2ddbc5ba981181dc376814ca09ac4db37b9f600` todavía no tiene una ejecución CI recuperada por la consulta disponible. **La corrección no se marca como validada hasta que Python y Docker pasen en este SHA exacto.**
 
-## Cambios recientes cerrados y probados
+## Implementación añadida
 
-- **Ingestión CSV:** restaura `csv.field_size_limit` en `finally`; no deja cambios globales del parser aunque falle una extracción.
-- **Skillbook:** hash chain SHA-256 por versión, migración de historiales antiguos, detección de manipulación de snapshots históricos y consulta de hashes. No sustituye firma externa ni WORM.
-- **Evidencias:** archivos publicados por rename atómico, modo 0600 y directorio 0700 en POSIX; rechaza symlinks y nombres inseguros; limpia temporales al fallar. El preflight detecta permisos públicos, symlinks y rutas `reports` inválidas.
-- **Red local:** se corrigió la afirmación falsa de aislamiento. Los adaptadores host declaran `network_access=not_enforced`; bloquear herramientas que requieren red no bloquea el egress de cualquier otro binario. La imagen Docker sí usa `--network=none` para Ruff/Bandit.
-- **Inventario:** expone que el aislamiento de red host no está aplicado y que la ejecución requiere `--execute` explícito.
-- **Procedencia:** adaptadores registran SHA-256 y versión del binario antes/después; una alteración invalida el resultado y los validadores del ledger. CI captura hashes de wheels de la plataforma y los incorpora al SBOM.
-- **Resiliencia:** reconciliación de ejecuciones interrumpidas, pruebas de terminación abrupta simulada, bloqueo/corrupción SQLite, promociones concurrentes de Skills, restauración segura y fixtures Office adversariales.
+- `skillbook.search_skills(..., record_usage=False)` permite medir recuperación sin alterar contadores ni timestamps de uso.
+- `skill_regression.py` mide Recall@K, Precision@K, MRR@K y hit rate sobre dataset JSONL; comprueba la integridad hash-chain y el estado activo de las Skills esperadas.
+- El benchmark falla cerrado ante IDs ausentes, Skills inactivas, historiales inválidos, datasets malformados, symlinks y umbrales inválidos.
+- `tests/test_skill_regression.py` cubre métricas, historial inválido, entradas duplicadas y symlinks.
+- `docs/IMPLEMENTATION_MATRIX.md` define estados, criterios de aceptación y evidencias externas necesarias.
+- README documenta el benchmark y el esquema del dataset. Falta un dataset curado con Skills reales y umbrales revisados por dominio.
 
-## Trabajo que aún admite implementación en código
+## Brechas de código aún abiertas
 
-1. Lock de dependencias con hashes estáticos verificados para todas las plataformas soportadas. El CI registra hashes por ejecución/plataforma, pero `requirements.lock` aún no aplica `--require-hashes`.
-2. Regresión ejecutable por cada versión de Skill y criterios de aceptación automatizados por dominio. Existen versionado, hash chain, revisión por antigüedad, revocación y rollback firmados, pero no un motor general de replay/regresión de cada metodología.
-3. Pruebas automatizadas de estrés/concurrencia y fallos de almacenamiento más amplias. La terminación abrupta del proceso se simula; no equivale a disco lleno, pérdida física o fallo del host.
-4. Procedencia y versiones permitidas para todos los binarios host. Se registra el hash observado, pero no existe allowlist firmada de hashes/versiones aprobadas para cada herramienta externa.
-5. Deduplicación/versionado y evaluación de recuperación documental a escala, con umbrales por especialidad. Los benchmarks sintéticos no prueban calidad experta ni embeddings reales.
-6. Revisión de consistencia final de documentación de instalación y compatibilidad multiplataforma; Windows requiere ACL para evidencias y datos que no se verifican con los mode bits POSIX.
+1. Lock de dependencias con hashes estáticos verificados y `--require-hashes` para todas las plataformas soportadas. No inventar hashes.
+2. Allowlist firmada de versiones/hashes aprobados de binarios; el hash observado antes/después solo detecta cambios durante la ejecución.
+3. Verificación/configuración de ACL Windows para directorios de datos, secretos y evidencias.
+4. Pruebas de estrés/concurrencia y fallos de almacenamiento más amplias; simulaciones no equivalen a disco lleno ni pérdida de host.
+5. Dataset experto y evaluación con embeddings reales y umbrales por especialidad.
+6. OCR y aislamiento de extractores documentales.
 
-## Dependencias externas o decisiones del propietario
+## Dependencias externas / decisiones del propietario
 
-- KMS/HSM o gestor de secretos, custodia/rotación/revocación de claves y segregación de funciones.
+- KMS/HSM o gestor de secretos, custodia, rotación/revocación y segregación de funciones.
 - RBAC/IdP/MFA y roles reales de operador, revisor y administrador.
-- WORM/offsite y anclaje de checkpoints independiente del host.
-- Cifrado de backups, claves independientes y simulacros reales de restauración/DR.
-- MicroVM/VM desechable y pruebas de escape; Docker comparte kernel.
-- Cuentas/credenciales y pruebas reales de proveedores Ollama/OpenAI/Anthropic/Gemini.
-- Revisión humana de licencia, procedencia, exactitud y vigencia de las 138 fuentes externas; embeddings y evaluación experta.
-- OCR para documentos escaneados, si se requiere.
-- Pruebas operacionales de carga, pérdida de host, RPO/RTO, observabilidad, alertas y respuesta a incidentes.
-- Revisión independiente, licencia del repositorio, branch protection y autorización de release.
+- WORM/offsite y checkpoints independientes del host.
+- Cifrado de backups, claves independientes y simulacros reales de DR/RPO/RTO.
+- MicroVM/VM desechable y pruebas reales de escape; Docker comparte kernel.
+- Proveedores IA reales, costes, cuotas, latencia, fallos y tratamiento de datos.
+- Revisión humana de licencia, procedencia, exactitud y vigencia de las 138 fuentes externas.
+- Carga/soak, observabilidad, alertas, respuesta a incidentes y revisión independiente.
+- Branch protection, required checks, revisión de licencia y autorización de release.
 
-**Conclusión:** el HEAD indicado pasa los workflows Python y Docker, pero no se declara terminado ni certificado. Aún quedan tareas de código enumeradas arriba y dependencias externas. No se ha hecho merge ni se ha modificado `main`.
+**Conclusión:** se añadieron pruebas de regresión del Skillbook y se corrigió un fallo de integración detectado por CI en el bootstrap de conocimiento. La corrección espera validación en el HEAD actual. El proyecto no se declara terminado ni certificado; `main` permanece intacta y el PR sigue sin fusionar.
 
 ---
 
