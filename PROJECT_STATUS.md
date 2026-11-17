@@ -87,3 +87,14 @@
 - Se verificó mediante lecturas del repositorio la existencia de los 48 archivos.
 - **Madurez real:** los 48 son borradores estructurados (`draft_structured_not_expert_validated`), no manuales expertos completos. Sus descripciones de trabajo por tema aún requieren desarrollo técnico específico, diagramas, referencias primarias verificadas, casos prácticos y revisión independiente.
 - No se declaran fuentes externas verificadas ni laboratorios ejecutados por la mera creación de estos documentos.
+
+
+## Investigación de biblioteca — ampliación 2026-11-17
+
+- Se añadió `knowledge/research/RESEARCH_PROTOCOL.md`: método de investigación, revisión de literatura, formulación de hipótesis, diseño experimental, métricas, análisis de incertidumbre, amenazas a validez, reproducibilidad, ética y puertas M0–M5.
+- Se añadió `knowledge/research/source_registry.json` con cuatro recursos oficiales NIST cuyos metadatos se revisaron. El estado es de metadatos oficiales revisados, no lectura integral ni validación de cada afirmación técnica.
+- Se añadieron agendas de investigación específicas para los 48 dominios en `knowledge/deep_modules/<area>/RESEARCH_AGENDA.md`, con preguntas por tema, hipótesis provisionales, método, métricas, entregables y salvaguardas.
+- El índice de la biblioteca enlaza las 48 agendas. Se añadió `knowledge_research_audit.py` y pruebas en `tests/test_knowledge_research_audit.py` para auditar estructura, no validez científica.
+- **Madurez real:** 48/48 agendas de investigación creadas. Ninguna se declara M4/M5: aún faltan revisiones bibliográficas ejecutadas, lectura integral de fuentes, experimentos, resultados, análisis y reproducción independiente.
+- Las agendas son planes de investigación específicos, no papers ni resultados. La auditoría no certifica calidad semántica, cumplimiento legal ni competencia de agentes.
+- **Pruebas:** pendientes de ejecución CI para el SHA que incorpore estos cambios. No se declara CI verde hasta revisar el run y sus logs.
