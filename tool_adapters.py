@@ -1,8 +1,9 @@
-"""Adaptadores de análisis local con ejecución acotada y evidencia estructurada.
+"""Adaptadores locales y de red con alcance explícito y evidencia estructurada.
 
-No instala herramientas ni usa shell. YARA y TShark se ejecutan en Docker aislado.
-pip-audit queda bloqueado porque requiere red y aún no existe una política
-específica y auditable para ese servicio.
+No instala herramientas ni usa shell. YARA/TShark se ejecutan en Docker aislado.
+OSV-Scanner, Grype y Volatility 3 solicitan modo offline; Zeek y Gitleaks
+procesan artefactos locales. Nmap requiere autorización y allowlist CIDR.
+pip-audit permanece bloqueado hasta disponer de una política de red auditable.
 """
 import hashlib
 import ipaddress
