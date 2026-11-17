@@ -291,3 +291,15 @@ python agent_simulation.py --workflow investigacion --task "Simular una revisió
 ```
 
 El informe se guarda en `reports/agent_simulations/`. Esta simulación comprueba estructura, prefijos, secciones y detención ante salidas inválidas; **no demuestra razonamiento ni calidad técnica de agentes reales**. Consulta `docs/AGENT_SIMULATION.md` para sus límites y uso desde pruebas.
+
+
+## Auditoría de memoria y Skills
+
+Comprueba de forma local y sin modelos reales la integridad del ledger, las referencias de las lecciones verificadas, las cadenas de versiones de Skills, las ejecuciones interrumpidas y las revisiones pendientes:
+
+```bash
+python learning_cycle_audit.py
+python learning_cycle_audit.py --max-review-age-days 90 --output reports/learning_cycle_audit.json
+```
+
+La recuperación de memoria vuelve a comprobar los hashes y eventos originales en el ledger; la recuperación de Skills excluye metodologías cuyo historial o snapshot actual no sea íntegro. Consulta [docs/LEARNING_CYCLE_AUDIT.md](docs/LEARNING_CYCLE_AUDIT.md), [docs/LEARNING_MEMORY.md](docs/LEARNING_MEMORY.md) y [docs/SKILL_PROMOTION.md](docs/SKILL_PROMOTION.md).
