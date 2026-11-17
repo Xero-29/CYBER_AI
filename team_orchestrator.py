@@ -163,6 +163,7 @@ def _invoke_objective_agent(
         "--think", "off",
         "--num-predict", str(token_budget),
     ]
+    command.append("--knowledge")
     if review_json:
         command.append("--review-json")
     command.extend(["--task-text", prompt])
@@ -756,6 +757,14 @@ def _auto_propose_skill_candidate(report, workflow, task, namespace, ledger_even
     )
 
 
+def step_uses_knowledge(step, workflow):
+    """Resuelve la política de conocimiento: etapa > flujo > activado."""
+    value = step.get("use_knowledge", workflow.get("use_knowledge", True))
+    if not isinstance(value, bool):
+        raise ValueError("use_knowledge debe ser booleano en el flujo o la etapa.")
+    return value
+
+
 def execute_workflow(
     task, workflow_name, dry_run=False, *,
     supervise_objectives=False, acceptance_criteria=None, review_rounds=2
@@ -885,7 +894,7 @@ def execute_workflow(
             ]
 
             # La memoria semántica se activa solo por configuración de etapa.
-            if step.get("use_knowledge", False):
+            if step_uses_knowledge(step, workflow):
                 command.append("--knowledge")
 
                 top_k = int(step.get("knowledge_top_k", 3))
