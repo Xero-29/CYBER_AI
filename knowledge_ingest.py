@@ -5,6 +5,7 @@ import argparse
 import csv
 import hashlib
 import json
+import stat
 import zipfile
 import uuid
 from html.parser import HTMLParser
@@ -73,10 +74,24 @@ def _validate_office_archive(path):
             if len(items) > 10_000:
                 raise ValueError("El documento Office contiene demasiadas entradas.")
             total = 0
+            seen_names = set()
             for item in items:
                 name = item.filename.replace("\\", "/")
-                if name.startswith("/") or ".." in Path(name).parts:
-                    raise ValueError("El documento Office contiene rutas internas inválidas.")
+                normalized = str(Path(name))
+                if (
+                    not name or name.startswith("/")
+                    or ".." in Path(name).parts
+                    or normalized in seen_names
+                ):
+                    raise ValueError("El documento Office contiene rutas internas inválidas o duplicadas.")
+                seen_names.add(normalized)
+                mode = item.external_attr >> 16
+                if stat.S_ISLNK(mode):
+                    raise ValueError("No se permiten enlaces simbólicos dentro del documento Office.")
+                if item.flag_bits & 0x1:
+                    raise ValueError("No se admiten entradas cifradas en documentos Office.")
+                if name.lower().endswith("vbaproject.bin"):
+                    raise ValueError("No se admiten proyectos VBA/macros en documentos Office.")
                 total += item.file_size
                 if total > MAX_ARCHIVE_UNCOMPRESSED_BYTES:
                     raise ValueError("El contenido descomprimido supera el límite permitido.")
