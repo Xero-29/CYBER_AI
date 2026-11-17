@@ -1,7 +1,9 @@
 """Pruebas del importador de documentos de CYBER_AI."""
 
 import stat
+import sys
 import tempfile
+import types
 import unittest
 import zipfile
 from pathlib import Path
@@ -62,6 +64,30 @@ class TestKnowledgeIngest(unittest.TestCase):
             json_path.write_text('{"name":"alpha","value":1}', encoding="utf-8")
             self.assertIn("alpha", ingest.extract_document_text(csv_path))
             self.assertIn('"value": 1', ingest.extract_document_text(json_path))
+
+    def test_pdf_extraction_preserves_page_markers_for_chunk_citations(self):
+        class FakePage:
+            def __init__(self, content):
+                self.content = content
+            def extract_text(self):
+                return self.content
+
+        class FakeReader:
+            is_encrypted = False
+            pages = [FakePage("Primera página"), FakePage("Segunda página")]
+
+            def __init__(self, path, strict=True):
+                self.path = path
+
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "source.pdf"
+            path.write_bytes(b"%PDF-test")
+            fake_module = types.SimpleNamespace(PdfReader=FakeReader)
+            with patch.dict(sys.modules, {"pypdf": fake_module}):
+                text = ingest.extract_document_text(path)
+        self.assertIn("[PDF page 1]", text)
+        self.assertIn("[PDF page 2]", text)
+        self.assertLess(text.index("Primera página"), text.index("Segunda página"))
 
     def test_office_archive_rejects_symlink_entries(self):
         with tempfile.TemporaryDirectory() as temp:
