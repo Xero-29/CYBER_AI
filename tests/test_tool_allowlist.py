@@ -35,6 +35,15 @@ class ToolAllowlistTests(unittest.TestCase):
         with self.assertRaises(ToolAllowlistError):
             load_signed_tool_allowlist(self.path, self.key)
 
+
+    def test_duplicate_json_keys_are_rejected(self):
+        self.path.write_text(
+            '{"schema_version":1,"schema_version":1,"tools":{}, "signature":"'
+            + "0" * 64 + '"}', encoding="utf-8"
+        )
+        with self.assertRaises(ToolAllowlistError):
+            load_signed_tool_allowlist(self.path, self.key)
+
     def test_short_key_is_rejected(self):
         with self.assertRaises(ToolAllowlistError):
             sign_tool_allowlist({"ruff": {"sha256": self.digest}}, b"short")
