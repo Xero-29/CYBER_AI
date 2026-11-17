@@ -1,0 +1,11 @@
+FROM debian:bookworm-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends yara tshark ca-certificates \
+ && rm -rf /var/lib/apt/lists/* \
+ && groupadd --gid 65532 cyber \
+ && useradd --uid 65532 --gid 65532 --no-create-home --shell /usr/sbin/nologin cyber
+
+USER 65532:65532
+WORKDIR /input
