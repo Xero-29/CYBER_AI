@@ -50,6 +50,52 @@
       "review_note": "Página metodológica revisada; reproducir evaluación requiere datasets/versiones y análisis de calibración."
     },
     {
+      "id": "MITRE-ATTACK-STIX-DATA",
+      "title": "ATT&CK STIX Data",
+      "publisher": "MITRE",
+      "type": "official_primary_reference",
+      "url": "https://github.com/mitre-attack/attack-stix-data",
+      "version": "Continuously versioned",
+      "published": "2026-11-05",
+      "verification_status": "official_data_repository_reviewed",
+      "verified_scope": "Distribuciones STIX versionadas del conocimiento ATT&CK.",
+      "domains": [
+        "threat_intel"
+      ],
+      "review_note": "Metadatos y resumen/versión oficial revisados; lectura integral y verificación de contenido técnico pendientes."
+    },
+    {
+      "id": "MITRE-ATTACK-V18-RELEASE",
+      "title": "MITRE ATT&CK October 2025 Release Notes",
+      "publisher": "MITRE",
+      "type": "official_primary_reference",
+      "url": "https://attack.mitre.org/resources/updates/updates-october-2025/",
+      "version": "v18",
+      "published": "2025-10-28",
+      "verification_status": "official_release_notes_reviewed",
+      "verified_scope": "Cambio de detections a Detection Strategies/Analytics y deprecación de Data Sources.",
+      "domains": [
+        "threat_intel",
+        "soc_siem"
+      ],
+      "review_note": "Metadatos y resumen/versión oficial revisados; lectura integral y verificación de contenido técnico pendientes."
+    },
+    {
+      "id": "MITRE-ATTACK-VERSION-HISTORY",
+      "title": "MITRE ATT&CK Version History",
+      "publisher": "MITRE",
+      "type": "official_primary_reference",
+      "url": "https://attack.mitre.org/resources/versions/",
+      "version": "Continuously versioned",
+      "published": "2026-10-13",
+      "verification_status": "official_version_history_reviewed",
+      "verified_scope": "ATT&CK v20.1 indicada como versión vigente al corte 2026-11-17.",
+      "domains": [
+        "threat_intel"
+      ],
+      "review_note": "Metadatos y resumen/versión oficial revisados; lectura integral y verificación de contenido técnico pendientes."
+    },
+    {
       "id": "NIST-CSF-REFERENCE-TOOL",
       "title": "NIST Cybersecurity Framework 2.0 Reference Tool",
       "publisher": "National Institute of Standards and Technology",
@@ -154,6 +200,36 @@
       "review_note": "Metadatos y descripción oficial revisados; lectura integral y pruebas de implementación pendientes."
     },
     {
+      "id": "NIST-IR-8176",
+      "title": "Security Assurance Requirements for Linux Application Container Deployments",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_primary_reference",
+      "url": "https://csrc.nist.gov/pubs/ir/8176/final",
+      "version": "Final",
+      "published": "2017",
+      "verification_status": "official_publication_record_registered",
+      "verified_scope": "Recurso complementario para assurance de despliegues de contenedores Linux; revisar texto completo.",
+      "domains": [
+        "containers"
+      ],
+      "review_note": "Metadatos y resumen/versión oficial revisados; lectura integral y verificación de contenido técnico pendientes."
+    },
+    {
+      "id": "NIST-LOG-MANAGEMENT-PROJECT",
+      "title": "NIST Log Management Project",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_primary_reference",
+      "url": "https://csrc.nist.gov/projects/log-management",
+      "version": "Current project page",
+      "published": "Current",
+      "verification_status": "official_project_page_reviewed",
+      "verified_scope": "Estado del proyecto y distinción entre SP 800-92 final y Rev. 1 draft.",
+      "domains": [
+        "soc_siem"
+      ],
+      "review_note": "Metadatos y resumen/versión oficial revisados; lectura integral y verificación de contenido técnico pendientes."
+    },
+    {
       "id": "NIST-SP-1308",
       "title": "NIST Cybersecurity Framework 2.0: Cybersecurity, Enterprise Risk Management, and Workforce Management Quick-Start Guide",
       "publisher": "National Institute of Standards and Technology",
@@ -185,6 +261,23 @@
         "secure_arch"
       ],
       "review_note": "Metadatos y resumen oficial revisados; requiere lectura del documento completo para afirmaciones detalladas."
+    },
+    {
+      "id": "NIST-SP-800-190",
+      "title": "Application Container Security Guide",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_primary_reference",
+      "url": "https://doi.org/10.6028/NIST.SP.800-190",
+      "version": "Final",
+      "published": "2017-09-25",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verified_scope": "Riesgos y recomendaciones de seguridad para tecnologías de contenedores; referencia histórica a complementar.",
+      "domains": [
+        "containers",
+        "cloud",
+        "devsecops"
+      ],
+      "review_note": "Metadatos y resumen/versión oficial revisados; lectura integral y verificación de contenido técnico pendientes."
     },
     {
       "id": "NIST-SP-800-207",
@@ -244,6 +337,51 @@
       "review_note": "Metadatos, fecha, alcance y supersesión revisados en página oficial NIST; leer el documento completo y registrar secciones antes de citar afirmaciones técnicas."
     },
     {
+      "id": "NIST-SP-800-63-4",
+      "title": "Digital Identity Guidelines",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_primary_reference",
+      "url": "https://doi.org/10.6028/NIST.SP.800-63-4",
+      "version": "Final",
+      "published": "2025-07",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verified_scope": "Prueba de identidad, enrolamiento, autenticación, gestión de autenticadores y federación.",
+      "domains": [
+        "identity"
+      ],
+      "review_note": "Metadatos y resumen/versión oficial revisados; lectura integral y verificación de contenido técnico pendientes."
+    },
+    {
+      "id": "NIST-SP-800-63B-4",
+      "title": "Digital Identity Guidelines: Authentication and Authenticator Management",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_primary_reference",
+      "url": "https://doi.org/10.6028/NIST.SP.800-63b-4",
+      "version": "Final",
+      "published": "2025-07",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verified_scope": "Requisitos de autenticación y niveles de garantía de autenticadores.",
+      "domains": [
+        "identity"
+      ],
+      "review_note": "Metadatos y resumen/versión oficial revisados; lectura integral y verificación de contenido técnico pendientes."
+    },
+    {
+      "id": "NIST-SP-800-63C-4",
+      "title": "Digital Identity Guidelines: Federation and Assertions",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_primary_reference",
+      "url": "https://doi.org/10.6028/NIST.SP.800-63c-4",
+      "version": "Final",
+      "published": "2025-07",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verified_scope": "Federación de identidades y assertions entre proveedores y relying parties.",
+      "domains": [
+        "identity"
+      ],
+      "review_note": "Metadatos y resumen/versión oficial revisados; lectura integral y verificación de contenido técnico pendientes."
+    },
+    {
       "id": "NIST-SP-800-82r3",
       "title": "Guide to Operational Technology (OT) Security",
       "publisher": "National Institute of Standards and Technology",
@@ -277,6 +415,70 @@
         "hardware_security"
       ],
       "review_note": "Es borrador público inicial, no versión final ni sustituto normativo de Rev. 3."
+    },
+    {
+      "id": "NIST-SP-800-83r1",
+      "title": "Guide to Malware Incident Prevention and Handling for Desktops and Laptops",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_primary_reference",
+      "url": "https://doi.org/10.6028/NIST.SP.800-83r1",
+      "version": "Revision 1 Final",
+      "published": "2013-07-01",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verified_scope": "Guía histórica de prevención y respuesta a incidentes de malware en endpoints.",
+      "domains": [
+        "malware",
+        "incident_response"
+      ],
+      "review_note": "Metadatos y resumen/versión oficial revisados; lectura integral y verificación de contenido técnico pendientes."
+    },
+    {
+      "id": "NIST-SP-800-86",
+      "title": "Guide to Integrating Forensic Techniques into Incident Response",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_primary_reference",
+      "url": "https://doi.org/10.6028/NIST.SP.800-86",
+      "version": "Final",
+      "published": "2006-09-01",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verified_scope": "Guía de forense TI/redes integrada a respuesta; no es asesoría legal ni guía exhaustiva.",
+      "domains": [
+        "forensics",
+        "incident_response"
+      ],
+      "review_note": "Metadatos y resumen/versión oficial revisados; lectura integral y verificación de contenido técnico pendientes."
+    },
+    {
+      "id": "NIST-SP-800-92",
+      "title": "Guide to Computer Security Log Management",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_primary_reference",
+      "url": "https://doi.org/10.6028/NIST.SP.800-92",
+      "version": "Final",
+      "published": "2006-09-13",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verified_scope": "Guía histórica de infraestructura y procesos de gestión de logs; debe contextualizarse por antigüedad.",
+      "domains": [
+        "soc_siem",
+        "forensics"
+      ],
+      "review_note": "Metadatos y resumen/versión oficial revisados; lectura integral y verificación de contenido técnico pendientes."
+    },
+    {
+      "id": "NIST-SP-800-92R1-IPD",
+      "title": "Cybersecurity Log Management Planning Guide",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_primary_reference",
+      "url": "https://doi.org/10.6028/NIST.SP.800-92r1.ipd",
+      "version": "Initial Public Draft",
+      "published": "2023-10-11",
+      "verification_status": "official_draft_metadata_and_abstract_reviewed",
+      "verified_scope": "Borrador de playbook de planificación de mejoras de logging; no versión final.",
+      "domains": [
+        "soc_siem",
+        "forensics"
+      ],
+      "review_note": "Registro y resumen oficial revisados; conservar estado de borrador y no usar como norma final."
     },
     {
       "id": "OWASP-API-TOP10-2023",
