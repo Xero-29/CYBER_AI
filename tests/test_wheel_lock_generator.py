@@ -15,7 +15,8 @@ class WheelLockGeneratorTests(unittest.TestCase):
         self.wheelhouse.mkdir()
         self.requirements = self.root / "requirements.in"
         self.requirements.write_text(
-            "ruff==0.14.5\\nbandit==1.8.6\\n", encoding="utf-8"
+            "ruff==0.14.5" + chr(10) + "bandit==1.8.6" + chr(10),
+            encoding="utf-8",
         )
 
     def tearDown(self):
@@ -23,11 +24,13 @@ class WheelLockGeneratorTests(unittest.TestCase):
 
     def wheel(self, filename, name, version):
         path = self.wheelhouse / filename
+        metadata = (
+            "Metadata-Version: 2.1" + chr(10)
+            + f"Name: {name}" + chr(10)
+            + f"Version: {version}" + chr(10)
+        )
         with zipfile.ZipFile(path, "w") as archive:
-            archive.writestr(
-                f"{name}-{version}.dist-info/METADATA",
-                f"Metadata-Version: 2.1\\nName: {name}\\nVersion: {version}\\n",
-            )
+            archive.writestr(f"{name}-{version}.dist-info/METADATA", metadata)
         return path
 
     def test_builds_sorted_lock_with_verified_wheel_hashes(self):
@@ -59,13 +62,12 @@ class WheelLockGeneratorTests(unittest.TestCase):
     def test_rejects_symlink_wheel(self):
         target = self.wheel("ruff-0.14.5-py3-none-any.whl", "ruff", "0.14.5")
         self.wheel("bandit-1.8.6-py3-none-any.whl", "bandit", "1.8.6")
-        link = self.wheelhouse / "ruff-copy.whl"
-        link.symlink_to(target)
+        (self.wheelhouse / "ruff-copy.whl").symlink_to(target)
         with self.assertRaisesRegex(WheelLockError, "Wheel inseguro"):
             build_lock(self.wheelhouse, self.requirements)
 
     def test_rejects_unpinned_direct_requirement(self):
-        self.requirements.write_text("ruff>=0.14.5\\n", encoding="utf-8")
+        self.requirements.write_text("ruff>=0.14.5" + chr(10), encoding="utf-8")
         with self.assertRaisesRegex(WheelLockError, "no fijado"):
             build_lock(self.wheelhouse, self.requirements)
 
