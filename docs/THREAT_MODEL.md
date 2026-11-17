@@ -61,7 +61,7 @@ Principios:
 | TM-03 | Repudiation | Negar una ejecución o cambio | Eventos, IDs, hashes y artefactos | Firma externa/identidad de operador y almacenamiento independiente pendientes |
 | TM-04 | Information disclosure | Prompt, retrieval o logs filtran secretos/PII | Redacción, namespace, TLS y restricciones HTTP remoto | Redacción no cubre todos los formatos; pruebas reales de privacidad/ACL pendientes |
 | TM-05 | Denial of service | Documento, modelo o herramienta agota recursos | Límites de tamaño, timeouts, salida acotada y límites de proceso | Carga/concurrencia y cuotas globales por tenant pendientes |
-| TM-06 | Elevation of privilege | Modelo invoca herramienta con permisos excesivos | Allowlist, autorización, ejecución explícita y argumentos sin shell | RBAC/roles y microVM pendientes |
+| TM-06 | Elevation of privilege | Modelo invoca herramienta con permisos excesivos o binario sustituido | Allowlist HMAC opcional, autorización, ejecución explícita y argumentos sin shell | TOCTOU del ejecutable, RBAC/roles y microVM pendientes |
 | TM-07 | Prompt injection | Documento ordena revelar secretos o ejecutar herramientas | RAG separa datos e instrucciones; núcleo valida permisos | Evaluación adversarial sistemática pendiente |
 | TM-08 | SSRF/DNS rebinding | Descargador alcanza metadata/red privada | Descarga exige proxy externo | Seguridad depende del proxy; pinning y egress deben verificarse externamente |
 | TM-09 | Supply-chain compromise | Dependencia, acción CI, imagen o plugin comprometido | Lock parcial, CI pinning y SBOM inicial | Hashes, firmas/provenance y digest completo pendientes |
