@@ -61,11 +61,15 @@ def run_isolated_tool(tool_id, target, *, config_path=None, timeout=180,
     before = _hash_target(path)
     started = time.monotonic()
     target_mount = str(path) + (":/input:ro" if path.is_dir() else ":/input/target:ro")
+    if os.name == "posix" and hasattr(os, "getuid") and os.getuid() != 0:
+        container_user = f"{os.getuid()}:{os.getgid()}"
+    else:
+        container_user = "65532:65532"
     command = [
         docker, "run", "--rm", "--pull=never",
         "--network=none", "--read-only", "--cap-drop=ALL",
         "--security-opt=no-new-privileges", "--pids-limit=64",
-        "--memory=1g", "--cpus=1.0", "--user=65532:65532",
+        "--memory=1g", "--cpus=1.0", "--user=" + container_user,
         "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=64m",
         "--mount", "type=bind,src=" + str(path) + ",dst=" +
             ("/input" if path.is_dir() else "/input/target") + ",readonly",
