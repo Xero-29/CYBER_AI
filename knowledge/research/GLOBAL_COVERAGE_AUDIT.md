@@ -79,3 +79,28 @@ Contrastar las 48 áreas del manifiesto con marcos, estándares, taxonomías, gu
 - OWASP GenAI: https://genai.owasp.org/
 
 Los enlaces son puntos de partida institucionales; fijar la edición exacta y comprobar el texto antes de atribuir requisitos concretos.
+
+
+## Matriz de requisitos verificables por especialidad — 2026-11-17
+
+La versión 1.1.0 de `global_coverage_matrix.json` añade, para cada una de las 48 especialidades:
+
+- Requisitos explícitos por cada tema técnico del currículo (sin convertirlos en contenido ya cubierto).
+- Artefactos exigibles: arquitectura, inventario, modelo de amenazas, controles, procedimientos, laboratorio, caso práctico, evaluación y procedencia.
+- Siete puertas de validación: fuentes, contenido técnico, procedimientos, herramientas, laboratorios, investigación y revisión independiente.
+- Estados controlados: `not_assessed`, `in_progress`, `partially_validated`, `validated`, `not_applicable`.
+- Para validar un elemento se exigen referencias de evidencia, revisor identificado y fecha.
+
+### Línea base de requisitos
+
+Todos los temas, artefactos y puertas empiezan en `not_assessed`. Esto es intencional: la matriz define qué debe probarse, no finge que ya está cubierto. No se calcula porcentaje global ni se declara ninguna especialidad validada.
+
+El auditor ahora contrasta la matriz con el manifiesto y el currículo, verifica correspondencia exacta de temas/artefactos, valida estados y rechaza elementos marcados como validados sin evidencia, revisor y fecha.
+
+### Criterio para declarar una especialidad completa
+
+Una especialidad solo podrá declararse validada cuando cada requisito aplicable tenga contenido técnico suficiente, fuentes primarias vigentes y revisadas, procedimientos reproducibles, herramientas probadas cuando corresponda, laboratorio y casos prácticos con resultados, además de revisión independiente. Las áreas críticas (OT, automoción, medicina, satélites y sistemas físicos) requieren instalaciones autorizadas y análisis de seguridad funcional.
+
+### Limitación
+
+Esta ampliación crea una matriz auditable, no una biblioteca ya completada. La lista de subtemas procede del currículo vigente y sigue siendo un universo de trabajo acotado, no una enumeración demostrablemente exhaustiva de todo lo que existe en ciberseguridad.
