@@ -42,9 +42,12 @@ class ToolExecutorTests(unittest.TestCase):
                     self.events = []
 
                 def append(self, **kwargs):
-                    event = {"event_id": f"event-{len(self.events) + 1}", **kwargs}
+                    event = {
+                        "event_id": f"event-{len(self.events) + 1}",
+                        **{key: value for key, value in kwargs.items() if key != "evidence"},
+                    }
                     self.events.append(event)
-                    return event
+                    return {"event_id": event["event_id"]}
 
             ledger = FakeLedger()
             evidence = {
