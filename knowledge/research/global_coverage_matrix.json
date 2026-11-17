@@ -17,14 +17,16 @@
       "type": "framework",
       "scope": "Govern, Identify, Protect, Detect, Respond, Recover.",
       "domains": [
-        "foundations",
-        "governance",
-        "secure_arch",
-        "incident_response",
         "business_continuity",
-        "vuln_management",
+        "devsecops",
+        "foundations",
+        "fraud_abuse",
+        "governance",
+        "incident_response",
+        "ot_ics",
+        "secure_arch",
         "soc_siem",
-        "devsecops"
+        "vuln_management"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -36,54 +38,54 @@
       "type": "workforce",
       "scope": "Work roles, competency areas and task/knowledge/skill statements; workforce mapping only.",
       "domains": [
-        "foundations",
-        "appsec",
-        "api",
-        "network",
-        "linux",
-        "windows_ad",
-        "cloud",
-        "containers",
-        "mobile",
-        "crypto",
-        "identity",
-        "malware",
-        "forensics",
-        "incident_response",
-        "threat_intel",
-        "reverse",
-        "iot_hardware",
-        "devsecops",
-        "ai_security",
-        "governance",
-        "vuln_management",
-        "bug_bounty",
-        "secure_arch",
-        "data_security",
-        "software_engineering",
-        "machine_learning",
-        "hardware_security",
-        "mathematics",
-        "soc_siem",
-        "edr_xdr",
-        "threat_hunting",
-        "red_team",
-        "wireless_security",
-        "ot_ics",
-        "telecom_5g",
-        "automotive_security",
-        "satellite_security",
-        "physical_security",
-        "email_dns_security",
-        "fraud_abuse",
-        "privacy_engineering",
-        "cloud_forensics",
         "ai_red_team",
+        "ai_security",
+        "api",
+        "appsec",
+        "automotive_security",
+        "bug_bounty",
+        "business_continuity",
+        "cloud",
+        "cloud_forensics",
+        "containers",
+        "crypto",
+        "data_security",
+        "database_security",
+        "devsecops",
+        "edr_xdr",
+        "email_dns_security",
+        "forensics",
+        "foundations",
+        "fraud_abuse",
+        "governance",
+        "hardware_security",
+        "identity",
+        "incident_response",
+        "iot_hardware",
+        "linux",
+        "machine_learning",
+        "malware",
+        "mathematics",
+        "mobile",
+        "network",
+        "ot_ics",
+        "physical_security",
         "pki_hsm",
         "post_quantum_crypto",
-        "business_continuity",
-        "database_security",
-        "vulnerability_research"
+        "privacy_engineering",
+        "red_team",
+        "reverse",
+        "satellite_security",
+        "secure_arch",
+        "soc_siem",
+        "software_engineering",
+        "telecom_5g",
+        "threat_hunting",
+        "threat_intel",
+        "vuln_management",
+        "vulnerability_research",
+        "windows_ad",
+        "wireless_security"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -95,21 +97,22 @@
       "type": "controls",
       "scope": "Security and privacy control catalog.",
       "domains": [
-        "foundations",
-        "governance",
-        "secure_arch",
-        "identity",
-        "network",
-        "linux",
-        "windows_ad",
+        "business_continuity",
         "cloud",
         "containers",
         "data_security",
         "database_security",
-        "soc_siem",
+        "foundations",
+        "governance",
+        "identity",
+        "linux",
+        "network",
         "physical_security",
-        "business_continuity",
-        "privacy_engineering"
+        "privacy_engineering",
+        "secure_arch",
+        "soc_siem",
+        "telecom_5g",
+        "windows_ad"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -121,14 +124,14 @@
       "type": "guidance",
       "scope": "Incident response and cybersecurity risk management.",
       "domains": [
+        "business_continuity",
+        "cloud_forensics",
+        "edr_xdr",
+        "forensics",
         "incident_response",
         "soc_siem",
         "threat_hunting",
-        "edr_xdr",
-        "forensics",
-        "cloud_forensics",
-        "threat_intel",
-        "business_continuity"
+        "threat_intel"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -140,11 +143,11 @@
       "type": "guidance",
       "scope": "Operational technology security.",
       "domains": [
-        "ot_ics",
+        "automotive_security",
         "hardware_security",
         "network",
+        "ot_ics",
         "physical_security",
-        "automotive_security",
         "satellite_security"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
@@ -157,11 +160,11 @@
       "type": "guidance",
       "scope": "Technical security testing and assessment.",
       "domains": [
-        "appsec",
         "api",
+        "appsec",
+        "bug_bounty",
         "network",
         "red_team",
-        "bug_bounty",
         "vuln_management",
         "vulnerability_research",
         "wireless_security"
@@ -176,11 +179,11 @@
       "type": "guidance",
       "scope": "Zero Trust architecture.",
       "domains": [
-        "secure_arch",
-        "identity",
-        "network",
         "cloud",
         "containers",
+        "identity",
+        "network",
+        "secure_arch",
         "windows_ad"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
@@ -193,12 +196,13 @@
       "type": "framework",
       "scope": "Secure software development practices.",
       "domains": [
-        "software_engineering",
-        "devsecops",
-        "appsec",
+        "ai_security",
         "api",
+        "appsec",
         "containers",
-        "ai_security"
+        "devsecops",
+        "secure_arch",
+        "software_engineering"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -210,12 +214,12 @@
       "type": "guidance",
       "scope": "Cybersecurity supply-chain risk management.",
       "domains": [
-        "devsecops",
-        "software_engineering",
+        "ai_security",
         "cloud",
+        "devsecops",
         "hardware_security",
         "iot_hardware",
-        "ai_security"
+        "software_engineering"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -227,10 +231,10 @@
       "type": "guidance",
       "scope": "Media sanitization and information disposition.",
       "domains": [
+        "business_continuity",
+        "cloud_forensics",
         "data_security",
         "forensics",
-        "cloud_forensics",
-        "business_continuity",
         "physical_security"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
@@ -243,8 +247,8 @@
       "type": "guidance",
       "scope": "Integrating forensic techniques into incident response.",
       "domains": [
-        "forensics",
         "cloud_forensics",
+        "forensics",
         "incident_response",
         "malware",
         "reverse"
@@ -259,10 +263,10 @@
       "type": "guidance",
       "scope": "Enterprise mobile device security.",
       "domains": [
-        "mobile",
-        "identity",
         "data_security",
-        "incident_response"
+        "identity",
+        "incident_response",
+        "mobile"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -274,8 +278,8 @@
       "type": "guidance",
       "scope": "Application container security.",
       "domains": [
-        "containers",
         "cloud",
+        "containers",
         "devsecops",
         "software_engineering"
       ],
@@ -289,12 +293,12 @@
       "type": "guidance",
       "scope": "Digital identity proofing, authentication and federation.",
       "domains": [
+        "api",
+        "cloud",
         "identity",
-        "windows_ad",
         "mobile",
         "pki_hsm",
-        "api",
-        "cloud"
+        "windows_ad"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -307,9 +311,9 @@
       "scope": "Contingency planning and recovery.",
       "domains": [
         "business_continuity",
-        "incident_response",
         "cloud",
-        "data_security"
+        "data_security",
+        "incident_response"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -321,11 +325,11 @@
       "type": "guidance",
       "scope": "Risk assessment methodology.",
       "domains": [
-        "governance",
+        "business_continuity",
         "foundations",
-        "secure_arch",
+        "governance",
         "privacy_engineering",
-        "business_continuity"
+        "secure_arch"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -337,11 +341,12 @@
       "type": "framework",
       "scope": "AI risk governance, mapping, measurement and management.",
       "domains": [
-        "ai_security",
         "ai_red_team",
-        "machine_learning",
+        "ai_security",
+        "data_security",
         "governance",
-        "data_security"
+        "machine_learning",
+        "mathematics"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -353,11 +358,11 @@
       "type": "framework",
       "scope": "Privacy risk management outcomes.",
       "domains": [
-        "privacy_engineering",
-        "governance",
         "data_security",
+        "fraud_abuse",
+        "governance",
         "identity",
-        "fraud_abuse"
+        "privacy_engineering"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -369,19 +374,21 @@
       "type": "knowledge_base",
       "scope": "Adversary tactics and techniques across enterprise platforms.",
       "domains": [
-        "red_team",
-        "threat_intel",
-        "threat_hunting",
-        "soc_siem",
-        "edr_xdr",
-        "malware",
-        "windows_ad",
-        "linux",
         "cloud",
         "containers",
-        "network",
+        "edr_xdr",
+        "email_dns_security",
         "identity",
-        "email_dns_security"
+        "incident_response",
+        "linux",
+        "malware",
+        "network",
+        "red_team",
+        "reverse",
+        "soc_siem",
+        "threat_hunting",
+        "threat_intel",
+        "windows_ad"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -393,10 +400,10 @@
       "type": "knowledge_base",
       "scope": "Adversary techniques for Android and iOS.",
       "domains": [
+        "edr_xdr",
         "mobile",
-        "threat_intel",
         "threat_hunting",
-        "edr_xdr"
+        "threat_intel"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -408,11 +415,11 @@
       "type": "knowledge_base",
       "scope": "Adversary behavior in industrial control environments.",
       "domains": [
+        "hardware_security",
         "ot_ics",
-        "threat_intel",
-        "threat_hunting",
         "red_team",
-        "hardware_security"
+        "threat_hunting",
+        "threat_intel"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -424,8 +431,8 @@
       "type": "knowledge_base",
       "scope": "Adversarial tactics and techniques targeting AI systems.",
       "domains": [
-        "ai_security",
         "ai_red_team",
+        "ai_security",
         "machine_learning",
         "software_engineering",
         "threat_intel"
@@ -440,14 +447,15 @@
       "type": "knowledge_base",
       "scope": "Countermeasure ontology and defensive techniques.",
       "domains": [
-        "soc_siem",
-        "edr_xdr",
-        "threat_hunting",
-        "secure_arch",
-        "network",
         "cloud",
-        "windows_ad",
-        "linux"
+        "edr_xdr",
+        "linux",
+        "malware",
+        "network",
+        "secure_arch",
+        "soc_siem",
+        "threat_hunting",
+        "windows_ad"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -459,9 +467,10 @@
       "type": "standard",
       "scope": "Verifiable application security requirements.",
       "domains": [
+        "api",
         "appsec",
-        "software_engineering",
-        "secure_arch"
+        "secure_arch",
+        "software_engineering"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -503,8 +512,8 @@
       "type": "standard",
       "scope": "Mobile application security verification.",
       "domains": [
-        "mobile",
         "appsec",
+        "mobile",
         "software_engineering"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
@@ -517,11 +526,11 @@
       "type": "taxonomy",
       "scope": "LLM application risk taxonomy, not a complete AI assurance framework.",
       "domains": [
-        "ai_security",
         "ai_red_team",
-        "machine_learning",
+        "ai_security",
+        "api",
         "appsec",
-        "api"
+        "machine_learning"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -533,22 +542,22 @@
       "type": "controls",
       "scope": "Prioritized enterprise cybersecurity safeguards.",
       "domains": [
-        "foundations",
-        "governance",
-        "network",
-        "linux",
-        "windows_ad",
         "cloud",
         "containers",
-        "mobile",
-        "identity",
         "data_security",
-        "email_dns_security",
-        "soc_siem",
+        "devsecops",
         "edr_xdr",
+        "email_dns_security",
+        "foundations",
+        "governance",
+        "identity",
         "incident_response",
+        "linux",
+        "mobile",
+        "network",
+        "soc_siem",
         "vuln_management",
-        "devsecops"
+        "windows_ad"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -560,13 +569,14 @@
       "type": "baseline",
       "scope": "Platform-specific secure configuration baselines; pin exact benchmark and version.",
       "domains": [
-        "linux",
-        "windows_ad",
         "cloud",
         "containers",
         "database_security",
+        "linux",
+        "mobile",
         "network",
-        "mobile"
+        "windows_ad",
+        "wireless_security"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -578,13 +588,13 @@
       "type": "standard",
       "scope": "Information security management system requirements.",
       "domains": [
-        "governance",
-        "foundations",
-        "secure_arch",
         "business_continuity",
-        "incident_response",
         "data_security",
-        "privacy_engineering"
+        "foundations",
+        "governance",
+        "incident_response",
+        "privacy_engineering",
+        "secure_arch"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -596,13 +606,13 @@
       "type": "guidance",
       "scope": "Information security controls guidance.",
       "domains": [
-        "governance",
-        "foundations",
-        "identity",
         "data_security",
-        "physical_security",
+        "foundations",
+        "governance",
+        "identity",
+        "incident_response",
         "network",
-        "incident_response"
+        "physical_security"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -614,11 +624,11 @@
       "type": "standard",
       "scope": "Information security risk management guidance.",
       "domains": [
-        "governance",
-        "foundations",
-        "secure_arch",
         "business_continuity",
-        "privacy_engineering"
+        "foundations",
+        "governance",
+        "privacy_engineering",
+        "secure_arch"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -630,10 +640,10 @@
       "type": "standard",
       "scope": "Privacy information management; check applicable edition.",
       "domains": [
-        "privacy_engineering",
-        "governance",
         "data_security",
-        "identity"
+        "governance",
+        "identity",
+        "privacy_engineering"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -645,10 +655,10 @@
       "type": "standard",
       "scope": "AI management system; does not replace technical AI testing.",
       "domains": [
-        "ai_security",
         "ai_red_team",
-        "machine_learning",
+        "ai_security",
         "governance",
+        "machine_learning",
         "software_engineering"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
@@ -661,10 +671,11 @@
       "type": "standard",
       "scope": "Industrial automation and control system cybersecurity.",
       "domains": [
-        "ot_ics",
+        "automotive_security",
         "hardware_security",
         "iot_hardware",
         "network",
+        "ot_ics",
         "physical_security"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
@@ -678,10 +689,10 @@
       "scope": "Business continuity management system.",
       "domains": [
         "business_continuity",
-        "incident_response",
         "cloud",
-        "telecom_5g",
-        "satellite_security"
+        "incident_response",
+        "satellite_security",
+        "telecom_5g"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -721,8 +732,8 @@
       "type": "standard",
       "scope": "Consumer IoT cybersecurity baseline.",
       "domains": [
-        "iot_hardware",
         "hardware_security",
+        "iot_hardware",
         "wireless_security"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
@@ -735,12 +746,13 @@
       "type": "specification",
       "scope": "TLS 1.3 protocol specification.",
       "domains": [
-        "network",
-        "crypto",
-        "pki_hsm",
-        "email_dns_security",
         "api",
-        "cloud"
+        "cloud",
+        "crypto",
+        "email_dns_security",
+        "network",
+        "pki_hsm",
+        "telecom_5g"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -752,11 +764,12 @@
       "type": "specification",
       "scope": "Internet X.509 certificate and CRL profile.",
       "domains": [
-        "pki_hsm",
         "crypto",
+        "email_dns_security",
         "identity",
         "network",
-        "email_dns_security"
+        "pki_hsm",
+        "post_quantum_crypto"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -769,9 +782,11 @@
       "scope": "Cryptographic module security requirements.",
       "domains": [
         "crypto",
-        "pki_hsm",
         "hardware_security",
-        "post_quantum_crypto"
+        "mathematics",
+        "pki_hsm",
+        "post_quantum_crypto",
+        "satellite_security"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -783,9 +798,10 @@
       "type": "standard",
       "scope": "ML-KEM, ML-DSA and SLH-DSA standards; migration and implementation assurance remain separate.",
       "domains": [
-        "post_quantum_crypto",
         "crypto",
+        "mathematics",
         "pki_hsm",
+        "post_quantum_crypto",
         "secure_arch"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
@@ -798,12 +814,12 @@
       "type": "taxonomy",
       "scope": "Identifiers for publicly disclosed vulnerabilities.",
       "domains": [
-        "vuln_management",
-        "vulnerability_research",
-        "bug_bounty",
-        "appsec",
         "api",
-        "software_engineering"
+        "appsec",
+        "bug_bounty",
+        "software_engineering",
+        "vuln_management",
+        "vulnerability_research"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -815,12 +831,16 @@
       "type": "taxonomy",
       "scope": "Common software and hardware weakness taxonomy.",
       "domains": [
-        "vuln_management",
-        "vulnerability_research",
-        "appsec",
         "api",
+        "appsec",
+        "bug_bounty",
+        "database_security",
+        "devsecops",
+        "hardware_security",
+        "reverse",
         "software_engineering",
-        "hardware_security"
+        "vuln_management",
+        "vulnerability_research"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -832,11 +852,11 @@
       "type": "method",
       "scope": "Vulnerability severity scoring; score is not risk by itself.",
       "domains": [
-        "vuln_management",
-        "vulnerability_research",
-        "bug_bounty",
+        "api",
         "appsec",
-        "api"
+        "bug_bounty",
+        "vuln_management",
+        "vulnerability_research"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -848,12 +868,13 @@
       "type": "taxonomy",
       "scope": "Common attack pattern taxonomy.",
       "domains": [
-        "vulnerability_research",
-        "appsec",
         "api",
-        "red_team",
+        "appsec",
+        "bug_bounty",
         "malware",
-        "reverse"
+        "red_team",
+        "reverse",
+        "vulnerability_research"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -865,10 +886,10 @@
       "type": "catalog",
       "scope": "Known exploited vulnerabilities; not an exhaustive exploitation list.",
       "domains": [
-        "vuln_management",
-        "vulnerability_research",
+        "soc_siem",
         "threat_intel",
-        "soc_siem"
+        "vuln_management",
+        "vulnerability_research"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -880,9 +901,9 @@
       "type": "model",
       "scope": "Exploit prediction probability; not a severity score.",
       "domains": [
+        "threat_intel",
         "vuln_management",
-        "vulnerability_research",
-        "threat_intel"
+        "vulnerability_research"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -894,10 +915,10 @@
       "type": "framework",
       "scope": "Reference for CSIRT service capabilities.",
       "domains": [
+        "forensics",
         "incident_response",
         "soc_siem",
-        "threat_intel",
-        "forensics"
+        "threat_intel"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -909,10 +930,10 @@
       "type": "standard",
       "scope": "Traffic Light Protocol for information sharing.",
       "domains": [
-        "threat_intel",
+        "fraud_abuse",
         "incident_response",
         "soc_siem",
-        "fraud_abuse"
+        "threat_intel"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -925,11 +946,11 @@
       "scope": "Cloud security controls and mappings.",
       "domains": [
         "cloud",
+        "cloud_forensics",
         "containers",
         "data_security",
-        "identity",
         "governance",
-        "cloud_forensics"
+        "identity"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -941,13 +962,13 @@
       "type": "standard",
       "scope": "Payment account data security; limited to payment-card scope.",
       "domains": [
-        "database_security",
-        "data_security",
-        "network",
-        "appsec",
         "api",
+        "appsec",
+        "data_security",
+        "database_security",
+        "governance",
         "identity",
-        "governance"
+        "network"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -959,11 +980,11 @@
       "type": "specification",
       "scope": "Security architecture and procedures for 5G systems.",
       "domains": [
-        "telecom_5g",
-        "network",
-        "identity",
         "crypto",
-        "iot_hardware"
+        "identity",
+        "iot_hardware",
+        "network",
+        "telecom_5g"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -975,11 +996,11 @@
       "type": "reference_family",
       "scope": "Space data-system security; select exact document and mission profile.",
       "domains": [
-        "satellite_security",
-        "network",
         "crypto",
+        "hardware_security",
+        "network",
         "pki_hsm",
-        "hardware_security"
+        "satellite_security"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -991,8 +1012,8 @@
       "type": "guidance",
       "scope": "IoT cybersecurity capabilities and manufacturer/consumer guidance.",
       "domains": [
-        "iot_hardware",
         "hardware_security",
+        "iot_hardware",
         "wireless_security"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
@@ -1005,11 +1026,11 @@
       "type": "guidance",
       "scope": "Computer security log management; check revision status.",
       "domains": [
-        "soc_siem",
-        "threat_hunting",
-        "incident_response",
         "edr_xdr",
-        "forensics"
+        "forensics",
+        "incident_response",
+        "soc_siem",
+        "threat_hunting"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -1023,8 +1044,8 @@
       "domains": [
         "hardware_security",
         "iot_hardware",
-        "windows_ad",
-        "linux"
+        "linux",
+        "windows_ad"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -1036,10 +1057,10 @@
       "type": "specification",
       "scope": "Structured cyber threat information representation and exchange.",
       "domains": [
-        "threat_intel",
-        "soc_siem",
+        "fraud_abuse",
         "incident_response",
-        "fraud_abuse"
+        "soc_siem",
+        "threat_intel"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
@@ -1051,11 +1072,11 @@
       "type": "framework",
       "scope": "Software artifact supply-chain integrity; pin version/profile.",
       "domains": [
-        "devsecops",
-        "software_engineering",
-        "containers",
+        "ai_security",
         "cloud",
-        "ai_security"
+        "containers",
+        "devsecops",
+        "software_engineering"
       ],
       "verification_status": "official_reference_catalogued_not_full_text_reviewed",
       "version_policy": "Pin exact edition/release, jurisdiction and retrieval date before relying on detailed requirements."
