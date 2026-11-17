@@ -187,6 +187,8 @@ class NucleiScannerTests(unittest.TestCase):
             self.assertIn(str(self.templates.resolve()), command)
             self.assertIn("-disable-unsigned-templates", command)
             self.assertIn("-no-stdin", command)
+            self.assertIn("-omit-raw", command)
+            self.assertIn("-omit-template", command)
             self.assertEqual(command[command.index("-type") + 1], "http")
             self.assertIn("dos,intrusive,fuzz,code,headless", command)
             self.assertEqual(result["rate_limit"], 3)
