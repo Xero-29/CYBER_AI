@@ -271,7 +271,10 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
     except json.JSONDecodeError:
         parsed = None
     target_hash_after = _hash_target(path)
-    binary_hash_after = _hash_binary(binary)["sha256"]
+    try:
+        binary_hash_after = _hash_binary(binary)["sha256"]
+    except ToolExecutionError:
+        binary_hash_after = None
     binary_modified = binary_hash_after != binary_provenance["sha256"]
     if binary_modified:
         status = "integrity_error"
