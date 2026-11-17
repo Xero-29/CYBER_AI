@@ -9,6 +9,15 @@ class SkillbookTests(unittest.TestCase):
  def tearDown(self): self.p.stop(); self.tmp.cleanup()
  def add(self,**kw):
   d=dict(name="Auditoria cabeceras HTTP",task_pattern="auditoria web revision cabeceras HTTP",description="Revisión defensiva de cabeceras",prerequisites=["objetivo autorizado"],methodology=["solicitar raíz con timeout","comparar cabeceras con OWASP","documentar evidencia"],validation=["repetir solicitud","guardar evidencia anonimizada"],tools=["requests"],tags=["web","http","headers"],evidence=["laboratorio A","laboratorio B"],source_urls=["https://owasp.org/"],success_runs=2,failure_runs=0,verified_by="VERITAS",verifier_verdict="RESPALDADA"); d.update(kw); return skillbook._insert_verified_skill(**d)
+ def test_retrieval_excludes_skill_with_tampered_current_snapshot(self):
+  skill=self.add()
+  with skillbook.connect() as db:
+   db.execute("UPDATE skills SET methodology_json=? WHERE skill_id=?",
+              ('["metodo alterado","paso inyectado"]',skill["skill_id"]))
+  self.assertFalse(skillbook.verify_skill_history(skill["skill_id"])["valid"])
+  self.assertEqual(skillbook.search_skills("auditoria web revision cabeceras HTTP"),[])
+  self.assertEqual(skillbook.build_skill_context("auditoria web revision cabeceras HTTP"),("",[]))
+
  def test_retrieval(self):
   x=self.add(); ctx,m=skillbook.build_skill_context("auditoria web revisar cabeceras HTTP"); self.assertIn(x["skill_id"],ctx); self.assertEqual(m[0]["skill_id"],x["skill_id"])
  def test_skills_due_for_review_uses_last_update_not_last_use(self):
