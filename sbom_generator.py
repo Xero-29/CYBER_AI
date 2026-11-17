@@ -69,7 +69,7 @@ def _read_requirements(path, root, seen=None, depth=0):
     return packages
 
 
-def build_sbom(root=PROJECT):
+def build_sbom(root=PROJECT, artifact_manifest=None):
     root = Path(root).resolve()
     lock_path = root / "requirements.lock"
     direct_path = root / "requirements.txt"
@@ -83,6 +83,32 @@ def build_sbom(root=PROJECT):
     if missing:
         raise LockfileError(f"Dependencias directas ausentes del lock: {sorted(missing)}.")
     lock_hash = hashlib.sha256(lock_path.read_bytes()).hexdigest()
+    artifact_hashes = {}
+    if artifact_manifest is not None:
+        manifest_path = Path(artifact_manifest)
+        if manifest_path.is_symlink() or not manifest_path.is_file():
+            raise LockfileError("Manifiesto de artefactos inválido.")
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as error:
+            raise LockfileError("No se pudo leer el manifiesto de artefactos.") from error
+        if manifest.get("lock_sha256") != lock_hash:
+            raise LockfileError("El manifiesto corresponde a otro requirements.lock.")
+        for artifact in manifest.get("artifacts", []):
+            name = _normalize(str(artifact.get("name", "")))
+            version = artifact.get("version")
+            digest = artifact.get("sha256")
+            if (
+                name not in locked
+                or locked[name]["version"] != version
+                or not isinstance(digest, str)
+                or not re.fullmatch(r"[a-f0-9]{64}", digest)
+                or name in artifact_hashes
+            ):
+                raise LockfileError("El manifiesto contiene un artefacto no fijado o inválido.")
+            artifact_hashes[name] = digest
+        if set(artifact_hashes) != set(locked):
+            raise LockfileError("El manifiesto no cubre todas las dependencias fijadas.")
     components = []
     refs = []
     for name, item in sorted(locked.items()):
@@ -95,11 +121,14 @@ def build_sbom(root=PROJECT):
             "version": item["version"],
             "purl": ref,
             "scope": "required",
+            **({
+                "hashes": [{"alg": "SHA-256", "content": artifact_hashes[name]}]
+            } if name in artifact_hashes else {}),
             "properties": [
                 {"name": "cyber_ai:dependency_type",
                  "value": "direct" if name in direct else "transitive"},
                 {"name": "cyber_ai:lock_source", "value": item["source"]},
-                {"name": "cyber_ai:artifact_hash", "value": "not-recorded"},
+                {"name": "cyber_ai:artifact_hash", "value": artifact_hashes.get(name, "not-recorded")},
             ],
         })
     serial = uuid.uuid5(uuid.NAMESPACE_URL, f"cyber-ai-requirements:{lock_hash}")
@@ -117,7 +146,7 @@ def build_sbom(root=PROJECT):
             "properties": [
                 {"name": "cyber_ai:lock_file", "value": "requirements.lock"},
                 {"name": "cyber_ai:lock_sha256", "value": lock_hash},
-                {"name": "cyber_ai:artifact_hashes", "value": "not-available-in-lock"},
+                {"name": "cyber_ai:artifact_hashes", "value": "captured-for-build-platform" if artifact_hashes else "not-recorded"},
                 {"name": "cyber_ai:dependency_graph", "value": "root-to-locked-components; transitive edges not inferred"},
             ],
         },
@@ -130,9 +159,10 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=PROJECT)
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--artifact-manifest", type=Path)
     args = parser.parse_args(argv)
     try:
-        document = build_sbom(args.root)
+        document = build_sbom(args.root, artifact_manifest=args.artifact_manifest)
         rendered = json.dumps(document, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
         if args.output:
             args.output.parent.mkdir(parents=True, exist_ok=True)
