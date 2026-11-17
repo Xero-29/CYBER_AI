@@ -3,33 +3,32 @@
 > Esta sección es la fuente de verdad vigente. Los bloques históricos que aparecen debajo documentan etapas anteriores y no deben interpretarse como el estado actual.
 
 **Rama:** `main`  
-**HEAD antes de esta actualización:** `521583b9e6733c32556655e0af0dfafe5039ff6e`  
-**Último cambio funcional:** `111c3a6a925f8fb696ee8d5aa2def2a6c98ef5ca`  
-**Documentación de integración:** `521583b9e6733c32556655e0af0dfafe5039ff6e`  
+**HEAD antes de esta actualización:** `cc76700035636ecf57591a1b385c3346aed03c57`  
+**Último cambio funcional:** `cc76700035636ecf57591a1b385c3346aed03c57`  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17` (no modificado).
 
 ## Integración realizada
 
-- `cyber_ai.py --ask "tarea"` delega en DIRECTOR; admite especialista manual y exclusión explícita de conocimiento.
-- `cyber_ai.py --team "tarea"` delega en el orquestador multiagente con supervisión del objetivo global.
-- DIRECTOR activa recuperación híbrida de conocimiento por defecto.
-- El orquestador multiagente activa conocimiento por defecto en etapas y revisiones; una política explícita de etapa o flujo puede desactivarlo. Los valores no booleanos se rechazan.
-- El orquestador genera un plan de capacidades y herramientas candidatas con `task_planner.py` y lo vincula al informe y al evento inicial del ledger. El plan declara que la ejecución de herramientas no ha comenzado.
-- El agente incorpora Skills activas y lecciones aprobadas; con ECO, embeddings y biblioteca indexada disponibles, recupera también conocimiento compartido.
-- Se añadieron pruebas de enrutamiento CLI, política de conocimiento y conexión del planificador al orquestador.
-- README y matriz de implementación actualizados.
+- `cyber_ai.py --ask` conecta la entrada principal con DIRECTOR, el agente y la recuperación de conocimiento.
+- `cyber_ai.py --team` conecta el flujo multiagente supervisado con el planificador de capacidades y el inventario de herramientas.
+- La ejecución local opcional se conecta mediante `--execute-tools --confirm-tool-execution --tool-target`. Requiere allowlist HMAC configurada y obligatoria, confirma la intención del operador y limita objetivos a rutas relativas dentro del repositorio.
+- El pipeline limita a tres adaptadores locales instalados y registrados; los adaptadores con requisitos de red o aislamiento especial siguen bloqueados.
+- Cada ejecución produce evidencia estructurada, verificación independiente de integridad y un evento del ledger con referencia a la evidencia.
+- Los resultados se añaden al contexto de los agentes como datos no confiables y se incluyen en el informe final. Si una ejecución o validación falla, el flujo no se etiqueta como completamente exitoso.
+- Se añadieron pruebas unitarias para pipeline, validación de evidencia y enrutamiento CLI. README, allowlist y matriz documentan el flujo.
 
-## Límites de esta integración
+## Límites y verificación pendiente
 
-- La recuperación semántica requiere proveedor de embeddings y biblioteca indexada; no se ha validado con proveedor real.
-- El plan de herramientas es informativo: no ejecuta adaptadores. La ejecución conserva autorización explícita.
-- La ejecución autorizada de herramientas, validación de resultados y evidencia aún no forman un ciclo automatizado integrado con el orquestador.
-- Las pruebas nuevas están versionadas, pero no se han ejecutado en esta sesión. CI del HEAD actual está pendiente.
+- La validación independiente comprueba integridad del binario/objetivo, hash, allowlist, código de salida y truncamiento. No demuestra que un hallazgo sea verdadero, explotable o completo.
+- Los adaptadores locales siguen ejecutándose en el host; `network_access=not_enforced`. No se afirma aislamiento de red ni sandbox del sistema operativo.
+- El flujo Nuclei/escaneo remoto sigue separado y conserva su autorización específica; no se integra en esta ruta local.
+- La ejecución real requiere binarios instalados, manifiesto HMAC válido, clave custodiada y objetivo válido.
+- Las pruebas añadidas no se han ejecutado en esta sesión. El CI del HEAD actual debe completar y pasar antes de considerar validada la integración.
 - No se afirma preparación para producción ni cierre de validación operacional.
 
-## Siguiente brecha de integración
+## Siguiente brecha
 
-Conectar selección de herramientas con ejecución autorizada, recoger resultados estructurados, verificarlos y adjuntar evidencias al informe/ledger sin ampliar permisos implícitamente.
+Unificar el flujo de escaneo remoto autorizado con los contratos de evidencia, ledger y revisión; después ejecutar pruebas E2E con herramientas reales, verificar aislamiento de procesos y añadir validación semántica experta de hallazgos.
 
 ---
 
