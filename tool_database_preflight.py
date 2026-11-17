@@ -38,7 +38,7 @@ def _osv_database_directory(environ: dict, home: Path, temp: Path) -> Path:
         base = Path(configured).expanduser()
         return base if base.name == "osv-scalibr" else base / "osv-scalibr"
     user_cache = home / ".cache" / "osv-scalibr"
-    if user_cache.exists():
+    if user_cache.is_dir():
         return user_cache
     return temp / "osv-scalibr"
 
