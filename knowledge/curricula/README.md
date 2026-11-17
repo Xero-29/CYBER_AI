@@ -49,3 +49,18 @@ Las 48 áreas cuentan con revisiones exploratorias iniciales, hipótesis y proto
 ## Cobertura de revisiones exploratorias — 2026-11-17
 
 Las 48 áreas tienen un dossier `LITERATURE_REVIEW.md` con pregunta, síntesis, taxonomía, hipótesis, protocolo propuesto, métricas, límites y brechas. Las 35 referencias añadidas están registradas como `official_reference_catalogued_not_content_reviewed`: localizadas en el emisor, no leídas íntegramente. No equivale a 48 revisiones sistemáticas ni a investigación empírica.
+
+
+## Matriz global de requisitos y validación por especialidad
+
+La matriz `../research/global_coverage_matrix.json` mantiene el cruce con 61 familias de referencia y ahora descompone cada especialidad en requisitos temáticos, artefactos y siete puertas de validación. Todos empiezan como `not_assessed`.
+
+Ejecuta desde la raíz:
+
+```bash
+python knowledge_global_coverage_audit.py
+python knowledge_global_coverage_audit.py --json
+python -m unittest tests.test_knowledge_global_coverage_audit -v
+```
+
+El auditor exige igualdad exacta entre manifiesto, currículo y matriz; comprueba que no se pierdan temas ni artefactos y bloquea el estado `validated` si faltan referencias de evidencia, revisor o fecha. La auditoría es estructural: la validación semántica requiere revisión humana y pruebas.
