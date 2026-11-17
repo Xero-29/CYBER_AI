@@ -1,6 +1,6 @@
 # Simulación multiagente sin modelos reales
 
-`agent_simulation.py` permite validar la estructura y los contratos de los flujos definidos en `config/workflows.json` sin conectarse a Ollama ni a proveedores externos y sin ejecutar herramientas. También reproduce el límite de contexto del orquestador: descarta etapas antiguas hasta respetar `max_context_chars` y reporta cuántas quedaron fuera.
+`workflow_contracts.py` contiene el contrato estructural compartido por `team_orchestrator.py` y `agent_simulation.py`. Ambos validan los mismos modos, etapas, límites, presupuestos de tokens, opciones de recuperación y flags antes de operar. El simulador no se conecta a Ollama ni a proveedores externos y no ejecuta herramientas. También reproduce el límite de contexto del orquestador: descarta etapas antiguas hasta respetar `max_context_chars` y reporta cuántas quedaron fuera.
 
 ## Uso
 
@@ -26,7 +26,7 @@ Las pruebas pueden inyectar respuestas por agente en `simulate_workflow(workflow
 
 ## Validación automatizada
 
-La suite comprueba los tres flujos existentes en el catálogo: `investigacion`, `critica_corta` y `revision_tecnica`. También cubre identificadores inseguros, catálogos malformados, modos inválidos, límites incorrectos, fixtures vacías/desconocidas/no textuales, transferencia y recorte de contexto, equivalencia del recorte frente a `team_orchestrator.build_prompt`, parada ante incumplimiento y escritura del informe CLI.
+La suite unitaria del contrato comprueba los límites, opciones y tipos; la suite del simulador comprueba los tres flujos existentes en el catálogo: `investigacion`, `critica_corta` y `revision_tecnica`. También cubre identificadores inseguros, catálogos malformados, modos inválidos, límites incorrectos, fixtures vacías/desconocidas/no textuales, transferencia y recorte de contexto, equivalencia del recorte frente a `team_orchestrator.build_prompt`, parada ante incumplimiento y escritura del informe CLI.
 
 ## Límites
 
