@@ -1,5 +1,6 @@
 """Pruebas del importador de documentos de CYBER_AI."""
 
+import csv
 import stat
 import sys
 import tempfile
@@ -64,6 +65,19 @@ class TestKnowledgeIngest(unittest.TestCase):
             json_path.write_text('{"name":"alpha","value":1}', encoding="utf-8")
             self.assertIn("alpha", ingest.extract_document_text(csv_path))
             self.assertIn('"value": 1', ingest.extract_document_text(json_path))
+
+    def test_csv_extraction_restores_process_global_field_limit(self):
+        original_limit = csv.field_size_limit()
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "bounded.csv"
+            path.write_text("name,value\nalpha,1\n", encoding="utf-8")
+            self.assertIn("alpha", ingest.extract_document_text(path))
+            self.assertEqual(csv.field_size_limit(), original_limit)
+
+            with patch.object(ingest, "MAX_EXTRACTED_CHARS", 5):
+                with self.assertRaisesRegex(ValueError, "límite de 10 millones"):
+                    ingest.extract_document_text(path)
+            self.assertEqual(csv.field_size_limit(), original_limit)
 
     def test_pdf_extraction_preserves_page_markers_for_chunk_citations(self):
         class FakePage:
