@@ -30,7 +30,7 @@ def audit_learning_cycle(*, max_review_age_days: int = 180) -> dict:
     if ledger_path.is_symlink():
         raise OSError("El archivo del ledger no puede ser un enlace simbólico.")
     if ledger_path.is_file():
-        ledger = ExecutionLedger(ledger_path)
+        ledger = ExecutionLedger(ledger_path, initialize=False)
         ledger_check = ledger.verify()
     else:
         ledger = None
