@@ -5,12 +5,12 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
+from knowledge_embeddings import generate_embedding
+from knowledge_library import search_knowledge_hybrid
+
 MAX_DATASET_BYTES = 2 * 1024 * 1024
 MAX_CASES = 5000
 MAX_LINE_BYTES = 64 * 1024
-
-from knowledge_embeddings import generate_embedding
-from knowledge_library import search_knowledge_hybrid
 
 ROOT = Path(__file__).resolve().parent
 DEFAULT_DATASET = ROOT / "knowledge" / "evaluation" / "domain_queries.jsonl"
