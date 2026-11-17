@@ -12,6 +12,8 @@ class GlobalCoverageAuditTests(unittest.TestCase):
         self.assertEqual(report["cross_cutting_gap_count"], 8)
         self.assertFalse(report["exhaustive_coverage_claim"])
         self.assertEqual(report["content_depth_assessed"], 0)
+        self.assertEqual(report["compendia_present"], 48)
+        self.assertEqual(report["compendia_missing"], [])
 
     def test_every_area_reference_id_exists(self):
         report = audit()
