@@ -39,6 +39,21 @@ class EntryPointTests(unittest.TestCase):
             self.assertEqual(main(), 0)
         self.assertIn("--no-knowledge", run.call_args.args[0])
 
+    @patch("cyber_ai.subprocess.run")
+    def test_team_routes_to_supervised_multi_agent_workflow(self, run):
+        run.return_value.returncode = 0
+        with patch.object(sys, "argv", [
+            "cyber_ai.py", "--team", "investiga integración de agentes",
+            "--workflow", "investigacion"
+        ]):
+            from cyber_ai import main
+            self.assertEqual(main(), 0)
+        command = run.call_args.args[0]
+        self.assertTrue(command[1].endswith("team_orchestrator.py"))
+        self.assertIn("--supervise-objectives", command)
+        self.assertIn("--workflow", command)
+        self.assertEqual(command[-1], "investiga integración de agentes")
+
     def test_missing_report_returns_error(self):
         result = subprocess.run(
             [sys.executable, "cyber_ai.py", "--report", "archivo_inexistente.txt"],
