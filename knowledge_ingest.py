@@ -338,6 +338,27 @@ def split_text(text, max_chars=1200, overlap=150):
     return chunks
 
 
+def _default_document_id(*, document_sha256, title, category, source, license,
+                         visibility, tenant_id, tags, expected_embedding_model):
+    """Identificador estable por contenido, procedencia y ámbito de acceso."""
+    identity = {
+        "schema_version": 1,
+        "document_sha256": document_sha256,
+        "title": title,
+        "category": category,
+        "source": source,
+        "license": license,
+        "visibility": visibility,
+        "tenant_id": tenant_id,
+        "tags": sorted(tags),
+        "expected_embedding_model": expected_embedding_model,
+    }
+    canonical = json.dumps(
+        identity, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    )
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
 def ingest_document(
     file_path,
     *,
@@ -366,22 +387,58 @@ def ingest_document(
         raise ValueError("batch_size debe estar entre 1 y 32.")
 
     text = extract_document_text(file_path)
-
     chunks = split_text(text, max_chars=max_chars)
+
+    source = source or file_path.name
+    for field, value in (
+        ("title", title), ("category", category), ("source", source),
+        ("license", license),
+    ):
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError(f"{field} es obligatorio y debe ser texto.")
+    title, category, source, license = (
+        title.strip(), category.strip(), source.strip(), license.strip()
+    )
+    if visibility not in {"shared", "tenant"}:
+        raise ValueError("visibility debe ser 'shared' o 'tenant'.")
+    if visibility == "tenant":
+        if not isinstance(tenant_id, str) or not tenant_id.strip():
+            raise ValueError("Los conocimientos privados requieren tenant_id.")
+        tenant_id = tenant_id.strip()
+    elif tenant_id is not None:
+        raise ValueError("Los conocimientos compartidos no deben tener tenant_id.")
+    if tags is None:
+        normalized_tags = []
+    elif isinstance(tags, (list, tuple)) and all(
+        isinstance(tag, str) and tag.strip() for tag in tags
+    ):
+        normalized_tags = sorted(set(tag.strip() for tag in tags))
+    else:
+        raise ValueError("tags debe ser una lista de textos no vacíos.")
+
+    if expected_embedding_model is not None and (
+        not isinstance(expected_embedding_model, str)
+        or not expected_embedding_model.strip()
+    ):
+        raise ValueError("expected_embedding_model debe ser texto no vacío.")
+    if expected_embedding_model is not None:
+        expected_embedding_model = expected_embedding_model.strip()
+
+    # La huella se calcula sobre el texto normalizado extraído.
+    document_sha256 = hashlib.sha256(text.encode("utf-8")).hexdigest()
     if document_id is None:
-        document_id = uuid.uuid4().hex
+        document_id = _default_document_id(
+            document_sha256=document_sha256, title=title, category=category,
+            source=source, license=license, visibility=visibility,
+            tenant_id=tenant_id, tags=normalized_tags,
+            expected_embedding_model=expected_embedding_model,
+        )
     elif not isinstance(document_id, str) or not document_id.strip() or len(document_id) > 128:
         raise ValueError("document_id debe ser texto no vacío de hasta 128 caracteres.")
     else:
         document_id = document_id.strip()
-    source = source or file_path.name
 
-    # La huella permite identificar el documento importado en el informe.
-    document_sha256 = hashlib.sha256(text.encode("utf-8")).hexdigest()
-
-    # Un reintento tras un corte reconoce el documento ya publicado.
-    if expected_embedding_model is not None and (not isinstance(expected_embedding_model, str) or not expected_embedding_model.strip()):
-        raise ValueError("expected_embedding_model debe ser texto no vacío.")
+    # El ID estable hace idempotentes también los reintentos sin ID explícito.
     existing_chunks = document_chunk_count(document_id, expected_embedding_model)
     if existing_chunks:
         return {
@@ -425,7 +482,7 @@ def ingest_document(
                 "embedding_model": actual_embedding_model,
                 "document_id": document_id,
                 "chunk_index": index,
-                "tags": tags,
+                "tags": normalized_tags,
                 "visibility": visibility,
                 "tenant_id": tenant_id,
             })
