@@ -24,6 +24,10 @@ class LearningCycleAuditTests(unittest.TestCase):
             self.root / "verified_lessons.jsonl",
         )
         self.memory_patch.start()
+        self.path_patch = patch.object(
+            learning_cycle_audit, "DEFAULT_DB", self.ledger.path
+        )
+        self.path_patch.start()
         self.ledger_patch = patch.object(
             learning_cycle_audit, "ExecutionLedger", return_value=self.ledger
         )
@@ -36,6 +40,7 @@ class LearningCycleAuditTests(unittest.TestCase):
     def tearDown(self):
         self.key_patch.stop()
         self.ledger_patch.stop()
+        self.path_patch.stop()
         self.memory_patch.stop()
         self.db_patch.stop()
         self.temp.cleanup()
