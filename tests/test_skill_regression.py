@@ -17,7 +17,7 @@ class SkillRegressionTests(unittest.TestCase):
 
     def write_dataset(self, rows):
         self.dataset.write_text(
-            "".join(json.dumps(row) + "\\n" for row in rows), encoding="utf-8"
+            "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8"
         )
 
     def test_metrics_and_skill_history_validation(self):
@@ -29,7 +29,7 @@ class SkillRegressionTests(unittest.TestCase):
             self.assertFalse(record_usage)
             return [{"skill_id": "skill-a" if "HTTP" in query else "skill-b"}]
         with patch.object(skill_regression.skillbook, "verify_skill_history",
-                          side_effect=lambda skill_id: {"valid": True, "status": "active", "current_version": 2}), \\
+                          side_effect=lambda skill_id: {"valid": True, "status": "active", "current_version": 2}), \
              patch.object(skill_regression.skillbook, "search_skills", side_effect=search):
             report = skill_regression.evaluate(self.dataset, top_k=1)
         self.assertEqual(report["metrics"]["recall_at_k"], 1.0)
@@ -65,7 +65,7 @@ class SkillRegressionTests(unittest.TestCase):
             {"id": "case-1", "query": "query", "relevant_skill_ids": ["skill-a"]}
         ])
         with patch.object(skill_regression.skillbook, "verify_skill_history",
-                          return_value={"valid": True, "status": "active", "current_version": 1}), \\
+                          return_value={"valid": True, "status": "active", "current_version": 1}), \
              patch.object(skill_regression.skillbook, "search_skills", return_value=[]):
             report = skill_regression.evaluate(self.dataset)
         self.assertEqual(report["metrics"]["hit_rate_at_k"], 0.0)
