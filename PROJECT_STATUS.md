@@ -132,3 +132,15 @@
 - Madurez: M1; no se declara M3/M4/M5. Los experimentos propuestos no se han ejecutado.
 - Pendiente: lectura integral, revisión sistemática de literatura académica, síntesis de evidencia, laboratorios, análisis estadístico, revisión experta y reproducción independiente.
 - Validación del contenido de los 35 dossiers y del auditor: Python workflow `44142729195` **success** y Docker sandbox workflow `44142729114` **success**, ambos sobre SHA `6b352c0e113a3b5c192473960985d0587b3a851c`. `verify.sh` reportó 48 áreas, 48 agendas completas, 48 revisiones trazables, 68 fuentes registradas, 25 páginas/documentos con estado de revisión verificable y **522 pruebas** aprobadas. Docker construyó ambas imágenes, ejecutó la verificación completa y Ruff dentro del sandbox endurecido.
+
+
+## Auditoría global de cobertura — 2026-11-17
+
+- Se añadió una matriz de contraste entre las **48 áreas** del manifiesto y **61 familias** de marcos, estándares, taxonomías, guías y especificaciones.
+- Todas las 48 áreas tienen al menos una referencia asociada en la línea base. El cruce valida IDs y trazabilidad estructural, no profundidad.
+- Los 48 dominios se mantienen como `not_assessed_by_this_crosswalk` en profundidad de contenido. No se declara cobertura total ni porcentaje global.
+- Se registran 8 brechas transversales: regulación nacional/sectorial, literatura académica sistemática, catálogo vivo de herramientas, versiones/protocolos, experimentación, sistemas críticos, cobertura regional/español y vigilancia de cambios.
+- Se añadió `knowledge_global_coverage_audit.py` y pruebas automatizadas. `verify.sh` incorpora el auditor.
+- Fuentes y versiones deben leerse y fijarse antes de afirmar cumplimiento. El registro actual es una línea base de referencias catalogadas, no lectura integral.
+- Informe: `knowledge/research/GLOBAL_COVERAGE_AUDIT.md`; matriz: `knowledge/research/global_coverage_matrix.json`.
+- **Límite:** esta auditoría demuestra que el cruce de 48 áreas y 61 referencias es estructuralmente consistente; no demuestra que CYBER_AI abarque todo el conocimiento existente, que los módulos estén completos ni que herramientas/laboratorios funcionen.
