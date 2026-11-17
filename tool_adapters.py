@@ -535,9 +535,11 @@ def run_local_tool(tool_id, target, *, config_path=None, plugin=None, timeout=No
             if remaining <= 0:
                 truncated = True
                 break
-            raw = log_path.read_bytes()[:remaining]
+            log_size = log_path.stat().st_size
+            with log_path.open("rb") as log_stream:
+                raw = log_stream.read(remaining)
             total_log_bytes += len(raw)
-            if log_path.stat().st_size > len(raw):
+            if log_size > len(raw):
                 truncated = True
             entries = []
             for line in raw.decode("utf-8", errors="replace").splitlines():
