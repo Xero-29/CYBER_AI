@@ -104,6 +104,8 @@ class NucleiScannerTests(unittest.TestCase):
             self.assertEqual(result["status"], "completed")
             self.assertEqual(result["findings_count"], 1)
             self.assertEqual(result["findings"][0]["template-id"], "test-template")
+            self.assertEqual(result["independent_evidence_validation"]["status"], "valid_structure")
+            self.assertTrue(result["ledger_event_id"])
             events = ExecutionLedger(self.ledger_path).history(namespace="security-scans")
             self.assertEqual(events[0]["status"], "completed")
             self.assertEqual(events[1]["status"], "started")

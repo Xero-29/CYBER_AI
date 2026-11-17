@@ -15,6 +15,7 @@ from urllib.parse import urlparse
 
 from execution_policy import AuthorizationError, authorize_target
 from execution_ledger import ExecutionLedger
+from scan_result_validator import validate_scan_result
 
 
 def validate_target(target):
@@ -85,13 +86,34 @@ def _record_scan_start(target, authorization_id):
 
 
 def _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger):
+    result.setdefault("evidence_schema", "cyber-ai.remote-scan.v1")
+    result.setdefault("scanner", "nuclei")
+    result.setdefault("authorization_id", authorization_id)
+    result.setdefault("duration_ms", max(0, int((time.monotonic() - started) * 1000)))
+    validation = validate_scan_result(result, expected_target=target)
+    result["independent_evidence_validation"] = validation
+    if result.get("status") == "completed" and not validation["findings_eligible"]:
+        result["status"] = "evidence_rejected"
+    event_payload = {
+        "evidence_schema": result["evidence_schema"],
+        "scanner": result["scanner"],
+        "target": target,
+        "authorization_id": authorization_id,
+        "status": result.get("status"),
+        "return_code": result.get("return_code"),
+        "findings_count": result.get("findings_count", len(result.get("findings", []))),
+        "validation": validation,
+        "findings": result.get("findings", []),
+    }
     event = _record_scan_event(
-        target, result, started, authorization_id=authorization_id,
+        target, event_payload, started, authorization_id=authorization_id,
         start_event_id=start_event_id,
     )
     if require_ledger and event is None:
         result["status"] = "ledger_error"
         result["ledger_error"] = "No se pudo persistir el evento terminal del escaneo."
+    elif event is not None:
+        result["ledger_event_id"] = event.get("event_id")
     return result
 
 
@@ -226,16 +248,20 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
             "error": str(error),
             "findings": [],
         }
-        _record_scan_event(target, result, started, authorization_id=authorization_id)
-        return result
+        return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)
 
     findings = []
+    malformed_findings_lines = 0
     if output_file.is_file():
         for line in output_file.read_text(encoding="utf-8").splitlines():
             try:
-                findings.append(json.loads(line))
+                parsed_finding = json.loads(line)
+                if isinstance(parsed_finding, dict):
+                    findings.append(parsed_finding)
+                else:
+                    malformed_findings_lines += 1
             except json.JSONDecodeError:
-                continue
+                malformed_findings_lines += 1
 
     status = "completed" if process.returncode == 0 else "scanner_error"
 
@@ -249,6 +275,7 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
         "return_code": process.returncode,
         "elapsed_seconds": elapsed,
         "findings_count": len(findings),
+        "malformed_findings_lines": malformed_findings_lines,
         "findings": findings,
         "scanner_messages": messages[-100:],
         "note": (
