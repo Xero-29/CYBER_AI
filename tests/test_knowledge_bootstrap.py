@@ -30,6 +30,37 @@ class KnowledgeBootstrapTests(unittest.TestCase):
             self.assertEqual(result["items"][0]["visibility"], "shared")
             self.assertIsNone(result["items"][0]["tenant_id"])
 
+    def test_windows_lock_uses_byte_range_and_releases(self):
+        from types import SimpleNamespace
+        calls = []
+        api = SimpleNamespace(
+            LK_LOCK=1, LK_UNLCK=2,
+            locking=lambda descriptor, operation, count: calls.append(
+                (descriptor, operation, count)
+            ),
+        )
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "lock"
+            with path.open("a+b") as lock:
+                with bootstrap.exclusive_file_lock(lock, windows=True, windows_api=api):
+                    self.assertEqual(path.read_bytes(), bytes(1))
+            self.assertEqual([call[1:] for call in calls], [(1, 1), (2, 1)])
+
+    def test_windows_lock_releases_after_failure(self):
+        from types import SimpleNamespace
+        calls = []
+        api = SimpleNamespace(
+            LK_LOCK=1, LK_UNLCK=2,
+            locking=lambda descriptor, operation, count: calls.append(operation),
+        )
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "lock"
+            with path.open("a+b") as lock:
+                with self.assertRaisesRegex(RuntimeError, "injected"):
+                    with bootstrap.exclusive_file_lock(lock, windows=True, windows_api=api):
+                        raise RuntimeError("injected")
+        self.assertEqual(calls, [1, 2])
+
     def test_rejects_path_escape(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
