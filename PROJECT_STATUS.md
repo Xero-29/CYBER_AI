@@ -3,8 +3,9 @@
 > Esta sección es la fuente de verdad vigente. Los bloques históricos que aparecen debajo documentan etapas anteriores y no deben interpretarse como el estado actual.
 
 **Rama:** `main`  
-**HEAD antes de esta actualización:** `c9b8d684dc04d02e91d96a2f31cf13151c2cb5ae`  
-**Último cambio funcional:** `2f472c9b734c3cdf38c4c69a5f51a1186b2e8d53`  
+**HEAD antes de esta actualización:** `521583b9e6733c32556655e0af0dfafe5039ff6e`  
+**Último cambio funcional:** `111c3a6a925f8fb696ee8d5aa2def2a6c98ef5ca`  
+**Documentación de integración:** `521583b9e6733c32556655e0af0dfafe5039ff6e`  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17` (no modificado).
 
 ## Integración realizada
