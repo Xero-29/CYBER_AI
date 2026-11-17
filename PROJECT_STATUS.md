@@ -3,7 +3,7 @@
 > Esta sección es la fuente de verdad vigente. Los bloques históricos que aparecen debajo documentan etapas anteriores y no deben interpretarse como el estado actual.
 
 **Rama:** `main`  
-**HEAD antes de esta actualización:** `9bca5cc15988eb76fea5f8b65f017f80bc80b114`  
+**HEAD antes de esta actualización:** `c9b8d684dc04d02e91d96a2f31cf13151c2cb5ae`  
 **Último cambio funcional:** `2f472c9b734c3cdf38c4c69a5f51a1186b2e8d53`  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17` (no modificado).
 
@@ -11,23 +11,24 @@
 
 - `cyber_ai.py --ask "tarea"` delega en DIRECTOR; admite especialista manual y exclusión explícita de conocimiento.
 - `cyber_ai.py --team "tarea"` delega en el orquestador multiagente con supervisión del objetivo global.
-- DIRECTOR activa la recuperación híbrida de conocimiento por defecto.
-- El orquestador multiagente activa conocimiento por defecto en las etapas y revisiones; una política explícita de etapa o flujo puede desactivarlo. Las políticas no booleanas se rechazan.
+- DIRECTOR activa recuperación híbrida de conocimiento por defecto.
+- El orquestador multiagente activa conocimiento por defecto en etapas y revisiones; una política explícita de etapa o flujo puede desactivarlo. Los valores no booleanos se rechazan.
+- El orquestador genera un plan de capacidades y herramientas candidatas con `task_planner.py` y lo vincula al informe y al evento inicial del ledger. El plan declara que la ejecución de herramientas no ha comenzado.
 - El agente incorpora Skills activas y lecciones aprobadas; con ECO, embeddings y biblioteca indexada disponibles, recupera también conocimiento compartido.
-- Se añadieron pruebas de enrutamiento CLI y de política de conocimiento para los flujos multiagente.
+- Se añadieron pruebas de enrutamiento CLI, política de conocimiento y conexión del planificador al orquestador.
 - README y matriz de implementación actualizados.
 
 ## Límites de esta integración
 
-- La recuperación semántica requiere un proveedor de embeddings configurado y la biblioteca indexada; no se ha validado con un proveedor real.
-- Las herramientas de seguridad no se ejecutan automáticamente. Conservan autorización y ejecución explícitas; el orquestador aún no coordina la ejecución de herramientas.
-- Planificador, inventario/selector de capacidades, orquestador, ejecución autorizada de herramientas, validación y evidencia no forman todavía un único ciclo extremo a extremo.
-- Las pruebas nuevas están versionadas, pero no se han ejecutado en esta sesión. CI sobre el HEAD actual está pendiente.
+- La recuperación semántica requiere proveedor de embeddings y biblioteca indexada; no se ha validado con proveedor real.
+- El plan de herramientas es informativo: no ejecuta adaptadores. La ejecución conserva autorización explícita.
+- La ejecución autorizada de herramientas, validación de resultados y evidencia aún no forman un ciclo automatizado integrado con el orquestador.
+- Las pruebas nuevas están versionadas, pero no se han ejecutado en esta sesión. CI del HEAD actual está pendiente.
 - No se afirma preparación para producción ni cierre de validación operacional.
 
 ## Siguiente brecha de integración
 
-Conectar el planificador y selector de capacidades al informe del orquestador, y vincular las herramientas autorizadas y sus resultados al flujo de evidencia/ledger sin ampliar permisos implícitamente.
+Conectar selección de herramientas con ejecución autorizada, recoger resultados estructurados, verificarlos y adjuntar evidencias al informe/ledger sin ampliar permisos implícitamente.
 
 ---
 
