@@ -262,3 +262,13 @@ No declarar el sistema completo ni certificado hasta que cada brecha tenga códi
 - No se ha añadido una licencia: es una decisión legal del propietario del repositorio, no algo que deba inventarse.
 - El lock `requirements.lock` sigue sin hashes de artefactos. Añadir hashes no verificados sería inseguro; debe generarse desde un entorno de resolución confiable y fijarse para todas las plataformas objetivo.
 - Próximas brechas implementables: hash-locked reproducible con verificación de artefactos, pruebas de estrés/concurrencia automatizadas, política de release y cobertura adicional de fallo abrupto. Las brechas que dependen de servicios/decisiones externas siguen abiertas: KMS/HSM, cifrado y rotación, WORM externo, RBAC/IdP, microVM, licencias y restauración real.
+
+
+## Endurecimiento adicional — 2026-11-17
+
+- `preflight.py` ahora comprueba permisos privados de `data/` y subdirectorios, rechaza symlinks en el árbol de datos y verifica que archivos locales sensibles (claves, secretos, credenciales y tokens) no sean accesibles por grupo/otros. `setup.sh` aplica permisos 0700 a directorios de datos existentes sin seguir un symlink en la raíz; los workflows preparan los permisos del checkout antes del preflight.
+- Skillbook: se añadió revocación/deprecación explícita de Skills activas mediante aprobación HMAC VERITAS vinculada a Skill, versión actual y motivo. La revocación crea versión append-only y excluye la Skill de la recuperación ejecutable.
+- Backups: se añadieron pruebas para symlink de archivo, traversal, manipulación del manifiesto firmado y limpieza de staging ante fallo de publicación atómica.
+- Se añadieron pruebas para permisos de directorios de datos, subdirectorios y claves locales.
+- La primera ejecución CI detectó que los directorios de datos del checkout tenían permisos 0755; se corrigió el flujo de instalación/CI para aplicar 0700 antes del preflight. Los resultados de los workflows del HEAD final deben confirmarse antes de marcar esta iteración como verde.
+- Persisten las brechas externas: KMS/HSM, RBAC/IdP/MFA, almacenamiento WORM/offsite, cifrado y recuperación real de backups, microVM, proveedores IA reales, revisión de licencias/corpus, carga/DR y revisión independiente.
