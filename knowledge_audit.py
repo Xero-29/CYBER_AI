@@ -138,7 +138,19 @@ def audit_files(manifest_path=MANIFEST, root=ROOT):
     ]
     hashes = defaultdict(list)
     for folder in scan_roots:
+        if folder.is_symlink():
+            result["unsafe_paths"].append({
+                "path": str(folder), "reason": "Directorio raíz symlink omitido.",
+            })
+            continue
         if not folder.exists():
+            continue
+        try:
+            folder.resolve().relative_to(root)
+        except ValueError:
+            result["unsafe_paths"].append({
+                "path": str(folder), "reason": "Directorio raíz fuera del proyecto.",
+            })
             continue
         for current, dirs, files in os.walk(folder, followlinks=False):
             current_path = Path(current)
