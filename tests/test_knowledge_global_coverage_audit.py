@@ -17,6 +17,10 @@ class GlobalCoverageAuditTests(unittest.TestCase):
         report = audit()
         self.assertTrue(all(row["references_exist"] for row in report["areas"]))
 
+    def test_reference_to_area_mapping_is_bidirectional(self):
+        report = audit()
+        self.assertTrue(report["ok"], report["errors"])
+
     def test_reference_mapping_does_not_imply_content_depth(self):
         report = audit()
         self.assertTrue(all(row["content_depth_status"] == "not_assessed_by_this_crosswalk"
