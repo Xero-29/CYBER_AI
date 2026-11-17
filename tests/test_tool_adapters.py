@@ -308,6 +308,11 @@ class ToolAdapterTests(unittest.TestCase):
         with (
             patch.object(tool_adapters, "_hash_binary", return_value=provenance),
             patch.object(tool_adapters, "verify_tool_allowed", return_value={"allowed": True}),
+            patch.object(tool_adapters, "inspect_tool_database", return_value={
+                "tool": "osv_scanner", "status": "present_structure_checked",
+                "archive_count": 1, "ecosystems": ["PyPI"],
+                "freshness": "unknown", "network_access": False,
+            }),
         ):
             evidence = run_local_tool("osv_scanner", ".")
         self.assertEqual(evidence["status"], "completed")
@@ -316,6 +321,9 @@ class ToolAdapterTests(unittest.TestCase):
         self.assertFalse(evidence["network_isolation_enforced"])
         self.assertIn("--offline", evidence["command"])
         self.assertEqual(evidence["parsed_json"], {"results": []})
+        self.assertEqual(
+            evidence["database_preflight"]["status"], "present_structure_checked"
+        )
 
     @patch("tool_adapters.subprocess.Popen")
     @patch("tool_adapters.shutil.which", return_value="/usr/bin/gitleaks")
