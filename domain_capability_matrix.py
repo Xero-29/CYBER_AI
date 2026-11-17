@@ -105,12 +105,15 @@ def select_domain_capabilities(task, *, inventory=None, limit=12):
     from tool_adapters import TOOL_SPECS
     inventory = inventory or build_inventory()
     tool_catalog = {item["id"]: item for item in TOOL_CATALOG}
-    normalized = _normalize(task)
+    normalized = " " + _normalize(task) + " "
     matches = []
     for area in areas:
         profile = DOMAIN_PROFILES[area["id"]]
         terms = profile["terms"]
-        found = [term for term in terms if _normalize(term) in normalized]
+        found = [
+            term for term in terms
+            if " " + _normalize(term) + " " in normalized
+        ]
         if not found:
             continue
         tool_candidates = []
