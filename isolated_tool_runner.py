@@ -163,10 +163,9 @@ def run_isolated_tool(tool_id, target, *, config_path=None, timeout=180,
         "tool_binary_modified": False, "tool_allowlist": allowlist,
         "target": str(path), "target_sha256": before, "target_sha256_after": after,
         "target_modified": modified,
-        "started_at": __import__("datetime").datetime.now(
-            __import__("datetime").timezone.utc
-        ).isoformat(),
+        "started_at": datetime.now(timezone.utc).isoformat(),
         "elapsed_seconds": round(time.monotonic() - started, 3),
+        "duration_ms": max(0, int((time.monotonic() - started) * 1000)),
         "status": status, "return_code": return_code,
         "tool_reported_success": return_code == 0 and not timed_out and not modified,
         "output_truncated": truncated["value"],
