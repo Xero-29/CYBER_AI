@@ -32,6 +32,30 @@ class SkillbookTests(unittest.TestCase):
   self.assertEqual(due[0]["reason"],"invalid_review_timestamp")
   self.assertIsNone(due[0]["review_due_at"])
 
+ def test_skill_history_verifies_contiguous_versions_and_current_snapshot(self):
+  skill=self.add()
+  result=skillbook.verify_skill_history(skill["skill_id"])
+  self.assertTrue(result["valid"],result)
+  self.assertEqual(result["versions_checked"],1)
+  self.assertEqual(result["current_version"],1)
+
+ def test_skill_history_detects_current_snapshot_mismatch(self):
+  skill=self.add()
+  with skillbook.connect() as db:
+   db.execute("UPDATE skills SET name=? WHERE skill_id=?",("tampered name",skill["skill_id"]))
+  result=skillbook.verify_skill_history(skill["skill_id"])
+  self.assertFalse(result["valid"])
+  self.assertEqual(result["reason"],"current_snapshot_mismatch")
+  self.assertIn("name",result["fields"])
+
+ def test_skill_history_detects_missing_version(self):
+  skill=self.add()
+  with skillbook.connect() as db:
+   db.execute("UPDATE skills SET version=2 WHERE skill_id=?",(skill["skill_id"],))
+  result=skillbook.verify_skill_history(skill["skill_id"])
+  self.assertFalse(result["valid"])
+  self.assertEqual(result["reason"],"version_sequence")
+
  def test_public_registration_cannot_self_assert_veritas(self):
   with self.assertRaisesRegex(ValueError,"(?i)registro directo deshabilitado"):
    skillbook.register_verified_skill(verified_by="VERITAS",verifier_verdict="CONFIRMADA")
