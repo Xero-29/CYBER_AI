@@ -20,6 +20,7 @@ class TestAgentSimulation(unittest.TestCase):
         self.assertEqual(report["status"], "completed")
         self.assertEqual(report["metrics"]["steps_passed"], 2)
         self.assertEqual(report["metrics"]["context_handoffs"], 1)
+        self.assertEqual(report["steps"][1]["input_context"][0]["agent"], "NEXO")
         self.assertEqual(report["real_model_calls"], 0)
         self.assertEqual(report["real_tool_calls"], 0)
         self.assertFalse(report["network_access"])
@@ -36,10 +37,7 @@ class TestAgentSimulation(unittest.TestCase):
         self.assertEqual(report["metrics"]["steps_failed"], 1)
 
     def test_agent_response_sequences_are_supported(self):
-        report = simulate_workflow(
-            self.workflow,
-            "Auditoría ficticia",
-            {
+        fixtures = {
                 "NEXO": ["ANÁLISIS: correcto\nHALLAZGOS: ninguno"],
                 "VERITAS": ["VEREDICTO: conforme\nEVIDENCIA: sintética\nLIMITACIONES: simulación"],
             },
