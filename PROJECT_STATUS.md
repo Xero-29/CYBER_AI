@@ -1,3 +1,41 @@
+# Estado verificado de integración — 2026-11-17
+
+**Base de integración:** `main` en `cfcb5a4c14176b6be3958eb631c32fcec2bd332f` al crear `codex/integration-hash-locks-2026-11-17`.  
+**Rama de integración:** `codex/integration-hash-locks-2026-11-17` (separada; no se ha fusionado ni modificado `main`).  
+**Rama fuente:** `codex/security-integrity-audit`, HEAD verificado `482df7480ac547003a90e621c95c15789067c4dc`.  
+**Divergencia observada antes de integrar:** merge-base `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`; rama fuente 13 commits adelante y 60 detrás de `main`. Los 60 commits de `main` se preservan al partir de su HEAD; los cambios de la rama fuente se trasladan solo en los archivos revisados, sin mover refs de `main`.  
+**PR #2:** fusionado en `main` mediante `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. **PR #1:** continúa abierto como draft, separado y obsoleto respecto a la base actual; no se ha integrado ni duplicado.
+
+## Cambios de esta integración
+
+- Dependencias principales y herramientas del sandbox fijadas con hashes SHA-256 y `pip --require-hashes`; el instalador falla cerrado fuera de CPython 3.12.x, Linux x86_64 y glibc >= 2.26.
+- Lock separado para Ruff/Bandit en Docker, verificación de wheels contra el lock y SBOM CycloneDX independiente para ambos entornos.
+- Generador de locks reproducible desde wheelhouse, con validación de metadatos y hashes; pruebas para wheels ausentes, duplicados, inválidos y symlinks.
+- Evaluación de conocimiento endurecida para datasets, resultados y entradas suministradas en memoria.
+- Selector de capacidades corregido para que un clon limpio descubra el inventario declarativo en memoria; no necesita que el usuario genere previamente `reports/capability_inventory.json`. La selección sigue sin ejecutar ni autorizar herramientas.
+- Los workflows conservan el smoke test Windows de allowlist de `main`, disparan Docker en la rama de integración e instalan dependencias con hash enforcement.
+
+## Evidencia y límites de validación
+
+- Rama fuente `482df7480ac547003a90e621c95c15789067c4dc`: Python Tests **success, 471 pruebas** ([run 44116054953](https://github.com/Xero-29/CYBER_AI/actions/runs/44116054953)); Docker Sandbox **success** ([run 44116054989](https://github.com/Xero-29/CYBER_AI/actions/runs/44116054989)). CI produjo manifiestos de 9 wheels del entorno principal y 8 del sandbox, más dos SBOM CycloneDX.
+- En `main` SHA `5b7e1c01153babf2f428464d191ee6622caf3239`, Python y Docker fallaron en dos pruebas de flujo porque `capability_selector.py` exigía un archivo de inventario no versionado. La corrección y las regresiones están en esta rama de integración; **aún no se declara validada hasta que Actions termine sobre su HEAD exacto**.
+- El lock hash-locked actual solo cubre la plataforma indicada. Los hashes fijan los wheels descargados y verificados contra el lock; no prueban por sí solos la procedencia del publicador ni sustituyen firmas/attestations upstream.
+
+## Pendiente antes de validación final del propietario
+
+1. Confirmar Python, Docker y Windows allowlist en el HEAD exacto de esta rama.
+2. Añadir locks y hashes independientes para Windows, macOS, ARM y otras plataformas si se van a soportar.
+3. Validar instalación y restauración en una máquina limpia; probar Ollama/proveedores reales y embeddings con credenciales externas.
+4. Ejecutar pruebas de estrés, concurrencia, disco lleno, corrupción y recuperación física.
+5. Conectar KMS/HSM, rotación y revocación de claves, RBAC/IdP/MFA, WORM/offsite y backups cifrados con simulacros DR/RPO/RTO.
+6. Validar microVM/aislamiento fuerte; Docker comparte el kernel del host.
+7. Curar con especialistas el corpus, licencias, vigencia, embeddings y umbrales por área; probar OCR/extractores en sandbox.
+8. Configurar branch protection y required checks, revisión independiente, observabilidad, alertas y respuesta a incidentes.
+
+**Conclusión provisional:** la base de código puede incorporar el hash-locking y el SBOM de ambos entornos sin descartar los 60 commits exclusivos de `main`. No está listo para producción ni certificado. El siguiente criterio es CI verde sobre el HEAD exacto de esta rama y revisión del PR; la validación operacional externa seguirá siendo necesaria.
+
+---
+
 # Estado canónico vigente — 2026-11-17
 
 > Esta sección es la fuente de verdad vigente. Los bloques históricos que aparecen debajo documentan etapas anteriores y no deben interpretarse como el estado actual.
