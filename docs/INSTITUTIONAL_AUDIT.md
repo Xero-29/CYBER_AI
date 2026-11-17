@@ -1,5 +1,7 @@
 # Auditoría arquitectónica institucional de CYBER_AI
 
+> **Documento histórico.** Esta auditoría fue realizada el 2026-11-12 sobre la rama `codex/security-integrity-audit`. Sus hallazgos y estados describen ese snapshot, no el HEAD actual de `main`. Para el diagnóstico vigente consulta [PROJECT_STATUS.md](../PROJECT_STATUS.md), [IMPLEMENTATION_MATRIX.md](IMPLEMENTATION_MATRIX.md) y [PROJECT_COMPLETION_PLAN.md](PROJECT_COMPLETION_PLAN.md). No reutilizar los estados de CI antiguos como evidencia de la rama principal actual.
+
 **Fecha:** 2026-11-12  
 **Rama auditada:** `codex/security-integrity-audit`  
 **Alcance:** revisión estática inicial del árbol, documentación, workflow y registros de GitHub Actions.  
