@@ -145,6 +145,21 @@ def _build_command(tool_id, binary, target, config_path=None):
     raise ToolExecutionError("Herramienta sin adaptador ejecutable.")
 
 
+def _hash_binary(binary):
+    """Resuelve el ejecutable real y calcula su SHA-256 para trazabilidad."""
+    try:
+        resolved = Path(binary).resolve(strict=True)
+        if not resolved.is_file():
+            raise ToolExecutionError("El ejecutable resuelto no es un archivo regular.")
+        digest = hashlib.sha256()
+        with resolved.open("rb") as stream:
+            for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                digest.update(chunk)
+        return {"resolved_path": str(resolved), "sha256": digest.hexdigest()}
+    except OSError as exc:
+        raise ToolExecutionError("No se pudo verificar la identidad del ejecutable.") from exc
+
+
 def _probe_tool_version(binary, tool_id, env):
     """Obtiene la versión instalada sin shell ni acceso de red intencional."""
     arguments = TOOL_SPECS[tool_id].get("version_args", ["--version"])
@@ -181,6 +196,8 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
     binary = shutil.which(spec["binary"])
     if not binary:
         raise ToolExecutionError("La herramienta no está instalada o no está en PATH.")
+    binary_provenance = _hash_binary(binary)
+    binary = binary_provenance["resolved_path"]
     limit = spec["timeout"] if timeout is None else timeout
     if not isinstance(limit, int) or not 1 <= limit <= 600:
         raise ToolExecutionError("El timeout debe estar entre 1 y 600 segundos.")
@@ -193,6 +210,8 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
         "NO_COLOR": "1",
     }
     tool_version = _probe_tool_version(binary, tool_id, env)
+    if _hash_binary(binary)["sha256"] != binary_provenance["sha256"]:
+        raise ToolExecutionError("El ejecutable cambió durante la identificación de versión.")
     target_hash_before = _hash_target(path)
     started = time.monotonic()
     timestamp = datetime.now(timezone.utc).isoformat()
@@ -252,10 +271,18 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
     except json.JSONDecodeError:
         parsed = None
     target_hash_after = _hash_target(path)
+    binary_hash_after = _hash_binary(binary)["sha256"]
+    binary_modified = binary_hash_after != binary_provenance["sha256"]
+    if binary_modified:
+        status = "integrity_error"
     evidence = {
         "schema_version": "1.0",
         "tool": tool_id,
         "tool_version": tool_version,
+        "tool_binary_path": binary_provenance["resolved_path"],
+        "tool_binary_sha256": binary_provenance["sha256"],
+        "tool_binary_sha256_after": binary_hash_after,
+        "tool_binary_modified": binary_modified,
         "target": str(path.relative_to(PROJECT_ROOT)),
         "target_sha256": target_hash_before,
         "target_sha256_after": target_hash_after,
@@ -264,7 +291,7 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
         "elapsed_seconds": round(time.monotonic() - started, 3),
         "status": status,
         "return_code": returncode,
-        "tool_reported_success": returncode == 0,
+        "tool_reported_success": returncode == 0 and not binary_modified,
         "output_truncated": truncated,
         "stdout": out_text,
         "stderr": err_text,
