@@ -438,7 +438,10 @@ def ingest_document(
         document_id = document_id.strip()
 
     # El ID estable hace idempotentes también los reintentos sin ID explícito.
-    existing_chunks = document_chunk_count(document_id, expected_embedding_model)
+    existing_chunks = document_chunk_count(
+        document_id, expected_embedding_model,
+        visibility=visibility, tenant_id=tenant_id,
+    )
     if existing_chunks:
         return {
             "document_id": document_id, "document_sha256": document_sha256,
