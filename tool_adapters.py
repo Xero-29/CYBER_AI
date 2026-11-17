@@ -344,9 +344,11 @@ def write_evidence(evidence, output_dir="reports/tool_evidence", *, allow_extern
             raise ToolExecutionError("Identificador de herramienta inválido para el nombre de evidencia.")
 
         stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
-        path = destination / f"{tool}_{stamp}_{uuid.uuid4().hex}.json"
+        token = uuid.uuid4().hex
+        path = destination / f"{tool}_{stamp}_{token}.json"
+        temporary = destination / f".{tool}_{stamp}_{token}.tmp"
         flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
-        descriptor = os.open(path, flags, 0o600)
+        descriptor = os.open(temporary, flags, 0o600)
         try:
             if os.name == "posix":
                 os.fchmod(descriptor, 0o600)
@@ -355,10 +357,18 @@ def write_evidence(evidence, output_dir="reports/tool_evidence", *, allow_extern
                 stream.write(json.dumps(evidence, ensure_ascii=False, indent=2) + "\n")
                 stream.flush()
                 os.fsync(stream.fileno())
+            # Publish only a fully written file; destination directory is private.
+            os.replace(temporary, path)
+            if os.name == "posix":
+                directory_fd = os.open(destination, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
+                try:
+                    os.fsync(directory_fd)
+                finally:
+                    os.close(directory_fd)
         except Exception:
             if descriptor >= 0:
                 os.close(descriptor)
-            path.unlink(missing_ok=True)
+            temporary.unlink(missing_ok=True)
             raise
         return path
     except ToolExecutionError:
