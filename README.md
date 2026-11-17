@@ -2,7 +2,7 @@
 
 Sistema modular de investigación técnica y ciberseguridad con agentes LLM, biblioteca de conocimiento, memoria verificada, Skills, adaptadores de herramientas y registro auditable de ejecuciones.
 
-> Estado: rama de integración `codex/security-integrity-audit`. No es una versión certificada para producción. Algunas capacidades están implementadas pero requieren validación local; consulta [PROJECT_STATUS.md](PROJECT_STATUS.md).
+> Estado: rama principal `main`. No es una versión certificada para producción. Algunas capacidades están implementadas pero requieren validación local; consulta [PROJECT_STATUS.md](PROJECT_STATUS.md).
 
 ## Requisitos
 
@@ -17,7 +17,7 @@ El núcleo Python usa dependencias ligeras declaradas en `requirements.txt`. Oll
 ## Descargar
 
 ```bash
-git clone --branch codex/security-integrity-audit https://github.com/Xero-29/CYBER_AI.git
+git clone --branch main https://github.com/Xero-29/CYBER_AI.git
 cd CYBER_AI
 ```
 
