@@ -72,12 +72,12 @@ class IsolatedToolRunnerTests(unittest.TestCase):
                 cid_path = Path(command[command.index("--cidfile") + 1])
                 cid_path.write_text("b" * 64, encoding="ascii")
                 return process
-            with patch("isolated_tool_runner.shutil.which", return_value="/usr/bin/docker"), \\
+            with patch("isolated_tool_runner.shutil.which", return_value="/usr/bin/docker"), \
                  patch("isolated_tool_runner.subprocess.run", return_value=subprocess.CompletedProcess(
                      ["docker"], 0, stdout="sha256:" + "a" * 64, stderr=""
-                 )) as docker_run, \\
-                 patch("isolated_tool_runner.verify_tool_allowed", return_value={"enforced": True}), \\
-                 patch("isolated_tool_runner.subprocess.Popen", side_effect=fake_popen), \\
+                 )) as docker_run, \
+                 patch("isolated_tool_runner.verify_tool_allowed", return_value={"enforced": True}), \
+                 patch("isolated_tool_runner.subprocess.Popen", side_effect=fake_popen), \
                  patch("isolated_tool_runner.os.killpg") as killpg:
                 evidence = run_isolated_tool("tshark", str(target), allow_external=True, timeout=1)
             self.assertEqual(evidence["status"], "timeout")
