@@ -253,6 +253,14 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
         reader.start()
 
         while process.poll() is None:
+            if output_file.is_file() and output_file.stat().st_size > 25_000_000:
+                _terminate_process_tree(process)
+                result = {
+                    "target": target, "status": "evidence_rejected",
+                    "error": "La salida JSONL superó el límite de 25 MB; el escaneo se detuvo.",
+                    "findings": [], "output_too_large": True,
+                }
+                return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)
             elapsed = int(time.monotonic() - started)
             print(
                 f"\r[En curso] Tiempo transcurrido: {elapsed}s",
