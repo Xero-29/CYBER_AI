@@ -107,7 +107,7 @@
 - El registro creció de 6 a **33 fuentes**. Distingue páginas oficiales revisadas, metadatos/abstract revisados, documentos parcialmente inspeccionados, borradores y referencias de catálogo. No se contabilizan todas como lectura integral.
 - Se inspeccionaron secciones concretas del PDF NIST SP 800-61 Rev. 3 (portada, resumen ejecutivo, ciclo de vida y fragmentos de contención); el resto de fuentes se limita al alcance de revisión declarado en cada registro. La lectura completa de estándares y documentos sigue pendiente.
 - Los 13 dossiers enlazan IDs de fuente del registro. El auditor `knowledge_research_audit.py` ahora comprueba estructura, URLs HTTPS, unicidad y existencia de IDs referenciados, y separa revisiones bibliográficas de agendas.
-- Se añadieron siete pruebas `unittest` para la auditoría. `verify.sh` ejecuta ahora el auditor antes de la suite automatizada.
+- Se añadieron ocho pruebas `unittest` para la auditoría. `verify.sh` ejecuta ahora el auditor antes de la suite automatizada.
 - **Cobertura documental de investigación:** 13/48 (27,1%). Las otras 35 áreas mantienen agenda de investigación, pero no revisión bibliográfica desarrollada.
 - **Madurez real:** M1 documental en los 13 dossiers; no se declara M3/M4/M5. No existen resultados experimentales ni reproducción independiente en esta ampliación.
 - **Pendiente:** completar revisiones de las 35 áreas, lectura integral y crítica de las fuentes, laboratorios seguros, resultados cuantitativos, análisis de incertidumbre, revisión por pares y reproducción externa.
