@@ -27,11 +27,11 @@ class IsolatedToolRunnerTests(unittest.TestCase):
             target.write_bytes(b"sample")
             rules = root / "rules.yar"
             rules.write_text("rule sample { condition: true }", encoding="utf-8")
-            with patch("isolated_tool_runner.shutil.which", return_value="/usr/bin/docker"), \\
+            with patch("isolated_tool_runner.shutil.which", return_value="/usr/bin/docker"), \
                  patch("isolated_tool_runner.subprocess.run", return_value=subprocess.CompletedProcess(
                      ["docker"], 0, stdout="sha256:" + "a" * 64, stderr=""
-                 )), \\
-                 patch("isolated_tool_runner.verify_tool_allowed", return_value={"enforced": True}), \\
+                 )), \
+                 patch("isolated_tool_runner.verify_tool_allowed", return_value={"enforced": True}), \
                  patch("isolated_tool_runner.subprocess.Popen", return_value=FakeProcess()) as popen:
                 evidence = run_isolated_tool(
                     "yara", str(target), config_path=str(rules), allow_external=True
