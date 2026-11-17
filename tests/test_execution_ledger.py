@@ -207,6 +207,42 @@ class ExecutionLedgerTests(unittest.TestCase):
 
 
 
+    def test_sqlite_busy_writer_fails_without_partial_event(self):
+        self.append(task="before lock")
+        with sqlite3.connect(self.ledger.path, timeout=0, isolation_level=None) as lock:
+            lock.execute("BEGIN IMMEDIATE")
+
+            def no_wait_connection():
+                db = sqlite3.connect(
+                    str(self.ledger.path), timeout=0, isolation_level=None
+                )
+                db.row_factory = sqlite3.Row
+                db.execute("PRAGMA busy_timeout=0")
+                return db
+
+            with patch.object(self.ledger, "connect", side_effect=no_wait_connection):
+                with self.assertRaises(sqlite3.OperationalError):
+                    self.append(task="blocked writer")
+
+            lock.rollback()
+
+        history = self.ledger.history(namespace="test")
+        self.assertEqual(len(history), 1)
+        self.assertEqual(history[0]["task"], "before lock")
+        self.assertTrue(self.ledger.verify()["valid"])
+
+    def test_verify_reports_unreadable_sqlite_database(self):
+        self.ledger.append(
+            namespace="test", task="before corruption", status="completed",
+            tool="unit", evidence={}, duration_ms=1,
+        )
+        with self.ledger.connect() as db:
+            db.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+        self.ledger.path.write_bytes(b"not a SQLite database")
+        result = self.ledger.verify()
+        self.assertFalse(result["valid"])
+        self.assertEqual(result["reason"], "database_error")
+
     def test_failed_sqlite_write_rolls_back_without_partial_ledger_event(self):
         self.append(task="prior valid event")
         with sqlite3.connect(self.ledger.path) as db:
