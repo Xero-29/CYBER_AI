@@ -4,7 +4,7 @@
 **Main preservado hasta:** `c9c794c984b3fff5ff2032d0831f7f161205afc0` (incluido como segundo padre de este merge de integración).  
 **Base inicial de esta rama:** `12c5942a73bf21f2eb0cc2bb5b79a5826801defd`.  
 **Rama fuente de dependencias:** `codex/security-integrity-audit`, HEAD `482df7480ac547003a90e621c95c15789067c4dc`; 13 commits únicos desde el merge-base `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.  
-**PR #2:** ya fusionado en main. **PR #1:** sigue como draft antiguo, no se duplica ni se integra a ciegas. No se ha modificado ni fusionado `main`.
+**PR #2:** ya fusionado en main. **PR #1:** sigue como draft antiguo y separado. **PR #11:** draft de integración para estos cambios ([abrir PR](https://github.com/Xero-29/CYBER_AI/pull/11)). No se ha modificado ni fusionado `main`.
 
 ## Cambios añadidos y preservados
 
@@ -18,7 +18,7 @@
 
 - Rama fuente `482df7480ac547003a90e621c95c15789067c4dc`: Python Tests success, 471 pruebas ([44116054953](https://github.com/Xero-29/CYBER_AI/actions/runs/44116054953)); Docker Sandbox success ([44116054989](https://github.com/Xero-29/CYBER_AI/actions/runs/44116054989)).
 - Main `c9c794c984b3fff5ff2032d0831f7f161205afc0`: Python Tests success ([44118679332](https://github.com/Xero-29/CYBER_AI/actions/runs/44118679332)); Docker Sandbox success ([44118679148](https://github.com/Xero-29/CYBER_AI/actions/runs/44118679148)).
-- La rama de integración debe volver a validarse sobre su HEAD exacto después de incorporar estas dos líneas de trabajo. No se declara verde hasta que sus propios checks concluyan.
+- El código de la rama de integración en `e55627ab23209fae26a4dcfa5f03ad4b4545d9e4` pasó Python Tests **success, 509 pruebas** ([run 44118956501](https://github.com/Xero-29/CYBER_AI/actions/runs/44118956501)), incluido Windows allowlist smoke, y Docker Sandbox **success** ([run 44118956453](https://github.com/Xero-29/CYBER_AI/actions/runs/44118956453)). Se generaron dos SBOM y manifiestos de wheels; Docker construyó la imagen, ejecutó `verify.sh` y Ruff dentro del sandbox. Esta actualización de estado es documental y disparará una nueva ronda de CI sobre el nuevo HEAD.
 
 ## Brechas pendientes
 
@@ -30,7 +30,7 @@
 - Faltan RBAC/IdP/MFA, WORM/offsite, backups cifrados y simulacros DR/RPO/RTO.
 - Faltan pruebas operacionales en equipo limpio, carga/estrés, proveedores reales, observabilidad y revisión experta de la biblioteca.
 
-**Estado:** rama de integración en preparación. No está certificada ni lista para producción. El criterio de avance es CI verde sobre el HEAD exacto de esta rama y revisión del PR; después quedarán las validaciones operacionales externas.
+**Estado:** integración de código lista para revisión en PR #11; no se ha fusionado. CI verde sobre el SHA de código `e55627ab23209fae26a4dcfa5f03ad4b4545d9e4`; el commit documental de este estado vuelve a ejecutar CI. No está certificada ni lista para producción.
 
 ---
 
