@@ -55,7 +55,7 @@ jobs:
               "requirements_lock_sha256": lock_hash,
           }
           output = Path(os.environ["RUNNER_TEMP"]) / "cyber-ai-sbom-provenance.json"
-          output.write_text(json.dumps(provenance, sort_keys=True, indent=2) + "\\n", encoding="utf-8")
+          output.write_text(json.dumps(provenance, sort_keys=True, indent=2) + "\n", encoding="utf-8")
           PY
       - name: Upload SBOM and build provenance
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
