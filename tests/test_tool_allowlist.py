@@ -44,6 +44,23 @@ class ToolAllowlistTests(unittest.TestCase):
         with self.assertRaises(ToolAllowlistError):
             load_signed_tool_allowlist(self.path, self.key)
 
+    def test_signer_rejects_invalid_tool_ids_and_hashes(self):
+        with self.assertRaises(ToolAllowlistError):
+            sign_tool_allowlist({"Ruff": {"sha256": self.digest}}, self.key)
+        with self.assertRaises(ToolAllowlistError):
+            sign_tool_allowlist({"ruff": {"sha256": "not-a-hash"}}, self.key)
+
+    def test_oversized_manifest_is_rejected(self):
+        self.path.write_bytes(b" " * 65537)
+        with self.assertRaises(ToolAllowlistError):
+            load_signed_tool_allowlist(self.path, self.key)
+
+    def test_non_regular_manifest_is_rejected(self):
+        directory = Path(self.temp.name) / "manifest-dir"
+        directory.mkdir()
+        with self.assertRaises(ToolAllowlistError):
+            load_signed_tool_allowlist(directory, self.key)
+
     def test_short_key_is_rejected(self):
         with self.assertRaises(ToolAllowlistError):
             sign_tool_allowlist({"ruff": {"sha256": self.digest}}, b"short")
