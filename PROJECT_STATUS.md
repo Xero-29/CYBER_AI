@@ -7,13 +7,16 @@
 **CI:** Python `unit-tests` aprobado en este SHA (run `44125848717`, 493 pruebas). Docker sandbox de este SHA pendiente de conclusión al actualizar este estado. Las pruebas Windows siguen aplazadas.  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17`, sin modificar.
 
-## Cambio reciente: motor de ejecución local
+## Cambio reciente: perfiles y herramientas personalizadas
 
-- Eliminado el límite fijo de tres herramientas; el pipeline procesa todos los candidatos elegibles salvo que el llamador configure un límite explícito.
-- Se admite un objetivo absoluto fuera del repositorio solo cuando el operador habilita `--allow-external-targets` junto con `--execute-tools --confirm-tool-execution --tool-target`.
-- Los objetivos externos siguen sujetos a existencia, tipo archivo/directorio, comprobación de integridad, allowlist HMAC de binarios, timeout, captura limitada de salida, evidencia protegida y ledger.
-- Las rutas internas continúan siendo el comportamiento predeterminado. No se habilitó shell ni ejecución arbitraria de comandos.
-- La ampliación de herramientas personalizadas mediante perfiles configurables y el aislamiento real de procesos/red siguen pendientes; los adaptadores registrados aún son el conjunto ejecutable.
+- Se incorporó `config/tool_execution_profiles.json` con perfiles `standard`, `extended` y `restricted`; el perfil se selecciona con `--tool-profile` en `cyber_ai.py --team`, o con `CYBER_AI_TOOL_PROFILE`.
+- Los perfiles configuran el máximo de herramientas, timeout, permiso de objetivos externos y activación de herramientas personalizadas. No pueden omitir confirmación ni allowlist HMAC.
+- Se incorporó un registro declarativo de herramientas personalizadas. Se definen ejecutable, argumentos argv, palabras clave y timeout en el JSON; el planificador puede proponerlas y el runner las ejecuta sin shell.
+- Cada herramienta personalizada exige hash SHA-256 firmado en la allowlist HMAC; su evidencia se valida y registra en el ledger como las herramientas nativas.
+- Los objetivos externos requieren simultáneamente el perfil `extended` (o uno equivalente que los permita) y el flag `--allow-external-targets`.
+- La ejecución arbitraria de shell continúa deshabilitada. El runner personalizado no impone aislamiento de red; la evidencia declara `network_access=not_enforced`.
+- Documentación: `docs/TOOL_EXECUTION_PROFILES.md`. Pruebas nuevas: `tests/test_tool_execution_profiles.py`.
+
 
 
 
