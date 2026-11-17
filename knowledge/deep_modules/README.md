@@ -4,7 +4,7 @@ Esta colección transforma los 48 currículos de dominio en módulos editoriales
 
 ## Investigación nivel L4/L5
 
-Cada especialidad dispone de una agenda de investigación en `./<area>/RESEARCH_AGENDA.md`. Siete dominios prioritarios cuentan además con una revisión bibliográfica inicial `LITERATURE_REVIEW.md`, vinculada por ID al registro de fuentes. Las revisiones son exploratorias y no representan revisiones sistemáticas completas ni experimentos ejecutados.
+Cada especialidad dispone de una agenda de investigación en `./<area>/RESEARCH_AGENDA.md`. Trece dominios prioritarios cuentan además con una revisión bibliográfica inicial `LITERATURE_REVIEW.md`, vinculada por ID al registro de fuentes. Las revisiones son exploratorias y no representan revisiones sistemáticas completas ni experimentos ejecutados.
 
 - Método obligatorio: `../research/RESEARCH_PROTOCOL.md`.
 - Registro inicial de fuentes oficiales: `../research/source_registry.json`.
