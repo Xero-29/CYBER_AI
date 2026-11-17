@@ -120,9 +120,12 @@ class ToolExecutionPipelineTests(unittest.TestCase):
             with patch.dict(os.environ, env, clear=True):
                 with self.assertRaises(ToolExecutionError):
                     execute_tool_plan(self.plan, outside, confirmed=True)
-                result = execute_tool_plan(
-                    self.plan, outside, confirmed=True, allow_external_targets=True
-                )
+                with patch.dict(
+                    os.environ, {**env, "CYBER_AI_TOOL_PROFILE": "extended"}, clear=True
+                ):
+                    result = execute_tool_plan(
+                        self.plan, outside, confirmed=True, allow_external_targets=True
+                    )
         self.assertTrue(result["external_targets_enabled"])
         self.assertTrue(run_tool.call_args.kwargs["allow_external"])
         self.assertTrue(write_evidence.call_args.kwargs["allow_external"])
