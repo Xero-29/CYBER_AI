@@ -1,11 +1,22 @@
 # Estado real y plan de cierre de CYBER_AI
 
-**Actualizado:** 2026-11-16  
+**Actualizado:** 2026-11-17  
 **Rama:** codex/security-integrity-audit
 **CI:** Actions fijadas por SHA, checkout v5/setup-python v6/upload-artifact v5 (Node 24)  
 **Base:** main (sin merge ni despliegue)
 
 ## Avance de esta iteración
+
+## Recuperación transaccional del ledger — 2026-11-17
+
+- `execution_ledger.py`: se incorpora el estado terminal `interrupted` y una reconciliación atómica de inicios sin evento terminal correlacionado por `metadata.start_event_id`.
+- La reconciliación verifica la cadena hash completa dentro de la transacción antes de escribir. Si hay secuencias, enlaces o hashes inválidos, aborta sin añadir eventos.
+- Los eventos recuperados declaran `outcome: unknown`; no se atribuye éxito ni fallo al trabajo que pudo quedar ejecutándose. Los IDs deterministas y la transacción evitan cierres duplicados o carreras entre reconciliadores.
+- CLI: `python ledger_cli.py reconcile` (opcional `--namespace NOMBRE`). Es una operación explícita; no se ejecuta automáticamente al iniciar el sistema.
+- Pruebas añadidas: recuperación idempotente, no duplicación cuando ya existe terminal, migración de esquema antiguo y rechazo de reconciliación sobre cadena corrupta.
+- **Límite:** solo se reconcilian inicios con `start_event_id` correlacionable. Esto registra el estado desconocido en el ledger; no recupera procesos del sistema operativo, resultados perdidos ni datos de almacenamiento físicamente dañado.
+- **CI de este cambio:** pendiente para el HEAD final de esta iteración. No declarar cierre hasta que Python y Docker pasen en el mismo SHA.
+
 
 ## Corrección de trazabilidad de ejecuciones (16-11-2026)
 
