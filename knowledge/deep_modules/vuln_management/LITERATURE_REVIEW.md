@@ -45,10 +45,20 @@ No sumar mecánicamente CVSS + EPSS + KEV. Son señales de naturaleza diferente.
 - Toda excepción tiene propietario, justificación, controles, expiración y revisión.
 - La priorización no debe ocultar activos desconocidos: calidad del inventario es una variable crítica.
 
+## Brechas
+
+Incorporar revisión completa de CVSS v4 y snapshots históricos de KEV/EPSS; ejecutar evaluación retrospectiva sin fuga temporal y documentar la calidad del inventario de activos.
+
 ## Referencias
 
 - FIRST, EPSS FAQ. https://www.first.org/epss/faq
 - FIRST, EPSS How It Works. https://www.first.org/epss/how-it-works
 - CISA, Known Exploited Vulnerabilities Catalog. https://www.cisa.gov/known-exploited-vulnerabilities-catalog
 - NIST, Vulnerability Management / NVD (referencia complementaria por desarrollar). https://nvd.nist.gov/
-\n\n## Identificadores del registro de fuentes\n\n- `FIRST-EPSS-FAQ`\n- `FIRST-EPSS-METHOD`\n- `CISA-KEV`\n
+
+
+## Identificadores del registro de fuentes
+
+- `FIRST-EPSS-FAQ`
+- `FIRST-EPSS-METHOD`
+- `CISA-KEV`
