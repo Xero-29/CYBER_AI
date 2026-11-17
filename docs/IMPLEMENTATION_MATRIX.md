@@ -9,6 +9,12 @@ Esta matriz separa implementación, verificación automatizada y validación ope
 - **Operacional pendiente:** requiere host, proveedor, credenciales, red, infraestructura o revisión humana.
 - **Bloqueado por decisión:** requiere autorización del propietario o una política organizacional.
 
+## Integración del flujo principal
+
+| Área | Estado | Evidencia / criterio de aceptación |
+|---|---|---|
+| Entrada principal → DIRECTOR → agente → Skills/memoria/conocimiento | Implementación añadida; CI pendiente | `cyber_ai.py --ask` delega en `director.py`; DIRECTOR enruta la tarea y activa `agent_runner.py --knowledge` por defecto. El runner recupera Skills y lecciones aprobadas y, cuando ECO/embeddings están configurados, fragmentos de la biblioteca. `--no-knowledge` permite desactivar explícitamente la recuperación. Tests de enrutamiento añadidos; falta CI sobre el HEAD y prueba local con proveedor/índice reales. No implica ejecución automática de herramientas ni del orquestador multiagente. |
+
 ## Brechas que admiten trabajo en el repositorio
 
 | Área | Estado | Evidencia / criterio de aceptación |
