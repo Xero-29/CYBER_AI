@@ -254,6 +254,64 @@ def validate_data_permissions(root):
     return findings
 
 
+def validate_evidence_permissions(root):
+    """Exige evidencias locales privadas y rechaza symlinks en POSIX."""
+    import stat
+
+    if os.name != "posix":
+        # Windows ACLs no se pueden verificar de forma portable con mode bits.
+        return []
+    root = Path(root)
+    reports = root / "reports"
+    evidence_root = reports / "tool_evidence"
+    for path, relative in ((reports, "reports"), (evidence_root, "reports/tool_evidence")):
+        if path.is_symlink():
+            return [{"path": relative, "reason": "El árbol de evidencias no puede contener enlaces simbólicos."}]
+    if not evidence_root.exists():
+        return []
+    if not evidence_root.is_dir():
+        return [{"path": "reports/tool_evidence", "reason": "El destino de evidencias debe ser un directorio."}]
+
+    findings = []
+    try:
+        directory_mode = stat.S_IMODE(evidence_root.stat(follow_symlinks=False).st_mode)
+        if directory_mode & 0o077:
+            findings.append({
+                "path": "reports/tool_evidence",
+                "reason": "Directorio de evidencias accesible por grupo u otros; usar chmod 700.",
+            })
+        for path in sorted(evidence_root.iterdir()):
+            relative = str(path.relative_to(root))
+            if path.is_symlink():
+                findings.append({
+                    "path": relative,
+                    "reason": "No se permiten enlaces simbólicos en las evidencias.",
+                })
+            elif path.is_dir():
+                findings.append({
+                    "path": relative,
+                    "reason": "No se permiten subdirectorios no auditados en las evidencias.",
+                })
+            elif path.is_file():
+                mode = stat.S_IMODE(path.stat(follow_symlinks=False).st_mode)
+                if mode & 0o077:
+                    findings.append({
+                        "path": relative,
+                        "reason": "Archivo de evidencia accesible por grupo u otros; usar chmod 600.",
+                    })
+            else:
+                findings.append({
+                    "path": relative,
+                    "reason": "Tipo de archivo no permitido en el directorio de evidencias.",
+                })
+    except OSError:
+        findings.append({
+            "path": "reports/tool_evidence",
+            "reason": "No se pudieron verificar los permisos de las evidencias.",
+        })
+    return findings
+
+
 def collect_checks(root=PROJECT, python_version=None, module_lookup=None,
                    executable_lookup=None, environ=None):
     root = Path(root)
@@ -311,6 +369,13 @@ def collect_checks(root=PROJECT, python_version=None, module_lookup=None,
     for finding in validate_data_permissions(root):
         add(
             "data_permissions",
+            "error",
+            f"{finding['path']}: {finding['reason']}",
+        )
+
+    for finding in validate_evidence_permissions(root):
+        add(
+            "evidence_permissions",
             "error",
             f"{finding['path']}: {finding['reason']}",
         )
