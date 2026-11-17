@@ -57,6 +57,8 @@ def load_packs(area_id=None):
             "id": item["id"], "name": item.get("name", item["id"]),
             "path": path, "relative": path.relative_to(root).as_posix(),
             "sha256": digest, "document_id": stable_id, "size": len(raw),
+            # Los paquetes versionados del repositorio son conocimiento compartido.
+            "visibility": "shared", "tenant_id": None,
         })
     return packs
 
