@@ -14,6 +14,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from workflow_contracts import WorkflowContractError, validate_workflow_definition
+
 PROJECT = Path(__file__).resolve().parent
 DEFAULT_WORKFLOWS = PROJECT / "config" / "workflows.json"
 DEFAULT_REPORTS = PROJECT / "reports" / "agent_simulations"
@@ -28,58 +30,11 @@ class SimulationError(ValueError):
 
 
 def validate_workflow_contract(workflow: dict[str, Any]) -> list[dict[str, Any]]:
-    if not isinstance(workflow, dict):
-        raise SimulationError("El flujo debe ser un objeto.")
-
-    workflow_mode = workflow.get("mode", "standard")
-    if not isinstance(workflow_mode, str) or workflow_mode not in {"standard", "technical"}:
-        raise SimulationError("El modo del flujo no es válido.")
-
-    for field in ("max_rounds", "max_context_chars"):
-        value = workflow.get(field)
-        if value is not None and (
-            isinstance(value, bool) or not isinstance(value, int) or value <= 0
-        ):
-            raise SimulationError(f"{field} debe ser un entero positivo.")
-
-    steps = workflow.get("steps")
-    if not isinstance(steps, list) or not steps:
-        raise SimulationError("El flujo debe contener al menos un paso.")
-
-    normalized = []
-    for index, step in enumerate(steps, start=1):
-        if not isinstance(step, dict):
-            raise SimulationError(f"El paso {index} debe ser un objeto.")
-        agent = step.get("agent")
-        objective = step.get("objective")
-        if not isinstance(agent, str) or not agent.strip():
-            raise SimulationError(f"El paso {index} no tiene agente válido.")
-        if not isinstance(objective, str) or not objective.strip():
-            raise SimulationError(f"El paso {index} no tiene objetivo válido.")
-
-        mode = step.get("mode", workflow_mode)
-        if not isinstance(mode, str) or mode not in {"standard", "technical"}:
-            raise SimulationError(f"El modo del paso {index} no es válido.")
-
-        prefix = step.get("required_output_prefix", "")
-        sections = step.get("required_output_sections", [])
-        if not isinstance(prefix, str):
-            raise SimulationError(f"El prefijo requerido del paso {index} no es válido.")
-        if not isinstance(sections, list) or any(
-            not isinstance(item, str) or not item.strip() for item in sections
-        ):
-            raise SimulationError(f"Las secciones requeridas del paso {index} no son válidas.")
-
-        normalized.append({
-            "order": index,
-            "agent": agent.strip(),
-            "objective": objective.strip(),
-            "mode": mode,
-            "required_output_prefix": prefix,
-            "required_output_sections": list(sections),
-        })
-    return normalized
-
+    """Aplica el contrato compartido con el orquestador real."""
+    try:
+        return validate_workflow_definition(workflow)
+    except WorkflowContractError as error:
+        raise SimulationError(str(error)) from error
 
 def _synthetic_response(agent: str, step: dict[str, Any]) -> str:
     """Produce una respuesta marcada como sintética que satisface el contrato formal."""
