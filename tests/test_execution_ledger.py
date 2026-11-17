@@ -116,6 +116,13 @@ class ExecutionLedgerTests(unittest.TestCase):
         self.assertEqual(migrated.history(namespace="test")[0]["status"], "interrupted")
         self.assertTrue(migrated.verify()["valid"])
 
+    def test_read_only_ledger_consumer_does_not_create_database(self):
+        missing = Path(self.tmp.name) / "missing" / "ledger.sqlite3"
+        ledger = ExecutionLedger(missing, initialize=False)
+        self.assertEqual(ledger.path, missing)
+        self.assertFalse(missing.exists())
+        self.assertFalse(missing.parent.exists())
+
     def test_environment_path_is_used_when_no_path_is_passed(self):
         configured = Path(self.tmp.name) / "external" / "ledger.sqlite3"
         with patch.dict(os.environ, {"CYBER_AI_LEDGER_PATH": str(configured)}):
