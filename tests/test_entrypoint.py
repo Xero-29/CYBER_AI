@@ -29,6 +29,16 @@ class EntryPointTests(unittest.TestCase):
         self.assertEqual(command[2], "auditoría web de mi aplicación")
         self.assertEqual(run.call_args.kwargs["check"], False)
 
+    @patch("cyber_ai.subprocess.run")
+    def test_ask_can_disable_knowledge_explicitly(self, run):
+        run.return_value.returncode = 0
+        with patch.object(sys, "argv", [
+            "cyber_ai.py", "--ask", "consulta simple", "--no-knowledge"
+        ]):
+            from cyber_ai import main
+            self.assertEqual(main(), 0)
+        self.assertIn("--no-knowledge", run.call_args.args[0])
+
     def test_missing_report_returns_error(self):
         result = subprocess.run(
             [sys.executable, "cyber_ai.py", "--report", "archivo_inexistente.txt"],
