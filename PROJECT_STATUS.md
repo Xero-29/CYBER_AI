@@ -1,3 +1,32 @@
+# Estado verificado — 2026-11-17 (main)
+
+**Rama principal:** `main`  
+**Respaldo:** `backup/main-before-cyber-ai-2026-11-17`, verificado idéntico al HEAD previo `7b5ed033f1f6461b5780a10ac4ada67a444b93e5`.  
+**Integración:** PR #2 fusionado en merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`.  
+**Último commit de código antes de esta actualización documental:** `a902c448bc5e110a1630abd7053cafb11527d469`.  
+**CI:** PR #2 tenía Python (456 pruebas) y Docker aprobados sobre `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`; esos resultados no validan los cambios posteriores en `main`. El conector disponible no devolvió status checks para los commits directos recientes. No declarar CI verde en el HEAD actual.
+
+## Cambios directos posteriores al merge
+
+- Allowlist HMAC-SHA256 para binarios locales, validación de esquema exacto, clave mínima de 32 bytes, límites de archivo, rechazo de symlinks y claves JSON duplicadas.
+- Integración en `tool_adapters.py`: cuando la política se configura, el ejecutable debe coincidir con el hash autorizado. `CYBER_AI_TOOL_ALLOWLIST_REQUIRED=1` activa fail-closed si la política no está configurada.
+- Pruebas unitarias para firma válida, manipulación, clave débil, symlink, claves JSON duplicadas, política obligatoria y binarios no autorizados.
+- Guía: `docs/TOOL_ALLOWLIST.md`.
+
+## Brechas restantes
+
+1. Lock de dependencias con hashes oficiales y `--require-hashes` para cada plataforma. No se inventan hashes; el SBOM actual registra wheels descargados por CI, no un lock estático universal.
+2. Enrolamiento de binarios desde fuentes verificadas y custodia/rotación externa de la clave HMAC. HMAC no es firma asimétrica y no reemplaza KMS/HSM.
+3. ACL Windows reales mediante APIs nativas y runner Windows; el control POSIX 0700/0600 no acredita ACL.
+4. Estrés prolongado, disco lleno, corrupción física y recuperación ante pérdida de host.
+5. Corpus experto etiquetado, embeddings reales y umbrales de recuperación por especialidad.
+6. OCR e aislamiento de parsers documentales.
+7. KMS/HSM, RBAC/IdP/MFA, WORM/offsite, backups cifrados/DR, MicroVM, proveedores IA reales, revisión humana de las 138 fuentes, observabilidad y revisión independiente.
+
+**Conclusión:** los cambios de la rama auditada ya están en `main` y se creó respaldo verificable. La allowlist está implementada, pero no se considera validada hasta CI sobre el HEAD final. No se declara CYBER_AI terminado ni certificado para producción.
+
+---
+
 # Estado verificado — 2026-11-17 (actualización en main)
 
 **Rama principal:** `main`  
