@@ -5,6 +5,7 @@ import json
 import os
 import re
 import stat
+from pathlib import Path
 
 
 class ToolAllowlistError(ValueError):
@@ -39,7 +40,7 @@ def sign_tool_allowlist(tools, key):
 def load_signed_tool_allowlist(path, key):
     if not isinstance(key, bytes) or len(key) < 32:
         raise ToolAllowlistError("La clave HMAC debe tener al menos 32 bytes.")
-    if __import__("pathlib").Path(path).is_symlink():
+    if Path(path).is_symlink():
         raise ToolAllowlistError("La allowlist no puede ser un enlace simbólico.")
     flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
     descriptor = None
