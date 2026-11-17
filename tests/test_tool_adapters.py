@@ -216,19 +216,21 @@ class ToolAdapterTests(unittest.TestCase):
         self.assertEqual(command, ["/usr/bin/tshark", "-r", str(capture), "-T", "json"])
 
 
-    @patch("tool_adapters.shutil.which")
-    def test_yara_requires_isolation_before_host_execution(self, which):
-        with self.assertRaisesRegex(ToolExecutionError, "sandbox aislado"):
-            run_local_tool("yara", "sample.py", config_path="sample.py")
-        which.assert_not_called()
+    def test_yara_is_delegated_to_docker_isolation_runner(self):
+        with patch("isolated_tool_runner.run_isolated_tool", return_value={"status": "completed"}) as runner:
+            result = run_local_tool("yara", "sample.py", config_path="rules.yar")
+        self.assertEqual(result["status"], "completed")
+        runner.assert_called_once()
+        self.assertEqual(runner.call_args.args, ("yara", "sample.py"))
 
-    @patch("tool_adapters.shutil.which")
-    def test_tshark_requires_isolation_before_host_execution(self, which):
+    def test_tshark_is_delegated_to_docker_isolation_runner(self):
         capture = self.root / "sample.pcap"
         capture.write_bytes(b"pcap")
-        with self.assertRaisesRegex(ToolExecutionError, "sandbox aislado"):
-            run_local_tool("tshark", "sample.pcap")
-        which.assert_not_called()
+        with patch("isolated_tool_runner.run_isolated_tool", return_value={"status": "completed"}) as runner:
+            result = run_local_tool("tshark", "sample.pcap")
+        self.assertEqual(result["status"], "completed")
+        runner.assert_called_once()
+        self.assertEqual(runner.call_args.args, ("tshark", "sample.pcap"))
 
 if __name__ == "__main__":
     unittest.main()
