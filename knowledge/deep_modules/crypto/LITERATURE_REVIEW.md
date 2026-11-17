@@ -42,3 +42,4 @@ Banco: dos servicios de prueba, certificados sintéticos, implementaciones compa
 ## Brechas
 
 Revisar los estándares FIPS completos, sus erratas y requisitos de validación; estudiar protocolos TLS/PKI y perfiles de transición; ejecutar pruebas cruzadas en implementaciones reales y revisión criptográfica independiente.
+\n\n## Identificadores del registro de fuentes\n\n- `NIST-FIPS-203`\n- `NIST-FIPS-204`\n- `NIST-FIPS-205`\n
