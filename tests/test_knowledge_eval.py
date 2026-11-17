@@ -16,7 +16,10 @@ class KnowledgeEvaluationTests(unittest.TestCase):
                 "relevant_categories": ["cybersecurity:api"],
             }) + "\n", encoding="utf-8")
             self.assertEqual(len(knowledge_eval.load_dataset(path)), 1)
-            path.write_text('{"query":""}\n', encoding="utf-8")
+            path.write_text(json.dumps({
+                "id": "invalid", "query": "",
+                "relevant_categories": ["cybersecurity:api"],
+            }) + "\n", encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "query inválida"):
                 knowledge_eval.load_dataset(path)
 
