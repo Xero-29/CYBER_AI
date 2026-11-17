@@ -67,7 +67,8 @@ def load_execution_config(path=None):
     reserved_ids = {
         "semgrep", "bandit", "ruff", "syft", "trivy", "pip_audit",
         "checkov", "detect_secrets", "hadolint", "shellcheck",
-        "actionlint", "kube_linter", "yara", "tshark",
+        "actionlint", "kube_linter", "yara", "tshark", "osv_scanner",
+        "grype", "gitleaks", "zeek", "volatility3", "nmap", "nuclei",
     }
     for tool in tools:
         if not isinstance(tool, dict):
