@@ -5,7 +5,7 @@
 **Alcance:** verificación de controles web/API, autorización, autenticación, gestión de datos y pruebas.  
 **Limitación:** revisión exploratoria dirigida, no revisión sistemática ni lectura íntegra de todos los estándares.
 
-## Pregunta y síntesis
+## Síntesis y pregunta
 
 ¿Cómo convertir estándares y taxonomías de riesgo web/API en requisitos verificables que detecten fallos de autorización y exposición de datos sin confundir cobertura de checklist con seguridad efectiva?
 
@@ -60,4 +60,10 @@ La evidencia consultada apunta a separar tres capas: (1) requisitos verificables
 - OWASP Foundation, *Application Security Verification Standard 5.0.0*, estable 2025-05-30. https://asvs.owasp.org/
 - OWASP Foundation, *API Security Top 10 2023*. https://owasp.org/www-project-api-security/
 - OWASP Foundation, *API1:2023 Broken Object Level Authorization*. https://api-security.owasp.org/editions/2023/en/0xa1-broken-object-level-authorization/
-\n\n## Identificadores del registro de fuentes\n\n- `OWASP-ASVS-5.0.0`\n- `OWASP-API-TOP10-2023`\n- `OWASP-API1-BOLA-2023`\n
+
+
+## Identificadores del registro de fuentes
+
+- `OWASP-ASVS-5.0.0`
+- `OWASP-API-TOP10-2023`
+- `OWASP-API1-BOLA-2023`
