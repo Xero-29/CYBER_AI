@@ -58,6 +58,10 @@ def main(argv=None):
     parser.add_argument("--target", required=True, help="Ruta relativa dentro del repositorio")
     parser.add_argument("--config", help="Configuración local para Semgrep")
     parser.add_argument("--plugin", help="Plugin explícito de Volatility 3 (allowlist del adaptador)")
+    parser.add_argument(
+        "--authorized-network", action="store_true",
+        help="Confirma autorización explícita para un objetivo Nmap dentro de la allowlist CIDR",
+    )
     parser.add_argument("--timeout", type=int)
     parser.add_argument("--execute", action="store_true", help="Confirma la ejecución local")
     parser.add_argument("--require-ledger", action="store_true",
@@ -99,7 +103,8 @@ def main(argv=None):
     try:
         evidence = run_local_tool(
             args.tool, args.target, config_path=args.config,
-            plugin=args.plugin, timeout=args.timeout
+            plugin=args.plugin, timeout=args.timeout,
+            allow_network=args.authorized_network,
         )
         if not isinstance(evidence, dict):
             raise TypeError("El adaptador debe devolver un objeto de evidencia.")
@@ -154,15 +159,27 @@ def main(argv=None):
                             },
                         },
                         {
-                            "name": "target_integrity",
-                            "passed": _integrity_pair_passed(
-                                evidence, "target_modified",
-                                "target_sha256", "target_sha256_after",
+                            "name": "target_integrity_or_authorized_scope",
+                            "passed": (
+                                evidence.get("scope_validated") is True
+                                if evidence.get("target_type") == "network"
+                                else _integrity_pair_passed(
+                                    evidence, "target_modified",
+                                    "target_sha256", "target_sha256_after",
+                                )
                             ),
-                            "evidence": {
-                                "sha256_before": evidence.get("target_sha256"),
-                                "sha256_after": evidence.get("target_sha256_after"),
-                            },
+                            "evidence": (
+                                {
+                                    "target_type": "network",
+                                    "authorization_scope": evidence.get("authorization_scope"),
+                                    "scope_allowlist_sha256": evidence.get("scope_allowlist_sha256"),
+                                }
+                                if evidence.get("target_type") == "network" else
+                                {
+                                    "sha256_before": evidence.get("target_sha256"),
+                                    "sha256_after": evidence.get("target_sha256_after"),
+                                }
+                            ),
                         },
                     ],
                     metadata={
