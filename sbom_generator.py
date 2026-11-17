@@ -92,9 +92,14 @@ def build_sbom(root=PROJECT, artifact_manifest=None):
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as error:
             raise LockfileError("No se pudo leer el manifiesto de artefactos.") from error
-        if manifest.get("lock_sha256") != lock_hash:
-            raise LockfileError("El manifiesto corresponde a otro requirements.lock.")
-        for artifact in manifest.get("artifacts", []):
+        if not isinstance(manifest, dict) or manifest.get("lock_sha256") != lock_hash:
+            raise LockfileError("El manifiesto corresponde a otro requirements.lock o tiene formato inválido.")
+        artifacts = manifest.get("artifacts")
+        if not isinstance(artifacts, list):
+            raise LockfileError("La lista de artefactos del manifiesto es inválida.")
+        for artifact in artifacts:
+            if not isinstance(artifact, dict):
+                raise LockfileError("Entrada de artefacto inválida.")
             name = _normalize(str(artifact.get("name", "")))
             version = artifact.get("version")
             digest = artifact.get("sha256")
