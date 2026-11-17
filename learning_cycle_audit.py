@@ -7,10 +7,10 @@ import json
 import os
 import sys
 from collections import Counter
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from execution_ledger import ExecutionLedger
+from execution_ledger import DEFAULT_DB, ExecutionLedger
 import learning_memory
 import skillbook
 
@@ -26,9 +26,16 @@ def _memory_line_count(path: Path) -> int:
 
 def audit_learning_cycle(*, max_review_age_days: int = 180) -> dict:
     """Inspecciona integridad y coherencia sin modificar eventos ni Skills."""
-    ledger = ExecutionLedger()
-    ledger_check = ledger.verify()
-    namespaces = ledger.namespaces() if ledger_check.get("valid") else []
+    ledger_path = Path(os.environ.get("CYBER_AI_LEDGER_PATH", DEFAULT_DB))
+    if ledger_path.is_symlink():
+        raise OSError("El archivo del ledger no puede ser un enlace simbólico.")
+    if ledger_path.is_file():
+        ledger = ExecutionLedger(ledger_path)
+        ledger_check = ledger.verify()
+    else:
+        ledger = None
+        ledger_check = {"valid": False, "checked": 0, "reason": "database_missing"}
+    namespaces = ledger.namespaces() if ledger and ledger_check.get("valid") else []
     event_counts = Counter()
     orphaned_starts = []
     history_truncated = []
@@ -76,32 +83,71 @@ def audit_learning_cycle(*, max_review_age_days: int = 180) -> dict:
     except (OSError, RuntimeError, ValueError) as error:
         memory.update({"status": "error", "error": str(error)[:300]})
 
-    skillbook.initialize()
-    with skillbook.connect() as db:
-        rows = db.execute(
-            "SELECT skill_id,name,status,version,updated_at FROM skills ORDER BY skill_id"
-        ).fetchall()
-        skill_counts = Counter(row["status"] for row in rows)
-        invalid_skills = []
-        for row in rows:
-            result = skillbook._verify_skill_history_in_db(db, row["skill_id"])
-            if not result.get("valid") or result.get("status") != row["status"]:
+    skill_db_path = Path(skillbook.DB_PATH)
+    if skill_db_path.is_symlink():
+        raise OSError("La base de Skills no puede ser un enlace simbólico.")
+    rows = []
+    invalid_skills = []
+    due_for_review = []
+    if skill_db_path.is_file():
+        with skillbook.connect() as db:
+            tables = {
+                row["name"] for row in db.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table'"
+                ).fetchall()
+            }
+            if "skills" not in tables or "skill_versions" not in tables:
                 invalid_skills.append({
-                    "skill_id": row["skill_id"],
-                    "name": row["name"],
-                    "status": row["status"],
-                    "reason": result.get("reason", "status_mismatch"),
-                    "fields": result.get("fields", []),
+                    "skill_id": None, "name": None, "status": None,
+                    "reason": "skillbook_schema_missing", "fields": [],
                 })
-
-    due_for_review = skillbook.list_skills_due_for_review(
-        max_age_days=max_review_age_days
-    )
+            else:
+                rows = db.execute(
+                    "SELECT skill_id,name,status,version,updated_at FROM skills ORDER BY skill_id"
+                ).fetchall()
+                for row in rows:
+                    result = skillbook._verify_skill_history_in_db(db, row["skill_id"])
+                    if not result.get("valid") or result.get("status") != row["status"]:
+                        invalid_skills.append({
+                            "skill_id": row["skill_id"],
+                            "name": row["name"],
+                            "status": row["status"],
+                            "reason": result.get("reason", "status_mismatch"),
+                            "fields": result.get("fields", []),
+                        })
+                cutoff = datetime.now(timezone.utc) - timedelta(days=max_review_age_days)
+                for row in rows:
+                    if row["status"] != "active":
+                        continue
+                    try:
+                        updated = datetime.fromisoformat(
+                            row["updated_at"].replace("Z", "+00:00")
+                        )
+                        if updated.tzinfo is None:
+                            updated = updated.replace(tzinfo=timezone.utc)
+                    except (TypeError, ValueError, AttributeError):
+                        due_for_review.append({
+                            "skill_id": row["skill_id"], "name": row["name"],
+                            "version": row["version"], "reason": "invalid_review_timestamp",
+                            "review_due_at": None,
+                        })
+                        continue
+                    if updated < cutoff:
+                        due_for_review.append({
+                            "skill_id": row["skill_id"], "name": row["name"],
+                            "version": row["version"], "reason": "review_age_exceeded",
+                            "review_due_at": updated.isoformat(),
+                        })
+    skill_counts = Counter(row["status"] for row in rows)
     ledger_ok = bool(ledger_check.get("valid"))
     skills_ok = not invalid_skills
-    memory_ok = memory["status"] in {
-        "verified", "disabled_missing_approval_key"
-    }
+    memory_ok = (
+        memory["status"] == "verified"
+        or (
+            memory["status"] == "disabled_missing_approval_key"
+            and memory.get("records_on_disk") == 0
+        )
+    )
     status = "ok" if ledger_ok and skills_ok and memory_ok and not orphaned_starts else "degraded"
 
     return {
@@ -109,6 +155,11 @@ def audit_learning_cycle(*, max_review_age_days: int = 180) -> dict:
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "status": status,
         "read_only": True,
+        "paths": {
+            "ledger": str(ledger_path),
+            "skillbook": str(skill_db_path),
+            "memory": str(learning_memory.MEMORY_FILE),
+        },
         "ledger": {
             **ledger_check,
             "namespaces": len(namespaces),
