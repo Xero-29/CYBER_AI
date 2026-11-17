@@ -13,13 +13,27 @@ from tool_adapters import TOOL_SPECS, ToolExecutionError, run_local_tool, write_
 from execution_ledger import ExecutionLedger
 
 
+def _tool_succeeded(evidence):
+    """Respeta el resultado explícito del adaptador y conserva compatibilidad."""
+    if not isinstance(evidence, dict):
+        return False
+    explicit = evidence.get("tool_reported_success")
+    if explicit is not None:
+        return explicit is True
+    return (
+        isinstance(evidence.get("return_code"), int)
+        and not isinstance(evidence.get("return_code"), bool)
+        and evidence.get("return_code") == 0
+    )
+
+
 def _terminal_status(evidence):
     status = evidence.get("status") if isinstance(evidence, dict) else None
     if status == "timeout":
         return "timeout"
     if status == "denied":
         return "denied"
-    if status == "completed" and evidence.get("tool_reported_success") is True:
+    if status == "completed" and _tool_succeeded(evidence):
         return "completed"
     return "failed"
 
@@ -159,7 +173,7 @@ def main(argv=None):
                             },
                         },
                         {
-                            "name": "target_integrity_or_authorized_scope",
+                            "name": "target_integrity",
                             "passed": (
                                 evidence.get("scope_validated") is True
                                 if evidence.get("target_type") == "network"
@@ -201,7 +215,7 @@ def main(argv=None):
     print(json.dumps(evidence, ensure_ascii=False, indent=2))
     if evidence.get("status") == "denied":
         return 2
-    return 0 if evidence.get("status") == "completed" and evidence.get("tool_reported_success") is True else 1
+    return 0 if evidence.get("status") == "completed" and _tool_succeeded(evidence) else 1
 
 
 if __name__ == "__main__":
