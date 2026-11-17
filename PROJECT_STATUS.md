@@ -292,3 +292,13 @@ No declarar el sistema completo ni certificado hasta que cada brecha tenga códi
 - **Estado CI:** pendiente de finalización para el HEAD que incorpora estas pruebas.
 - **Citas PDF:** la extracción conserva marcadores `[PDF page N]` dentro del texto para que los fragmentos recuperados mantengan la referencia de página; se añadió una prueba con lector PDF simulado. No se ha añadido OCR: sigue siendo una dependencia externa opcional.
 - **Revisión de Skills:** añadido `list_skills_due_for_review(max_age_days)` y CLI `python skillbook_cli.py review-due --max-age-days 180`. Identifica Skills activas cuya última aprobación/actualización superó la antigüedad configurada o tiene timestamp inválido. Es una alerta de revisión; no caduca ni revoca automáticamente una Skill, porque la revocación sigue exigiendo aprobación HMAC VERITAS.
+
+## Validación final de esta iteración — 17-11-2026
+
+**HEAD de código validado:** `0e702e4cc41cac0112dd236863940b3630096616`.
+
+- Python tests: **success** — https://github.com/Xero-29/CYBER_AI/actions/runs/44103957939
+- Docker sandbox: **success** — https://github.com/Xero-29/CYBER_AI/actions/runs/44103959685
+- Se ejecutó la verificación completa, generación de SBOM y procedencia; el workflow Docker construyó la imagen, ejecutó la verificación completa y Ruff dentro del sandbox.
+- Los tests nuevos incluidos en este HEAD cubren integridad SQLite, payload corrupto, writer ocupado, archivo SQLite ilegible, archivos Office adversariales, marcadores de página PDF, promoción concurrente de Skills y detección de Skills que requieren revisión.
+- **Alcance:** CI verde no equivale a validación operacional, auditoría externa ni certificación institucional. No se han probado KMS/HSM, WORM/offsite, microVM, OCR real, proveedores IA con credenciales ni recuperación ante pérdida de host.
