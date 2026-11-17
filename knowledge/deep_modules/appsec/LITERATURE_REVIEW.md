@@ -5,9 +5,11 @@
 **Alcance:** verificación de controles web/API, autorización, autenticación, gestión de datos y pruebas.  
 **Limitación:** revisión exploratoria dirigida, no revisión sistemática ni lectura íntegra de todos los estándares.
 
-## Síntesis y pregunta
+## Pregunta
 
 ¿Cómo convertir estándares y taxonomías de riesgo web/API en requisitos verificables que detecten fallos de autorización y exposición de datos sin confundir cobertura de checklist con seguridad efectiva?
+
+## Síntesis
 
 La evidencia consultada apunta a separar tres capas: (1) requisitos verificables de controles (OWASP ASVS), (2) taxonomía de riesgos API (OWASP API Security Top 10 2023) y (3) pruebas específicas de la implementación y su contexto. ASVS 5.0.0 es la versión estable publicada el 30-05-2025 y declara como propósito normalizar requisitos para diseñar, desarrollar y probar aplicaciones web y servicios. API Top 10 2023 incluye riesgos diferenciados de autorización a nivel de objeto, propiedad y función; el listado también incorpora consumo ilimitado, flujos de negocio sensibles, SSRF, inventario deficiente y consumo inseguro de APIs.
 
