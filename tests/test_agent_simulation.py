@@ -36,13 +36,14 @@ class TestAgentSimulation(unittest.TestCase):
         self.assertEqual(report["metrics"]["steps_executed"], 1)
         self.assertEqual(report["metrics"]["steps_failed"], 1)
 
-    def test_agent_response_sequences_are_supported(self):
+    def test_agent_response_sequences_are_supported_without_mutation(self):
         fixtures = {
-                "NEXO": ["ANÁLISIS: correcto\nHALLAZGOS: ninguno"],
-                "VERITAS": ["VEREDICTO: conforme\nEVIDENCIA: sintética\nLIMITACIONES: simulación"],
-            },
-        )
+            "NEXO": ["ANÁLISIS: correcto\\nHALLAZGOS: ninguno"],
+            "VERITAS": ["VEREDICTO: conforme\\nEVIDENCIA: sintética\\nLIMITACIONES: simulación"],
+        }
+        report = simulate_workflow(self.workflow, "Auditoría ficticia", fixtures)
         self.assertEqual(report["status"], "completed")
+        self.assertEqual(len(fixtures["NEXO"]), 1)
 
     def test_empty_task_is_rejected(self):
         with self.assertRaises(SimulationError):
