@@ -49,7 +49,7 @@ Toda afirmación de CI debe indicar SHA completo y enlace a cada workflow. Si el
 ## Protocolo de cierre
 
 1. Identificar una brecha y su criterio de aceptación.
-2. Implementar el cambio en la rama de trabajo, sin modificar `main`.
+2. Implementar el cambio en la rama autorizada por el propietario. En esta etapa, el alcance solicitado incluye directamente `main`; conservar el respaldo previo y registrar cada cambio.
 3. Añadir pruebas negativas, límites y regresiones.
 4. Ejecutar CI sobre el SHA resultante.
 5. Inspeccionar fallos y corregirlos; repetir hasta obtener evidencia verde.
