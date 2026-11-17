@@ -54,6 +54,12 @@ jobs:
           mkdir -p "$RUNNER_TEMP/sandbox-wheelhouse"
           python -m pip download --require-hashes --only-binary=:all: --dest "$RUNNER_TEMP/sandbox-wheelhouse" -r sandbox/requirements.lock
           python dependency_artifact_manifest.py --lock-file sandbox/requirements.lock --wheelhouse "$RUNNER_TEMP/sandbox-wheelhouse" --output "$RUNNER_TEMP/sandbox-dependency-artifacts.json"
+      - name: Generate optional document lock candidate
+        run: |
+          mkdir -p "$RUNNER_TEMP/document-wheelhouse"
+          python -m pip download --only-binary=:all: --dest "$RUNNER_TEMP/document-wheelhouse" -r requirements-documents.in
+          python wheel_lock_generator.py --wheelhouse "$RUNNER_TEMP/document-wheelhouse" --requirements requirements-documents.in --output "$RUNNER_TEMP/requirements-documents.lock"
+          cat "$RUNNER_TEMP/requirements-documents.lock"
       - name: Generate CycloneDX SBOM
         run: |
           python sbom_generator.py \
