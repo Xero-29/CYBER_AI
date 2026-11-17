@@ -238,7 +238,7 @@ def _validated_nmap_scope(target):
     raw_allowlist = os.environ.get("CYBER_AI_NMAP_ALLOWED_CIDRS", "")
     if not raw_allowlist.strip():
         raise ToolExecutionError(
-            "Nmap está bloqueado: configura CYBER_AI_NMAP_ALLOWED_CIDRS con los rangos autorizados."
+            "Nmap está bloqueado: configura la allowlist CIDR CYBER_AI_NMAP_ALLOWED_CIDRS con los rangos autorizados."
         )
     allowed = []
     for value in raw_allowlist.split(","):
