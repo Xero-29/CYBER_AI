@@ -92,7 +92,7 @@ class ExecutionLedgerTests(unittest.TestCase):
         event = migrated.append(namespace="test", task="after migration",
                                 status="started", tool="unit", evidence={}, duration_ms=0)
         self.assertEqual(event["status"], "started")
-        recovered = migrated.reconcile_interrupted()
+        recovered = migrated.reconcile_interrupted(stale_after_seconds=0)
         self.assertEqual(recovered["reconciled"], 1)
         self.assertEqual(migrated.history(namespace="test")[0]["status"], "interrupted")
         self.assertTrue(migrated.verify()["valid"])
@@ -118,7 +118,7 @@ class ExecutionLedgerTests(unittest.TestCase):
             duration_ms=0,
             metadata={"task_id": "crashed-task"},
         )
-        result = self.ledger.reconcile_interrupted()
+        result = self.ledger.reconcile_interrupted(stale_after_seconds=0)
         self.assertEqual(result["reconciled"], 1)
         history = self.ledger.history(namespace="test")
         terminal = next(item for item in history if item["status"] == "interrupted")
@@ -141,6 +141,12 @@ class ExecutionLedgerTests(unittest.TestCase):
                 "SELECT COUNT(*) FROM execution_events WHERE status='interrupted'"
             ).fetchone()[0]
         self.assertEqual(count, 0)
+
+    def test_reconcile_skips_recent_starts_by_default(self):
+        self.append(status="started", evidence={"phase": "start"}, duration_ms=0)
+        result = self.ledger.reconcile_interrupted()
+        self.assertEqual(result["reconciled"], 0)
+        self.assertTrue(self.ledger.verify()["valid"])
 
     def test_reconcile_does_not_close_start_with_existing_terminal_event(self):
         started = self.append(
