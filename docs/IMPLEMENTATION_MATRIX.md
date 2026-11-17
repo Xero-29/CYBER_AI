@@ -13,12 +13,12 @@ Esta matriz separa implementación, verificación automatizada y validación ope
 
 | Área | Estado | Evidencia / criterio de aceptación |
 |---|---|---|
-| Regresión de Skills | Implementación añadida; CI pendiente | `skill_regression.py` evalúa Recall@K, Precision@K, MRR@K y hit rate; verifica hash-chain y estado activo de cada Skill esperada; no altera contadores de uso. Tests unitarios incluidos. Falta dataset curado con Skills reales y umbrales aprobados por dominio. |
+| Regresión de Skills | Implementada; CI aprobado en SHA `5e2e85c` | `skill_regression.py` evalúa Recall@K, Precision@K, MRR@K y hit rate; verifica hash-chain y estado activo de cada Skill esperada; no altera contadores de uso. Suite Python de 456 pruebas aprobada en el SHA exacto. Falta dataset curado con Skills reales y umbrales aprobados por dominio. |
 | Dependencias reproducibles | Parcial | `requirements.lock` fija versiones; CI calcula hashes de wheels y los publica en SBOM por plataforma. Falta lock con `--require-hashes` y hashes oficiales verificados para cada plataforma/arquitectura soportada. No inventar hashes. |
-| Procedencia de herramientas | Parcial | Se registra ruta, versión y SHA-256 antes/después de ejecución. Falta política de binarios aprobados, firmada y administrada fuera del repositorio, más un proceso seguro de enrolamiento/rotación. |
+| Procedencia e integridad de herramientas | Parcial | Se registra ruta, versión y SHA-256 del binario y del objetivo antes/después. Si alguno cambia, la ejecución queda como `integrity_error`; el ledger separa salida del proceso, integridad del binario e integridad del objetivo. Falta allowlist firmada de binarios aprobados y proceso de enrolamiento/rotación. |
 | Permisos Windows | Pendiente | Los controles POSIX verifican 0700/0600; Windows requiere comprobación y configuración de ACL mediante APIs nativas y pruebas en runner Windows. No presentar mode bits como verificación ACL. |
 | Resiliencia del almacenamiento | Parcial | Hay pruebas de transacciones, bloqueo, corrupción lógica y crash de proceso simulado. Faltan pruebas de estrés prolongado, disco lleno, terminación del host y recuperación desde almacenamiento real. |
-| Evaluación de conocimiento | Parcial | Existe benchmark sintético por especialidad. Falta corpus revisado por expertos, embeddings reales, dataset etiquetado y umbrales de aceptación por área. |
+| Evaluación de conocimiento | Parcial; entradas endurecidas y CI aprobado en SHA `5e2e85c` | El benchmark valida JSONL y listas en memoria, normaliza IDs/categorías, limita recursos, valida vectores finitos y forma de resultados; mide Recall@K, Precision@K y MRR@K. Falta corpus etiquetado revisado por expertos, embeddings reales y umbrales de aceptación por área. |
 | Extracción documental | Parcial | Extracción de formatos soportados con límites y marcadores de página PDF. OCR y ejecución aislada de parsers no están integrados. |
 | Integración de proveedores | Parcial | Adaptadores y tests simulados. Faltan pruebas con cuentas reales, cuotas, latencia, errores, costes y políticas de datos de cada proveedor. |
 
@@ -34,6 +34,13 @@ Esta matriz separa implementación, verificación automatizada y validación ope
 | Calidad del conocimiento | Licencia, procedencia, vigencia y exactitud revisadas para cada fuente externa | Especialistas |
 | Producción | Carga, soak, alertas, observabilidad, respuesta a incidentes y aceptación de riesgos | Propietario |
 | Release | Revisión independiente, protección de rama, required checks, licencia y autorización de publicación | Propietario |
+
+## Validación reciente de código
+
+- SHA exacto: `5e2e85cec0c2f4cb3627e87617be0c244f83cd27`.
+- Python tests: [success, 456 pruebas](https://github.com/Xero-29/CYBER_AI/actions/runs/44111423059).
+- Docker sandbox: [success](https://github.com/Xero-29/CYBER_AI/actions/runs/44111420579).
+- Estos resultados no validan commits posteriores ni sustituyen pruebas operacionales externas.
 
 ## Evidencia por commit
 

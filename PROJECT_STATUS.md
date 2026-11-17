@@ -1,36 +1,36 @@
 # Estado verificado más reciente — 2026-11-17
 
-**HEAD de código:** `a2ddbc5ba981181dc376814ca09ac4db37b9f600`  
+**HEAD de código validado:** `5e2e85cec0c2f4cb3627e87617be0c244f83cd27`  
 **Rama:** `codex/security-integrity-audit`  
 **main:** `7b5ed033f1f6461b5780a10ac4ada67a444b93e5` — sin modificar.  
-**Comparación:** 467 commits adelante, 0 detrás.  
+**Comparación con main:** 483 commits adelante, 0 detrás; el merge-base coincide con el HEAD de `main`.  
 **PR #2:** abierto, draft, mergeable; no fusionado.  
-**Protección de rama:** `protected=false`; branch protection y required checks aún no están configurados.
+**Protección de rama:** `protected=false`; required checks y branch protection aún no están configurados.
 
-## Estado de CI y correcciones
+## CI del SHA exacto
 
-- Último commit previo a esta tanda con ambos workflows aprobados: `5ae51fa26a400df3ac57659f74885562d8f983be` — Python run 44108665999 y Docker run 44108666075.
-- En `78ff1cd1e6ce133f35f33883459fe89829f59da3`, Python y Docker fallaron durante `verify.sh`. Los logs identificaron dos fallos de bootstrap: los paquetes offline no incluían metadatos `visibility` y `tenant_id`, requeridos por el nuevo conteo de fragmentos con ámbito.
-- Corrección aplicada en `knowledge_bootstrap.py`: cada paquete offline declara explícitamente `visibility="shared"` y `tenant_id=None`; se añadieron aserciones en `tests/test_knowledge_bootstrap.py`.
-- El HEAD actual `a2ddbc5ba981181dc376814ca09ac4db37b9f600` todavía no tiene una ejecución CI recuperada por la consulta disponible. **La corrección no se marca como validada hasta que Python y Docker pasen en este SHA exacto.**
+- Python tests — **success, 456 pruebas**: https://github.com/Xero-29/CYBER_AI/actions/runs/44111423059
+- Docker sandbox — **success**: https://github.com/Xero-29/CYBER_AI/actions/runs/44111420579
+- Ambos workflows validaron exactamente `5e2e85cec0c2f4cb3627e87617be0c244f83cd27`.
+- La suite ejecuta `verify.sh`, pruebas unitarias, preflight, manifiesto de artefactos de dependencias y SBOM CycloneDX. Docker construye la imagen endurecida y ejecuta Ruff sin red.
 
-## Implementación añadida
+## Cambios recientes verificados
 
-- `skillbook.search_skills(..., record_usage=False)` permite medir recuperación sin alterar contadores ni timestamps de uso.
-- `skill_regression.py` mide Recall@K, Precision@K, MRR@K y hit rate sobre dataset JSONL; comprueba la integridad hash-chain y el estado activo de las Skills esperadas.
-- El benchmark falla cerrado ante IDs ausentes, Skills inactivas, historiales inválidos, datasets malformados, symlinks y umbrales inválidos.
-- `tests/test_skill_regression.py` cubre métricas, historial inválido, entradas duplicadas y symlinks.
-- `docs/IMPLEMENTATION_MATRIX.md` define estados, criterios de aceptación y evidencias externas necesarias.
-- README documenta el benchmark y el esquema del dataset. Falta un dataset curado con Skills reales y umbrales revisados por dominio.
+- Ejecución de herramientas: si el binario o el objetivo cambia durante el análisis, la evidencia pasa a `integrity_error` y el comando no informa éxito.
+- Ledger: validadores separados para código de salida, integridad del binario e integridad del objetivo; conserva hashes antes/después.
+- Evaluación de conocimiento: valida también datasets suministrados en memoria, IDs/categorías normalizados, vectores numéricos finitos y estructura de resultados del buscador.
+- Dataset JSONL: límites de tamaño total, línea y cantidad de casos; rechazo de symlinks, campos desconocidos, IDs/categorías duplicados y consultas vacías.
+- Bootstrap: lock de archivo portable entre POSIX y Windows, con pruebas de adquisición y liberación del lock.
+- Se corrigieron fallos intermedios detectados por CI. No se consideran aprobados los SHA que fallaron o fueron cancelados; la evidencia verde es la de los dos enlaces anteriores.
 
-## Brechas de código aún abiertas
+## Brechas de código todavía abiertas
 
-1. Lock de dependencias con hashes estáticos verificados y `--require-hashes` para todas las plataformas soportadas. No inventar hashes.
-2. Allowlist firmada de versiones/hashes aprobados de binarios; el hash observado antes/después solo detecta cambios durante la ejecución.
-3. Verificación/configuración de ACL Windows para directorios de datos, secretos y evidencias.
-4. Pruebas de estrés/concurrencia y fallos de almacenamiento más amplias; simulaciones no equivalen a disco lleno ni pérdida de host.
-5. Dataset experto y evaluación con embeddings reales y umbrales por especialidad.
-6. OCR y aislamiento de extractores documentales.
+1. Lock de dependencias con hashes estáticos oficiales y `--require-hashes` para todas las plataformas soportadas. Los hashes del SBOM actual cubren los wheels descargados por el runner; no equivalen a un lock multiplataforma.
+2. Allowlist firmada de versiones y SHA-256 aprobados para binarios; las huellas antes/después detectan cambios durante la ejecución, pero no autentican por sí solas la procedencia inicial.
+3. Verificación y configuración real de ACL Windows para directorios de datos, secretos y evidencias.
+4. Más pruebas de estrés/concurrencia y fallos de almacenamiento; las simulaciones no equivalen a disco lleno, corrupción física o pérdida de host.
+5. Dataset experto, embeddings reales y umbrales de recuperación revisados por especialidad.
+6. OCR y ejecución aislada de extractores documentales.
 
 ## Dependencias externas / decisiones del propietario
 
@@ -39,12 +39,12 @@
 - WORM/offsite y checkpoints independientes del host.
 - Cifrado de backups, claves independientes y simulacros reales de DR/RPO/RTO.
 - MicroVM/VM desechable y pruebas reales de escape; Docker comparte kernel.
-- Proveedores IA reales, costes, cuotas, latencia, fallos y tratamiento de datos.
-- Revisión humana de licencia, procedencia, exactitud y vigencia de las 138 fuentes externas.
+- Proveedores IA reales, costes, cuotas, latencia, fallos y políticas de tratamiento de datos.
+- Revisión humana de licencia, procedencia, exactitud y vigencia de las 138 referencias externas.
 - Carga/soak, observabilidad, alertas, respuesta a incidentes y revisión independiente.
-- Branch protection, required checks, revisión de licencia y autorización de release.
+- Branch protection, required checks, revisión independiente y autorización de release.
 
-**Conclusión:** se añadieron pruebas de regresión del Skillbook y se corrigió un fallo de integración detectado por CI en el bootstrap de conocimiento. La corrección espera validación en el HEAD actual. El proyecto no se declara terminado ni certificado; `main` permanece intacta y el PR sigue sin fusionar.
+**Conclusión:** el código actual tiene CI verde en el SHA indicado, pero CYBER_AI no está terminado ni certificado institucionalmente. La validación operacional y varias garantías de cadena de suministro/identidad siguen pendientes. `main` permanece intacta y el PR continúa sin fusionar.
 
 ---
 
