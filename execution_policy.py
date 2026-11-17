@@ -79,8 +79,8 @@ def authorize_target(target, action, authorization_id):
     if not isinstance(authorization_id, str) or not authorization_id.strip():
         raise AuthorizationError("Se requiere un identificador de autorización.")
     canonical, address = _canonical_target(target)
-    if not address.is_global:
-        raise AuthorizationError("El destino no es una IP pública global.")
+    if not (address.is_global or address.is_private or address.is_loopback):
+        raise AuthorizationError("La dirección IP no es global, privada ni loopback; destino rechazado.")
     now = datetime.now(timezone.utc)
     for grant in _load_grants():
         if not isinstance(grant, dict) or grant.get("id") != authorization_id:
