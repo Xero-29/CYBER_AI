@@ -1,8 +1,9 @@
 import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import knowledge_eval
 
@@ -136,6 +137,41 @@ class KnowledgeEvaluationTests(unittest.TestCase):
         search = Mock(return_value={"category": "api"})
         with self.assertRaisesRegex(ValueError, "lista de resultados"):
             knowledge_eval.evaluate(cases, 1, embed=embed, search=search)
+
+    def test_rejects_directory_as_dataset(self):
+        with tempfile.TemporaryDirectory() as temp:
+            with self.assertRaisesRegex(ValueError, "archivo regular"):
+                knowledge_eval.load_dataset(Path(temp))
+
+    def test_report_writer_publishes_private_complete_file(self):
+        with tempfile.TemporaryDirectory() as temp:
+            destination = Path(temp) / "reports" / "evaluation.json"
+            result = knowledge_eval._write_report(destination, '{"valid":true}')
+            self.assertEqual(result.read_text(encoding="utf-8"), '{"valid":true}\n')
+            self.assertFalse(list(destination.parent.glob("*.tmp")))
+            if os.name == "posix":
+                import stat
+                self.assertEqual(stat.S_IMODE(destination.stat().st_mode), 0o600)
+
+    def test_report_writer_rejects_symlink_destination_without_touching_target(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            target = root / "outside.json"
+            target.write_text("preserve", encoding="utf-8")
+            link = root / "report.json"
+            link.symlink_to(target)
+            with self.assertRaisesRegex(ValueError, "symlink"):
+                knowledge_eval._write_report(link, '{"changed":true}')
+            self.assertEqual(target.read_text(encoding="utf-8"), "preserve")
+
+    def test_report_writer_cleans_temporary_file_after_publish_failure(self):
+        with tempfile.TemporaryDirectory() as temp:
+            destination = Path(temp) / "report.json"
+            with patch("knowledge_eval.os.replace", side_effect=OSError("publish failed")):
+                with self.assertRaises(OSError):
+                    knowledge_eval._write_report(destination, '{"valid":true}')
+            self.assertFalse(destination.exists())
+            self.assertEqual(list(Path(temp).iterdir()), [])
 
     def test_default_domain_dataset_covers_all_48_manifest_areas(self):
         manifest = json.loads((knowledge_eval.ROOT / "knowledge/packs/manifest.json").read_text(encoding="utf-8"))
