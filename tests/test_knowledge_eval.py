@@ -98,6 +98,43 @@ class KnowledgeEvaluationTests(unittest.TestCase):
         self.assertEqual(result["mrr_at_k"], 0.25)
         self.assertEqual(result["no_hit_queries"], 1)
 
+    def test_evaluate_validates_in_memory_cases_before_provider_call(self):
+        embed = Mock()
+        search = Mock()
+        invalid = [{
+            "id": "case", "query": "api",
+            "relevant_categories": ["api"], "unexpected": True,
+        }]
+        with self.assertRaisesRegex(ValueError, "exactamente"):
+            knowledge_eval.evaluate(invalid, 1, embed=embed, search=search)
+        embed.assert_not_called()
+        search.assert_not_called()
+
+    def test_evaluate_rejects_non_finite_embedding_before_search(self):
+        cases = [{
+            "id": "case", "query": "api",
+            "relevant_categories": ["api"],
+        }]
+        embed = Mock(return_value={
+            "embedding": [float("nan")], "embedding_space": "test-space",
+        })
+        search = Mock()
+        with self.assertRaisesRegex(ValueError, "vector o espacio"):
+            knowledge_eval.evaluate(cases, 1, embed=embed, search=search)
+        search.assert_not_called()
+
+    def test_evaluate_rejects_malformed_search_results(self):
+        cases = [{
+            "id": "case", "query": "api",
+            "relevant_categories": ["api"],
+        }]
+        embed = Mock(return_value={
+            "embedding": [1.0], "embedding_space": "test-space",
+        })
+        search = Mock(return_value={"category": "api"})
+        with self.assertRaisesRegex(ValueError, "lista de resultados"):
+            knowledge_eval.evaluate(cases, 1, embed=embed, search=search)
+
     def test_default_domain_dataset_covers_all_48_manifest_areas(self):
         manifest = json.loads((knowledge_eval.ROOT / "knowledge/packs/manifest.json").read_text(encoding="utf-8"))
         cases = knowledge_eval.load_dataset(knowledge_eval.DEFAULT_DATASET)

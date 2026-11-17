@@ -66,22 +66,91 @@ def load_dataset(path):
     return cases
 
 
+def _normalize_cases(cases):
+    """Validate and normalize in-memory datasets using the same strict schema."""
+    if not isinstance(cases, list) or not cases:
+        raise ValueError("dataset debe ser una lista no vacía.")
+    if len(cases) > MAX_CASES:
+        raise ValueError("El dataset supera 5000 casos.")
+    normalized = []
+    seen_ids = set()
+    for index, item in enumerate(cases, 1):
+        if not isinstance(item, dict) or set(item) != {
+            "id", "query", "relevant_categories"
+        }:
+            raise ValueError(
+                f"Caso {index}: se requieren exactamente id, query y relevant_categories."
+            )
+        case_id, query, expected = (
+            item["id"], item["query"], item["relevant_categories"]
+        )
+        if not isinstance(case_id, str) or not case_id.strip():
+            raise ValueError(f"ID inválido en caso {index}.")
+        normalized_id = case_id.strip()
+        if normalized_id in seen_ids:
+            raise ValueError(f"ID duplicado en caso {index}.")
+        if not isinstance(query, str) or not query.strip():
+            raise ValueError(f"query inválida en caso {index}.")
+        if (
+            not isinstance(expected, list) or not expected
+            or any(not isinstance(value, str) or not value.strip() for value in expected)
+            or len({value.strip() for value in expected}) != len(expected)
+        ):
+            raise ValueError(f"relevant_categories inválida en caso {index}.")
+        seen_ids.add(normalized_id)
+        normalized.append({
+            "id": normalized_id,
+            "query": query.strip(),
+            "relevant_categories": [value.strip() for value in expected],
+        })
+    return normalized
+
+
 def evaluate(dataset, top_k=5, *, embed=generate_embedding, search=search_knowledge_hybrid):
     if isinstance(top_k, bool) or not isinstance(top_k, int) or not 1 <= top_k <= 50:
         raise ValueError("top_k debe estar entre 1 y 50.")
-    cases = load_dataset(dataset) if isinstance(dataset, (str, Path)) else dataset
-    if not isinstance(cases, list) or not cases:
-        raise ValueError("dataset debe ser una lista no vacía.")
+    cases = (
+        load_dataset(dataset)
+        if isinstance(dataset, (str, Path))
+        else _normalize_cases(dataset)
+    )
     details = []
     recalls, precisions, reciprocal_ranks = [], [], []
     for case in cases:
         vector = embed(case["query"], agent_name="ECO")
+        if not isinstance(vector, dict):
+            raise ValueError("El proveedor de embeddings devolvió una respuesta inválida.")
+        embedding = vector.get("embedding")
+        embedding_space = vector.get("embedding_space")
+        if (
+            not isinstance(embedding, (list, tuple))
+            or not embedding
+            or len(embedding) > 65536
+            or any(
+                isinstance(value, bool)
+                or not isinstance(value, (int, float))
+                or not math.isfinite(value)
+                for value in embedding
+            )
+            or not isinstance(embedding_space, str)
+            or not embedding_space.strip()
+        ):
+            raise ValueError("El proveedor devolvió un vector o espacio de embeddings inválido.")
         results = search(
             query_text=case["query"],
-            query_embedding=vector["embedding"],
-            embedding_model=vector["embedding_space"],
+            query_embedding=embedding,
+            embedding_model=embedding_space,
             top_k=top_k,
         )
+        if not isinstance(results, list):
+            raise ValueError("La búsqueda devolvió una lista de resultados inválida.")
+        results = results[:top_k]
+        for result in results:
+            if not isinstance(result, dict):
+                raise ValueError("La búsqueda devolvió un resultado inválido.")
+            category = result.get("category")
+            if category is not None and not isinstance(category, str):
+                raise ValueError("La categoría recuperada debe ser texto.")
         expected = set(case["relevant_categories"])
         retrieved = [item for item in results if item.get("category") in expected]
         found_categories = {item.get("category") for item in retrieved}
