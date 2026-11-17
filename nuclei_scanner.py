@@ -118,11 +118,22 @@ def _finalize_scan(target, result, started, authorization_id, start_event_id, re
 
 
 def scan_target(target, timeout=45, authorized=False, authorization_id=None,
-                require_ledger=False):
+                require_ledger=False, templates_path=None, severity=None,
+                rate_limit=2, concurrency=2):
     """Ejecuta Nuclei solo con un permiso local, específico y vigente."""
     target = validate_target(target)
     if not isinstance(require_ledger, bool):
         raise TypeError("require_ledger debe ser booleano.")
+    if type(timeout) is not int or not 5 <= timeout <= 3600:
+        raise ValueError("timeout debe estar entre 5 y 3600 segundos.")
+    if type(rate_limit) is not int or not 1 <= rate_limit <= 20:
+        raise ValueError("rate_limit debe estar entre 1 y 20 solicitudes por segundo.")
+    if type(concurrency) is not int or not 1 <= concurrency <= 10:
+        raise ValueError("concurrency debe estar entre 1 y 10.")
+    allowed_severities = {"info", "low", "medium", "high", "critical"}
+    selected_severity = severity or "info,low,medium,high,critical"
+    if not isinstance(selected_severity, str) or not selected_severity or not set(selected_severity.split(",")).issubset(allowed_severities):
+        raise ValueError("severity contiene valores no permitidos.")
     started = time.monotonic()
     start_event_id = None
     if authorized is not True or not authorization_id:
@@ -154,6 +165,30 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
         }
         return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)
 
+    template_root = Path(
+        templates_path or os.environ.get(
+            "CYBER_AI_NUCLEI_TEMPLATES",
+            Path.home() / "nuclei-templates" / "http",
+        )
+    ).expanduser()
+    if template_root.is_symlink():
+        result = {"target": target, "status": "error",
+                  "error": "El directorio de plantillas no puede ser un enlace simbólico.",
+                  "findings": []}
+        return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)
+    try:
+        template_root = template_root.resolve(strict=True)
+    except OSError:
+        result = {"target": target, "status": "error",
+                  "error": "No se encontró el directorio de plantillas HTTP. Instala las plantillas o configura CYBER_AI_NUCLEI_TEMPLATES.",
+                  "findings": []}
+        return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)
+    if not template_root.is_dir() or not any(template_root.rglob("*.yaml")):
+        result = {"target": target, "status": "error",
+                  "error": "El directorio de plantillas no contiene archivos YAML.",
+                  "findings": []}
+        return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)
+
     output_dir = Path("reports")
     output_dir.mkdir(parents=True, exist_ok=True)
     scan_id = uuid.uuid4().hex
@@ -168,26 +203,21 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
         }
 
     command = [
-        executable,
-        "-u", target,
-        "-t", str(Path.home() / "nuclei-templates/http/technologies/bulma-detect.yaml"),
-        "-t", str(Path.home() / "nuclei-templates/http/misconfiguration/http-missing-security-headers.yaml"),
-        "-jsonl",
-        "-stats",
-        "-stats-interval", "5",
-        "-no-interactsh",
-        "-disable-update-check",
-        "-disable-redirects",
-        "-rl", "2",
-        "-c", "2",
-        "-timeout", "5",
-        "-retries", "1",
+        executable, "-u", target, "-t", str(template_root),
+        "-severity", selected_severity,
+        "-exclude-tags", "dos,intrusive,fuzz,code,headless",
+        "-disable-unsigned-templates", "-jsonl", "-stats",
+        "-stats-interval", "5", "-no-interactsh",
+        "-disable-update-check", "-disable-redirects",
+        "-rl", str(rate_limit), "-c", str(concurrency),
+        "-timeout", "5", "-retries", "1", "-max-host-error", "5",
         "-o", str(output_file.resolve()),
     ]
 
     print("\n[1/4] Preparando escaneo", flush=True)
     print(f"Objetivo: {target}", flush=True)
-    print("Límite de solicitudes: 2 por segundo; concurrencia: 2.", flush=True)
+    print(f"Plantillas: {template_root}", flush=True)
+    print(f"Severidades: {selected_severity}; límite: {rate_limit} req/s; concurrencia: {concurrency}.", flush=True)
     print("[2/4] Iniciando Nuclei. La salida aparecerá debajo.", flush=True)
 
     messages = []
@@ -210,8 +240,9 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
             for line in process.stdout:
                 line = line.rstrip()
                 if line:
-                    messages.append(line)
-                    print(f"[Nuclei] {line}", flush=True)
+                    if len(messages) < 100:
+                        messages.append(line[:2000])
+                    print(f"[Nuclei] {line[:2000]}", flush=True)
 
         reader = threading.Thread(target=show_output, daemon=True)
         reader.start()
@@ -252,7 +283,9 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
 
     findings = []
     malformed_findings_lines = 0
-    if output_file.is_file():
+    if output_too_large:
+        malformed_findings_lines = 1
+    elif output_file.is_file():
         for line in output_file.read_text(encoding="utf-8").splitlines():
             try:
                 parsed_finding = json.loads(line)
@@ -263,7 +296,8 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
             except json.JSONDecodeError:
                 malformed_findings_lines += 1
 
-    status = "completed" if process.returncode == 0 else "scanner_error"
+    output_too_large = output_file.is_file() and output_file.stat().st_size > 25_000_000
+    status = "evidence_rejected" if output_too_large else ("completed" if process.returncode == 0 else "scanner_error")
 
     print(f"[4/4] Hallazgos registrados: {len(findings)}", flush=True)
     print(f"Estado final: {status}", flush=True)
@@ -276,6 +310,11 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
         "elapsed_seconds": elapsed,
         "findings_count": len(findings),
         "malformed_findings_lines": malformed_findings_lines,
+        "template_directory": str(template_root),
+        "severity_filter": selected_severity,
+        "rate_limit": rate_limit,
+        "concurrency": concurrency,
+        "output_too_large": output_too_large,
         "findings": findings,
         "scanner_messages": messages[-100:],
         "note": (
