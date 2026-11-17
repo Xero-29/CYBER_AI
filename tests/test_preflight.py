@@ -35,6 +35,44 @@ class PreflightTests(unittest.TestCase):
         self.assertFalse(report["network_accessed"])
         self.assertFalse(report["services_started"])
 
+    def test_env_file_with_group_or_world_read_permissions_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            env_file = root / ".env"
+            env_file.write_text("API_KEY=not-a-real-key\\n", encoding="utf-8")
+            env_file.chmod(0o644)
+            findings = preflight.validate_env_file_permissions(root)
+        self.assertEqual(len(findings), 1)
+        self.assertIn("chmod 600", findings[0]["reason"])
+
+    def test_env_file_with_owner_only_permissions_is_accepted(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            env_file = root / ".env.local"
+            env_file.write_text("API_KEY=not-a-real-key\\n", encoding="utf-8")
+            env_file.chmod(0o600)
+            findings = preflight.validate_env_file_permissions(root)
+        self.assertEqual(findings, [])
+
+    def test_env_example_is_excluded_from_permission_check(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            env_file = root / ".env.example"
+            env_file.write_text("API_KEY=\\n", encoding="utf-8")
+            env_file.chmod(0o644)
+            findings = preflight.validate_env_file_permissions(root)
+        self.assertEqual(findings, [])
+
+    def test_env_symlink_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            target = root / "secrets"
+            target.write_text("API_KEY=not-a-real-key\\n", encoding="utf-8")
+            (root / ".env").symlink_to(target)
+            findings = preflight.validate_env_file_permissions(root)
+        self.assertEqual(len(findings), 1)
+        self.assertIn("enlace simbólico", findings[0]["reason"])
+
     def test_old_python_blocks_readiness(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
