@@ -92,6 +92,9 @@ class ExecutionLedgerTests(unittest.TestCase):
         event = migrated.append(namespace="test", task="after migration",
                                 status="started", tool="unit", evidence={}, duration_ms=0)
         self.assertEqual(event["status"], "started")
+        recovered = migrated.reconcile_interrupted()
+        self.assertEqual(recovered["reconciled"], 1)
+        self.assertEqual(migrated.history(namespace="test")[0]["status"], "interrupted")
         self.assertTrue(migrated.verify()["valid"])
 
     def test_environment_path_is_used_when_no_path_is_passed(self):
