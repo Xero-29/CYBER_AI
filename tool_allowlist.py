@@ -5,11 +5,19 @@ import json
 import os
 import re
 import stat
-from pathlib import Path
 
 
 class ToolAllowlistError(ValueError):
     """La política firmada de herramientas no es válida o no autoriza el binario."""
+
+
+def _unique_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ToolAllowlistError("La allowlist contiene claves JSON duplicadas.")
+        result[key] = value
+    return result
 
 
 def _canonical_payload(document):
@@ -31,20 +39,38 @@ def sign_tool_allowlist(tools, key):
 def load_signed_tool_allowlist(path, key):
     if not isinstance(key, bytes) or len(key) < 32:
         raise ToolAllowlistError("La clave HMAC debe tener al menos 32 bytes.")
-    candidate = Path(path)
-    if candidate.is_symlink():
-        raise ToolAllowlistError("La allowlist no puede ser un enlace simbólico.")
+    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+    descriptor = None
     try:
-        info = candidate.stat(follow_symlinks=False)
+        descriptor = os.open(path, flags)
+        info = os.fstat(descriptor)
         if not stat.S_ISREG(info.st_mode) or info.st_size > 65536:
             raise ToolAllowlistError("La allowlist debe ser un archivo regular de hasta 64 KiB.")
-        document = json.loads(candidate.read_text(encoding="utf-8"))
-    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        chunks = []
+        total = 0
+        while True:
+            chunk = os.read(descriptor, min(8192, 65537 - total))
+            if not chunk:
+                break
+            total += len(chunk)
+            if total > 65536:
+                raise ToolAllowlistError("La allowlist supera el límite de 64 KiB.")
+            chunks.append(chunk)
+        raw = b"".join(chunks)
+        document = json.loads(raw.decode("utf-8"), object_pairs_hook=_unique_object)
+    except ToolAllowlistError:
+        raise
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
         raise ToolAllowlistError("No se pudo leer la allowlist firmada.") from exc
+    finally:
+        if descriptor is not None:
+            os.close(descriptor)
     if not isinstance(document, dict) or set(document) != {"schema_version", "tools", "signature"}:
         raise ToolAllowlistError("Esquema de allowlist inválido.")
-    if document["schema_version"] != 1 or not isinstance(document["tools"], dict):
-        raise ToolAllowlistError("Versión o catálogo de allowlist inválido.")
+    if type(document["schema_version"]) is not int or document["schema_version"] != 1:
+        raise ToolAllowlistError("Versión de allowlist inválida.")
+    if not isinstance(document["tools"], dict) or not document["tools"]:
+        raise ToolAllowlistError("Catálogo de allowlist inválido.")
     signature = document["signature"]
     if not isinstance(signature, str) or not re.fullmatch(r"[0-9a-f]{64}", signature):
         raise ToolAllowlistError("Firma HMAC inválida.")
