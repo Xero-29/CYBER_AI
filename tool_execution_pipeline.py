@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 
 from execution_ledger import ExecutionLedger
+from tool_result_validator import validate_tool_evidence
 from tool_adapters import (
     TOOL_SPECS,
     ToolExecutionError,
@@ -52,10 +53,12 @@ def execute_tool_plan(plan, target, *, confirmed=False, max_tools=3):
             tool_id = item["id"]
             try:
                 evidence = run_local_tool(tool_id, str(target_path))
+                validation = validate_tool_evidence(evidence)
+                evidence["independent_integrity_validation"] = validation
                 evidence_path = write_evidence(evidence)
                 status = evidence.get("status", "failed")
                 ledger_status = (
-                    "completed" if status == "completed" else
+                    "completed" if validation["status"] == "valid_integrity" else
                     "timeout" if status == "timeout" else "failed"
                 )
                 event = ExecutionLedger().append(
@@ -70,6 +73,7 @@ def execute_tool_plan(plan, target, *, confirmed=False, max_tools=3):
                         "target_sha256": evidence.get("target_sha256"),
                         "tool_binary_sha256": evidence.get("tool_binary_sha256"),
                         "status": status,
+                        "validation": validation,
                     },
                     duration_ms=int(evidence.get("duration_ms", 0)),
                     metadata={"plan_status": plan.get("status"), "authorization_mode": "operator-confirmed-local-allowlist"},
@@ -79,6 +83,7 @@ def execute_tool_plan(plan, target, *, confirmed=False, max_tools=3):
                     "evidence_path": str(evidence_path),
                     "ledger_event_id": event["event_id"],
                     "findings_count": evidence.get("findings_count"),
+                    "validation": validation,
                 })
             except Exception as error:
                 event = ExecutionLedger().append(
@@ -100,7 +105,11 @@ def execute_tool_plan(plan, target, *, confirmed=False, max_tools=3):
         else:
             os.environ["CYBER_AI_TOOL_ALLOWLIST_REQUIRED"] = previous_required
     return {
-        "status": "completed" if results and all(x["status"] == "completed" for x in results) else "partial_or_failed",
+        "status": "completed" if results and all(
+            x["status"] == "completed"
+            and x.get("validation", {}).get("status") == "valid_integrity"
+            for x in results
+        ) else "partial_or_failed",
         "target": str(target_path),
         "results": results,
         "note": "Los hallazgos son indicios no confiables y requieren validación independiente.",
