@@ -210,7 +210,7 @@ class TestWorkflowValidation(unittest.TestCase):
             self.assertTrue(report["steps"][1]["validation_errors"])
 
 
-    def test_knowledge_flags_are_limited_to_configured_steps(self):
+    def test_knowledge_is_enabled_by_default_and_can_be_configured_per_step(self):
         workflow = {
             "workflows": {
                 "knowledge_test": {
@@ -327,8 +327,9 @@ class TestWorkflowValidation(unittest.TestCase):
                 )
 
             for agent, command in commands:
-                if agent != "NEXO":
-                    self.assertNotIn("--knowledge", command)
+                self.assertIn("--knowledge", command)
+                self.assertIn("--knowledge-top-k", command)
+                self.assertIn("--knowledge-min-score", command)
 
 
 if __name__ == "__main__":
