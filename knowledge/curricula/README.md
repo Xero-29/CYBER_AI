@@ -39,3 +39,8 @@ Se han creado 48 módulos, uno por cada área del manifiesto. Su estado inicial 
 - Agendas específicas de las 48 áreas: `../deep_modules/<area>/RESEARCH_AGENDA.md`.
 - Auditoría estructural: `python knowledge_research_audit.py` y `python -m pytest tests/test_knowledge_research_audit.py`.
 - Las agendas no son papers, revisiones sistemáticas ni experimentos ejecutados. M4/M5 solo se asignan tras evidencia empírica y reproducción independiente.
+
+
+## Revisiones bibliográficas iniciales
+
+Siete dominios cuentan con síntesis de fuentes primarias, hipótesis y protocolos experimentales propuestos (aún no ejecutados): AppSec/API, respuesta a incidentes, DevSecOps/supply chain, gestión de vulnerabilidades, OT/ICS, arquitectura segura y criptografía. Consulta el índice en `../deep_modules/README.md`. El auditor `knowledge_research_audit.py` verifica que los IDs de fuente citados existan en el registro; no certifica que el documento completo haya sido leído ni que las conclusiones sean científicamente válidas.
