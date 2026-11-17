@@ -61,11 +61,12 @@ def _digest(previous, payload):
 class ExecutionLedger:
     """SQLite hash chain. Tamper-evident, not tamper-proof."""
 
-    def __init__(self, path=None):
+    def __init__(self, path=None, *, initialize=True):
         configured_path = path if path is not None else os.environ.get("CYBER_AI_LEDGER_PATH", DEFAULT_DB)
         self.path = Path(configured_path)
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        self.initialize()
+        if initialize:
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+            self.initialize()
 
     def connect(self, *, configure_wal=False):
         db = sqlite3.connect(str(self.path), timeout=30, isolation_level=None)
