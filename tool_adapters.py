@@ -231,7 +231,7 @@ def _validated_nmap_scope(target):
             )
     except ValueError as error:
         raise ToolExecutionError("Nmap no acepta DNS, argumentos ni objetivos no IP.") from error
-    if requested.num_addresses > 16 or requested.is_multicast or requested.is_unspecified:
+    if requested.num_addresses > 16 or requested.network_address.is_multicast or requested.network_address.is_unspecified:
         raise ToolExecutionError("El alcance Nmap debe ser un bloque unicast de máximo 16 direcciones.")
 
     raw_allowlist = os.environ.get("CYBER_AI_NMAP_ALLOWED_CIDRS", "")
