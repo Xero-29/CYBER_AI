@@ -86,18 +86,22 @@ class ToolAdapterTests(unittest.TestCase):
 
     def test_target_mutation_during_execution_invalidates_success(self):
         provenance = {"resolved_path": "/usr/bin/ruff", "sha256": "a" * 64}
+
         def start_process(*args, **kwargs):
             (self.root / "sample.py").write_text("print('changed')\\n", encoding="utf-8")
             return FakeProcess()
-        with patch.object(tool_adapters, "_hash_binary", return_value=provenance), \\
-             patch.object(tool_adapters.shutil, "which", return_value="/usr/bin/ruff"), \\
-             patch.object(
-                 tool_adapters.subprocess, "run",
-                 return_value=subprocess.CompletedProcess(
-                     ["ruff", "--version"], 0, stdout="ruff 0.14.5\\n", stderr=""
-                 ),
-             ), \\
-             patch.object(tool_adapters.subprocess, "Popen", side_effect=start_process):
+
+        with (
+            patch.object(tool_adapters, "_hash_binary", return_value=provenance),
+            patch.object(tool_adapters.shutil, "which", return_value="/usr/bin/ruff"),
+            patch.object(
+                tool_adapters.subprocess, "run",
+                return_value=subprocess.CompletedProcess(
+                    ["ruff", "--version"], 0, stdout="ruff 0.14.5\\n", stderr=""
+                ),
+            ),
+            patch.object(tool_adapters.subprocess, "Popen", side_effect=start_process),
+        ):
             evidence = run_local_tool("ruff", "sample.py")
         self.assertEqual(evidence["status"], "integrity_error")
         self.assertTrue(evidence["target_modified"])
