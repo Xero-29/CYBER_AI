@@ -20,6 +20,7 @@ DEFAULT_REPORTS = PROJECT / "reports" / "agent_simulations"
 WORKFLOW_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")
 MAX_TASK_CHARS = 100_000
 MAX_RESPONSE_CHARS = 100_000
+_MISSING = object()
 
 
 class SimulationError(ValueError):
@@ -134,15 +135,13 @@ def _validate_response_fixtures(
         if isinstance(fixture, list):
             if not fixture:
                 raise SimulationError(f"La secuencia de fixtures de {agent} está vacía.")
-            if any(not isinstance(item, str) for item in fixture):
-                raise SimulationError(f"Las fixtures de {agent} deben ser textos.")
+            # Se permiten valores no textuales para probar el cierre seguro del
+            # validador de respuestas en escenarios adversariales.
             validated[agent] = tuple(fixture)
-        elif isinstance(fixture, str):
-            validated[agent] = fixture
         else:
-            raise SimulationError(
-                f"La fixture de {agent} debe ser texto o una lista no vacía de textos."
-            )
+            # El tipo de respuesta se valida durante la simulación: un fixture
+            # no textual produce un paso fallido, no una excepción de configuración.
+            validated[agent] = fixture
     return validated
 
 
@@ -168,12 +167,12 @@ def simulate_workflow(
 
     for step in steps:
         agent = step["agent"]
-        supplied = fixtures.get(agent)
+        supplied = fixtures.get(agent, _MISSING)
         if isinstance(supplied, tuple):
             offset = response_offsets.get(agent, 0)
             response = supplied[offset] if offset < len(supplied) else _synthetic_response(agent, step)
             response_offsets[agent] = offset + 1
-        elif supplied is None:
+        elif supplied is _MISSING:
             response = _synthetic_response(agent, step)
         else:
             response = supplied
