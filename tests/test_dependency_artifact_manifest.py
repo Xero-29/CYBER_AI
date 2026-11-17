@@ -16,13 +16,17 @@ class DependencyArtifactManifestTests(unittest.TestCase):
         self.write_lock("a" * 64, "b" * 64)
 
     def write_lock(self, requests_hash, certifi_hash):
+        newline = chr(10)
+        slash = chr(92)
         (self.root / "requirements.txt").write_text(
-            "requests==2.0 " + chr(92) + "\\n    --hash=sha256:" + requests_hash + "\\n",
+            "requests==2.0 " + slash + newline
+            + "    --hash=sha256:" + requests_hash + newline,
             encoding="utf-8",
         )
         (self.root / "requirements.lock").write_text(
-            "-r requirements.txt\\ncertifi==1.0 " + chr(92)
-            + "\\n    --hash=sha256:" + certifi_hash + "\\n",
+            "-r requirements.txt" + newline
+            + "certifi==1.0 " + slash + newline
+            + "    --hash=sha256:" + certifi_hash + newline,
             encoding="utf-8",
         )
 
@@ -70,7 +74,8 @@ class DependencyArtifactManifestTests(unittest.TestCase):
             build_manifest(self.root, self.wheelhouse)
 
     def test_manifest_rejects_missing_locked_wheel(self):
-        self.wheel("requests-2.0-py3-none-any.whl", "requests", "2.0")
+        requests_wheel = self.wheel("requests-2.0-py3-none-any.whl", "requests", "2.0")
+        self.pin_created_wheels(requests_wheel=requests_wheel)
         with self.assertRaisesRegex(ArtifactManifestError, "certifi"):
             build_manifest(self.root, self.wheelhouse)
 

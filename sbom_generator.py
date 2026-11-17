@@ -30,13 +30,13 @@ def _logical_requirement_lines(path):
         if not line or line.startswith("#"):
             continue
         if pending:
-            if line.endswith("\\\\"):
+            if line.endswith(chr(92)):
                 pending += " " + line[:-1].strip()
                 continue
             yield start_line, pending + " " + line
             pending = ""
             start_line = None
-        elif line.endswith("\\\\"):
+        elif line.endswith(chr(92)):
             pending = line[:-1].strip()
             start_line = number
         else:

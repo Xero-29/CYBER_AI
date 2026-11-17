@@ -11,13 +11,17 @@ class SbomGeneratorTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.root = Path(self.temp.name)
+        newline = chr(10)
+        slash = chr(92)
         (self.root / "requirements.txt").write_text(
-            "Requests==2.34.2 " + chr(92) + "\\n    --hash=sha256:" + "a" * 64 + "\\n",
+            "Requests==2.34.2 " + slash + newline
+            + "    --hash=sha256:" + "a" * 64 + newline,
             encoding="utf-8",
         )
         (self.root / "requirements.lock").write_text(
-            "-r requirements.txt\\ncertifi==2026.10.23 " + chr(92)
-            + "\\n    --hash=sha256:" + "b" * 64 + "\\n",
+            "-r requirements.txt" + newline
+            + "certifi==2026.10.23 " + slash + newline
+            + "    --hash=sha256:" + "b" * 64 + newline,
             encoding="utf-8",
         )
 
