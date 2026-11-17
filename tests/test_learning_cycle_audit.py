@@ -54,6 +54,20 @@ class LearningCycleAuditTests(unittest.TestCase):
         self.assertEqual(report["memory"]["status"], "disabled_missing_approval_key")
         self.assertIsNone(report["memory"]["rejected_or_unverifiable_records"])
 
+    def test_configured_memory_audit_reuses_existing_read_only_ledger(self):
+        key = learning_cycle_audit.learning_memory.APPROVAL_KEY_ENV
+        with (
+            patch.dict(os.environ, {key: "k" * 32}),
+            patch.object(
+                learning_cycle_audit.learning_memory,
+                "read_lessons",
+                wraps=learning_cycle_audit.learning_memory.read_lessons,
+            ) as reader,
+        ):
+            report = learning_cycle_audit.audit_learning_cycle()
+        reader.assert_called_once_with(ledger=self.ledger)
+        self.assertEqual(report["memory"]["status"], "verified")
+
     def test_missing_ledger_is_reported_without_creating_it(self):
         missing = self.root / "absent" / "ledger.sqlite3"
         with (
