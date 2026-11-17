@@ -29,11 +29,14 @@ def audit(root: Path = ROOT) -> dict:
             if not ref.get(key): errors.append(f"Referencia sin {key}: {ref.get('id', '?')}")
         unknown = set(ref.get("domains", [])) - set(manifest_ids)
         if unknown: errors.append(f"{ref.get('id')}: dominios inexistentes {sorted(unknown)}")
+    reference_domains = {item["id"]: set(item.get("domains", [])) for item in refs}
     rows = []
     for area in area_rows:
         aid, links = area.get("id", "?"), area.get("reference_ids", [])
         unknown = sorted(set(links) - known_refs)
         if unknown: errors.append(f"{aid}: referencias inexistentes {unknown}")
+        inconsistent = sorted(ref_id for ref_id in links if ref_id in reference_domains and aid not in reference_domains[ref_id])
+        if inconsistent: errors.append(f"{aid}: mapeo inverso ausente en referencias {inconsistent}")
         if len(links) != len(set(links)): errors.append(f"{aid}: referencias duplicadas")
         if not links: warnings.append(f"{aid}: sin referencias asociadas")
         rows.append({"id": aid, "reference_count": len(links), "references_exist": not unknown,
