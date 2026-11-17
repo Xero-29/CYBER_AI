@@ -145,6 +145,73 @@ def _save_version(db, skill_id, version, change_type, actor):
     )
 
 
+def verify_skill_history(skill_id):
+    """Comprueba continuidad, snapshots y coherencia de la versión actual."""
+    if not isinstance(skill_id, str) or not skill_id.strip():
+        raise ValueError("skill_id es obligatorio.")
+    initialize()
+    with connect() as db:
+        current = db.execute(
+            "SELECT * FROM skills WHERE skill_id=?", (skill_id.strip(),)
+        ).fetchone()
+        versions = db.execute(
+            """SELECT version,change_type,actor,snapshot_json,created_at
+               FROM skill_versions WHERE skill_id=? ORDER BY version""",
+            (skill_id.strip(),),
+        ).fetchall()
+    if current is None:
+        return {"valid": False, "skill_id": skill_id, "reason": "skill_not_found"}
+    if not versions:
+        return {"valid": False, "skill_id": skill_id, "reason": "history_missing"}
+    expected_versions = list(range(1, current["version"] + 1))
+    actual_versions = [row["version"] for row in versions]
+    if actual_versions != expected_versions:
+        return {
+            "valid": False, "skill_id": skill_id,
+            "reason": "version_sequence", "expected": expected_versions,
+            "actual": actual_versions,
+        }
+    snapshots = []
+    try:
+        for row in versions:
+            snapshot = json.loads(row["snapshot_json"])
+            if (
+                not isinstance(snapshot, dict)
+                or snapshot.get("skill_id") != skill_id
+                or snapshot.get("version") != row["version"]
+            ):
+                return {
+                    "valid": False, "skill_id": skill_id,
+                    "reason": "snapshot_identity", "failed_version": row["version"],
+                }
+            snapshots.append(snapshot)
+    except (TypeError, ValueError, json.JSONDecodeError):
+        return {
+            "valid": False, "skill_id": skill_id,
+            "reason": "malformed_snapshot",
+        }
+    # last_used_at/use_count son contadores operacionales y no forman parte
+    # de una nueva versión metodológica.
+    mutable = {"last_used_at", "use_count"}
+    latest = snapshots[-1]
+    mismatches = [
+        key for key in current.keys()
+        if key not in mutable and current[key] != latest.get(key)
+    ]
+    if mismatches:
+        return {
+            "valid": False, "skill_id": skill_id,
+            "reason": "current_snapshot_mismatch",
+            "fields": sorted(mismatches),
+        }
+    return {
+        "valid": True, "skill_id": skill_id,
+        "versions_checked": len(versions),
+        "current_version": current["version"],
+        "status": current["status"],
+    }
+
+
 def list_skill_versions(skill_id):
     """Devuelve el historial inmutable de snapshots de una Skill."""
     initialize()
