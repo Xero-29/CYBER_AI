@@ -4,8 +4,11 @@
 import json
 from datetime import datetime, timezone
 from pathlib import Path
+
 from capability_selector import select_capabilities
+from domain_capability_matrix import select_domain_capabilities
 from tool_registry import select_tools
+
 
 def create_plan(task, output_path=None):
     planning_warnings = []
@@ -17,7 +20,30 @@ def create_plan(task, output_path=None):
             "El inventario de capacidades no está generado; se continúa "
             "en modo degradado sin plantillas candidatas."
         )
+
     tool_plan = select_tools(task, limit=10)
+    try:
+        domain_plan = select_domain_capabilities(task, limit=12)
+    except (FileNotFoundError, OSError, ValueError, ImportError) as error:
+        domain_plan = {
+            "matched_domain_count": 0,
+            "domains": [],
+            "skill_candidates": [],
+            "execution_started": False,
+            "note": "La matriz de dominios no pudo consultarse.",
+        }
+        planning_warnings.append(
+            f"Matriz de dominios/Skills no disponible: {type(error).__name__}."
+        )
+
+    domain_tools = {}
+    for domain in domain_plan["domains"]:
+        for candidate in domain["tool_candidates"]:
+            entry = domain_tools.setdefault(candidate["id"], {
+                **candidate, "source_domains": [],
+            })
+            entry["source_domains"].append(domain["id"])
+
     plan = {
         "planning_warnings": planning_warnings,
         "task": task,
@@ -26,6 +52,10 @@ def create_plan(task, output_path=None):
         "candidate_count": len(candidates),
         "tool_candidates": tool_plan["candidates"],
         "tool_candidate_count": tool_plan["candidate_count"],
+        "domain_capabilities": domain_plan["domains"],
+        "domain_candidate_count": domain_plan["matched_domain_count"],
+        "domain_tool_candidates": list(domain_tools.values()),
+        "skill_candidates": domain_plan["skill_candidates"],
         "tool_execution_started": False,
         "steps": [
             {
@@ -39,12 +69,20 @@ def create_plan(task, output_path=None):
             for i, item in enumerate(candidates, 1)
         ],
         "execution_started": False,
-        "note": "Plan preliminar basado en reglas; requiere validar relevancia antes de ejecutar."
+        "note": (
+            "Plan preliminar: relaciona dominios, paquetes de conocimiento, "
+            "herramientas y Skills. Las candidatas requieren revisión y no "
+            "se ejecutan ni autorizan automáticamente."
+        ),
     }
     output = Path(output_path) if output_path is not None else Path("reports/task_plan.json")
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(plan, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    output.write_text(
+        json.dumps(plan, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
     return plan, output
+
 
 if __name__ == "__main__":
     import sys
@@ -54,5 +92,8 @@ if __name__ == "__main__":
     plan, output = create_plan(" ".join(sys.argv[1:]))
     print("Tarea:", plan["task"])
     print("Comprobaciones candidatas:", plan["candidate_count"])
+    print("Dominios relacionados:", plan["domain_candidate_count"])
+    print("Herramientas por dominio:", len(plan["domain_tool_candidates"]))
+    print("Skills relacionadas:", len(plan["skill_candidates"]))
     print("Plan:", output)
     print("Estado:", plan["status"])
