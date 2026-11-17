@@ -62,10 +62,20 @@ Prioridad de implementación:
 6. política de publicación y rollback;
 7. pruebas de supply-chain adversarial en entorno local.
 
+## Brechas
+
+Revisar requisitos SLSA por nivel, verificar builder y provenance en un consumidor independiente, y ejecutar los escenarios de manipulación descritos. La evidencia actual es documental; no se han ejecutado pipelines experimentales.
+
 ## Referencias
 
 - NIST, SP 800-218 SSDF 1.1. https://doi.org/10.6028/NIST.SP.800-218
 - NIST NCCoE, DevSecOps Practices, initial preliminary draft, 2026-03-24. https://csrc.nist.gov/pubs/other/2026/03/24/devsecops-practices/iprd
 - SLSA, Specification v1.1. https://slsa.dev/spec/v1.1/
 - SLSA, Provenance. https://slsa.dev/spec/v1.1/provenance
-\n\n## Identificadores del registro de fuentes\n\n- `NIST-SP-800-218`\n- `NIST-DEVSECOPS-IPD-2026`\n- `SLSA-v1.1`\n
+
+
+## Identificadores del registro de fuentes
+
+- `NIST-SP-800-218`
+- `NIST-DEVSECOPS-IPD-2026`
+- `SLSA-v1.1`
