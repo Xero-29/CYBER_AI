@@ -227,6 +227,7 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
     try:
         process = subprocess.Popen(
             command,
+            stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
@@ -283,6 +284,7 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
         }
         return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)
 
+    output_too_large = output_file.is_file() and output_file.stat().st_size > 25_000_000
     findings = []
     malformed_findings_lines = 0
     if output_too_large:
@@ -298,7 +300,6 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
             except json.JSONDecodeError:
                 malformed_findings_lines += 1
 
-    output_too_large = output_file.is_file() and output_file.stat().st_size > 25_000_000
     status = "evidence_rejected" if output_too_large else ("completed" if process.returncode == 0 else "scanner_error")
 
     print(f"[4/4] Hallazgos registrados: {len(findings)}", flush=True)
