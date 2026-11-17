@@ -89,6 +89,51 @@ class PreflightTests(unittest.TestCase):
         checks = preflight.validate_provider_routes(config, environ={})
         self.assertEqual(checks[0]["status"], "error")
 
+    def test_secret_hygiene_rejects_literal_api_key(self):
+        findings = preflight.validate_secret_hygiene({
+            "llm_providers": {"remote": {"api_key": "hard-coded-secret"}}
+        })
+        self.assertEqual(len(findings), 1)
+        self.assertIn("api_key", findings[0]["path"])
+
+    def test_secret_hygiene_accepts_environment_variable_reference(self):
+        findings = preflight.validate_secret_hygiene({
+            "llm_providers": {"remote": {
+                "api_key_env": "CYBER_AI_TEST_API_KEY",
+                "requires_api_key": True,
+            }}
+        })
+        self.assertEqual(findings, [])
+
+    def test_secret_hygiene_rejects_malformed_environment_variable_name(self):
+        findings = preflight.validate_secret_hygiene({
+            "llm_providers": {"remote": {"api_key_env": "not-a-valid-name"}}
+        })
+        self.assertEqual(len(findings), 1)
+
+    def test_preflight_blocks_project_config_with_embedded_secret(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            self.make_project(root)
+            (root / "config/model_roles.json").write_text(
+                json.dumps({"llm_providers": {"remote": {
+                    "api_key": "embedded-secret"
+                }}}),
+                encoding="utf-8",
+            )
+            report = preflight.collect_checks(
+                root=root,
+                python_version=(3, 12, 0),
+                module_lookup=lambda name: object(),
+                executable_lookup=lambda name: None,
+                environ={},
+            )
+        self.assertEqual(report["status"], "blocked")
+        self.assertTrue(any(
+            item["name"] == "secret_hygiene" and item["status"] == "error"
+            for item in report["checks"]
+        ))
+
     def test_custom_provider_is_reported_without_importing_plugin(self):
         config = {
             "default_provider": "custom",
