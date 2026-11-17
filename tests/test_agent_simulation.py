@@ -73,5 +73,92 @@ class TestAgentSimulation(unittest.TestCase):
         self.assertTrue(report["steps"][0]["validation_errors"])
 
 
+
+    def test_empty_falsy_fixture_mapping_is_rejected(self):
+        for invalid in ([], "", 0, False):
+            with self.subTest(invalid=invalid):
+                with self.assertRaises(SimulationError):
+                    simulate_workflow(self.workflow, "tarea", invalid)
+
+    def test_empty_fixture_sequence_is_rejected(self):
+        with self.assertRaises(SimulationError):
+            simulate_workflow(self.workflow, "tarea", {"NEXO": []})
+
+    def test_unknown_fixture_agent_is_rejected(self):
+        with self.assertRaises(SimulationError):
+            simulate_workflow(self.workflow, "tarea", {"AGENTE_INEXISTENTE": "texto"})
+
+    def test_fixture_sequence_rejects_non_text_items(self):
+        with self.assertRaises(SimulationError):
+            simulate_workflow(self.workflow, "tarea", {"NEXO": ["texto", None]})
+
+    def test_unhashable_mode_is_rejected_as_contract_error(self):
+        with self.assertRaises(SimulationError):
+            validate_workflow_contract({
+                "steps": [{"agent": "NEXO", "objective": "x", "mode": []}]
+            })
+
+    def test_invalid_workflow_limits_are_rejected(self):
+        for field in ("max_rounds", "max_context_chars"):
+            with self.subTest(field=field):
+                with self.assertRaises(SimulationError):
+                    validate_workflow_contract({
+                        field: True,
+                        "steps": [{"agent": "NEXO", "objective": "x"}],
+                    })
+
+    def test_task_size_limit_is_enforced(self):
+        with self.assertRaises(SimulationError):
+            simulate_workflow(self.workflow, "x" * 100_001)
+
+    def test_all_repository_workflows_load_and_simulate(self):
+        from agent_simulation import load_workflow
+
+        for name in ("investigacion", "critica_corta", "revision_tecnica"):
+            with self.subTest(workflow=name):
+                workflow = load_workflow(name)
+                report = simulate_workflow(workflow, "Prueba sintética")
+                self.assertEqual(report["status"], "completed")
+                self.assertEqual(report["metrics"]["steps_total"], len(workflow["steps"]))
+                self.assertEqual(report["metrics"]["steps_passed"], len(workflow["steps"]))
+
+    def test_loader_rejects_path_like_workflow_ids(self):
+        from agent_simulation import load_workflow
+
+        with self.assertRaises(SimulationError):
+            load_workflow("../README")
+
+    def test_loader_rejects_invalid_catalog_roots(self):
+        import json
+        import tempfile
+        from pathlib import Path
+        from agent_simulation import load_workflow
+
+        for payload in ([], {"version": 1, "workflows": []}, {"workflows": None}):
+            with self.subTest(payload=payload), tempfile.TemporaryDirectory() as temp:
+                path = Path(temp) / "workflows.json"
+                path.write_text(json.dumps(payload), encoding="utf-8")
+                with self.assertRaises(SimulationError):
+                    load_workflow("demo", path)
+
+    def test_cli_writes_report_for_real_catalog_workflow(self):
+        import json
+        import tempfile
+        from pathlib import Path
+        from agent_simulation import main
+
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp) / "simulation.json"
+            result = main([
+                "--workflow", "investigacion",
+                "--task", "Prueba CLI sin proveedor real",
+                "--output", str(output),
+            ])
+            report = json.loads(output.read_text(encoding="utf-8"))
+            self.assertEqual(result, 0)
+            self.assertEqual(report["status"], "completed")
+            self.assertEqual(report["real_model_calls"], 0)
+            self.assertEqual(report["real_tool_calls"], 0)
+
 if __name__ == "__main__":
     unittest.main()
