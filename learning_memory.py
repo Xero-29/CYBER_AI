@@ -312,7 +312,7 @@ def _record_signature_is_valid(item, key):
         return False
 
 
-def read_lessons(path=None):
+def read_lessons(path=None, *, ledger=None):
     """Lee solo lecciones firmadas cuyas referencias siguen verificables en el ledger."""
     path = Path(path) if path else MEMORY_FILE
     key = os.environ.get(APPROVAL_KEY_ENV, "")
@@ -339,7 +339,7 @@ def read_lessons(path=None):
 
     # La firma acredita la aprobación; el ledger vivo acredita que la evidencia
     # sigue existiendo, conserva sus hashes y mantiene una cadena íntegra.
-    ledger = ExecutionLedger()
+    ledger = ledger if ledger is not None else ExecutionLedger()
     if not ledger.verify().get("valid"):
         return []
 
