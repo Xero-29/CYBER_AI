@@ -34,6 +34,14 @@ class DomainCapabilityMatrixTests(unittest.TestCase):
         self.assertFalse(result["execution_started"])
 
     @patch("skillbook.search_skills", return_value=[])
+    def test_short_domain_terms_do_not_match_inside_unrelated_words(self, search_skills):
+        result = select_domain_capabilities(
+            "revisión de credenciales expuestas",
+            inventory={"tools": {}},
+        )
+        self.assertNotIn("network", {item["id"] for item in result["domains"]})
+
+    @patch("skillbook.search_skills", return_value=[])
     def test_catalog_only_domains_are_not_misreported_as_operational(self, search_skills):
         result = select_domain_capabilities(
             "seguridad móvil Android",
