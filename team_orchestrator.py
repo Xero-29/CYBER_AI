@@ -17,6 +17,7 @@ from task_planner import create_plan
 from tool_execution_pipeline import execute_tool_plan, ToolExecutionError
 
 from model_memory_manager import load_config
+from workflow_contracts import WorkflowContractError, validate_workflow_definition
 import experiment_engine
 import objective_controller
 
@@ -27,33 +28,22 @@ REPORT_DIR = PROJECT / "reports" / "team_runs"
 
 
 def load_workflow(name):
-    """Carga un flujo y verifica que sus especialistas existan."""
+    """Carga un flujo, valida su contrato y comprueba los especialistas."""
     data = json.loads(WORKFLOW_FILE.read_text(encoding="utf-8"))
-    workflows = data.get("workflows", {})
+    workflows = data.get("workflows", {}) if isinstance(data, dict) else {}
 
-    if name not in workflows:
+    if not isinstance(workflows, dict) or name not in workflows:
         raise ValueError(f"No existe el flujo {name!r}.")
 
     workflow = workflows[name]
-    steps = workflow.get("steps", [])
-    if not steps:
-        raise ValueError("El flujo no contiene pasos.")
+    try:
+        steps = validate_workflow_definition(workflow)
+    except WorkflowContractError as error:
+        raise ValueError(f"Contrato inválido en el flujo {name!r}: {error}") from error
 
     agents = load_config().get("agents", {})
-    workflow_mode = workflow.get("mode", "standard")
-    if workflow_mode not in {"standard", "technical"}:
-        raise ValueError(
-            f"Modo inválido en el flujo {name!r}: {workflow_mode!r}."
-        )
-
     for number, step in enumerate(steps, start=1):
-        step_mode = step.get("mode", workflow_mode)
-        if step_mode not in {"standard", "technical"}:
-            raise ValueError(
-                f"Paso {number}: modo inválido {step_mode!r}."
-            )
-
-        agent_name = step.get("agent")
+        agent_name = step["agent"]
         if agent_name not in agents:
             raise ValueError(
                 f"Paso {number}: no existe el especialista {agent_name!r}."
@@ -68,7 +58,9 @@ def load_workflow(name):
                 "no un agente conversacional."
             )
 
-    return workflow
+    normalized_workflow = dict(workflow)
+    normalized_workflow["steps"] = steps
+    return normalized_workflow
 
 
 def latest_record_after(offset):
