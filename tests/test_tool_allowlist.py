@@ -61,6 +61,12 @@ class ToolAllowlistTests(unittest.TestCase):
         with self.assertRaises(ToolAllowlistError):
             load_signed_tool_allowlist(directory, self.key)
 
+    def test_verifier_rejects_invalid_tool_id_and_binary_digest(self):
+        with self.assertRaises(ToolAllowlistError):
+            verify_tool_allowed("../ruff", self.digest)
+        with self.assertRaises(ToolAllowlistError):
+            verify_tool_allowed("ruff", "not-a-digest")
+
     def test_short_key_is_rejected(self):
         with self.assertRaises(ToolAllowlistError):
             sign_tool_allowlist({"ruff": {"sha256": self.digest}}, b"short")
