@@ -95,6 +95,24 @@ class KnowledgeAuditSecurityTests(unittest.TestCase):
                 1,
             )
 
+    def test_symlinked_scan_root_is_not_followed(self):
+        outside = self.root / "outside"
+        outside.mkdir()
+        (outside / "private.txt").write_text("not part of the project")
+        data_dir = self.root / "data"
+        data_dir.mkdir(exist_ok=True)
+        link = data_dir / "knowledge_base"
+        try:
+            link.symlink_to(outside, target_is_directory=True)
+            self.write_manifest({})
+            report = audit_files(self.manifest, self.root)
+            self.assertTrue(any(
+                item["path"] == str(link) for item in report["unsafe_paths"]
+            ))
+            self.assertEqual(report["unregistered_files"], [])
+        finally:
+            link.unlink(missing_ok=True)
+
     def test_invalid_database_schema_returns_diagnostic(self):
         database = self.root / "empty.sqlite3"
         sqlite3.connect(database).close()
