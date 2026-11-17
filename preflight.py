@@ -175,10 +175,10 @@ def validate_env_file_permissions(root):
             if not path.is_file():
                 continue
             mode = stat.S_IMODE(path.stat(follow_symlinks=False).st_mode)
-            if mode & (stat.S_IRGRP | stat.S_IROTH):
+            if mode & 0o077:
                 findings.append({
                     "path": path.name,
-                    "reason": "Permisos inseguros: el archivo .env es legible por grupo u otros; usar chmod 600.",
+                    "reason": "Permisos inseguros: grupo u otros tienen permisos sobre el archivo .env; usar chmod 600.",
                 })
         except OSError:
             findings.append({
