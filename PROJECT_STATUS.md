@@ -3,9 +3,9 @@
 > Esta sección es la fuente de verdad vigente. Los bloques históricos que aparecen debajo documentan etapas anteriores y no deben interpretarse como el estado actual.
 
 **Rama:** `main`  
-**Último commit de implementación:** `6c00d128c7edd26e7f5ebd11b93fdb6a005e5dad`  
+**Último cambio de código y pruebas:** `39f197ea6aa96b30535d6a356084ae148756b898`  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17` (no modificado).  
-**CI del HEAD:** pendiente de resultado verificable; no se extrapola la evidencia de commits anteriores.
+**CI del HEAD:** sin checks publicados/recuperables en la última consulta; queda pendiente de validación exacta.
 
 ## Integración realizada
 
@@ -13,7 +13,7 @@
 - `cyber_ai.py --team` conecta el flujo multiagente supervisado con planificador e inventario de herramientas.
 - La ejecución local opcional usa `--execute-tools --confirm-tool-execution --tool-target`; exige confirmación explícita, allowlist HMAC obligatoria y objetivo relativo confinado al repositorio.
 - El pipeline local genera evidencia, valida integridad y registra eventos del ledger; los resultados llegan a los agentes como datos no confiables.
-- Nuclei ahora usa el contrato `cyber-ai.remote-scan.v1`, valida estructura y origen de cada hallazgo contra el destino autorizado, rechaza JSONL malformado y enlaza la evidencia con el evento terminal del ledger.
+- Nuclei usa el contrato `cyber-ai.remote-scan.v1`, valida estructura y origen de cada hallazgo contra el destino autorizado, rechaza JSONL malformado y enlaza la evidencia con el evento terminal del ledger.
 - La autorización de Nuclei continúa siendo específica por destino/acción y separada del planificador local. No se heredan permisos entre rutas.
 - El planificador degrada con advertencia explícita cuando falta el índice de capacidades.
 
