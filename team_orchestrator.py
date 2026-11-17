@@ -771,7 +771,8 @@ def step_uses_knowledge(step, workflow):
 def execute_workflow(
     task, workflow_name, dry_run=False, *,
     supervise_objectives=False, acceptance_criteria=None, review_rounds=2,
-    execute_tools=False, confirm_tool_execution=False, tool_target=None
+    execute_tools=False, confirm_tool_execution=False, tool_target=None,
+    allow_external_targets=False
 ):
     """Ejecuta el flujo de forma secuencial y registra cada respuesta."""
     workflow_started = time.monotonic()
@@ -867,6 +868,7 @@ def execute_workflow(
             tool_execution = execute_tool_plan(
                 capability_plan, tool_target,
                 confirmed=confirm_tool_execution,
+                allow_external_targets=allow_external_targets,
             )
             report["tool_execution"] = tool_execution
             capability_plan["tool_execution_started"] = True
@@ -1229,7 +1231,11 @@ def main(argv=None):
     )
     parser.add_argument(
         "--tool-target",
-        help="Ruta relativa al repositorio que analizarán los adaptadores locales.",
+        help="Ruta del archivo o directorio que analizarán los adaptadores locales.",
+    )
+    parser.add_argument(
+        "--allow-external-targets", action="store_true",
+        help="Permitir objetivos fuera del repositorio tras confirmación explícita.",
     )
     parser.add_argument(
         "--experiment-test",
@@ -1266,6 +1272,8 @@ def main(argv=None):
             "y --experiment-hypothesis."
         )
 
+    if args.allow_external_targets and not args.execute_tools:
+        parser.error("--allow-external-targets requiere --execute-tools.")
     if args.execute_tools and (
         not args.confirm_tool_execution or not args.tool_target
     ):
@@ -1303,6 +1311,7 @@ def main(argv=None):
                 "execute_tools": True,
                 "confirm_tool_execution": True,
                 "tool_target": args.tool_target,
+                "allow_external_targets": args.allow_external_targets,
             })
         if args.supervise_objectives:
             workflow_options.update({
