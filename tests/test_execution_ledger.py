@@ -129,6 +129,19 @@ class ExecutionLedgerTests(unittest.TestCase):
         self.assertEqual(self.ledger.reconcile_interrupted()["reconciled"], 0)
         self.assertTrue(self.ledger.verify()["valid"])
 
+    def test_reconcile_refuses_to_append_to_a_corrupted_chain(self):
+        self.append(status="started", evidence={"phase": "start"}, duration_ms=0)
+        with sqlite3.connect(self.ledger.path) as db:
+            db.execute("DROP TRIGGER execution_events_no_update")
+            db.execute("UPDATE execution_events SET task='tampered'")
+        with self.assertRaises(LedgerError):
+            self.ledger.reconcile_interrupted()
+        with sqlite3.connect(self.ledger.path) as db:
+            count = db.execute(
+                "SELECT COUNT(*) FROM execution_events WHERE status='interrupted'"
+            ).fetchone()[0]
+        self.assertEqual(count, 0)
+
     def test_reconcile_does_not_close_start_with_existing_terminal_event(self):
         started = self.append(
             status="started", evidence={"phase": "start"}, duration_ms=0,
