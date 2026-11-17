@@ -105,6 +105,7 @@ def main():
     group.add_argument("--self-test", action="store_true", help="Comprobar archivos básicos.")
     group.add_argument("--scan", help="Escanear una URL HTTP/HTTPS autorizada con Nuclei.")
     parser.add_argument("--agent", help="Especialista opcional para --ask.")
+    parser.add_argument("--no-knowledge", action="store_true", help="Desactivar recuperación de conocimiento en --ask.")
     parser.add_argument("--confirm-authorized", action="store_true", help="Confirmación adicional del operador.")
     parser.add_argument("--authorization-id", help="ID de autorización local, vigente y limitada al destino.")
     args = parser.parse_args()
@@ -113,13 +114,15 @@ def main():
         command = [sys.executable, str(Path(__file__).resolve().parent / "director.py"), args.ask]
         if args.agent:
             command.extend(["--agent", args.agent])
+        if args.no_knowledge:
+            command.append("--no-knowledge")
         # La ruta principal consulta conocimiento por defecto; DIRECTOR permite
         # desactivarlo explícitamente cuando no haya embeddings configurados.
         result = subprocess.run(command, cwd=Path(__file__).resolve().parent, check=False)
         return result.returncode
 
-    if args.agent:
-        parser.error("--agent solo puede utilizarse junto con --ask.")
+    if args.agent or args.no_knowledge:
+        parser.error("--agent y --no-knowledge solo pueden utilizarse junto con --ask.")
 
     if args.scan:
         try:
@@ -158,7 +161,8 @@ def main():
     if args.self_test:
         required = [
             "report_analyzer.py", "nvd_client.py", "report_manager.py",
-            "batch_analyzer.py", "nuclei_scanner.py", "CONTEXT.md",
+            "batch_analyzer.py", "nuclei_scanner.py", "director.py",
+            "agent_runner.py", "CONTEXT.md",
         ]
         missing = [name for name in required if not Path(name).is_file()]
         if missing:
