@@ -1,3 +1,35 @@
+# Estado canónico vigente — 2026-11-17
+
+> Esta sección es la fuente de verdad vigente. Los bloques históricos que aparecen debajo documentan etapas anteriores y no deben interpretarse como el estado actual.
+
+**Rama:** `main`  
+**HEAD antes de esta actualización:** `d728c12888fdc5dcd19fcf3030339ab46098b24f`  
+**Último cambio funcional:** `2f472c9b734c3cdf38c4c69a5f51a1186b2e8d53`  
+**Respaldo:** `backup/main-before-cyber-ai-2026-11-17` (no modificado).
+
+## Integración realizada
+
+- `cyber_ai.py --ask "tarea"` proporciona una entrada principal para tareas de agentes y delega en DIRECTOR.
+- DIRECTOR enruta al especialista y pasa `--knowledge` por defecto a `agent_runner.py`; `--no-knowledge` permite desactivar la recuperación explícitamente.
+- El agente ya incorpora Skills activas y lecciones aprobadas; ahora la ruta principal también solicita la recuperación híbrida de la biblioteca a través de ECO.
+- Se corrigió el paso del texto completo mediante `--task-text`, evitando depender de argumentos posicionales para instrucciones con espacios o saltos de línea.
+- Se añadieron pruebas de enrutamiento de la entrada principal y de activación/desactivación de recuperación de conocimiento.
+- README y matriz de implementación actualizados.
+
+## Límites de esta integración
+
+- La recuperación semántica necesita un proveedor de embeddings configurado y la biblioteca indexada. Esta integración no crea esos prerrequisitos ni valida su disponibilidad.
+- El flujo de agente no ejecuta automáticamente herramientas de seguridad. Las herramientas conservan autorización y ejecución explícitas.
+- El orquestador multiagente, el flujo de escaneo y el análisis de informes siguen siendo rutas separadas; no se afirma que toda la arquitectura esté unificada.
+- Las pruebas nuevas están versionadas, pero **no se han ejecutado aquí**. CI sobre el HEAD actual sigue pendiente de evidencia.
+- No se afirma preparación para producción ni cierre de validación operacional.
+
+## Siguiente brecha de integración
+
+Conectar el planificador, la selección de capacidades, el orquestador multiagente, las herramientas autorizadas y el cierre de evidencia/ledger bajo contratos compartidos. Antes de automatizar ejecución, deben preservarse las autorizaciones explícitas, límites de alcance y controles de seguridad.
+
+---
+
 # Estado actual verificado — 2026-11-17
 
 **Rama activa:** `main`  
