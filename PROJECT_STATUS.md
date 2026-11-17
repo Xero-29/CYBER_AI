@@ -15,7 +15,7 @@
 - CLI: `python ledger_cli.py reconcile --confirm-no-active-runs` (opcional `--namespace NOMBRE` y `--older-than-seconds 300`). Exige confirmación de que los trabajadores están detenidos y omite inicios recientes por defecto; no se ejecuta automáticamente al iniciar el sistema.
 - Pruebas añadidas: recuperación idempotente, no duplicación cuando ya existe terminal, migración de esquema antiguo y rechazo de reconciliación sobre cadena corrupta.
 - **Límite:** solo se reconcilian inicios con `start_event_id` correlacionable y más antiguos que el umbral configurado. La CLI exige confirmar que no hay ejecuciones activas. Esto registra el estado desconocido en el ledger; no recupera procesos del sistema operativo, resultados perdidos ni datos de almacenamiento físicamente dañado.
-- **CI de este cambio:** pendiente para el HEAD final de esta iteración. No declarar cierre hasta que Python y Docker pasen en el mismo SHA.
+- **CI del código:** Python tests — [success](https://github.com/Xero-29/CYBER_AI/actions/runs/43996430032) y Docker sandbox — [success](https://github.com/Xero-29/CYBER_AI/actions/runs/43996436845), ambos en `2fe9ede3d5d2c49bbc45551ee9d0325893bc6b25`. La actualización documental posterior vuelve a disparar CI y debe validarse por separado.
 
 
 ## Corrección de trazabilidad de ejecuciones (16-11-2026)
