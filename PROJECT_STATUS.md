@@ -77,3 +77,13 @@
 - Se corrigió la detección de encabezados de la auditoría para aceptar espacios y texto adicional en títulos de sección.
 - El currículo no se contabiliza como contenido experto ya validado. Los paquetes actuales requieren ampliación editorial por dominio, revisión técnica independiente y referencias con licencia/procedencia verificadas.
 - CI disparado para el nuevo código; los resultados deben asociarse al SHA exacto antes de declarar las pruebas superadas.
+
+
+## Módulos de profundización de la biblioteca — 2026-11-17
+
+- Se crearon 48 módulos en `knowledge/deep_modules/<area>/README.md`, uno por cada ID del currículo y del manifiesto de conocimiento.
+- Cada módulo contiene propósito/límites, competencias, expansión de temas técnicos, procedimiento operativo, laboratorio reproducible seguro, evaluación y requisitos de procedencia de fuentes.
+- Índice: `knowledge/deep_modules/README.md`; guía editorial: `knowledge/curricula/README.md`.
+- Se verificó mediante lecturas del repositorio la existencia de los 48 archivos.
+- **Madurez real:** los 48 son borradores estructurados (`draft_structured_not_expert_validated`), no manuales expertos completos. Sus descripciones de trabajo por tema aún requieren desarrollo técnico específico, diagramas, referencias primarias verificadas, casos prácticos y revisión independiente.
+- No se declaran fuentes externas verificadas ni laboratorios ejecutados por la mera creación de estos documentos.
