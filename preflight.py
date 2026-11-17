@@ -267,6 +267,8 @@ def validate_evidence_permissions(root):
     for path, relative in ((reports, "reports"), (evidence_root, "reports/tool_evidence")):
         if path.is_symlink():
             return [{"path": relative, "reason": "El árbol de evidencias no puede contener enlaces simbólicos."}]
+    if reports.exists() and not reports.is_dir():
+        return [{"path": "reports", "reason": "La ruta reports debe ser un directorio."}]
     if not evidence_root.exists():
         return []
     if not evidence_root.is_dir():
