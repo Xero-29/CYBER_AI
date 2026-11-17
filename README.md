@@ -77,7 +77,7 @@ python cyber_ai.py --ask "Explica este hallazgo" --agent NEXO
 python cyber_ai.py --ask "Explica este hallazgo" --no-knowledge
 ```
 
-El flujo `--team` utiliza `team_orchestrator.py` y supervisa las etapas contra el objetivo global. La recuperación de conocimiento se activa por defecto en las etapas y revisiones, salvo que una etapa o el flujo la desactive expresamente en `config/workflows.json`. Esta entrada no ejecuta automáticamente herramientas de seguridad ni sustituye la autorización de objetivos. Los escáneres y adaptadores conservan sus flujos explícitos de autorización y ejecución documentados más abajo.
+El flujo `--team` utiliza `team_orchestrator.py`, genera un plan de capacidades y herramientas candidatas ligado al informe del flujo, y supervisa las etapas contra el objetivo global. La recuperación de conocimiento se activa por defecto en las etapas y revisiones, salvo que una etapa o el flujo la desactive expresamente en `config/workflows.json`. Esta entrada no ejecuta automáticamente herramientas de seguridad ni sustituye la autorización de objetivos. Los escáneres y adaptadores conservan sus flujos explícitos de autorización y ejecución documentados más abajo.
 
 ## Ejecutar agentes LLM locales
 
