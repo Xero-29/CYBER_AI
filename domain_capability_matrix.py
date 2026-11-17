@@ -123,8 +123,11 @@ def select_domain_capabilities(task, *, inventory=None, limit=12):
             tool_candidates.append({
                 "id": tool_id,
                 "name": item.get("purpose", tool_id),
+                "category": item.get("category"),
+                "risk": item.get("risk"),
                 "available": bool(detected.get("available", False)),
                 "adapter_registered": adapted,
+                "adapter_supported": adapted,
                 "adapter_status": (
                     "blocked_by_network_policy" if adapted and TOOL_SPECS[tool_id].get("network")
                     else "isolated_runner" if adapted and TOOL_SPECS[tool_id].get("requires_isolation")
@@ -132,7 +135,10 @@ def select_domain_capabilities(task, *, inventory=None, limit=12):
                     else "separate_runner" if tool_id == "nuclei"
                     else "catalog_only"
                 ),
+                "requires_isolation": bool(detected.get("requires_isolation", False)),
+                "network_blocked": bool(adapted and TOOL_SPECS[tool_id].get("network")),
                 "execution_permitted": False,
+                "status": "candidate_only",
             })
         matches.append({
             "id": area["id"],
