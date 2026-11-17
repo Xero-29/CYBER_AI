@@ -3,32 +3,33 @@
 > Esta sección es la fuente de verdad vigente. Los bloques históricos que aparecen debajo documentan etapas anteriores y no deben interpretarse como el estado actual.
 
 **Rama:** `main`  
-**HEAD antes de esta actualización:** `cc76700035636ecf57591a1b385c3346aed03c57`  
-**Último cambio funcional:** `cc76700035636ecf57591a1b385c3346aed03c57`  
+**HEAD de código/documentación revisado:** `cfcb5a4c14176b6be3958eb631c32fcec2bd332f`  
+**Último cambio funcional:** `3e0ebfcf611772b2ffa381b8603c2b04090dd8aa`  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17` (no modificado).
 
 ## Integración realizada
 
 - `cyber_ai.py --ask` conecta la entrada principal con DIRECTOR, el agente y la recuperación de conocimiento.
-- `cyber_ai.py --team` conecta el flujo multiagente supervisado con el planificador de capacidades y el inventario de herramientas.
-- La ejecución local opcional se conecta mediante `--execute-tools --confirm-tool-execution --tool-target`. Requiere allowlist HMAC configurada y obligatoria, confirma la intención del operador y limita objetivos a rutas relativas dentro del repositorio.
-- El pipeline limita a tres adaptadores locales instalados y registrados; los adaptadores con requisitos de red o aislamiento especial siguen bloqueados.
-- Cada ejecución produce evidencia estructurada, verificación independiente de integridad y un evento del ledger con referencia a la evidencia.
-- Los resultados se añaden al contexto de los agentes como datos no confiables y se incluyen en el informe final. Si una ejecución o validación falla, el flujo no se etiqueta como completamente exitoso.
-- Se añadieron pruebas unitarias para pipeline, validación de evidencia y enrutamiento CLI. README, allowlist y matriz documentan el flujo.
+- `cyber_ai.py --team` conecta el flujo multiagente supervisado con el planificador y el inventario de herramientas.
+- La ejecución local opcional se conecta mediante `--execute-tools --confirm-tool-execution --tool-target`. Exige confirmación explícita, allowlist HMAC obligatoria y rutas relativas confinadas al repositorio.
+- El pipeline solo considera hasta tres adaptadores locales instalados y registrados. Los que requieren red o aislamiento especial siguen bloqueados.
+- Cada ejecución genera evidencia estructurada, validación independiente de integridad y evento del ledger. El resultado se agrega al contexto de los agentes y al informe final.
+- Si una herramienta falla o su evidencia no supera validación, el flujo no se etiqueta como completamente exitoso.
+- El planificador degrada de forma explícita cuando el índice de capacidades no existe, en vez de interrumpir todo el orquestador.
+- Se añadieron pruebas de CLI, pipeline, validador y fallback del planificador. README, matriz y guía de allowlist documentan el flujo.
 
 ## Límites y verificación pendiente
 
-- La validación independiente comprueba integridad del binario/objetivo, hash, allowlist, código de salida y truncamiento. No demuestra que un hallazgo sea verdadero, explotable o completo.
-- Los adaptadores locales siguen ejecutándose en el host; `network_access=not_enforced`. No se afirma aislamiento de red ni sandbox del sistema operativo.
-- El flujo Nuclei/escaneo remoto sigue separado y conserva su autorización específica; no se integra en esta ruta local.
-- La ejecución real requiere binarios instalados, manifiesto HMAC válido, clave custodiada y objetivo válido.
-- Las pruebas añadidas no se han ejecutado en esta sesión. El CI del HEAD actual debe completar y pasar antes de considerar validada la integración.
+- La validación independiente comprueba integridad de binario/objetivo, hash, allowlist, código de salida y truncamiento. No demuestra la veracidad, explotabilidad ni exhaustividad de un hallazgo.
+- Los adaptadores locales se ejecutan en el host; `network_access=not_enforced`. No se afirma aislamiento de red ni sandbox del sistema operativo.
+- El escaneo remoto Nuclei sigue en su flujo separado y conserva autorización específica.
+- La ejecución real requiere binarios instalados, manifiesto HMAC válido, clave protegida y objetivo válido.
+- CI anterior detectó fallos de integración; se corrigieron dos causas (índice no generado y opciones false innecesarias). La ejecución de CI del HEAD actual todavía debe completarse y pasar. No se declara la integración validada hasta entonces.
 - No se afirma preparación para producción ni cierre de validación operacional.
 
 ## Siguiente brecha
 
-Unificar el flujo de escaneo remoto autorizado con los contratos de evidencia, ledger y revisión; después ejecutar pruebas E2E con herramientas reales, verificar aislamiento de procesos y añadir validación semántica experta de hallazgos.
+Unificar el escaneo remoto autorizado con contratos de evidencia/ledger/revisión; después ejecutar pruebas E2E con herramientas reales y verificar aislamiento de procesos. Añadir validación semántica experta de hallazgos.
 
 ---
 
