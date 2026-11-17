@@ -56,6 +56,14 @@ class WheelLockGeneratorTests(unittest.TestCase):
         with self.assertRaisesRegex(WheelLockError, "Wheel inválido"):
             build_lock(self.wheelhouse, self.requirements)
 
+    def test_rejects_symlink_wheel(self):
+        target = self.wheel("ruff-0.14.5-py3-none-any.whl", "ruff", "0.14.5")
+        self.wheel("bandit-1.8.6-py3-none-any.whl", "bandit", "1.8.6")
+        link = self.wheelhouse / "ruff-copy.whl"
+        link.symlink_to(target)
+        with self.assertRaisesRegex(WheelLockError, "Wheel inseguro"):
+            build_lock(self.wheelhouse, self.requirements)
+
     def test_rejects_unpinned_direct_requirement(self):
         self.requirements.write_text("ruff>=0.14.5\\n", encoding="utf-8")
         with self.assertRaisesRegex(WheelLockError, "no fijado"):

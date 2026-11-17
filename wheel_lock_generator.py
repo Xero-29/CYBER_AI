@@ -38,8 +38,11 @@ def wheel_metadata(path):
 
 
 def read_expected(path):
+    path = Path(path)
+    if path.is_symlink() or not path.is_file():
+        raise WheelLockError("Archivo de requisitos inexistente o inseguro.")
     expected = {}
-    for number, raw in enumerate(Path(path).read_text(encoding="utf-8").splitlines(), 1):
+    for number, raw in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
         line = raw.strip()
         if not line or line.startswith("#"):
             continue
@@ -69,8 +72,14 @@ def build_lock(wheelhouse, requirements):
     if not wheels:
         raise WheelLockError("Wheelhouse vacío.")
     for wheel in wheels:
+        if wheel.is_symlink() or not wheel.is_file():
+            raise WheelLockError(f"Wheel inseguro: {wheel.name}.")
         name, version = wheel_metadata(wheel)
-        digest = hashlib.sha256(wheel.read_bytes()).hexdigest()
+        digest_builder = hashlib.sha256()
+        with wheel.open("rb") as stream:
+            for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                digest_builder.update(chunk)
+        digest = digest_builder.hexdigest()
         current = packages.get(name)
         if current and current["version"] != version:
             raise WheelLockError(f"Versiones múltiples en wheelhouse: {name}.")
