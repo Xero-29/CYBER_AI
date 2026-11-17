@@ -189,5 +189,36 @@ class ExecutionLedgerTests(unittest.TestCase):
         self.assertEqual(verification["checked"], expected_count)
 
 
+
+    def test_failed_sqlite_write_rolls_back_without_partial_ledger_event(self):
+        self.append(task="prior valid event")
+        with sqlite3.connect(self.ledger.path) as db:
+            db.execute("""
+                CREATE TRIGGER simulate_storage_failure
+                AFTER INSERT ON execution_events
+                BEGIN
+                    SELECT RAISE(ABORT, 'simulated storage failure');
+                END
+            """)
+        with self.assertRaisesRegex(sqlite3.IntegrityError, "simulated storage failure"):
+            self.append(task="event that must roll back")
+        with sqlite3.connect(self.ledger.path) as db:
+            rows = db.execute(
+                "SELECT task,status FROM execution_events ORDER BY sequence"
+            ).fetchall()
+        self.assertEqual(rows, [("prior valid event", "completed")])
+        verification = self.ledger.verify()
+        self.assertTrue(verification["valid"], verification)
+        self.assertEqual(verification["checked"], 1)
+
+    def test_duplicate_event_id_does_not_change_existing_hash_chain(self):
+        first = self.append(event_id="stable-event-id", task="first event")
+        with self.assertRaises(sqlite3.IntegrityError):
+            self.append(event_id="stable-event-id", task="duplicate event")
+        history = self.ledger.history(namespace="test")
+        self.assertEqual(len(history), 1)
+        self.assertEqual(history[0]["event_id"], first["event_id"])
+        self.assertTrue(self.ledger.verify()["valid"])
+
 if __name__ == "__main__":
     unittest.main()
