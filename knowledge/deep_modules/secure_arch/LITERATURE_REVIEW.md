@@ -32,8 +32,17 @@ Banco sintético: dos aplicaciones, usuarios, dispositivos gestionados/no gestio
 
 SP 800-207 es una arquitectura de referencia de alto nivel, no receta universal ni certificación. El resultado depende de cobertura de identidad, integridad del dispositivo, enforcement real y calidad de políticas. No inferir Zero Trust por tener MFA o microsegmentación.
 
+## Brechas
+
+Revisar el documento completo y validar una arquitectura de referencia con IdP, PDP/PEP, telemetría, revocación y modos de fallo. No se ha implementado ni medido una arquitectura Zero Trust en este estudio.
+
 ## Fuentes
 
 - NIST SP 800-207, Zero Trust Architecture (2020): https://doi.org/10.6028/NIST.SP.800-207
 - NIST SP 800-82 Rev. 4 initial public draft (2026): https://csrc.nist.gov/pubs/sp/800/82/r4/ipd
-\n\n## Identificadores del registro de fuentes\n\n- `NIST-SP-800-207`\n- `NIST-SP-800-82r4-IPD`\n
+
+
+## Identificadores del registro de fuentes
+
+- `NIST-SP-800-207`
+- `NIST-SP-800-82r4-IPD`
