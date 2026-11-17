@@ -7,7 +7,10 @@ específica para ese servicio.
 import hashlib
 import json
 import os
+import re
 import shutil
+import stat
+import uuid
 import signal
 import subprocess
 import threading
@@ -310,21 +313,56 @@ def write_evidence(evidence, output_dir="reports/tool_evidence", *, allow_extern
     raw = Path(output_dir)
     if not raw.is_absolute():
         raw = PROJECT_ROOT / raw
-    raw.mkdir(parents=True, exist_ok=True)
-    if allow_external:
+    if raw.is_symlink():
+        raise ToolExecutionError("El destino de evidencias no puede ser un enlace simbólico.")
+    try:
+        raw.mkdir(parents=True, exist_ok=True, mode=0o700)
         if raw.is_symlink():
-            raise ToolExecutionError("El destino externo de evidencias no puede ser un enlace simbólico.")
-        destination = raw.resolve(strict=True)
-        if not destination.is_dir():
-            raise ToolExecutionError("El destino de evidencias debe ser un directorio.")
-    else:
-        destination = _confined_path(raw)
-        if not destination.is_dir():
-            raise ToolExecutionError("El destino de evidencias debe ser un directorio.")
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
-    path = destination / (evidence["tool"] + "_" + stamp + ".json")
-    path.write_text(json.dumps(evidence, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    return path
+            raise ToolExecutionError("El destino de evidencias no puede ser un enlace simbólico.")
+        if allow_external:
+            destination = raw.resolve(strict=True)
+            if not destination.is_dir():
+                raise ToolExecutionError("El destino de evidencias debe ser un directorio.")
+        else:
+            destination = _confined_path(raw)
+            if not destination.is_dir():
+                raise ToolExecutionError("El destino de evidencias debe ser un directorio.")
+
+        # Tool output may contain sensitive paths or data. Keep the directory
+        # private on POSIX and create every evidence file with mode 0600.
+        if os.name == "posix":
+            os.chmod(destination, 0o700)
+            directory_mode = stat.S_IMODE(
+                destination.stat(follow_symlinks=False).st_mode
+            )
+            if directory_mode & 0o077:
+                raise ToolExecutionError("El directorio de evidencias no es privado.")
+        tool = evidence.get("tool") if isinstance(evidence, dict) else None
+        if not isinstance(tool, str) or not re.fullmatch(r"[A-Za-z0-9_-]{1,64}", tool):
+            raise ToolExecutionError("Identificador de herramienta inválido para el nombre de evidencia.")
+
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+        path = destination / f"{tool}_{stamp}_{uuid.uuid4().hex}.json"
+        flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
+        descriptor = os.open(path, flags, 0o600)
+        try:
+            if os.name == "posix":
+                os.fchmod(descriptor, 0o600)
+            with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+                descriptor = -1
+                stream.write(json.dumps(evidence, ensure_ascii=False, indent=2) + "\n")
+                stream.flush()
+                os.fsync(stream.fileno())
+        except Exception:
+            if descriptor >= 0:
+                os.close(descriptor)
+            path.unlink(missing_ok=True)
+            raise
+        return path
+    except ToolExecutionError:
+        raise
+    except OSError as error:
+        raise ToolExecutionError("No se pudo escribir evidencia protegida.") from error
 
 
 __all__ = ["TOOL_SPECS", "ToolExecutionError", "run_local_tool", "write_evidence"]
