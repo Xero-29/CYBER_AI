@@ -205,11 +205,7 @@ class ExecutionLedger:
             db.close()
 
     def reconcile_interrupted(self, *, namespace=None):
-        """Close orphaned starts as interrupted; never infer task success or failure.
-
-        Only lifecycle pairs carrying metadata.start_event_id are reconciled. The
-        transaction lock and deterministic event IDs make repeated calls safe.
-        """
+        """Atomically close orphaned starts as interrupted, never as successful."""
         db = self.connect()
         reconciled = []
         try:
@@ -222,7 +218,7 @@ class ExecutionLedger:
             query += " ORDER BY sequence"
             starts = db.execute(query, params).fetchall()
             rows = db.execute(
-                "SELECT status, metadata FROM execution_events WHERE status!='started'"
+                "SELECT metadata FROM execution_events WHERE status!='started'"
             ).fetchall()
             closed = set()
             for row in rows:
@@ -232,42 +228,63 @@ class ExecutionLedger:
                     start_id = None
                 if start_id:
                     closed.add(start_id)
+
+            for start in starts:
+                if start["event_id"] in closed:
+                    continue
+                event_id = "interrupted-" + start["event_id"]
+                created_at = datetime.now(timezone.utc).isoformat()
+                metadata = {
+                    "start_event_id": start["event_id"],
+                    "recovered_by": "execution_ledger.reconcile_interrupted",
+                    "original_started_at": start["created_at"],
+                }
+                evidence_hash = hashlib.sha256(_canonical({
+                    "phase": "lifecycle_reconciliation",
+                    "outcome": "unknown",
+                    "reason": "start_event_has_no_terminal_record",
+                }).encode("utf-8")).hexdigest()
+                previous = db.execute(
+                    "SELECT event_hash FROM execution_events ORDER BY sequence DESC LIMIT 1"
+                ).fetchone()
+                previous_hash = previous["event_hash"] if previous else GENESIS
+                payload = {
+                    "event_id": event_id, "created_at": created_at,
+                    "namespace": start["namespace"],
+                    "task_fingerprint": start["task_fingerprint"],
+                    "task": start["task"], "status": "interrupted",
+                    "tool": start["tool"], "tool_version": start["tool_version"],
+                    "model": start["model"], "environment": start["environment"],
+                    "duration_ms": 0, "cost_microunits": None,
+                    "evidence_sha256": evidence_hash, "validator_results": [],
+                    "metadata": metadata, "previous_hash": previous_hash,
+                }
+                event_hash = _digest(previous_hash, _canonical(payload))
+                db.execute("""
+                    INSERT INTO execution_events (
+                        event_id,created_at,namespace,task_fingerprint,task,status,tool,
+                        tool_version,model,environment,duration_ms,cost_microunits,
+                        evidence_sha256,validator_results,metadata,previous_hash,event_hash
+                    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                """, (
+                    event_id, created_at, start["namespace"], start["task_fingerprint"],
+                    start["task"], "interrupted", start["tool"], start["tool_version"],
+                    start["model"], start["environment"], 0, None, evidence_hash,
+                    "[]", _canonical(metadata), previous_hash, event_hash,
+                ))
+                sequence = db.execute("SELECT last_insert_rowid()").fetchone()[0]
+                reconciled.append({
+                    "sequence": sequence, "event_id": event_id,
+                    "status": "interrupted", "previous_hash": previous_hash,
+                    "event_hash": event_hash,
+                })
+                closed.add(start["event_id"])
             db.commit()
         except Exception:
             db.rollback()
             raise
         finally:
             db.close()
-
-        for start in starts:
-            if start["event_id"] in closed:
-                continue
-            try:
-                result = self.append(
-                    namespace=start["namespace"],
-                    task=start["task"],
-                    status="interrupted",
-                    tool=start["tool"],
-                    tool_version=start["tool_version"],
-                    model=start["model"],
-                    environment=start["environment"],
-                    duration_ms=0,
-                    evidence={
-                        "phase": "lifecycle_reconciliation",
-                        "outcome": "unknown",
-                        "reason": "start_event_has_no_terminal_record",
-                    },
-                    metadata={
-                        "start_event_id": start["event_id"],
-                        "recovered_by": "execution_ledger.reconcile_interrupted",
-                        "original_started_at": start["created_at"],
-                    },
-                    event_id="interrupted-" + start["event_id"],
-                )
-                reconciled.append(result)
-            except sqlite3.IntegrityError:
-                # Another reconciler may have inserted the same deterministic ID.
-                continue
         return {"reconciled": len(reconciled), "events": reconciled}
 
     def verify(self):
