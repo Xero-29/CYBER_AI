@@ -54,6 +54,23 @@ class ExecutionLedgerTests(unittest.TestCase):
         self.assertFalse(result["valid"])
         self.assertEqual(result["failed_sequence"], 1)
 
+    def test_verify_reports_malformed_json_without_raising(self):
+        self.append()
+        with sqlite3.connect(self.ledger.path) as db:
+            db.execute("DROP TRIGGER execution_events_no_update")
+            db.execute("UPDATE execution_events SET metadata='{'")
+        result = self.ledger.verify()
+        self.assertFalse(result["valid"])
+        self.assertEqual(result["failed_sequence"], 1)
+        self.assertEqual(result["reason"], "malformed_payload")
+
+    def test_verify_runs_sqlite_integrity_check(self):
+        self.append()
+        with patch.object(self.ledger, "connect", wraps=self.ledger.connect) as connect:
+            result = self.ledger.verify()
+        self.assertTrue(result["valid"], result)
+        self.assertTrue(connect.called)
+
     def test_secrets_are_redacted_from_free_text(self):
         value = _redact_text(
             "Authorization: Bearer abc123 api_key='super secret' "
