@@ -3,7 +3,7 @@
 > Esta sección describe el HEAD auditado; los bloques históricos inferiores son contexto.
 
 **Rama:** `main`  
-**HEAD de implementación:** `fe9b9dcf430b5fc5c826a8214bc23fe12c8bc123`. GitHub no devuelve estados de CI asociados a este SHA; las pruebas del nuevo código están pendientes. No se extrapolan resultados de CI previos. Las pruebas Windows siguen aplazadas.  
+**HEAD de implementación:** `88c68a79755c583f80921af41b86e4864333818e`. CI de este HEAD pendiente de resultado; no se extrapolan resultados de CI previos. Las pruebas Windows siguen aplazadas.  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17`, sin modificar.
 
 ## Cambio reciente: perfiles y herramientas personalizadas
@@ -29,7 +29,7 @@
 - La CLI Nuclei exige autorización y ledger, y permite IP públicas, privadas o loopback únicamente con un permiso exacto, vigente y local. Los nombres DNS siguen bloqueados hasta implementar DNS pinning.
 - Nuclei sigue separado de la ejecución local: requiere `--scan`, confirmación e ID de autorización; el plan multiagente no puede iniciar escaneos de red.
 - Documentación: `docs/NUCLEI_INTEGRATION.md` y `docs/TOOL_EXECUTION_PROFILES.md`.
-- Pruebas añadidas/actualizadas: `tests/test_isolated_tool_runner.py`, `tests/test_nuclei_scanner.py`, `tests/test_execution_policy.py`, `tests/test_tool_adapters.py`.
+- Pruebas añadidas/actualizadas: `tests/test_isolated_tool_runner.py` (incluye smoke real condicional en CI), `tests/test_nuclei_scanner.py`, `tests/test_execution_policy.py`, `tests/test_capability_inventory.py`, `tests/test_tool_adapters.py`.
 
 ## Auditoría estructural y funcional
 
