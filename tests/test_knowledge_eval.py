@@ -24,7 +24,7 @@ class KnowledgeEvaluationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp) / "cases.jsonl"
             row = {"id": "same", "query": "api", "relevant_categories": ["api"]}
-            path.write_text(json.dumps(row) + "\\n" + json.dumps(row) + "\\n", encoding="utf-8")
+            path.write_text(json.dumps(row) + "\n" + json.dumps(row) + "\n", encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "duplicado"):
                 knowledge_eval.load_dataset(path)
 
@@ -35,7 +35,7 @@ class KnowledgeEvaluationTests(unittest.TestCase):
             path.write_text(json.dumps({
                 "id": "one", "query": "api",
                 "relevant_categories": ["api"],
-            }) + "\\n", encoding="utf-8")
+            }) + "\n", encoding="utf-8")
             link.symlink_to(path)
             with self.assertRaisesRegex(ValueError, "symlink"):
                 knowledge_eval.load_dataset(link)
@@ -46,7 +46,7 @@ class KnowledgeEvaluationTests(unittest.TestCase):
             path.write_text(json.dumps({
                 "id": "one", "query": "api",
                 "relevant_categories": ["api"], "untrusted": True,
-            }) + "\\n", encoding="utf-8")
+            }) + "\n", encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "exactamente"):
                 knowledge_eval.load_dataset(path)
 
