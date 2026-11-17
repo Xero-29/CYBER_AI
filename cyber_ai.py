@@ -5,6 +5,7 @@ import argparse
 import hashlib
 import json
 import sys
+import subprocess
 import uuid
 from pathlib import Path
 
@@ -98,13 +99,27 @@ def print_scan_summary(summary):
 def main():
     parser = argparse.ArgumentParser(description="CYBER_AI: análisis de informes de seguridad.")
     group = parser.add_mutually_exclusive_group()
+    group.add_argument("--ask", help="Enviar una tarea al flujo integrado de agentes.")
     group.add_argument("--report", help="Analizar un archivo TXT o Markdown.")
     group.add_argument("--batch", help="Analizar todos los TXT y Markdown de una carpeta.")
     group.add_argument("--self-test", action="store_true", help="Comprobar archivos básicos.")
     group.add_argument("--scan", help="Escanear una URL HTTP/HTTPS autorizada con Nuclei.")
+    parser.add_argument("--agent", help="Especialista opcional para --ask.")
     parser.add_argument("--confirm-authorized", action="store_true", help="Confirmación adicional del operador.")
     parser.add_argument("--authorization-id", help="ID de autorización local, vigente y limitada al destino.")
     args = parser.parse_args()
+
+    if args.ask:
+        command = [sys.executable, str(Path(__file__).resolve().parent / "director.py"), args.ask]
+        if args.agent:
+            command.extend(["--agent", args.agent])
+        # La ruta principal consulta conocimiento por defecto; DIRECTOR permite
+        # desactivarlo explícitamente cuando no haya embeddings configurados.
+        result = subprocess.run(command, cwd=Path(__file__).resolve().parent, check=False)
+        return result.returncode
+
+    if args.agent:
+        parser.error("--agent solo puede utilizarse junto con --ask.")
 
     if args.scan:
         try:
