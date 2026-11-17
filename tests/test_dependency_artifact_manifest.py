@@ -80,8 +80,9 @@ class DependencyArtifactManifestTests(unittest.TestCase):
             build_manifest(self.root, self.wheelhouse)
 
     def test_manifest_rejects_version_not_in_lock(self):
-        self.wheel("requests-9.9-py3-none-any.whl", "requests", "9.9")
-        self.wheel("certifi-1.0-py3-none-any.whl", "certifi", "1.0")
+        requests_wheel = self.wheel("requests-9.9-py3-none-any.whl", "requests", "9.9")
+        certifi_wheel = self.wheel("certifi-1.0-py3-none-any.whl", "certifi", "1.0")
+        self.pin_created_wheels(requests_wheel, certifi_wheel)
         with self.assertRaisesRegex(ArtifactManifestError, "versión distinta"):
             build_manifest(self.root, self.wheelhouse)
 
