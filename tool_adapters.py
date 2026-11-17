@@ -1,8 +1,8 @@
 """Adaptadores de análisis local con ejecución acotada y evidencia estructurada.
 
-No instala herramientas ni usa shell. pip-audit queda bloqueado porque su
-consulta de vulnerabilidades requiere red y aún no existe una política de red
-específica para ese servicio.
+No instala herramientas ni usa shell. YARA y TShark se ejecutan en Docker aislado.
+pip-audit queda bloqueado porque requiere red y aún no existe una política
+específica y auditable para ese servicio.
 """
 import hashlib
 import json
@@ -212,6 +212,8 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None, allow_ext
     limit = spec["timeout"] if timeout is None else timeout
     if not isinstance(limit, int) or not 1 <= limit <= 600:
         raise ToolExecutionError("El timeout debe estar entre 1 y 600 segundos.")
+    if config_path is None and tool_id == "semgrep":
+        config_path = os.environ.get("CYBER_AI_SEMGREP_CONFIG")
     command = _build_command(tool_id, binary, path, config_path=config_path)
     env = {
         "PATH": os.environ.get("PATH", ""),
