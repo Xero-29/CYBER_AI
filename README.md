@@ -6,7 +6,7 @@ Sistema modular de investigación técnica y ciberseguridad con agentes LLM, bib
 
 ## Requisitos
 
-- Linux recomendado (Ubuntu), Python 3.12 o superior.
+- Instalación con lock SHA-256 soportada actualmente: CPython 3.12.x, Linux x86_64 y glibc >= 2.26. Otras plataformas requieren locks específicos verificados.
 - Git.
 - Para agentes locales: Ollama instalado y ejecutándose.
 - Para el sandbox: Docker Engine/CLI.
@@ -26,7 +26,7 @@ cd CYBER_AI
 ```bash
 python3.12 -m venv .venv
 source .venv/bin/activate
-python -m pip install -r requirements.lock
+python -m pip install --require-hashes -r requirements.lock
 ```
 
 También puedes usar el instalador incluido:
@@ -36,7 +36,7 @@ bash setup.sh
 source .venv/bin/activate
 ```
 
-El instalador crea el entorno virtual e instala dependencias Python. No instala Ollama, Docker, modelos ni herramientas de seguridad.
+El instalador valida CPython 3.12.x, Linux x86_64 y glibc >= 2.26 antes de instalar con `--require-hashes`. Fuera de esa plataforma falla de forma cerrada; no reutilices hashes de otra arquitectura. No instala Ollama, Docker, modelos ni herramientas de seguridad.
 
 ## Comprobaciones iniciales
 
@@ -191,7 +191,7 @@ Genera un SBOM CycloneDX determinista a partir de las dependencias fijadas:
 python sbom_generator.py --output reports/cyber-ai-sbom.cdx.json
 ```
 
-El SBOM distingue dependencias directas y transitivas y registra el hash del lock. El lock actual no contiene hashes de artefactos ni un grafo transitivo completo; el SBOM no afirma verificar esos elementos.
+El SBOM distingue dependencias directas y transitivas, registra el hash del lock y, cuando se genera en CI, incorpora SHA-256 de los wheels descargados y comprobados contra el lock para la plataforma del runner. Esto fija los artefactos usados, pero no demuestra por sí solo la procedencia del publicador ni equivale a una firma upstream. La imagen Docker mantiene `sandbox/requirements.lock` separado para Ruff y Bandit y CI genera un SBOM independiente para ese entorno.
 
 Para medir la recuperación por especialidad después de indexar, ejecuta el benchmark por defecto de 48 consultas (una por área). El conjunto de 12 consultas anteriores queda disponible como smoke test rápido:
 
