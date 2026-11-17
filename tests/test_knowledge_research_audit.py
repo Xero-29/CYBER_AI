@@ -69,7 +69,6 @@ Lectura integral y experimento pendientes.
 ## Identificadores del registro de fuentes
 - `{source_id}`
 
-Referencia: https://example.org/source
 """
         (self.root / "knowledge/deep_modules/demo/LITERATURE_REVIEW.md").write_text(
             dossier, encoding="utf-8"
@@ -108,6 +107,7 @@ Referencia: https://example.org/source
         self.assertEqual(report["literature_review_count"], 1)
         self.assertEqual(report["traceable_literature_reviews"], 1)
         self.assertEqual(report["unique_source_ids_referenced_by_dossiers"], 1)
+        self.assertTrue(report["ok"], "HTTPS provenance is validated centrally in the source registry")
 
     def test_rejects_unknown_source_reference(self) -> None:
         self.write_dossier("UNKNOWN-SOURCE")
