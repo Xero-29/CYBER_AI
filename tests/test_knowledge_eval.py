@@ -115,13 +115,15 @@ class KnowledgeEvaluationTests(unittest.TestCase):
             "id": "case", "query": "api",
             "relevant_categories": ["api"],
         }]
-        embed = Mock(return_value={
-            "embedding": [float("nan")], "embedding_space": "test-space",
-        })
-        search = Mock()
-        with self.assertRaisesRegex(ValueError, "vector o espacio"):
-            knowledge_eval.evaluate(cases, 1, embed=embed, search=search)
-        search.assert_not_called()
+        for invalid_value in (float("nan"), float("inf"), 10 ** 1000, True):
+            with self.subTest(value_type=type(invalid_value).__name__):
+                embed = Mock(return_value={
+                    "embedding": [invalid_value], "embedding_space": "test-space",
+                })
+                search = Mock()
+                with self.assertRaisesRegex(ValueError, "vector o espacio"):
+                    knowledge_eval.evaluate(cases, 1, embed=embed, search=search)
+                search.assert_not_called()
 
     def test_evaluate_rejects_malformed_search_results(self):
         cases = [{

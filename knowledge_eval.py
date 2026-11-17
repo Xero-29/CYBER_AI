@@ -2,6 +2,7 @@
 """Evalúa la recuperación semántica con un conjunto JSONL versionado."""
 import argparse
 import json
+import math
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -66,6 +67,15 @@ def load_dataset(path):
     return cases
 
 
+def _is_finite_number(value):
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return False
+    try:
+        return math.isfinite(value)
+    except OverflowError:
+        return False
+
+
 def _normalize_cases(cases):
     """Validate and normalize in-memory datasets using the same strict schema."""
     if not isinstance(cases, list) or not cases:
@@ -127,9 +137,7 @@ def evaluate(dataset, top_k=5, *, embed=generate_embedding, search=search_knowle
             or not embedding
             or len(embedding) > 65536
             or any(
-                isinstance(value, bool)
-                or not isinstance(value, (int, float))
-                or not math.isfinite(value)
+                not _is_finite_number(value)
                 for value in embedding
             )
             or not isinstance(embedding_space, str)
