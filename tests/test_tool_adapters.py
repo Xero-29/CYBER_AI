@@ -84,8 +84,10 @@ class ToolAdapterTests(unittest.TestCase):
     @patch("tool_adapters.subprocess.Popen")
     @patch("tool_adapters.shutil.which", return_value="/usr/bin/semgrep")
     def test_semgrep_requires_local_config(self, which, popen):
-        with self.assertRaisesRegex(ToolExecutionError, "configuración local"):
-            run_local_tool("semgrep", "sample.py")
+        provenance = {"resolved_path": "/usr/bin/semgrep", "sha256": "d" * 64}
+        with patch.object(tool_adapters, "_hash_binary", return_value=provenance):
+            with self.assertRaisesRegex(ToolExecutionError, "configuración local"):
+                run_local_tool("semgrep", "sample.py")
         popen.assert_not_called()
 
     @patch("tool_adapters.subprocess.Popen")
