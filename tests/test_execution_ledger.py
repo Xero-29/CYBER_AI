@@ -108,6 +108,36 @@ class ExecutionLedgerTests(unittest.TestCase):
         self.assertEqual(len(self.ledger.history(namespace="alpha")), 1)
         self.assertEqual(len(self.ledger.history(namespace="beta")), 1)
 
+    def test_reconcile_marks_orphaned_start_as_interrupted_and_is_idempotent(self):
+        started = self.append(
+            status="started",
+            evidence={"phase": "start"},
+            duration_ms=0,
+            metadata={"task_id": "crashed-task"},
+        )
+        result = self.ledger.reconcile_interrupted()
+        self.assertEqual(result["reconciled"], 1)
+        history = self.ledger.history(namespace="test")
+        terminal = next(item for item in history if item["status"] == "interrupted")
+        self.assertEqual(terminal["metadata"]["start_event_id"], started["event_id"])
+        self.assertEqual(terminal["metadata"]["recovered_by"], "execution_ledger.reconcile_interrupted")
+        self.assertEqual(terminal["status"], "interrupted")
+        self.assertEqual(terminal["metadata"]["original_started_at"], history[-1]["created_at"])
+        self.assertEqual(self.ledger.reconcile_interrupted()["reconciled"], 0)
+        self.assertTrue(self.ledger.verify()["valid"])
+
+    def test_reconcile_does_not_close_start_with_existing_terminal_event(self):
+        started = self.append(
+            status="started", evidence={"phase": "start"}, duration_ms=0,
+        )
+        self.append(
+            status="completed",
+            metadata={"start_event_id": started["event_id"]},
+        )
+        result = self.ledger.reconcile_interrupted()
+        self.assertEqual(result["reconciled"], 0)
+        self.assertTrue(self.ledger.verify()["valid"])
+
     def test_concurrent_writers_preserve_a_valid_contiguous_hash_chain(self):
         worker_count = 6
         events_per_worker = 8
