@@ -112,7 +112,10 @@ class LearningMemoryTests(unittest.TestCase):
         }
         with self.memory_path.open("a", encoding="utf-8") as file:
             file.write(json.dumps(pending) + "\n")
-        lessons = learning_memory.read_lessons()
+        with patch.object(
+            learning_memory, "ExecutionLedger", return_value=FakeLedger(self.events)
+        ):
+            lessons = learning_memory.read_lessons()
         self.assertEqual(len(lessons), 1)
         self.assertEqual(lessons[0]["verified_by"], "VERITAS")
         self.assertEqual(lessons[0]["schema_version"], 2)
@@ -120,6 +123,12 @@ class LearningMemoryTests(unittest.TestCase):
     def test_without_approval_key_memory_fails_closed(self):
         self.save_lesson()
         with patch.dict(os.environ, {learning_memory.APPROVAL_KEY_ENV: ""}):
+            with patch.object(
+            learning_memory, "ExecutionLedger", return_value=FakeLedger(self.events)
+        ):
+            with patch.object(
+            learning_memory, "ExecutionLedger", return_value=FakeLedger(self.events)
+        ):
             self.assertEqual(learning_memory.read_lessons(), [])
 
     def test_direct_self_asserted_registration_is_disabled(self):
@@ -197,18 +206,51 @@ class LearningMemoryTests(unittest.TestCase):
         second = self.save_lesson()
         self.assertTrue(first["saved"])
         self.assertFalse(second["saved"])
-        self.assertEqual(len(learning_memory.read_lessons()), 1)
+        with patch.object(
+            learning_memory, "ExecutionLedger", return_value=FakeLedger(self.events)
+        ):
+            self.assertEqual(len(learning_memory.read_lessons()), 1)
 
     def test_lesson_is_limited_to_its_agents(self):
         self.save_lesson()
-        nexo_context = learning_memory.build_memory_context(
-            "Autenticacion local Ollama", namespace="nexo"
-        )
-        veritas_context = learning_memory.build_memory_context(
-            "Autenticacion local Ollama", namespace="veritas"
-        )
+        with patch.object(
+            learning_memory, "ExecutionLedger", return_value=FakeLedger(self.events)
+        ):
+            nexo_context = learning_memory.build_memory_context(
+                "Autenticacion local Ollama", namespace="nexo"
+            )
+            veritas_context = learning_memory.build_memory_context(
+                "Autenticacion local Ollama", namespace="veritas"
+            )
         self.assertIn("Corrección verificada", nexo_context)
         self.assertEqual(veritas_context, "")
+
+    def test_signed_lesson_is_not_taught_when_ledger_event_is_missing(self):
+        self.save_lesson()
+        incomplete = [self.events[0]]
+        with patch.object(
+            learning_memory, "ExecutionLedger",
+            return_value=FakeLedger(incomplete),
+        ):
+            self.assertEqual(learning_memory.read_lessons(), [])
+
+    def test_signed_lesson_is_not_taught_when_ledger_hash_changes(self):
+        self.save_lesson()
+        changed = [dict(item) for item in self.events]
+        changed[0]["evidence_sha256"] = "9" * 64
+        with patch.object(
+            learning_memory, "ExecutionLedger",
+            return_value=FakeLedger(changed),
+        ):
+            self.assertEqual(learning_memory.read_lessons(), [])
+
+    def test_signed_lesson_is_not_taught_when_ledger_chain_is_invalid(self):
+        self.save_lesson()
+        with patch.object(
+            learning_memory, "ExecutionLedger",
+            return_value=FakeLedger(self.events, valid=False),
+        ):
+            self.assertEqual(learning_memory.read_lessons(), [])
 
     def test_executor_injects_signed_lessons_into_task(self):
         expected = "LECCION DE PRUEBA VERIFICADA"
