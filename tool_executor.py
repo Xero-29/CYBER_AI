@@ -10,7 +10,7 @@ import time
 from pathlib import Path
 
 from tool_adapters import TOOL_SPECS, ToolExecutionError, run_local_tool, write_evidence
-from execution_ledger import ExecutionLedger
+from execution_ledger import MAX_SQLITE_INTEGER, ExecutionLedger
 
 
 def _terminal_status(evidence):
@@ -25,15 +25,15 @@ def _terminal_status(evidence):
 
 
 def _duration_ms(evidence, started):
-    """Prefer adapter-reported duration; fall back to the local monotonic clock."""
+    """Prefer a bounded adapter duration; fall back to the monotonic clock."""
     elapsed = evidence.get("elapsed_seconds") if isinstance(evidence, dict) else None
-    if (
-        isinstance(elapsed, (int, float))
-        and not isinstance(elapsed, bool)
-        and math.isfinite(elapsed)
-        and elapsed >= 0
-    ):
-        return int(elapsed * 1000)
+    if isinstance(elapsed, int) and not isinstance(elapsed, bool):
+        if 0 <= elapsed <= MAX_SQLITE_INTEGER // 1000:
+            return elapsed * 1000
+    elif isinstance(elapsed, float) and math.isfinite(elapsed) and elapsed >= 0:
+        milliseconds = elapsed * 1000
+        if math.isfinite(milliseconds) and milliseconds <= MAX_SQLITE_INTEGER:
+            return int(milliseconds)
     return max(0, int((time.monotonic() - started) * 1000))
 
 
