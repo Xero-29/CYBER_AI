@@ -259,16 +259,24 @@ def _run_local_tool_with_home(
 
     def drain(stream, key):
         cap = MAX_OUTPUT_BYTES // 2
-        while True:
-            chunk = stream.read(65536)
-            if not chunk:
-                break
-            remaining = cap - len(captured[key])
-            if remaining > 0:
-                captured[key].extend(chunk[:remaining])
-            if len(chunk) > remaining:
-                stream_truncated["value"] = True
+        try:
+            while True:
+                chunk = stream.read(65536)
+                if not chunk:
+                    break
+                remaining = cap - len(captured[key])
+                if remaining > 0:
+                    captured[key].extend(chunk[:remaining])
+                if len(chunk) > remaining:
+                    stream_truncated["value"] = True
+        except (OSError, ValueError):
+            # The owner closes the pipe after the reader has been joined or
+            # the isolated process group has been terminated.
+            return
 
+    process = None
+    readers = []
+    process_finished = False
     try:
         process = subprocess.Popen(
             command, cwd=str(PROJECT_ROOT), env=env,
@@ -276,15 +284,14 @@ def _run_local_tool_with_home(
             stderr=subprocess.PIPE, shell=False,
             start_new_session=(os.name == "posix"),
         )
-        readers = [
-            threading.Thread(target=drain, args=(process.stdout, "stdout"), daemon=True),
-            threading.Thread(target=drain, args=(process.stderr, "stderr"), daemon=True),
-        ]
-        for reader in readers:
+        for stream, key in ((process.stdout, "stdout"), (process.stderr, "stderr")):
+            reader = threading.Thread(target=drain, args=(stream, key), daemon=True)
             reader.start()
+            readers.append(reader)
         timed_out = False
         try:
             returncode = process.wait(timeout=limit)
+            process_finished = True
         except subprocess.TimeoutExpired:
             timed_out = True
             if os.name == "posix":
@@ -295,12 +302,48 @@ def _run_local_tool_with_home(
             else:
                 process.kill()
             process.wait()
+            process_finished = True
             returncode = None
-        for reader in readers:
-            reader.join(timeout=5)
         status = "timeout" if timed_out else "completed"
     except OSError as exc:
         raise ToolExecutionError("No se pudo iniciar el ejecutable.") from exc
+    finally:
+        if process is not None and not process_finished:
+            if os.name == "posix":
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+            else:
+                try:
+                    process.kill()
+                except OSError:
+                    pass
+            try:
+                process.wait(timeout=5)
+            except (OSError, subprocess.TimeoutExpired):
+                pass
+        for reader in readers:
+            reader.join(timeout=5)
+        if any(reader.is_alive() for reader in readers) and process is not None:
+            # A descendant retaining stdout/stderr must not outlive this tool
+            # invocation or keep the pipe-draining threads blocked.
+            if os.name == "posix":
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+            for reader in readers:
+                reader.join(timeout=2)
+        if process is not None:
+            for stream in (process.stdout, process.stderr):
+                if stream is not None and not stream.closed:
+                    try:
+                        stream.close()
+                    except OSError:
+                        pass
+        for reader in readers:
+            reader.join(timeout=1)
 
     out_text = captured["stdout"].decode("utf-8", errors="replace")
     err_text = captured["stderr"].decode("utf-8", errors="replace")
