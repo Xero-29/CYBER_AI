@@ -54,6 +54,17 @@ class WheelLockGeneratorTests(unittest.TestCase):
         with self.assertRaisesRegex(WheelLockError, "Versiones múltiples"):
             build_lock(self.wheelhouse, self.requirements)
 
+    def test_rejects_oversized_wheel_metadata(self):
+        path = self.wheelhouse / "ruff-0.14.5-py3-none-any.whl"
+        metadata = (
+            "Metadata-Version: 2.1\\nName: ruff\\nVersion: 0.14.5\\n\\n"
+            + "x" * (2 * 1024 * 1024 + 1)
+        )
+        with zipfile.ZipFile(path, "w") as archive:
+            archive.writestr("ruff-0.14.5.dist-info/METADATA", metadata)
+        with self.assertRaisesRegex(WheelLockError, "METADATA supera 2 MiB"):
+            build_lock(self.wheelhouse, self.requirements)
+
     def test_rejects_invalid_wheel(self):
         (self.wheelhouse / "broken.whl").write_bytes(b"not a wheel")
         with self.assertRaisesRegex(WheelLockError, "Wheel inválido"):
