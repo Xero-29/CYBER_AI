@@ -3,9 +3,6 @@
 import argparse
 import json
 import math
-import os
-import stat
-import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -22,93 +19,58 @@ DEFAULT_DATASET = ROOT / "knowledge" / "evaluation" / "domain_queries.jsonl"
 
 def load_dataset(path):
     source = Path(path)
-    if source.is_symlink():
+    if source.is_symlink() or not source.is_file():
         raise ValueError("El dataset debe ser un archivo regular, no un symlink.")
-    flags = (
-        os.O_RDONLY
-        | getattr(os, "O_CLOEXEC", 0)
-        | getattr(os, "O_NOFOLLOW", 0)
-        | getattr(os, "O_NONBLOCK", 0)
-    )
-    try:
-        descriptor = os.open(source, flags)
-    except OSError as error:
-        raise ValueError("No se pudo abrir el dataset como archivo regular.") from error
-
+    if source.stat().st_size > MAX_DATASET_BYTES:
+        raise ValueError("El dataset supera 2 MiB.")
     cases = []
     seen_ids = set()
-    try:
-        before = os.fstat(descriptor)
-        if not stat.S_ISREG(before.st_mode):
-            raise ValueError("El dataset debe ser un archivo regular, no un symlink.")
-        if before.st_size > MAX_DATASET_BYTES:
-            raise ValueError("El dataset supera 2 MiB.")
-        with os.fdopen(descriptor, "rb") as stream:
-            descriptor = None
-            total_bytes = 0
-            for line_number, raw in enumerate(stream, 1):
-                total_bytes += len(raw)
-                if total_bytes > MAX_DATASET_BYTES:
-                    raise ValueError("El dataset supera 2 MiB.")
-                if len(raw) > MAX_LINE_BYTES:
-                    raise ValueError(f"Línea {line_number} supera 64 KiB.")
-                if not raw.strip():
-                    continue
-                try:
-                    item = json.loads(raw.decode("utf-8"))
-                except (UnicodeDecodeError, json.JSONDecodeError) as error:
-                    raise ValueError(f"JSONL inválido en línea {line_number}.") from error
-                if not isinstance(item, dict) or set(item) != {
-                    "id", "query", "relevant_categories"
-                }:
-                    raise ValueError(
-                        f"Línea {line_number}: se requieren exactamente id, query y relevant_categories."
-                    )
-                case_id, query, expected = (
-                    item["id"], item["query"], item["relevant_categories"]
+    with source.open("rb") as stream:
+        for line_number, raw in enumerate(stream, 1):
+            if len(raw) > MAX_LINE_BYTES:
+                raise ValueError(f"Línea {line_number} supera 64 KiB.")
+            if not raw.strip():
+                continue
+            try:
+                item = json.loads(raw.decode("utf-8"))
+            except (UnicodeDecodeError, json.JSONDecodeError) as error:
+                raise ValueError(f"JSONL inválido en línea {line_number}.") from error
+            if not isinstance(item, dict) or set(item) != {
+                "id", "query", "relevant_categories"
+            }:
+                raise ValueError(
+                    f"Línea {line_number}: se requieren exactamente id, query y relevant_categories."
                 )
-                if not isinstance(case_id, str) or not case_id.strip() or case_id.strip() in seen_ids:
-                    raise ValueError(f"ID ausente o duplicado en línea {line_number}.")
-                if not isinstance(query, str) or not query.strip():
-                    raise ValueError(f"query inválida en línea {line_number}.")
-                if (
-                    not isinstance(expected, list) or not expected
-                    or any(not isinstance(value, str) or not value.strip() for value in expected)
-                    or len({value.strip() for value in expected}) != len(expected)
-                ):
-                    raise ValueError(f"relevant_categories inválida en línea {line_number}.")
-                normalized_case = {
-                    "id": case_id.strip(),
-                    "query": query.strip(),
-                    "relevant_categories": [value.strip() for value in expected],
-                }
-                try:
-                    json.dumps(
-                        normalized_case, ensure_ascii=False, separators=(",", ":")
-                    ).encode("utf-8")
-                except UnicodeEncodeError as error:
-                    raise ValueError(
-                        f"Línea {line_number} contiene Unicode inválido."
-                    ) from error
-                seen_ids.add(case_id.strip())
-                cases.append(normalized_case)
-                if len(cases) > MAX_CASES:
-                    raise ValueError("El dataset supera 5000 casos.")
-            after = os.fstat(stream.fileno())
-            identity_before = (
-                before.st_dev, before.st_ino, before.st_size,
-                before.st_mtime_ns, before.st_ctime_ns,
+            case_id, query, expected = (
+                item["id"], item["query"], item["relevant_categories"]
             )
-            identity_after = (
-                after.st_dev, after.st_ino, after.st_size,
-                after.st_mtime_ns, after.st_ctime_ns,
-            )
-            if identity_before != identity_after:
-                raise ValueError("El dataset cambió durante su lectura.")
-    finally:
-        if descriptor is not None:
-            os.close(descriptor)
-
+            if not isinstance(case_id, str) or not case_id.strip() or case_id.strip() in seen_ids:
+                raise ValueError(f"ID ausente o duplicado en línea {line_number}.")
+            if not isinstance(query, str) or not query.strip():
+                raise ValueError(f"query inválida en línea {line_number}.")
+            if (
+                not isinstance(expected, list) or not expected
+                or any(not isinstance(value, str) or not value.strip() for value in expected)
+                or len({value.strip() for value in expected}) != len(expected)
+            ):
+                raise ValueError(f"relevant_categories inválida en línea {line_number}.")
+            normalized_case = {
+                "id": case_id.strip(),
+                "query": query.strip(),
+                "relevant_categories": [value.strip() for value in expected],
+            }
+            try:
+                json.dumps(
+                    normalized_case, ensure_ascii=False, separators=(",", ":")
+                ).encode("utf-8")
+            except UnicodeEncodeError as error:
+                raise ValueError(
+                    f"Línea {line_number} contiene Unicode inválido."
+                ) from error
+            seen_ids.add(case_id.strip())
+            cases.append(normalized_case)
+            if len(cases) > MAX_CASES:
+                raise ValueError("El dataset supera 5000 casos.")
     if not cases:
         raise ValueError("El conjunto de evaluación está vacío.")
     return cases
@@ -258,47 +220,6 @@ def evaluate(dataset, top_k=5, *, embed=generate_embedding, search=search_knowle
     }
 
 
-def _write_report(path, rendered):
-    """Publish a report atomically without following a destination symlink."""
-    destination = Path(path)
-    if destination.is_symlink():
-        raise ValueError("La ruta de salida no puede ser un symlink.")
-    parent = destination.parent
-    if parent.is_symlink():
-        raise ValueError("El directorio de salida no puede ser un symlink.")
-    parent.mkdir(parents=True, exist_ok=True)
-    if parent.is_symlink() or not parent.is_dir():
-        raise ValueError("El directorio de salida no es seguro.")
-
-    descriptor, temporary_name = tempfile.mkstemp(
-        prefix=f".{destination.name}.", suffix=".tmp", dir=parent
-    )
-    temporary = Path(temporary_name)
-    try:
-        if os.name == "posix":
-            os.fchmod(descriptor, 0o600)
-        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
-            descriptor = -1
-            stream.write(rendered + "\n")
-            stream.flush()
-            os.fsync(stream.fileno())
-        if destination.is_symlink():
-            raise ValueError("La ruta de salida no puede convertirse en symlink.")
-        os.replace(temporary, destination)
-        if os.name == "posix":
-            directory_fd = os.open(parent, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
-            try:
-                os.fsync(directory_fd)
-            finally:
-                os.close(directory_fd)
-    except Exception:
-        if descriptor >= 0:
-            os.close(descriptor)
-        temporary.unlink(missing_ok=True)
-        raise
-    return destination
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dataset", default=str(DEFAULT_DATASET))
@@ -308,7 +229,9 @@ def main():
     report = evaluate(args.dataset, args.top_k)
     rendered = json.dumps(report, ensure_ascii=False, indent=2)
     if args.output:
-        destination = _write_report(args.output, rendered)
+        destination = Path(args.output)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_text(rendered + "\n", encoding="utf-8")
         print(f"Informe: {destination}")
     print(
         f"Consultas: {report['queries']} | Recall@{args.top_k}: "
