@@ -8,7 +8,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from execution_ledger import ExecutionLedger, LedgerError, _redact_text
+from execution_ledger import ExecutionLedger, LedgerError, MAX_SQLITE_INTEGER, _redact_text
 
 
 class ExecutionLedgerTests(unittest.TestCase):
@@ -320,6 +320,73 @@ os._exit(0)
         self.assertEqual(len(history), 1)
         self.assertEqual(history[0]["event_id"], first["event_id"])
         self.assertTrue(self.ledger.verify()["valid"])
+
+
+    def test_sqlite_integer_bounds_are_validated_before_insert(self):
+        for field in ("duration_ms", "cost_microunits"):
+            with self.subTest(field=field):
+                with self.assertRaisesRegex(LedgerError, "2\\^63-1"):
+                    self.append(**{field: MAX_SQLITE_INTEGER + 1})
+
+    def test_ledger_storage_is_created_with_private_permissions(self):
+        if os.name == "nt":
+            self.skipTest("POSIX permission bits are not enforced on Windows")
+        mode = self.ledger.path.parent.stat().st_mode & 0o777
+        self.assertEqual(mode & 0o077, 0)
+        self.assertEqual(self.ledger.path.stat().st_mode & 0o077, 0)
+
+    def test_ledger_rejects_group_or_world_accessible_parent(self):
+        if os.name == "nt":
+            self.skipTest("POSIX permission bits are not enforced on Windows")
+        path = Path(self.tmp.name) / "public" / "ledger.sqlite3"
+        path.parent.mkdir(mode=0o700)
+        path.parent.chmod(0o755)
+        with self.assertRaisesRegex(LedgerError, "privado"):
+            ExecutionLedger(path)
+
+    def test_ledger_rejects_symlinked_database_and_parent(self):
+        if not hasattr(os, "symlink"):
+            self.skipTest("symlinks unavailable")
+        target = Path(self.tmp.name) / "target.sqlite3"
+        target.write_bytes(b"")
+        link = Path(self.tmp.name) / "linked.sqlite3"
+        try:
+            link.symlink_to(target)
+        except OSError:
+            self.skipTest("symlinks unavailable")
+        with self.assertRaises(LedgerError):
+            ExecutionLedger(link)
+
+        real_parent = Path(self.tmp.name) / "real-parent"
+        real_parent.mkdir()
+        linked_parent = Path(self.tmp.name) / "linked-parent"
+        try:
+            linked_parent.symlink_to(real_parent, target_is_directory=True)
+        except OSError:
+            self.skipTest("directory symlinks unavailable")
+        with self.assertRaises(LedgerError):
+            ExecutionLedger(linked_parent / "ledger.sqlite3")
+
+    def test_ledger_rejects_symlinked_wal_companion(self):
+        if not hasattr(os, "symlink"):
+            self.skipTest("symlinks unavailable")
+        path = Path(self.tmp.name) / "wal-ledger.sqlite3"
+        ledger = ExecutionLedger(path)
+        target = Path(self.tmp.name) / "outside-wal"
+        target.write_text("protected", encoding="utf-8")
+        wal = Path(f"{path}-wal")
+        try:
+            wal.symlink_to(target)
+        except OSError:
+            self.skipTest("symlinks unavailable")
+        with self.assertRaises(LedgerError):
+            ledger.connect()
+
+    def test_reconcile_rejects_unrepresentable_stale_threshold(self):
+        with self.assertRaisesRegex(LedgerError, "finito y no negativo"):
+            self.ledger.reconcile_interrupted(
+                stale_after_seconds=10 ** 1000
+            )
 
 if __name__ == "__main__":
     unittest.main()
