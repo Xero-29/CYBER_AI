@@ -1,10 +1,9 @@
 # Estado de reconciliación — 2026-11-18
 
 **Rama de integración:** `codex/reconcile-security-integrity-2026-11-18`  
-**HEAD verificado antes de esta actualización:** `12dce8e33de8205c3704d94cb6e2016e61d1f356`.  
-**Base:** `main` en `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`; comparación: **119 commits adelante, 0 detrás**, 48 rutas cambiadas.  
-**Merge-base con main:** `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`. Main permanece intacta.  
-**Merge controlado en esta rama:** `2585b99be752bef3276ce5721690542c9f05e7d2`, con segundo padre PR #11 en `04c001a206cde98613cf9c151ce4f6a95fb86a21`. Se conservó el árbol validado de PR #11 y se sobrepusieron rutas revisadas; no hubo merge en main ni rebase/force-push.
+**HEAD verificado antes de esta actualización:** `b9427f21a3374fd6ca1a366cf25e5c985223e677`.  
+**Base:** `main` en `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`; comparación: **140 commits adelante, 0 detrás**, 55 rutas cambiadas. Main permanece intacta.  
+**Merge controlado en esta rama:** `2585b99be752bef3276ce5721690542c9f05e7d2`, con segundo padre PR #11 en `04c001a206cde98613cf9c151ce4f6a95fb86a21`. No hubo merge en main ni rebase/force-push.
 
 **Rama fuente de auditoría:** `codex/security-integrity-audit`, HEAD inspeccionado `8104739d542e3264166eb0e7b1b493aa26e9ce0a`. Sigue divergente de main: 112 commits exclusivos de auditoría y 573 exclusivos de main desde `cae816d6037b56f017c2fbdb3e98ef00df58c1d`. Se portan cambios por funcionalidad, sin copiar el diff completo ni retirar capacidades nuevas de main.
 
@@ -18,16 +17,18 @@
 - Backups: límites de cantidad de archivos y tamaño del manifiesto, comprobados antes y después de leer.
 - Evaluación de conocimiento: lectura protegida contra symlinks, identidad estable, límites de bytes y Unicode; escritura atómica de informes y códigos de salida CLI comprobables.
 - Allowlist HMAC: lectura resistente a reemplazo de ruta, validación de firma/configuración en preflight y pruebas de denegación antes de iniciar procesos.
-- Los adaptadores convierten denegaciones de allowlist en errores de ejecución tipados; preflight informa política de allowlist y ledger sin exponer secretos.
+- Adaptadores y runner personalizado: denegaciones de allowlist como errores tipados, HOME/TMP efímeros, PATH mínimo, sin herencia de variables secretas y cierre de stdout/stderr. Los runners intentan terminar descendientes que conservan pipes.
+- Proveedores IA: solicitudes limitadas a 8 MiB, respuestas a 16 MiB, cuerpo de error HTTP a 2 KiB, timeout finito máximo 600 s, nombres de variables API key validados y esquema de respuestas de plugins comprobado.
 - Agentes, ejecutor de herramientas y task runner exigen ledger por defecto; el modo sin registro requiere excepción explícita.
 - Runner Docker: montaje de evidencias `0700`; workflow instala con `pip --require-hashes` y protege el directorio de datos.
-- Pruebas de regresión y documentación actualizada de ledger, allowlist, preflight y salidas atómicas.
+- Pruebas de regresión y documentación actualizada de ledger, allowlist, proveedores, runners, preflight y salidas atómicas.
 
 ## Evidencia de CI
 
-**HEAD `12dce8e33de8205c3704d94cb6e2016e61d1f356`:**
-- Python Tests — **success**, 675 pruebas, 2 omitidas en entorno base y extractores documentales; Windows allowlist smoke — **success**: [run 44365770789](https://github.com/Xero-29/CYBER_AI/actions/runs/44365770789).
-- Docker Sandbox — **success**, 675 pruebas, 1 omitida, smoke Ruff y evidencia: [run 44365770879](https://github.com/Xero-29/CYBER_AI/actions/runs/44365770879).
+**HEAD `b9427f21a3374fd6ca1a366cf25e5c985223e677`:**
+- Python Tests — **success**, 685 pruebas, 2 omitidas en entorno base y extractores documentales; Windows allowlist smoke — **success**: [run 44367764696](https://github.com/Xero-29/CYBER_AI/actions/runs/44367764696).
+- Docker Sandbox — **success**, 685 pruebas, 1 omitida, Ruff 0.14.5 ejecutado dentro del sandbox y evidencia publicada: [run 44367764862](https://github.com/Xero-29/CYBER_AI/actions/runs/44367764862).
+- No se observaron advertencias de pipes sin cerrar en los logs de la ejecución Python.
 
 **PR #11:** sigue abierto en draft, sin duplicarlo: [PR #11](https://github.com/Xero-29/CYBER_AI/pull/11). Su HEAD `04c001a206cde98613cf9c151ce4f6a95fb86a21` pasó Python Tests ([run 44359934767](https://github.com/Xero-29/CYBER_AI/actions/runs/44359934767)) y Docker Sandbox ([run 44359934228](https://github.com/Xero-29/CYBER_AI/actions/runs/44359934228)).
 
@@ -35,8 +36,8 @@
 
 ## Próximas tareas de reconciliación
 
-1. Continuar revisión de contratos de adaptadores/proveedores, integridad de evidencias y documentación cruzada para detectar componentes desconectados.
-2. Revisar los últimos cambios de seguridad frente a los módulos más recientes de main, en particular los runners y la biblioteca de conocimientos.
+1. Continuar revisión de adaptadores/proveedores, integridad de evidencias y componentes conectados a los runners más recientes de main.
+2. Revisar los contratos de restauración, observabilidad y auditoría de ejecuciones para detectar brechas puramente de código.
 3. Repetir Python, Docker, SBOM y locks sobre el HEAD final después de esta actualización documental.
 4. No abrir un PR solapado mientras PR #11 siga cubriendo locks/SBOM.
 5. Mantener como pendientes externos KMS/HSM, WORM/offsite, RBAC/IdP/MFA, simulacros restore/DR, microVM/egress/escape, proveedores reales y revisión experta de fuentes.
