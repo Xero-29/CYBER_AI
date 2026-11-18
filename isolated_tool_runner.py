@@ -106,6 +106,7 @@ def run_isolated_tool(tool_id, target, *, config_path=None, timeout=180,
                 truncated["value"] = True
 
     process = None
+    readers = []
     try:
         process = subprocess.Popen(
             command, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
@@ -147,6 +148,42 @@ def run_isolated_tool(tool_id, target, *, config_path=None, timeout=180,
     except OSError as exc:
         raise ToolExecutionError("No se pudo iniciar Docker para el análisis aislado.") from exc
     finally:
+        if process is not None and any(reader.is_alive() for reader in readers):
+            try:
+                container_id = cidfile.read_text(encoding="ascii").strip()
+                if len(container_id) == 64 and all(c in "0123456789abcdef" for c in container_id):
+                    subprocess.run(
+                        [docker, "kill", container_id], stdin=subprocess.DEVNULL,
+                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                        timeout=10, check=False,
+                    )
+            except (OSError, subprocess.TimeoutExpired, UnicodeError):
+                pass
+            if os.name == "posix":
+                import signal
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+            elif process.poll() is None:
+                process.kill()
+            if process.poll() is None:
+                try:
+                    process.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                    process.wait()
+            for reader in readers:
+                reader.join(timeout=5)
+        if process is not None:
+            for stream in (process.stdout, process.stderr):
+                if stream is not None:
+                    try:
+                        stream.close()
+                    except OSError:
+                        pass
+        for reader in readers:
+            reader.join(timeout=1)
         try:
             cidfile.unlink(missing_ok=True)
         except OSError:
