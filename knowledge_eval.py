@@ -77,12 +77,21 @@ def load_dataset(path):
                     or len({value.strip() for value in expected}) != len(expected)
                 ):
                     raise ValueError(f"relevant_categories inválida en línea {line_number}.")
-                seen_ids.add(case_id.strip())
-                cases.append({
+                normalized_case = {
                     "id": case_id.strip(),
                     "query": query.strip(),
                     "relevant_categories": [value.strip() for value in expected],
-                })
+                }
+                try:
+                    json.dumps(
+                        normalized_case, ensure_ascii=False, separators=(",", ":")
+                    ).encode("utf-8")
+                except UnicodeEncodeError as error:
+                    raise ValueError(
+                        f"Línea {line_number} contiene Unicode inválido."
+                    ) from error
+                seen_ids.add(case_id.strip())
+                cases.append(normalized_case)
                 if len(cases) > MAX_CASES:
                     raise ValueError("El dataset supera 5000 casos.")
             after = os.fstat(stream.fileno())
