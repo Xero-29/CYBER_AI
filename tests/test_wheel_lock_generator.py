@@ -4,6 +4,8 @@ import unittest
 import zipfile
 from pathlib import Path
 
+import wheel_lock_generator
+
 from unittest.mock import patch
 
 from wheel_lock_generator import WheelLockError, build_lock, wheel_metadata
@@ -146,6 +148,26 @@ class WheelLockGeneratorTests(unittest.TestCase):
         with self.assertRaisesRegex(WheelLockError, "inexistente o inseguro"):
             build_lock(self.wheelhouse, link)
 
+
+
+    def test_main_reports_symlink_output_as_error(self):
+        target = self.root / "target.lock"
+        target.write_text("keep", encoding="utf-8")
+        output = self.root / "output.lock"
+        try:
+            output.symlink_to(target)
+        except OSError:
+            self.skipTest("symlinks unavailable")
+        with patch.object(wheel_lock_generator, "build_lock", return_value="lock"):
+            self.assertEqual(
+                wheel_lock_generator.main([
+                    "--wheelhouse", str(self.wheelhouse),
+                    "--requirements", str(self.requirements),
+                    "--output", str(output),
+                ]),
+                2,
+            )
+        self.assertEqual(target.read_text(encoding="utf-8"), "keep")
 
 if __name__ == "__main__":
     unittest.main()
