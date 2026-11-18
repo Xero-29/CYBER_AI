@@ -3,6 +3,9 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
+
+import sbom_generator
 
 from sbom_generator import LockfileError, build_sbom
 
@@ -155,6 +158,26 @@ class SbomGeneratorTests(unittest.TestCase):
         with self.assertRaises(LockfileError):
             build_sbom(self.root)
 
+
+
+    def test_main_reports_symlink_output_as_error(self):
+        if not hasattr(Path, "symlink_to"):
+            self.skipTest("symlinks unavailable")
+        target = self.root / "target.json"
+        target.write_text("keep", encoding="utf-8")
+        output = self.root / "output.json"
+        try:
+            output.symlink_to(target)
+        except OSError:
+            self.skipTest("symlinks unavailable")
+        with patch.object(sbom_generator, "build_sbom", return_value={"components": []}):
+            self.assertEqual(
+                sbom_generator.main([
+                    "--root", str(self.root), "--output", str(output),
+                ]),
+                2,
+            )
+        self.assertEqual(target.read_text(encoding="utf-8"), "keep")
 
 if __name__ == "__main__":
     unittest.main()
