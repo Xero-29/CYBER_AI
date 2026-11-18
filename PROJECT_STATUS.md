@@ -1,30 +1,41 @@
 # Estado de reconciliación — 2026-11-18
 
-**Rama de integración aislada:** `codex/reconcile-security-integrity-2026-11-18`  
-**Base inmutable de esta rama:** `main` en `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`.  
-**Rama fuente de auditoría:** `codex/security-integrity-audit`, HEAD inspeccionado `8104739d542e3264166eb0e7b1b493aa26e9ce0a`.  
-**Merge-base:** `cae816d6037b56f017c2fbdb3e98ef00df58c1d`. La divergencia observada es 112 commits exclusivos de auditoría y 573 exclusivos de main. No se ha realizado merge, rebase, force-push ni modificación de main.
+**Rama de integración:** `codex/reconcile-security-integrity-2026-11-18`  
+**HEAD actual antes de esta actualización:** `d476448ded6e6cc4197e0eeb8731c52512a567b7`.  
+**Base:** `main` en `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`; comparación actual: **86 commits adelante, 0 detrás**, 42 rutas cambiadas.  
+**Merge-base con main:** `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`. Main permanece sin modificar.  
+**Merge controlado en esta rama:** commit `2585b99be752bef3276ce5721690542c9f05e7d2`, con primer padre la rama de reconciliación y segundo padre PR #11 en `04c001a206cde98613cf9c151ce4f6a95fb86a21`. Se conservó el árbol validado de PR #11 y se sobrepusieron únicamente nueve rutas revisadas de la rama de reconciliación; no hubo merge en main ni rebase/force-push.
 
-## Trabajo de esta fase
+**Rama fuente de auditoría:** `codex/security-integrity-audit`, HEAD inspeccionado `8104739d542e3264166eb0e7b1b493aa26e9ce0a`. Sigue divergente de main: 112 commits exclusivos de auditoría y 573 exclusivos de main desde `cae816d6037b56f017c2fbdb3e98ef00df58c1d`. No se copiará el diff completo a ciegas.
 
-- Creada esta rama desde el HEAD exacto de main para reconciliar por etapas.
-- Portados desde la rama de auditoría, como adiciones independientes: `safe_io.py`, `tests/test_safe_io.py`, `docs/SECURE_FILE_OUTPUTS.md`, los locks documentales y los locks de herramientas del sandbox.
-- La prueba Python del HEAD `27d5e7126e50490fb09de92521355a4d8a50712d` terminó correctamente: [GitHub Actions 44359851530](https://github.com/Xero-29/CYBER_AI/actions/runs/44359851530). No hay evidencia de Docker Sandbox ejecutado en ese HEAD todavía.
-- PR #11 continúa siendo el PR existente para locks/SBOM. Se corrigieron sus fixtures de artefactos para usar hashes SHA-256 válidos y se añadió soporte de `--lock-file` al generador de manifiestos, necesario para los entornos sandbox y documentos. Los checks del nuevo HEAD aún deben concluir.
+## Cambios integrados y endurecimiento portado
 
-## Decisiones de integración pendientes
+- Se incorporó la integración de locks/SBOM de PR #11, incluido soporte de `--lock-file` para manifiestos de runtime, sandbox y extractores documentales. Se corrigieron sus fixtures para que cada wheel esté ligado a hashes SHA-256 del lock.
+- `safe_io.atomic_write_text` quedó conectado a los generadores de locks, manifiestos de artefactos, SBOM y manifiestos JSON de descargas de conocimiento.
+- El ledger valida la ruta y los archivos DB/WAL/SHM contra symlinks/no-regular-files, exige directorio POSIX privado y archivos `0600`, limita enteros a SQLite signed 64-bit y rechaza umbrales de recuperación no representables.
+- Los backups limitan cantidad de archivos y tamaño del manifiesto, tanto al crear como al verificar.
+- Los datasets de evaluación se leen con `O_NOFOLLOW` cuando está disponible, se validan por identidad antes/después, límite de bytes real, Unicode y tamaños para entradas en memoria.
+- Agentes, ejecutor de herramientas y task runner requieren ledger por defecto. La ejecución sin registro exige una excepción explícita: `CYBER_AI_ALLOW_UNLOGGED_EXECUTION=1` para agentes o `--allow-unlogged-execution` para los CLI.
+- El runner Docker restringe el directorio de evidencias a `0700`; el workflow prepara `data` con permisos privados y usa `pip --require-hashes`.
+- Se añadieron pruebas de regresión para symlinks/permisos del ledger, límites SQLite, backups, Unicode/tamaño de datasets, ejecución sin ledger y permisos del montaje Docker.
 
-- No copiar en bloque los 49 archivos modificados de auditoría: varios también evolucionaron en main y una sustitución ciega puede revertir capacidades nuevas de main.
-- Comparar y reconciliar por separado los módulos compartidos de ejecución, ledger, adaptadores, backups, workflows, documentación y biblioteca de conocimiento.
-- Preservar los módulos y contenidos nuevos de main, incluidos agentes/simulación, runners especializados, atlas, currículos y módulos profundos.
-- No crear un PR adicional mientras PR #11 siga cubriendo parte del mismo trabajo. La rama de reconciliación permanece como área de trabajo y no se presenta como lista para integrar.
+## Evidencia de CI y PR
 
-## Pendientes
+- PR #11 sigue abierto en draft, sin duplicarlo: [PR #11](https://github.com/Xero-29/CYBER_AI/pull/11). Su HEAD `04c001a206cde98613cf9c151ce4f6a95fb86a21` pasó Python Tests ([run 44359934767](https://github.com/Xero-29/CYBER_AI/actions/runs/44359934767)) y Docker Sandbox ([run 44359934228](https://github.com/Xero-29/CYBER_AI/actions/runs/44359934228)).
+- En la rama de reconciliación, HEAD `bb2f32a63c92f6f4dffbf3502cd24da5462fe0d4` pasó Python Tests: 640 pruebas, 2 omitidas ([run 44361098214](https://github.com/Xero-29/CYBER_AI/actions/runs/44361098214)). Docker falló en ese HEAD porque el montaje de evidencias se creaba con permisos demasiado abiertos; el runner y su prueba se corrigieron después.
+- HEAD actual `d476448ded6e6cc4197e0eeb8731c52512a567b7`: Python Tests y Docker Sandbox están pendientes/en ejecución; no se declara verde hasta concluir ambos sobre el mismo SHA.
+- PR #2 permanece cerrado y fusionado en `478c6ddc676221e4c07b8c5780f127bc5a9e749e`; no se duplicó.
 
-1. Reconciliar de forma revisada los cambios compartidos de la rama de auditoría, con pruebas específicas por módulo.
-2. Esperar y corregir cualquier fallo restante de PR #11; no declararlo verde hasta que todos los checks requeridos concluyan exitosamente.
-3. Ejecutar Python y Docker sobre el mismo HEAD de reconciliación y verificar artefactos SBOM.
-4. Actualizar esta sección con cada commit y evidencia exacta.
+## Próximas tareas de reconciliación
+
+1. Validar Python y Docker en el HEAD actual; corregir cualquier regresión encontrada.
+2. Revisar individualmente las rutas restantes de la auditoría, especialmente workflows, adaptadores, ejecutores, preflight, backups y documentación, conservando las capacidades añadidas en main.
+3. Ejecutar la suite completa y SBOM en el HEAD final de reconciliación.
+4. Mantener PR #11 como único PR existente para la integración de locks/SBOM; no abrir un PR solapado.
+5. Mantener pendientes externos separados: KMS/HSM, WORM/offsite, RBAC/IdP/MFA, pruebas de restore/DR, microVM/egress/escape, proveedores reales y revisión experta de fuentes.
+
+**Estado:** la rama de reconciliación ya integra main sin divergencia de base y una primera parte sustancial de los cambios de auditoría, pero todavía no está lista para integrar ni para validación final del usuario.
+
 
 ---
 
