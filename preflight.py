@@ -443,6 +443,16 @@ def collect_checks(root=PROJECT, python_version=None, module_lookup=None,
                 "No se pudo validar la allowlist firmada; no se expone la clave.",
             )
 
+    allow_unlogged = str(
+        environ.get("CYBER_AI_ALLOW_UNLOGGED_EXECUTION", "")
+    ).strip().lower() in {"1", "true", "yes"}
+    add(
+        "ledger_policy",
+        "warning" if allow_unlogged else "ok",
+        "La ejecución sin ledger está habilitada explícitamente."
+        if allow_unlogged else
+        "El ledger es obligatorio por defecto en los ejecutores.",
+    )
     ledger_path = Path(environ.get(
         "CYBER_AI_LEDGER_PATH", root / "data/execution_ledger.sqlite3"
     ))
