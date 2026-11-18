@@ -1,83 +1,67 @@
 # Estado verificado más reciente — 2026-11-18
 
 **Repositorio:** `Xero-29/CYBER_AI`  
-**Rama de código auditada:** `codex/security-integrity-audit`  
-**Último HEAD con cambios de código y CI verde:** `4ebbe42b39ddfb989225cdf5beff5b4055d918da`  
-**HEAD documental posterior:** `86bd736a703059d9bba31d0677dbfdda8ecc2d6a`  
+**Rama auditada:** `codex/security-integrity-audit`  
+**HEAD de código con CI verde:** `1aed9ba58da7299a8e9eb0a9b304920894270abb`  
+**HEAD documental anterior:** `53660782db2f2a43d21031418be217e9647db0d4`  
 **main inspeccionada:** `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`  
-**Comparación al iniciar esta actualización:** divergente; la rama auditada estaba **85 commits adelante y 573 detrás**. Merge-base: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.
+**Divergencia actual:** `diverged`, rama auditada **90 commits adelante y 573 detrás**. Merge-base: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.
 
 ## Ramas, commits y PRs
 
-- **PR #2:** cerrado y fusionado el 2026-11-17. Merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`.
-- **PR #11:** abierto en draft, rama `codex/integration-hash-locks-2026-11-17-v2`, HEAD `279e03cbe8ac41a189a8bbbd5474f3c48aef30ee`, base `main`. GitHub lo reporta mergeable, pero sus workflows fallan; no está listo para integrar.
-  - Python Tests: run [44329788792](https://github.com/Xero-29/CYBER_AI/actions/runs/44329788792), 627 tests, **1 failure y 6 errors**.
-  - Docker Sandbox: run [44329785863](https://github.com/Xero-29/CYBER_AI/actions/runs/44329785863), 495 tests, **4 failures y 2 errors**.
-  - Los logs incluyen un `NameError: isolated_home` en la ruta Nmap, una prueba que no obtiene HOME efímero y errores de fixtures del lock de dependencias. No se portó ese branch ni se duplicó su PR.
-- **PR #1:** abierto en draft, rama `feature/institutional-extensibility-knowledge`.
-- **PR #3–#10:** propuestas abiertas de Dependabot sobre dependencias y Actions.
-- El commit histórico `7b5ed033f1f6461b5780a10ac4ada67a444b93e5` es ancestro común y está preservado; la rama de respaldo `backup/main-before-cyber-ai-2026-11-17` sigue presente.
-- No se hizo merge, rebase ni push a `main`. Con 573 commits de divergencia, no se debe integrar directamente sin revisar y reconciliar el árbol en una rama separada.
+- **PR #2:** cerrado y fusionado el 2026-11-17. Merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. No debe duplicarse ni reabrirse.
+- **PR #11:** abierto en draft, rama `codex/integration-hash-locks-2026-11-17-v2`, HEAD `d9ce6eb26fa018330e5890c3632f963912a6626e`, base `main`. GitHub lo reporta mergeable, pero sus checks fallan:
+  - Python Tests — run [44335073066](https://github.com/Xero-29/CYBER_AI/actions/runs/44335073066): 627 tests, **5 errors** y 1 omitido.
+  - Docker Sandbox — run [44335073344](https://github.com/Xero-29/CYBER_AI/actions/runs/44335073344): 627 tests, **5 errors**.
+  - Los cinco errores reproducen el mismo defecto de fixtures: `tests/test_dependency_artifact_manifest.py` crea un `requirements.txt` con `requests==2.0` sin hash, mientras el parser ahora exige hashes en los locks. El job Windows de allowlist y la construcción de imágenes Docker sí terminaron correctamente; la suite falla antes de los pasos de SBOM/Ruff.
+  - No se modificó ni se reutilizó esa rama de integración en esta ejecución.
+- **PR #1 y PR #3–#10:** siguen abiertos; los PRs de Dependabot requieren revisión individual y regeneración de locks cuando corresponda.
+- El commit histórico `7b5ed033f1f6461b5780a10ac4ada67a444b93e5` es ancestro común de `main` y de la rama auditada; ya no es un commit exclusivo de `main`. Existe una rama de respaldo de `main`.
+- No se hizo merge, rebase, force-push ni modificación de `main`. La divergencia de 573 commits impide una integración segura por actualización directa; requiere reconciliación en una rama separada y revisión por archivo.
 
-## CI del último HEAD con cambios de código
+## CI del HEAD de código exacto
 
-SHA `4ebbe42b39ddfb989225cdf5beff5b4055d918da`:
+SHA `1aed9ba58da7299a8e9eb0a9b304920894270abb`:
 
-- Python Tests: **success, 528 tests**, run [44334519555](https://github.com/Xero-29/CYBER_AI/actions/runs/44334519555).
-- Docker Sandbox: **success, 528 tests y Ruff dentro del contenedor**, run [44334519559](https://github.com/Xero-29/CYBER_AI/actions/runs/44334519559).
-- Ambos workflows terminaron en `completed/success` sobre el mismo SHA.
-- El commit posterior `86bd736a703059d9bba31d0677dbfdda8ecc2d6a` solo actualiza documentación; su CI se vuelve a comprobar en Actions.
-- No hubo entorno local de ejecución disponible en esta sesión; la evidencia reproducible es GitHub Actions.
+- Python Tests — **completed/success, 530 pruebas**: [run 44336406992](https://github.com/Xero-29/CYBER_AI/actions/runs/44336406992).
+- Docker Sandbox — **completed/success, 530 pruebas y Ruff dentro del contenedor**: [run 44336406832](https://github.com/Xero-29/CYBER_AI/actions/runs/44336406832).
+- Ambos checks validaron exactamente el mismo SHA. El workflow Python también generó SBOM CycloneDX y manifiestos de artefactos para el entorno principal y el sandbox.
+- No se dispuso de entorno local en esta sesión; la evidencia de ejecución es GitHub Actions.
 
 ## Implementaciones concretas de esta iteración
 
-- `wheel_lock_generator.py`:
-  - límites de 512 MiB por wheel, 2 GiB por wheelhouse, 1.024 wheels, 100.000 entradas ZIP y 1 MiB para el archivo de requisitos;
-  - rechaza symlinks, archivos no regulares, METADATA duplicada/inválida y valores Name/Version que puedan inyectar líneas en el lock;
-  - compara identidad/tamaño/tiempos del archivo antes y después del hash para detectar sustituciones durante la inspección;
-  - escritura atómica del lock.
-- `dependency_artifact_manifest.py`:
-  - aplica límites equivalentes al wheelhouse;
-  - valida estrictamente la identidad METADATA y detecta cambios del wheel durante el hashing;
-  - conserva la comprobación contra hashes fijados en el lock y escribe el manifiesto de forma atómica.
-- `tool_allowlist.py`:
-  - allowlist HMAC-SHA256, JSON canónico, rechazo de claves duplicadas, esquema estricto y tamaño máximo de 64 KiB;
-  - rechaza symlinks, archivos no regulares, puntos de reanálisis de Windows y reemplazos de ruta detectados durante la apertura.
-- `tool_adapters.py`:
-  - valida el hash del ejecutable contra la allowlist configurada antes de iniciar el proceso;
-  - incorpora el resultado de la política a la evidencia de ejecución.
-- `preflight.py`:
-  - comprueba la firma/configuración de la allowlist sin iniciar herramientas ni usar red;
-  - bloquea si `CYBER_AI_TOOL_ALLOWLIST_REQUIRED=1` y la política falta o es inválida;
-  - marca como advertencia el override de ejecución sin ledger.
-- `safe_io.py`:
-  - escritura atómica mediante temporal exclusivo;
-  - rechaza destinos no regulares y componentes de ruta symlink/reparse;
-  - integrado en generación de locks, manifiestos de artefactos, SBOM y manifiesto de descargas de conocimiento.
-- **Ledger fail-closed:** `tool_executor.py`, `task_runner.py` y `agent_runner.py` exigen registrar inicio/resultado por defecto. El bypass requiere `--allow-unlogged-execution` o `CYBER_AI_ALLOW_UNLOGGED_EXECUTION=1` y se reporta en preflight.
-- Documentación nueva/actualizada: `docs/TOOL_ALLOWLIST.md`, `docs/SECURE_FILE_OUTPUTS.md`, `docs/LOCAL_PREFLIGHT.md`, `docs/EXECUTION_LEDGER.md`.
-- Pruebas nuevas/ampliadas: wheel metadata/recursos, allowlist y su integración, preflight, escritura segura, política fail-closed del ledger y cierre de eventos. Total CI: 528 pruebas.
+- `execution_ledger.py`:
+  - limita `duration_ms` y `cost_microunits` al rango entero de SQLite (`0..2^63-1`);
+  - convierte el umbral de reconciliación a `float` de forma controlada y transforma desbordamientos en `LedgerError`, sin propagar `OverflowError`.
+- `tool_executor.py`:
+  - valida la duración informada por adaptadores sin convertir enteros arbitrariamente grandes a float;
+  - comprueba que la conversión a milisegundos sea finita y quepa en SQLite; ante valores inválidos o fuera de rango usa el reloj monotónico local.
+- Pruebas de regresión:
+  - límites SQLite máximo y desbordamiento para duración/coste;
+  - umbrales de reconciliación no representables;
+  - duración de adaptador con booleanos, negativos, NaN, infinito, texto, enteros gigantes y floats fuera de rango.
+- El nuevo código quedó publicado en commits pequeños y separados en la rama auditada.
 
 ## Límites de lo implementado
 
-- La allowlist HMAC es opcional para compatibilidad. Si no se configuran ruta y clave y no se activa `CYBER_AI_TOOL_ALLOWLIST_REQUIRED=1`, la evidencia indica `not_configured`; no se debe interpretar como binario aprobado. La clave HMAC es simétrica: custodia, rotación y segregación requieren infraestructura externa. El enrolamiento debe verificar origen, firma del proveedor y licencia del binario antes de firmarlo.
-- La escritura atómica evita clases comunes de sobrescritura por symlink; no protege frente a un administrador local capaz de cambiar simultáneamente directorios padre.
-- `requirements-documents.lock` no está incorporado en esta rama. Existe en PR #11, pero esa integración falla CI y usa versiones distintas a los rangos actuales; no se copió sin validación.
-- Los locks actuales no cubren todas las plataformas y arquitecturas; el principal está acotado a CPython 3.12.x, Linux x86_64 y glibc >= 2.26.
-- La salida del preflight sigue mostrando 138 fuentes de conocimiento, 0 revisadas y 276 verificaciones pendientes. El catálogo y los perfiles existen, pero la calidad experta, procedencia, licencias y vigencia requieren revisión.
+- La allowlist HMAC sigue siendo opcional para compatibilidad. Sin ruta/clave y sin `CYBER_AI_TOOL_ALLOWLIST_REQUIRED=1`, el estado `not_configured` no equivale a binario aprobado. La custodia, rotación y segregación de la clave simétrica requieren KMS/HSM o firma asimétrica.
+- La escritura atómica reduce riesgos de symlink, pero no protege contra un administrador local capaz de modificar simultáneamente los directorios padre.
+- `requirements-documents.lock` no está incorporado en esta rama; no se copió desde PR #11 porque su rama falla CI y sus versiones no se han validado contra el conjunto actual.
+- Los locks principales cubren un entorno concreto (CPython 3.12, Linux x86_64, glibc >= 2.26), no todas las plataformas.
+- El preflight aún refleja 138 fuentes de conocimiento, 0 revisadas y 276 verificaciones pendientes. Tener catálogo y perfiles no demuestra exactitud, vigencia, licencia ni calidad experta.
 
-## Únicos pendientes operativos / externos conocidos
+## Pendientes que aún no se pueden cerrar solo con pruebas unitarias
 
-1. Configurar una clave HMAC protegida, enrolar los binarios reales instalados y activar `CYBER_AI_TOOL_ALLOWLIST_REQUIRED=1`; para producción, sustituir HMAC compartida por firma asimétrica o KMS/HSM.
-2. Revisar y reconciliar los 573 commits exclusivos de `main` desde el merge-base; reparar los fallos de PR #11 en su rama de integración separada antes de proponer cualquier merge. No hacer merge automático.
-3. Obtener hashes reproducibles para el extra documental y para cada plataforma/arquitectura soportada; verificar instalaciones reales de extractores.
-4. Proveer RBAC/IdP/MFA, gestión de secretos/KMS, almacenamiento WORM/offsite, cifrado de backups y simulacros reales de restauración/DR.
-5. Ejecutar pruebas reales de microVM/VM, egress enforcement, escape de sandbox, concurrencia, carga/soak, disco lleno y recuperación tras caída/corrupción del host.
-6. Conectar proveedores/modelos reales y medir calidad, coste, latencia, cuotas, fallos y política de datos.
-7. Revisar manualmente las 138 fuentes, las 276 verificaciones pendientes y los contenidos por especialidad; validar licencias, exactitud, vigencia y recuperación semántica con un dataset experto.
-8. Verificar ACL Windows, protección de rama, alertas/observabilidad y respuesta a incidentes en la infraestructura de despliegue.
+1. Reconciliar los 573 commits exclusivos de `main` desde el merge-base en una rama separada; preservar los 90 commits de auditoría y resolver cambios con revisión por archivo. No integrar automáticamente.
+2. Corregir los fixtures de hash de PR #11 en su rama propia y volver a ejecutar ambos workflows antes de considerarlo integrable.
+3. Obtener y validar locks con hashes para dependencias documentales y plataformas adicionales.
+4. Configurar custodia de claves, KMS/HSM, RBAC/IdP/MFA, WORM/offsite y cifrado de backups; ejecutar simulacros DR/RPO/RTO.
+5. Ejecutar pruebas reales de microVM/VM, egress, escape de sandbox, concurrencia, carga/soak, disco lleno y recuperación tras caída/corrupción del host.
+6. Conectar proveedores/modelos reales y medir calidad, coste, latencia, cuotas, fallos y políticas de datos.
+7. Revisar las 138 fuentes y 276 verificaciones pendientes con especialistas; validar licencias, exactitud, vigencia y recuperación semántica con un dataset experto.
+8. Verificar ACL Windows, protección de rama, alertas, observabilidad y respuesta a incidentes en infraestructura de despliegue.
 
-**Conclusión:** el código de esta rama pasó 528 pruebas en Python y 528 en Docker, con Ruff aprobado, en el SHA exacto enlazado. Se cerraron brechas de validación de wheels, allowlist configurable, escritura segura de artefactos y trazabilidad obligatoria por defecto. No está listo para producción ni para declarar finalizada la validación institucional: la allowlist aún requiere activación y enrolamiento, la integración con main sigue muy divergente y la propuesta PR #11 falla. No se modificó `main`.
+**Conclusión:** el HEAD de código `1aed9ba58da7299a8e9eb0a9b304920894270abb` pasó 530 pruebas en Python y Docker, con Ruff aprobado. Esto acredita los checks automatizados de ese SHA, no una certificación ni preparación para producción. La rama continúa divergente de `main`, PR #11 sigue fallando y permanecen pendientes operacionales y de revisión experta. `main` no fue modificada.
 
 
 ---
