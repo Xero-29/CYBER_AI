@@ -172,8 +172,10 @@ class ExecutionLedgerTests(unittest.TestCase):
             ExecutionLedger(parent_link / "ledger.sqlite3")
 
     def test_ledger_rejects_symlinked_wal_companion(self):
-        path = Path(self.tmp.name) / "ledger.sqlite3"
-        target = Path(self.tmp.name) / "external-wal"
+        directory = Path(self.tmp.name) / "wal-case"
+        directory.mkdir(mode=0o700)
+        path = directory / "ledger.sqlite3"
+        target = directory / "external-wal"
         target.write_bytes(b"")
         Path(f"{path}-wal").symlink_to(target)
         with self.assertRaisesRegex(LedgerError, "archivos auxiliares"):
