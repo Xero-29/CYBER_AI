@@ -7,6 +7,7 @@ import ipaddress
 import json
 import math
 import os
+import re
 from functools import lru_cache
 from importlib.metadata import entry_points
 from urllib.parse import urlsplit
@@ -23,6 +24,10 @@ class _NoRedirect(HTTPRedirectHandler):
 
 
 _HTTP_OPENER = build_opener(_NoRedirect)
+MAX_PROVIDER_REQUEST_BYTES = 8 * 1024 * 1024
+MAX_PROVIDER_RESPONSE_BYTES = 16 * 1024 * 1024
+MAX_PROVIDER_ERROR_BYTES = 2 * 1024
+ENV_NAME_PATTERN = re.compile(r\"[A-Za-z_][A-Za-z0-9_]{0,127}\")
 
 
 @lru_cache(maxsize=32)
@@ -173,14 +178,28 @@ def resolve_model(provider, agent, agent_name=None):
 
 
 def _http_json(url, payload=None, headers=None, timeout=600):
-    data = None if payload is None else json.dumps(payload).encode("utf-8")
-    request = Request(url, data=data, headers={"Content-Type": "application/json", **(headers or {})},
-                      method="GET" if payload is None else "POST")
+    data = None if payload is None else json.dumps(
+        payload, ensure_ascii=False, allow_nan=False
+    ).encode("utf-8")
+    if data is not None and len(data) > MAX_PROVIDER_REQUEST_BYTES:
+        raise ValueError("La solicitud al proveedor IA supera 8 MiB.")
+    request = Request(
+        url,
+        data=data,
+        headers={"Content-Type": "application/json", **(headers or {})},
+        method="GET" if payload is None else "POST",
+    )
     try:
         with _HTTP_OPENER.open(request, timeout=timeout) as response:
-            return json.load(response)
+            raw = response.read(MAX_PROVIDER_RESPONSE_BYTES + 1)
+            if len(raw) > MAX_PROVIDER_RESPONSE_BYTES:
+                raise RuntimeError("La respuesta del proveedor IA supera 16 MiB.")
+            try:
+                return json.loads(raw.decode("utf-8"))
+            except (UnicodeDecodeError, json.JSONDecodeError) as error:
+                raise RuntimeError("El proveedor IA devolvió JSON inválido.") from error
     except HTTPError as exc:
-        detail = exc.read().decode("utf-8", errors="replace")[:2000]
+        detail = exc.read(MAX_PROVIDER_ERROR_BYTES).decode("utf-8", errors="replace")
         raise RuntimeError(f"Proveedor IA respondió HTTP {exc.code}: {detail}") from exc
     except URLError as exc:
         raise RuntimeError(f"No se pudo conectar con el proveedor IA: {exc}") from exc
@@ -188,6 +207,10 @@ def _http_json(url, payload=None, headers=None, timeout=600):
 
 def _credentials(provider):
     key_env = provider.get("api_key_env")
+    if key_env is not None and (
+        not isinstance(key_env, str) or not ENV_NAME_PATTERN.fullmatch(key_env)
+    ):
+        raise RuntimeError("api_key_env debe ser un nombre de variable de entorno válido.")
     key = os.environ.get(key_env, "") if key_env else ""
     if provider.get("requires_api_key", True) and not key:
         if not key_env:
@@ -342,13 +365,22 @@ def _validate_plugin_response(endpoint, result, protocol):
 
 def request(provider, endpoint, payload=None, timeout=600):
     """Normaliza llamadas y valida respuestas de todos los proveedores."""
-    if isinstance(timeout, bool) or not isinstance(timeout, (int, float)) or not math.isfinite(timeout) or not 0 < timeout <= 600:
+    if not _finite_number(timeout) or not 0 < timeout <= 600:
         raise ValueError("timeout debe ser un número finito mayor que 0 y máximo 600 segundos.")
+    timeout = float(timeout)
     protocol = provider.get("protocol")
     required = {"api/chat": "chat", "api/embed": "embeddings", "api/ps": "model_listing"}.get(endpoint)
     if required and required not in provider_capabilities(provider):
         raise ValueError(f"El proveedor {provider.get('name', protocol)} no ofrece {required}.")
     request_payload = payload or {}
+    try:
+        encoded_payload = json.dumps(
+            request_payload, ensure_ascii=False, allow_nan=False
+        ).encode("utf-8")
+    except (TypeError, ValueError, UnicodeEncodeError) as error:
+        raise ValueError("La solicitud al proveedor debe ser JSON válido.") from error
+    if len(encoded_payload) > MAX_PROVIDER_REQUEST_BYTES:
+        raise ValueError("La solicitud al proveedor IA supera 8 MiB.")
     if protocol == "ollama":
         base = str(provider.get("base_url", "")).rstrip("/")
         if not base:
@@ -365,6 +397,16 @@ def request(provider, endpoint, payload=None, timeout=600):
         if adapter is None:
             raise ValueError(f"Protocolo no compatible: {protocol}")
         result = adapter.request(provider, endpoint, request_payload, timeout)
+    try:
+        encoded_result = json.dumps(
+            result, ensure_ascii=False, allow_nan=False
+        ).encode("utf-8")
+    except (TypeError, ValueError, UnicodeEncodeError) as error:
+        raise RuntimeError(
+            f"El proveedor {protocol} devolvió una respuesta no serializable."
+        ) from error
+    if len(encoded_result) > MAX_PROVIDER_RESPONSE_BYTES:
+        raise RuntimeError(f"El proveedor {protocol} superó el límite de respuesta de 16 MiB.")
     result = _validate_plugin_response(endpoint, result, protocol)
     if endpoint == "api/embed":
         expected = request_payload.get("input")
@@ -373,8 +415,7 @@ def request(provider, endpoint, payload=None, timeout=600):
     for field in ("prompt_eval_count", "eval_count"):
         value = result.get(field)
         if value is not None and (
-            isinstance(value, bool) or not isinstance(value, (int, float))
-            or not math.isfinite(value) or value < 0
+            not _finite_number(value) or value < 0
         ):
             raise RuntimeError(f"El proveedor {protocol} devolvió un contador inválido: {field}.")
     return result
