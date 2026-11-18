@@ -79,6 +79,50 @@ class TestKnowledgeIngest(unittest.TestCase):
                     ingest.extract_document_text(path)
             self.assertEqual(csv.field_size_limit(), original_limit)
 
+    def test_extracts_real_docx_when_optional_dependency_is_installed(self):
+        try:
+            from docx import Document
+        except ImportError:
+            self.skipTest("python-docx opcional no instalado")
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "fixture.docx"
+            document = Document()
+            document.add_paragraph("DOCX integration fixture")
+            document.save(path)
+            text = ingest.extract_document_text(path)
+        self.assertIn("DOCX integration fixture", text)
+
+    def test_extracts_real_xlsx_when_optional_dependency_is_installed(self):
+        try:
+            from openpyxl import Workbook
+        except ImportError:
+            self.skipTest("openpyxl opcional no instalado")
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "fixture.xlsx"
+            workbook = Workbook()
+            workbook.active["A1"] = "XLSX integration fixture"
+            workbook.save(path)
+            text = ingest.extract_document_text(path)
+        self.assertIn("XLSX integration fixture", text)
+
+    def test_extracts_real_pptx_when_optional_dependency_is_installed(self):
+        try:
+            from pptx import Presentation
+            from pptx.util import Inches
+        except ImportError:
+            self.skipTest("python-pptx opcional no instalado")
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "fixture.pptx"
+            presentation = Presentation()
+            slide = presentation.slides.add_slide(presentation.slide_layouts[6])
+            shape = slide.shapes.add_textbox(
+                Inches(1), Inches(1), Inches(5), Inches(1)
+            )
+            shape.text_frame.text = "PPTX integration fixture"
+            presentation.save(path)
+            text = ingest.extract_document_text(path)
+        self.assertIn("PPTX integration fixture", text)
+
     def test_pdf_extraction_preserves_page_markers_for_chunk_citations(self):
         class FakePage:
             def __init__(self, content):
