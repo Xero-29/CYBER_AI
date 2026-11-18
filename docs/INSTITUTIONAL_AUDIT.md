@@ -1,5 +1,7 @@
 # Auditoría arquitectónica institucional de CYBER_AI
 
+> **Documento histórico.** Esta auditoría fue realizada el 2026-11-12 sobre la rama `codex/security-integrity-audit`. Sus hallazgos y estados describen ese snapshot, no el HEAD actual de `main`. Para el diagnóstico vigente consulta [PROJECT_STATUS.md](../PROJECT_STATUS.md), [IMPLEMENTATION_MATRIX.md](IMPLEMENTATION_MATRIX.md) y [PROJECT_COMPLETION_PLAN.md](PROJECT_COMPLETION_PLAN.md). No reutilizar los estados de CI antiguos como evidencia de la rama principal actual.
+
 **Fecha:** 2026-11-12  
 **Rama auditada:** `codex/security-integrity-audit`  
 **Alcance:** revisión estática inicial del árbol, documentación, workflow y registros de GitHub Actions.  
@@ -162,13 +164,11 @@ Cada riesgo nuevo debe incluir archivo/línea, escenario de fallo, severidad, pr
 
 ## 8. Segunda pasada: hallazgos de ejecución, red y reutilización
 
-### AUD-008 — La inspección HTTP permite destinos internos y redirecciones
-**Severidad:** alta; potencialmente crítica según el entorno donde se ejecute.  
-**Evidencia:** `agent_core.py::action_check_headers` valida el esquema HTTP/HTTPS y exige `authorized=True`, pero después entrega la URL directamente a `urllib.request.urlopen`. No hay validación de direcciones IP privadas, loopback, link-local o metadatos; tampoco se deshabilitan ni revalidan redirecciones.  
-**Escenario:** un usuario o agente con capacidad de solicitar una inspección puede apuntar a un servicio interno; una redirección o resolución DNS cambiante también puede llevar la petición a otro destino. La confirmación booleana no impone un alcance de red.  
-**Impacto:** posible SSRF y acceso indirecto a servicios internos desde el host de CYBER_AI. No se ha ejecutado ninguna petición de prueba.  
-**Corrección propuesta:** política centralizada de destinos permitidos; resolver y validar todas las IP antes de conectar; bloquear rangos no públicos por defecto; fijar la IP validada durante la conexión; controlar cada redirección y volver a validar destino, puerto y esquema; límites de respuesta y auditoría de autorización. Añadir pruebas unitarias con DNS/HTTP simulados.  
-**Estado:** riesgo de diseño confirmado por inspección; explotabilidad concreta pendiente.
+### AUD-008 — Prototipo de inspección HTTP con alcance insuficientemente controlado
+**Severidad original:** alta.  
+**Evidencia histórica:** el hallazgo correspondía a `agent_core.py::action_check_headers`, un prototipo que aceptaba una URL arbitraria y no aplicaba una política de red completa.  
+**Estado actual:** **cerrado por eliminación del prototipo**. `agent_core.py` y sus pruebas fueron retirados al quedar fuera del flujo de producto y ser sustituidos por el pipeline de adaptadores. No se conserva una herramienta genérica equivalente de inspección HTTP en la ruta principal. Nuclei sigue un flujo separado con grants específicos por destino/acción.  
+**Límite residual:** la eliminación reduce la superficie de ataque, pero no equivale a implementar un transporte HTTP con DNS fijado, control de redirecciones y bloqueo de rangos internos para futuras herramientas de red.
 
 ### AUD-009 — El consentimiento de escaneo no equivale a un alcance autorizado verificable
 **Severidad:** alta.  
@@ -216,7 +216,7 @@ Se añadió `execution_policy.py` con denegación por defecto y grants locales v
 El archivo de grants debe estar fuera del repositorio, configurado mediante `CYBER_AI_AUTHORIZATIONS_FILE` y protegido con permisos POSIX `0600`. El archivo versionado `config/authorized_targets.json` permanece vacío.
 
 ### Integraciones
-- `agent_core.py`: la inspección HTTP exige grant; deshabilita redirecciones y proxies ambientales.
+- `tool_adapters.py` / `tool_execution_pipeline.py`: adaptadores locales con allowlist y confirmación; no ofrecen un cliente HTTP genérico ni fuerzan aislamiento de red del host.
 - `nuclei_scanner.py`: exige confirmación adicional e ID de grant; valida permiso antes de iniciar Nuclei; deshabilita redirecciones.
 - `task_runner.py`: aplica la misma política antes de iniciar el proceso Nuclei.
 - `cyber_ai.py`: transmite el ID de autorización al escáner.

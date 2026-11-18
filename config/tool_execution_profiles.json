@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "default_profile": "standard",
+  "profiles": {
+    "standard": {
+      "max_tools": null,
+      "allow_external_targets": false,
+      "timeout_seconds": 180,
+      "enable_custom_tools": false
+    },
+    "extended": {
+      "max_tools": null,
+      "allow_external_targets": true,
+      "timeout_seconds": 300,
+      "enable_custom_tools": true
+    },
+    "restricted": {
+      "max_tools": 3,
+      "allow_external_targets": false,
+      "timeout_seconds": 90,
+      "enable_custom_tools": false
+    }
+  },
+  "custom_tools": []
+}

@@ -1,0 +1,12 @@
+{
+  "authorizations": [
+    {
+      "id": "replace-with-unique-grant-id",
+      "target": "http://127.0.0.1:8080",
+      "actions": ["nuclei_scan"],
+      "expires_at": "2099-12-31T23:59:59Z",
+      "approved_by": "replace-with-responsible-operator",
+      "ticket": "replace-with-authorization-ticket"
+    }
+  ]
+}

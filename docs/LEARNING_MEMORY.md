@@ -29,7 +29,7 @@ signature = hmac.new(
 
 Después se llama a `save_verified_lesson_from_ledger(..., approval_signature=signature)`.
 
-La firma se valida nuevamente en cada lectura. Si la clave no está configurada, no se recuperan lecciones; es un comportamiento fail-closed. El archivo se escribe con permisos 0600, bloqueo exclusivo, append y fsync. Se rechazan enlaces simbólicos.
+La firma se valida nuevamente en cada lectura. Además, la recuperación contrasta los IDs y hashes de evidencia con el ledger actual, exige que la cadena siga íntegra y vuelve a comprobar las revisiones independientes. Si falta la clave, el ledger está corrupto, falta un evento o cambia un hash, la lección no se enseña (fail-closed). El archivo se escribe con permisos 0600, bloqueo exclusivo, append y fsync. Se rechazan enlaces simbólicos.
 
 ## Compatibilidad y límites
 
@@ -37,3 +37,7 @@ La firma se valida nuevamente en cada lectura. Si la clave no está configurada,
 - HMAC demuestra posesión de una clave compartida, no identidad criptográfica del modelo VERITAS ni revisión independiente.
 - La clave debe estar bajo control de un proceso aprobador separado. Para nivel institucional se requiere firma asimétrica/KMS/HSM, identidad autenticada, doble control y auditoría externa inmutable.
 - La firma preserva la referencia al ledger; la integridad actual del ledger debe verificarse mediante preflight/operación antes de confiar en evidencia histórica.
+
+## Diagnóstico
+
+Ejecuta `python learning_cycle_audit.py` para revisar la integridad del ledger, las referencias de memoria, las cadenas de versiones de Skills, los eventos interrumpidos y las revisiones pendientes. Es una auditoría de solo lectura: no reconcilia ni modifica registros. Consulta [LEARNING_CYCLE_AUDIT.md](LEARNING_CYCLE_AUDIT.md).

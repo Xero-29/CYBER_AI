@@ -8,7 +8,6 @@ explícito que aplique allowlist, resolución DNS segura y bloqueo de redes priv
 el cliente valida DNS, pero no puede eliminar por sí solo la ventana TOCTOU.
 """
 import argparse
-import fcntl
 import hashlib
 import ipaddress
 import json
@@ -21,6 +20,8 @@ from pathlib import Path
 from urllib.parse import urljoin, urlparse
 
 import requests
+
+from knowledge_bootstrap import exclusive_file_lock
 
 ROOT = Path(__file__).resolve().parent
 CATALOG = ROOT / "data/knowledge_sources/download_catalog.json"
@@ -333,9 +334,8 @@ def _run(args):
             print(f"[NO VERIFICADO] {item.get('id', 'sin-id')}: se omite")
             continue
         state = manifest["resources"].get(item.get("id"), {})
-        if state.get("status") == "downloaded":
-            print(f"[OMITIDO] {item['id']}: ya descargado")
-            continue
+        # No confiar solo en el manifiesto: download() verifica el hash del
+        # archivo presente y repara/re-descarga si falta o está corrupto.
         if state.get("status") == "failed" and not args.retry_failed:
             print(f"[PENDIENTE DE REINTENTO] {item['id']}")
             continue
@@ -371,12 +371,9 @@ def main(argv=None):
 
     lock_path = MANIFEST.with_suffix(MANIFEST.suffix + ".lock")
     lock_path.parent.mkdir(parents=True, exist_ok=True)
-    with lock_path.open("a+") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX)
-        try:
+    with lock_path.open("a+b") as lock:
+        with exclusive_file_lock(lock):
             return _run(args)
-        finally:
-            fcntl.flock(lock, fcntl.LOCK_UN)
 
 
 if __name__ == "__main__":

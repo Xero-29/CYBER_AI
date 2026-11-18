@@ -17,6 +17,7 @@ from task_planner import create_plan
 from tool_execution_pipeline import execute_tool_plan, ToolExecutionError
 
 from model_memory_manager import load_config
+from workflow_contracts import WorkflowContractError, validate_workflow_definition
 import experiment_engine
 import objective_controller
 
@@ -27,33 +28,22 @@ REPORT_DIR = PROJECT / "reports" / "team_runs"
 
 
 def load_workflow(name):
-    """Carga un flujo y verifica que sus especialistas existan."""
+    """Carga un flujo, valida su contrato y comprueba los especialistas."""
     data = json.loads(WORKFLOW_FILE.read_text(encoding="utf-8"))
-    workflows = data.get("workflows", {})
+    workflows = data.get("workflows", {}) if isinstance(data, dict) else {}
 
-    if name not in workflows:
+    if not isinstance(workflows, dict) or name not in workflows:
         raise ValueError(f"No existe el flujo {name!r}.")
 
     workflow = workflows[name]
-    steps = workflow.get("steps", [])
-    if not steps:
-        raise ValueError("El flujo no contiene pasos.")
+    try:
+        steps = validate_workflow_definition(workflow)
+    except WorkflowContractError as error:
+        raise ValueError(f"Contrato inválido en el flujo {name!r}: {error}") from error
 
     agents = load_config().get("agents", {})
-    workflow_mode = workflow.get("mode", "standard")
-    if workflow_mode not in {"standard", "technical"}:
-        raise ValueError(
-            f"Modo inválido en el flujo {name!r}: {workflow_mode!r}."
-        )
-
     for number, step in enumerate(steps, start=1):
-        step_mode = step.get("mode", workflow_mode)
-        if step_mode not in {"standard", "technical"}:
-            raise ValueError(
-                f"Paso {number}: modo inválido {step_mode!r}."
-            )
-
-        agent_name = step.get("agent")
+        agent_name = step["agent"]
         if agent_name not in agents:
             raise ValueError(
                 f"Paso {number}: no existe el especialista {agent_name!r}."
@@ -68,7 +58,9 @@ def load_workflow(name):
                 "no un agente conversacional."
             )
 
-    return workflow
+    normalized_workflow = dict(workflow)
+    normalized_workflow["steps"] = steps
+    return normalized_workflow
 
 
 def latest_record_after(offset):
@@ -771,7 +763,8 @@ def step_uses_knowledge(step, workflow):
 def execute_workflow(
     task, workflow_name, dry_run=False, *,
     supervise_objectives=False, acceptance_criteria=None, review_rounds=2,
-    execute_tools=False, confirm_tool_execution=False, tool_target=None
+    execute_tools=False, confirm_tool_execution=False, tool_target=None,
+    allow_external_targets=False
 ):
     """Ejecuta el flujo de forma secuencial y registra cada respuesta."""
     workflow_started = time.monotonic()
@@ -867,6 +860,7 @@ def execute_workflow(
             tool_execution = execute_tool_plan(
                 capability_plan, tool_target,
                 confirmed=confirm_tool_execution,
+                allow_external_targets=allow_external_targets,
             )
             report["tool_execution"] = tool_execution
             capability_plan["tool_execution_started"] = True
@@ -1229,7 +1223,11 @@ def main(argv=None):
     )
     parser.add_argument(
         "--tool-target",
-        help="Ruta relativa al repositorio que analizarán los adaptadores locales.",
+        help="Ruta del archivo o directorio que analizarán los adaptadores locales.",
+    )
+    parser.add_argument(
+        "--allow-external-targets", action="store_true",
+        help="Permitir objetivos fuera del repositorio tras confirmación explícita.",
     )
     parser.add_argument(
         "--experiment-test",
@@ -1266,6 +1264,8 @@ def main(argv=None):
             "y --experiment-hypothesis."
         )
 
+    if args.allow_external_targets and not args.execute_tools:
+        parser.error("--allow-external-targets requiere --execute-tools.")
     if args.execute_tools and (
         not args.confirm_tool_execution or not args.tool_target
     ):
@@ -1303,6 +1303,7 @@ def main(argv=None):
                 "execute_tools": True,
                 "confirm_tool_execution": True,
                 "tool_target": args.tool_target,
+                "allow_external_targets": args.allow_external_targets,
             })
         if args.supervise_objectives:
             workflow_options.update({

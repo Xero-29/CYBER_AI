@@ -44,10 +44,6 @@ jobs:
             --file sandbox/Dockerfile .
 
       - name: Build isolated YARA and TShark analysis image
-        if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
-        run: sh build-analysis-sandbox.sh
-
-      - name: Build isolated YARA and TShark analysis image
         run: sh build-analysis-sandbox.sh
 
       - name: Protect checked-out runtime data directories
@@ -56,14 +52,9 @@ jobs:
             find data -type d -exec chmod 700 {} +
           fi
 
-      - name: Run complete local verification with analysis sandbox
-        if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+      - name: Run complete local verification
         env:
           CYBER_AI_RUN_DOCKER_SANDBOX_TESTS: "1"
-        run: bash verify.sh
-
-      - name: Run complete local verification on integration branch push
-        if: github.event_name == 'push' && github.ref == 'refs/heads/codex/integration-hash-locks-2026-11-17-v2'
         run: bash verify.sh
 
       - name: Run Ruff inside hardened sandbox

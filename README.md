@@ -85,6 +85,8 @@ python cyber_ai.py --team "Revisa la calidad y seguridad del código" --execute-
 
 Solo se consideran adaptadores locales registrados; los que requieren red o aislamiento especial siguen bloqueados. El objetivo debe estar dentro del repositorio. La ejecución no se activa por defecto. La validación automática verifica integridad de hashes, allowlist, código de salida y ausencia de modificación del objetivo/binario; no demuestra por sí sola que cada hallazgo sea verdadero. Los resultados se entregan a los agentes como datos no confiables y quedan enlazados al informe y al ledger.
 
+Los adaptadores host usan `HOME`/temporales efímeros y un entorno mínimo que no hereda las variables secretas del proceso invocador. Aun así comparten el UID y el acceso al sistema de archivos del usuario; no equivalen a un sandbox ni imponen aislamiento de red. Para objetivos no confiables utiliza el runner Docker y recuerda que Docker comparte el kernel.
+
 ## Ejecutar agentes LLM locales
 
 1. Instala Ollama siguiendo su documentación oficial y arranca el servicio.
@@ -191,7 +193,7 @@ python data_backup.py verify --snapshot /ruta/segura/cyber-ai-backup --require-s
 python data_backup.py restore --snapshot /ruta/segura/cyber-ai-backup --confirm-quiesced --confirm-replace --require-signature
 ```
 
-La verificación de un backup firmado requiere la misma clave. HMAC autentica el manifiesto frente a quien no controla la clave, pero **no cifra** los datos ni proporciona identidad individual, KMS/HSM o almacenamiento WORM. Sin clave configurada, el backup sigue siendo compatible con el modo anterior sin firma. Protege también el acceso al directorio de backups y conserva la clave fuera del host de origen.
+La verificación de un backup firmado requiere la misma clave. HMAC autentica el manifiesto frente a quien no controla la clave, pero **no cifra** los datos ni proporciona identidad individual, KMS/HSM o almacenamiento WORM. Sin clave configurada, el backup sigue siendo compatible con el modo anterior sin firma. Protege también el acceso al directorio de backups y conserva la clave fuera del host de origen. El formato limita cada snapshot a 50.000 archivos y un manifiesto de 16 MiB para acotar el coste de verificación; planifica un mecanismo de archivo separado para volúmenes mayores.
 
 Genera un SBOM CycloneDX determinista a partir de las dependencias fijadas:
 
@@ -199,7 +201,7 @@ Genera un SBOM CycloneDX determinista a partir de las dependencias fijadas:
 python sbom_generator.py --output reports/cyber-ai-sbom.cdx.json
 ```
 
-El SBOM distingue dependencias directas y transitivas, registra el hash del lock y, en CI, incorpora SHA-256 de los wheels descargados y verificados contra el lock. Se generan SBOM separados para runtime, sandbox (Ruff/Bandit) y extractores documentales opcionales. Esto fija los artefactos usados para la plataforma del runner, pero no demuestra la procedencia upstream del publicador ni equivale a una firma upstream.
+El SBOM distingue dependencias directas y transitivas, registra el hash del lock y, en CI, incorpora SHA-256 de los wheels descargados y verificados contra el lock. Se generan SBOM separados para runtime, sandbox (Ruff/Bandit) y extractores documentales opcionales. Esto fija los artefactos usados para la plataforma del runner, pero no demuestra la procedencia upstream del publicador ni equivale a una firma upstream. Los generadores de locks/manifiestos rechazan metadatos `METADATA` de wheel superiores a 2 MiB para limitar la descompresión de entradas no confiables.
 
 Para medir la recuperación por especialidad después de indexar, ejecuta el benchmark por defecto de 48 consultas (una por área). El conjunto de 12 consultas anteriores queda disponible como smoke test rápido:
 

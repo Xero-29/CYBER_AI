@@ -2,27 +2,25 @@
 
 **Rama de integración:** `codex/integration-hash-locks-2026-11-17-v2`  
 **PR existente:** [#11](https://github.com/Xero-29/CYBER_AI/pull/11), abierto en draft; no se creó un PR duplicado.  
-**HEAD de la rama antes de esta reconciliación:** `9dc728a598ef81873f13115383fc7e733ebd9dc1`.  
-**Base histórica de PR #11:** `c9c794c984b3fff5ff2032d0831f7f161205afc0`.  
-**main actual inspeccionada:** `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`.  
-**Divergencia de PR #11:** 35 commits propios y 477 commits de main desde el merge-base `c9c794...`. Se detectó solapamiento en cuatro archivos: ambos workflows, `README.md` y `PROJECT_STATUS.md`. Esta rama conserva el contenido actual de main y reaplica sobre él los locks/SBOM; no se hizo merge ni se modificó main.
+**HEAD previo:** `ba4c8e61319a1f2320c0d0dcf9f72149aec594f2`. **main:** `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`.  
+**Divergencia previa:** 39 commits propios y 477 commits de main desde el merge-base `c9c794c984b3fff5ff2032d0831f7f161205afc0`. Se detectó solapamiento en los dos workflows, README y PROJECT_STATUS. La nueva revisión conserva main como base del árbol e incorpora los cambios de integración; main no se modifica.
 
 **Rama fuente de auditoría:** `codex/security-integrity-audit`, HEAD `3f83ed5bcf42f1ae3e1b1c38fc48a8a4c1f94781`; 35 commits adelante y 573 detrás de main desde el merge-base `cae816d6037b56f017c2fbdb3e98ef00df58c1d`. El commit histórico `7b5ed033f1f6461b5780a10ac4ada67a444b93e5` es ancestro común y está preservado.
 
-## Reconciliación aplicada en esta rama
+## Cambios de integración
 
-- `.github/workflows/python-tests.yml`: se conservan los jobs de main y el smoke de allowlist Windows; se añaden `--require-hashes`, verificación de locks runtime/sandbox/documentos, instalación de extractores opcionales, suite completa con esos extractores y tres SBOM con provenance.
-- `.github/workflows/docker-sandbox.yml`: se conserva la construcción y prueba del sandbox YARA/TShark de main, el sandbox Ruff/Bandit con lock, y se evita ejecutar el build de análisis en un push de esta rama cuando esos archivos solo llegan por el merge ref de PR.
-- `README.md`: se conserva la documentación actual de main y se añade la plataforma exacta de los locks, la instalación hash-enforced y el extra documental reproducible.
-- `PROJECT_STATUS.md`: se conserva el historial y estado canónico actual de main, con este registro de integración por delante.
-- El lock opcional documental y el lock de herramientas ya estaban propuestos en PR #11; no se duplicaron en la rama de auditoría.
+- Se conservan las capacidades recientes de main: sandbox YARA/TShark, contratos de ejecución, Nuclei, orquestación y biblioteca ampliada.
+- Se mantienen locks SHA-256 para runtime, Ruff/Bandit y extractores documentales; CI verifica wheels, instala extractores y genera SBOM separados con provenance.
+- Se portan del branch de auditoría los límites/Unicode en datasets, entorno host efímero para adaptadores, límites de manifiesto/archivos de backup y límite de 2 MiB para METADATA de wheels.
+- El smoke de repositorio exige el entrypoint canónico `preflight.py` y `verify.sh`, no el antiguo `verifier.py` eliminado de main.
 
-## CI e integración
+## Evidencia y validación
 
 - main HEAD `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`: Python Tests **success, 605 pruebas** ([run 44198470095](https://github.com/Xero-29/CYBER_AI/actions/runs/44198470095)); Docker Sandbox **success, 605 pruebas y Ruff** ([run 44198470143](https://github.com/Xero-29/CYBER_AI/actions/runs/44198470143)).
-- PR #11 HEAD anterior `2910089...`: los eventos push pasaron, pero el evento `pull_request` falló porque `tests/test_verifier.py` exigía `verifier.py`, eliminado en main. La prueba ya se actualizó en esta rama para comprobar `preflight.py` y `verify.sh`.
-- Los pushes de la rama fuente y de esta rama de integración pasan CI en sus HEAD anteriores; la nueva reconciliación necesita CI de push y de PR sobre el nuevo HEAD exacto.
-- PR #11 sigue en draft y no se fusiona automáticamente. No se considera lista para merge hasta que el workflow `pull_request` y Docker concluyan en success y se revise el diff final.
+- Rama de auditoría HEAD `3f83ed5bcf42f1ae3e1b1c38fc48a8a4c1f94781`: Python Tests **success, 481 pruebas** ([run 44327499508](https://github.com/Xero-29/CYBER_AI/actions/runs/44327499508)); Docker Sandbox **success** ([run 44327500029](https://github.com/Xero-29/CYBER_AI/actions/runs/44327500029)).
+- PR #11 HEAD anterior falló en evento `pull_request` porque una prueba exigía `verifier.py`, eliminado en main. Se actualizó para comprobar `preflight.py` y `verify.sh`.
+- El nuevo merge commit requiere checks de push y pull_request sobre el SHA exacto. No se extrapola CI de los padres.
+- PR #11 permanece en draft; no se fusiona automáticamente.
 
 ---
 

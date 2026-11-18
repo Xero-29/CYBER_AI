@@ -63,6 +63,7 @@ def validate_scan_result(result, *, expected_target=None):
         "findings_eligible": not errors,
         "scope_note": (
             "Valida estructura y correspondencia con el origen autorizado; "
-            "no demuestra veracidad, explotabilidad ni exhaustividad."
+            "no demuestra veracidad, explotabilidad, exhaustividad ni impone "
+            "un firewall de salida que limite todas las conexiones al origen."
         ),
     }

@@ -29,7 +29,13 @@ class NucleiScannerTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.ledger_path = Path(self.temp.name) / "ledger.sqlite3"
-        self.ledger_env = patch.dict(os.environ, {"CYBER_AI_LEDGER_PATH": str(self.ledger_path)})
+        self.templates = Path(self.temp.name) / "templates"
+        self.templates.mkdir()
+        (self.templates / "test-template.yaml").write_text("id: test\\n", encoding="utf-8")
+        self.ledger_env = patch.dict(os.environ, {
+            "CYBER_AI_LEDGER_PATH": str(self.ledger_path),
+            "CYBER_AI_NUCLEI_TEMPLATES": str(self.templates),
+        })
         self.ledger_env.start()
         self.authorization = patch(
             "nuclei_scanner.authorize_target",
@@ -97,14 +103,14 @@ class NucleiScannerTests(unittest.TestCase):
 
             with patch("nuclei_scanner.shutil.which", return_value="/usr/bin/nuclei"):
                 with patch("nuclei_scanner.subprocess.Popen", side_effect=fake_popen):
-                    with patch("nuclei_scanner.Path.home", return_value=root):
-                        with patch("nuclei_scanner.time.sleep"):
-                            result = scan_target("http://127.0.0.1:8765", authorized=True, authorization_id="test-grant")
+                    with patch("nuclei_scanner.time.sleep"):
+                        result = scan_target("http://127.0.0.1:8765", authorized=True, authorization_id="test-grant")
 
             self.assertEqual(result["status"], "completed")
             self.assertEqual(result["findings_count"], 1)
             self.assertEqual(result["findings"][0]["template-id"], "test-template")
             self.assertEqual(result["independent_evidence_validation"]["status"], "valid_structure")
+            self.assertEqual(result["network_scope_enforcement"], "not_enforced_at_egress")
             self.assertTrue(result["ledger_event_id"])
             events = ExecutionLedger(self.ledger_path).history(namespace="security-scans")
             self.assertEqual(events[0]["status"], "completed")
@@ -146,6 +152,48 @@ class NucleiScannerTests(unittest.TestCase):
 
         self.assertEqual(result["status"], "error")
         self.assertIn("No se pudo iniciar", result["error"])
+
+    def test_scan_rejects_invalid_rate_limits(self):
+        with self.assertRaises(ValueError):
+            scan_target("http://127.0.0.1:8765", rate_limit=0)
+        with self.assertRaises(ValueError):
+            scan_target("http://127.0.0.1:8765", concurrency=11)
+
+    def test_missing_template_directory_is_reported_before_execution(self):
+        with patch("nuclei_scanner.shutil.which", return_value="/usr/bin/nuclei"):
+            result = scan_target(
+                "http://127.0.0.1:8765", authorized=True,
+                authorization_id="test-grant", templates_path="/missing/templates",
+            )
+        self.assertEqual(result["status"], "error")
+        self.assertIn("plantillas", result["error"].lower())
+
+    def test_nuclei_command_uses_full_template_directory_and_safe_exclusions(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            output_file = Path(tmp) / "unused"
+            captured = {}
+            def fake_popen(command, **kwargs):
+                captured["command"] = command
+                output = Path(command[command.index("-o") + 1])
+                output.write_text("", encoding="utf-8")
+                return FakeProcess()
+            with patch("nuclei_scanner.shutil.which", return_value="/usr/bin/nuclei"), \
+                 patch("nuclei_scanner.subprocess.Popen", side_effect=fake_popen), \
+                 patch("nuclei_scanner.time.sleep"):
+                result = scan_target(
+                    "http://127.0.0.1:8765", authorized=True,
+                    authorization_id="test-grant", rate_limit=3, concurrency=1,
+                )
+            command = captured["command"]
+            self.assertIn(str(self.templates.resolve()), command)
+            self.assertIn("-disable-unsigned-templates", command)
+            self.assertIn("-no-stdin", command)
+            self.assertIn("-omit-raw", command)
+            self.assertIn("-omit-template", command)
+            self.assertEqual(command[command.index("-type") + 1], "http")
+            self.assertIn("dos,intrusive,fuzz,code,headless", command)
+            self.assertEqual(result["rate_limit"], 3)
+            self.assertEqual(result["concurrency"], 1)
 
 
 if __name__ == "__main__":

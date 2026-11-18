@@ -1,93 +1,113 @@
-# Ecosistema de herramientas de CYBER_AI
+# Ecosistema de herramientas y capacidades de CYBER_AI
 
-## Catálogo detectado
+## Inventario del código
 
-El inventario registra 20 herramientas en categorías separadas:
+El catálogo declarativo de `capability_inventory.py` contiene **21 herramientas**. El registro local contiene **20 IDs**; Nuclei conserva un runner remoto separado.
 
-| Área | Herramientas |
-|---|---|
-| SAST y calidad | Semgrep, Bandit, Ruff, ShellCheck |
-| Dependencias y vulnerabilidades | pip-audit, OSV-Scanner |
-| Supply chain y SBOM | Trivy, Grype, Syft |
-| IaC, secretos y contenedores | Checkov, Gitleaks, detect-secrets, Hadolint |
-| CI/CD y Kubernetes | actionlint, kube-linter |
-| Malware y forense | YARA, TShark, Zeek, Volatility 3 |
-| Red activa | Nmap, Nuclei |
+| Grupo | Herramientas | Estado de integración |
+|---|---|---|
+| SAST y calidad | Semgrep, Bandit, Ruff, ShellCheck | Adaptadores locales |
+| Dependencias | pip-audit, OSV-Scanner | OSV-Scanner en modo offline con base local; pip-audit bloqueado por política de red |
+| Supply chain y SBOM | Trivy, Grype, Syft | Grype en modo offline con base local; Trivy y Syft con adaptador |
+| IaC y secretos | Checkov, Gitleaks, detect-secrets | Gitleaks local con redacción total de secretos; Checkov y detect-secrets con adaptador |
+| Contenedores y CI/CD | Hadolint, actionlint, Kube-Linter | Adaptadores locales |
+| Malware y forense | YARA, TShark, Zeek, Volatility 3 | YARA/TShark por runner Docker; Zeek offline sobre PCAP; Volatility 3 con plugins allowlisted y modo offline |
+| Red y vulnerabilidades | Nmap, Nuclei | Nmap con adaptador TCP limitado a IP/CIDR autorizado; Nuclei con runner remoto separado |
 
-## Componentes
+### Recuento que no debe confundirse
 
-- `capability_inventory.py`: detecta ejecutables disponibles y plantillas locales. Solo consulta el PATH y el sistema de archivos; no ejecuta herramientas.
-- `tool_registry.py`: selecciona candidatos según la tarea, explica coincidencias y muestra disponibilidad.
-- `execution_policy.py`: conserva el control de autorización para acciones de red activas.
+- **21:** herramientas declaradas en el catálogo.
+- **20:** IDs registrados en `TOOL_SPECS`.
+- **17:** adaptadores directos en host: 16 locales/offline y Nmap, que requiere autorización activa y allowlist CIDR; el egress del host no está aislado.
+- **1:** pip-audit, registrado pero bloqueado porque aún no existe una política de red específica.
+- **2:** YARA y TShark, integrados mediante runner Docker aislado.
+- **1:** Nuclei conserva su runner remoto separado y no es un ID de `TOOL_SPECS`.
 
-Uso:
+La presencia de un binario, una entrada de catálogo o una ruta de integración no significa que esté instalado, probado ni autorizado para ejecutarse.
+
+## Matriz de dominios
+
+`domain_capability_matrix.py` conecta cada uno de los 48 paquetes offline con:
+- Perfil de dominio y términos de enrutamiento en español/inglés.
+- Paquete de conocimiento correspondiente.
+- Herramientas candidatas declaradas para ese dominio.
+- Estado real de disponibilidad y adaptador de cada candidata.
+- Skills activas potencialmente relacionadas, consultadas sin incrementar contadores de uso.
+
+El planificador añade `domain_capabilities`, `domain_tool_candidates` y `skill_candidates` al plan. Las herramientas se presentan como candidatas y nunca se ejecutan por el mero hecho de coincidir con un dominio.
+
+Comandos:
 
 ```bash
 python capability_inventory.py
 python tool_registry.py "analisis estatico de codigo Python"
-python tool_registry.py "inventario de dependencias"
-python tool_registry.py "descubrimiento de red y puertos"
+python task_planner.py "auditoria de red y analisis de PCAP"
 ```
 
-## Reglas de integración
+## Reglas de integración y seguridad
 
-1. Un candidato no es una orden de ejecución.
+1. Una candidata no es una orden de ejecución.
 2. Una herramienta no instalada se informa como no disponible; nunca se simula que existe.
-3. Las herramientas de análisis local deben ejecutarse sobre rutas explícitas y con límites de recursos.
-4. Las herramientas que consultan bases remotas deben declarar su comportamiento de red, fuentes y caché.
-5. Nmap y Nuclei requieren alcance autorizado y una integración de política específica antes de ejecutarse.
-6. Análisis de muestras y volcados requiere aislamiento, límites de tamaño y protección de datos.
+3. Una herramienta sin adaptador se marca como catálogo solamente.
+4. Las herramientas de análisis local deben ejecutarse sobre rutas explícitas y con límites de recursos.
+5. Las herramientas de red requieren autorización y alcance específicos.
+6. YARA/TShark usan Docker con red deshabilitada. OSV-Scanner, Grype y Volatility 3 solicitan modo offline; Gitleaks y Zeek procesan archivos locales. Estas opciones del propio programa no son aislamiento de egress del sistema operativo; los adaptadores host siguen sin sandbox general.
 7. La salida de una herramienta es evidencia no confiable: se valida, normaliza y conserva con versión, hash y procedencia.
-8. El catálogo no instala paquetes ni descarga binarios. La instalación debe gestionarse por un proceso reproducible de dependencias y verificación de hashes.
+8. El catálogo no instala paquetes ni descarga binarios. La instalación debe gestionarse por un proceso reproducible y verificado.
+9. Una Skill solo se sugiere cuando está activa en Skillbook. Una Skill no concede permisos ni sustituye validación humana.
 
-## Estado real
+## Brechas por cerrar
 
-- Catálogo declarativo: **20 herramientas**.
-- Adaptadores registrados: **14**; de ellos, **11** admiten ejecución local acotada, **1** (pip-audit) se bloquea por requerir red y **2** (YARA/TShark) se bloquean en host porque requieren aislamiento. Las restantes 6 herramientas siguen solo catalogadas.
-- El inventario distingue disponibilidad del binario, adaptador registrado y bloqueo por política. Estar instalado o catalogado no concede autorización.
-- La selección de herramientas no construye comandos shell ni otorga alcance de red.
+- Implementar aislamiento de egress obligatorio para Nmap; el adaptador actual restringe alcance, puertos y duración, pero no impone firewall/sandbox de red a nivel del sistema operativo.
+- Implementar aislamiento general para adaptadores host y herramientas personalizadas.
+- El preflight integrado verifica presencia y estructura de los ZIP OSV-Scanner, pero OSV no expone en ese layout una fecha de construcción autoritativa ni un identificador de esquema; su frescura permanece desconocida y el escáner valida el ecosistema requerido durante la ejecución. Para Grype se ejecuta `grype db status --output json` sin auto-update, se exige metadato válido y base local existente, y se rechazan bases de más de 14 días por defecto (`CYBER_AI_GRYPE_DB_MAX_AGE_DAYS`, rango 1–3650).
+- Aplicar filtrado de egress para Nuclei y DNS pinning antes de admitir nombres DNS.
+- Ampliar los conectores de SOC/SIEM, EDR/XDR, cloud, móvil, wireless, OT/ICS, hardware/firmware, PKI/HSM y seguridad de IA.
+- Crear Skills verificadas por dominio; no generar Skills activas solo por coincidencia textual.
+- Incorporar fuentes externas solo tras revisar licencia, procedencia, hash y vigencia.
+- Validar herramientas y metodología en laboratorios autorizados.
 
-## Adaptadores locales implementados
+**Conclusión:** la matriz ahora relaciona los 48 paquetes con el planificador y muestra las herramientas/Skills candidatas. Esto cierra la desconexión de enrutamiento, pero no convierte los paquetes en 48 capacidades operativas ni certifica cobertura integral.
 
-Los 11 adaptadores que pueden ejecutarse directamente en el host son Semgrep, Bandit, Ruff, Syft, Trivy, Checkov, detect-secrets, Hadolint, ShellCheck, actionlint y kube-linter.
+## Adaptadores offline añadidos
 
-- `tool_executor.py`: CLI explícita; sin `--execute` solo presenta un dry-run.
-- Cada ejecución exige una ruta existente dentro del repositorio, rechaza enlaces simbólicos, limita el objetivo a 10.000 archivos y 100 MB, fija timeout (máximo 600 s), limita la salida capturada a 2 MB, evita shell y mata el grupo de procesos al agotar el tiempo.
-- La evidencia registra versión y SHA-256 del binario antes/después, huellas del objetivo antes/después, código de salida, duración y salida. Si el binario o el objetivo cambia durante el análisis, el resultado queda como error de integridad; el ledger conserva validadores separados para salida del proceso, integridad del binario e integridad del objetivo.
-- Los archivos de evidencia se publican mediante rename atómico; en POSIX usan modo 0600 y directorio 0700. Pueden contener salida sensible. El preflight detecta directorios/archivos de evidencia con permisos de grupo/otros y symlinks. En Windows se deben aplicar ACL privadas en el directorio de evidencia.
-- Semgrep exige configuración local explícita; no descarga reglas. Trivy usa flags offline y no actualiza bases.
-- pip-audit se deniega porque requiere red. YARA y TShark se deniegan en el ejecutor local hasta integrarse en aislamiento. Nmap y Nuclei siguen bajo autorización de red separada.
+- `osv_scanner`: `--offline`, salida JSON y base local previamente descargada. La base no se descarga desde CYBER_AI.
+- `grype`: análisis de directorio en JSON; se desactiva la actualización automática y las fuentes externas. Requiere base local válida.
+- `gitleaks`: análisis de directorio con informe JSON y `--redact=100`; puede devolver código 1 cuando encuentra secretos, que se interpreta como escaneo completado con hallazgos, no como fallo de ejecución.
+- `zeek`: solo acepta PCAP/PCAPNG/CAP y ejecuta `-r` en un directorio temporal; los logs JSON se incorporan a la evidencia.
+- `volatility3`: solo acepta archivo de volcado y plugin explícito de una allowlist; usa `--offline` y caché temporal.
 
-**Límite de red importante:** el ejecutor local no aplica aislamiento de egress al proceso. La evidencia declara `network_access: not_enforced` y `network_isolation_enforced: false`; que una herramienta esté marcada como no dependiente de red no impide que el binario o una dependencia intente conectarse. Para garantizar ausencia de red se debe usar el runner Docker endurecido o una política de red del sistema operativo. No se debe analizar malware ni repositorios hostiles en modo local.
-
-Ejemplos (desde la raíz del repositorio):
-
-```bash
-python tool_executor.py --tool ruff --target .
-python tool_executor.py --tool ruff --target . --execute
-python tool_executor.py --tool bandit --target .
-python tool_executor.py --tool syft --target .
-python tool_executor.py --tool trivy --target .
-python tool_executor.py --tool semgrep --target . --config config/semgrep.yml
-```
-
-## Sandbox Docker en GitHub Actions
-
-**Implementado en la rama `codex/security-integrity-audit`:**
-
-- `sandbox_runner.py` invoca Docker con argumentos separados, sin shell, y mantiene una allowlist explícita que coincide con los binarios instalados en la imagen (actualmente Ruff y Bandit). Semgrep, Syft y Trivy se rechazan en el runner hasta que se incorporen y prueben en la imagen.
-- El contenedor usa `--network=none`, `--read-only`, `--cap-drop=ALL`, `no-new-privileges`, usuario no root con el UID/GID del operador (la imagen tiene UID/GID predeterminado 65532), límites de 1 GiB RAM, 2 CPU y 128 procesos, y `/tmp` como tmpfs pequeño sin ejecución.
-- El repositorio se monta en `/workspace` en solo lectura. La única ruta escribible montada es el directorio externo de evidencias en `/evidence`.
-- No se monta el socket Docker, no se usa `--privileged`, no se pasan secretos al contenedor y las herramientas con política de red quedan denegadas. El runner limita también el proceso Docker del host; si vence el timeout, solicita `docker kill` y `docker rm --force` del contenedor nombrado.
-- `.github/workflows/docker-sandbox.yml` construye la imagen y ejecuta pruebas unitarias más un smoke test de Ruff en GitHub-hosted runner efímero. El workflow tiene `contents: read`, checkout sin persistir credenciales y timeout de job.
-- La imagen contiene versiones fijadas de Ruff y Bandit y ahora fija la imagen oficial Python 3.12 slim Bookworm por digest de manifiesto `linux/amd64`. El digest debe renovarse mediante revisión periódica de vulnerabilidades; fijarlo mejora reproducibilidad, pero no significa que sea permanentemente seguro. Las pruebas verifican que el runner rechaza Semgrep, Syft y Trivy mientras no estén instalados. `.dockerignore` excluye metadatos Git, artefactos, entornos virtuales y patrones comunes de secretos del contexto de build.
-- Las acciones `checkout`, `setup-python` y `upload-artifact` del workflow están fijadas a SHA inmutables. El job mantiene permisos `contents: read`, checkout sin credenciales persistentes y no recibe secretos del repositorio.
-
-Ejemplo:
+Ejemplos:
 
 ```bash
-docker build -t cyber-ai-tool-sandbox:local -f sandbox/Dockerfile .
-python sandbox_runner.py --tool ruff --target tests/fixtures/sandbox_sample.py --execute
+python tool_executor.py --tool osv_scanner --target . --execute
+python tool_executor.py --tool grype --target . --execute
+python tool_executor.py --tool gitleaks --target . --execute
+python tool_executor.py --tool zeek --target captures/sample.pcap --execute
+python tool_executor.py --tool volatility3 --target captures/memory.raw --plugin windows.info --execute
 ```
 
-**Límites importantes:** Docker reduce la exposición, pero comparte el kernel del runner y no equivale a una microVM. GitHub-hosted runner efímero es una frontera razonable para pruebas y análisis benignos, no una garantía contra exploits del kernel o muestras deliberadamente hostiles. Para malware o entradas adversariales se requiere una VM/microVM desechable (por ejemplo, Firecracker/Kata bajo infraestructura controlada), con destrucción posterior y sin credenciales. GitHub-hosted `ubuntu-latest` no garantiza que el usuario pueda iniciar una microVM anidada con KVM; no se ha añadido una falsa promesa de microVM al workflow. La imagen base está fijada por digest, pero las dependencias Python instaladas con pip aún no están fijadas por hashes de artefactos ni tienen SBOM/procedencia firmada. No se afirma aislamiento fuerte ni ejecución de todos los adaptadores.
+Los ejemplos requieren binarios y bases locales ya aprovisionadas. Antes de ejecutar OSV-Scanner/Grype, CYBER_AI ejecuta un preflight read-only y falla cerrado si la base está ausente o inválida; Grype también falla si su fecha supera la política de antigüedad. Para inspeccionar el estado sin iniciar escaneos: `python tool_database_preflight.py --json`. El preflight no descarga, actualiza ni extrae bases. OSV solo permite confirmar estructura ZIP y ecosistemas presentes: no se atribuye frescura ni esquema no expuestos por su formato documentado. La ejecución no se activa automáticamente ni descarga herramientas o bases.
+
+## Preflight de bases de vulnerabilidades
+
+- **OSV-Scanner:** localiza `osv-scalibr/<ecosystem>/all.zip` bajo `OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY` (o la variable alternativa documentada), valida estructura ZIP y registra ecosistemas. El formato no aporta una fecha de construcción autoritativa ni versión de esquema; el estado de frescura se informa como desconocido. La base concreta del ecosistema requerido se valida también al escanear.
+- **Grype:** consulta `grype db status --output json` con auto-update y consultas externas desactivadas. Exige ruta local, metadatos válidos, versión de esquema y fecha de construcción de hasta 14 días; configura el límite con `CYBER_AI_GRYPE_DB_MAX_AGE_DAYS` (1–3650).
+- **Ambos:** preflight de solo lectura; no descarga ni actualiza bases. La ejecución se bloquea cuando el preflight falla.
+
+```bash
+python tool_database_preflight.py --json
+python tool_database_preflight.py --tool osv_scanner --json
+python tool_database_preflight.py --tool grype --json
+```
+
+## Nmap: autorización obligatoria
+
+El adaptador Nmap no acepta nombres DNS ni argumentos libres. Exige el flag `--authorized-network`, una IP/CIDR literal de máximo 16 direcciones y pertenencia a la allowlist del operador `CYBER_AI_NMAP_ALLOWED_CIDRS` (lista separada por comas). Ejecuta TCP connect sobre los 100 puertos frecuentes, con un reintento y límite de tiempo por host; no habilita NSE, detección de sistema operativo, DNS ni evasión. El inventario no lo marca `execution_ready` automáticamente. La allowlist no sustituye aislamiento de egress del host: úsalo únicamente con autorización expresa y controles de red externos.
+
+```bash
+export CYBER_AI_NMAP_ALLOWED_CIDRS="192.0.2.0/28"
+python tool_executor.py --tool nmap --target 192.0.2.10 --authorized-network --execute
+```
+
+El rango anterior es solo un ejemplo documental reservado para pruebas; no representa un activo real.

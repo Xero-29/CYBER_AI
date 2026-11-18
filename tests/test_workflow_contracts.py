@@ -1,0 +1,158 @@
+"""Contract tests shared by the live orchestrator and offline simulator."""
+import json
+import tempfile
+import unittest
+from pathlib import Path
+from unittest.mock import patch
+
+import team_orchestrator
+from workflow_contracts import WorkflowContractError, validate_workflow_definition
+
+
+class WorkflowContractTests(unittest.TestCase):
+    def test_repository_workflow_catalog_satisfies_shared_contract(self):
+        root = Path(__file__).resolve().parents[1]
+        catalog = json.loads(
+            (root / "config" / "workflows.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(catalog.get("version"), 1)
+        self.assertIsInstance(catalog.get("workflows"), dict)
+        for name, workflow in catalog["workflows"].items():
+            with self.subTest(workflow=name):
+                steps = validate_workflow_definition(workflow)
+                self.assertEqual(len(steps), len(workflow["steps"]))
+
+    def test_live_orchestrator_loads_every_repository_workflow(self):
+        for name in ("investigacion", "critica_corta", "revision_tecnica"):
+            with self.subTest(workflow=name):
+                workflow = team_orchestrator.load_workflow(name)
+                self.assertTrue(workflow["steps"])
+                self.assertTrue(all(step["agent"] for step in workflow["steps"]))
+
+    def test_rejects_unknown_mode_types(self):
+        for mode in ([], {}, None, 1):
+            with self.subTest(mode=mode):
+                with self.assertRaises(WorkflowContractError):
+                    validate_workflow_definition({
+                        "mode": mode,
+                        "steps": [{"agent": "NEXO", "objective": "test"}],
+                    })
+
+    def test_rejects_non_positive_workflow_limits(self):
+        for field in ("max_rounds", "max_steps", "max_context_chars"):
+            with self.subTest(field=field):
+                with self.assertRaises(WorkflowContractError):
+                    validate_workflow_definition({
+                        field: 0,
+                        "steps": [{"agent": "NEXO", "objective": "test"}],
+                    })
+
+    def test_rejects_invalid_retry_and_token_budgets(self):
+        cases = (
+            {"max_retries": -1},
+            {"max_retries": 3},
+            {"num_predict": 99},
+            {"num_predict": 2600},
+            {"num_predict": 500, "max_num_predict": 400},
+            {"max_num_predict": True},
+        )
+        for options in cases:
+            with self.subTest(options=options):
+                step = {"agent": "NEXO", "objective": "test", **options}
+                with self.assertRaises(WorkflowContractError):
+                    validate_workflow_definition({"steps": [step]})
+
+    def test_rejects_invalid_knowledge_retrieval_options(self):
+        cases = (
+            {"knowledge_top_k": 0},
+            {"knowledge_top_k": 6},
+            {"knowledge_top_k": True},
+            {"knowledge_min_score": -0.1},
+            {"knowledge_min_score": 1.1},
+            {"knowledge_min_score": float("nan")},
+            {"knowledge_min_score": True},
+        )
+        for options in cases:
+            with self.subTest(options=options):
+                step = {"agent": "NEXO", "objective": "test", **options}
+                with self.assertRaises(WorkflowContractError):
+                    validate_workflow_definition({"steps": [step]})
+
+    def test_rejects_non_boolean_feature_flags(self):
+        for field in ("think", "use_knowledge"):
+            with self.subTest(field=field):
+                with self.assertRaises(WorkflowContractError):
+                    validate_workflow_definition({
+                        "steps": [{
+                            "agent": "NEXO", "objective": "test", field: "yes"
+                        }]
+                    })
+
+    def test_live_orchestrator_rejects_invalid_step_contract(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "workflows.json"
+            path.write_text(json.dumps({
+                "workflows": {
+                    "invalid": {
+                        "steps": [{
+                            "agent": "NEXO", "objective": "test", "num_predict": 20
+                        }]
+                    }
+                }
+            }), encoding="utf-8")
+            with (
+                patch.object(team_orchestrator, "WORKFLOW_FILE", path),
+                patch.object(team_orchestrator, "load_config") as load_config,
+            ):
+                with self.assertRaises(ValueError):
+                    team_orchestrator.load_workflow("invalid")
+                load_config.assert_not_called()
+
+    def test_live_orchestrator_loads_normalized_valid_workflow(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "workflows.json"
+            path.write_text(json.dumps({
+                "workflows": {
+                    "valid": {
+                        "mode": "technical",
+                        "steps": [{
+                            "agent": " NEXO ", "objective": " revisar ",
+                            "num_predict": 300,
+                        }]
+                    }
+                }
+            }), encoding="utf-8")
+            config = {
+                "agents": {
+                    "NEXO": {"enabled": True, "type": "reasoning"}
+                }
+            }
+            with (
+                patch.object(team_orchestrator, "WORKFLOW_FILE", path),
+                patch.object(team_orchestrator, "load_config", return_value=config),
+            ):
+                workflow = team_orchestrator.load_workflow("valid")
+            self.assertEqual(workflow["steps"][0]["agent"], "NEXO")
+            self.assertEqual(workflow["steps"][0]["objective"], "revisar")
+            self.assertEqual(workflow["steps"][0]["mode"], "technical")
+            self.assertEqual(workflow["steps"][0]["num_predict"], 300)
+
+    def test_normalization_preserves_runtime_step_options(self):
+        workflow = {
+            "steps": [{
+                "agent": " NEXO ",
+                "objective": " Analizar ",
+                "num_predict": 300,
+                "custom_metadata": {"scope": "test"},
+            }]
+        }
+        steps = validate_workflow_definition(workflow)
+        self.assertEqual(steps[0]["agent"], "NEXO")
+        self.assertEqual(steps[0]["objective"], "Analizar")
+        self.assertEqual(steps[0]["num_predict"], 300)
+        self.assertEqual(steps[0]["custom_metadata"], {"scope": "test"})
+        self.assertEqual(steps[0]["required_output_sections"], [])
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -14,28 +14,54 @@ from tool_adapters import (
     run_local_tool,
     write_evidence,
 )
+from tool_execution_profiles import load_active_profile, get_custom_tools
+from custom_tool_runner import run_custom_tool
 
 
-def execute_tool_plan(plan, target, *, confirmed=False, max_tools=3):
+def execute_tool_plan(plan, target, *, confirmed=False, max_tools=None, allow_external_targets=False):
     if not confirmed:
         raise ToolExecutionError("La ejecución requiere confirmación explícita del operador.")
     if not isinstance(plan, dict) or not isinstance(plan.get("tool_candidates"), list):
         raise ToolExecutionError("Plan de herramientas inválido.")
-    if not isinstance(max_tools, int) or not 1 <= max_tools <= 3:
-        raise ToolExecutionError("El límite de herramientas debe estar entre 1 y 3.")
-    target_path = Path(target)
-    if target_path.is_absolute():
-        raise ToolExecutionError("El objetivo debe expresarse como ruta relativa al repositorio.")
-    if ".." in target_path.parts:
-        raise ToolExecutionError("No se permiten rutas que salgan del repositorio.")
-    selected = [
+    if max_tools is not None and (not isinstance(max_tools, int) or max_tools < 1):
+        raise ToolExecutionError("max_tools debe ser un entero positivo o None.")
+    try:
+        _, profile_name, profile = load_active_profile()
+        custom_tools = {item["id"]: item for item in get_custom_tools()}
+    except (ValueError, OSError) as exc:
+        raise ToolExecutionError("La configuración de perfiles/herramientas no es válida.") from exc
+    if max_tools is None:
+        max_tools = profile.get("max_tools")
+    external_enabled = bool(allow_external_targets and profile.get("allow_external_targets", False))
+    if allow_external_targets and not external_enabled:
+        raise ToolExecutionError("El perfil seleccionado no permite objetivos externos.")
+    timeout_seconds = profile.get("timeout_seconds", 180)
+    enabled_tools = profile.get("enabled_tools")
+    target_path = Path(target).expanduser()
+    if not target_path.is_absolute():
+        target_path = Path(__file__).resolve().parent / target_path
+    try:
+        target_path = target_path.resolve(strict=True)
+    except OSError as exc:
+        raise ToolExecutionError("El objetivo debe existir y ser accesible.") from exc
+    if not (target_path.is_file() or target_path.is_dir()):
+        raise ToolExecutionError("El objetivo debe ser un archivo o directorio.")
+    project_root = Path(__file__).resolve().parent
+    if not external_enabled:
+        try:
+            target_path.relative_to(project_root)
+        except ValueError as exc:
+            raise ToolExecutionError("El perfil actual no permite objetivos fuera del repositorio.") from exc
+    eligible = [
         item for item in plan["tool_candidates"]
         if isinstance(item, dict)
-        and item.get("id") in TOOL_SPECS
+        and (item.get("id") in TOOL_SPECS or item.get("id") in custom_tools)
         and item.get("adapter_supported") is True
         and item.get("available") is True
         and item.get("risk") != "active_network"
-    ][:max_tools]
+        and (enabled_tools is None or item.get("id") in enabled_tools)
+    ]
+    selected = eligible if max_tools is None else eligible[:max_tools]
     if not selected:
         raise ToolExecutionError("El plan no contiene adaptadores locales elegibles.")
     if not os.environ.get("CYBER_AI_TOOL_ALLOWLIST_PATH") or not os.environ.get(
@@ -53,10 +79,24 @@ def execute_tool_plan(plan, target, *, confirmed=False, max_tools=3):
         for item in selected:
             tool_id = item["id"]
             try:
-                evidence = run_local_tool(tool_id, str(target_path))
+                tool_target = (
+                    str(target_path.relative_to(project_root))
+                    if target_path.is_relative_to(project_root) else str(target_path)
+                )
+                if tool_id in custom_tools:
+                    custom_spec = custom_tools[tool_id]
+                    evidence = run_custom_tool(
+                        custom_spec, tool_target, allow_external=external_enabled,
+                        timeout=min(timeout_seconds, custom_spec.get("timeout_seconds", timeout_seconds)),
+                    )
+                else:
+                    evidence = run_local_tool(
+                        tool_id, tool_target, allow_external=external_enabled,
+                        timeout=timeout_seconds,
+                    )
                 validation = validate_tool_evidence(evidence)
                 evidence["independent_integrity_validation"] = validation
-                evidence_path = write_evidence(evidence)
+                evidence_path = write_evidence(evidence, allow_external=external_enabled)
                 status = evidence.get("status", "failed")
                 ledger_status = (
                     "completed" if validation["status"] == "valid_integrity" else
@@ -112,6 +152,11 @@ def execute_tool_plan(plan, target, *, confirmed=False, max_tools=3):
             for x in results
         ) else "partial_or_failed",
         "target": str(target_path),
+        "selected_tools": len(selected),
+        "max_tools": max_tools,
+        "external_targets_enabled": external_enabled,
+        "execution_profile": profile_name,
+        "custom_tools_enabled": bool(profile.get("enable_custom_tools", False)),
         "results": results,
         "note": "Los hallazgos son indicios no confiables y requieren validación independiente.",
     }

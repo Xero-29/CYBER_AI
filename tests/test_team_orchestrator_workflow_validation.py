@@ -9,6 +9,7 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 import team_orchestrator as coordinator
+import capability_inventory
 
 
 class TestWorkflowValidation(unittest.TestCase):
@@ -143,7 +144,9 @@ class TestWorkflowValidation(unittest.TestCase):
                 ),
             }
 
-            def fake_run(command, cwd=None, timeout=None, check=None):
+            def fake_run(command, cwd=None, timeout=None, check=None, **kwargs):
+                if len(command) > 2 and command[1:3] == ["image", "inspect"]:
+                    return SimpleNamespace(returncode=1, stdout="")
                 agent = command[3]
                 calls.append(agent)
 
@@ -267,7 +270,9 @@ class TestWorkflowValidation(unittest.TestCase):
                 "FARO": "Respuesta simulada de FARO.",
             }
 
-            def fake_run(command, cwd=None, timeout=None, check=None):
+            def fake_run(command, cwd=None, timeout=None, check=None, **kwargs):
+                if len(command) > 2 and command[1:3] == ["image", "inspect"]:
+                    return SimpleNamespace(returncode=1, stdout="")
                 agent = command[3]
                 commands.append((agent, list(command)))
                 event = {

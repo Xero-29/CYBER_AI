@@ -4,6 +4,7 @@
 import argparse
 import hashlib
 import json
+import os
 import sys
 import subprocess
 import uuid
@@ -109,13 +110,34 @@ def main():
     parser.add_argument("--workflow", help="Flujo de config/workflows.json para --team.")
     parser.add_argument("--execute-tools", action="store_true", help="Ejecutar adaptadores locales planificados.")
     parser.add_argument("--confirm-tool-execution", action="store_true", help="Confirmación explícita para ejecutar adaptadores.")
-    parser.add_argument("--tool-target", help="Ruta relativa al repositorio que se analizará.")
+    parser.add_argument("--tool-target", help="Ruta del archivo o directorio que se analizará.")
+    parser.add_argument("--allow-external-targets", action="store_true", help="Permitir objetivos externos; requiere perfil extended y confirmación.")
+    parser.add_argument("--tool-profile", help="Perfil de ejecución: standard, extended o restricted.")
     parser.add_argument("--no-knowledge", action="store_true", help="Desactivar recuperación de conocimiento en --ask.")
     parser.add_argument("--confirm-authorized", action="store_true", help="Confirmación adicional del operador.")
     parser.add_argument("--authorization-id", help="ID de autorización local, vigente y limitada al destino.")
+    parser.add_argument("--nuclei-templates", help="Directorio local de plantillas HTTP de Nuclei.")
+    parser.add_argument("--scan-severity", default="info,low,medium,high,critical", help="Severidades Nuclei separadas por coma.")
+    parser.add_argument("--scan-timeout", type=int, default=300, help="Tiempo máximo del escaneo Nuclei (5-3600 s).")
+    parser.add_argument("--scan-rate-limit", type=int, default=2, help="Máximo de solicitudes Nuclei por segundo (1-20).")
+    parser.add_argument("--scan-concurrency", type=int, default=2, help="Concurrencia Nuclei (1-10).")
     args = parser.parse_args()
+    scan_options_requested = (
+        args.nuclei_templates or args.authorization_id or args.confirm_authorized
+        or args.scan_severity != "info,low,medium,high,critical"
+        or args.scan_timeout != 300 or args.scan_rate_limit != 2
+        or args.scan_concurrency != 2
+    )
+    if scan_options_requested and not args.scan:
+        parser.error("Las opciones de Nuclei requieren --scan.")
 
     if args.team:
+        if args.tool_profile:
+            if not args.execute_tools:
+                parser.error("--tool-profile requiere --execute-tools.")
+            if not __import__("re").fullmatch(r"[a-z0-9_-]{1,48}", args.tool_profile):
+                parser.error("Nombre de perfil inválido.")
+            os.environ["CYBER_AI_TOOL_PROFILE"] = args.tool_profile
         if args.agent or args.no_knowledge:
             parser.error("--agent y --no-knowledge no se aplican al flujo --team.")
         if args.execute_tools and (
@@ -123,7 +145,7 @@ def main():
         ):
             parser.error("--execute-tools requiere --confirm-tool-execution y --tool-target.")
         if not args.execute_tools and (
-            args.confirm_tool_execution or args.tool_target
+            args.confirm_tool_execution or args.tool_target or args.allow_external_targets
         ):
             parser.error("--confirm-tool-execution y --tool-target requieren --execute-tools.")
         command = [
@@ -138,11 +160,13 @@ def main():
                 "--execute-tools", "--confirm-tool-execution",
                 "--tool-target", args.tool_target,
             ])
+            if args.allow_external_targets:
+                command.append("--allow-external-targets")
         command.append(args.team)
         result = subprocess.run(command, cwd=Path(__file__).resolve().parent, check=False)
         return result.returncode
 
-    if args.workflow or args.execute_tools or args.confirm_tool_execution or args.tool_target:
+    if args.workflow or args.execute_tools or args.confirm_tool_execution or args.tool_target or args.allow_external_targets or args.tool_profile:
         parser.error("--workflow y las opciones de ejecución solo pueden utilizarse junto con --team.")
 
     if args.ask:
@@ -160,11 +184,19 @@ def main():
         parser.error("--agent y --no-knowledge solo pueden utilizarse junto con --ask.")
 
     if args.scan:
+        if not args.confirm_authorized or not args.authorization_id:
+            parser.error("--scan requiere --confirm-authorized y --authorization-id.")
         try:
             result = scan_target(
                 args.scan,
+                timeout=args.scan_timeout,
                 authorized=args.confirm_authorized,
                 authorization_id=args.authorization_id,
+                require_ledger=True,
+                templates_path=args.nuclei_templates,
+                severity=args.scan_severity,
+                rate_limit=args.scan_rate_limit,
+                concurrency=args.scan_concurrency,
             )
             output_dir = Path("reports")
             output_dir.mkdir(parents=True, exist_ok=True)
@@ -196,7 +228,7 @@ def main():
     if args.self_test:
         required = [
             "report_analyzer.py", "nvd_client.py", "report_manager.py",
-            "batch_analyzer.py", "nuclei_scanner.py", "director.py",
+            "batch_analyzer.py", "nuclei_scanner.py", "isolated_tool_runner.py", "director.py",
             "agent_runner.py", "CONTEXT.md",
         ]
         missing = [name for name in required if not Path(name).is_file()]

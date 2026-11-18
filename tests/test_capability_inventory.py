@@ -24,6 +24,42 @@ class CapabilityInventoryTests(unittest.TestCase):
         self.assertFalse(result["tools"]["ruff"]["host_network_isolation_enforced"])
         self.assertTrue(result["tools"]["ruff"]["explicit_execute_required"])
 
+    @patch("capability_inventory.subprocess.run")
+    @patch("capability_inventory.shutil.which")
+    def test_yara_and_tshark_availability_comes_from_isolated_docker_image(self, which, run):
+        which.side_effect = lambda name: "/usr/bin/docker" if name == "docker" else None
+        run.return_value = __import__("subprocess").CompletedProcess(
+            ["docker"], 0, stdout="sha256:" + "a" * 64, stderr=""
+        )
+        result = capability_inventory.build_inventory()
+        self.assertTrue(result["tools"]["yara"]["available"])
+        self.assertTrue(result["tools"]["tshark"]["available"])
+        self.assertEqual(result["tools"]["yara"]["path"], "docker-image:sha256:" + "a" * 64)
+        self.assertTrue(result["tools"]["yara"]["host_network_isolation_enforced"])
+        self.assertEqual(
+            result["safety"]["local_host_egress_isolation"],
+            "docker_network_none_for_yara_tshark_only",
+        )
+
+    def test_offline_adapters_are_distinguished_from_database_readiness(self):
+        expected = {"osv_scanner", "grype", "gitleaks", "zeek", "volatility3"}
+        self.assertTrue(expected <= set(capability_inventory.TOOL_SPECS))
+        with patch("capability_inventory.shutil.which", return_value="/usr/bin/tool"):
+            result = capability_inventory.build_inventory()
+        for tool_id in expected:
+            item = result["tools"][tool_id]
+            self.assertTrue(item["adapter_registered"])
+            self.assertTrue(item["offline_only"])
+            self.assertFalse(item["host_network_isolation_enforced"])
+        self.assertTrue(result["tools"]["osv_scanner"]["local_database_required"])
+        self.assertFalse(result["tools"]["osv_scanner"]["execution_ready"])
+        self.assertTrue(result["tools"]["gitleaks"]["execution_ready"])
+        self.assertEqual(result["summary"]["adapter_registered"], 20)
+        self.assertEqual(result["summary"]["catalog_only"], 1)
+        self.assertTrue(result["tools"]["nmap"]["adapter_registered"])
+        self.assertFalse(result["tools"]["nmap"]["execution_ready"])
+        self.assertTrue(result["tools"]["nmap"]["scoped_network_required"])
+
     def test_active_network_tools_require_scoped_authorization(self):
         active = [
             item for item in capability_inventory.TOOL_CATALOG
@@ -48,6 +84,9 @@ class CapabilityInventoryTests(unittest.TestCase):
             result["summary"]["registered"] - result["summary"]["adapter_registered"],
         )
         self.assertIn("adapter_registered", result["tools"]["ruff"])
+        self.assertEqual(result["domain_matrix"]["manifest_area_count"], 48)
+        self.assertTrue(result["domain_matrix"]["all_areas_mapped"])
+        self.assertFalse(result["domain_matrix"]["operational_coverage_claimed"])
 
 if __name__ == "__main__":
     unittest.main()

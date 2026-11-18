@@ -126,5 +126,25 @@ class KnowledgeDownloaderSecurityTests(unittest.TestCase):
                 "https://egress.example.org:8443",
             )
 
+    def test_manifest_downloaded_status_does_not_skip_missing_file(self):
+        item = self.item()
+        catalog = {"resources": [item]}
+        manifest = {"resources": {"docs-example": {
+            "status": "downloaded", "sha256": "0" * 64,
+        }}}
+        args = __import__("argparse").Namespace(
+            area=None, dry_run=False, retry_failed=False,
+        )
+        with patch.object(downloader, "load_json", side_effect=[catalog, manifest]), \
+             patch.object(downloader, "save_json"), \
+             patch.object(downloader, "used_bytes", return_value=0), \
+             patch.object(downloader, "download", return_value="downloaded") as run_download, \
+             patch.object(downloader.time, "sleep"):
+            result = downloader._run(args)
+        self.assertEqual(result, 0)
+        run_download.assert_called_once_with(item, manifest, False)
+
+
+
 if __name__ == "__main__":
     unittest.main()

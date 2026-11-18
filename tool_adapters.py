@@ -14,11 +14,10 @@ import uuid
 import signal
 import subprocess
 import threading
+import tempfile
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-
-from tool_allowlist import verify_tool_allowed
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent
@@ -183,6 +182,19 @@ def _probe_tool_version(binary, tool_id, env):
 
 
 def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
+    """Ejecuta el adaptador con HOME/TMP efímeros y entorno mínimo."""
+    with tempfile.TemporaryDirectory(prefix="cyber-ai-tool-home-") as isolated_home:
+        if os.name == "posix":
+            os.chmod(isolated_home, 0o700)
+        return _run_local_tool_with_home(
+            tool_id, target, config_path=config_path, timeout=timeout,
+            isolated_home=isolated_home,
+        )
+
+
+def _run_local_tool_with_home(
+    tool_id, target, *, config_path=None, timeout=None, isolated_home
+):
     """Ejecuta un adaptador local; no aplica aislamiento de red al proceso."""
     if tool_id not in TOOL_SPECS:
         raise ToolExecutionError("Herramienta no registrada.")
@@ -202,15 +214,29 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
     if not binary:
         raise ToolExecutionError("La herramienta no está instalada o no está en PATH.")
     binary_provenance = _hash_binary(binary)
-    allowlist_evidence = verify_tool_allowed(tool_id, binary_provenance["sha256"])
     binary = binary_provenance["resolved_path"]
     limit = spec["timeout"] if timeout is None else timeout
     if not isinstance(limit, int) or not 1 <= limit <= 600:
         raise ToolExecutionError("El timeout debe estar entre 1 y 600 segundos.")
     command = _build_command(tool_id, binary, path, config_path=config_path)
+    # Never expose the caller's home/configuration tree or ambient secrets
+    # to a host tool. The executable itself is absolute; child lookups are
+    # limited to its installation directory and the platform default PATH.
+    safe_path_entries = [str(Path(binary).parent)]
+    safe_path_entries.extend(
+        entry for entry in os.defpath.split(os.pathsep) if entry
+    )
+    safe_path = os.pathsep.join(dict.fromkeys(safe_path_entries))
     env = {
-        "PATH": os.environ.get("PATH", ""),
-        "HOME": os.environ.get("HOME", ""),
+        "PATH": safe_path,
+        "HOME": isolated_home,
+        "TMPDIR": isolated_home,
+        "TEMP": isolated_home,
+        "TMP": isolated_home,
+        "XDG_CONFIG_HOME": str(Path(isolated_home) / "config"),
+        "XDG_CACHE_HOME": str(Path(isolated_home) / "cache"),
+        "PYTHONNOUSERSITE": "1",
+        "PYTHONDONTWRITEBYTECODE": "1",
         "LANG": "C.UTF-8",
         "LC_ALL": "C.UTF-8",
         "NO_COLOR": "1",
@@ -293,7 +319,6 @@ def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
         "tool_binary_sha256": binary_provenance["sha256"],
         "tool_binary_sha256_after": binary_hash_after,
         "tool_binary_modified": binary_modified,
-        "tool_allowlist": allowlist_evidence,
         "target": str(path.relative_to(PROJECT_ROOT)),
         "target_sha256": target_hash_before,
         "target_sha256_after": target_hash_after,

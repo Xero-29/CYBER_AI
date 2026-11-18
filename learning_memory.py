@@ -312,8 +312,8 @@ def _record_signature_is_valid(item, key):
         return False
 
 
-def read_lessons(path=None):
-    """Lee únicamente lecciones con firma VERITAS válida."""
+def read_lessons(path=None, *, ledger=None):
+    """Lee solo lecciones firmadas cuyas referencias siguen verificables en el ledger."""
     path = Path(path) if path else MEMORY_FILE
     key = os.environ.get(APPROVAL_KEY_ENV, "")
     if len(key.encode("utf-8")) < 32 or not path.is_file():
@@ -321,34 +321,49 @@ def read_lessons(path=None):
     if path.is_symlink() or path.parent.is_symlink():
         raise RuntimeError("El archivo y directorio de memoria no pueden ser enlaces simbólicos.")
 
-    lessons = []
     try:
+        raw_items = []
         with path.open(encoding="utf-8") as file:
             for line in file:
                 try:
                     item = json.loads(line)
                 except json.JSONDecodeError:
                     continue
-                if not isinstance(item, dict) or not _record_signature_is_valid(item, key):
-                    continue
-                refs = item.get("ledger_event_refs")
-                event_ids = item.get("event_ids")
-                if (
-                    not isinstance(refs, list) or len(refs) < 2
-                    or not all(isinstance(ref, str) for ref in refs)
-                    or not isinstance(event_ids, list) or len(refs) != len(event_ids)
-                    or not all(isinstance(event_id, str) and event_id for event_id in event_ids)
-                    or len(set(event_ids)) != len(event_ids)
-                    or any(
-                        not ref.startswith(f"ledger_event:{event_id}:sha256:")
-                        or not re.fullmatch(r"[a-f0-9]{64}", ref.rsplit(":", 1)[-1])
-                        for event_id, ref in zip(event_ids, refs)
-                    )
-                ):
-                    continue
-                lessons.append(item)
+                if isinstance(item, dict) and _record_signature_is_valid(item, key):
+                    raw_items.append(item)
     except OSError as error:
         raise RuntimeError(f"No se pudo leer la memoria: {error}") from error
+
+    if not raw_items:
+        return []
+
+    # La firma acredita la aprobación; el ledger vivo acredita que la evidencia
+    # sigue existiendo, conserva sus hashes y mantiene una cadena íntegra.
+    ledger = ledger if ledger is not None else ExecutionLedger()
+    if not ledger.verify().get("valid"):
+        return []
+
+    lessons = []
+    for item in raw_items:
+        refs = item.get("ledger_event_refs")
+        event_ids = item.get("event_ids")
+        if (
+            not isinstance(refs, list) or len(refs) < 2
+            or not all(isinstance(ref, str) for ref in refs)
+            or not isinstance(event_ids, list) or len(refs) != len(event_ids)
+            or not all(isinstance(event_id, str) and event_id for event_id in event_ids)
+            or len(set(event_ids)) != len(event_ids)
+        ):
+            continue
+        try:
+            _, current_refs = _verified_ledger_evidence(
+                item.get("namespace"), event_ids, ledger=ledger
+            )
+        except (OSError, ValueError, RuntimeError):
+            continue
+        if current_refs != refs:
+            continue
+        lessons.append(item)
     return lessons
 
 

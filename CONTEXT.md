@@ -1,103 +1,43 @@
-# CYBER_AI — Contexto del proyecto
+# CYBER_AI — Contexto vigente del proyecto
 
 ## Objetivo
-Crear una herramienta ligera de ciberseguridad para identificar,
-clasificar y documentar vulnerabilidades, con el fin de participar
-en programas Bug Bounty y, posteriormente, ofrecer servicios
-profesionales de auditoría autorizada.
+Plataforma modular de investigación y operaciones de ciberseguridad asistidas por IA, extensible a todas las especialidades del catálogo y a nuevos dominios. Debe comprender tareas, identificar dominios, recuperar conocimiento con procedencia, reutilizar Skills verificadas, coordinar especialistas, seleccionar herramientas, exigir autorización, ejecutar dentro de límites técnicos, validar resultados y conservar evidencia auditable. El proveedor de IA es intercambiable; biblioteca, memoria, Skills, políticas y ledger permanecen en el proyecto. La cobertura profunda debe medirse por subtema y evidencia, no inferirse del número de paquetes.
 
-## Restricciones
-- Equipo actual: Intel Core i5-4200M, 16 GB RAM y SSD.
-- Sistema: Ubuntu, Python 3.12.3.
-- Presupuesto reducido.
-- Priorizar herramientas existentes y automatización.
-- Evitar entrenar modelos grandes o construir infraestructura innecesaria.
+## Restricciones de diseño
+- Mantener consumo y dependencias razonables para equipos modestos.
+- Reutilizar herramientas especializadas en vez de crear sustitutos innecesarios.
+- Separar planificación, autorización, ejecución, evidencia y revisión.
+- No interpretar la salida de una herramienta como verdad verificada.
+- No ejecutar herramientas ni escaneos activos sin autorización explícita y alcance definido.
+- Mantener datos locales y credenciales fuera del control de los proveedores LLM.
 
-## Arquitectura prevista
-1. Detección: herramientas de seguridad existentes.
-2. Verificación: módulo activado cada vez que se genera un informe.
-3. Inteligencia de vulnerabilidades: consulta fuentes públicas como
-   NVD/CVE para encontrar coincidencias conocidas.
-4. Clasificación: distinguir hallazgos conocidos, posibles novedades,
-   duplicados y casos pendientes de validación.
-5. Estado de solución: registrar si existe parche, no existe o
-   todavía no se ha podido determinar.
-6. Informes: guardar evidencias, referencias y recomendaciones.
-7. Automatización: conectar el verificador al flujo de informes.
+## Entradas principales
+- `python cyber_ai.py --ask "tarea"`: DIRECTOR, especialistas, memoria y recuperación de conocimiento.
+- `python cyber_ai.py --team "tarea"`: planificador, capacidades y orquestación multiagente supervisada.
+- `python cyber_ai.py --report archivo.txt`: análisis de un informe y referencias CVE.
+- `python cyber_ai.py --batch carpeta/`: procesamiento por lotes de informes TXT/Markdown.
+- `python cyber_ai.py --scan https://objetivo-autorizado`: escaneo Nuclei con autorización local específica.
+- `python cyber_ai.py --self-test`: comprobación superficial de archivos; no sustituye la suite de pruebas.
 
-## Reglas fundamentales
-- No descartar una vulnerabilidad únicamente porque no tenga parche.
-- Una búsqueda sin coincidencias no demuestra que sea nueva.
-- Una coincidencia por palabras no demuestra que sea el mismo fallo.
-- No afirmar que existe o no existe un parche sin evidencia suficiente.
-- Marcar como pendientes los casos que no puedan verificarse.
-- Ejecutar pruebas únicamente en sistemas propios o autorizados.
-- Mantener los módulos independientes y ligeros.
+## Subsistemas con función identificada
+- Agentes y proveedores: `director.py`, `team_orchestrator.py`, `agent_runner.py`, `llm_providers.py`.
+- Capacidades y ejecución: `capability_inventory.py`, `capability_selector.py`, `task_planner.py`, `tool_adapters.py`, `tool_execution_pipeline.py`.
+- Autorización y trazabilidad: `execution_policy.py`, `tool_allowlist.py`, `execution_ledger.py`, validadores y evidencia.
+- Conocimiento: `knowledge_*.py`, `data/knowledge_sources/`, `knowledge/packs/`.
+- Memoria y Skills: `learning_memory.py`, `model_memory_manager.py`, `skillbook.py`.
+- Informes y CVE: `report_analyzer.py`, `nvd_client.py`, `batch_analyzer.py`, `report_manager.py`.
+- Escaneo remoto: `nuclei_scanner.py` y `scan_result_validator.py`.
 
-## Estado actual
-- Estructura creada: reports/ y data/.
-- Verificador inicial: verifier.py, consulta la API pública de NVD.
-- El verificador inicial todavía no está conectado automáticamente
-  al generador de informes.
-- No se ha confirmado todavía una consulta real exitosa a NVD.
+## Límites conocidos
+- La validación de evidencia comprueba integridad/estructura y alcance declarado; no demuestra por sí sola la veracidad ni explotabilidad de hallazgos.
+- La ejecución de adaptadores locales ocurre en el host; el aislamiento de red del proceso no está forzado.
+- Nuclei conserva un flujo de autorización independiente; no hereda permisos del planificador local.
+- Las capacidades declaradas o catalogadas no implican que una herramienta esté instalada, adaptada o lista para ejecutarse.
+- El estado de CI y las pruebas debe comprobarse en el commit actual; no reutilizar resultados de commits anteriores como si validaran cambios nuevos.
 
-## Próximas tareas
-1. Comprobar y mejorar verifier.py.
-2. Añadir registro de resultados y deduplicación.
-3. Consultar fuentes públicas para verificar referencias y parches.
-4. Integrar la verificación al generar cada informe.
-5. Añadir pruebas y documentación mínima de uso.
-
-## Instrucciones para Codex
-Lee este archivo antes de modificar el proyecto.
-Inspecciona los archivos existentes y evita sobrescribir trabajo útil.
-Implementa la solución funcional más sencilla, sin dependencias
-innecesarias. Ejecuta pruebas y actualiza este contexto al terminar.
-
-## Progreso
-- Paso 4/12: estructura básica y pruebas automáticas iniciales.
-- Pruebas: comprobación de carpetas, verificador y archivo de contexto.
-- Seguridad: analizar únicamente sistemas propios o con autorización.
-
-- Paso 5/12: añadido report_analyzer.py para extraer referencias CVE y generar análisis JSON.
-- Los hallazgos sin CVE quedan pendientes; no se declaran vulnerabilidades nuevas automáticamente.
-- El estado del parche queda como no verificado hasta disponer de evidencia.
-- Pruebas añadidas para referencias CVE, clasificación y estado del parche.
-
-- Paso 6/12: creado cyber_ai.py como punto de entrada de la herramienta.
-- Incluye comprobación básica y análisis de informes mediante --report.
-- Pruebas: entrada principal y manejo de informe inexistente.
-
-- Paso 7/12: probado el flujo de análisis con un informe de ejemplo.
-- Validado el JSON generado, la extracción de CVE y el estado de parche no verificado.
-
-- Paso 8/12: añadido nvd_client.py para comprobar identificadores CVE exactos en NVD.
-- El análisis de informes incorpora la respuesta de NVD cuando existe conexión.
-- Si la consulta falla, el estado queda pendiente; el parche sigue sin verificar.
-- Pruebas de NVD realizadas con respuestas simuladas, sin depender de Internet.
-
-- Paso 9/12: añadido índice local de informes y detección de duplicados exactos por huella SHA-256.
-- Los duplicados se marcan como posibles duplicados; no se comparan todavía vulnerabilidades semánticamente.
-
-- Paso 10/12: añadido batch_analyzer.py para procesar lotes de informes TXT y Markdown.
-- Cada informe genera su JSON de análisis; errores de lectura se registran por archivo.\n
-- Paso 11/12: integrado el comando --batch en cyber_ai.py.
-- La herramienta puede analizar un informe individual o una carpeta completa.
-- Añadidas pruebas de procesamiento por lotes y manejo de carpetas inexistentes.
-
-
-## Uso de la herramienta
-- Analizar un informe: `python3 cyber_ai.py --report reports/informe.txt`
-- Analizar una carpeta: `python3 cyber_ai.py --batch reports`
-- Comprobar instalación: `python3 cyber_ai.py --self-test`
-- Ejecutar pruebas: `python3 -m unittest discover -s tests -v`
-
-## Limitaciones
-- Las coincidencias CVE requieren validación manual.
-- El estado del parche permanece sin verificar automáticamente.
-- Una búsqueda sin resultados no demuestra que exista una vulnerabilidad nueva.
-- La detección de duplicados compara el texto normalizado, no la causa técnica.
-- Ejecutar pruebas de seguridad únicamente con autorización.
-
-- Paso 12/12: integración final, compilación, pruebas automáticas y prueba funcional.
-- Estado: revisar los resultados de las pruebas antes de considerar la herramienta validada.
+## Reglas para mantener el repositorio
+1. Cada módulo nuevo debe tener un propósito concreto, un punto de entrada o consumidor identificable y pruebas apropiadas.
+2. No mantener prototipos, demos ni duplicados sin uso como si fueran subsistemas activos.
+3. Antes de eliminar un archivo, comprobar sus referencias, pruebas y documentación; conservar utilidades independientes si aportan una función distinta y documentada.
+4. Actualizar esta página cuando cambie la arquitectura real. No acumular cronologías antiguas como estado vigente.
+5. No declarar el sistema listo para producción sin superar los gates documentados y una revisión independiente.

@@ -13,13 +13,27 @@ from tool_adapters import TOOL_SPECS, ToolExecutionError, run_local_tool, write_
 from execution_ledger import ExecutionLedger
 
 
+def _tool_succeeded(evidence):
+    """Respeta el resultado explícito del adaptador y conserva compatibilidad."""
+    if not isinstance(evidence, dict):
+        return False
+    explicit = evidence.get("tool_reported_success")
+    if explicit is not None:
+        return explicit is True
+    return (
+        isinstance(evidence.get("return_code"), int)
+        and not isinstance(evidence.get("return_code"), bool)
+        and evidence.get("return_code") == 0
+    )
+
+
 def _terminal_status(evidence):
     status = evidence.get("status") if isinstance(evidence, dict) else None
     if status == "timeout":
         return "timeout"
     if status == "denied":
         return "denied"
-    if status == "completed" and evidence.get("return_code") == 0:
+    if status == "completed" and _tool_succeeded(evidence):
         return "completed"
     return "failed"
 
@@ -57,6 +71,11 @@ def main(argv=None):
     parser.add_argument("--tool", required=True, choices=sorted(TOOL_SPECS))
     parser.add_argument("--target", required=True, help="Ruta relativa dentro del repositorio")
     parser.add_argument("--config", help="Configuración local para Semgrep")
+    parser.add_argument("--plugin", help="Plugin explícito de Volatility 3 (allowlist del adaptador)")
+    parser.add_argument(
+        "--authorized-network", action="store_true",
+        help="Confirma autorización explícita para un objetivo Nmap dentro de la allowlist CIDR",
+    )
     parser.add_argument("--timeout", type=int)
     parser.add_argument("--execute", action="store_true", help="Confirma la ejecución local")
     parser.add_argument("--require-ledger", action="store_true",
@@ -97,7 +116,9 @@ def main(argv=None):
     artifact_sha256 = None
     try:
         evidence = run_local_tool(
-            args.tool, args.target, config_path=args.config, timeout=args.timeout
+            args.tool, args.target, config_path=args.config,
+            plugin=args.plugin, timeout=args.timeout,
+            allow_network=args.authorized_network,
         )
         if not isinstance(evidence, dict):
             raise TypeError("El adaptador debe devolver un objeto de evidencia.")
@@ -137,7 +158,7 @@ def main(argv=None):
                             "passed": (
                                 isinstance(evidence.get("return_code"), int)
                                 and not isinstance(evidence.get("return_code"), bool)
-                                and evidence.get("return_code") == 0
+                                and _tool_succeeded(evidence)
                             ),
                         },
                         {
@@ -153,14 +174,26 @@ def main(argv=None):
                         },
                         {
                             "name": "target_integrity",
-                            "passed": _integrity_pair_passed(
-                                evidence, "target_modified",
-                                "target_sha256", "target_sha256_after",
+                            "passed": (
+                                evidence.get("scope_validated") is True
+                                if evidence.get("target_type") == "network"
+                                else _integrity_pair_passed(
+                                    evidence, "target_modified",
+                                    "target_sha256", "target_sha256_after",
+                                )
                             ),
-                            "evidence": {
-                                "sha256_before": evidence.get("target_sha256"),
-                                "sha256_after": evidence.get("target_sha256_after"),
-                            },
+                            "evidence": (
+                                {
+                                    "target_type": "network",
+                                    "authorization_scope": evidence.get("authorization_scope"),
+                                    "scope_allowlist_sha256": evidence.get("scope_allowlist_sha256"),
+                                }
+                                if evidence.get("target_type") == "network" else
+                                {
+                                    "sha256_before": evidence.get("target_sha256"),
+                                    "sha256_after": evidence.get("target_sha256_after"),
+                                }
+                            ),
                         },
                     ],
                     metadata={
@@ -182,7 +215,7 @@ def main(argv=None):
     print(json.dumps(evidence, ensure_ascii=False, indent=2))
     if evidence.get("status") == "denied":
         return 2
-    return 0 if evidence.get("status") == "completed" and evidence.get("return_code") == 0 else 1
+    return 0 if evidence.get("status") == "completed" and _tool_succeeded(evidence) else 1
 
 
 if __name__ == "__main__":
