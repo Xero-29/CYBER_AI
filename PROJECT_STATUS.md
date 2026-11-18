@@ -182,3 +182,13 @@ El contenido histórico que sigue registra implementaciones y validaciones de co
 - Cada especialidad incluye un diseño de laboratorio con cuatro casos (baseline, fallo sintético, detección y mitigación/regresión), salvaguardas, métricas, preguntas de investigación y artefactos de aceptación.
 - Se añadió el índice de los 48 compendios.
 - **Límite:** son cuadernos técnicos y planes de trabajo, no libros exhaustivos ni revisiones sistemáticas completas. Los laboratorios están diseñados, no ejecutados; no se elevó la madurez de ninguna especialidad.
+
+
+## Reconciliación de seguridad — 2026-11-18
+
+- Rama de trabajo separada: `codex/reconcile-main-security-audit-2026-11-18`, creada desde `main` en `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`. No se modificó `main` ni se reescribió la rama `codex/security-integrity-audit`.
+- Commit inicial de portabilidad selectiva: `8a375b05c02b38299bef3fe03361e61ba51eb678`. Incorpora nueve archivos nuevos que no existían en el árbol de `main`: `safe_io.py`, sus pruebas, el generador de locks y sus pruebas, locks de documentos/sandbox y documentación de salidas seguras. Se excluyeron deliberadamente prototipos huérfanos y pruebas asociadas a módulos retirados.
+- La comparación de ramas confirma que este commit es un avance lineal de un commit sobre `main`; no se ha realizado merge ni rebase de las ramas originales.
+- **No se considera integrada la auditoría:** siguen pendientes los cambios de seguridad en archivos compartidos (`execution_ledger.py`, `tool_adapters.py`, `preflight.py`, `data_backup.py`, `sandbox_runner.py`, `sbom_generator.py`, etc.). No se copiaron versiones completas a ciegas porque `main` contiene implementaciones más recientes y capacidades que deben preservarse mediante integración de tres vías y pruebas.
+- PR #11 permanece como único PR de locks/SBOM. Su HEAD observado es `04c001a206cde98613cf9c151ce4f6a95fb86a21`; Python Tests y Docker Sandbox terminaron `success` en los runs [44359934767](https://github.com/Xero-29/CYBER_AI/actions/runs/44359934767) y [44359934228](https://github.com/Xero-29/CYBER_AI/actions/runs/44359934228). No se creó un PR duplicado.
+- El commit `8a375b05c02b38299bef3fe03361e61ba51eb678` todavía no tiene checks reportados. Los nueve archivos añadidos requieren validación CI antes de considerarse aceptados.
