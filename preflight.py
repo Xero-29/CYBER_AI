@@ -424,7 +424,7 @@ def collect_checks(root=PROJECT, python_version=None, module_lookup=None,
         )
     else:
         try:
-            from tool_allowlist import load_signed_tool_allowlist
+            from tool_allowlist import ToolAllowlistError, load_signed_tool_allowlist
             candidate = Path(allowlist_path)
             if not candidate.is_absolute():
                 candidate = root / candidate
@@ -435,7 +435,7 @@ def collect_checks(root=PROJECT, python_version=None, module_lookup=None,
                 "tool_allowlist", "ok",
                 f"Firma HMAC válida; {len(approved_tools)} ejecutables aprobados.",
             )
-        except Exception:
+        except ToolAllowlistError:
             add(
                 "tool_allowlist", "error",
                 "No se pudo validar la allowlist firmada; no se expone la clave.",
