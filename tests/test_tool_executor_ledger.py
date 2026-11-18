@@ -129,3 +129,35 @@ class ToolExecutorLedgerTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+    def test_ledger_initialization_failure_blocks_execution_by_default(self):
+        error = io.StringIO()
+        with patch.object(
+            tool_executor, "ExecutionLedger", side_effect=OSError("ledger unavailable")
+        ), patch.object(tool_executor, "run_local_tool") as runner, \
+             contextlib.redirect_stdout(io.StringIO()), \
+             contextlib.redirect_stderr(error):
+            result = tool_executor.main([
+                "--tool", "ruff", "--target", "tests/fixtures/sample.py", "--execute",
+            ])
+        self.assertEqual(result, 3)
+        runner.assert_not_called()
+        self.assertIn("no se pudo registrar el inicio", error.getvalue())
+
+    def test_unlogged_execution_requires_explicit_override(self):
+        output = io.StringIO()
+        with patch.object(
+            tool_executor, "ExecutionLedger", side_effect=OSError("ledger unavailable")
+        ), patch.object(
+            tool_executor, "run_local_tool",
+            side_effect=tool_executor.ToolExecutionError("blocked for test"),
+        ) as runner, contextlib.redirect_stdout(output), \
+             contextlib.redirect_stderr(io.StringIO()):
+            result = tool_executor.main([
+                "--tool", "ruff", "--target", "tests/fixtures/sample.py", "--execute",
+                "--allow-unlogged-execution",
+            ])
+        self.assertEqual(result, 2)
+        runner.assert_called_once()
+        self.assertIn("blocked for test", output.getvalue())
+
