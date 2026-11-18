@@ -111,6 +111,42 @@ class KnowledgeEvaluationTests(unittest.TestCase):
         embed.assert_not_called()
         search.assert_not_called()
 
+    def test_in_memory_dataset_enforces_per_case_size_limit_before_provider_call(self):
+        cases = [{
+            "id": "large", "query": "q" * knowledge_eval.MAX_LINE_BYTES,
+            "relevant_categories": ["api"],
+        }]
+        embed = Mock()
+        search = Mock()
+        with self.assertRaisesRegex(ValueError, "64 KiB"):
+            knowledge_eval.evaluate(cases, 1, embed=embed, search=search)
+        embed.assert_not_called()
+        search.assert_not_called()
+
+    def test_in_memory_dataset_enforces_total_size_limit_before_provider_call(self):
+        cases = [
+            {
+                "id": f"case-{index}",
+                "query": "q" * 60000,
+                "relevant_categories": ["api"],
+            }
+            for index in range(40)
+        ]
+        embed = Mock()
+        search = Mock()
+        with self.assertRaisesRegex(ValueError, "2 MiB"):
+            knowledge_eval.evaluate(cases, 1, embed=embed, search=search)
+        embed.assert_not_called()
+        search.assert_not_called()
+
+    def test_in_memory_dataset_rejects_unencodable_unicode(self):
+        cases = [{
+            "id": "case", "query": "\ud800",
+            "relevant_categories": ["api"],
+        }]
+        with self.assertRaisesRegex(ValueError, "Unicode inválido"):
+            knowledge_eval._normalize_cases(cases)
+
     def test_evaluate_rejects_non_finite_embedding_before_search(self):
         cases = [{
             "id": "case", "query": "api",
