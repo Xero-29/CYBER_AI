@@ -4,6 +4,7 @@ import argparse
 import json
 import math
 import os
+import sys
 import stat
 from datetime import datetime, timezone
 from pathlib import Path
@@ -258,18 +259,22 @@ def evaluate(dataset, top_k=5, *, embed=generate_embedding, search=search_knowle
     }
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dataset", default=str(DEFAULT_DATASET))
     parser.add_argument("--top-k", type=int, default=5)
     parser.add_argument("--output", help="Ruta JSON para conservar el informe.")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     report = evaluate(args.dataset, args.top_k)
     rendered = json.dumps(report, ensure_ascii=False, indent=2)
     if args.output:
-        atomic_write_text(
-            args.output, rendered + "\n", create_parents=True
-        )
+        try:
+            atomic_write_text(
+                args.output, rendered + "\n", create_parents=True
+            )
+        except (OSError, ValueError) as error:
+            print(f"ERROR: {error}", file=sys.stderr)
+            return 2
         print(f"Informe: {args.output}")
     print(
         f"Consultas: {report['queries']} | Recall@{args.top_k}: "
@@ -278,6 +283,7 @@ def main():
         f"{report['mrr_at_k']:.3f} | Sin resultados relevantes: "
         f"{report['no_hit_queries']}"
     )
+    return 0
 
 
 if __name__ == "__main__":
