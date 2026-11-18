@@ -2,9 +2,9 @@
 
 **Repositorio:** `Xero-29/CYBER_AI`  
 **Rama auditada:** `codex/security-integrity-audit`  
-**HEAD de código/configuración validado antes de esta actualización:** `617ba6c55525503d7cd55ea34a276b8d68ea664f`  
+**HEAD de código y documentación verificado:** `a4d548004b63cdd2fddb4e437f8102a533f422ce`  
 **main inspeccionada:** `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`  
-**Divergencia observada antes de esta actualización:** `diverged`, rama auditada **108 commits adelante y 573 detrás**. Merge-base: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.
+**Divergencia de este HEAD:** `diverged`, rama auditada **110 commits adelante y 573 detrás**. Merge-base: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.
 
 ## Ramas, commits y PRs
 
@@ -19,10 +19,10 @@
 
 ## CI del HEAD exacto
 
-SHA `617ba6c55525503d7cd55ea34a276b8d68ea664f`:
+SHA `a4d548004b63cdd2fddb4e437f8102a533f422ce`:
 
-- Python Tests — **completed/success, 540 pruebas**: [run 44338745968](https://github.com/Xero-29/CYBER_AI/actions/runs/44338745968).
-- Docker Sandbox — **completed/success, 540 pruebas y Ruff dentro del contenedor**: [run 44338745520](https://github.com/Xero-29/CYBER_AI/actions/runs/44338745520).
+- Python Tests — **completed/success, 540 pruebas**: [run 44338941062](https://github.com/Xero-29/CYBER_AI/actions/runs/44338941062).
+- Docker Sandbox — **completed/success, 540 pruebas y Ruff dentro del contenedor**: [run 44338940887](https://github.com/Xero-29/CYBER_AI/actions/runs/44338940887).
 - Ambos checks validaron exactamente el mismo SHA. El workflow Python ejecutó primero el entorno base y después instaló las dependencias documentales con hashes; los cuatro tests de extracción real PDF/DOCX/XLSX/PPTX pasaron en la segunda ejecución.
 - Se generaron tres SBOM CycloneDX (núcleo, sandbox y documentos) y manifiestos de artefactos de wheels. No se observaron `ResourceWarning` de pipes abiertos en esta ejecución.
 - No se dispuso de entorno local con el checkout completo; la evidencia de ejecución es GitHub Actions.
@@ -59,7 +59,7 @@ SHA `617ba6c55525503d7cd55ea34a276b8d68ea664f`:
 7. Revisar las 138 fuentes y 276 verificaciones pendientes con especialistas; validar licencias, exactitud, vigencia y recuperación semántica con un dataset experto.
 8. Verificar ACL Windows, protección de rama, alertas, observabilidad y respuesta a incidentes en la infraestructura de despliegue.
 
-**Conclusión:** el código del SHA `617ba6c55525503d7cd55ea34a276b8d68ea664f` pasó 540 pruebas en Python y Docker, incluyendo los extractores documentales reales, y Ruff aprobó dentro del sandbox. Esto acredita los checks automatizados de ese SHA, no una certificación ni preparación para producción. La rama continúa divergente de `main`, PR #11 sigue fallando y permanecen pendientes operacionales y de revisión experta. `main` no fue modificada.
+**Conclusión:** el código del SHA `a4d548004b63cdd2fddb4e437f8102a533f422ce` pasó 540 pruebas en Python y Docker, incluyendo los extractores documentales reales, y Ruff aprobó dentro del sandbox. Esto acredita los checks automatizados de ese SHA, no una certificación ni preparación para producción. La rama continúa divergente de `main`, PR #11 sigue fallando y permanecen pendientes operacionales y de revisión experta. `main` no fue modificada.
 
 
 ---
