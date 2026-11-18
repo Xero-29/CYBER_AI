@@ -7,6 +7,7 @@ import re
 import sys
 import uuid
 from pathlib import Path
+from safe_io import atomic_write_text
 
 PROJECT = Path(__file__).resolve().parent
 PACKAGE_LINE = re.compile(r"^([A-Za-z0-9][A-Za-z0-9._-]*)==([A-Za-z0-9][A-Za-z0-9.!+_-]*)$")
@@ -252,8 +253,7 @@ def main(argv=None):
         )
         rendered = json.dumps(document, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
         if args.output:
-            args.output.parent.mkdir(parents=True, exist_ok=True)
-            args.output.write_text(rendered, encoding="utf-8")
+            atomic_write_text(args.output, rendered, create_parents=True)
             print(f"SBOM CycloneDX generado: {args.output} ({len(document['components'])} componentes)")
         else:
             sys.stdout.write(rendered)
