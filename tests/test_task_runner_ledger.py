@@ -39,6 +39,7 @@ class TaskRunnerLedgerTests(unittest.TestCase):
             try:
                 os.chdir(workspace)
                 with (
+                    patch.object(Path, "home", return_value=Path(home)),
                     patch.object(task_runner, "select_capabilities", return_value=[{"path": str(template)}]),
                     patch.object(task_runner, "authorize_target", return_value={"authorization_id": "grant"}),
                     patch.object(task_runner.shutil, "which", return_value="/usr/bin/nuclei"),
@@ -65,6 +66,7 @@ class TaskRunnerLedgerTests(unittest.TestCase):
             try:
                 os.chdir(workspace)
                 with (
+                    patch.object(Path, "home", return_value=Path(home)),
                     patch.object(task_runner, "select_capabilities", return_value=[{"path": str(template)}]),
                     patch.object(task_runner, "authorize_target", return_value={"authorization_id": "grant"}),
                     patch.object(task_runner.shutil, "which", return_value="/usr/bin/nuclei"),
