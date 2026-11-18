@@ -6,6 +6,7 @@ Ejecuta `python preflight.py` después de instalar dependencias. La comprobació
 - **Advertencias:** integraciones opcionales no instaladas, extractores documentales opcionales ausentes o ledger aún no creado.
 - **Ledger existente:** si existe, se verifica su cadena hash; un fallo de integridad bloquea la comprobación.
 - **Allowlist de ejecutables:** se valida la firma HMAC y el número de binarios aprobados cuando se configura. Si `CYBER_AI_TOOL_ALLOWLIST_REQUIRED=1`, la ausencia o invalidez de la política bloquea el preflight. Sin modo obligatorio, la ausencia se muestra como advertencia y los adaptadores conservan compatibilidad.
+- **Política del ledger:** `tool_executor.py`, `task_runner.py` y `agent_runner.py` exigen trazabilidad por defecto. `CYBER_AI_ALLOW_UNLOGGED_EXECUTION=1` es una excepción explícita y el preflight la marca como advertencia.
 
 Para automatización:
 
