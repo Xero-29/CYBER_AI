@@ -93,21 +93,24 @@ def _copy_checked_file(source, destination, *, expected_size=None, expected_sha2
     digest = hashlib.sha256()
     total = 0
     destination = Path(destination)
+    created = False
     try:
-        with os.fdopen(descriptor, "rb") as source_stream, destination.open("xb") as target_stream:
-            while True:
-                block = source_stream.read(1024 * 1024)
-                if not block:
-                    break
-                total += len(block)
-                if total > MAX_BACKUP_FILE_BYTES:
-                    raise BackupError("Un archivo supera el límite de 10 GiB.")
-                if expected_size is not None and total > expected_size:
-                    raise BackupError("El archivo fuente creció durante la copia.")
-                digest.update(block)
-                target_stream.write(block)
-            target_stream.flush()
-            os.fsync(target_stream.fileno())
+        with os.fdopen(descriptor, "rb") as source_stream:
+            with destination.open("xb") as target_stream:
+                created = True
+                while True:
+                    block = source_stream.read(1024 * 1024)
+                    if not block:
+                        break
+                    total += len(block)
+                    if total > MAX_BACKUP_FILE_BYTES:
+                        raise BackupError("Un archivo supera el límite de 10 GiB.")
+                    if expected_size is not None and total > expected_size:
+                        raise BackupError("El archivo fuente creció durante la copia.")
+                    digest.update(block)
+                    target_stream.write(block)
+                target_stream.flush()
+                os.fsync(target_stream.fileno())
             after = os.fstat(source_stream.fileno())
         current = Path(source).lstat()
         hexdigest = digest.hexdigest()
@@ -115,13 +118,19 @@ def _copy_checked_file(source, destination, *, expected_size=None, expected_sha2
             _file_identity(before) != _file_identity(after)
             or _file_identity(after) != _file_identity(current)
             or (expected_size is not None and total != expected_size)
-            or (expected_sha256 is not None and not hmac.compare_digest(hexdigest, expected_sha256))
+            or (
+                expected_sha256 is not None
+                and not hmac.compare_digest(hexdigest, expected_sha256)
+            )
         ):
-            raise BackupError(f"El archivo cambió o no coincide durante la copia: {Path(source).name}")
+            raise BackupError(
+                f"El archivo cambió o no coincide durante la copia: {Path(source).name}"
+            )
         os.chmod(destination, 0o600)
         return total, hexdigest
     except Exception:
-        destination.unlink(missing_ok=True)
+        if created:
+            destination.unlink(missing_ok=True)
         raise
 
 
