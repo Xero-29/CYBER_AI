@@ -198,5 +198,38 @@ class KnowledgeEvaluationTests(unittest.TestCase):
             knowledge_eval.evaluate([{}], 0)
 
 
+
+    def test_main_writes_report_atomically_and_returns_success(self):
+        report = {
+            "queries": 0, "recall_at_k": 0.0, "precision_at_k": 0.0,
+            "mrr_at_k": 0.0, "no_hit_queries": 0,
+        }
+        output = Path(self.temp.name) / "report.json"
+        with patch.object(knowledge_eval, "evaluate", return_value=report):
+            self.assertEqual(
+                knowledge_eval.main(["--dataset", "unused", "--output", str(output)]),
+                0,
+            )
+        self.assertEqual(json.loads(output.read_text(encoding="utf-8")), report)
+
+    def test_main_rejects_symlink_report_destination(self):
+        target = Path(self.temp.name) / "protected.json"
+        target.write_text("keep", encoding="utf-8")
+        output = Path(self.temp.name) / "report-link.json"
+        try:
+            output.symlink_to(target)
+        except OSError:
+            self.skipTest("symlinks unavailable")
+        report = {
+            "queries": 0, "recall_at_k": 0.0, "precision_at_k": 0.0,
+            "mrr_at_k": 0.0, "no_hit_queries": 0,
+        }
+        with patch.object(knowledge_eval, "evaluate", return_value=report):
+            self.assertEqual(
+                knowledge_eval.main(["--dataset", "unused", "--output", str(output)]),
+                2,
+            )
+        self.assertEqual(target.read_text(encoding="utf-8"), "keep")
+
 if __name__ == "__main__":
     unittest.main()
