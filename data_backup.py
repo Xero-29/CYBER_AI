@@ -49,6 +49,14 @@ def _open_regular_file(path):
         ):
             raise BackupError(f"Archivo no regular o reemplazado: {path.name}")
         return descriptor, opened
+    except OSError as error:
+        try:
+            os.close(descriptor)
+        except (OSError, UnboundLocalError):
+            pass
+        raise BackupError(
+            f"No se pudo abrir de forma segura el archivo: {path.name}"
+        ) from error
     except Exception:
         try:
             os.close(descriptor)
