@@ -30,15 +30,15 @@ La firma se calcula sobre el JSON canónico sin el campo `signature`. Para firma
 ```python
 import json
 import os
-from pathlib import Path
+from safe_io import atomic_write_text
 from tool_allowlist import sign_tool_allowlist
 
 tools = {"ruff": {"sha256": "SHA256_REAL_DEL_BINARIO"}}
 key = os.environ["CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY"].encode("utf-8")
 document = sign_tool_allowlist(tools, key)
-Path("tools.signed.json").write_text(
+atomic_write_text(
+    "tools.signed.json",
     json.dumps(document, sort_keys=True, separators=(",", ":")) + "\n",
-    encoding="utf-8",
 )
 ```
 
