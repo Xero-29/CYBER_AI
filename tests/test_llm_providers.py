@@ -450,5 +450,16 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
                 {"model": "test", "messages": [{"role": "user", "content": "hi"}]},
             )
 
+
+    def test_request_rejects_invalid_provider_payload_and_endpoint_shapes(self):
+        with self.assertRaisesRegex(ValueError, "provider debe ser"):
+            llm_providers.request([], "api/chat", {})
+        provider = {"name": "local", "protocol": "ollama",
+                    "base_url": "http://127.0.0.1:11434"}
+        with self.assertRaisesRegex(ValueError, "payload debe ser"):
+            llm_providers.request(provider, "api/chat", ["not", "an", "object"])
+        with self.assertRaisesRegex(ValueError, "Endpoint de proveedor"):
+            llm_providers.request(provider, "api/shell", {})
+
 if __name__ == "__main__":
     unittest.main()
