@@ -33,3 +33,13 @@ python -m pip install --require-hashes -r requirements-documents.lock
 ```
 
 `requirements-documents.in` fija las dependencias directas; `requirements-documents.lock` fija también las transitivas y hashes SHA-256. El lock se valida descargando exclusivamente wheels y comparando el manifiesto de artefactos antes de generar un SBOM CycloneDX independiente. Su plataforma de referencia es CPython 3.12, Linux x86_64 y glibc >= 2.26. No reutilices esos hashes en otras plataformas; genera y revisa un lock específico.
+
+Para regenerarlo en la plataforma de referencia:
+
+```bash
+mkdir -p /tmp/cyber-ai-document-wheelhouse
+python -m pip download --only-binary=:all: --dest /tmp/cyber-ai-document-wheelhouse -r requirements-documents.in
+python wheel_lock_generator.py --wheelhouse /tmp/cyber-ai-document-wheelhouse --requirements requirements-documents.in --output requirements-documents.lock
+```
+
+Revisa el diff y ejecuta `pip install --require-hashes -r requirements-documents.lock` antes de publicar el cambio.
