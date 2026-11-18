@@ -8,6 +8,7 @@ import os
 import re
 import shutil
 import sqlite3
+import stat
 import sys
 import uuid
 from datetime import datetime, timezone
@@ -27,12 +28,101 @@ class BackupError(ValueError):
     pass
 
 
+def _file_identity(info):
+    return (
+        info.st_dev, info.st_ino, info.st_mode, info.st_size,
+        info.st_mtime_ns, info.st_ctime_ns,
+    )
+
+
+def _open_regular_file(path):
+    path = Path(path)
+    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+    try:
+        descriptor = os.open(path, flags)
+        opened = os.fstat(descriptor)
+        current = path.lstat()
+        if (
+            not stat.S_ISREG(opened.st_mode)
+            or stat.S_ISLNK(current.st_mode)
+            or _file_identity(opened) != _file_identity(current)
+        ):
+            raise BackupError(f"Archivo no regular o reemplazado: {path.name}")
+        return descriptor, opened
+    except Exception:
+        try:
+            os.close(descriptor)
+        except (OSError, UnboundLocalError):
+            pass
+        raise
+
+
 def _sha256(path):
     digest = hashlib.sha256()
-    with Path(path).open("rb") as stream:
+    descriptor, before = _open_regular_file(path)
+    with os.fdopen(descriptor, "rb") as stream:
         for block in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(block)
+        after = os.fstat(stream.fileno())
+    current = Path(path).lstat()
+    if _file_identity(before) != _file_identity(after) or _file_identity(after) != _file_identity(current):
+        raise BackupError(f"El archivo cambió durante el cálculo SHA-256: {Path(path).name}")
     return digest.hexdigest()
+
+
+def _read_bounded_regular_file(path, maximum_bytes):
+    descriptor, before = _open_regular_file(path)
+    if before.st_size > maximum_bytes:
+        os.close(descriptor)
+        raise BackupError("El archivo supera el límite de lectura.")
+    with os.fdopen(descriptor, "rb") as stream:
+        content = stream.read(maximum_bytes + 1)
+        after = os.fstat(stream.fileno())
+    current = Path(path).lstat()
+    if (
+        len(content) > maximum_bytes
+        or _file_identity(before) != _file_identity(after)
+        or _file_identity(after) != _file_identity(current)
+    ):
+        raise BackupError(f"El archivo cambió o superó el límite durante la lectura: {Path(path).name}")
+    return content
+
+
+def _copy_checked_file(source, destination, *, expected_size=None, expected_sha256=None):
+    descriptor, before = _open_regular_file(source)
+    digest = hashlib.sha256()
+    total = 0
+    destination = Path(destination)
+    try:
+        with os.fdopen(descriptor, "rb") as source_stream, destination.open("xb") as target_stream:
+            while True:
+                block = source_stream.read(1024 * 1024)
+                if not block:
+                    break
+                total += len(block)
+                if total > MAX_BACKUP_FILE_BYTES:
+                    raise BackupError("Un archivo supera el límite de 10 GiB.")
+                if expected_size is not None and total > expected_size:
+                    raise BackupError("El archivo fuente creció durante la copia.")
+                digest.update(block)
+                target_stream.write(block)
+            target_stream.flush()
+            os.fsync(target_stream.fileno())
+            after = os.fstat(source_stream.fileno())
+        current = Path(source).lstat()
+        hexdigest = digest.hexdigest()
+        if (
+            _file_identity(before) != _file_identity(after)
+            or _file_identity(after) != _file_identity(current)
+            or (expected_size is not None and total != expected_size)
+            or (expected_sha256 is not None and not hmac.compare_digest(hexdigest, expected_sha256))
+        ):
+            raise BackupError(f"El archivo cambió o no coincide durante la copia: {Path(source).name}")
+        os.chmod(destination, 0o600)
+        return total, hexdigest
+    except Exception:
+        destination.unlink(missing_ok=True)
+        raise
 
 
 def _backup_signing_key():
