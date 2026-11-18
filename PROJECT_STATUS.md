@@ -1,46 +1,50 @@
 # Estado de reconciliación — 2026-11-18
 
 **Rama de integración:** `codex/reconcile-security-integrity-2026-11-18`  
-**HEAD verificado antes de esta actualización documental:** `160c1cdf3878dd2a3ce971a61b35d36d2e0a37ac`.  
-**Base:** `main` en `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`; comparación: **92 commits adelante, 0 detrás**, 42 rutas cambiadas.  
+**HEAD verificado antes de esta actualización:** `e6000d892b51dfa1252503cfd3db78ab498aa1f3`.  
+**Base:** `main` en `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`; comparación: **114 commits adelante, 0 detrás**, 48 rutas cambiadas.  
 **Merge-base con main:** `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`. Main permanece intacta.  
-**Merge controlado en esta rama:** `2585b99be752bef3276ce5721690542c9f05e7d2`, con segundo padre PR #11 en `04c001a206cde98613cf9c151ce4f6a95fb86a21`. Se conservó el árbol validado de PR #11 y se sobrepusieron nueve rutas revisadas; no hubo merge en main ni rebase/force-push.
+**Merge controlado en esta rama:** `2585b99be752bef3276ce5721690542c9f05e7d2`, con segundo padre PR #11 en `04c001a206cde98613cf9c151ce4f6a95fb86a21`. Se conservó el árbol validado de PR #11 y se sobrepusieron rutas revisadas; no hubo merge en main ni rebase/force-push.
 
-**Rama fuente de auditoría:** `codex/security-integrity-audit`, HEAD inspeccionado `8104739d542e3264166eb0e7b1b493aa26e9ce0a`. Sigue divergente de main: 112 commits exclusivos de auditoría y 573 exclusivos de main desde `cae816d6037b56f017c2fbdb3e98ef00df58c1d`. No se copia el diff completo a ciegas.
+**Rama fuente de auditoría:** `codex/security-integrity-audit`, HEAD inspeccionado `8104739d542e3264166eb0e7b1b493aa26e9ce0a`. Sigue divergente de main: 112 commits exclusivos de auditoría y 573 exclusivos de main desde `cae816d6037b56f017c2fbdb3e98ef00df58c1d`. Se están portando cambios por funcionalidad, no copiando el diff completo.
 
 ## Cambios integrados y endurecimiento portado
 
-- Integración de locks/SBOM de PR #11; manifiestos independientes para runtime, sandbox y extractores documentales; CLI `--lock-file`.
-- Generador de manifiestos de wheels: verificación obligatoria contra hashes fijados en el lock, rechazo de symlinks, límites de cantidad/tamaño/entradas y validación estricta de identidad METADATA.
-- Generador de locks: límites de wheelhouse, validación de metadatos y requisitos, rechazo de symlinks y publicación atómica.
-- `safe_io.atomic_write_text` conectado a generadores de locks, manifiestos de artefactos, SBOM y manifiestos JSON de descargas de conocimiento.
-- Ledger: validación de ruta y archivos DB/WAL/SHM contra symlinks/no-regular-files, directorio POSIX privado, archivos `0600`, límites SQLite signed 64-bit y umbrales de recuperación representables.
-- Backups: límites de cantidad de archivos y tamaño del manifiesto, verificados antes y después de leer.
-- Evaluación de conocimiento: lectura protegida contra symlinks, comprobación de identidad del archivo, límites de bytes y Unicode para archivos y entradas en memoria.
-- Agentes, ejecutor de herramientas y task runner requieren ledger por defecto. La ejecución sin registro requiere excepción explícita.
-- Runner Docker: montaje de evidencias privado `0700`; workflow instala dependencias con `pip --require-hashes` y prepara el directorio de datos con permisos privados.
-- Pruebas de regresión para los controles anteriores.
+- Locks/SBOM de PR #11, manifiestos separados por entorno y soporte `--lock-file`.
+- Manifiesto de wheels: hashes contrastados con el lock, límites de tamaño/cantidad/entradas, rechazo de symlinks y validación estricta de METADATA.
+- Generador de locks: validación de wheelhouse y requisitos, límites y publicación atómica.
+- `safe_io.atomic_write_text` integrado en locks, manifiestos de artefactos, SBOM, manifiestos de descargas y reportes de evaluación de conocimiento.
+- Ledger: protección de ruta y archivos DB/WAL/SHM, directorio POSIX privado, archivos `0600`, límites SQLite signed 64-bit y umbrales de recuperación representables.
+- Backups: límites de cantidad de archivos y tamaño del manifiesto, comprobados antes y después de leer.
+- Evaluación de conocimiento: lectura protegida contra symlinks, identidad estable, límites de bytes y Unicode; escritura atómica de informes y códigos de salida CLI comprobables.
+- Allowlist HMAC: lectura resistente a reemplazo de ruta, validación de firma/configuración en preflight y pruebas de denegación antes de iniciar procesos.
+- Los adaptadores convierten una denegación de allowlist en un error de ejecución tipado; preflight informa política de allowlist y ledger sin exponer secretos.
+- Agentes, ejecutor de herramientas y task runner exigen ledger por defecto; el modo sin registro requiere excepción explícita.
+- Runner Docker: montaje de evidencias `0700`; workflow instala con `pip --require-hashes` y protege el directorio de datos.
+- Pruebas de regresión para las correcciones anteriores y documentación actualizada de allowlist/preflight.
 
-## Evidencia de CI y PR
+## Evidencia de CI
 
-**HEAD `160c1cdf3878dd2a3ce971a61b35d36d2e0a37ac`:**
-- Python Tests — **success**, 663 pruebas, 2 omitidas en cada ejecución (entorno base y extractores documentales): [run 44362869276](https://github.com/Xero-29/CYBER_AI/actions/runs/44362869276).
-- Windows allowlist smoke — **success**, dentro del mismo workflow Python.
-- Docker Sandbox — **success**, imagen, verificación completa, smoke de Ruff y evidencia: [run 44362869543](https://github.com/Xero-29/CYBER_AI/actions/runs/44362869543).
+**HEAD `e6000d892b51dfa1252503cfd3db78ab498aa1f3`:**
+- Docker Sandbox — **success**: [run 44365168880](https://github.com/Xero-29/CYBER_AI/actions/runs/44365168880). La verificación completa ejecutó **675 pruebas, 1 omitida**, y completó la validación Ruff dentro del sandbox.
+- Python Tests — run [44365168554](https://github.com/Xero-29/CYBER_AI/actions/runs/44365168554) permanece pendiente. Un run anterior de Python, [44364370702](https://github.com/Xero-29/CYBER_AI/actions/runs/44364370702), sigue marcado `in_progress` desde las 17:57:38 UTC sin pasos/logs publicados; por eso no declaro CI global verde ni Windows smoke validado en este HEAD.
 
-**PR #11:** continúa abierto en draft, sin duplicarlo: [PR #11](https://github.com/Xero-29/CYBER_AI/pull/11). Su HEAD `04c001a206cde98613cf9c151ce4f6a95fb86a21` pasó Python Tests ([run 44359934767](https://github.com/Xero-29/CYBER_AI/actions/runs/44359934767)) y Docker Sandbox ([run 44359934228](https://github.com/Xero-29/CYBER_AI/actions/runs/44359934228)).
+**Evidencia anterior, no sustituye al HEAD actual:** en `160c1cdf3878dd2a3ce971a61b35d36d2e0a37ac`, Python Tests pasó 663 pruebas, 2 omitidas y Windows allowlist smoke; Docker Sandbox también pasó ([Python 44362869276](https://github.com/Xero-29/CYBER_AI/actions/runs/44362869276), [Docker 44362869543](https://github.com/Xero-29/CYBER_AI/actions/runs/44362869543)).
+
+**PR #11:** sigue abierto en draft, sin duplicarlo: [PR #11](https://github.com/Xero-29/CYBER_AI/pull/11). Su HEAD `04c001a206cde98613cf9c151ce4f6a95fb86a21` pasó Python Tests ([run 44359934767](https://github.com/Xero-29/CYBER_AI/actions/runs/44359934767)) y Docker Sandbox ([run 44359934228](https://github.com/Xero-29/CYBER_AI/actions/runs/44359934228)).
 
 **PR #2:** cerrado y fusionado en `478c6ddc676221e4c07b8c5780f127bc5a9e749e`; no se duplicó.
 
 ## Próximas tareas de reconciliación
 
-1. Continuar revisión por archivo de los cambios restantes de la rama de auditoría, preservando agentes, simulación, atlas, currículos, módulos de conocimiento y runners que existen en main.
-2. Revisar en particular contratos de adaptadores/proveedores, integridad de evidencias, workflows y documentación cruzada para detectar código presente pero desconectado.
-3. Ejecutar una auditoría final de SBOM, locks, permisos y trazabilidad sobre el HEAD definitivo.
-4. No abrir un PR solapado mientras PR #11 siga cubriendo locks/SBOM; la rama de reconciliación es todavía un área de trabajo.
-5. Mantener como pendientes externos KMS/HSM, WORM/offsite, RBAC/IdP/MFA, simulacros restore/DR, microVM/egress/escape, proveedores reales y revisión experta de fuentes.
+1. Revisar los cambios restantes de la rama de auditoría por archivo y conservar las capacidades nuevas de main (agentes, simulación, atlas, currículos, módulos de conocimiento y runners).
+2. Revisar contratos de adaptadores/proveedores, integridad de evidencias y documentación cruzada para detectar componentes desconectados.
+3. Resolver el run Python de GitHub Actions que permanece `in_progress`; validar Windows allowlist smoke sobre el HEAD definitivo.
+4. Repetir Python, Docker, SBOM y locks sobre el HEAD final.
+5. No abrir un PR solapado mientras PR #11 siga cubriendo locks/SBOM.
+6. Mantener como pendientes externos KMS/HSM, WORM/offsite, RBAC/IdP/MFA, simulacros restore/DR, microVM/egress/escape, proveedores reales y revisión experta de fuentes.
 
-**Estado:** CI Python y Docker están verdes en el HEAD indicado. La reconciliación técnica continúa; esto no es una autorización de integración ni una declaración de preparación de producción.
+**Estado:** Docker está verde en el HEAD indicado. La validación Python/Windows de ese mismo HEAD sigue pendiente; la reconciliación técnica continúa y no se autoriza integración ni se declara preparación de producción.
 
 
 ---
