@@ -222,10 +222,11 @@ def _run_local_tool_with_home(
     # Never expose the caller's home/configuration tree or ambient secrets
     # to a host tool. The executable itself is absolute; child lookups are
     # limited to its installation directory and the platform default PATH.
-    safe_path = os.pathsep.join(dict.fromkeys([
-        str(Path(binary).parent),
-        *os.defpath.split(os.pathsep),
-    ]))
+    safe_path_entries = [str(Path(binary).parent)]
+    safe_path_entries.extend(
+        entry for entry in os.defpath.split(os.pathsep) if entry
+    )
+    safe_path = os.pathsep.join(dict.fromkeys(safe_path_entries))
     env = {
         "PATH": safe_path,
         "HOME": isolated_home,
