@@ -137,6 +137,7 @@ class ExecutionLedger:
                     ) from error
 
     def connect(self, *, configure_wal=False):
+        self._secure_storage_path()
         db = sqlite3.connect(str(self.path), timeout=30, isolation_level=None)
         db.row_factory = sqlite3.Row
         db.execute("PRAGMA busy_timeout=30000")
