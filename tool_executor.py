@@ -78,8 +78,16 @@ def main(argv=None):
     )
     parser.add_argument("--timeout", type=int)
     parser.add_argument("--execute", action="store_true", help="Confirma la ejecución local")
-    parser.add_argument("--require-ledger", action="store_true",
-                        help="Bloquea la ejecución si no puede registrar inicio y resultado")
+    ledger_group = parser.add_mutually_exclusive_group()
+    ledger_group.add_argument(
+        "--require-ledger", dest="require_ledger", action="store_true",
+        help="Bloquea la ejecución si no puede registrar inicio y resultado",
+    )
+    ledger_group.add_argument(
+        "--allow-unlogged-execution", dest="require_ledger", action="store_false",
+        help="Permite explícitamente ejecutar sin registrar el ledger",
+    )
+    parser.set_defaults(require_ledger=True)
     args = parser.parse_args(argv)
 
     if not args.execute:
