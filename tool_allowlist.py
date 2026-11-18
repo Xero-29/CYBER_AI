@@ -51,18 +51,29 @@ def load_signed_tool_allowlist(path, key):
     if not isinstance(key, bytes) or len(key) < 32:
         raise ToolAllowlistError("La clave HMAC debe tener al menos 32 bytes.")
     candidate = Path(path)
-    if candidate.is_symlink():
-        raise ToolAllowlistError("La allowlist no puede ser un enlace simbólico.")
-    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+    reparse_flag = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
     descriptor = None
     try:
+        path_info = candidate.lstat()
+        if (
+            stat.S_ISLNK(path_info.st_mode)
+            or getattr(path_info, "st_file_attributes", 0) & reparse_flag
+        ):
+            raise ToolAllowlistError("La allowlist no puede ser un enlace o punto de reanálisis.")
+        flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
         descriptor = os.open(candidate, flags)
         info = os.fstat(descriptor)
-        if not stat.S_ISREG(info.st_mode) or info.st_size > 65536:
-            raise ToolAllowlistError("La allowlist debe ser un archivo regular de hasta 64 KiB.")
-        reparse_flag = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
-        if getattr(info, "st_file_attributes", 0) & reparse_flag:
-            raise ToolAllowlistError("La allowlist no puede ser un punto de reanálisis de Windows.")
+        path_after = candidate.lstat()
+        if (
+            not stat.S_ISREG(info.st_mode)
+            or info.st_size > 65536
+            or stat.S_ISLNK(path_after.st_mode)
+            or getattr(path_after, "st_file_attributes", 0) & reparse_flag
+            or (info.st_dev, info.st_ino) != (path_after.st_dev, path_after.st_ino)
+        ):
+            raise ToolAllowlistError(
+                "La allowlist debe ser un archivo regular estable de hasta 64 KiB."
+            )
         chunks = []
         total = 0
         while True:
