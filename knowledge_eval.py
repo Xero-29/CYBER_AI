@@ -122,6 +122,7 @@ def _normalize_cases(cases):
         raise ValueError("El dataset supera 5000 casos.")
     normalized = []
     seen_ids = set()
+    total_bytes = 0
     for index, item in enumerate(cases, 1):
         if not isinstance(item, dict) or set(item) != {
             "id", "query", "relevant_categories"
@@ -145,12 +146,25 @@ def _normalize_cases(cases):
             or len({value.strip() for value in expected}) != len(expected)
         ):
             raise ValueError(f"relevant_categories inválida en caso {index}.")
-        seen_ids.add(normalized_id)
-        normalized.append({
+        normalized_case = {
             "id": normalized_id,
             "query": query.strip(),
             "relevant_categories": [value.strip() for value in expected],
-        })
+        }
+        try:
+            encoded_case = json.dumps(
+                normalized_case, ensure_ascii=False, separators=(",", ":")
+            ).encode("utf-8")
+        except UnicodeEncodeError as error:
+            raise ValueError(f"El caso {index} contiene Unicode inválido.") from error
+        line_bytes = len(encoded_case) + 1
+        if line_bytes > MAX_LINE_BYTES:
+            raise ValueError(f"Caso {index} supera 64 KiB.")
+        total_bytes += line_bytes
+        if total_bytes > MAX_DATASET_BYTES:
+            raise ValueError("El dataset supera 2 MiB.")
+        seen_ids.add(normalized_id)
+        normalized.append(normalized_case)
     return normalized
 
 
