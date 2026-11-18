@@ -35,8 +35,13 @@ def build_docker_command(tool_id, target, evidence_dir, image=DEFAULT_IMAGE, tim
         raise ToolExecutionError("La ruta de evidencias contiene caracteres no permitidos para Docker --mount.")
     if evidence.is_symlink():
         raise ToolExecutionError("La carpeta de evidencias no puede ser un enlace simbólico.")
-    evidence.mkdir(parents=True, exist_ok=True)
+    evidence.mkdir(parents=True, exist_ok=True, mode=0o700)
     evidence = evidence.resolve(strict=True)
+    if os.name == "posix":
+        try:
+            os.chmod(evidence, 0o700)
+        except OSError as error:
+            raise ToolExecutionError("No se pudieron restringir los permisos del directorio de evidencias.") from error
     try:
         evidence.relative_to(PROJECT_ROOT.resolve())
     except ValueError:
