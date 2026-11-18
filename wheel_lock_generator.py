@@ -9,6 +9,7 @@ import sys
 import zipfile
 from email.parser import Parser
 from pathlib import Path
+from safe_io import atomic_write_text
 
 
 MAX_WHEEL_METADATA_BYTES = 2 * 1024 * 1024
@@ -209,7 +210,7 @@ def main(argv=None):
     try:
         lock = build_lock(args.wheelhouse, args.requirements)
         if args.output:
-            Path(args.output).write_text(lock, encoding="utf-8")
+            atomic_write_text(args.output, lock)
         else:
             sys.stdout.write(lock)
     except (OSError, WheelLockError) as error:
