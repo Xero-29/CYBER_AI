@@ -54,8 +54,16 @@ def main():
         "--authorization-id",
         help="ID de una autorización local vigente y limitada al destino",
     )
-    parser.add_argument("--require-ledger", action="store_true",
-                        help="No inicia el escaneo si el ledger no registra inicio y resultado")
+    ledger_policy = parser.add_mutually_exclusive_group()
+    ledger_policy.add_argument(
+        "--require-ledger", dest="require_ledger", action="store_true",
+        help="Exige ledger para el escaneo (predeterminado).",
+    )
+    ledger_policy.add_argument(
+        "--allow-unlogged-execution", dest="require_ledger", action="store_false",
+        help="Permite explícitamente escanear sin ledger; no recomendado.",
+    )
+    parser.set_defaults(require_ledger=True)
     args = parser.parse_args()
 
     parsed = urlparse(args.target)
