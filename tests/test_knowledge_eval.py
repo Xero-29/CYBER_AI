@@ -24,6 +24,16 @@ class KnowledgeEvaluationTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "query inválida"):
                 knowledge_eval.load_dataset(path)
 
+    def test_load_dataset_rejects_unpaired_unicode_escapes(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "cases.jsonl"
+            path.write_text(json.dumps({
+                "id": "case", "query": "\ud800",
+                "relevant_categories": ["api"],
+            }) + "\\n", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "Unicode inválido"):
+                knowledge_eval.load_dataset(path)
+
     def test_rejects_duplicate_case_ids(self):
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp) / "cases.jsonl"
