@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - codex/security-integrity-audit
+      - codex/reconcile-security-integrity-2026-11-18
   pull_request:
     branches:
       - main
