@@ -9,6 +9,7 @@ from unittest.mock import patch
 from tool_execution_profiles import (
     ProfileConfigError, get_custom_tools, load_active_profile,
 )
+import custom_tool_runner
 from custom_tool_runner import run_custom_tool
 from tool_allowlist import sign_tool_allowlist
 
@@ -84,12 +85,29 @@ class ToolExecutionProfileTests(unittest.TestCase):
                 "argv": ["-c", "print('custom-ok')", "{target}"],
                 "timeout_seconds": 10,
             }
+            real_popen = custom_tool_runner.subprocess.Popen
+            launched = []
+            captured_env = {}
+
+            def record_process(*args, **kwargs):
+                captured_env.update(kwargs["env"])
+                process = real_popen(*args, **kwargs)
+                launched.append(process)
+                return process
+
             with patch.dict(os.environ, {
                 "CYBER_AI_TOOL_ALLOWLIST_PATH": str(allowlist_path),
                 "CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY": key,
                 "CYBER_AI_TOOL_ALLOWLIST_REQUIRED": "1",
-            }, clear=False):
+                "AWS_SECRET_ACCESS_KEY": "must-not-be-inherited",
+            }, clear=False), patch.object(
+                custom_tool_runner.subprocess, "Popen", side_effect=record_process
+            ):
                 evidence = run_custom_tool(spec, str(target), allow_external=True)
+            self.assertNotIn("AWS_SECRET_ACCESS_KEY", captured_env)
+            self.assertNotEqual(captured_env["HOME"], os.environ.get("HOME"))
+            self.assertTrue(launched[0].stdout.closed)
+            self.assertTrue(launched[0].stderr.closed)
             self.assertEqual(evidence["status"], "completed")
             self.assertEqual(evidence["return_code"], 0)
             self.assertIn("custom-ok", evidence["stdout"])
