@@ -71,5 +71,16 @@ class AgentRunnerLedgerGuardTests(unittest.TestCase):
         self.assertEqual(ledger.appended, [])
 
 
+
+    def test_agent_ledger_is_required_by_default_with_explicit_override(self):
+        self.assertTrue(agent_runner._ledger_required({}))
+        self.assertFalse(agent_runner._ledger_required({
+            "CYBER_AI_ALLOW_UNLOGGED_EXECUTION": "1"
+        }))
+        self.assertTrue(agent_runner._ledger_required({
+            "CYBER_AI_ALLOW_UNLOGGED_EXECUTION": "1",
+            "CYBER_AI_LEDGER_REQUIRED": "1",
+        }))
+
 if __name__ == "__main__":
     unittest.main()
