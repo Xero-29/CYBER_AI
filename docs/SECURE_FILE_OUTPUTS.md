@@ -18,7 +18,7 @@ La función:
 - usa permisos restrictivos `0600` en POSIX;
 - permite crear directorios padre solo cuando el llamador lo solicita expresamente.
 
-Las pruebas `tests/test_safe_io.py` cubren escritura/reemplazo, destino symlink, padre symlink, creación explícita de directorios y destinos no regulares.
+Las pruebas `tests/test_safe_io.py` cubren escritura/reemplazo, destino symlink, padre symlink, creación explícita de directorios y destinos no regulares; `tests/test_sbom_generator.py`, `tests/test_wheel_lock_generator.py` y `tests/test_knowledge_eval.py` comprueban la integración y el rechazo de salidas enlazadas.
 
 ## Límites
 
