@@ -18,6 +18,8 @@ DEFAULT_DATA = PROJECT / "data"
 LOCK_SUFFIXES = {".lock", ".pid", ".sock", "-wal", "-shm"}
 SCHEMA = "cyber-ai-data-backup-v1"
 MAX_BACKUP_FILES = 50_000
+MAX_BACKUP_FILE_BYTES = 10 * 1024 * 1024 * 1024
+MAX_BACKUP_TOTAL_BYTES = 50 * 1024 * 1024 * 1024
 MAX_MANIFEST_BYTES = 16 * 1024 * 1024
 
 
@@ -82,6 +84,7 @@ def _validate_manifest(snapshot, manifest, *, require_signature=False):
     seen = set()
     expected = {"manifest.json"}
     verified = []
+    total_bytes = 0
     for item in files:
         if not isinstance(item, dict):
             raise BackupError("Entrada de manifiesto inválida.")
@@ -94,8 +97,12 @@ def _validate_manifest(snapshot, manifest, *, require_signature=False):
             isinstance(item.get("size"), bool)
             or not isinstance(item.get("size"), int)
             or item["size"] < 0
+            or item["size"] > MAX_BACKUP_FILE_BYTES
         ):
-            raise BackupError(f"Tamaño inválido en manifiesto: {key}")
+            raise BackupError(f"Tamaño inválido o superior al límite por archivo: {key}")
+        total_bytes += item["size"]
+        if total_bytes > MAX_BACKUP_TOTAL_BYTES:
+            raise BackupError("El backup supera el límite total de 50 GiB.")
         digest = item.get("sha256")
         if (
             not isinstance(digest, str) or len(digest) != 64
@@ -193,6 +200,7 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None):
     staging = destination.parent / f".{destination.name}.tmp-{uuid.uuid4().hex}"
     staging.mkdir(mode=0o700)
     entries = []
+    total_bytes = 0
     try:
         for current, dirs, files in os.walk(data_dir, followlinks=False):
             current_path = Path(current)
@@ -208,6 +216,11 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None):
                     continue
                 if len(entries) >= MAX_BACKUP_FILES:
                     raise BackupError("El directorio de datos supera el límite de archivos del backup.")
+                source_size = source.stat().st_size
+                if source_size > MAX_BACKUP_FILE_BYTES:
+                    raise BackupError("Un archivo supera el límite de 10 GiB.")
+                if total_bytes + source_size > MAX_BACKUP_TOTAL_BYTES:
+                    raise BackupError("El backup supera el límite total de 50 GiB.")
                 relative = source.relative_to(data_dir).as_posix()
                 if relative == "manifest.json":
                     raise BackupError("data/manifest.json está reservado para el manifiesto del backup.")
@@ -223,8 +236,14 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None):
                     os.chmod(target, 0o600)
                 except OSError:
                     pass
+                target_size = target.stat().st_size
+                if target_size > MAX_BACKUP_FILE_BYTES:
+                    raise BackupError("Un archivo supera el límite de 10 GiB tras copiarse.")
+                total_bytes += target_size
+                if total_bytes > MAX_BACKUP_TOTAL_BYTES:
+                    raise BackupError("El backup supera el límite total de 50 GiB.")
                 entries.append({
-                    "path": relative, "kind": kind, "size": target.stat().st_size,
+                    "path": relative, "kind": kind, "size": target_size,
                     "sha256": _sha256(target),
                 })
         manifest = {
