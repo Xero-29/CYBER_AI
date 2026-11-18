@@ -1050,7 +1050,7 @@ def run_agent(*args, **kwargs):
     try:
         return _run_agent_impl(*args, **kwargs)
     except Exception as execution_error:
-        ledger_required = os.environ.get("CYBER_AI_LEDGER_REQUIRED") == "1"
+        ledger_required = _ledger_required()
         try:
             config = load_config()
             resolved_name, agent = resolve_agent(agent_name, config)
