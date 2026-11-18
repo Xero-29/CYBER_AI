@@ -1,3 +1,5 @@
+import os
+import stat
 import subprocess
 import tempfile
 import unittest
@@ -46,6 +48,20 @@ class SandboxRunnerTests(unittest.TestCase):
         self.assertIn("--require-ledger", command)
         self.assertNotIn("--privileged", command)
         self.assertNotIn("/var/run/docker.sock", joined)
+
+    def test_evidence_mount_is_created_with_private_permissions(self):
+        evidence = self.root.parent / (self.root.name + "-private-evidence")
+        sandbox_runner.build_docker_command("ruff", "sample.py", evidence)
+        if os.name == "posix":
+            self.assertEqual(stat.S_IMODE(evidence.stat().st_mode), 0o700)
+
+    @unittest.skipIf(os.name == "nt", "Los bits POSIX no representan ACL de Windows.")
+    def test_existing_public_evidence_mount_is_rejected(self):
+        evidence = self.root.parent / (self.root.name + "-public-evidence")
+        evidence.mkdir(mode=0o755)
+        evidence.chmod(0o755)
+        with self.assertRaisesRegex(ToolExecutionError, "privada"):
+            sandbox_runner.build_docker_command("ruff", "sample.py", evidence)
 
     def test_only_tools_bundled_in_image_are_allowed(self):
         self.assertEqual(SANDBOX_TOOLS, frozenset({"ruff", "bandit"}))
