@@ -462,5 +462,38 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Endpoint de proveedor"):
             llm_providers.request(provider, "api/shell", {})
 
+
+    def test_plugin_chat_rejects_non_string_thinking(self):
+        class Plugin:
+            def request(self, provider, endpoint, payload, timeout):
+                return {"message": {"content": "ok", "thinking": 123}}
+            def capabilities(self, provider):
+                return ["chat"]
+
+        with patch.object(llm_providers, "_load_provider_plugin", return_value=Plugin()):
+            with self.assertRaisesRegex(RuntimeError, "contrato de chat"):
+                llm_providers.request(
+                    {"name": "custom", "protocol": "custom"},
+                    "api/chat",
+                    {"model": "test"},
+                )
+
+    def test_plugin_model_catalog_requires_named_models(self):
+        class Plugin:
+            def request(self, provider, endpoint, payload, timeout):
+                return {"models": [{"name": None}]}
+            def capabilities(self, provider):
+                return ["model_listing"]
+            def installed_models(self, provider):
+                return set()
+
+        with patch.object(llm_providers, "_load_provider_plugin", return_value=Plugin()):
+            with self.assertRaisesRegex(RuntimeError, "contrato de catálogo"):
+                llm_providers.request(
+                    {"name": "custom", "protocol": "custom"},
+                    "api/ps",
+                    {},
+                )
+
 if __name__ == "__main__":
     unittest.main()
