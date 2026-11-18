@@ -371,6 +371,7 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
     def test_provider_request_payload_is_bounded_before_transport(self):
         provider = {"name": "custom", "protocol": "custom"}
         plugin = unittest.mock.Mock()
+        plugin.capabilities.return_value = ["chat"]
         with patch.object(llm_providers, "_load_provider_plugin", return_value=plugin):
             with self.assertRaisesRegex(ValueError, "supera 8 MiB"):
                 llm_providers.request(
