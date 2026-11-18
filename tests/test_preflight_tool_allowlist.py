@@ -54,6 +54,15 @@ class PreflightToolAllowlistTests(unittest.TestCase):
         self.assertNotIn(key, check["detail"])
         self.assertIn("1 ejecutables", check["detail"])
 
+    def test_preflight_warns_when_unlogged_execution_override_is_active(self):
+        with tempfile.TemporaryDirectory() as temp:
+            report = self.collect(
+                Path(temp), {"CYBER_AI_ALLOW_UNLOGGED_EXECUTION": "1"}
+            )
+        check = next(item for item in report["checks"] if item["name"] == "ledger_policy")
+        self.assertEqual(check["status"], "warning")
+        self.assertIn("sin ledger", check["detail"])
+
     def test_partial_allowlist_configuration_is_an_error(self):
         with tempfile.TemporaryDirectory() as temp:
             report = self.collect(
