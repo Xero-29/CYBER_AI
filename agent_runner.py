@@ -16,6 +16,14 @@ from urllib.error import HTTPError, URLError
 
 from model_memory_manager import load_config, resolve_agent, record
 from execution_ledger import ExecutionLedger
+
+
+def _ledger_required(environ=None):
+    environ = os.environ if environ is None else environ
+    allow_unlogged = str(
+        environ.get("CYBER_AI_ALLOW_UNLOGGED_EXECUTION", "")
+    ).strip().lower() in {"1", "true", "yes"}
+    return not allow_unlogged or environ.get("CYBER_AI_LEDGER_REQUIRED") == "1"
 from learning_memory import build_memory_context
 from skillbook import build_skill_context
 from llm_providers import (
@@ -502,7 +510,7 @@ def _run_agent_impl(
 
     memory_config = agent.get("memory") or {}
     ledger_namespace = str(memory_config.get("namespace") or name)
-    ledger_required = os.environ.get("CYBER_AI_LEDGER_REQUIRED") == "1"
+    ledger_required = _ledger_required()
     ledger_start_event = None
     try:
         ledger_start_event = ExecutionLedger().append(
