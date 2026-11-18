@@ -2,9 +2,9 @@
 
 **Repositorio:** `Xero-29/CYBER_AI`  
 **Rama auditada:** `codex/security-integrity-audit`  
-**HEAD de código y documentación verificado:** `a4d548004b63cdd2fddb4e437f8102a533f422ce`  
+**HEAD de código probado antes de esta actualización documental:** `a4d548004b63cdd2fddb4e437f8102a533f422ce`  
 **main inspeccionada:** `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`  
-**Divergencia de este HEAD:** `diverged`, rama auditada **110 commits adelante y 573 detrás**. Merge-base: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.
+**Divergencia observada en ese HEAD:** `diverged`, rama auditada **110 commits adelante y 573 detrás**. Merge-base: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.
 
 ## Ramas, commits y PRs
 
@@ -15,6 +15,7 @@
   - Los cinco errores son los tests de `dependency_artifact_manifest`: el fixture crea `requirements.txt` con `requests==2.0` sin hash y el parser de lock exige SHA-256. El job Windows de allowlist terminó correctamente. No se modificó esa rama ni se duplicó el PR.
 - **PR #1 y PR #3–#10:** siguen abiertos; las actualizaciones de Dependabot requieren revisión individual.
 - El commit histórico `7b5ed033f1f6461b5780a10ac4ada67a444b93e5` es ancestro común de `main` y de la rama auditada; ya no es exclusivo de `main`. Existe una rama de respaldo de `main`.
+- Desde el merge-base, el diff de `main` contiene 291 rutas y el de auditoría 49. `main` incorpora currículos y módulos profundos de conocimiento, fuentes de adquisición y ejecutores nuevos (`agent_simulation.py`, `custom_tool_runner.py`, `isolated_tool_runner.py`), y elimina archivos antiguos (`agent_core.py`, `agent_benchmark.py`, `audit_target.py`). La integración debe preservar estos cambios y revisar especialmente los archivos compartidos; no es una actualización lineal.
 - No se hizo merge, rebase, force-push ni modificación de `main`. La divergencia de 573 commits requiere reconciliación en una rama separada y revisión por archivo; no es seguro actualizar esta rama directamente.
 
 ## CI del HEAD exacto
