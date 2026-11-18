@@ -3,9 +3,9 @@
 **Repositorio:** `Xero-29/CYBER_AI`  
 **Rama auditada:** `codex/security-integrity-audit`  
 **Último HEAD con cambios de código y CI verde:** `6d5d8e2ca9afd8e06388f2799147898f318da82b`  
-**Commits documentales posteriores:** `ce9467d010103ac7e85f4f345322f9b87f318fad`, `6f1b6b8f95b6ab222ab8856c87e91fbd776fcc54`  
+**Commits documentales posteriores:** `ce9467d010103ac7e85f4f345322f9b87f318fad`, `6f1b6b8f95b6ab222ab8856c87e91fbd776fcc54`, `bcbc20fbabac8bfa6f1b87e11091cd3c93ca3506`  
 **main inspeccionada:** `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`  
-**Comparación actual:** divergente; la rama auditada está **55 commits adelante y 573 detrás**. Merge-base: `cae816d6037b56f017c2fbdb3e98ef00df58c1d`.
+**Comparación actual:** divergente; la rama auditada está **69 commits adelante y 573 detrás**. Merge-base: `cae816d6037b56f017c2fbdb3e98ef00df58c1d`.
 
 ## Ramas, commits y PRs
 
