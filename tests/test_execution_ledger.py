@@ -3,6 +3,7 @@ import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor
 import sqlite3
+import stat
 import tempfile
 import unittest
 from pathlib import Path
@@ -139,6 +140,44 @@ class ExecutionLedgerTests(unittest.TestCase):
             ledger.append(namespace="test", task="env path", status="completed",
                           tool="unit-test", evidence={"ok": True}, duration_ms=1)
         self.assertTrue(configured.is_file())
+
+    @unittest.skipIf(os.name == "nt", "Los bits POSIX no representan ACL de Windows.")
+    def test_ledger_storage_is_created_with_private_permissions(self):
+        path = Path(self.tmp.name) / "private" / "ledger.sqlite3"
+        ExecutionLedger(path)
+        self.assertEqual(stat.S_IMODE(path.parent.stat().st_mode), 0o700)
+        self.assertEqual(stat.S_IMODE(path.stat().st_mode), 0o600)
+
+    @unittest.skipIf(os.name == "nt", "La validación de permisos POSIX no aplica en Windows.")
+    def test_ledger_rejects_group_or_world_accessible_parent(self):
+        parent = Path(self.tmp.name) / "public"
+        parent.mkdir(mode=0o755)
+        parent.chmod(0o755)
+        with self.assertRaisesRegex(LedgerError, "privado"):
+            ExecutionLedger(parent / "ledger.sqlite3")
+
+    def test_ledger_rejects_symlinked_database_and_parent(self):
+        target = Path(self.tmp.name) / "target.sqlite3"
+        target.write_bytes(b"")
+        database_link = Path(self.tmp.name) / "database-link.sqlite3"
+        database_link.symlink_to(target)
+        with self.assertRaisesRegex(LedgerError, "symlinks"):
+            ExecutionLedger(database_link)
+
+        real_parent = Path(self.tmp.name) / "real-parent"
+        real_parent.mkdir(mode=0o700)
+        parent_link = Path(self.tmp.name) / "parent-link"
+        parent_link.symlink_to(real_parent, target_is_directory=True)
+        with self.assertRaisesRegex(LedgerError, "symlinks"):
+            ExecutionLedger(parent_link / "ledger.sqlite3")
+
+    def test_ledger_rejects_symlinked_wal_companion(self):
+        path = Path(self.tmp.name) / "ledger.sqlite3"
+        target = Path(self.tmp.name) / "external-wal"
+        target.write_bytes(b"")
+        Path(f"{path}-wal").symlink_to(target)
+        with self.assertRaisesRegex(LedgerError, "archivos auxiliares"):
+            ExecutionLedger(path)
 
     def test_namespace_isolation(self):
         self.append(namespace="alpha")
