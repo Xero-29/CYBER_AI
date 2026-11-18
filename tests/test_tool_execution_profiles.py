@@ -135,7 +135,7 @@ class ToolExecutionProfileTests(unittest.TestCase):
                 side_effect=ToolAllowlistError("not approved"),
             ), patch.object(custom_tool_runner.subprocess, "Popen") as process:
                 with self.assertRaisesRegex(ToolExecutionError, "allowlist firmada"):
-                    run_custom_tool(spec, str(target))
+                    run_custom_tool(spec, str(target), allow_external=True)
             process.assert_not_called()
 
 if __name__ == "__main__":
