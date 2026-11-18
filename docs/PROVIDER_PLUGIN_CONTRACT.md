@@ -52,6 +52,15 @@ Ejemplo conceptual en `config/model_roles.json`:
 
 Asigna `provider: "custom"` al agente que deba usarlo o configura `capability_providers` para seleccionar este proveedor por capacidad. `fallback_providers` acepta una lista explícita de alternativas por capacidad. Los proveedores remotos deben usar HTTPS. Las credenciales se leen desde variables de entorno; nunca las guardes en configuración versionada, Skills, memoria ni reportes.
 
+
+## Límites de transporte y datos
+
+- Las solicitudes JSON están limitadas a 8 MiB antes de invocar el transporte o el plugin.
+- Las respuestas JSON de transporte y plugins están limitadas a 16 MiB; los errores HTTP leen como máximo 2 KiB del cuerpo.
+- El timeout debe ser finito, mayor que cero y no superar 600 segundos.
+- Los contadores de uso y los vectores deben contener números finitos; las dimensiones de embeddings deben ser consistentes y el número de vectores debe coincidir con el número de entradas.
+- `api_key_env` debe ser un nombre válido de variable de entorno. El secreto no se serializa en payloads, logs ni reportes.
+
 ## Reglas de interoperabilidad
 
 1. Chat y embeddings son capacidades distintas. Una API de chat no sirve automáticamente para embeddings.
