@@ -11,6 +11,8 @@ execution_ledger.py adds a transactional SQLite event log for observed task runs
 - Hash chaining detects modified, missing, reordered or broken-chain rows.
 - SQLite triggers block ordinary UPDATE/DELETE operations.
 - Secret-like metadata keys are redacted before persistence.
+- The database path and DB/WAL/SHM companions are revalidated against symlinks and non-regular files before each connection; POSIX requires a private parent directory and restricts database files to `0600`.
+- SQLite integer fields are bounded to the signed 64-bit range before insertion; unrepresentable recovery thresholds fail closed.
 - History queries are namespace-scoped.
 
 ## Signed external checkpoints
