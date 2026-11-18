@@ -8,6 +8,7 @@ import sys
 import zipfile
 from email.parser import Parser
 from pathlib import Path
+from safe_io import atomic_write_text
 
 from sbom_generator import _project_file, _read_requirements
 
