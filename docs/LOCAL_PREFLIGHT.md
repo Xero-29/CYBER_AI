@@ -14,6 +14,19 @@ python preflight.py --json
 
 Una salida `ready` significa que el entorno supera las comprobaciones locales básicas. No significa que proveedores externos, modelos, Docker, escáneres o el sistema completo hayan sido probados en esa máquina.
 
+
+## Allowlist de ejecutables y política del ledger
+
+El preflight valida la allowlist HMAC de ejecutables cuando se configura. Define conjuntamente:
+
+- `CYBER_AI_TOOL_ALLOWLIST_PATH`: ruta al manifiesto firmado.
+- `CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY`: clave HMAC de al menos 32 bytes, entregada desde un gestor de secretos.
+- `CYBER_AI_TOOL_ALLOWLIST_REQUIRED=1`: convierte la ausencia de allowlist en error bloqueante. Sin este requisito, la ausencia se informa como advertencia de compatibilidad.
+
+Una configuración parcial o una firma inválida bloquea el preflight. La clave nunca se imprime en el informe.
+
+El ledger es obligatorio por defecto en agentes, ejecutor de herramientas y task runner. El preflight emite una advertencia si se activa explícitamente `CYBER_AI_ALLOW_UNLOGGED_EXECUTION=1`; los CLI permiten la excepción solo con `--allow-unlogged-execution`. No uses estas excepciones en despliegues operativos.
+
 ## Lock de dependencias
 
 La instalación principal usa `pip --require-hashes` y hashes SHA-256 fijados para wheels verificados por CI. El lock actual soporta CPython 3.12.x, Linux x86_64 y glibc >= 2.26. `setup.sh` rechaza otras plataformas para evitar una instalación sin hashes compatibles. Para ampliar plataformas se deben incorporar hashes verificados de sus wheels y añadir pruebas CI específicas; no se deben reutilizar hashes de otra arquitectura.
