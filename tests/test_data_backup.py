@@ -40,6 +40,28 @@ class DataBackupTests(unittest.TestCase):
         self.assertEqual((self.data / "events.jsonl").read_text(encoding="utf-8"), '{"event":"test"}\n')
         self.assertTrue(Path(restored["previous_data_preserved_at"]).is_dir())
 
+    def test_rejects_oversized_manifest_before_json_parsing(self):
+        snapshot = self.root / "backup"
+        create_backup(self.data, snapshot)
+        manifest_path = snapshot / "manifest.json"
+        with patch("data_backup.MAX_MANIFEST_BYTES", 32):
+            manifest_path.write_bytes(b" " * 33)
+            with self.assertRaisesRegex(BackupError, "16 MiB"):
+                verify_backup(snapshot)
+
+    def test_backup_and_verifier_enforce_file_count_limit(self):
+        snapshot = self.root / "backup"
+        with patch("data_backup.MAX_BACKUP_FILES", 1):
+            with self.assertRaisesRegex(BackupError, "límite de archivos"):
+                create_backup(self.data, snapshot)
+            self.assertFalse(snapshot.exists())
+
+        snapshot = self.root / "valid-backup"
+        create_backup(self.data, snapshot)
+        with patch("data_backup.MAX_BACKUP_FILES", 1):
+            with self.assertRaisesRegex(BackupError, "límite de archivos"):
+                verify_backup(snapshot)
+
     def test_detects_modified_backup_file(self):
         snapshot = self.root / "backup"
         create_backup(self.data, snapshot)
