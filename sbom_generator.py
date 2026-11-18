@@ -7,7 +7,7 @@ import re
 import sys
 import uuid
 from pathlib import Path
-from safe_io import atomic_write_text
+from safe_io import SafeWriteError, atomic_write_text
 
 PROJECT = Path(__file__).resolve().parent
 PACKAGE_LINE = re.compile(r"^([A-Za-z0-9][A-Za-z0-9._-]*)==([A-Za-z0-9][A-Za-z0-9.!+_-]*)$")
@@ -257,7 +257,7 @@ def main(argv=None):
             print(f"SBOM CycloneDX generado: {args.output} ({len(document['components'])} componentes)")
         else:
             sys.stdout.write(rendered)
-    except (OSError, LockfileError) as error:
+    except (OSError, LockfileError, SafeWriteError) as error:
         print(f"ERROR: {error}", file=sys.stderr)
         return 2
     return 0
