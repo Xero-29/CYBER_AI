@@ -70,39 +70,6 @@ class ToolAdapterTests(unittest.TestCase):
     @patch("tool_adapters.subprocess.Popen")
     @patch("tool_adapters.shutil.which", return_value="/usr/bin/ruff")
     @patch("tool_adapters.subprocess.run")
-    def test_host_tool_uses_ephemeral_home_and_does_not_forward_secrets(
-        self, version_run, which, popen
-    ):
-        version_run.return_value = subprocess.CompletedProcess(
-            ["ruff", "--version"], 0, stdout="ruff 0.14.5\n", stderr=""
-        )
-        popen.return_value = FakeProcess()
-        provenance = {"resolved_path": "/usr/bin/ruff", "sha256": "a" * 64}
-        with (
-            patch.dict(os.environ, {
-                "HOME": "/home/private-user",
-                "AWS_SECRET_ACCESS_KEY": "must-not-be-forwarded",
-                "OPENAI_API_KEY": "must-not-be-forwarded",
-            }),
-            patch.object(tool_adapters, "_hash_binary", return_value=provenance),
-        ):
-            run_local_tool("ruff", "sample.py")
-
-        process_env = popen.call_args.kwargs["env"]
-        version_env = version_run.call_args.kwargs["env"]
-        self.assertNotEqual(process_env["HOME"], "/home/private-user")
-        self.assertEqual(process_env["HOME"], process_env["TMPDIR"])
-        self.assertEqual(process_env, version_env)
-        self.assertNotIn("AWS_SECRET_ACCESS_KEY", process_env)
-        self.assertNotIn("OPENAI_API_KEY", process_env)
-        self.assertNotIn("/home/private-user", process_env["PATH"])
-        self.assertIn("/usr/bin", process_env["PATH"])
-        self.assertTrue(all(process_env["PATH"].split(os.pathsep)))
-        self.assertFalse(Path(process_env["HOME"]).exists())
-
-    @patch("tool_adapters.subprocess.Popen")
-    @patch("tool_adapters.shutil.which", return_value="/usr/bin/ruff")
-    @patch("tool_adapters.subprocess.run")
     def test_binary_replacement_during_execution_invalidates_evidence(self, version_run, which, popen):
         version_run.return_value = subprocess.CompletedProcess(["ruff", "--version"], 0, stdout="ruff 0.14.5", stderr="")
         popen.return_value = FakeProcess()
@@ -249,19 +216,293 @@ class ToolAdapterTests(unittest.TestCase):
         self.assertEqual(command, ["/usr/bin/tshark", "-r", str(capture), "-T", "json"])
 
 
-    @patch("tool_adapters.shutil.which")
-    def test_yara_requires_isolation_before_host_execution(self, which):
-        with self.assertRaisesRegex(ToolExecutionError, "sandbox aislado"):
-            run_local_tool("yara", "sample.py", config_path="sample.py")
-        which.assert_not_called()
+    def test_yara_is_delegated_to_docker_isolation_runner(self):
+        with patch("isolated_tool_runner.run_isolated_tool", return_value={"status": "completed"}) as runner:
+            result = run_local_tool("yara", "sample.py", config_path="rules.yar")
+        self.assertEqual(result["status"], "completed")
+        runner.assert_called_once()
+        self.assertEqual(runner.call_args.args, ("yara", "sample.py"))
 
-    @patch("tool_adapters.shutil.which")
-    def test_tshark_requires_isolation_before_host_execution(self, which):
+    def test_tshark_is_delegated_to_docker_isolation_runner(self):
         capture = self.root / "sample.pcap"
         capture.write_bytes(b"pcap")
-        with self.assertRaisesRegex(ToolExecutionError, "sandbox aislado"):
-            run_local_tool("tshark", "sample.pcap")
-        which.assert_not_called()
+        with patch("isolated_tool_runner.run_isolated_tool", return_value={"status": "completed"}) as runner:
+            result = run_local_tool("tshark", "sample.pcap")
+        self.assertEqual(result["status"], "completed")
+        runner.assert_called_once()
+        self.assertEqual(runner.call_args.args, ("tshark", "sample.pcap"))
+
+    def test_osv_scanner_uses_offline_json_mode(self):
+        command = tool_adapters._build_command(
+            "osv_scanner", "/usr/bin/osv-scanner", self.root
+        )
+        self.assertEqual(
+            command,
+            [
+                "/usr/bin/osv-scanner", "--offline", "scan", "source",
+                "-r", str(self.root), "--format", "json",
+            ],
+        )
+        self.assertTrue(tool_adapters.TOOL_SPECS["osv_scanner"]["offline_only"])
+        self.assertTrue(tool_adapters.TOOL_SPECS["osv_scanner"]["local_database_required"])
+
+    def test_grype_uses_local_directory_json_mode(self):
+        command = tool_adapters._build_command(
+            "grype", "/usr/bin/grype", self.root
+        )
+        self.assertEqual(command, ["/usr/bin/grype", str(self.root), "-o", "json"])
+        self.assertTrue(tool_adapters.TOOL_SPECS["grype"]["local_database_required"])
+
+    def test_gitleaks_redacts_all_secret_values(self):
+        command = tool_adapters._build_command(
+            "gitleaks", "/usr/bin/gitleaks", self.root
+        )
+        self.assertIn("--redact=100", command)
+        self.assertIn("--report-format", command)
+        self.assertIn("json", command)
+        with self.assertRaisesRegex(ToolExecutionError, "directorio"):
+            tool_adapters._build_command(
+                "gitleaks", "/usr/bin/gitleaks", self.root / "sample.py"
+            )
+
+    def test_zeek_accepts_only_offline_capture_files(self):
+        capture = self.root / "trace.pcapng"
+        capture.write_bytes(b"pcap")
+        command = tool_adapters._build_command(
+            "zeek", "/usr/bin/zeek", capture
+        )
+        self.assertEqual(
+            command,
+            ["/usr/bin/zeek", "-r", str(capture), "LogAscii::use_json=T"],
+        )
+        with self.assertRaisesRegex(ToolExecutionError, "PCAP"):
+            tool_adapters._build_command(
+                "zeek", "/usr/bin/zeek", self.root / "sample.py"
+            )
+
+    def test_volatility_requires_allowlisted_plugin_and_offline_mode(self):
+        command = tool_adapters._build_command(
+            "volatility3", "/usr/bin/vol", self.root / "sample.py",
+            plugin="windows.info",
+        )
+        self.assertEqual(
+            command,
+            ["/usr/bin/vol", "--offline", "-f", str(self.root / "sample.py"), "windows.info"],
+        )
+        with self.assertRaisesRegex(ToolExecutionError, "allowlist"):
+            tool_adapters._build_command(
+                "volatility3", "/usr/bin/vol", self.root / "sample.py",
+                plugin="malicious.plugin",
+            )
+
+    @patch("tool_adapters.subprocess.Popen")
+    @patch("tool_adapters.shutil.which", return_value="/usr/bin/osv-scanner")
+    def test_osv_preflight_failure_blocks_before_process_start(self, which, popen):
+        provenance = {"resolved_path": "/usr/bin/osv-scanner", "sha256": "a" * 64}
+        with (
+            patch.object(tool_adapters, "_hash_binary", return_value=provenance),
+            patch.object(tool_adapters, "verify_tool_allowed", return_value={"allowed": True}),
+            patch.object(tool_adapters, "inspect_tool_database", return_value={
+                "tool": "osv_scanner", "status": "missing",
+            }),
+            self.assertRaisesRegex(ToolExecutionError, "no se inició el escaneo"),
+        ):
+            run_local_tool("osv_scanner", ".")
+        popen.assert_not_called()
+
+    @patch("tool_adapters.subprocess.Popen")
+    @patch("tool_adapters.shutil.which", return_value="/usr/bin/grype")
+    def test_grype_stale_database_blocks_before_process_start(self, which, popen):
+        provenance = {"resolved_path": "/usr/bin/grype", "sha256": "b" * 64}
+        with (
+            patch.object(tool_adapters, "_hash_binary", return_value=provenance),
+            patch.object(tool_adapters, "verify_tool_allowed", return_value={"allowed": True}),
+            patch.object(tool_adapters, "inspect_tool_database", return_value={
+                "tool": "grype", "status": "stale", "age_days": 20,
+            }),
+            self.assertRaisesRegex(ToolExecutionError, "no se inició el escaneo"),
+        ):
+            run_local_tool("grype", ".")
+        popen.assert_not_called()
+
+    @patch("tool_adapters.subprocess.Popen")
+    @patch("tool_adapters.shutil.which", return_value="/usr/bin/osv-scanner")
+    @patch("tool_adapters.subprocess.run")
+    def test_osv_execution_records_offline_configuration(self, version_run, which, popen):
+        version_run.return_value = subprocess.CompletedProcess(
+            ["osv-scanner", "--version"], 0, stdout="osv-scanner 2.0", stderr=""
+        )
+        process = FakeProcess(stdout=b'{"results":[]}')
+        popen.return_value = process
+        provenance = {"resolved_path": "/usr/bin/osv-scanner", "sha256": "a" * 64}
+        with (
+            patch.object(tool_adapters, "_hash_binary", return_value=provenance),
+            patch.object(tool_adapters, "verify_tool_allowed", return_value={"allowed": True}),
+            patch.object(tool_adapters, "inspect_tool_database", return_value={
+                "tool": "osv_scanner", "status": "present_structure_checked",
+                "archive_count": 1, "ecosystems": ["PyPI"],
+                "freshness": "unknown", "network_access": False,
+            }),
+        ):
+            evidence = run_local_tool("osv_scanner", ".")
+        self.assertEqual(evidence["status"], "completed")
+        self.assertTrue(evidence["tool_reported_success"])
+        self.assertEqual(evidence["network_access"], "disabled_by_tool_offline_mode")
+        self.assertFalse(evidence["network_isolation_enforced"])
+        self.assertIn("--offline", evidence["command"])
+        self.assertEqual(evidence["parsed_json"], {"results": []})
+        self.assertEqual(
+            evidence["database_preflight"]["status"], "present_structure_checked"
+        )
+
+    @patch("tool_adapters.subprocess.Popen")
+    @patch("tool_adapters.shutil.which", return_value="/usr/bin/gitleaks")
+    @patch("tool_adapters.subprocess.run")
+    def test_gitleaks_findings_exit_code_is_not_misreported_as_execution_failure(
+        self, version_run, which, popen
+    ):
+        version_run.return_value = subprocess.CompletedProcess(
+            ["gitleaks", "version"], 0, stdout="gitleaks 8.0", stderr=""
+        )
+        process = FakeProcess(stdout=b'[{"RuleID":"test"}]')
+        process.wait = Mock(return_value=1)
+        popen.return_value = process
+        provenance = {"resolved_path": "/usr/bin/gitleaks", "sha256": "b" * 64}
+        with (
+            patch.object(tool_adapters, "_hash_binary", return_value=provenance),
+            patch.object(tool_adapters, "verify_tool_allowed", return_value={"allowed": True}),
+        ):
+            evidence = run_local_tool("gitleaks", ".")
+        self.assertEqual(evidence["return_code"], 1)
+        self.assertTrue(evidence["tool_reported_success"])
+        self.assertTrue(evidence["findings_present"])
+
+    @patch("tool_adapters.subprocess.Popen")
+    @patch("tool_adapters.shutil.which", return_value="/usr/bin/zeek")
+    @patch("tool_adapters.subprocess.run")
+    def test_zeek_collects_json_logs_in_temporary_workspace(self, version_run, which, popen):
+        capture = self.root / "trace.pcap"
+        capture.write_bytes(b"pcap")
+        version_run.return_value = subprocess.CompletedProcess(
+            ["zeek", "--version"], 0, stdout="zeek 7.0", stderr=""
+        )
+        def start_process(command, **kwargs):
+            Path(kwargs["cwd"], "conn.log").write_text(
+                '{"id.orig_h":"192.0.2.1"}\n', encoding="utf-8"
+            )
+            return FakeProcess()
+        popen.side_effect = start_process
+        provenance = {"resolved_path": "/usr/bin/zeek", "sha256": "c" * 64}
+        with (
+            patch.object(tool_adapters, "_hash_binary", return_value=provenance),
+            patch.object(tool_adapters, "verify_tool_allowed", return_value={"allowed": True}),
+        ):
+            evidence = run_local_tool("zeek", "trace.pcap")
+        self.assertEqual(evidence["status"], "completed")
+        self.assertEqual(
+            evidence["parsed_json"]["logs"]["conn.log"][0]["id.orig_h"],
+            "192.0.2.1",
+        )
+
+    def test_nmap_requires_explicit_authorization_and_cidr_allowlist(self):
+        with patch.dict(os.environ, {"CYBER_AI_NMAP_ALLOWED_CIDRS": ""}):
+            with self.assertRaisesRegex(ToolExecutionError, "allowlist CIDR"):
+                run_local_tool("nmap", "192.0.2.10", allow_network=True)
+        with patch.dict(os.environ, {"CYBER_AI_NMAP_ALLOWED_CIDRS": "192.0.2.0/28"}):
+            with self.assertRaisesRegex(ToolExecutionError, "16 direcciones"):
+                run_local_tool("nmap", "192.0.2.0/24", allow_network=True)
+            with self.assertRaisesRegex(ToolExecutionError, "no está contenido"):
+                run_local_tool("nmap", "198.51.100.10", allow_network=True)
+        with self.assertRaisesRegex(ToolExecutionError, "authorized-network"):
+            run_local_tool("nmap", "192.0.2.10")
+
+    def test_nmap_command_is_limited_to_tcp_top_ports_without_scripts(self):
+        command = tool_adapters._build_nmap_command(
+            "/usr/bin/nmap", "192.0.2.10"
+        )
+        self.assertEqual(
+            command,
+            [
+                "/usr/bin/nmap", "-sT", "-Pn", "-n", "--top-ports", "100",
+                "--max-retries", "1", "--host-timeout", "60s",
+                "--max-rate", "25", "-oX", "-", "192.0.2.10",
+            ],
+        )
+        self.assertNotIn("-sV", command)
+        self.assertNotIn("--script", command)
+
+    @patch("tool_adapters.shutil.which", return_value="/usr/bin/nmap")
+    @patch("tool_adapters.subprocess.run")
+    def test_authorized_nmap_scan_returns_scope_and_xml_evidence(self, run, which):
+        xml = (
+            '<nmaprun><host><status state="up"/>'
+            '<address addr="192.0.2.10" addrtype="ipv4"/>'
+            '<ports><port protocol="tcp" portid="22">'
+            '<state state="open"/><service name="ssh"/></port></ports>'
+            '</host></nmaprun>'
+        )
+        run.side_effect = [
+            subprocess.CompletedProcess(
+                ["nmap", "--version"], 0, stdout="Nmap version 7.95", stderr=""
+            ),
+            subprocess.CompletedProcess(
+                ["nmap", "-sT"], 0, stdout=xml, stderr=""
+            ),
+        ]
+        provenance = {"resolved_path": "/usr/bin/nmap", "sha256": "d" * 64}
+        with (
+            patch.dict(os.environ, {"CYBER_AI_NMAP_ALLOWED_CIDRS": "192.0.2.0/28"}),
+            patch.object(tool_adapters, "_hash_binary", return_value=provenance),
+            patch.object(tool_adapters, "verify_tool_allowed", return_value={"allowed": True}),
+        ):
+            evidence = run_local_tool(
+                "nmap", "192.0.2.10", allow_network=True
+            )
+        self.assertEqual(evidence["status"], "completed")
+        self.assertTrue(evidence["scope_validated"])
+        self.assertEqual(evidence["authorization_scope"], "192.0.2.10/32")
+        self.assertFalse(evidence["network_isolation_enforced"])
+        self.assertTrue(evidence["tool_reported_success"])
+        self.assertTrue(evidence["findings_present"])
+        self.assertEqual(
+            evidence["parsed_json"]["hosts"][0]["ports"][0]["service"],
+            "ssh",
+        )
+
+    @patch("tool_adapters.subprocess.Popen")
+    @patch("tool_adapters.shutil.which", return_value="/usr/bin/ruff")
+    @patch("tool_adapters.subprocess.run")
+    def test_host_tool_uses_ephemeral_home_and_does_not_forward_secrets(
+        self, version_run, which, popen
+    ):
+        version_run.return_value = subprocess.CompletedProcess(
+            ["ruff", "--version"], 0, stdout="ruff 0.14.5\n", stderr=""
+        )
+        popen.return_value = FakeProcess()
+        provenance = {"resolved_path": "/usr/bin/ruff", "sha256": "a" * 64}
+        with (
+            patch.dict(os.environ, {
+                "HOME": "/home/private-user",
+                "AWS_SECRET_ACCESS_KEY": "must-not-be-forwarded",
+                "OPENAI_API_KEY": "must-not-be-forwarded",
+            }),
+            patch.object(tool_adapters, "_hash_binary", return_value=provenance),
+            patch.object(tool_adapters, "verify_tool_allowed", return_value={"allowed": True}),
+        ):
+            run_local_tool("ruff", "sample.py")
+
+        process_env = popen.call_args.kwargs["env"]
+        version_env = version_run.call_args.kwargs["env"]
+        self.assertNotEqual(process_env["HOME"], "/home/private-user")
+        self.assertEqual(process_env["HOME"], process_env["TMPDIR"])
+        self.assertEqual(process_env, version_env)
+        self.assertNotIn("AWS_SECRET_ACCESS_KEY", process_env)
+        self.assertNotIn("OPENAI_API_KEY", process_env)
+        self.assertNotIn("/home/private-user", process_env["PATH"])
+        self.assertIn("/usr/bin", process_env["PATH"])
+        self.assertTrue(all(process_env["PATH"].split(os.pathsep)))
+        self.assertFalse(Path(process_env["HOME"]).exists())
+
 
 if __name__ == "__main__":
     unittest.main()
