@@ -2,14 +2,23 @@
 """Generate a deterministic, hash-enforced lock from a downloaded wheelhouse."""
 import argparse
 import hashlib
+import os
 from email.parser import Parser
 import re
+import stat
 import sys
 import zipfile
 from pathlib import Path
 
 
 MAX_WHEEL_METADATA_BYTES = 2 * 1024 * 1024
+MAX_WHEEL_BYTES = 512 * 1024 * 1024
+MAX_WHEELHOUSE_BYTES = 2 * 1024 * 1024 * 1024
+MAX_WHEEL_COUNT = 1024
+MAX_WHEEL_ENTRIES = 100_000
+MAX_REQUIREMENTS_BYTES = 1024 * 1024
+NAME_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
+VERSION_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9.!+_-]*")
 
 
 class WheelLockError(ValueError):
@@ -21,10 +30,18 @@ def normalize_name(value):
 
 
 def wheel_metadata(path):
+    path = Path(path)
+    if path.is_symlink() or not path.is_file():
+        raise WheelLockError(f"Wheel inexistente o inseguro: {path.name}.")
     try:
+        if path.stat().st_size > MAX_WHEEL_BYTES:
+            raise WheelLockError(f"Wheel supera el límite de {MAX_WHEEL_BYTES} bytes: {path.name}.")
         with zipfile.ZipFile(path) as archive:
+            entries = archive.infolist()
+            if len(entries) > MAX_WHEEL_ENTRIES:
+                raise WheelLockError(f"Wheel supera el límite de {MAX_WHEEL_ENTRIES} entradas: {path.name}.")
             metadata_files = [
-                info for info in archive.infolist()
+                info for info in entries
                 if info.filename.endswith(".dist-info/METADATA")
             ]
             if len(metadata_files) != 1:
@@ -40,11 +57,28 @@ def wheel_metadata(path):
             ):
                 raise WheelLockError(f"Wheel METADATA inválido o demasiado grande: {path.name}.")
             metadata = Parser().parsestr(raw_metadata.decode("utf-8"))
-    except (OSError, zipfile.BadZipFile, UnicodeDecodeError, RuntimeError, NotImplementedError) as error:
+    except WheelLockError:
+        raise
+    except (
+        OSError, zipfile.BadZipFile, zipfile.LargeZipFile, UnicodeDecodeError,
+        RuntimeError, NotImplementedError,
+    ) as error:
         raise WheelLockError(f"Wheel inválido: {path.name}.") from error
-    name, version = metadata.get("Name"), metadata.get("Version")
-    if not name or not version:
-        raise WheelLockError(f"Wheel sin nombre o versión: {path.name}.")
+
+    names = metadata.get_all("Name", [])
+    versions = metadata.get_all("Version", [])
+    metadata_versions = metadata.get_all("Metadata-Version", [])
+    if (
+        metadata.defects
+        or len(names) != 1
+        or len(versions) != 1
+        or len(metadata_versions) != 1
+        or not re.fullmatch(r"[0-9]+\.[0-9]+", metadata_versions[0])
+    ):
+        raise WheelLockError(f"Wheel con identidad METADATA ausente, duplicada o inválida: {path.name}.")
+    name, version = names[0], versions[0]
+    if not NAME_PATTERN.fullmatch(name) or not VERSION_PATTERN.fullmatch(version):
+        raise WheelLockError(f"Wheel con Name/Version inválidos: {path.name}.")
     return normalize_name(name), version
 
 
@@ -52,13 +86,22 @@ def read_expected(path):
     path = Path(path)
     if path.is_symlink() or not path.is_file():
         raise WheelLockError("Archivo de requisitos inexistente o inseguro.")
+    try:
+        raw_requirements = path.read_bytes()
+        if len(raw_requirements) > MAX_REQUIREMENTS_BYTES:
+            raise WheelLockError(
+                f"El archivo de requisitos supera {MAX_REQUIREMENTS_BYTES} bytes."
+            )
+        requirements_text = raw_requirements.decode("utf-8")
+    except UnicodeDecodeError as error:
+        raise WheelLockError("El archivo de requisitos no es UTF-8 válido.") from error
     expected = {}
-    for number, raw in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+    for number, raw in enumerate(requirements_text.splitlines(), 1):
         line = raw.strip()
         if not line or line.startswith("#"):
             continue
         match = re.fullmatch(
-            r"([A-Za-z0-9][A-Za-z0-9._-]*)==([A-Za-z0-9][A-Za-z0-9.!+_-]*)",
+            rf"({NAME_PATTERN.pattern})==({VERSION_PATTERN.pattern})",
             line,
         )
         if not match:
@@ -79,17 +122,51 @@ def build_lock(wheelhouse, requirements):
         raise WheelLockError("Wheelhouse inexistente o inseguro.")
     expected = read_expected(requirements)
     packages = {}
-    wheels = sorted(wheelhouse.glob("*.whl"))
+    wheels = []
+    total_bytes = 0
+    try:
+        with os.scandir(wheelhouse) as entries:
+            for entry in entries:
+                if not entry.name.endswith(".whl"):
+                    continue
+                if len(wheels) >= MAX_WHEEL_COUNT:
+                    raise WheelLockError(f"Wheelhouse supera el límite de {MAX_WHEEL_COUNT} wheels.")
+                if entry.is_symlink() or not entry.is_file(follow_symlinks=False):
+                    raise WheelLockError(f"Wheel inseguro: {entry.name}.")
+                size = entry.stat(follow_symlinks=False).st_size
+                if size > MAX_WHEEL_BYTES:
+                    raise WheelLockError(f"Wheel supera el límite de {MAX_WHEEL_BYTES} bytes: {entry.name}.")
+                total_bytes += size
+                if total_bytes > MAX_WHEELHOUSE_BYTES:
+                    raise WheelLockError(
+                        f"Wheelhouse supera el límite total de {MAX_WHEELHOUSE_BYTES} bytes."
+                    )
+                wheels.append(Path(entry.path))
+    except OSError as error:
+        raise WheelLockError("No se pudo inspeccionar el wheelhouse.") from error
     if not wheels:
         raise WheelLockError("Wheelhouse vacío.")
+    wheels.sort(key=lambda item: item.name)
     for wheel in wheels:
-        if wheel.is_symlink() or not wheel.is_file():
-            raise WheelLockError(f"Wheel inseguro: {wheel.name}.")
+        before = wheel.stat(follow_symlinks=False)
+        if not stat.S_ISREG(before.st_mode):
+            raise WheelLockError(f"Wheel no regular: {wheel.name}.")
         name, version = wheel_metadata(wheel)
         digest_builder = hashlib.sha256()
         with wheel.open("rb") as stream:
             for chunk in iter(lambda: stream.read(1024 * 1024), b""):
                 digest_builder.update(chunk)
+        after = wheel.stat(follow_symlinks=False)
+        identity_before = (
+            before.st_dev, before.st_ino, before.st_size,
+            before.st_mtime_ns, before.st_ctime_ns,
+        )
+        identity_after = (
+            after.st_dev, after.st_ino, after.st_size,
+            after.st_mtime_ns, after.st_ctime_ns,
+        )
+        if identity_before != identity_after:
+            raise WheelLockError(f"Wheel cambió durante la verificación: {wheel.name}.")
         digest = digest_builder.hexdigest()
         current = packages.get(name)
         if current and current["version"] != version:
