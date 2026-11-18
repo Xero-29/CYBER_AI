@@ -16,6 +16,8 @@ REQUIRED_FILES = (
     "cyber_ai.py",
     "requirements.txt",
     "requirements.lock",
+    "tool_allowlist.py",
+    "safe_io.py",
     "config/model_roles.json",
     "tests",
 )
