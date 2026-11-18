@@ -3,7 +3,10 @@
 import argparse
 import hashlib
 import json
+import os
 import platform
+import re
+import stat
 import sys
 import zipfile
 from email.parser import Parser
@@ -13,6 +16,12 @@ from sbom_generator import _read_requirements
 
 
 MAX_WHEEL_METADATA_BYTES = 2 * 1024 * 1024
+MAX_WHEEL_BYTES = 512 * 1024 * 1024
+MAX_WHEELHOUSE_BYTES = 2 * 1024 * 1024 * 1024
+MAX_WHEEL_COUNT = 1024
+MAX_WHEEL_ENTRIES = 100_000
+NAME_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
+VERSION_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9.!+_-]*")
 
 
 class ArtifactManifestError(ValueError):
@@ -20,10 +29,22 @@ class ArtifactManifestError(ValueError):
 
 
 def _wheel_metadata(path):
+    path = Path(path)
+    if path.is_symlink() or not path.is_file():
+        raise ArtifactManifestError(f"Wheel inexistente o inseguro: {path.name}")
     try:
+        if path.stat().st_size > MAX_WHEEL_BYTES:
+            raise ArtifactManifestError(
+                f"Wheel supera el límite de {MAX_WHEEL_BYTES} bytes: {path.name}"
+            )
         with zipfile.ZipFile(path) as archive:
+            entries = archive.infolist()
+            if len(entries) > MAX_WHEEL_ENTRIES:
+                raise ArtifactManifestError(
+                    f"Wheel supera el límite de {MAX_WHEEL_ENTRIES} entradas: {path.name}"
+                )
             metadata_names = [
-                info for info in archive.infolist()
+                info for info in entries
                 if info.filename.endswith(".dist-info/METADATA")
             ]
             if len(metadata_names) != 1:
@@ -45,14 +66,31 @@ def _wheel_metadata(path):
                     f"Wheel METADATA inválido o demasiado grande: {path.name}"
                 )
             metadata = Parser().parsestr(raw_metadata.decode("utf-8"))
-            name, version = metadata.get("Name"), metadata.get("Version")
-            if not name or not version:
-                raise ArtifactManifestError(
-                    f"Wheel sin Name/Version válidos: {path.name}"
-                )
-            return name, version
-    except (OSError, zipfile.BadZipFile, UnicodeDecodeError, RuntimeError, NotImplementedError) as error:
+    except ArtifactManifestError:
+        raise
+    except (
+        OSError, zipfile.BadZipFile, zipfile.LargeZipFile, UnicodeDecodeError,
+        RuntimeError, NotImplementedError,
+    ) as error:
         raise ArtifactManifestError(f"Wheel inválido: {path.name}") from error
+
+    names = metadata.get_all("Name", [])
+    versions = metadata.get_all("Version", [])
+    metadata_versions = metadata.get_all("Metadata-Version", [])
+    if (
+        metadata.defects
+        or len(names) != 1
+        or len(versions) != 1
+        or len(metadata_versions) != 1
+        or not re.fullmatch(r"[0-9]+\\.[0-9]+", metadata_versions[0])
+    ):
+        raise ArtifactManifestError(
+            f"Wheel con identidad METADATA ausente, duplicada o inválida: {path.name}"
+        )
+    name, version = names[0], versions[0]
+    if not NAME_PATTERN.fullmatch(name) or not VERSION_PATTERN.fullmatch(version):
+        raise ArtifactManifestError(f"Wheel con Name/Version inválidos: {path.name}")
+    return name, version
 
 
 def build_manifest(root, wheelhouse, lock_file="requirements.lock"):
@@ -71,13 +109,50 @@ def build_manifest(root, wheelhouse, lock_file="requirements.lock"):
     except ValueError as error:
         raise ArtifactManifestError("El lock debe permanecer dentro del proyecto.") from error
     direct = _read_requirements(lock, root)
-    wheels = sorted(wheelhouse.glob("*.whl"))
+    wheels = []
+    total_bytes = 0
+    try:
+        with os.scandir(wheelhouse) as entries:
+            for entry in entries:
+                if not entry.name.endswith(".whl"):
+                    continue
+                if len(wheels) >= MAX_WHEEL_COUNT:
+                    raise ArtifactManifestError(
+                        f"Wheelhouse supera el límite de {MAX_WHEEL_COUNT} wheels."
+                    )
+                if entry.is_symlink() or not entry.is_file(follow_symlinks=False):
+                    raise ArtifactManifestError("No se permiten symlinks en el wheelhouse.")
+                size = entry.stat(follow_symlinks=False).st_size
+                if size > MAX_WHEEL_BYTES:
+                    raise ArtifactManifestError(
+                        f"Wheel supera el límite de {MAX_WHEEL_BYTES} bytes: {entry.name}"
+                    )
+                total_bytes += size
+                if total_bytes > MAX_WHEELHOUSE_BYTES:
+                    raise ArtifactManifestError(
+                        f"Wheelhouse supera el límite total de {MAX_WHEELHOUSE_BYTES} bytes."
+                    )
+                wheels.append(Path(entry.path))
+    except OSError as error:
+        raise ArtifactManifestError("No se pudo inspeccionar el wheelhouse.") from error
     if not wheels:
         raise ArtifactManifestError("No se encontraron wheels descargados.")
+    wheels.sort(key=lambda item: item.name)
     found = {}
+    verified_total_bytes = 0
     for wheel in wheels:
-        if wheel.is_symlink() or not wheel.is_file():
-            raise ArtifactManifestError("No se permiten symlinks en el wheelhouse.")
+        before = wheel.stat(follow_symlinks=False)
+        if not stat.S_ISREG(before.st_mode):
+            raise ArtifactManifestError(f"Wheel no regular: {wheel.name}")
+        if before.st_size > MAX_WHEEL_BYTES:
+            raise ArtifactManifestError(
+                f"Wheel supera el límite de {MAX_WHEEL_BYTES} bytes: {wheel.name}"
+            )
+        verified_total_bytes += before.st_size
+        if verified_total_bytes > MAX_WHEELHOUSE_BYTES:
+            raise ArtifactManifestError(
+                f"Wheelhouse supera el límite total de {MAX_WHEELHOUSE_BYTES} bytes."
+            )
         name, version = _wheel_metadata(wheel)
         from sbom_generator import _normalize
         normalized = _normalize(name)
@@ -94,6 +169,19 @@ def build_manifest(root, wheelhouse, lock_file="requirements.lock"):
             for chunk in iter(lambda: stream.read(1024 * 1024), b""):
                 digest.update(chunk)
         digest_value = digest.hexdigest()
+        after = wheel.stat(follow_symlinks=False)
+        identity_before = (
+            before.st_dev, before.st_ino, before.st_size,
+            before.st_mtime_ns, before.st_ctime_ns,
+        )
+        identity_after = (
+            after.st_dev, after.st_ino, after.st_size,
+            after.st_mtime_ns, after.st_ctime_ns,
+        )
+        if identity_before != identity_after:
+            raise ArtifactManifestError(
+                f"Wheel cambió durante la verificación: {wheel.name}"
+            )
         if digest_value not in direct[normalized]["hashes"]:
             raise ArtifactManifestError(
                 f"El hash del wheel no coincide con requirements.lock: {wheel.name}."
@@ -102,7 +190,7 @@ def build_manifest(root, wheelhouse, lock_file="requirements.lock"):
             "name": normalized,
             "version": version,
             "filename": wheel.name,
-            "size_bytes": wheel.stat().st_size,
+            "size_bytes": after.st_size,
             "sha256": digest_value,
         }
     missing = sorted(set(direct) - set(found))
