@@ -3,6 +3,7 @@ import tempfile
 import unittest
 import zipfile
 from pathlib import Path
+from unittest.mock import patch
 
 from dependency_artifact_manifest import ArtifactManifestError, build_manifest
 
@@ -123,6 +124,80 @@ class DependencyArtifactManifestTests(unittest.TestCase):
         (self.wheelhouse / "broken.whl").write_bytes(b"not a zip")
         with self.assertRaisesRegex(ArtifactManifestError, "Wheel inválido"):
             build_manifest(self.root, self.wheelhouse)
+
+
+    def test_manifest_rejects_metadata_version_line_injection(self):
+        requests = self.wheelhouse / "requests-2.0-py3-none-any.whl"
+        with zipfile.ZipFile(requests, "w") as archive:
+            archive.writestr(
+                "requests-2.0.dist-info/METADATA",
+                "Metadata-Version: 2.1" + chr(10)
+                + "Name: requests" + chr(10)
+                + "Version: 2.0" + chr(10)
+                + " injected: lock-line" + chr(10),
+            )
+        certifi = self.wheel(
+            "certifi-1.0-py3-none-any.whl", "certifi", "1.0"
+        )
+        self.pin_created_wheels(requests, certifi)
+        with self.assertRaisesRegex(ArtifactManifestError, "Name/Version inválidos"):
+            build_manifest(self.root, self.wheelhouse)
+
+    def test_manifest_rejects_duplicate_identity_headers(self):
+        requests = self.wheelhouse / "requests-2.0-py3-none-any.whl"
+        with zipfile.ZipFile(requests, "w") as archive:
+            archive.writestr(
+                "requests-2.0.dist-info/METADATA",
+                "Metadata-Version: 2.1" + chr(10)
+                + "Name: requests" + chr(10)
+                + "Name: attacker" + chr(10)
+                + "Version: 2.0" + chr(10),
+            )
+        certifi = self.wheel(
+            "certifi-1.0-py3-none-any.whl", "certifi", "1.0"
+        )
+        self.pin_created_wheels(requests, certifi)
+        with self.assertRaisesRegex(ArtifactManifestError, "identidad METADATA"):
+            build_manifest(self.root, self.wheelhouse)
+
+    def test_manifest_rejects_oversized_wheel_before_metadata_read(self):
+        (self.wheelhouse / "large.whl").write_bytes(b"x" * 9)
+        with patch("dependency_artifact_manifest.MAX_WHEEL_BYTES", 8):
+            with self.assertRaisesRegex(ArtifactManifestError, "supera el límite"):
+                build_manifest(self.root, self.wheelhouse)
+
+    def test_manifest_rejects_wheelhouse_count_limit(self):
+        (self.wheelhouse / "one.whl").write_bytes(b"x")
+        (self.wheelhouse / "two.whl").write_bytes(b"x")
+        with patch("dependency_artifact_manifest.MAX_WHEEL_COUNT", 1):
+            with self.assertRaisesRegex(ArtifactManifestError, "límite de 1 wheels"):
+                build_manifest(self.root, self.wheelhouse)
+
+    def test_manifest_rejects_total_wheelhouse_size_limit(self):
+        (self.wheelhouse / "one.whl").write_bytes(b"x")
+        (self.wheelhouse / "two.whl").write_bytes(b"x")
+        with patch("dependency_artifact_manifest.MAX_WHEELHOUSE_BYTES", 1):
+            with self.assertRaisesRegex(ArtifactManifestError, "límite total"):
+                build_manifest(self.root, self.wheelhouse)
+
+    def test_manifest_rejects_symlink_wheel(self):
+        target = self.root / "outside.whl"
+        with zipfile.ZipFile(target, "w") as archive:
+            archive.writestr(
+                "requests-2.0.dist-info/METADATA",
+                "Metadata-Version: 2.1" + chr(10)
+                + "Name: requests" + chr(10)
+                + "Version: 2.0" + chr(10),
+            )
+        (self.wheelhouse / "requests.whl").symlink_to(target)
+        with self.assertRaisesRegex(ArtifactManifestError, "symlinks"):
+            build_manifest(self.root, self.wheelhouse)
+
+    def test_manifest_rejects_symlink_wheelhouse(self):
+        link = self.root / "wheelhouse-link"
+        link.symlink_to(self.wheelhouse, target_is_directory=True)
+        with self.assertRaisesRegex(ArtifactManifestError, "directorio real"):
+            build_manifest(self.root, link)
 
 
 if __name__ == "__main__":
