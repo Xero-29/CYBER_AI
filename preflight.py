@@ -404,6 +404,43 @@ def collect_checks(root=PROJECT, python_version=None, module_lookup=None,
         add(f"optional:{executable}", "ok" if available else "warning",
             "Detectado en PATH." if available else "No detectado; solo necesario para esa integración.")
 
+    allowlist_path = str(environ.get("CYBER_AI_TOOL_ALLOWLIST_PATH", "")).strip()
+    allowlist_key = environ.get("CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY", "")
+    allowlist_required = str(
+        environ.get("CYBER_AI_TOOL_ALLOWLIST_REQUIRED", "")
+    ).strip().lower() in {"1", "true", "yes"}
+    if not allowlist_path and not allowlist_key:
+        add(
+            "tool_allowlist",
+            "error" if allowlist_required else "warning",
+            "La ejecución exige una allowlist firmada, pero no está configurada."
+            if allowlist_required else
+            "Sin allowlist firmada; los adaptadores conservan el modo de compatibilidad.",
+        )
+    elif not allowlist_path or not allowlist_key:
+        add(
+            "tool_allowlist", "error",
+            "Configura conjuntamente la ruta y la clave HMAC de la allowlist.",
+        )
+    else:
+        try:
+            from tool_allowlist import load_signed_tool_allowlist
+            candidate = Path(allowlist_path)
+            if not candidate.is_absolute():
+                candidate = root / candidate
+            approved_tools = load_signed_tool_allowlist(
+                candidate, str(allowlist_key).encode("utf-8")
+            )
+            add(
+                "tool_allowlist", "ok",
+                f"Firma HMAC válida; {len(approved_tools)} ejecutables aprobados.",
+            )
+        except Exception:
+            add(
+                "tool_allowlist", "error",
+                "No se pudo validar la allowlist firmada; no se expone la clave.",
+            )
+
     ledger_path = Path(environ.get(
         "CYBER_AI_LEDGER_PATH", root / "data/execution_ledger.sqlite3"
     ))
