@@ -1,19 +1,19 @@
 # Estado de reconciliación — 2026-11-18
 
 **Rama de integración:** `codex/reconcile-security-integrity-2026-11-18`  
-**HEAD verificado antes de esta actualización:** `f86279386dc7c55ec23161accaf063f346e48bf5`.  
-**Base:** `main` en `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`; comparación: **115 commits adelante, 0 detrás**, 48 rutas cambiadas.  
+**HEAD verificado antes de esta actualización:** `12dce8e33de8205c3704d94cb6e2016e61d1f356`.  
+**Base:** `main` en `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`; comparación: **119 commits adelante, 0 detrás**, 48 rutas cambiadas.  
 **Merge-base con main:** `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`. Main permanece intacta.  
 **Merge controlado en esta rama:** `2585b99be752bef3276ce5721690542c9f05e7d2`, con segundo padre PR #11 en `04c001a206cde98613cf9c151ce4f6a95fb86a21`. Se conservó el árbol validado de PR #11 y se sobrepusieron rutas revisadas; no hubo merge en main ni rebase/force-push.
 
-**Rama fuente de auditoría:** `codex/security-integrity-audit`, HEAD inspeccionado `8104739d542e3264166eb0e7b1b493aa26e9ce0a`. Sigue divergente de main: 112 commits exclusivos de auditoría y 573 exclusivos de main desde `cae816d6037b56f017c2fbdb3e98ef00df58c1d`. Los cambios se portan por funcionalidad, no copiando el diff completo.
+**Rama fuente de auditoría:** `codex/security-integrity-audit`, HEAD inspeccionado `8104739d542e3264166eb0e7b1b493aa26e9ce0a`. Sigue divergente de main: 112 commits exclusivos de auditoría y 573 exclusivos de main desde `cae816d6037b56f017c2fbdb3e98ef00df58c1d`. Se portan cambios por funcionalidad, sin copiar el diff completo ni retirar capacidades nuevas de main.
 
 ## Cambios integrados y endurecimiento portado
 
 - Locks/SBOM de PR #11, manifiestos separados por entorno y soporte `--lock-file`.
 - Manifiesto de wheels: hashes contrastados con el lock, límites de tamaño/cantidad/entradas, rechazo de symlinks y validación estricta de METADATA.
 - Generador de locks: validación de wheelhouse y requisitos, límites y publicación atómica.
-- `safe_io.atomic_write_text` integrado en locks, manifiestos de artefactos, SBOM, manifiestos de descargas y reportes de evaluación de conocimiento.
+- `safe_io.atomic_write_text` integrado en locks, manifiestos de artefactos, SBOM, manifiestos de descargas, reportes de evaluación y ejemplo de firma de allowlist.
 - Ledger: protección de ruta y archivos DB/WAL/SHM, directorio POSIX privado, archivos `0600`, límites SQLite signed 64-bit y umbrales de recuperación representables.
 - Backups: límites de cantidad de archivos y tamaño del manifiesto, comprobados antes y después de leer.
 - Evaluación de conocimiento: lectura protegida contra symlinks, identidad estable, límites de bytes y Unicode; escritura atómica de informes y códigos de salida CLI comprobables.
@@ -21,13 +21,13 @@
 - Los adaptadores convierten denegaciones de allowlist en errores de ejecución tipados; preflight informa política de allowlist y ledger sin exponer secretos.
 - Agentes, ejecutor de herramientas y task runner exigen ledger por defecto; el modo sin registro requiere excepción explícita.
 - Runner Docker: montaje de evidencias `0700`; workflow instala con `pip --require-hashes` y protege el directorio de datos.
-- Pruebas de regresión para las correcciones anteriores; documentación de allowlist y preflight actualizada.
+- Pruebas de regresión y documentación actualizada de ledger, allowlist, preflight y salidas atómicas.
 
 ## Evidencia de CI
 
-**HEAD `f86279386dc7c55ec23161accaf063f346e48bf5`:**
-- Python Tests — **success**, 675 pruebas, 2 omitidas en cada ejecución (base y extractores documentales); Windows allowlist smoke — **success**: [run 44365409653](https://github.com/Xero-29/CYBER_AI/actions/runs/44365409653).
-- Docker Sandbox — **success**, verificación completa, smoke Ruff y evidencia publicada: [run 44365409654](https://github.com/Xero-29/CYBER_AI/actions/runs/44365409654).
+**HEAD `12dce8e33de8205c3704d94cb6e2016e61d1f356`:**
+- Python Tests — **success**, 675 pruebas, 2 omitidas en entorno base y extractores documentales; Windows allowlist smoke — **success**: [run 44365770789](https://github.com/Xero-29/CYBER_AI/actions/runs/44365770789).
+- Docker Sandbox — **success**, 675 pruebas, 1 omitida, smoke Ruff y evidencia: [run 44365770879](https://github.com/Xero-29/CYBER_AI/actions/runs/44365770879).
 
 **PR #11:** sigue abierto en draft, sin duplicarlo: [PR #11](https://github.com/Xero-29/CYBER_AI/pull/11). Su HEAD `04c001a206cde98613cf9c151ce4f6a95fb86a21` pasó Python Tests ([run 44359934767](https://github.com/Xero-29/CYBER_AI/actions/runs/44359934767)) y Docker Sandbox ([run 44359934228](https://github.com/Xero-29/CYBER_AI/actions/runs/44359934228)).
 
@@ -35,13 +35,13 @@
 
 ## Próximas tareas de reconciliación
 
-1. Revisar los cambios restantes de la rama de auditoría por archivo y conservar las capacidades nuevas de main (agentes, simulación, atlas, currículos, módulos de conocimiento y runners).
-2. Revisar contratos de adaptadores/proveedores, integridad de evidencias y documentación cruzada para detectar componentes desconectados.
-3. Repetir Python, Docker, SBOM y locks sobre el HEAD final después de la siguiente actualización documental.
+1. Continuar revisión de contratos de adaptadores/proveedores, integridad de evidencias y documentación cruzada para detectar componentes desconectados.
+2. Revisar los últimos cambios de seguridad frente a los módulos más recientes de main, en particular los runners y la biblioteca de conocimientos.
+3. Repetir Python, Docker, SBOM y locks sobre el HEAD final después de esta actualización documental.
 4. No abrir un PR solapado mientras PR #11 siga cubriendo locks/SBOM.
 5. Mantener como pendientes externos KMS/HSM, WORM/offsite, RBAC/IdP/MFA, simulacros restore/DR, microVM/egress/escape, proveedores reales y revisión experta de fuentes.
 
-**Estado:** Python y Docker están verdes en el HEAD indicado. La reconciliación técnica continúa; esto no es autorización de integración ni declaración de preparación de producción.
+**Estado:** Python y Docker están verdes en el HEAD indicado. La reconciliación técnica continúa; no se declara preparación de producción ni se autoriza integración automática.
 
 
 ---
