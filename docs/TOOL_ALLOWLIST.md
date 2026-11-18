@@ -1,16 +1,18 @@
 # Allowlist firmada de ejecutables
 
-Los adaptadores locales pueden validar el SHA-256 del ejecutable contra una allowlist HMAC antes de iniciarlo.
+Los adaptadores locales pueden exigir que el SHA-256 del ejecutable coincida con una política HMAC-SHA256 antes de iniciar el proceso. La verificación ocurre después de resolver el binario y antes de ejecutar la herramienta.
 
 ## Configuración
 
-1. Genera un manifiesto fuera del repositorio, en un proceso de enrolamiento controlado, con `sign_tool_allowlist` de `tool_allowlist.py`.
-2. Cada entrada tiene el identificador de herramienta y el SHA-256 exacto del binario aprobado.
-3. Protege el manifiesto y la clave por separado. No guardes la clave en Git ni dentro del mismo manifiesto.
-4. Configura `CYBER_AI_TOOL_ALLOWLIST_PATH` y `CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY` en el entorno de ejecución.
-5. Activa `CYBER_AI_TOOL_ALLOWLIST_REQUIRED=1` para que la ausencia de política también bloquee la ejecución.
+Define estas variables en el entorno del proceso:
 
-Ejemplo de estructura antes de firmar:
+- `CYBER_AI_TOOL_ALLOWLIST_PATH`: ruta al manifiesto firmado.
+- `CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY`: clave HMAC de al menos 32 bytes.
+- `CYBER_AI_TOOL_ALLOWLIST_REQUIRED=1`: bloquea la ejecución si falta cualquiera de los dos valores o si la firma/hash no coincide.
+
+Si solo se configura una de las dos primeras variables, la ejecución se deniega. Si no se configura ninguna y el modo obligatorio no está activo, el sistema permanece en modo de compatibilidad y la evidencia marca `not_configured`; ese modo no equivale a una allowlist aprobada.
+
+El manifiesto contiene el identificador de cada herramienta y el SHA-256 exacto del binario enrolado. Ejemplo de estructura sin firmar:
 
 ```json
 {
@@ -23,16 +25,40 @@ Ejemplo de estructura antes de firmar:
 }
 ```
 
-La firma es HMAC-SHA256 sobre el JSON canónico sin el campo `signature`. La validación rechaza symlinks, archivos no regulares, manifiestos mayores de 64 KiB, campos inesperados, firmas inválidas y binarios no aprobados.
+La firma se calcula sobre el JSON canónico sin el campo `signature`. Para firmar durante un proceso de enrolamiento controlado:
+
+```python
+import json
+import os
+from pathlib import Path
+from tool_allowlist import sign_tool_allowlist
+
+tools = {"ruff": {"sha256": "SHA256_REAL_DEL_BINARIO"}}
+key = os.environ["CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY"].encode("utf-8")
+document = sign_tool_allowlist(tools, key)
+Path("tools.signed.json").write_text(
+    json.dumps(document, sort_keys=True, separators=(",", ":")) + "\n",
+    encoding="utf-8",
+)
+```
+
+Protege la clave y el manifiesto por separado. No guardes la clave en Git, no la imprimas y no la incluyas en reportes. El archivo se limita a 64 KiB; se rechazan symlinks, archivos no regulares, claves JSON duplicadas, campos inválidos, firmas no válidas y hashes no aprobados.
+
+## Integración y verificación
+
+- `tool_adapters.run_local_tool` consulta la allowlist antes de iniciar cualquier adaptador host.
+- `tool_executor.py` recibe la política a través de esa ruta y conserva su resultado en la evidencia y el ledger.
+- `preflight.py` valida la firma/configuración sin iniciar herramientas ni usar red. En modo obligatorio, una política ausente o inválida bloquea el preflight.
+- El preflight muestra el número de ejecutables aprobados, nunca el secreto HMAC.
+- Las pruebas `tests/test_tool_allowlist.py`, `tests/test_tool_adapters_allowlist.py` y `tests/test_preflight_tool_allowlist.py` cubren firma, manipulación, claves duplicadas, límites, symlinks, denegación previa al proceso y diagnóstico.
 
 ## Límites
 
-- La allowlist es opcional para compatibilidad; en despliegues controlados debe activarse el modo obligatorio.
-- HMAC no es firma asimétrica: todos los verificadores que poseen la clave pueden firmar. La custodia, rotación y distribución de la clave requieren un gestor externo.
-- La política autentica la correspondencia entre herramienta y hash, pero no demuestra por sí sola que el binario provenga del editor legítimo. El enrolamiento debe verificar el origen del artefacto antes de firmarlo.
-- La comprobación por ruta no elimina por completo una carrera TOCTOU frente a un atacante local capaz de reemplazar el ejecutable entre la verificación y su inicio. No uses esta allowlist como frontera contra un administrador/atacante con control concurrente del host; usa artefactos inmutables, permisos de instalación restrictivos y aislamiento externo.
-- El hash se toma del ejecutable resuelto en el host. Esto no aísla el proceso, no impide egress y no sustituye sandbox/VM.
-
+- HMAC es simétrico: cualquier verificador que posea la clave también puede firmar. Custodia, rotación, revocación y segregación de funciones requieren un gestor externo/KMS/HSM. Para separar firmantes y verificadores, se necesita una firma asimétrica y una política de claves públicas.
+- La allowlist autentica la correspondencia entre ID de herramienta y hash; no prueba por sí sola la procedencia legítima del binario. El enrolamiento debe verificar origen, firma del proveedor, versión y licencia antes de aprobarlo.
+- La comprobación de hash no elimina todas las carreras TOCTOU frente a un atacante con control concurrente del host. Usa directorios de instalación inmutables y permisos restrictivos; no confíes en ella como frontera frente a administradores maliciosos.
+- No aísla el proceso, no impide egress y no sustituye Docker endurecido, microVM o VM desechable.
+- La política no activa automáticamente la ejecución de herramientas ni autoriza objetivos externos; los controles de objetivo y confirmación siguen siendo independientes.
 
 ## Uso desde el flujo multiagente
 
