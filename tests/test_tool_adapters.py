@@ -66,6 +66,8 @@ class ToolAdapterTests(unittest.TestCase):
         self.assertEqual(evidence["tool_binary_sha256"], "a" * 64)
         self.assertEqual(evidence["tool_binary_sha256_after"], "a" * 64)
         self.assertFalse(evidence["tool_binary_modified"])
+        self.assertTrue(process.stdout.closed)
+        self.assertTrue(process.stderr.closed)
 
     @patch("tool_adapters.subprocess.Popen")
     @patch("tool_adapters.shutil.which", return_value="/usr/bin/ruff")
@@ -167,12 +169,15 @@ class ToolAdapterTests(unittest.TestCase):
     @patch("tool_adapters.subprocess.run")
     def test_timeout_is_recorded(self, version_run, which, popen):
         version_run.return_value = subprocess.CompletedProcess(["bandit", "--version"], 0, stdout="Bandit 1.8.6", stderr="")
-        popen.return_value = FakeProcess(timeout=True)
+        process = FakeProcess(timeout=True)
+        popen.return_value = process
         provenance = {"resolved_path": "/usr/bin/bandit", "sha256": "b" * 64}
         with patch.object(tool_adapters, "_hash_binary", return_value=provenance):
             evidence = run_local_tool("bandit", "sample.py", timeout=1)
         self.assertEqual(evidence["status"], "timeout")
         self.assertIsNone(evidence["return_code"])
+        self.assertTrue(process.stdout.closed)
+        self.assertTrue(process.stderr.closed)
 
     def test_evidence_is_written_inside_repository_with_private_permissions(self):
         evidence = {"tool": "ruff", "status": "completed"}
