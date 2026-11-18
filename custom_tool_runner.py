@@ -4,6 +4,7 @@ import os
 import shutil
 import signal
 import subprocess
+import tempfile
 import threading
 import time
 from datetime import datetime, timezone
@@ -52,34 +53,84 @@ def run_custom_tool(spec, target, *, allow_external=False, timeout=None):
                 truncated["value"] = True
 
     command = [executable, *argv]
+    timed_out = False
+    return_code = None
     try:
-        process = subprocess.Popen(
-            command, cwd=str(Path(__file__).resolve().parent),
-            env={"PATH": os.environ.get("PATH", ""), "HOME": os.environ.get("HOME", ""),
-                 "LANG": "C.UTF-8", "LC_ALL": "C.UTF-8", "NO_COLOR": "1"},
-            stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-            shell=False, start_new_session=(os.name == "posix"),
-        )
-        readers = [threading.Thread(target=drain, args=(process.stdout, "stdout"), daemon=True),
-                   threading.Thread(target=drain, args=(process.stderr, "stderr"), daemon=True)]
-        for reader in readers:
-            reader.start()
-        timed_out = False
-        try:
-            return_code = process.wait(timeout=limit)
-        except subprocess.TimeoutExpired:
-            timed_out = True
+        with tempfile.TemporaryDirectory(prefix="cyber-ai-custom-home-") as isolated_home:
             if os.name == "posix":
-                try:
-                    os.killpg(process.pid, signal.SIGKILL)
-                except ProcessLookupError:
-                    pass
-            else:
-                process.kill()
-            process.wait()
-            return_code = None
-        for reader in readers:
-            reader.join(timeout=5)
+                os.chmod(isolated_home, 0o700)
+            safe_path_entries = [str(Path(executable).parent)]
+            safe_path_entries.extend(
+                entry for entry in os.defpath.split(os.pathsep) if entry
+            )
+            env = {
+                "PATH": os.pathsep.join(dict.fromkeys(safe_path_entries)),
+                "HOME": isolated_home,
+                "TMPDIR": isolated_home,
+                "TEMP": isolated_home,
+                "TMP": isolated_home,
+                "XDG_CONFIG_HOME": str(Path(isolated_home) / "config"),
+                "XDG_CACHE_HOME": str(Path(isolated_home) / "cache"),
+                "PYTHONNOUSERSITE": "1",
+                "PYTHONDONTWRITEBYTECODE": "1",
+                "LANG": "C.UTF-8",
+                "LC_ALL": "C.UTF-8",
+                "NO_COLOR": "1",
+            }
+            if os.name == "nt":
+                for variable in ("SYSTEMROOT", "WINDIR", "PATHEXT", "COMSPEC"):
+                    if os.environ.get(variable):
+                        env[variable] = os.environ[variable]
+                env["USERPROFILE"] = isolated_home
+                env["APPDATA"] = str(Path(isolated_home) / "AppData" / "Roaming")
+                env["LOCALAPPDATA"] = str(Path(isolated_home) / "AppData" / "Local")
+            process = subprocess.Popen(
+                command, cwd=str(Path(__file__).resolve().parent),
+                env=env, stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                shell=False, start_new_session=(os.name == "posix"),
+            )
+            readers = [
+                threading.Thread(target=drain, args=(process.stdout, "stdout"), daemon=True),
+                threading.Thread(target=drain, args=(process.stderr, "stderr"), daemon=True),
+            ]
+            for reader in readers:
+                reader.start()
+            try:
+                return_code = process.wait(timeout=limit)
+            except subprocess.TimeoutExpired:
+                timed_out = True
+                if os.name == "posix":
+                    try:
+                        os.killpg(process.pid, signal.SIGKILL)
+                    except ProcessLookupError:
+                        pass
+                else:
+                    process.kill()
+                process.wait()
+                return_code = None
+            for reader in readers:
+                reader.join(timeout=5)
+            if any(reader.is_alive() for reader in readers):
+                if os.name == "posix":
+                    try:
+                        os.killpg(process.pid, signal.SIGKILL)
+                    except ProcessLookupError:
+                        pass
+                elif process.poll() is None:
+                    process.kill()
+                if process.poll() is None:
+                    process.wait()
+                for reader in readers:
+                    reader.join(timeout=5)
+            for stream in (process.stdout, process.stderr):
+                if stream is not None:
+                    try:
+                        stream.close()
+                    except OSError:
+                        pass
+            for reader in readers:
+                reader.join(timeout=1)
     except OSError as exc:
         raise ToolExecutionError("No se pudo iniciar la herramienta personalizada.") from exc
 
