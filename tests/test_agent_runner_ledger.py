@@ -82,5 +82,32 @@ class AgentRunnerLedgerGuardTests(unittest.TestCase):
             "CYBER_AI_LEDGER_REQUIRED": "1",
         }))
 
+
+    def test_ledger_failure_is_fatal_by_default(self):
+        with (
+            patch.object(agent_runner, "_run_agent_impl", side_effect=RuntimeError("provider failed")),
+            patch.object(agent_runner, "load_config", return_value={}),
+            patch.object(agent_runner, "resolve_agent", return_value=("agent", {"memory": {"namespace": "ns"}})),
+            patch.object(agent_runner, "ExecutionLedger", side_effect=OSError("ledger offline")),
+            patch.dict("os.environ", {}, clear=True),
+        ):
+            with self.assertRaisesRegex(RuntimeError, "no se pudo cerrar su evento"):
+                agent_runner.run_agent("agent", "task under test")
+
+    def test_explicit_unlogged_override_preserves_original_agent_error(self):
+        with (
+            patch.object(agent_runner, "_run_agent_impl", side_effect=RuntimeError("provider failed")),
+            patch.object(agent_runner, "load_config", return_value={}),
+            patch.object(agent_runner, "resolve_agent", return_value=("agent", {"memory": {"namespace": "ns"}})),
+            patch.object(agent_runner, "ExecutionLedger", side_effect=OSError("ledger offline")),
+            patch.dict(
+                "os.environ",
+                {"CYBER_AI_ALLOW_UNLOGGED_EXECUTION": "1"},
+                clear=True,
+            ),
+        ):
+            with self.assertRaisesRegex(RuntimeError, "provider failed"):
+                agent_runner.run_agent("agent", "task under test")
+
 if __name__ == "__main__":
     unittest.main()
