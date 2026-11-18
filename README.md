@@ -94,6 +94,8 @@ python tool_executor.py --tool ruff --target tests/fixtures/sandbox_sample.py --
 python tool_executor.py --tool ruff --target tests/fixtures/sandbox_sample.py --execute --require-ledger
 ```
 
+La ejecución host usa un entorno mínimo y un `HOME`/directorio temporal efímero para no heredar por defecto las variables secretas ni la configuración del usuario. Esto **no** restringe el acceso del proceso al resto del sistema de archivos ni aplica aislamiento de red; los adaptadores host siguen ejecutándose con el usuario local. Para objetivos no confiables, prefiere el sandbox Docker y conserva presente que Docker comparte el kernel del host.
+
 La ejecución real requiere `--execute`. Para el contenedor:
 
 ```bash
