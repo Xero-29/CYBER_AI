@@ -8,6 +8,7 @@ Los archivos generados por herramientas de dependencias, SBOM y biblioteca no de
 - `dependency_artifact_manifest.py`: manifiestos de wheels enlazados al hash del lock.
 - `sbom_generator.py`: SBOM CycloneDX.
 - `knowledge_downloader.py`: manifiesto de descargas y estado de la biblioteca.
+- `knowledge_eval.py`: informes de evaluación de recuperación semántica.
 
 La función:
 - valida que los componentes existentes de la ruta no sean symlinks ni puntos de reanálisis;
