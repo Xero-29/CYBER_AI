@@ -365,6 +365,12 @@ def _validate_plugin_response(endpoint, result, protocol):
 
 def request(provider, endpoint, payload=None, timeout=600):
     """Normaliza llamadas y valida respuestas de todos los proveedores."""
+    if not isinstance(provider, dict):
+        raise ValueError("provider debe ser un objeto.")
+    if endpoint not in {"api/chat", "api/embed", "api/ps"}:
+        raise ValueError(f"Endpoint de proveedor no admitido: {endpoint}")
+    if payload is not None and not isinstance(payload, dict):
+        raise ValueError("payload debe ser un objeto JSON.")
     if not _finite_number(timeout) or not 0 < timeout <= 600:
         raise ValueError("timeout debe ser un número finito mayor que 0 y máximo 600 segundos.")
     timeout = float(timeout)
@@ -372,7 +378,7 @@ def request(provider, endpoint, payload=None, timeout=600):
     required = {"api/chat": "chat", "api/embed": "embeddings", "api/ps": "model_listing"}.get(endpoint)
     if required and required not in provider_capabilities(provider):
         raise ValueError(f"El proveedor {provider.get('name', protocol)} no ofrece {required}.")
-    request_payload = payload or {}
+    request_payload = {} if payload is None else payload
     try:
         encoded_payload = json.dumps(
             request_payload, ensure_ascii=False, allow_nan=False
