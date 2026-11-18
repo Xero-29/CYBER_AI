@@ -283,11 +283,19 @@ class ExecutionLedger:
 
     def reconcile_interrupted(self, *, namespace=None, stale_after_seconds=300):
         """Atomically close stale orphaned starts; call only after stopping workers."""
-        if (isinstance(stale_after_seconds, bool)
-                or not isinstance(stale_after_seconds, (int, float))
-                or not math.isfinite(stale_after_seconds) or stale_after_seconds < 0):
+        if isinstance(stale_after_seconds, bool) or not isinstance(
+            stale_after_seconds, (int, float)
+        ):
             raise LedgerError("stale_after_seconds debe ser finito y no negativo.")
-        cutoff = datetime.now(timezone.utc).timestamp() - stale_after_seconds
+        try:
+            stale_seconds = float(stale_after_seconds)
+        except (OverflowError, ValueError) as error:
+            raise LedgerError(
+                "stale_after_seconds debe ser finito y no negativo."
+            ) from error
+        if not math.isfinite(stale_seconds) or stale_seconds < 0:
+            raise LedgerError("stale_after_seconds debe ser finito y no negativo.")
+        cutoff = datetime.now(timezone.utc).timestamp() - stale_seconds
         db = self.connect()
         reconciled = []
         try:
