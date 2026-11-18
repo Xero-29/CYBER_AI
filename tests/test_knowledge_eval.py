@@ -30,7 +30,7 @@ class KnowledgeEvaluationTests(unittest.TestCase):
             path.write_text(json.dumps({
                 "id": "case", "query": "\ud800",
                 "relevant_categories": ["api"],
-            }) + "\\n", encoding="utf-8")
+            }) + "\n", encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "Unicode inválido"):
                 knowledge_eval.load_dataset(path)
 
