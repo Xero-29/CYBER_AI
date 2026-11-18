@@ -7,6 +7,7 @@ import os
 import stat
 from datetime import datetime, timezone
 from pathlib import Path
+from safe_io import atomic_write_text
 
 from knowledge_embeddings import generate_embedding
 from knowledge_library import search_knowledge_hybrid
@@ -266,9 +267,9 @@ def main():
     report = evaluate(args.dataset, args.top_k)
     rendered = json.dumps(report, ensure_ascii=False, indent=2)
     if args.output:
-        destination = Path(args.output)
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        destination.write_text(rendered + "\n", encoding="utf-8")
+        atomic_write_text(
+            args.output, rendered + "\n", create_parents=True
+        )
         print(f"Informe: {destination}")
     print(
         f"Consultas: {report['queries']} | Recall@{args.top_k}: "
