@@ -126,7 +126,15 @@ La allowlist está desactivada por compatibilidad si no se configura. En desplie
 
 ## Herramientas locales y sandbox
 
-El inventario de 21 herramientas distingue disponibilidad del binario y adaptadores realmente registrados. Hay 14 especificaciones de adaptador: 11 herramientas de ejecución local acotada; YARA y TShark quedan bloqueadas en el host hasta disponer de sandbox aislado; pip-audit queda bloqueado por requerir red. El informe separa adaptador registrado de ejecución realmente habilitada. La presencia en el catálogo no significa que la herramienta esté instalada. Genera el informe con `python capability_inventory.py`.
+El inventario declara **21 herramientas**: **20 IDs** en `TOOL_SPECS` y Nuclei con runner remoto separado. De los 20 IDs, **17 adaptadores** se ejecutan directamente en el host (16 locales/offline y Nmap con autorización de red); **pip-audit** está registrado pero bloqueado por política de red; **YARA y TShark** usan un runner Docker aislado. Nmap no tiene aislamiento de egress impuesto por el sistema operativo y los adaptadores host no tienen sandbox general. OSV-Scanner y Grype requieren bases locales y ejecutan preflight read-only obligatorio antes del escaneo; OSV no ofrece fecha/esquema autoritativos en el layout documentado, mientras Grype valida metadatos y antigüedad. La presencia en el catálogo no significa que la herramienta esté instalada, que su base exista o que haya sido validada operacionalmente. Genera el informe con `python capability_inventory.py`.
+
+Antes de usar OSV-Scanner o Grype, revisa las bases locales sin descargar ni actualizarlas:
+
+```bash
+python tool_database_preflight.py --json
+```
+
+Grype se bloquea si la base falta, es inválida o supera 14 días (configurable mediante `CYBER_AI_GRYPE_DB_MAX_AGE_DAYS`). OSV-Scanner valida presencia y estructura de sus archivos ZIP, pero su formato documentado no ofrece una fecha de construcción autoritativa; CYBER_AI no afirma que esté actualizado.
 
 El registro de herramientas se encuentra en `tool_adapters.py`. Para ejecutar directamente un adaptador local:
 
@@ -191,7 +199,7 @@ Genera un SBOM CycloneDX determinista a partir de las dependencias fijadas:
 python sbom_generator.py --output reports/cyber-ai-sbom.cdx.json
 ```
 
-El SBOM distingue dependencias directas y transitivas, registra el hash del lock y, cuando se genera en CI, incorpora SHA-256 de los wheels descargados y comprobados contra el lock para la plataforma del runner. Esto fija los artefactos usados, pero no demuestra por sí solo la procedencia del publicador ni equivale a una firma upstream. La imagen Docker mantiene `sandbox/requirements.lock` separado para Ruff y Bandit y CI genera un SBOM independiente para ese entorno.
+El SBOM distingue dependencias directas y transitivas, registra el hash del lock y, en CI, incorpora SHA-256 de los wheels descargados y verificados contra el lock. Se generan SBOM separados para runtime, sandbox (Ruff/Bandit) y extractores documentales opcionales. Esto fija los artefactos usados para la plataforma del runner, pero no demuestra la procedencia upstream del publicador ni equivale a una firma upstream.
 
 Para medir la recuperación por especialidad después de indexar, ejecuta el benchmark por defecto de 48 consultas (una por área). El conjunto de 12 consultas anteriores queda disponible como smoke test rápido:
 
@@ -220,7 +228,7 @@ Cada línea del dataset debe ser un objeto JSON con exactamente `id`, `query` y 
 
 ## Conocimiento y Skills
 
-- Ingesta TXT, Markdown, HTML, CSV, JSON/JSONL y código: disponible con las dependencias base. PDF, DOCX, XLSX y PPTX requieren `python -m pip install --require-hashes -r requirements-documents.lock`. El lock opcional tiene hashes SHA-256 y SBOM separado en CI para CPython 3.12.x/Linux x86_64/glibc >= 2.26; otras plataformas necesitan locks propios. `requirements-documents.in` contiene las versiones directas. Los PDF escaneados necesitan OCR externo; el importador no ejecuta OCR.
+- Ingesta TXT, Markdown, HTML, CSV, JSON/JSONL y código: disponible con las dependencias base. PDF, DOCX, XLSX y PPTX requieren `python -m pip install --require-hashes -r requirements-documents.lock`. `requirements-documents.in` contiene las versiones directas; el lock documental está verificado para CPython 3.12.x/Linux x86_64/glibc >= 2.26. Otras plataformas requieren locks propios. Los PDF escaneados necesitan OCR externo; el importador no ejecuta OCR.
 - Recuperación e indexación: revisa `knowledge_library.py`, `knowledge_embeddings.py` y `knowledge_reindex.py`.
 - Fuentes externas: el catálogo requiere revisión de licencia y verificación antes de habilitar descargas.
 - Skills: `propose_skill_from_ledger` crea candidatas no ejecutables; solo la promoción firmada por VERITAS las hace recuperables. El CLI `skillbook_cli.py` permite proponer desde un manifiesto ligado a dos ejecuciones, exportar el payload canónico para firma independiente, promover con firma y generar/aplicar rollback. El historial de versiones es append-only. Una coincidencia recuperada no concede permisos de ejecución.
@@ -280,3 +288,26 @@ python ledger_cli.py history --namespace local-tools
 - `reports/`: resultados y evidencias generadas.
 
 Al informar un fallo, conserva el comando, versión de Python, salida completa y el identificador de ejecución de CI si aplica.
+
+
+## Simulación de coordinación multiagente
+
+Antes de conectar o validar proveedores reales, puedes probar los contratos formales y el traspaso secuencial de contexto sin invocar modelos ni herramientas:
+
+```bash
+python agent_simulation.py --workflow investigacion --task "Simular una revisión técnica"
+```
+
+El informe se guarda en `reports/agent_simulations/`. Esta simulación comprueba estructura, prefijos, secciones y detención ante salidas inválidas; **no demuestra razonamiento ni calidad técnica de agentes reales**. Consulta `docs/AGENT_SIMULATION.md` para sus límites y uso desde pruebas.
+
+
+## Auditoría de memoria y Skills
+
+Comprueba de forma local y sin modelos reales la integridad del ledger, las referencias de las lecciones verificadas, las cadenas de versiones de Skills, las ejecuciones interrumpidas y las revisiones pendientes:
+
+```bash
+python learning_cycle_audit.py
+python learning_cycle_audit.py --max-review-age-days 90 --output reports/learning_cycle_audit.json
+```
+
+La recuperación de memoria vuelve a comprobar los hashes y eventos originales en el ledger; la recuperación de Skills excluye metodologías cuyo historial o snapshot actual no sea íntegro. Consulta [docs/LEARNING_CYCLE_AUDIT.md](docs/LEARNING_CYCLE_AUDIT.md), [docs/LEARNING_MEMORY.md](docs/LEARNING_MEMORY.md) y [docs/SKILL_PROMOTION.md](docs/SKILL_PROMOTION.md).
