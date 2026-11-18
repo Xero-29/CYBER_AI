@@ -67,9 +67,6 @@ class TaskRunnerLedgerTests(unittest.TestCase):
         )
 
 
-if __name__ == "__main__":
-    unittest.main()
-
     def test_execute_blocks_when_ledger_cannot_start_by_default(self):
         with tempfile.TemporaryDirectory() as workspace, tempfile.TemporaryDirectory() as home:
             template = Path(home) / "nuclei-templates/http/technologies/tech-detect.yaml"
@@ -128,3 +125,5 @@ if __name__ == "__main__":
         self.assertEqual(result, 0)
         scanner.assert_called_once()
 
+if __name__ == "__main__":
+    unittest.main()
