@@ -70,6 +70,37 @@ class ToolAdapterTests(unittest.TestCase):
     @patch("tool_adapters.subprocess.Popen")
     @patch("tool_adapters.shutil.which", return_value="/usr/bin/ruff")
     @patch("tool_adapters.subprocess.run")
+    def test_host_tool_uses_ephemeral_home_and_does_not_forward_secrets(
+        self, version_run, which, popen
+    ):
+        version_run.return_value = subprocess.CompletedProcess(
+            ["ruff", "--version"], 0, stdout="ruff 0.14.5\\n", stderr=""
+        )
+        popen.return_value = FakeProcess()
+        provenance = {"resolved_path": "/usr/bin/ruff", "sha256": "a" * 64}
+        with (
+            patch.dict(os.environ, {
+                "HOME": "/home/private-user",
+                "AWS_SECRET_ACCESS_KEY": "must-not-be-forwarded",
+                "OPENAI_API_KEY": "must-not-be-forwarded",
+            }),
+            patch.object(tool_adapters, "_hash_binary", return_value=provenance),
+        ):
+            run_local_tool("ruff", "sample.py")
+
+        process_env = popen.call_args.kwargs["env"]
+        version_env = version_run.call_args.kwargs["env"]
+        self.assertNotEqual(process_env["HOME"], "/home/private-user")
+        self.assertEqual(process_env["HOME"], process_env["TMPDIR"])
+        self.assertEqual(process_env, version_env)
+        self.assertNotIn("AWS_SECRET_ACCESS_KEY", process_env)
+        self.assertNotIn("OPENAI_API_KEY", process_env)
+        self.assertNotIn("/home/private-user", process_env["PATH"])
+        self.assertIn("/usr/bin", process_env["PATH"])
+
+    @patch("tool_adapters.subprocess.Popen")
+    @patch("tool_adapters.shutil.which", return_value="/usr/bin/ruff")
+    @patch("tool_adapters.subprocess.run")
     def test_binary_replacement_during_execution_invalidates_evidence(self, version_run, which, popen):
         version_run.return_value = subprocess.CompletedProcess(["ruff", "--version"], 0, stdout="ruff 0.14.5", stderr="")
         popen.return_value = FakeProcess()
