@@ -74,7 +74,7 @@ class ToolAdapterTests(unittest.TestCase):
         self, version_run, which, popen
     ):
         version_run.return_value = subprocess.CompletedProcess(
-            ["ruff", "--version"], 0, stdout="ruff 0.14.5\\n", stderr=""
+            ["ruff", "--version"], 0, stdout="ruff 0.14.5\n", stderr=""
         )
         popen.return_value = FakeProcess()
         provenance = {"resolved_path": "/usr/bin/ruff", "sha256": "a" * 64}
@@ -97,6 +97,7 @@ class ToolAdapterTests(unittest.TestCase):
         self.assertNotIn("OPENAI_API_KEY", process_env)
         self.assertNotIn("/home/private-user", process_env["PATH"])
         self.assertIn("/usr/bin", process_env["PATH"])
+        self.assertFalse(Path(process_env["HOME"]).exists())
 
     @patch("tool_adapters.subprocess.Popen")
     @patch("tool_adapters.shutil.which", return_value="/usr/bin/ruff")
