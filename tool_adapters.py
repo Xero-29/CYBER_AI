@@ -597,6 +597,27 @@ def _run_local_tool_with_home(
             returncode = None
         for reader in readers:
             reader.join(timeout=5)
+        if any(reader.is_alive() for reader in readers):
+            # A descendant can inherit stdout/stderr after the direct child exits.
+            if os.name == "posix":
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+            elif process.poll() is None:
+                process.kill()
+            if process.poll() is None:
+                process.wait()
+            for reader in readers:
+                reader.join(timeout=5)
+        for stream in (process.stdout, process.stderr):
+            if stream is not None:
+                try:
+                    stream.close()
+                except OSError:
+                    pass
+        for reader in readers:
+            reader.join(timeout=1)
         status = "timeout" if timed_out else "completed"
     except OSError as exc:
         if zeek_workspace is not None:
