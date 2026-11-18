@@ -1,12 +1,12 @@
 # Estado de reconciliación — 2026-11-18
 
 **Rama de integración:** `codex/reconcile-security-integrity-2026-11-18`  
-**HEAD verificado antes de esta actualización:** `e6000d892b51dfa1252503cfd3db78ab498aa1f3`.  
-**Base:** `main` en `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`; comparación: **114 commits adelante, 0 detrás**, 48 rutas cambiadas.  
+**HEAD verificado antes de esta actualización:** `f86279386dc7c55ec23161accaf063f346e48bf5`.  
+**Base:** `main` en `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`; comparación: **115 commits adelante, 0 detrás**, 48 rutas cambiadas.  
 **Merge-base con main:** `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`. Main permanece intacta.  
 **Merge controlado en esta rama:** `2585b99be752bef3276ce5721690542c9f05e7d2`, con segundo padre PR #11 en `04c001a206cde98613cf9c151ce4f6a95fb86a21`. Se conservó el árbol validado de PR #11 y se sobrepusieron rutas revisadas; no hubo merge en main ni rebase/force-push.
 
-**Rama fuente de auditoría:** `codex/security-integrity-audit`, HEAD inspeccionado `8104739d542e3264166eb0e7b1b493aa26e9ce0a`. Sigue divergente de main: 112 commits exclusivos de auditoría y 573 exclusivos de main desde `cae816d6037b56f017c2fbdb3e98ef00df58c1d`. Se están portando cambios por funcionalidad, no copiando el diff completo.
+**Rama fuente de auditoría:** `codex/security-integrity-audit`, HEAD inspeccionado `8104739d542e3264166eb0e7b1b493aa26e9ce0a`. Sigue divergente de main: 112 commits exclusivos de auditoría y 573 exclusivos de main desde `cae816d6037b56f017c2fbdb3e98ef00df58c1d`. Los cambios se portan por funcionalidad, no copiando el diff completo.
 
 ## Cambios integrados y endurecimiento portado
 
@@ -18,18 +18,16 @@
 - Backups: límites de cantidad de archivos y tamaño del manifiesto, comprobados antes y después de leer.
 - Evaluación de conocimiento: lectura protegida contra symlinks, identidad estable, límites de bytes y Unicode; escritura atómica de informes y códigos de salida CLI comprobables.
 - Allowlist HMAC: lectura resistente a reemplazo de ruta, validación de firma/configuración en preflight y pruebas de denegación antes de iniciar procesos.
-- Los adaptadores convierten una denegación de allowlist en un error de ejecución tipado; preflight informa política de allowlist y ledger sin exponer secretos.
+- Los adaptadores convierten denegaciones de allowlist en errores de ejecución tipados; preflight informa política de allowlist y ledger sin exponer secretos.
 - Agentes, ejecutor de herramientas y task runner exigen ledger por defecto; el modo sin registro requiere excepción explícita.
 - Runner Docker: montaje de evidencias `0700`; workflow instala con `pip --require-hashes` y protege el directorio de datos.
-- Pruebas de regresión para las correcciones anteriores y documentación actualizada de allowlist/preflight.
+- Pruebas de regresión para las correcciones anteriores; documentación de allowlist y preflight actualizada.
 
 ## Evidencia de CI
 
-**HEAD `e6000d892b51dfa1252503cfd3db78ab498aa1f3`:**
-- Docker Sandbox — **success**: [run 44365168880](https://github.com/Xero-29/CYBER_AI/actions/runs/44365168880). La verificación completa ejecutó **675 pruebas, 1 omitida**, y completó la validación Ruff dentro del sandbox.
-- Python Tests — run [44365168554](https://github.com/Xero-29/CYBER_AI/actions/runs/44365168554) permanece pendiente. Un run anterior de Python, [44364370702](https://github.com/Xero-29/CYBER_AI/actions/runs/44364370702), sigue marcado `in_progress` desde las 17:57:38 UTC sin pasos/logs publicados; por eso no declaro CI global verde ni Windows smoke validado en este HEAD.
-
-**Evidencia anterior, no sustituye al HEAD actual:** en `160c1cdf3878dd2a3ce971a61b35d36d2e0a37ac`, Python Tests pasó 663 pruebas, 2 omitidas y Windows allowlist smoke; Docker Sandbox también pasó ([Python 44362869276](https://github.com/Xero-29/CYBER_AI/actions/runs/44362869276), [Docker 44362869543](https://github.com/Xero-29/CYBER_AI/actions/runs/44362869543)).
+**HEAD `f86279386dc7c55ec23161accaf063f346e48bf5`:**
+- Python Tests — **success**, 675 pruebas, 2 omitidas en cada ejecución (base y extractores documentales); Windows allowlist smoke — **success**: [run 44365409653](https://github.com/Xero-29/CYBER_AI/actions/runs/44365409653).
+- Docker Sandbox — **success**, verificación completa, smoke Ruff y evidencia publicada: [run 44365409654](https://github.com/Xero-29/CYBER_AI/actions/runs/44365409654).
 
 **PR #11:** sigue abierto en draft, sin duplicarlo: [PR #11](https://github.com/Xero-29/CYBER_AI/pull/11). Su HEAD `04c001a206cde98613cf9c151ce4f6a95fb86a21` pasó Python Tests ([run 44359934767](https://github.com/Xero-29/CYBER_AI/actions/runs/44359934767)) y Docker Sandbox ([run 44359934228](https://github.com/Xero-29/CYBER_AI/actions/runs/44359934228)).
 
@@ -39,12 +37,11 @@
 
 1. Revisar los cambios restantes de la rama de auditoría por archivo y conservar las capacidades nuevas de main (agentes, simulación, atlas, currículos, módulos de conocimiento y runners).
 2. Revisar contratos de adaptadores/proveedores, integridad de evidencias y documentación cruzada para detectar componentes desconectados.
-3. Resolver el run Python de GitHub Actions que permanece `in_progress`; validar Windows allowlist smoke sobre el HEAD definitivo.
-4. Repetir Python, Docker, SBOM y locks sobre el HEAD final.
-5. No abrir un PR solapado mientras PR #11 siga cubriendo locks/SBOM.
-6. Mantener como pendientes externos KMS/HSM, WORM/offsite, RBAC/IdP/MFA, simulacros restore/DR, microVM/egress/escape, proveedores reales y revisión experta de fuentes.
+3. Repetir Python, Docker, SBOM y locks sobre el HEAD final después de la siguiente actualización documental.
+4. No abrir un PR solapado mientras PR #11 siga cubriendo locks/SBOM.
+5. Mantener como pendientes externos KMS/HSM, WORM/offsite, RBAC/IdP/MFA, simulacros restore/DR, microVM/egress/escape, proveedores reales y revisión experta de fuentes.
 
-**Estado:** Docker está verde en el HEAD indicado. La validación Python/Windows de ese mismo HEAD sigue pendiente; la reconciliación técnica continúa y no se autoriza integración ni se declara preparación de producción.
+**Estado:** Python y Docker están verdes en el HEAD indicado. La reconciliación técnica continúa; esto no es autorización de integración ni declaración de preparación de producción.
 
 
 ---
