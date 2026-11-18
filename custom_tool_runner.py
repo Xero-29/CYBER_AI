@@ -13,7 +13,7 @@ from pathlib import Path
 from tool_adapters import (
     MAX_OUTPUT_BYTES, ToolExecutionError, _confined_path, _hash_binary, _hash_target,
 )
-from tool_allowlist import verify_tool_allowed
+from tool_allowlist import ToolAllowlistError, verify_tool_allowed
 
 
 def run_custom_tool(spec, target, *, allow_external=False, timeout=None):
@@ -27,7 +27,12 @@ def run_custom_tool(spec, target, *, allow_external=False, timeout=None):
     if not executable:
         raise ToolExecutionError("El ejecutable personalizado no está instalado o no se encuentra.")
     provenance = _hash_binary(executable)
-    allowlist = verify_tool_allowed(tool_id, provenance["sha256"])
+    try:
+        allowlist = verify_tool_allowed(tool_id, provenance["sha256"])
+    except ToolAllowlistError as error:
+        raise ToolExecutionError(
+            "El binario personalizado no está aprobado por la allowlist firmada."
+        ) from error
     executable = provenance["resolved_path"]
     argv = [arg.replace("{target}", str(path)) for arg in spec["argv"]]
     if any("{" in arg or "}" in arg for arg in argv):
