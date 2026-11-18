@@ -101,7 +101,8 @@ ollama pull qwen3.5:4b-q4_K_M
 python agent_runner.py status
 python agent_runner.py ask NEXO "Analiza este problema y propone una metodología verificable."
 
-# Exigir ledger antes de ejecutar y al registrar el resultado:
+# El ledger es obligatorio por defecto. Esta variable también fuerza
+# la política si se activa una excepción de compatibilidad:
 export CYBER_AI_LEDGER_REQUIRED=1
 python agent_runner.py ask NEXO "Analiza este problema y propone una metodología verificable."
 ```
@@ -248,7 +249,7 @@ No firmes automáticamente la salida del mismo agente que propuso la Skill. Mant
 
 Los extractores de Office validan el tamaño de los paquetes comprimidos, pero siguen procesando archivos en el proceso local; importa solo documentos confiables hasta que se ejecute la extracción en una sandbox dedicada.
 
-Los ejecutores `tool_executor.py` y `task_runner.py` admiten `--require-ledger`: si el ledger no puede registrar el inicio o el resultado, la operación se bloquea o termina con código 3. `agent_runner.py` permite exigirlo con `CYBER_AI_LEDGER_REQUIRED=1`; `nuclei_scanner.scan_target` acepta `require_ledger=True`; `team_orchestrator.py` exige registrar inicio y resultado. Sin exigencia configurada, los ejecutores que lo permiten emiten advertencias y continúan. Los eventos `started` se enlazan a un evento terminal; no se usan como evidencia de éxito para promocionar Skills. Una excepción inesperada todavía puede dejar un inicio sin evento terminal.
+Los ejecutores `tool_executor.py` y `task_runner.py` exigen ledger por defecto; `--require-ledger` se conserva como refuerzo explícito y `--allow-unlogged-execution` solo permite una excepción deliberada para pruebas controladas. `agent_runner.py` también exige ledger por defecto; solo permite ejecución sin registro con `CYBER_AI_ALLOW_UNLOGGED_EXECUTION=1`, y `CYBER_AI_LEDGER_REQUIRED=1` prevalece sobre esa excepción. `nuclei_scanner.scan_target` acepta `require_ledger=True`; `team_orchestrator.py` exige registrar inicio y resultado. Los eventos `started` se enlazan a un evento terminal; no se usan como evidencia de éxito para promocionar Skills. Una excepción inesperada todavía puede dejar un inicio sin evento terminal.
 
 Los datos locales, bases SQLite, historiales y reportes se guardan fuera del control de versiones mediante `.gitignore`. Haz copias de seguridad antes de borrar o recrear `data/`.
 
