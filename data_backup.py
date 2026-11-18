@@ -317,10 +317,16 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None):
                 target = staging / relative
                 target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
                 if source.suffix.lower() in {".sqlite", ".sqlite3", ".db"}:
+                    source_before = source.lstat()
+                    if not stat.S_ISREG(source_before.st_mode):
+                        raise BackupError(f"Archivo SQLite no regular: {relative}")
                     _sqlite_snapshot(source, target)
+                    source_after = source.lstat()
+                    if _file_identity(source_before) != _file_identity(source_after):
+                        raise BackupError(f"El archivo SQLite cambió durante el snapshot: {relative}")
                     kind = "sqlite_snapshot"
                 else:
-                    shutil.copy2(source, target)
+                    _copy_checked_file(source, target, expected_size=source_size)
                     kind = "file_copy_quiesced"
                 try:
                     os.chmod(target, 0o600)
@@ -383,7 +389,7 @@ def verify_backup(snapshot, *, require_signature=False):
     try:
         if manifest_path.stat().st_size > MAX_MANIFEST_BYTES:
             raise BackupError("El manifiesto del backup supera 16 MiB.")
-        manifest_bytes = manifest_path.read_bytes()
+        manifest_bytes = _read_bounded_regular_file(manifest_path, MAX_MANIFEST_BYTES)
         if len(manifest_bytes) > MAX_MANIFEST_BYTES:
             raise BackupError("El manifiesto del backup supera 16 MiB.")
         manifest = json.loads(manifest_bytes.decode("utf-8"))
@@ -422,7 +428,7 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
     staging.mkdir(mode=0o700)
     previous = None
     try:
-        manifest_bytes = (snapshot / "manifest.json").read_bytes()
+        manifest_bytes = _read_bounded_regular_file(snapshot / "manifest.json", MAX_MANIFEST_BYTES)
         if hashlib.sha256(manifest_bytes).hexdigest() != report["manifest_sha256"]:
             raise BackupError("El manifiesto cambió después de su verificación.")
         manifest = json.loads(manifest_bytes.decode("utf-8"))
@@ -431,7 +437,10 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
             source = snapshot.joinpath(*relative.parts)
             target = staging.joinpath(*relative.parts)
             target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
-            shutil.copy2(source, target)
+            _copy_checked_file(
+                source, target, expected_size=item["size"],
+                expected_sha256=item["sha256"],
+            )
             if target.stat().st_size != item["size"] or _sha256(target) != item["sha256"]:
                 raise BackupError(f"El archivo cambió durante la restauración: {relative.as_posix()}")
             if target.suffix.lower() in {".sqlite", ".sqlite3", ".db"}:
