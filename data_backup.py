@@ -275,6 +275,8 @@ def verify_backup(snapshot, *, require_signature=False):
         if manifest_path.stat().st_size > MAX_MANIFEST_BYTES:
             raise BackupError("El manifiesto del backup supera 16 MiB.")
         manifest_bytes = manifest_path.read_bytes()
+        if len(manifest_bytes) > MAX_MANIFEST_BYTES:
+            raise BackupError("El manifiesto del backup supera 16 MiB.")
         manifest = json.loads(manifest_bytes.decode("utf-8"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
         raise BackupError("El manifiesto no es JSON UTF-8 válido.") from error
