@@ -13,6 +13,7 @@ PROJECT = Path(__file__).resolve().parent
 DEFAULT_DB = PROJECT / "data" / "execution_ledger.sqlite3"
 GENESIS = "0" * 64
 MAX_FIELD = 16384
+MAX_SQLITE_INTEGER = (1 << 63) - 1
 SECRET_KEY = re.compile(r"(?:api[_-]?key|authorization|password|secret|token|credential)", re.I)
 SECRET_ASSIGNMENT = re.compile(
     r"""(?i)\b(api[_-]?key|access[_-]?token|refresh[_-]?token|password|passwd|secret|client[_-]?secret)\b\s*([:=])\s*("[^"]*"|'[^']*'|[^\s,;]+)"""
@@ -152,13 +153,18 @@ class ExecutionLedger:
                 raise LedgerError(f"{name} es obligatorio.")
         if status not in {"started", "completed", "failed", "timeout", "denied", "cancelled", "interrupted"}:
             raise LedgerError("Estado de ejecución no permitido.")
-        if isinstance(duration_ms, bool) or not isinstance(duration_ms, int) or duration_ms < 0:
-            raise LedgerError("duration_ms debe ser un entero no negativo.")
-        if cost_microunits is not None and (
-            isinstance(cost_microunits, bool) or not isinstance(cost_microunits, int)
-            or cost_microunits < 0
+        if (
+            isinstance(duration_ms, bool)
+            or not isinstance(duration_ms, int)
+            or not 0 <= duration_ms <= MAX_SQLITE_INTEGER
         ):
-            raise LedgerError("cost_microunits debe ser un entero no negativo.")
+            raise LedgerError("duration_ms debe ser un entero entre 0 y 2^63-1.")
+        if cost_microunits is not None and (
+            isinstance(cost_microunits, bool)
+            or not isinstance(cost_microunits, int)
+            or not 0 <= cost_microunits <= MAX_SQLITE_INTEGER
+        ):
+            raise LedgerError("cost_microunits debe ser un entero entre 0 y 2^63-1.")
         evidence_hash = hashlib.sha256(_canonical(_clean(evidence)).encode()).hexdigest()
         validators = _clean(validator_results or [])
         safe_metadata = _clean(metadata or {})
@@ -207,11 +213,19 @@ class ExecutionLedger:
 
     def reconcile_interrupted(self, *, namespace=None, stale_after_seconds=300):
         """Atomically close stale orphaned starts; call only after stopping workers."""
-        if (isinstance(stale_after_seconds, bool)
-                or not isinstance(stale_after_seconds, (int, float))
-                or not math.isfinite(stale_after_seconds) or stale_after_seconds < 0):
+        if isinstance(stale_after_seconds, bool) or not isinstance(
+            stale_after_seconds, (int, float)
+        ):
             raise LedgerError("stale_after_seconds debe ser finito y no negativo.")
-        cutoff = datetime.now(timezone.utc).timestamp() - stale_after_seconds
+        try:
+            stale_seconds = float(stale_after_seconds)
+        except (OverflowError, ValueError) as error:
+            raise LedgerError(
+                "stale_after_seconds debe ser finito y no negativo."
+            ) from error
+        if not math.isfinite(stale_seconds) or stale_seconds < 0:
+            raise LedgerError("stale_after_seconds debe ser finito y no negativo.")
+        cutoff = datetime.now(timezone.utc).timestamp() - stale_seconds
         db = self.connect()
         reconciled = []
         try:
