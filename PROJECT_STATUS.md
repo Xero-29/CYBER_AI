@@ -1,11 +1,11 @@
 # Estado verificado más reciente — 2026-11-18
 
 **Repositorio:** `Xero-29/CYBER_AI`  
-**Rama auditada:** `codex/security-integrity-audit`  
-**Último HEAD con cambios de código y CI verde:** `6d5d8e2ca9afd8e06388f2799147898f318da82b`  
-**Commits documentales posteriores:** `ce9467d010103ac7e85f4f345322f9b87f318fad`, `6f1b6b8f95b6ab222ab8856c87e91fbd776fcc54`, `bcbc20fbabac8bfa6f1b87e11091cd3c93ca3506`  
+**Rama de código auditada:** `codex/security-integrity-audit`  
+**Último HEAD con cambios de código y CI verde:** `4ebbe42b39ddfb989225cdf5beff5b4055d918da`  
+**HEAD documental posterior:** `86bd736a703059d9bba31d0677dbfdda8ecc2d6a`  
 **main inspeccionada:** `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`  
-**Comparación actual:** divergente; la rama auditada está **69 commits adelante y 573 detrás**. Merge-base: `cae816d6037b56f017c2fbdb3e98ef00df58c1d`.
+**Comparación al iniciar esta actualización:** divergente; la rama auditada estaba **85 commits adelante y 573 detrás**. Merge-base: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.
 
 ## Ramas, commits y PRs
 
@@ -21,12 +21,13 @@
 
 ## CI del último HEAD con cambios de código
 
-SHA `6d5d8e2ca9afd8e06388f2799147898f318da82b`:
+SHA `4ebbe42b39ddfb989225cdf5beff5b4055d918da`:
 
-- Python Tests: **success, 520 tests**, run [44332915366](https://github.com/Xero-29/CYBER_AI/actions/runs/44332915366).
-- Docker Sandbox: **success, 520 tests y Ruff 0.14.5 dentro del contenedor**, run [44332914931](https://github.com/Xero-29/CYBER_AI/actions/runs/44332914931).
+- Python Tests: **success, 528 tests**, run [44334519555](https://github.com/Xero-29/CYBER_AI/actions/runs/44334519555).
+- Docker Sandbox: **success, 528 tests y Ruff dentro del contenedor**, run [44334519559](https://github.com/Xero-29/CYBER_AI/actions/runs/44334519559).
 - Ambos workflows terminaron en `completed/success` sobre el mismo SHA.
-- Los commits posteriores indicados arriba son documentales. El entorno de esta sesión no permitió ejecutar la suite local; la evidencia reproducible es GitHub Actions.
+- El commit posterior `86bd736a703059d9bba31d0677dbfdda8ecc2d6a` solo actualiza documentación; su CI se vuelve a comprobar en Actions.
+- No hubo entorno local de ejecución disponible en esta sesión; la evidencia reproducible es GitHub Actions.
 
 ## Implementaciones concretas de esta iteración
 
@@ -37,7 +38,7 @@ SHA `6d5d8e2ca9afd8e06388f2799147898f318da82b`:
   - escritura atómica del lock.
 - `dependency_artifact_manifest.py`:
   - aplica límites equivalentes al wheelhouse;
-  - valida de forma estricta la identidad METADATA y detecta cambios del wheel durante el hashing;
+  - valida estrictamente la identidad METADATA y detecta cambios del wheel durante el hashing;
   - conserva la comprobación contra hashes fijados en el lock y escribe el manifiesto de forma atómica.
 - `tool_allowlist.py`:
   - allowlist HMAC-SHA256, JSON canónico, rechazo de claves duplicadas, esquema estricto y tamaño máximo de 64 KiB;
@@ -47,13 +48,15 @@ SHA `6d5d8e2ca9afd8e06388f2799147898f318da82b`:
   - incorpora el resultado de la política a la evidencia de ejecución.
 - `preflight.py`:
   - comprueba la firma/configuración de la allowlist sin iniciar herramientas ni usar red;
-  - bloquea si `CYBER_AI_TOOL_ALLOWLIST_REQUIRED=1` y la política falta o es inválida; exige que ruta y clave se configuren juntas.
+  - bloquea si `CYBER_AI_TOOL_ALLOWLIST_REQUIRED=1` y la política falta o es inválida;
+  - marca como advertencia el override de ejecución sin ledger.
 - `safe_io.py`:
-  - incorpora escritura atómica mediante temporal exclusivo;
+  - escritura atómica mediante temporal exclusivo;
   - rechaza destinos no regulares y componentes de ruta symlink/reparse;
-  - se usa en generación de locks, manifiestos de artefactos, SBOM y manifiesto de descargas de conocimiento.
-- Documentación nueva/actualizada: `docs/TOOL_ALLOWLIST.md`, `docs/SECURE_FILE_OUTPUTS.md`, `docs/LOCAL_PREFLIGHT.md`.
-- Pruebas nuevas: `tests/test_wheel_lock_generator.py`, ampliación de `tests/test_dependency_artifact_manifest.py`, `tests/test_tool_allowlist.py`, `tests/test_tool_adapters_allowlist.py`, `tests/test_preflight_tool_allowlist.py` y `tests/test_safe_io.py`.
+  - integrado en generación de locks, manifiestos de artefactos, SBOM y manifiesto de descargas de conocimiento.
+- **Ledger fail-closed:** `tool_executor.py`, `task_runner.py` y `agent_runner.py` exigen registrar inicio/resultado por defecto. El bypass requiere `--allow-unlogged-execution` o `CYBER_AI_ALLOW_UNLOGGED_EXECUTION=1` y se reporta en preflight.
+- Documentación nueva/actualizada: `docs/TOOL_ALLOWLIST.md`, `docs/SECURE_FILE_OUTPUTS.md`, `docs/LOCAL_PREFLIGHT.md`, `docs/EXECUTION_LEDGER.md`.
+- Pruebas nuevas/ampliadas: wheel metadata/recursos, allowlist y su integración, preflight, escritura segura, política fail-closed del ledger y cierre de eventos. Total CI: 528 pruebas.
 
 ## Límites de lo implementado
 
@@ -74,7 +77,7 @@ SHA `6d5d8e2ca9afd8e06388f2799147898f318da82b`:
 7. Revisar manualmente las 138 fuentes, las 276 verificaciones pendientes y los contenidos por especialidad; validar licencias, exactitud, vigencia y recuperación semántica con un dataset experto.
 8. Verificar ACL Windows, protección de rama, alertas/observabilidad y respuesta a incidentes en la infraestructura de despliegue.
 
-**Conclusión:** el código de esta rama pasó 520 pruebas en Python y 520 en Docker, con Ruff aprobado, en el SHA exacto enlazado. Se cerraron brechas de validación de wheels, allowlist opcional y escritura segura de artefactos. No está listo para producción ni para declarar finalizada la validación institucional: la allowlist aún requiere activación y enrolamiento, la integración con main sigue muy divergente y la propuesta PR #11 falla. No se modificó `main`.
+**Conclusión:** el código de esta rama pasó 528 pruebas en Python y 528 en Docker, con Ruff aprobado, en el SHA exacto enlazado. Se cerraron brechas de validación de wheels, allowlist configurable, escritura segura de artefactos y trazabilidad obligatoria por defecto. No está listo para producción ni para declarar finalizada la validación institucional: la allowlist aún requiere activación y enrolamiento, la integración con main sigue muy divergente y la propuesta PR #11 falla. No se modificó `main`.
 
 
 ---
