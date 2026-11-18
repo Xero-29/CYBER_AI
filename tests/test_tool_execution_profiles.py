@@ -11,7 +11,8 @@ from tool_execution_profiles import (
 )
 import custom_tool_runner
 from custom_tool_runner import run_custom_tool
-from tool_allowlist import sign_tool_allowlist
+from tool_allowlist import ToolAllowlistError, sign_tool_allowlist
+from tool_adapters import ToolExecutionError
 
 
 class ToolExecutionProfileTests(unittest.TestCase):
@@ -114,6 +115,28 @@ class ToolExecutionProfileTests(unittest.TestCase):
             self.assertTrue(evidence["tool_allowlist"]["enforced"])
             self.assertEqual(evidence["network_access"], "not_enforced")
 
+
+
+    def test_custom_runner_denies_unapproved_binary_before_process_start(self):
+        spec = {
+            "id": "custom_python_check",
+            "executable": sys.executable,
+            "argv": ["-c", "print('should-not-run')", "{target}"],
+            "timeout_seconds": 10,
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            target = Path(directory) / "target"
+            target.write_text("sample", encoding="utf-8")
+            with patch.object(
+                custom_tool_runner, "_hash_binary",
+                return_value={"resolved_path": sys.executable, "sha256": "a" * 64},
+            ), patch.object(
+                custom_tool_runner, "verify_tool_allowed",
+                side_effect=ToolAllowlistError("not approved"),
+            ), patch.object(custom_tool_runner.subprocess, "Popen") as process:
+                with self.assertRaisesRegex(ToolExecutionError, "allowlist firmada"):
+                    run_custom_tool(spec, str(target))
+            process.assert_not_called()
 
 if __name__ == "__main__":
     unittest.main()
