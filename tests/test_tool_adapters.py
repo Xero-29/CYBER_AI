@@ -97,6 +97,7 @@ class ToolAdapterTests(unittest.TestCase):
         self.assertNotIn("OPENAI_API_KEY", process_env)
         self.assertNotIn("/home/private-user", process_env["PATH"])
         self.assertIn("/usr/bin", process_env["PATH"])
+        self.assertTrue(all(process_env["PATH"].split(os.pathsep)))
         self.assertFalse(Path(process_env["HOME"]).exists())
 
     @patch("tool_adapters.subprocess.Popen")
