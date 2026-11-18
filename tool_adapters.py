@@ -311,7 +311,7 @@ def _parse_nmap_xml(output):
 
 
 
-def _run_scoped_nmap(target, spec, *, timeout=None):
+def _run_scoped_nmap(target, spec, *, timeout=None, isolated_home):
     normalized_target, scope, allowlist_hash = _validated_nmap_scope(target)
     limit = spec["timeout"] if timeout is None else timeout
     if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= 180:
@@ -451,7 +451,9 @@ def _run_local_tool_with_home(
     if spec.get("scoped_network"):
         if not allow_network:
             raise ToolExecutionError("Nmap requiere --authorized-network además de la allowlist CIDR.")
-        return _run_scoped_nmap(target, spec, timeout=timeout)
+        return _run_scoped_nmap(
+            target, spec, timeout=timeout, isolated_home=isolated_home
+        )
     if spec.get("requires_isolation"):
         from isolated_tool_runner import run_isolated_tool
         return run_isolated_tool(
@@ -477,13 +479,32 @@ def _run_local_tool_with_home(
         raise ToolExecutionError("El timeout debe estar entre 1 y 600 segundos.")
     if config_path is None and tool_id == "semgrep":
         config_path = os.environ.get("CYBER_AI_SEMGREP_CONFIG")
+    safe_path_entries = [str(Path(binary).parent)]
+    safe_path_entries.extend(
+        entry for entry in os.defpath.split(os.pathsep) if entry
+    )
+    safe_path = os.pathsep.join(dict.fromkeys(safe_path_entries))
     env = {
-        "PATH": os.environ.get("PATH", ""),
-        "HOME": os.environ.get("HOME", ""),
+        "PATH": safe_path,
+        "HOME": isolated_home,
+        "TMPDIR": isolated_home,
+        "TEMP": isolated_home,
+        "TMP": isolated_home,
+        "XDG_CONFIG_HOME": str(Path(isolated_home) / "config"),
+        "XDG_CACHE_HOME": str(Path(isolated_home) / "cache"),
+        "PYTHONNOUSERSITE": "1",
+        "PYTHONDONTWRITEBYTECODE": "1",
         "LANG": "C.UTF-8",
         "LC_ALL": "C.UTF-8",
         "NO_COLOR": "1",
     }
+    if os.name == "nt":
+        for variable in ("SYSTEMROOT", "WINDIR", "PATHEXT", "COMSPEC"):
+            if os.environ.get(variable):
+                env[variable] = os.environ[variable]
+        env["USERPROFILE"] = isolated_home
+        env["APPDATA"] = str(Path(isolated_home) / "AppData" / "Roaming")
+        env["LOCALAPPDATA"] = str(Path(isolated_home) / "AppData" / "Local")
     for variable in (
         "OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY",
         "OSV_SCALIBR_LOCAL_DB_CACHE_DIRECTORY",
