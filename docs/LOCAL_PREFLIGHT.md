@@ -5,6 +5,7 @@ Ejecuta `python preflight.py` después de instalar dependencias. La comprobació
 - **Errores:** bloquean la preparación básica (Python anterior a 3.12, archivos base ausentes, configuración inválida o dependencias base ausentes).
 - **Advertencias:** integraciones opcionales no instaladas, extractores documentales opcionales ausentes o ledger aún no creado.
 - **Ledger existente:** si existe, se verifica su cadena hash; un fallo de integridad bloquea la comprobación.
+- **Allowlist de ejecutables:** se valida la firma HMAC y el número de binarios aprobados cuando se configura. Si `CYBER_AI_TOOL_ALLOWLIST_REQUIRED=1`, la ausencia o invalidez de la política bloquea el preflight. Sin modo obligatorio, la ausencia se muestra como advertencia y los adaptadores conservan compatibilidad.
 
 Para automatización:
 
