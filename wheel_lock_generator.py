@@ -87,7 +87,8 @@ def read_expected(path):
     if path.is_symlink() or not path.is_file():
         raise WheelLockError("Archivo de requisitos inexistente o inseguro.")
     try:
-        raw_requirements = path.read_bytes()
+        with path.open("rb") as stream:
+            raw_requirements = stream.read(MAX_REQUIREMENTS_BYTES + 1)
         if len(raw_requirements) > MAX_REQUIREMENTS_BYTES:
             raise WheelLockError(
                 f"El archivo de requisitos supera {MAX_REQUIREMENTS_BYTES} bytes."
