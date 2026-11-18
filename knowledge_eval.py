@@ -270,7 +270,7 @@ def main():
         atomic_write_text(
             args.output, rendered + "\n", create_parents=True
         )
-        print(f"Informe: {destination}")
+        print(f"Informe: {args.output}")
     print(
         f"Consultas: {report['queries']} | Recall@{args.top_k}: "
         f"{report['recall_at_k']:.3f} | Precision@{args.top_k}: "
