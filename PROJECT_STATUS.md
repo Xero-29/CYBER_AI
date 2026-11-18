@@ -2,66 +2,64 @@
 
 **Repositorio:** `Xero-29/CYBER_AI`  
 **Rama auditada:** `codex/security-integrity-audit`  
-**HEAD de código con CI verde:** `1aed9ba58da7299a8e9eb0a9b304920894270abb`  
-**HEAD documental anterior:** `53660782db2f2a43d21031418be217e9647db0d4`  
+**HEAD de código/configuración validado antes de esta actualización:** `617ba6c55525503d7cd55ea34a276b8d68ea664f`  
 **main inspeccionada:** `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`  
-**Divergencia actual:** `diverged`, rama auditada **90 commits adelante y 573 detrás**. Merge-base: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.
+**Divergencia observada antes de esta actualización:** `diverged`, rama auditada **108 commits adelante y 573 detrás**. Merge-base: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.
 
 ## Ramas, commits y PRs
 
 - **PR #2:** cerrado y fusionado el 2026-11-17. Merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. No debe duplicarse ni reabrirse.
 - **PR #11:** abierto en draft, rama `codex/integration-hash-locks-2026-11-17-v2`, HEAD `d9ce6eb26fa018330e5890c3632f963912a6626e`, base `main`. GitHub lo reporta mergeable, pero sus checks fallan:
-  - Python Tests — run [44335073066](https://github.com/Xero-29/CYBER_AI/actions/runs/44335073066): 627 tests, **5 errors** y 1 omitido.
+  - Python Tests — run [44335073066](https://github.com/Xero-29/CYBER_AI/actions/runs/44335073066): 627 tests, **5 errors**.
   - Docker Sandbox — run [44335073344](https://github.com/Xero-29/CYBER_AI/actions/runs/44335073344): 627 tests, **5 errors**.
-  - Los cinco errores reproducen el mismo defecto de fixtures: `tests/test_dependency_artifact_manifest.py` crea un `requirements.txt` con `requests==2.0` sin hash, mientras el parser ahora exige hashes en los locks. El job Windows de allowlist y la construcción de imágenes Docker sí terminaron correctamente; la suite falla antes de los pasos de SBOM/Ruff.
-  - No se modificó ni se reutilizó esa rama de integración en esta ejecución.
-- **PR #1 y PR #3–#10:** siguen abiertos; los PRs de Dependabot requieren revisión individual y regeneración de locks cuando corresponda.
-- El commit histórico `7b5ed033f1f6461b5780a10ac4ada67a444b93e5` es ancestro común de `main` y de la rama auditada; ya no es un commit exclusivo de `main`. Existe una rama de respaldo de `main`.
-- No se hizo merge, rebase, force-push ni modificación de `main`. La divergencia de 573 commits impide una integración segura por actualización directa; requiere reconciliación en una rama separada y revisión por archivo.
+  - Los cinco errores son los tests de `dependency_artifact_manifest`: el fixture crea `requirements.txt` con `requests==2.0` sin hash y el parser de lock exige SHA-256. El job Windows de allowlist terminó correctamente. No se modificó esa rama ni se duplicó el PR.
+- **PR #1 y PR #3–#10:** siguen abiertos; las actualizaciones de Dependabot requieren revisión individual.
+- El commit histórico `7b5ed033f1f6461b5780a10ac4ada67a444b93e5` es ancestro común de `main` y de la rama auditada; ya no es exclusivo de `main`. Existe una rama de respaldo de `main`.
+- No se hizo merge, rebase, force-push ni modificación de `main`. La divergencia de 573 commits requiere reconciliación en una rama separada y revisión por archivo; no es seguro actualizar esta rama directamente.
 
-## CI del HEAD de código exacto
+## CI del HEAD exacto
 
-SHA `1aed9ba58da7299a8e9eb0a9b304920894270abb`:
+SHA `617ba6c55525503d7cd55ea34a276b8d68ea664f`:
 
-- Python Tests — **completed/success, 530 pruebas**: [run 44336406992](https://github.com/Xero-29/CYBER_AI/actions/runs/44336406992).
-- Docker Sandbox — **completed/success, 530 pruebas y Ruff dentro del contenedor**: [run 44336406832](https://github.com/Xero-29/CYBER_AI/actions/runs/44336406832).
-- Ambos checks validaron exactamente el mismo SHA. El workflow Python también generó SBOM CycloneDX y manifiestos de artefactos para el entorno principal y el sandbox.
-- No se dispuso de entorno local en esta sesión; la evidencia de ejecución es GitHub Actions.
+- Python Tests — **completed/success, 540 pruebas**: [run 44338745968](https://github.com/Xero-29/CYBER_AI/actions/runs/44338745968).
+- Docker Sandbox — **completed/success, 540 pruebas y Ruff dentro del contenedor**: [run 44338745520](https://github.com/Xero-29/CYBER_AI/actions/runs/44338745520).
+- Ambos checks validaron exactamente el mismo SHA. El workflow Python ejecutó primero el entorno base y después instaló las dependencias documentales con hashes; los cuatro tests de extracción real PDF/DOCX/XLSX/PPTX pasaron en la segunda ejecución.
+- Se generaron tres SBOM CycloneDX (núcleo, sandbox y documentos) y manifiestos de artefactos de wheels. No se observaron `ResourceWarning` de pipes abiertos en esta ejecución.
+- No se dispuso de entorno local con el checkout completo; la evidencia de ejecución es GitHub Actions.
 
 ## Implementaciones concretas de esta iteración
 
-- `execution_ledger.py`:
-  - limita `duration_ms` y `cost_microunits` al rango entero de SQLite (`0..2^63-1`);
-  - convierte el umbral de reconciliación a `float` de forma controlada y transforma desbordamientos en `LedgerError`, sin propagar `OverflowError`.
-- `tool_executor.py`:
-  - valida la duración informada por adaptadores sin convertir enteros arbitrariamente grandes a float;
-  - comprueba que la conversión a milisegundos sea finita y quepa en SQLite; ante valores inválidos o fuera de rango usa el reloj monotónico local.
-- Pruebas de regresión:
-  - límites SQLite máximo y desbordamiento para duración/coste;
-  - umbrales de reconciliación no representables;
-  - duración de adaptador con booleanos, negativos, NaN, infinito, texto, enteros gigantes y floats fuera de rango.
-- El nuevo código quedó publicado en commits pequeños y separados en la rama auditada.
+- **Ledger SQLite y duración:**
+  - `duration_ms` y `cost_microunits` quedan limitados a `0..2^63-1`; umbrales de reconciliación gigantes se rechazan con `LedgerError`.
+  - Las duraciones de adaptadores se validan sin convertir enteros arbitrariamente grandes a float; valores no finitos o fuera de rango usan el reloj monotónico.
+  - El ledger rechaza symlinks y archivos no regulares en DB/WAL/SHM. En POSIX exige directorio padre privado (0700) y restringe archivos a 0600. La comprobación se repite antes de abrir cada conexión.
+- **Ejecución de herramientas:**
+  - `tool_adapters.py` cierra stdout/stderr, drena los pipes y elimina procesos descendientes que mantengan abiertos los descriptores tras terminar el proceso principal.
+  - `sandbox_runner.py` crea el montaje de evidencias con permisos privados (0700), requisito para que el ledger del contenedor pueda escribirse sin abrir el directorio a otros usuarios.
+- **Dependencias documentales:**
+  - `requirements-documents.in` fija las dependencias directas; `requirements-documents.lock` fija dependencias transitivas y SHA-256. `requirements-documents.txt` conserva un alias de compatibilidad.
+  - CI descarga exclusivamente wheels, valida el manifiesto y publica un SBOM documental separado. README y `docs/LOCAL_PREFLIGHT.md` describen instalación y regeneración.
+- **Pruebas de regresión:** límites y desbordamientos SQLite; symlinks DB/WAL/SHM; permisos POSIX; limpieza de pipes; montaje privado de Docker; extracción real de PDF, DOCX, XLSX y PPTX.
 
 ## Límites de lo implementado
 
-- La allowlist HMAC sigue siendo opcional para compatibilidad. Sin ruta/clave y sin `CYBER_AI_TOOL_ALLOWLIST_REQUIRED=1`, el estado `not_configured` no equivale a binario aprobado. La custodia, rotación y segregación de la clave simétrica requieren KMS/HSM o firma asimétrica.
-- La escritura atómica reduce riesgos de symlink, pero no protege contra un administrador local capaz de modificar simultáneamente los directorios padre.
-- `requirements-documents.lock` no está incorporado en esta rama; no se copió desde PR #11 porque su rama falla CI y sus versiones no se han validado contra el conjunto actual.
-- Los locks principales cubren un entorno concreto (CPython 3.12, Linux x86_64, glibc >= 2.26), no todas las plataformas.
-- El preflight aún refleja 138 fuentes de conocimiento, 0 revisadas y 276 verificaciones pendientes. Tener catálogo y perfiles no demuestra exactitud, vigencia, licencia ni calidad experta.
+- La allowlist HMAC sigue siendo opcional para compatibilidad. Sin ruta/clave y sin `CYBER_AI_TOOL_ALLOWLIST_REQUIRED=1`, `not_configured` no equivale a binario aprobado. Custodia, rotación y segregación de claves requieren KMS/HSM o firma asimétrica.
+- En Windows el código no inspecciona ACL; deben configurarse y verificarse en la infraestructura. El lock documental actual cubre CPython 3.12, Linux x86_64 y glibc >= 2.26, no otras plataformas.
+- El ledger es tamper-evident, no WORM ni tamper-proof; un administrador privilegiado puede reemplazar la base. Checkpoints externos, KMS/HSM y almacenamiento inmutable siguen siendo externos.
+- El preflight refleja 138 fuentes de conocimiento, 0 revisadas y 276 verificaciones pendientes. El catálogo no demuestra exactitud, vigencia, licencia ni calidad experta.
 
-## Pendientes que aún no se pueden cerrar solo con pruebas unitarias
+## Pendientes que aún requieren integración, infraestructura o validación real
 
-1. Reconciliar los 573 commits exclusivos de `main` desde el merge-base en una rama separada; preservar los 90 commits de auditoría y resolver cambios con revisión por archivo. No integrar automáticamente.
-2. Corregir los fixtures de hash de PR #11 en su rama propia y volver a ejecutar ambos workflows antes de considerarlo integrable.
-3. Obtener y validar locks con hashes para dependencias documentales y plataformas adicionales.
-4. Configurar custodia de claves, KMS/HSM, RBAC/IdP/MFA, WORM/offsite y cifrado de backups; ejecutar simulacros DR/RPO/RTO.
+1. Reconciliar los 573 commits de `main` desde el merge-base en una rama separada; preservar los cambios de auditoría y revisar conflictos por archivo. No integrar automáticamente.
+2. Corregir los cinco fixtures de hash en PR #11 en su propia rama y volver a ejecutar sus workflows antes de considerar esa integración.
+3. Añadir locks hash-verified para plataformas adicionales y validar wheels específicos de cada arquitectura.
+4. Configurar KMS/HSM, RBAC/IdP/MFA, WORM/offsite y cifrado de backups; ejecutar simulacros de restauración y DR con RPO/RTO medidos.
 5. Ejecutar pruebas reales de microVM/VM, egress, escape de sandbox, concurrencia, carga/soak, disco lleno y recuperación tras caída/corrupción del host.
 6. Conectar proveedores/modelos reales y medir calidad, coste, latencia, cuotas, fallos y políticas de datos.
 7. Revisar las 138 fuentes y 276 verificaciones pendientes con especialistas; validar licencias, exactitud, vigencia y recuperación semántica con un dataset experto.
-8. Verificar ACL Windows, protección de rama, alertas, observabilidad y respuesta a incidentes en infraestructura de despliegue.
+8. Verificar ACL Windows, protección de rama, alertas, observabilidad y respuesta a incidentes en la infraestructura de despliegue.
 
-**Conclusión:** el HEAD de código `1aed9ba58da7299a8e9eb0a9b304920894270abb` pasó 530 pruebas en Python y Docker, con Ruff aprobado. Esto acredita los checks automatizados de ese SHA, no una certificación ni preparación para producción. La rama continúa divergente de `main`, PR #11 sigue fallando y permanecen pendientes operacionales y de revisión experta. `main` no fue modificada.
+**Conclusión:** el código del SHA `617ba6c55525503d7cd55ea34a276b8d68ea664f` pasó 540 pruebas en Python y Docker, incluyendo los extractores documentales reales, y Ruff aprobó dentro del sandbox. Esto acredita los checks automatizados de ese SHA, no una certificación ni preparación para producción. La rama continúa divergente de `main`, PR #11 sigue fallando y permanecen pendientes operacionales y de revisión experta. `main` no fue modificada.
 
 
 ---
