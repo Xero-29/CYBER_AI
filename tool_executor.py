@@ -59,8 +59,16 @@ def main(argv=None):
     parser.add_argument("--config", help="Configuración local para Semgrep")
     parser.add_argument("--timeout", type=int)
     parser.add_argument("--execute", action="store_true", help="Confirma la ejecución local")
-    parser.add_argument("--require-ledger", action="store_true",
-                        help="Bloquea la ejecución si no puede registrar inicio y resultado")
+    ledger_policy = parser.add_mutually_exclusive_group()
+    ledger_policy.add_argument(
+        "--require-ledger", dest="require_ledger", action="store_true",
+        help="Exige registrar inicio y resultado en el ledger (predeterminado).",
+    )
+    ledger_policy.add_argument(
+        "--allow-unlogged-execution", dest="require_ledger", action="store_false",
+        help="Permite explícitamente ejecutar sin ledger; no recomendado.",
+    )
+    parser.set_defaults(require_ledger=True)
     args = parser.parse_args(argv)
 
     if not args.execute:
