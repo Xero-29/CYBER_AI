@@ -5,6 +5,7 @@ import os
 import re
 import shutil
 import subprocess
+import stat
 import sys
 import uuid
 from pathlib import Path
@@ -35,8 +36,12 @@ def build_docker_command(tool_id, target, evidence_dir, image=DEFAULT_IMAGE, tim
         raise ToolExecutionError("La ruta de evidencias contiene caracteres no permitidos para Docker --mount.")
     if evidence.is_symlink():
         raise ToolExecutionError("La carpeta de evidencias no puede ser un enlace simbólico.")
-    evidence.mkdir(parents=True, exist_ok=True)
+    evidence.mkdir(parents=True, exist_ok=True, mode=0o700)
     evidence = evidence.resolve(strict=True)
+    if os.name != "nt" and stat.S_IMODE(evidence.stat().st_mode) & 0o077:
+        raise ToolExecutionError(
+            "La carpeta de evidencias debe ser privada (permisos 0700)."
+        )
     try:
         evidence.relative_to(PROJECT_ROOT.resolve())
     except ValueError:
