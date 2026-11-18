@@ -3,11 +3,11 @@
 import argparse
 import hashlib
 import os
-from email.parser import Parser
 import re
 import stat
 import sys
 import zipfile
+from email.parser import Parser
 from pathlib import Path
 
 
@@ -148,10 +148,18 @@ def build_lock(wheelhouse, requirements):
     if not wheels:
         raise WheelLockError("Wheelhouse vacío.")
     wheels.sort(key=lambda item: item.name)
+    verified_total_bytes = 0
     for wheel in wheels:
         before = wheel.stat(follow_symlinks=False)
         if not stat.S_ISREG(before.st_mode):
             raise WheelLockError(f"Wheel no regular: {wheel.name}.")
+        if before.st_size > MAX_WHEEL_BYTES:
+            raise WheelLockError(f"Wheel supera el límite de {MAX_WHEEL_BYTES} bytes: {wheel.name}.")
+        verified_total_bytes += before.st_size
+        if verified_total_bytes > MAX_WHEELHOUSE_BYTES:
+            raise WheelLockError(
+                f"Wheelhouse supera el límite total de {MAX_WHEELHOUSE_BYTES} bytes."
+            )
         name, version = wheel_metadata(wheel)
         digest_builder = hashlib.sha256()
         with wheel.open("rb") as stream:
