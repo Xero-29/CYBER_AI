@@ -46,6 +46,22 @@ class SafeIoTests(unittest.TestCase):
             with self.assertRaises(SafeWriteError):
                 atomic_write_text(link / "manifest.json", "{}")
 
+    def test_parent_creation_does_not_follow_symlink_components(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            real = root / "real"
+            real.mkdir()
+            link = root / "linked"
+            try:
+                link.symlink_to(real, target_is_directory=True)
+            except (OSError, NotImplementedError):
+                self.skipTest("symlinks unavailable")
+            with self.assertRaises(SafeWriteError):
+                atomic_write_text(
+                    link / "new" / "manifest.json", "{}", create_parents=True
+                )
+            self.assertFalse((real / "new").exists())
+
     def test_parent_creation_is_explicit(self):
         with tempfile.TemporaryDirectory() as temp:
             destination = Path(temp) / "new" / "nested" / "report.json"
