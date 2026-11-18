@@ -82,7 +82,7 @@ def _wheel_metadata(path):
         or len(names) != 1
         or len(versions) != 1
         or len(metadata_versions) != 1
-        or not re.fullmatch(r"[0-9]+\\.[0-9]+", metadata_versions[0])
+        or not re.fullmatch(r"[0-9]+\.[0-9]+", metadata_versions[0])
     ):
         raise ArtifactManifestError(
             f"Wheel con identidad METADATA ausente, duplicada o inválida: {path.name}"
