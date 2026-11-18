@@ -46,6 +46,13 @@ Reglas:
 - Los comandos personalizados son responsabilidad del operador: el runner no puede demostrar que un binario arbitrario no use red. La evidencia marca `network_access=not_enforced`; no se debe interpretar como aislamiento de red.
 - No registrar herramientas que ejecuten acciones destructivas, exploten objetivos o modifiquen el objetivo analizado. El runner comprueba hashes antes/después y marca cambios como error de integridad, pero eso no revierte modificaciones.
 
+
+### Entorno del runner personalizado
+
+Cada ejecución crea un `HOME` y directorios temporales efímeros con permisos privados. El proceso recibe un entorno mínimo: `PATH` limitado al directorio del ejecutable y rutas de sistema, sin heredar variables de credenciales del operador; en Windows solo se conservan variables de sistema necesarias para arrancar procesos. stdout/stderr se drenan con límite de salida y se cierran al terminar; si un descendiente conserva los pipes, el runner intenta terminar el grupo de procesos en POSIX.
+
+Esto reduce exposición accidental de secretos y fugas de descriptores, pero no impone aislamiento de egress ni convierte un ejecutable personalizado en sandbox.
+
 ## Aislamiento de YARA y TShark
 
 YARA y TShark ya no se ejecutan directamente en el host. Se delegan a `isolated_tool_runner.py`, que usa la imagen Docker construida con:
