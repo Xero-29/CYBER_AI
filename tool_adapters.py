@@ -18,6 +18,7 @@ import tempfile
 import time
 from datetime import datetime, timezone
 from pathlib import Path
+from tool_allowlist import ToolAllowlistError, verify_tool_allowed
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent
@@ -215,6 +216,12 @@ def _run_local_tool_with_home(
         raise ToolExecutionError("La herramienta no está instalada o no está en PATH.")
     binary_provenance = _hash_binary(binary)
     binary = binary_provenance["resolved_path"]
+    try:
+        binary_allowlist = verify_tool_allowed(tool_id, binary_provenance["sha256"])
+    except ToolAllowlistError as exc:
+        raise ToolExecutionError(
+            "El ejecutable no está aprobado por la allowlist firmada."
+        ) from exc
     limit = spec["timeout"] if timeout is None else timeout
     if not isinstance(limit, int) or not 1 <= limit <= 600:
         raise ToolExecutionError("El timeout debe estar entre 1 y 600 segundos.")
@@ -316,6 +323,7 @@ def _run_local_tool_with_home(
         "tool": tool_id,
         "tool_version": tool_version,
         "tool_binary_path": binary_provenance["resolved_path"],
+        "binary_allowlist": binary_allowlist,
         "tool_binary_sha256": binary_provenance["sha256"],
         "tool_binary_sha256_after": binary_hash_after,
         "tool_binary_modified": binary_modified,
