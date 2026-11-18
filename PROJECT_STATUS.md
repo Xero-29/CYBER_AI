@@ -1,50 +1,59 @@
-# Estado verificado más reciente — 2026-11-17
+# Estado verificado más reciente — 2026-11-18
 
-**HEAD de código validado:** `5e2e85cec0c2f4cb3627e87617be0c244f83cd27`  
-**Rama:** `codex/security-integrity-audit`  
-**main:** `7b5ed033f1f6461b5780a10ac4ada67a444b93e5` — sin modificar.  
-**Comparación con main:** 483 commits adelante, 0 detrás; el merge-base coincide con el HEAD de `main`.  
-**PR #2:** abierto, draft, mergeable; no fusionado.  
-**Protección de rama:** `protected=false`; required checks y branch protection aún no están configurados.
+**Repositorio:** `Xero-29/CYBER_AI`  
+**Rama auditada:** `codex/security-integrity-audit`  
+**HEAD inspeccionado antes de esta iteración:** `482df7480ac547003a90e621c95c15789067c4dc` ([commit](https://github.com/Xero-29/CYBER_AI/commit/482df7480ac547003a90e621c95c15789067c4dc))  
+**main inspeccionada:** `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`  
+**Comparación:** divergente; rama auditada **13 commits adelante y 573 detrás** de `main`. Merge-base: `cae816d6037b56f017c2fbdb3e98ef00df58c1d`.
 
-## CI del SHA exacto
+## Ramas, commits y PRs
 
-- Python tests — **success, 456 pruebas**: https://github.com/Xero-29/CYBER_AI/actions/runs/44111423059
-- Docker sandbox — **success**: https://github.com/Xero-29/CYBER_AI/actions/runs/44111420579
-- Ambos workflows validaron exactamente `5e2e85cec0c2f4cb3627e87617be0c244f83cd27`.
-- La suite ejecuta `verify.sh`, pruebas unitarias, preflight, manifiesto de artefactos de dependencias y SBOM CycloneDX. Docker construye la imagen endurecida y ejecuta Ruff sin red.
+- **PR #2:** fusionado el 2026-11-17. Merge commit: `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. La rama auditada conserva 13 commits posteriores a su base común; no se debe tratar el PR como abierto.
+- **PR #11:** abierto en draft, en la rama separada `codex/integration-hash-locks-2026-11-17-v2`, HEAD `2910089fe75852359079d85ab8ac1e7f4cf339c3`, base SHA `c9c794c984b3fff5ff2032d0831f7f161205afc0`. Contiene trabajo de locks/SBOM sobre otra base. No se duplicó ni se fusionó.
+- **PR #1:** abierto en draft sobre `feature/institutional-extensibility-knowledge`; es una propuesta antigua y separada.
+- El commit histórico exclusivo de `main`, `7b5ed033f1f6461b5780a10ac4ada67a444b93e5` (`fix: repair sandbox policy tests`), **ya no es exclusivo**: es ancestro común de ambas líneas. La comparación desde ese commit muestra 497 commits en la rama auditada y 1057 en `main`; el cambio está preservado.
+- No se integró `main` en la rama auditada. Con 573 commits de divergencia, una integración directa sin revisar el diff completo sería insegura. No se hizo merge automático ni se modificó `main`.
 
-## Cambios recientes verificados
+## CI y evidencia por SHA
 
-- Ejecución de herramientas: si el binario o el objetivo cambia durante el análisis, la evidencia pasa a `integrity_error` y el comando no informa éxito.
-- Ledger: validadores separados para código de salida, integridad del binario e integridad del objetivo; conserva hashes antes/después.
-- Evaluación de conocimiento: valida también datasets suministrados en memoria, IDs/categorías normalizados, vectores numéricos finitos y estructura de resultados del buscador.
-- Dataset JSONL: límites de tamaño total, línea y cantidad de casos; rechazo de symlinks, campos desconocidos, IDs/categorías duplicados y consultas vacías.
-- Bootstrap: lock de archivo portable entre POSIX y Windows, con pruebas de adquisición y liberación del lock.
-- Se corrigieron fallos intermedios detectados por CI. No se consideran aprobados los SHA que fallaron o fueron cancelados; la evidencia verde es la de los dos enlaces anteriores.
+Último HEAD anterior a las correcciones de esta iteración: `482df7480ac547003a90e621c95c15789067c4dc`.
 
-## Brechas de código todavía abiertas
+- Python Tests: **success**, run [44116054953](https://github.com/Xero-29/CYBER_AI/actions/runs/44116054953), HEAD exacto `482df7480ac547003a90e621c95c15789067c4dc`.
+- Docker Sandbox: **success**, run [44116054989](https://github.com/Xero-29/CYBER_AI/actions/runs/44116054989), HEAD exacto `482df7480ac547003a90e621c95c15789067c4dc`.
+- Ambos jobs terminaron en `completed/success`. No se extrapola ese resultado a commits posteriores.
+- Las correcciones de evaluación de conocimiento publicadas en esta iteración requieren CI nuevo sobre el HEAD posterior.
 
-1. Lock de dependencias con hashes estáticos oficiales y `--require-hashes` para todas las plataformas soportadas. Los hashes del SBOM actual cubren los wheels descargados por el runner; no equivalen a un lock multiplataforma.
-2. Allowlist firmada de versiones y SHA-256 aprobados para binarios; las huellas antes/después detectan cambios durante la ejecución, pero no autentican por sí solas la procedencia inicial.
-3. Verificación y configuración real de ACL Windows para directorios de datos, secretos y evidencias.
-4. Más pruebas de estrés/concurrencia y fallos de almacenamiento; las simulaciones no equivalen a disco lleno, corrupción física o pérdida de host.
-5. Dataset experto, embeddings reales y umbrales de recuperación revisados por especialidad.
-6. OCR y ejecución aislada de extractores documentales.
+## Trabajo de esta iteración
 
-## Dependencias externas / decisiones del propietario
+- `knowledge_eval.py`: la ruta de datasets en memoria ahora aplica límites equivalentes al JSONL: 64 KiB por caso, 2 MiB totales y rechazo de Unicode no codificable en UTF-8.
+- `tests/test_knowledge_eval.py`: regresiones para límite por caso, límite total y Unicode inválido; verifican que los proveedores no se invoquen cuando falla la validación.
+- `README.md`: se corrigieron los requisitos de plataforma, se eliminó el ejemplo de instalación manual que omitía la validación de plataforma y se aclaró el alcance real de hashes/SBOM y del extra documental.
+- Estos cambios son código/documentación; no equivalen a probar proveedores reales ni a validar infraestructura externa.
 
-- KMS/HSM o gestor de secretos, custodia, rotación/revocación y segregación de funciones.
-- RBAC/IdP/MFA y roles reales de operador, revisor y administrador.
-- WORM/offsite y checkpoints independientes del host.
-- Cifrado de backups, claves independientes y simulacros reales de DR/RPO/RTO.
+## Brechas de implementación que siguen abiertas
+
+1. `requirements-documents.txt` usa rangos sin hashes; los extractores opcionales no tienen todavía un lock reproducible.
+2. Allowlist firmada de binarios/hashes aprobados y verificación de procedencia inicial; los hashes antes/después solo detectan modificaciones durante la ejecución.
+3. Soporte de instalación reproducible para otras plataformas; el lock principal está limitado a CPython 3.12.x, Linux x86_64 y glibc >= 2.26.
+4. Aplicación/verificación de ACL Windows en datos, secretos y evidencias.
+5. Pruebas de concurrencia, carga prolongada, disco lleno, corrupción física y recuperación tras pérdida de host.
+6. Dataset experto, embeddings reales y umbrales por especialidad para medir la calidad de recuperación.
+7. OCR y aislamiento de extractores documentales en un entorno desechable.
+8. Revisar en conjunto los 573 commits nuevos de `main` antes de proponer una rama de integración; no asumir que el diff de 13 commits cubre las nuevas APIs o cambios de seguridad.
+
+## Infraestructura externa y aceptación operacional
+
+- KMS/HSM o gestor de secretos con custodia, rotación, revocación y segregación de funciones.
+- RBAC/IdP/MFA con roles y aprobaciones independientes.
+- Almacenamiento WORM/offsite y checkpoints fuera del host.
+- Cifrado de backups con claves independientes y simulacros reales de DR/RPO/RTO.
 - MicroVM/VM desechable y pruebas reales de escape; Docker comparte kernel.
-- Proveedores IA reales, costes, cuotas, latencia, fallos y políticas de tratamiento de datos.
-- Revisión humana de licencia, procedencia, exactitud y vigencia de las 138 referencias externas.
-- Carga/soak, observabilidad, alertas, respuesta a incidentes y revisión independiente.
-- Branch protection, required checks, revisión independiente y autorización de release.
+- Proveedores/modelos reales: cuotas, costes, latencia, fallos y políticas de datos.
+- Revisión humana de licencia, procedencia, exactitud y vigencia de fuentes.
+- Observabilidad, alertas, respuesta a incidentes, carga/soak y revisión independiente.
+- Branch protection, required checks y autorización de release. La protección de rama no se volvió a verificar en esta pasada.
 
-**Conclusión:** el código actual tiene CI verde en el SHA indicado, pero CYBER_AI no está terminado ni certificado institucionalmente. La validación operacional y varias garantías de cadena de suministro/identidad siguen pendientes. `main` permanece intacta y el PR continúa sin fusionar.
+**Conclusión:** el último HEAD inspeccionado tiene CI verde, pero las nuevas correcciones aún requieren CI propio y la rama sigue muy divergente de `main`. CYBER_AI no está listo para producción ni certificado. No se fusionó nada y `main` permanece intacta.
 
 ---
 
