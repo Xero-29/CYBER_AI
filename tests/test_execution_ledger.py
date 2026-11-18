@@ -8,7 +8,9 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from execution_ledger import ExecutionLedger, LedgerError, _redact_text
+from execution_ledger import (
+    MAX_SQLITE_INTEGER, ExecutionLedger, LedgerError, _redact_text,
+)
 
 
 class ExecutionLedgerTests(unittest.TestCase):
@@ -87,6 +89,20 @@ class ExecutionLedgerTests(unittest.TestCase):
             self.append(status="success")
         with self.assertRaises(LedgerError):
             self.append(duration_ms=-1)
+
+    def test_sqlite_integer_bounds_are_validated_before_insert(self):
+        accepted = self.append(
+            duration_ms=MAX_SQLITE_INTEGER,
+            cost_microunits=MAX_SQLITE_INTEGER,
+        )
+        self.assertEqual(accepted["status"], "completed")
+        with self.assertRaises(LedgerError):
+            self.append(task="duration overflow", duration_ms=MAX_SQLITE_INTEGER + 1)
+        with self.assertRaises(LedgerError):
+            self.append(
+                task="cost overflow", cost_microunits=MAX_SQLITE_INTEGER + 1
+            )
+        self.assertTrue(self.ledger.verify()["valid"])
 
     def test_migrates_legacy_schema_without_breaking_hash_chain(self):
         path = Path(self.tmp.name) / "legacy.sqlite3"
@@ -205,6 +221,10 @@ os._exit(0)
         result = self.ledger.reconcile_interrupted()
         self.assertEqual(result["reconciled"], 0)
         self.assertTrue(self.ledger.verify()["valid"])
+
+    def test_reconcile_rejects_unrepresentable_stale_threshold(self):
+        with self.assertRaises(LedgerError):
+            self.ledger.reconcile_interrupted(stale_after_seconds=10**1000)
 
     def test_reconcile_does_not_close_start_with_existing_terminal_event(self):
         started = self.append(
