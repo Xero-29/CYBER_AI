@@ -407,6 +407,8 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
             def read(self, amount=-1):
                 self.requested = amount
                 return b"e" * amount
+            def close(self):
+                return None
 
         body = ErrorBody()
         error = HTTPError(
