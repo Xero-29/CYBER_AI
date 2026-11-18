@@ -11,7 +11,8 @@ from tool_allowlist import ToolAllowlistError
 class ToolAdapterAllowlistIntegrationTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
-        self.target = Path(self.temp.name) / "target.py"
+        self.root = Path(self.temp.name)
+        self.target = self.root / "target.py"
         self.target.write_text("print('safe')\n", encoding="utf-8")
         self.digest = "a" * 64
         self.binary = {
@@ -24,6 +25,7 @@ class ToolAdapterAllowlistIntegrationTests(unittest.TestCase):
 
     def patches(self, allowlist):
         return (
+            patch.object(tool_adapters, "PROJECT_ROOT", self.root),
             patch.object(tool_adapters, "_confined_path", return_value=self.target),
             patch.object(tool_adapters.shutil, "which", return_value=sys.executable),
             patch.object(tool_adapters, "_hash_binary", return_value=self.binary),
@@ -40,7 +42,7 @@ class ToolAdapterAllowlistIntegrationTests(unittest.TestCase):
         policy = {"enforced": True, "status": "approved", "sha256": self.digest}
         with self.patches(policy)[0], self.patches(policy)[1], self.patches(policy)[2], \
              self.patches(policy)[3], self.patches(policy)[4], self.patches(policy)[5], \
-             self.patches(policy)[6]:
+             self.patches(policy)[6], self.patches(policy)[7]:
             evidence = tool_adapters.run_local_tool("ruff", "target.py")
         self.assertEqual(evidence["status"], "completed")
         self.assertEqual(evidence["binary_allowlist"], policy)
@@ -48,7 +50,7 @@ class ToolAdapterAllowlistIntegrationTests(unittest.TestCase):
 
     def test_unapproved_binary_is_denied_before_process_start(self):
         with self.patches(None)[0], self.patches(None)[1], self.patches(None)[2], \
-             patch.object(
+             self.patches(None)[3], patch.object(
                  tool_adapters, "verify_tool_allowed",
                  side_effect=ToolAllowlistError("not approved"),
              ), patch.object(tool_adapters.subprocess, "Popen") as process:
