@@ -231,5 +231,35 @@ class DataBackupTests(unittest.TestCase):
         self.assertFalse(destination.exists())
         self.assertEqual(list(self.root.glob(".backup.tmp-*")), [])
 
+
+    def test_backup_rejects_single_file_over_size_limit(self):
+        (self.data / "large.bin").write_bytes(b"1234")
+        with patch("data_backup.MAX_BACKUP_FILE_BYTES", 3):
+            with self.assertRaisesRegex(BackupError, "límite de 10 GiB"):
+                create_backup(self.data, self.root / "single-limit-backup")
+
+    def test_backup_rejects_aggregate_size_limit_and_cleans_staging(self):
+        (self.data / "a.bin").write_bytes(b"12")
+        (self.data / "b.bin").write_bytes(b"34")
+        destination = self.root / "aggregate-limit-backup"
+        with patch("data_backup.MAX_BACKUP_FILE_BYTES", 10), patch(
+            "data_backup.MAX_BACKUP_TOTAL_BYTES", 3
+        ):
+            with self.assertRaisesRegex(BackupError, "límite total"):
+                create_backup(self.data, destination)
+        self.assertFalse(destination.exists())
+        self.assertFalse(list(self.root.glob(".aggregate-limit-backup.tmp-*")))
+
+    def test_verifier_rejects_aggregate_size_limit(self):
+        (self.data / "a.bin").write_bytes(b"12")
+        (self.data / "b.bin").write_bytes(b"34")
+        destination = self.root / "verify-limit-backup"
+        create_backup(self.data, destination)
+        with patch("data_backup.MAX_BACKUP_FILE_BYTES", 10), patch(
+            "data_backup.MAX_BACKUP_TOTAL_BYTES", 3
+        ):
+            with self.assertRaisesRegex(BackupError, "límite total"):
+                verify_backup(destination)
+
 if __name__ == "__main__":
     unittest.main()
