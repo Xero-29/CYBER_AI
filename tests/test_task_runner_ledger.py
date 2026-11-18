@@ -69,3 +69,62 @@ class TaskRunnerLedgerTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+    def test_execute_blocks_when_ledger_cannot_start_by_default(self):
+        with tempfile.TemporaryDirectory() as workspace, tempfile.TemporaryDirectory() as home:
+            template = Path(home) / "nuclei-templates/http/technologies/tech-detect.yaml"
+            template.parent.mkdir(parents=True)
+            template.write_text("id: test\n", encoding="utf-8")
+            old_cwd = os.getcwd()
+            try:
+                os.chdir(workspace)
+                with (
+                    patch.object(Path, "home", return_value=Path(home)),
+                    patch.object(task_runner, "select_capabilities", return_value=[{"path": str(template)}]),
+                    patch.object(task_runner, "authorize_target", return_value={"authorization_id": "grant"}),
+                    patch.object(task_runner.shutil, "which", return_value="/usr/bin/nuclei"),
+                    patch.object(task_runner, "ExecutionLedger", side_effect=OSError("ledger offline")),
+                    patch.object(task_runner.subprocess, "run") as scanner,
+                    patch.object(sys, "argv", [
+                        "task_runner.py", "--task", "inspect web headers",
+                        "--target", "https://203.0.113.10", "--execute",
+                        "--confirm-authorized", "--authorization-id", "grant",
+                    ]),
+                ):
+                    result = task_runner.main()
+            finally:
+                os.chdir(old_cwd)
+        self.assertEqual(result, 3)
+        scanner.assert_not_called()
+
+    def test_unlogged_scan_requires_explicit_override(self):
+        with tempfile.TemporaryDirectory() as workspace, tempfile.TemporaryDirectory() as home:
+            template = Path(home) / "nuclei-templates/http/technologies/tech-detect.yaml"
+            template.parent.mkdir(parents=True)
+            template.write_text("id: test\n", encoding="utf-8")
+            old_cwd = os.getcwd()
+            try:
+                os.chdir(workspace)
+                with (
+                    patch.object(Path, "home", return_value=Path(home)),
+                    patch.object(task_runner, "select_capabilities", return_value=[{"path": str(template)}]),
+                    patch.object(task_runner, "authorize_target", return_value={"authorization_id": "grant"}),
+                    patch.object(task_runner.shutil, "which", return_value="/usr/bin/nuclei"),
+                    patch.object(task_runner, "ExecutionLedger", side_effect=OSError("ledger offline")),
+                    patch.object(
+                        task_runner.subprocess, "run",
+                        return_value=unittest.mock.Mock(returncode=0, stdout="", stderr=""),
+                    ) as scanner,
+                    patch.object(sys, "argv", [
+                        "task_runner.py", "--task", "inspect web headers",
+                        "--target", "https://203.0.113.10", "--execute",
+                        "--confirm-authorized", "--authorization-id", "grant",
+                        "--allow-unlogged-execution",
+                    ]),
+                ):
+                    result = task_runner.main()
+            finally:
+                os.chdir(old_cwd)
+        self.assertEqual(result, 0)
+        scanner.assert_called_once()
+
