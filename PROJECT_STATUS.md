@@ -2,44 +2,46 @@
 
 **Repositorio:** `Xero-29/CYBER_AI`  
 **Rama auditada:** `codex/security-integrity-audit`  
-**HEAD inspeccionado antes de esta iteración:** `482df7480ac547003a90e621c95c15789067c4dc` ([commit](https://github.com/Xero-29/CYBER_AI/commit/482df7480ac547003a90e621c95c15789067c4dc))  
+**Último cambio de código de esta iteración:** `ac21f3c641ecf92e347d97a93a816dac0acaa557` ([commit](https://github.com/Xero-29/CYBER_AI/commit/ac21f3c641ecf92e347d97a93a816dac0acaa557)). Los commits documentales posteriores no alteran el código.  
 **main inspeccionada:** `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`  
-**Comparación:** divergente; rama auditada **13 commits adelante y 573 detrás** de `main`. Merge-base: `cae816d6037b56f017c2fbdb3e98ef00df58c1d`.
+**Comparación:** divergente; rama auditada **19 commits adelante y 573 detrás** de `main`. Merge-base: `cae816d6037b56f017c2fbdb3e98ef00df58c1d`.
 
 ## Ramas, commits y PRs
 
-- **PR #2:** fusionado el 2026-11-17. Merge commit: `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. La rama auditada conserva 13 commits posteriores a su base común; no se debe tratar el PR como abierto.
+- **PR #2:** fusionado el 2026-11-17. Merge commit: `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. La rama auditada conserva commits posteriores; el PR no está abierto.
 - **PR #11:** abierto en draft, en la rama separada `codex/integration-hash-locks-2026-11-17-v2`, HEAD `2910089fe75852359079d85ab8ac1e7f4cf339c3`, base SHA `c9c794c984b3fff5ff2032d0831f7f161205afc0`. Contiene trabajo de locks/SBOM sobre otra base. No se duplicó ni se fusionó.
 - **PR #1:** abierto en draft sobre `feature/institutional-extensibility-knowledge`; es una propuesta antigua y separada.
-- El commit histórico exclusivo de `main`, `7b5ed033f1f6461b5780a10ac4ada67a444b93e5` (`fix: repair sandbox policy tests`), **ya no es exclusivo**: es ancestro común de ambas líneas. La comparación desde ese commit muestra 497 commits en la rama auditada y 1057 en `main`; el cambio está preservado.
-- No se integró `main` en la rama auditada. Con 573 commits de divergencia, una integración directa sin revisar el diff completo sería insegura. No se hizo merge automático ni se modificó `main`.
+- El commit histórico `7b5ed033f1f6461b5780a10ac4ada67a444b93e5` (`fix: repair sandbox policy tests`) ya es ancestro común de `main` y de la rama auditada; el cambio está preservado.
+- No se integró `main` en la rama auditada. Con 573 commits de divergencia, una integración directa sin revisar el diff completo sería insegura. No hubo merge automático ni cambios a `main`.
 
 ## CI y evidencia por SHA
 
-Último HEAD anterior a las correcciones de esta iteración: `482df7480ac547003a90e621c95c15789067c4dc`.
+Último HEAD previo a las correcciones de esta iteración: `482df7480ac547003a90e621c95c15789067c4dc`.
 
 - Python Tests: **success**, run [44116054953](https://github.com/Xero-29/CYBER_AI/actions/runs/44116054953), HEAD exacto `482df7480ac547003a90e621c95c15789067c4dc`.
 - Docker Sandbox: **success**, run [44116054989](https://github.com/Xero-29/CYBER_AI/actions/runs/44116054989), HEAD exacto `482df7480ac547003a90e621c95c15789067c4dc`.
-- Ambos jobs terminaron en `completed/success`. No se extrapola ese resultado a commits posteriores.
-- Las correcciones de evaluación de conocimiento publicadas en esta iteración requieren CI nuevo sobre el HEAD posterior.
+- Ambos jobs terminaron en `completed/success`. Esa evidencia no se extrapola a commits posteriores.
+- Los cambios de esta iteración requieren CI nuevo sobre el HEAD final.
 
 ## Trabajo de esta iteración
 
-- `knowledge_eval.py`: la ruta de datasets en memoria ahora aplica límites equivalentes al JSONL: 64 KiB por caso, 2 MiB totales y rechazo de Unicode no codificable en UTF-8.
-- `tests/test_knowledge_eval.py`: regresiones para límite por caso, límite total y Unicode inválido; verifican que los proveedores no se invoquen cuando falla la validación.
-- `README.md`: se corrigieron los requisitos de plataforma, se eliminó el ejemplo de instalación manual que omitía la validación de plataforma y se aclaró el alcance real de hashes/SBOM y del extra documental.
-- Estos cambios son código/documentación; no equivalen a probar proveedores reales ni a validar infraestructura externa.
+- `knowledge_eval.py`: los datasets en memoria ahora aplican límites de 64 KiB por caso y 2 MiB totales, además de rechazar Unicode no codificable en UTF-8.
+- `tests/test_knowledge_eval.py`: regresiones para límites por caso/total y Unicode inválido; comprueban que los proveedores no se invoquen cuando falla la validación.
+- `tool_adapters.py`: los procesos host usan `HOME` y temporales efímeros, `PATH` reducido al directorio del ejecutable y rutas del sistema, y un entorno mínimo que no hereda variables secretas del proceso llamador.
+- `tests/test_tool_adapters.py`: regresión que comprueba que no se propagan variables de credenciales ni el HOME del usuario.
+- `README.md`: requisitos de plataforma corregidos a CPython 3.12.x/Linux x86_64/glibc >= 2.26; instalación guiada por `setup.sh`; alcance de SBOM/locks y aislamiento host descritos sin sobreafirmaciones.
+- La reducción de entorno no es sandbox del sistema operativo: un adaptador host aún corre con el UID local y puede acceder a archivos permitidos por ese usuario.
 
 ## Brechas de implementación que siguen abiertas
 
 1. `requirements-documents.txt` usa rangos sin hashes; los extractores opcionales no tienen todavía un lock reproducible.
-2. Allowlist firmada de binarios/hashes aprobados y verificación de procedencia inicial; los hashes antes/después solo detectan modificaciones durante la ejecución.
-3. Soporte de instalación reproducible para otras plataformas; el lock principal está limitado a CPython 3.12.x, Linux x86_64 y glibc >= 2.26.
+2. Allowlist firmada de binarios/hashes aprobados y verificación de procedencia inicial; las huellas antes/después solo detectan modificaciones durante la ejecución.
+3. Soporte reproducible para otras plataformas; el lock principal está limitado a CPython 3.12.x, Linux x86_64 y glibc >= 2.26.
 4. Aplicación/verificación de ACL Windows en datos, secretos y evidencias.
 5. Pruebas de concurrencia, carga prolongada, disco lleno, corrupción física y recuperación tras pérdida de host.
 6. Dataset experto, embeddings reales y umbrales por especialidad para medir la calidad de recuperación.
 7. OCR y aislamiento de extractores documentales en un entorno desechable.
-8. Revisar en conjunto los 573 commits nuevos de `main` antes de proponer una rama de integración; no asumir que el diff de 13 commits cubre las nuevas APIs o cambios de seguridad.
+8. Revisión de los 573 commits nuevos de `main` antes de proponer una rama de integración; no asumir compatibilidad de APIs o controles.
 
 ## Infraestructura externa y aceptación operacional
 
@@ -53,7 +55,7 @@
 - Observabilidad, alertas, respuesta a incidentes, carga/soak y revisión independiente.
 - Branch protection, required checks y autorización de release. La protección de rama no se volvió a verificar en esta pasada.
 
-**Conclusión:** el último HEAD inspeccionado tiene CI verde, pero las nuevas correcciones aún requieren CI propio y la rama sigue muy divergente de `main`. CYBER_AI no está listo para producción ni certificado. No se fusionó nada y `main` permanece intacta.
+**Conclusión:** el último HEAD con CI verde es anterior a las correcciones actuales. Las nuevas pruebas deben terminar sobre el HEAD final antes de la validación del usuario. La rama sigue muy divergente de `main`; no se fusionó nada y `main` permanece intacta.
 
 ---
 
