@@ -1,4 +1,5 @@
 import unittest
+from urllib.error import HTTPError
 from unittest.mock import patch
 import llm_providers
 
@@ -315,15 +316,13 @@ class NativeProtocolTests(unittest.TestCase):
             "https://generativelanguage.googleapis.com/v1beta",
         )
 
-if __name__ == "__main__":
-    unittest.main()
 
 
 class ProviderBoundaryValidationTests(unittest.TestCase):
     def test_timeout_must_be_finite_and_bounded(self):
         provider = {"name": "local", "protocol": "ollama",
                     "base_url": "http://127.0.0.1:11434"}
-        for timeout in (0, -1, 601, float("inf"), float("nan"), True, "5"):
+        for timeout in (0, -1, 601, float("inf"), float("nan"), True, "5", 10 ** 1000):
             with self.subTest(timeout=timeout), self.assertRaises(ValueError):
                 llm_providers.request(provider, "api/chat", {}, timeout=timeout)
 
@@ -361,9 +360,95 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
                     "base_url": "https://api.example/v1", "requires_api_key": False}
         with patch.object(llm_providers, "_http_json", return_value={
             "choices": [{"message": {"content": "ok"}, "finish_reason": "stop"}],
-            "usage": {"prompt_tokens": -1, "completion_tokens": 2},
+            "usage": {"prompt_tokens": 10 ** 1000, "completion_tokens": 2},
         }):
             with self.assertRaisesRegex(RuntimeError, "contador inválido"):
                 llm_providers.request(provider, "api/chat", {
                     "model": "m", "messages": [{"role": "user", "content": "hola"}]
                 })
+
+
+    def test_provider_request_payload_is_bounded_before_transport(self):
+        provider = {"name": "custom", "protocol": "custom"}
+        plugin = unittest.mock.Mock()
+        with patch.object(llm_providers, "_load_provider_plugin", return_value=plugin):
+            with self.assertRaisesRegex(ValueError, "supera 8 MiB"):
+                llm_providers.request(
+                    provider,
+                    "api/chat",
+                    {"content": "x" * (llm_providers.MAX_PROVIDER_REQUEST_BYTES + 1)},
+                )
+        plugin.request.assert_not_called()
+
+    def test_http_transport_bounds_response_bytes(self):
+        class Response:
+            requested = None
+            def __enter__(self):
+                return self
+            def __exit__(self, *args):
+                return False
+            def read(self, amount):
+                self.requested = amount
+                return b"x" * amount
+
+        response = Response()
+        with patch.object(llm_providers._HTTP_OPENER, "open", return_value=response):
+            with self.assertRaisesRegex(RuntimeError, "supera 16 MiB"):
+                llm_providers._http_json("https://provider.example/v1/models")
+        self.assertEqual(
+            response.requested,
+            llm_providers.MAX_PROVIDER_RESPONSE_BYTES + 1,
+        )
+
+    def test_http_error_body_read_is_bounded(self):
+        class ErrorBody:
+            requested = None
+            def read(self, amount=-1):
+                self.requested = amount
+                return b"e" * amount
+
+        body = ErrorBody()
+        error = HTTPError(
+            "https://provider.example/v1/chat",
+            500,
+            "failure",
+            {},
+            body,
+        )
+        with patch.object(llm_providers._HTTP_OPENER, "open", side_effect=error):
+            with self.assertRaisesRegex(RuntimeError, "HTTP 500"):
+                llm_providers._http_json("https://provider.example/v1/chat", {})
+        self.assertEqual(body.requested, llm_providers.MAX_PROVIDER_ERROR_BYTES)
+
+    def test_plugin_response_size_is_bounded(self):
+        class Plugin:
+            def request(self, provider, endpoint, payload, timeout):
+                return {"message": {"content": "x" * (llm_providers.MAX_PROVIDER_RESPONSE_BYTES + 1)}}
+            def capabilities(self, provider):
+                return ["chat"]
+
+        with patch.object(llm_providers, "_load_provider_plugin", return_value=Plugin()):
+            with self.assertRaisesRegex(RuntimeError, "límite de respuesta"):
+                llm_providers.request(
+                    {"name": "custom", "protocol": "custom"},
+                    "api/chat",
+                    {"model": "test"},
+                )
+
+    def test_invalid_api_key_environment_variable_name_is_rejected(self):
+        provider = {
+            "name": "cloud",
+            "protocol": "openai",
+            "base_url": "https://api.example/v1",
+            "api_key_env": "INVALID\nENV",
+            "requires_api_key": True,
+        }
+        with self.assertRaisesRegex(RuntimeError, "nombre de variable"):
+            llm_providers.request(
+                provider,
+                "api/chat",
+                {"model": "test", "messages": [{"role": "user", "content": "hi"}]},
+            )
+
+if __name__ == "__main__":
+    unittest.main()
