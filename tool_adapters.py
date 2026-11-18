@@ -22,7 +22,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from tool_allowlist import verify_tool_allowed
+from tool_allowlist import ToolAllowlistError, verify_tool_allowed
 from tool_database_preflight import inspect_tool_database
 
 
@@ -320,7 +320,10 @@ def _run_scoped_nmap(target, spec, *, timeout=None, isolated_home):
     if not binary:
         raise ToolExecutionError("Nmap no está instalado o no está en PATH.")
     provenance = _hash_binary(binary)
-    allowlist_evidence = verify_tool_allowed("nmap", provenance["sha256"])
+    try:
+        allowlist_evidence = verify_tool_allowed("nmap", provenance["sha256"])
+    except ToolAllowlistError as error:
+        raise ToolExecutionError("El binario Nmap no está aprobado por la allowlist firmada.") from error
     binary = provenance["resolved_path"]
     # Keep caller credentials and configuration out of host tool processes.
     safe_path_entries = [str(Path(binary).parent)]
@@ -472,7 +475,12 @@ def _run_local_tool_with_home(
     if not binary:
         raise ToolExecutionError("La herramienta no está instalada o no está en PATH.")
     binary_provenance = _hash_binary(binary)
-    allowlist_evidence = verify_tool_allowed(tool_id, binary_provenance["sha256"])
+    try:
+        allowlist_evidence = verify_tool_allowed(tool_id, binary_provenance["sha256"])
+    except ToolAllowlistError as error:
+        raise ToolExecutionError(
+            "El binario no está aprobado por la allowlist firmada."
+        ) from error
     binary = binary_provenance["resolved_path"]
     limit = spec["timeout"] if timeout is None else timeout
     if not isinstance(limit, int) or not 1 <= limit <= 600:
