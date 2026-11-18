@@ -177,7 +177,7 @@ class KnowledgeEvaluationTests(unittest.TestCase):
 
     def test_in_memory_dataset_rejects_unencodable_unicode(self):
         cases = [{
-            "id": "case", "query": "\\ud800",
+            "id": "case", "query": "\ud800",
             "relevant_categories": ["api"],
         }]
         with self.assertRaisesRegex(ValueError, "Unicode inválido"):
@@ -187,7 +187,7 @@ class KnowledgeEvaluationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp) / "cases.jsonl"
             path.write_text(json.dumps({
-                "id": "case", "query": "\\ud800",
+                "id": "case", "query": "\ud800",
                 "relevant_categories": ["api"],
             }) + "\n", encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "Unicode inválido"):
