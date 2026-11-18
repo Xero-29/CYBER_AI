@@ -454,10 +454,15 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
             source = snapshot.joinpath(*relative.parts)
             target = staging.joinpath(*relative.parts)
             target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
-            _copy_checked_file(
-                source, target, expected_size=item["size"],
-                expected_sha256=item["sha256"],
-            )
+            try:
+                _copy_checked_file(
+                    source, target, expected_size=item["size"],
+                    expected_sha256=item["sha256"],
+                )
+            except BackupError as error:
+                raise BackupError(
+                    f"El archivo cambió durante la restauración: {relative.as_posix()}"
+                ) from error
             if target.stat().st_size != item["size"] or _sha256(target) != item["sha256"]:
                 raise BackupError(f"El archivo cambió durante la restauración: {relative.as_posix()}")
             if target.suffix.lower() in {".sqlite", ".sqlite3", ".db"}:
