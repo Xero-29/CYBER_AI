@@ -120,10 +120,10 @@ def main(argv=None):
     args = parser.parse_args(argv)
     try:
         manifest = build_manifest(args.root, args.wheelhouse, lock_file=args.lock_file)
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(
+        atomic_write_text(
+            args.output,
             json.dumps(manifest, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
-            encoding="utf-8",
+            create_parents=True,
         )
         print(f"Manifiesto de artefactos generado: {len(manifest['artifacts'])} wheels")
         return 0
