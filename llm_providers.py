@@ -339,7 +339,11 @@ def _validate_plugin_response(endpoint, result, protocol):
         raise RuntimeError(f"El plugin {protocol} devolvió una respuesta no estructurada.")
     if endpoint == "api/chat":
         message = result.get("message")
-        if not isinstance(message, dict) or not isinstance(message.get("content"), str):
+        if (
+            not isinstance(message, dict)
+            or not isinstance(message.get("content"), str)
+            or not isinstance(message.get("thinking", ""), str)
+        ):
             raise RuntimeError(f"El plugin {protocol} no cumple el contrato de chat.")
     elif endpoint == "api/embed":
         vectors = result.get("embeddings")
@@ -356,7 +360,16 @@ def _validate_plugin_response(endpoint, result, protocol):
         if len(dimensions) != 1:
             raise RuntimeError(f"El plugin {protocol} devolvió dimensiones inconsistentes.")
     elif endpoint == "api/ps":
-        if not isinstance(result.get("models"), list):
+        models = result.get("models")
+        if (
+            not isinstance(models, list)
+            or any(
+                not isinstance(item, dict)
+                or not isinstance(item.get("name"), str)
+                or not item["name"].strip()
+                for item in models
+            )
+        ):
             raise RuntimeError(f"El plugin {protocol} no cumple el contrato de catálogo.")
     else:
         raise ValueError(f"Endpoint no admitido para plugins: {endpoint}")
