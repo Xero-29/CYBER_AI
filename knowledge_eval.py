@@ -3,6 +3,8 @@
 import argparse
 import json
 import math
+import os
+import stat
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -19,61 +21,96 @@ DEFAULT_DATASET = ROOT / "knowledge" / "evaluation" / "domain_queries.jsonl"
 
 def load_dataset(path):
     source = Path(path)
-    if source.is_symlink() or not source.is_file():
+    if source.is_symlink():
         raise ValueError("El dataset debe ser un archivo regular, no un symlink.")
-    if source.stat().st_size > MAX_DATASET_BYTES:
-        raise ValueError("El dataset supera 2 MiB.")
+    flags = (
+        os.O_RDONLY
+        | getattr(os, "O_CLOEXEC", 0)
+        | getattr(os, "O_NOFOLLOW", 0)
+        | getattr(os, "O_NONBLOCK", 0)
+    )
+    try:
+        descriptor = os.open(source, flags)
+    except OSError as error:
+        raise ValueError("No se pudo abrir el dataset como archivo regular.") from error
+
     cases = []
     seen_ids = set()
-    with source.open("rb") as stream:
-        for line_number, raw in enumerate(stream, 1):
-            if len(raw) > MAX_LINE_BYTES:
-                raise ValueError(f"Línea {line_number} supera 64 KiB.")
-            if not raw.strip():
-                continue
-            try:
-                item = json.loads(raw.decode("utf-8"))
-            except (UnicodeDecodeError, json.JSONDecodeError) as error:
-                raise ValueError(f"JSONL inválido en línea {line_number}.") from error
-            if not isinstance(item, dict) or set(item) != {
-                "id", "query", "relevant_categories"
-            }:
-                raise ValueError(
-                    f"Línea {line_number}: se requieren exactamente id, query y relevant_categories."
+    try:
+        before = os.fstat(descriptor)
+        if not stat.S_ISREG(before.st_mode):
+            raise ValueError("El dataset debe ser un archivo regular, no un symlink.")
+        if before.st_size > MAX_DATASET_BYTES:
+            raise ValueError("El dataset supera 2 MiB.")
+        with os.fdopen(descriptor, "rb") as stream:
+            descriptor = None
+            total_bytes = 0
+            for line_number, raw in enumerate(stream, 1):
+                total_bytes += len(raw)
+                if total_bytes > MAX_DATASET_BYTES:
+                    raise ValueError("El dataset supera 2 MiB.")
+                if len(raw) > MAX_LINE_BYTES:
+                    raise ValueError(f"Línea {line_number} supera 64 KiB.")
+                if not raw.strip():
+                    continue
+                try:
+                    item = json.loads(raw.decode("utf-8"))
+                except (UnicodeDecodeError, json.JSONDecodeError) as error:
+                    raise ValueError(f"JSONL inválido en línea {line_number}.") from error
+                if not isinstance(item, dict) or set(item) != {
+                    "id", "query", "relevant_categories"
+                }:
+                    raise ValueError(
+                        f"Línea {line_number}: se requieren exactamente id, query y relevant_categories."
+                    )
+                case_id, query, expected = (
+                    item["id"], item["query"], item["relevant_categories"]
                 )
-            case_id, query, expected = (
-                item["id"], item["query"], item["relevant_categories"]
+                if not isinstance(case_id, str) or not case_id.strip() or case_id.strip() in seen_ids:
+                    raise ValueError(f"ID ausente o duplicado en línea {line_number}.")
+                if not isinstance(query, str) or not query.strip():
+                    raise ValueError(f"query inválida en línea {line_number}.")
+                if (
+                    not isinstance(expected, list) or not expected
+                    or any(not isinstance(value, str) or not value.strip() for value in expected)
+                    or len({value.strip() for value in expected}) != len(expected)
+                ):
+                    raise ValueError(f"relevant_categories inválida en línea {line_number}.")
+                normalized_case = {
+                    "id": case_id.strip(),
+                    "query": query.strip(),
+                    "relevant_categories": [value.strip() for value in expected],
+                }
+                try:
+                    json.dumps(
+                        normalized_case, ensure_ascii=False, separators=(",", ":")
+                    ).encode("utf-8")
+                except UnicodeEncodeError as error:
+                    raise ValueError(
+                        f"Línea {line_number} contiene Unicode inválido."
+                    ) from error
+                seen_ids.add(case_id.strip())
+                cases.append(normalized_case)
+                if len(cases) > MAX_CASES:
+                    raise ValueError("El dataset supera 5000 casos.")
+            after = os.fstat(stream.fileno())
+            identity_before = (
+                before.st_dev, before.st_ino, before.st_size,
+                before.st_mtime_ns, before.st_ctime_ns,
             )
-            if not isinstance(case_id, str) or not case_id.strip() or case_id.strip() in seen_ids:
-                raise ValueError(f"ID ausente o duplicado en línea {line_number}.")
-            if not isinstance(query, str) or not query.strip():
-                raise ValueError(f"query inválida en línea {line_number}.")
-            if (
-                not isinstance(expected, list) or not expected
-                or any(not isinstance(value, str) or not value.strip() for value in expected)
-                or len({value.strip() for value in expected}) != len(expected)
-            ):
-                raise ValueError(f"relevant_categories inválida en línea {line_number}.")
-            seen_ids.add(case_id.strip())
-            cases.append({
-                "id": case_id.strip(),
-                "query": query.strip(),
-                "relevant_categories": [value.strip() for value in expected],
-            })
-            if len(cases) > MAX_CASES:
-                raise ValueError("El dataset supera 5000 casos.")
+            identity_after = (
+                after.st_dev, after.st_ino, after.st_size,
+                after.st_mtime_ns, after.st_ctime_ns,
+            )
+            if identity_before != identity_after:
+                raise ValueError("El dataset cambió durante su lectura.")
+    finally:
+        if descriptor is not None:
+            os.close(descriptor)
+
     if not cases:
         raise ValueError("El conjunto de evaluación está vacío.")
     return cases
-
-
-def _is_finite_number(value):
-    if isinstance(value, bool) or not isinstance(value, (int, float)):
-        return False
-    try:
-        return math.isfinite(value)
-    except OverflowError:
-        return False
 
 
 def _normalize_cases(cases):
@@ -84,6 +121,7 @@ def _normalize_cases(cases):
         raise ValueError("El dataset supera 5000 casos.")
     normalized = []
     seen_ids = set()
+    total_bytes = 0
     for index, item in enumerate(cases, 1):
         if not isinstance(item, dict) or set(item) != {
             "id", "query", "relevant_categories"
@@ -107,12 +145,25 @@ def _normalize_cases(cases):
             or len({value.strip() for value in expected}) != len(expected)
         ):
             raise ValueError(f"relevant_categories inválida en caso {index}.")
-        seen_ids.add(normalized_id)
-        normalized.append({
+        normalized_case = {
             "id": normalized_id,
             "query": query.strip(),
             "relevant_categories": [value.strip() for value in expected],
-        })
+        }
+        try:
+            encoded_case = json.dumps(
+                normalized_case, ensure_ascii=False, separators=(",", ":")
+            ).encode("utf-8")
+        except UnicodeEncodeError as error:
+            raise ValueError(f"El caso {index} contiene Unicode inválido.") from error
+        line_bytes = len(encoded_case) + 1
+        if line_bytes > MAX_LINE_BYTES:
+            raise ValueError(f"Caso {index} supera 64 KiB.")
+        total_bytes += line_bytes
+        if total_bytes > MAX_DATASET_BYTES:
+            raise ValueError("El dataset supera 2 MiB.")
+        seen_ids.add(normalized_id)
+        normalized.append(normalized_case)
     return normalized
 
 
