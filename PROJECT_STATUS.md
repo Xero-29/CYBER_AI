@@ -1,3 +1,33 @@
+# Estado de reconciliación — 2026-11-18
+
+**Rama de integración aislada:** `codex/reconcile-security-integrity-2026-11-18`  
+**Base inmutable de esta rama:** `main` en `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`.  
+**Rama fuente de auditoría:** `codex/security-integrity-audit`, HEAD inspeccionado `8104739d542e3264166eb0e7b1b493aa26e9ce0a`.  
+**Merge-base:** `cae816d6037b56f017c2fbdb3e98ef00df58c1d`. La divergencia observada es 112 commits exclusivos de auditoría y 573 exclusivos de main. No se ha realizado merge, rebase, force-push ni modificación de main.
+
+## Trabajo de esta fase
+
+- Creada esta rama desde el HEAD exacto de main para reconciliar por etapas.
+- Portados desde la rama de auditoría, como adiciones independientes: `safe_io.py`, `tests/test_safe_io.py`, `docs/SECURE_FILE_OUTPUTS.md`, los locks documentales y los locks de herramientas del sandbox.
+- La prueba Python del HEAD `27d5e7126e50490fb09de92521355a4d8a50712d` terminó correctamente: [GitHub Actions 44359851530](https://github.com/Xero-29/CYBER_AI/actions/runs/44359851530). No hay evidencia de Docker Sandbox ejecutado en ese HEAD todavía.
+- PR #11 continúa siendo el PR existente para locks/SBOM. Se corrigieron sus fixtures de artefactos para usar hashes SHA-256 válidos y se añadió soporte de `--lock-file` al generador de manifiestos, necesario para los entornos sandbox y documentos. Los checks del nuevo HEAD aún deben concluir.
+
+## Decisiones de integración pendientes
+
+- No copiar en bloque los 49 archivos modificados de auditoría: varios también evolucionaron en main y una sustitución ciega puede revertir capacidades nuevas de main.
+- Comparar y reconciliar por separado los módulos compartidos de ejecución, ledger, adaptadores, backups, workflows, documentación y biblioteca de conocimiento.
+- Preservar los módulos y contenidos nuevos de main, incluidos agentes/simulación, runners especializados, atlas, currículos y módulos profundos.
+- No crear un PR adicional mientras PR #11 siga cubriendo parte del mismo trabajo. La rama de reconciliación permanece como área de trabajo y no se presenta como lista para integrar.
+
+## Pendientes
+
+1. Reconciliar de forma revisada los cambios compartidos de la rama de auditoría, con pruebas específicas por módulo.
+2. Esperar y corregir cualquier fallo restante de PR #11; no declararlo verde hasta que todos los checks requeridos concluyan exitosamente.
+3. Ejecutar Python y Docker sobre el mismo HEAD de reconciliación y verificar artefactos SBOM.
+4. Actualizar esta sección con cada commit y evidencia exacta.
+
+---
+
 # Estado canónico vigente — 2026-11-17
 
 **Rama:** `main`  
