@@ -194,7 +194,7 @@ python data_backup.py verify --snapshot /ruta/segura/cyber-ai-backup --require-s
 python data_backup.py restore --snapshot /ruta/segura/cyber-ai-backup --confirm-quiesced --confirm-replace --require-signature
 ```
 
-La verificación de un backup firmado requiere la misma clave. HMAC autentica el manifiesto frente a quien no controla la clave, pero **no cifra** los datos ni proporciona identidad individual, KMS/HSM o almacenamiento WORM. Sin clave configurada, el backup sigue siendo compatible con el modo anterior sin firma. Protege también el acceso al directorio de backups y conserva la clave fuera del host de origen. El formato limita cada snapshot a 50.000 archivos y un manifiesto de 16 MiB para acotar el coste de verificación; planifica un mecanismo de archivo separado para volúmenes mayores.
+La verificación de un backup firmado requiere la misma clave. HMAC autentica el manifiesto frente a quien no controla la clave, pero **no cifra** los datos ni proporciona identidad individual, KMS/HSM o almacenamiento WORM. Sin clave configurada, el backup sigue siendo compatible con el modo anterior sin firma. Protege también el acceso al directorio de backups y conserva la clave fuera del host de origen. El formato limita cada snapshot a 50.000 archivos, 10 GiB por archivo, 50 GiB totales y un manifiesto de 16 MiB para acotar el coste de copia/verificación; planifica un mecanismo de archivo separado para volúmenes mayores.
 
 Genera un SBOM CycloneDX determinista a partir de las dependencias fijadas:
 
