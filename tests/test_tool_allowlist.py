@@ -80,6 +80,21 @@ class ToolAllowlistTests(unittest.TestCase):
         with self.assertRaises(ToolAllowlistError):
             load_signed_tool_allowlist(link, self.key)
 
+    def test_path_replacement_between_open_and_read_is_rejected(self):
+        if os.name != "posix":
+            self.skipTest("La sustitución de archivo abierto se prueba en POSIX.")
+        real_open = os.open
+
+        def replace_after_open(path, flags):
+            descriptor = real_open(path, flags)
+            self.path.unlink()
+            self.path.write_text(json.dumps(self.document), encoding="utf-8")
+            return descriptor
+
+        with patch("tool_allowlist.os.open", side_effect=replace_after_open):
+            with self.assertRaises(ToolAllowlistError):
+                load_signed_tool_allowlist(self.path, self.key)
+
     def test_required_policy_fails_when_not_configured(self):
         with patch.dict(os.environ, {
             "CYBER_AI_TOOL_ALLOWLIST_REQUIRED": "1",
