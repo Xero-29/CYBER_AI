@@ -5,6 +5,7 @@ import math
 import os
 import re
 import sqlite3
+import stat
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -64,9 +65,76 @@ class ExecutionLedger:
 
     def __init__(self, path=None):
         configured_path = path if path is not None else os.environ.get("CYBER_AI_LEDGER_PATH", DEFAULT_DB)
-        self.path = Path(configured_path)
-        self.path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            self.path = Path(os.path.abspath(os.fspath(configured_path)))
+        except (TypeError, ValueError, OSError) as error:
+            raise LedgerError("Ruta del ledger inválida.") from error
+        self._secure_storage_path()
         self.initialize()
+
+    def _secure_storage_path(self):
+        """Keep the database, WAL and SHM inside a private, non-symlink directory."""
+        for parent in reversed(self.path.parents):
+            try:
+                info = parent.lstat()
+            except FileNotFoundError:
+                continue
+            if stat.S_ISLNK(info.st_mode) or not stat.S_ISDIR(info.st_mode):
+                raise LedgerError("No se permiten rutas padre con symlinks o no-directorios.")
+
+        try:
+            self.path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+        except OSError as error:
+            raise LedgerError("No se pudo crear el directorio privado del ledger.") from error
+
+        for parent in reversed(self.path.parents):
+            try:
+                info = parent.lstat()
+            except OSError as error:
+                raise LedgerError("No se pudo validar la ruta del ledger.") from error
+            if stat.S_ISLNK(info.st_mode) or not stat.S_ISDIR(info.st_mode):
+                raise LedgerError("No se permiten rutas padre con symlinks o no-directorios.")
+
+        if os.name != "nt":
+            parent_mode = stat.S_IMODE(self.path.parent.stat().st_mode)
+            if parent_mode & 0o077:
+                raise LedgerError(
+                    "El directorio del ledger debe ser privado (permisos 0700)."
+                )
+
+        flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY
+        flags |= getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_CLOEXEC", 0)
+        try:
+            descriptor = os.open(self.path, flags, 0o600)
+        except FileExistsError:
+            pass
+        except OSError as error:
+            raise LedgerError("No se pudo crear el archivo privado del ledger.") from error
+        else:
+            os.close(descriptor)
+
+        for candidate in (
+            self.path,
+            Path(f"{self.path}-wal"),
+            Path(f"{self.path}-shm"),
+        ):
+            try:
+                info = candidate.lstat()
+            except FileNotFoundError:
+                continue
+            except OSError as error:
+                raise LedgerError("No se pudo validar un archivo del ledger.") from error
+            if stat.S_ISLNK(info.st_mode) or not stat.S_ISREG(info.st_mode):
+                raise LedgerError(
+                    "El ledger y sus archivos auxiliares deben ser archivos regulares, no symlinks."
+                )
+            if os.name != "nt" and stat.S_IMODE(info.st_mode) & 0o077:
+                try:
+                    os.chmod(candidate, 0o600, follow_symlinks=False)
+                except (OSError, NotImplementedError) as error:
+                    raise LedgerError(
+                        "No se pudieron restringir los permisos del ledger."
+                    ) from error
 
     def connect(self, *, configure_wal=False):
         db = sqlite3.connect(str(self.path), timeout=30, isolation_level=None)
