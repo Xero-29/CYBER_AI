@@ -22,6 +22,7 @@ from urllib.parse import urljoin, urlparse
 import requests
 
 from knowledge_bootstrap import exclusive_file_lock
+from safe_io import atomic_write_text
 
 ROOT = Path(__file__).resolve().parent
 CATALOG = ROOT / "data/knowledge_sources/download_catalog.json"
@@ -51,10 +52,11 @@ def load_json(path, default):
 
 
 def save_json(path, data):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temp = path.with_suffix(path.suffix + ".tmp")
-    temp.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    temp.replace(path)
+    atomic_write_text(
+        path,
+        json.dumps(data, ensure_ascii=False, indent=2) + "\n",
+        create_parents=True,
+    )
 
 
 def sha256(path):
