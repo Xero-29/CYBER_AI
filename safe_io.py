@@ -53,8 +53,23 @@ def atomic_write_text(path, text, *, encoding="utf-8", mode=0o600, create_parent
     destination = Path(os.path.abspath(os.fspath(path)))
     parent = destination.parent
     if create_parents:
-        parent.mkdir(parents=True, exist_ok=True)
-    if not parent.is_dir():
+        missing = []
+        current = parent
+        while not current.exists() and not current.is_symlink():
+            missing.append(current)
+            current = current.parent
+        _reject_symlink_components(current)
+        if not current.is_dir():
+            raise SafeWriteError("Un componente de la ruta de salida no es un directorio.")
+        for directory in reversed(missing):
+            try:
+                directory.mkdir()
+            except FileExistsError:
+                pass
+            _reject_symlink_components(directory)
+            if not directory.is_dir():
+                raise SafeWriteError("Un componente de la ruta de salida no es un directorio.")
+    elif not parent.is_dir():
         raise SafeWriteError("El directorio padre del destino no existe.")
     _reject_symlink_components(parent)
     _validate_destination(destination)
