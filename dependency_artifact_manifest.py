@@ -12,6 +12,9 @@ from pathlib import Path
 from sbom_generator import _read_requirements
 
 
+MAX_WHEEL_METADATA_BYTES = 2 * 1024 * 1024
+
+
 class ArtifactManifestError(ValueError):
     pass
 
@@ -20,23 +23,35 @@ def _wheel_metadata(path):
     try:
         with zipfile.ZipFile(path) as archive:
             metadata_names = [
-                name for name in archive.namelist()
-                if name.endswith(".dist-info/METADATA")
+                info for info in archive.infolist()
+                if info.filename.endswith(".dist-info/METADATA")
             ]
             if len(metadata_names) != 1:
                 raise ArtifactManifestError(
                     f"Wheel con METADATA ausente o ambiguo: {path.name}"
                 )
-            metadata = Parser().parsestr(
-                archive.read(metadata_names[0]).decode("utf-8")
-            )
+            metadata_info = metadata_names[0]
+            if metadata_info.file_size > MAX_WHEEL_METADATA_BYTES:
+                raise ArtifactManifestError(
+                    f"Wheel METADATA supera 2 MiB: {path.name}"
+                )
+            with archive.open(metadata_info) as stream:
+                raw_metadata = stream.read(MAX_WHEEL_METADATA_BYTES + 1)
+            if (
+                len(raw_metadata) > MAX_WHEEL_METADATA_BYTES
+                or len(raw_metadata) != metadata_info.file_size
+            ):
+                raise ArtifactManifestError(
+                    f"Wheel METADATA inválido o demasiado grande: {path.name}"
+                )
+            metadata = Parser().parsestr(raw_metadata.decode("utf-8"))
             name, version = metadata.get("Name"), metadata.get("Version")
             if not name or not version:
                 raise ArtifactManifestError(
                     f"Wheel sin Name/Version válidos: {path.name}"
                 )
             return name, version
-    except (OSError, zipfile.BadZipFile, UnicodeDecodeError) as error:
+    except (OSError, zipfile.BadZipFile, UnicodeDecodeError, RuntimeError, NotImplementedError) as error:
         raise ArtifactManifestError(f"Wheel inválido: {path.name}") from error
 
 
