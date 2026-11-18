@@ -7,6 +7,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+import data_backup
 from data_backup import BackupError, create_backup, restore_backup, verify_backup
 
 
@@ -260,6 +261,16 @@ class DataBackupTests(unittest.TestCase):
         ):
             with self.assertRaisesRegex(BackupError, "límite total"):
                 verify_backup(destination)
+
+
+    def test_failed_copy_does_not_delete_existing_destination(self):
+        source = self.data / "source.bin"
+        source.write_bytes(b"source")
+        destination = self.root / "existing.bin"
+        destination.write_text("keep", encoding="utf-8")
+        with self.assertRaises(FileExistsError):
+            data_backup._copy_checked_file(source, destination)
+        self.assertEqual(destination.read_text(encoding="utf-8"), "keep")
 
 if __name__ == "__main__":
     unittest.main()
