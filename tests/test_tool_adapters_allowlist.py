@@ -1,3 +1,4 @@
+import io
 import sys
 import tempfile
 import unittest
@@ -47,6 +48,33 @@ class ToolAdapterAllowlistIntegrationTests(unittest.TestCase):
         self.assertEqual(evidence["status"], "completed")
         self.assertEqual(evidence["tool_allowlist"], policy)
         self.assertTrue(evidence["tool_reported_success"])
+
+
+    def test_process_pipes_are_closed_after_output_is_drained(self):
+        policy = {"enforced": True, "status": "approved", "sha256": self.digest}
+
+        class FakeProcess:
+            def __init__(self):
+                self.stdout = io.BytesIO(b"{}")
+                self.stderr = io.BytesIO(b"")
+                self.pid = 1234
+            def wait(self, timeout=None):
+                return 0
+            def poll(self):
+                return 0
+            def kill(self):
+                return None
+
+        process = FakeProcess()
+        with self.patches(policy)[0], self.patches(policy)[1], self.patches(policy)[2], \
+             self.patches(policy)[3], self.patches(policy)[4], self.patches(policy)[5], \
+             self.patches(policy)[6], self.patches(policy)[7], patch.object(
+                 tool_adapters.subprocess, "Popen", return_value=process
+             ):
+            evidence = tool_adapters.run_local_tool("ruff", "target.py")
+        self.assertEqual(evidence["status"], "completed")
+        self.assertTrue(process.stdout.closed)
+        self.assertTrue(process.stderr.closed)
 
     def test_unapproved_binary_is_denied_before_process_start(self):
         with self.patches(None)[0], self.patches(None)[1], self.patches(None)[2], \
