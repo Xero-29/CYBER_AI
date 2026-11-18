@@ -6,7 +6,7 @@ Sistema modular de investigación técnica y ciberseguridad con agentes LLM, bib
 
 ## Requisitos
 
-- Linux recomendado (Ubuntu), Python 3.12 o superior.
+- Linux x86_64 con glibc >= 2.26 y CPython 3.12.x. El lock actual no declara soporte para otras arquitecturas, libc ni versiones de Python.
 - Git.
 - Para agentes locales: Ollama instalado y ejecutándose.
 - Para el sandbox: Docker Engine/CLI.
@@ -24,19 +24,11 @@ cd CYBER_AI
 ## Instalar dependencias Python
 
 ```bash
-python3.12 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements.lock
-```
-
-También puedes usar el instalador incluido:
-
-```bash
 bash setup.sh
 source .venv/bin/activate
 ```
 
-El instalador crea el entorno virtual e instala dependencias Python. No instala Ollama, Docker, modelos ni herramientas de seguridad.
+`setup.sh` crea el entorno virtual e instala con `pip --require-hashes`. Antes de instalar comprueba CPython 3.12.x, Linux x86_64 y glibc >= 2.26. No omitas esa validación ejecutando manualmente `pip install -r requirements.lock` en una plataforma no soportada. El instalador no instala Ollama, Docker, modelos ni herramientas de seguridad.
 
 ## Comprobaciones iniciales
 
@@ -156,7 +148,7 @@ Genera un SBOM CycloneDX determinista a partir de las dependencias fijadas:
 python sbom_generator.py --output reports/cyber-ai-sbom.cdx.json
 ```
 
-El SBOM distingue dependencias directas y transitivas y registra el hash del lock. El lock actual no contiene hashes de artefactos ni un grafo transitivo completo; el SBOM no afirma verificar esos elementos.
+El lock contiene hashes SHA-256 permitidos por pip para los wheels de la plataforma soportada. El SBOM registra el hash del lock y clasifica dependencias directas/transitivas, pero no repite los hashes de cada wheel como hashes de componentes salvo que se proporcione `--artifact-manifest`. Tampoco infiere las aristas transitivas paquete a paquete: declara el conjunto de componentes fijados bajo la aplicación.
 
 Para medir la recuperación por especialidad después de indexar, ejecuta el benchmark por defecto de 48 consultas (una por área). El conjunto de 12 consultas anteriores queda disponible como smoke test rápido:
 
@@ -185,7 +177,7 @@ Cada línea del dataset debe ser un objeto JSON con exactamente `id`, `query` y 
 
 ## Conocimiento y Skills
 
-- Ingesta TXT, Markdown, HTML, CSV, JSON/JSONL y código: disponible con las dependencias base. PDF, DOCX, XLSX y PPTX requieren `pip install -r requirements-documents.txt`. Los PDF escaneados necesitan OCR externo; el importador no ejecuta OCR.
+- Ingesta TXT, Markdown, HTML, CSV, JSON/JSONL y código: disponible con las dependencias base. PDF, DOCX, XLSX y PPTX requieren los paquetes opcionales de `requirements-documents.txt`; ese archivo todavía usa rangos sin hashes y **no es reproducible ni apto para producción**. Úsalo solo en un entorno desechable de evaluación hasta que exista un lock verificado para la plataforma objetivo. Los PDF escaneados necesitan OCR externo; el importador no ejecuta OCR.
 - Recuperación e indexación: revisa `knowledge_library.py`, `knowledge_embeddings.py` y `knowledge_reindex.py`.
 - Fuentes externas: el catálogo requiere revisión de licencia y verificación antes de habilitar descargas.
 - Skills: `propose_skill_from_ledger` crea candidatas no ejecutables; solo la promoción firmada por VERITAS las hace recuperables. El CLI `skillbook_cli.py` permite proponer desde un manifiesto ligado a dos ejecuciones, exportar el payload canónico para firma independiente, promover con firma y generar/aplicar rollback. El historial de versiones es append-only. Una coincidencia recuperada no concede permisos de ejecución.
