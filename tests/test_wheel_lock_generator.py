@@ -4,7 +4,9 @@ import unittest
 import zipfile
 from pathlib import Path
 
-from wheel_lock_generator import WheelLockError, build_lock
+from unittest.mock import patch
+
+from wheel_lock_generator import WheelLockError, build_lock, wheel_metadata
 
 
 class WheelLockGeneratorTests(unittest.TestCase):
@@ -81,6 +83,68 @@ class WheelLockGeneratorTests(unittest.TestCase):
         self.requirements.write_text("ruff>=0.14.5" + chr(10), encoding="utf-8")
         with self.assertRaisesRegex(WheelLockError, "no fijado"):
             build_lock(self.wheelhouse, self.requirements)
+
+
+    def test_rejects_wheel_metadata_version_line_injection(self):
+        path = self.wheelhouse / "ruff-0.14.5-py3-none-any.whl"
+        metadata = (
+            "Metadata-Version: 2.1" + chr(10)
+            + "Name: ruff" + chr(10)
+            + "Version: 0.14.5" + chr(10)
+            + " injected: lock-line" + chr(10)
+        )
+        with zipfile.ZipFile(path, "w") as archive:
+            archive.writestr("ruff-0.14.5.dist-info/METADATA", metadata)
+        with self.assertRaisesRegex(WheelLockError, "Name/Version inválidos"):
+            wheel_metadata(path)
+
+    def test_rejects_duplicate_wheel_identity_headers(self):
+        path = self.wheelhouse / "ruff-0.14.5-py3-none-any.whl"
+        metadata = (
+            "Metadata-Version: 2.1" + chr(10)
+            + "Name: ruff" + chr(10)
+            + "Name: attacker" + chr(10)
+            + "Version: 0.14.5" + chr(10)
+        )
+        with zipfile.ZipFile(path, "w") as archive:
+            archive.writestr("ruff-0.14.5.dist-info/METADATA", metadata)
+        with self.assertRaisesRegex(WheelLockError, "identidad METADATA"):
+            wheel_metadata(path)
+
+    def test_rejects_oversized_wheel_before_opening_archive(self):
+        path = self.wheelhouse / "large.whl"
+        path.write_bytes(b"x" * 9)
+        with patch("wheel_lock_generator.MAX_WHEEL_BYTES", 8):
+            with self.assertRaisesRegex(WheelLockError, "supera el límite"):
+                wheel_metadata(path)
+
+    def test_rejects_wheelhouse_count_limit_before_parsing(self):
+        (self.wheelhouse / "one.whl").write_bytes(b"x")
+        (self.wheelhouse / "two.whl").write_bytes(b"x")
+        with patch("wheel_lock_generator.MAX_WHEEL_COUNT", 1):
+            with self.assertRaisesRegex(WheelLockError, "límite de 1 wheels"):
+                build_lock(self.wheelhouse, self.requirements)
+
+    def test_rejects_total_wheelhouse_size_limit(self):
+        (self.wheelhouse / "one.whl").write_bytes(b"x")
+        (self.wheelhouse / "two.whl").write_bytes(b"x")
+        with patch("wheel_lock_generator.MAX_WHEELHOUSE_BYTES", 1):
+            with self.assertRaisesRegex(WheelLockError, "límite total"):
+                build_lock(self.wheelhouse, self.requirements)
+
+    def test_rejects_oversized_requirements_file_with_bounded_read(self):
+        self.requirements.write_text("ruff==0.14.5" + chr(10), encoding="utf-8")
+        with patch("wheel_lock_generator.MAX_REQUIREMENTS_BYTES", 4):
+            with self.assertRaisesRegex(WheelLockError, "supera 4 bytes"):
+                build_lock(self.wheelhouse, self.requirements)
+
+    def test_rejects_symlink_requirements_file(self):
+        target = self.root / "actual-requirements.in"
+        target.write_text("ruff==0.14.5" + chr(10), encoding="utf-8")
+        link = self.root / "linked-requirements.in"
+        link.symlink_to(target)
+        with self.assertRaisesRegex(WheelLockError, "inexistente o inseguro"):
+            build_lock(self.wheelhouse, link)
 
 
 if __name__ == "__main__":
