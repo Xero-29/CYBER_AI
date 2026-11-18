@@ -108,6 +108,17 @@ class DependencyArtifactManifestTests(unittest.TestCase):
         with self.assertRaisesRegex(ArtifactManifestError, "versión distinta"):
             build_manifest(self.root, self.wheelhouse)
 
+    def test_manifest_rejects_oversized_wheel_metadata(self):
+        path = self.wheelhouse / "requests-2.0-py3-none-any.whl"
+        metadata = (
+            "Metadata-Version: 2.1\\nName: requests\\nVersion: 2.0\\n\\n"
+            + "x" * (2 * 1024 * 1024 + 1)
+        )
+        with zipfile.ZipFile(path, "w") as archive:
+            archive.writestr("requests-2.0.dist-info/METADATA", metadata)
+        with self.assertRaisesRegex(ArtifactManifestError, "METADATA supera 2 MiB"):
+            build_manifest(self.root, self.wheelhouse)
+
     def test_manifest_rejects_invalid_wheel(self):
         (self.wheelhouse / "broken.whl").write_bytes(b"not a zip")
         with self.assertRaisesRegex(ArtifactManifestError, "Wheel inválido"):
