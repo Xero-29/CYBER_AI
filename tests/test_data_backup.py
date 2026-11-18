@@ -151,14 +151,14 @@ class DataBackupTests(unittest.TestCase):
     def test_restore_detects_source_changes_after_verification(self):
         snapshot = self.root / "backup"
         create_backup(self.data, snapshot)
-        original_copy = shutil.copy2
+        original_copy = data_backup._copy_checked_file
 
-        def mutate_before_copy(source, target):
+        def mutate_before_copy(source, target, **kwargs):
             if Path(source) == snapshot / "events.jsonl":
                 Path(source).write_text("tampered", encoding="utf-8")
-            return original_copy(source, target)
+            return original_copy(source, target, **kwargs)
 
-        with patch("data_backup.shutil.copy2", side_effect=mutate_before_copy):
+        with patch("data_backup._copy_checked_file", side_effect=mutate_before_copy):
             with self.assertRaisesRegex(BackupError, "cambió durante la restauración"):
                 restore_backup(
                     snapshot, self.data, confirm_quiesced=True, confirm_replace=True
