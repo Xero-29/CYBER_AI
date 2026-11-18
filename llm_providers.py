@@ -27,7 +27,7 @@ _HTTP_OPENER = build_opener(_NoRedirect)
 MAX_PROVIDER_REQUEST_BYTES = 8 * 1024 * 1024
 MAX_PROVIDER_RESPONSE_BYTES = 16 * 1024 * 1024
 MAX_PROVIDER_ERROR_BYTES = 2 * 1024
-ENV_NAME_PATTERN = re.compile(r\"[A-Za-z_][A-Za-z0-9_]{0,127}\")
+ENV_NAME_PATTERN = re.compile(r"[A-Za-z_][A-Za-z0-9_]{0,127}")
 
 
 @lru_cache(maxsize=32)
