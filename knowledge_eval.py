@@ -167,6 +167,15 @@ def _normalize_cases(cases):
     return normalized
 
 
+def _is_finite_number(value):
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return False
+    try:
+        return math.isfinite(value)
+    except OverflowError:
+        return False
+
+
 def evaluate(dataset, top_k=5, *, embed=generate_embedding, search=search_knowledge_hybrid):
     if isinstance(top_k, bool) or not isinstance(top_k, int) or not 1 <= top_k <= 50:
         raise ValueError("top_k debe estar entre 1 y 50.")
