@@ -127,9 +127,6 @@ class ToolExecutorLedgerTests(unittest.TestCase):
                 )
 
 
-if __name__ == "__main__":
-    unittest.main()
-
     def test_ledger_initialization_failure_blocks_execution_by_default(self):
         error = io.StringIO()
         with patch.object(
@@ -161,3 +158,5 @@ if __name__ == "__main__":
         runner.assert_called_once()
         self.assertIn("blocked for test", output.getvalue())
 
+if __name__ == "__main__":
+    unittest.main()
