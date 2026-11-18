@@ -416,6 +416,7 @@ def request(provider, endpoint, payload=None, timeout=600):
         if adapter is None:
             raise ValueError(f"Protocolo no compatible: {protocol}")
         result = adapter.request(provider, endpoint, request_payload, timeout)
+    result = _validate_plugin_response(endpoint, result, protocol)
     try:
         encoded_result = json.dumps(
             result, ensure_ascii=False, allow_nan=False
@@ -426,7 +427,6 @@ def request(provider, endpoint, payload=None, timeout=600):
         ) from error
     if len(encoded_result) > MAX_PROVIDER_RESPONSE_BYTES:
         raise RuntimeError(f"El proveedor {protocol} superó el límite de respuesta de 16 MiB.")
-    result = _validate_plugin_response(endpoint, result, protocol)
     if endpoint == "api/embed":
         expected = request_payload.get("input")
         if isinstance(expected, list) and len(result["embeddings"]) != len(expected):
