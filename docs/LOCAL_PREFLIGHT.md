@@ -23,3 +23,13 @@ La instalación principal usa `pip --require-hashes` y hashes SHA-256 fijados pa
 ## Dependencias del sandbox
 
 Las herramientas de análisis dentro de la imagen Docker usan `sandbox/requirements.lock`, con hashes SHA-256 de Ruff, Bandit y sus dependencias. La construcción instala con `pip --require-hashes`. El workflow descarga los wheels, valida sus hashes contra el lock y publica un SBOM CycloneDX separado para el sandbox. Para regenerar el lock: descargar wheels con `sandbox/requirements.in`, ejecutar `wheel_lock_generator.py` y revisar el diff antes de incorporarlo.
+
+## Extractores documentales opcionales
+
+PDF, DOCX, XLSX y PPTX usan dependencias opcionales separadas del entorno base. Para reproducir el entorno validado en CI:
+
+```bash
+python -m pip install --require-hashes -r requirements-documents.lock
+```
+
+`requirements-documents.in` fija las dependencias directas; `requirements-documents.lock` fija también las transitivas y hashes SHA-256. El lock se valida descargando exclusivamente wheels y comparando el manifiesto de artefactos antes de generar un SBOM CycloneDX independiente. Su plataforma de referencia es CPython 3.12, Linux x86_64 y glibc >= 2.26. No reutilices esos hashes en otras plataformas; genera y revisa un lock específico.
