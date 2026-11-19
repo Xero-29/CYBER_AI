@@ -179,5 +179,31 @@ Aplicar vectores de prueba oficiales, known-answer tests, negative tests, fuzzin
 - Ensayo de rotación/revocación/recuperación de claves en PKI aislada.
 No crear cifrados propios para producción ni usar claves reales en ejercicios.
 
+
+
+## Referencias primarias y estado de revisión
+
+Las referencias siguientes se registran para orientar verificación. Los metadatos oficiales se han comprobado; salvo indicación expresa, **no se declara lectura integral** ni conformidad de una implementación.
+
+| ID | Referencia | Uso en el compendio | Estado |
+|---|---|---|---|
+| NIST-SP-800-90A-r1 | [NIST SP 800-90A Rev. 1](https://doi.org/10.6028/NIST.SP.800-90Ar1) | DRBG deterministas | Metadatos oficiales; revisar borrador Rev. 2 antes de fijar perfil |
+| NIST-SP-800-90B | [NIST SP 800-90B](https://doi.org/10.6028/NIST.SP.800-90B) | Fuentes de entropía y health tests | Metadatos oficiales; lectura integral pendiente |
+| NIST-SP-800-90C | [NIST SP 800-90C](https://doi.org/10.6028/NIST.SP.800-90C) | Construcciones RBG | Final, septiembre 2025; metadatos y alcance oficial revisados |
+| NIST-FIPS-197 | [FIPS 197 AES](https://doi.org/10.6028/NIST.FIPS.197) | AES y key schedule | Actualización editorial 2023, sin cambios técnicos declarados |
+| NIST-SP-800-56A-r3 | [NIST SP 800-56A Rev. 3](https://doi.org/10.6028/NIST.SP.800-56Ar3) | DH/ECDH y establecimiento de claves | Metadatos oficiales; NIST anunció actualización en enero 2026 |
+| NIST-SP-800-57p1r5 | [NIST SP 800-57 Part 1 Rev. 5](https://doi.org/10.6028/NIST.SP.800-57pt1r5) | Gestión y ciclo de vida de claves | Metadatos oficiales; comprobar publicaciones posteriores |
+| NIST-FIPS-203 | [FIPS 203 ML-KEM](https://doi.org/10.6028/NIST.FIPS.203) | KEM poscuántico | Nota NIST de noviembre 2025 sobre errata/revisión potencial |
+| NIST-FIPS-204 | [FIPS 204 ML-DSA](https://doi.org/10.6028/NIST.FIPS.204) | Firmas poscuánticas basadas en retículos | Metadatos oficiales; lectura integral pendiente |
+| NIST-FIPS-205 | [FIPS 205 SLH-DSA](https://doi.org/10.6028/NIST.FIPS.205) | Firmas hash-based sin estado | Metadatos oficiales; lectura integral pendiente |
+| RFC-5869 | [HKDF](https://www.rfc-editor.org/rfc/rfc5869) | Derivación de claves | RFC publicado; revisión técnica integral pendiente |
+| RFC-8439 | [ChaCha20 and Poly1305](https://www.rfc-editor.org/rfc/rfc8439) | AEAD y nonce | RFC publicado; revisión técnica integral pendiente |
+| RFC-8446 | [TLS 1.3](https://www.rfc-editor.org/rfc/rfc8446) | Handshake y key schedule | RFC publicado; revisar erratas y actualizaciones |
+| RFC-9106 | [Argon2 Memory-Hard Function](https://www.rfc-editor.org/rfc/rfc9106) | Derivación de contraseñas | RFC publicado; revisar perfiles/parametrización |
+| RFC-8032 | [Edwards-Curve Digital Signature Algorithm (EdDSA)](https://www.rfc-editor.org/rfc/rfc8032) | Firmas EdDSA | RFC publicado; revisar variantes y perfiles |
+| RFC-9180 | [Hybrid Public Key Encryption](https://www.rfc-editor.org/rfc/rfc9180) | Composición KEM/KDF/AEAD | RFC publicado; lectura integral pendiente |
+
+No asumir que un RFC es automáticamente un perfil normativo de NIST, ni que una referencia final valida un producto. La política de selección debe especificar requisitos de interoperabilidad, jurisdicción, certificación y ciclo de vida.
+
 ## Estado de validación de la ampliación
 Contenido técnico editorial añadido para orientar revisión disciplinar; no implica lectura integral de fuentes, revisión externa ni ejecución de laboratorio. Mantener madurez M1/M2 hasta completar puertas G1–G8 con evidencias.
