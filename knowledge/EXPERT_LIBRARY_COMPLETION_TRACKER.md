@@ -1,11 +1,11 @@
 # Seguimiento de aplicación del estándar experto — Biblioteca CYBER_AI
 
 **Corte editorial:** 2026-11-19  
-**Áreas:** 48/48 con compendio técnico específico ampliado en esta rama.  
+**Áreas:** 48/48 con compendio editorial; seis módulos P0 recibieron reescritura disciplinar específica en esta rama.  
 **Estado global:** borradores técnicos ampliados; investigación documental y validación experimental pendientes.
 
 ## Alcance aplicado
-Cada compendio existente recibió un apéndice disciplinar con arquitectura/mecanismos, amenazas y fallos, controles, evaluación, laboratorios propuestos y límites de aplicación. La matriz de investigación cubre una pregunta falsable, hipótesis, diseño y métricas para cada área.
+Los seis módulos P0 (identity, malware, forensics, incident_response, threat_intel y reverse) fueron reescritos para sustituir bloques genéricos por mecanismos, casos límite, pruebas negativas, métricas y laboratorios específicos. Cada uno dispone ahora de agenda experimental y revisión exploratoria de literatura. Esto es avance editorial M2, no validación disciplinar. Las otras 42 áreas conservan el estado editorial previo y requieren auditoría granular.
 
 ## Matriz de áreas
 | ID | Área | Compendio | Agenda específica | Fuentes integrales | Laboratorio ejecutado | Revisión independiente |
@@ -20,12 +20,12 @@ Cada compendio existente recibió un apéndice disciplinar con arquitectura/meca
 | `containers` | Contenedores y Kubernetes | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
 | `mobile` | Seguridad móvil | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
 | `crypto` | Criptografía | Ampliado con siete capítulos técnicos específicos, agenda experimental y mapa de fuentes; borrador M2 | Protocolo por subtema definido; ejecución pendiente | Metadatos de 15 fuentes primarias/RFC registradas; lectura integral pendiente | 7 protocolos de laboratorio diseñados; no ejecutados | Revisión independiente pendiente |
-| `identity` | Identidad y acceso | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
-| `malware` | Análisis de malware | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
-| `forensics` | Informática forense | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
-| `incident_response` | Respuesta a incidentes | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
-| `threat_intel` | Inteligencia de amenazas | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
-| `reverse` | Ingeniería inversa | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
+| `identity` | Identidad y acceso | Reescrito por 7 temas; borrador M2 | 6 protocolos específicos | Fuentes registradas; lectura integral pendiente | 6 labs diseñados, no ejecutados | Pendiente |
+| `malware` | Análisis de malware | Reescrito por 7 temas; borrador M2 | 6 protocolos específicos | Fuentes registradas; lectura integral pendiente | 7 labs fríos diseñados, no ejecutados | Pendiente |
+| `forensics` | Informática forense | Reescrito por 7 temas; borrador M2 | 6 protocolos específicos | Fuentes registradas; lectura integral pendiente | 7 labs fríos diseñados, no ejecutados | Pendiente |
+| `incident_response` | Respuesta a incidentes | Reescrito por 7 temas; borrador M2 | 6 protocolos específicos | Fuentes registradas; lectura integral pendiente | 7 labs fríos diseñados, no ejecutados | Pendiente |
+| `threat_intel` | Inteligencia de amenazas | Reescrito por 7 temas; borrador M2 | 6 protocolos específicos | Fuentes registradas; lectura integral pendiente | 7 labs fríos diseñados, no ejecutados | Pendiente |
+| `reverse` | Ingeniería inversa | Reescrito por 7 temas; borrador M2 | 7 protocolos específicos | Fuentes registradas; lectura integral pendiente | 7 labs fríos diseñados, no ejecutados | Pendiente |
 | `iot_hardware` | IoT y hardware | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
 | `devsecops` | DevSecOps | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
 | `ai_security` | Seguridad de IA | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
@@ -77,3 +77,16 @@ Cada compendio existente recibió un apéndice disciplinar con arquitectura/meca
 
 ## Regla de aceptación
 Ningún área se declara completa hasta satisfacer las ocho puertas G1–G8 con evidencia trazable. La presencia de un compendio o una agenda no equivale a aprobación.
+
+## Remediación P0 — corte 2026-11-19
+
+| Módulo | Compendio específico | Agenda | Revisión de literatura | Laboratorios |
+|---|---|---|---|---|
+| identity | 7 temas reescritos | 6 protocolos | Mapa de fuentes; lectura integral pendiente | 6 diseñados, no ejecutados |
+| malware | 7 temas reescritos | 6 protocolos | Mapa de fuentes; lectura integral pendiente | 7 diseñados, no ejecutados |
+| forensics | 7 temas reescritos | 6 protocolos | Mapa de fuentes; lectura integral pendiente | 7 diseñados, no ejecutados |
+| incident_response | 7 temas reescritos | 6 protocolos | Mapa de fuentes; lectura integral pendiente | 7 diseñados, no ejecutados |
+| threat_intel | 7 temas reescritos | 6 protocolos | Mapa de fuentes; lectura integral pendiente | 7 diseñados, no ejecutados |
+| reverse | 7 temas reescritos | 7 protocolos | Mapa de fuentes; lectura integral pendiente | 7 diseñados, no ejecutados |
+
+**Límite:** el número de temas/protocolos/laboratorios describe artefactos de diseño, no pruebas completadas. No asignar M3/M4/M5 ni declarar biblioteca completa.
