@@ -1854,6 +1854,160 @@
         "software_engineering"
       ],
       "review_note": "Se revisaron páginas oficiales de especificación y provenance; no se afirma auditoría de un builder concreto."
+    },
+    {
+      "id": "NIST-AI-600-1",
+      "title": "Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_risk_management_profile",
+      "url": "https://doi.org/10.6028/NIST.AI.600-1",
+      "version": "NIST AI 600-1",
+      "published": "2024-07-26",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verified_scope": "Perfil transversal del AI RMF para riesgos de IA generativa a lo largo del ciclo de vida.",
+      "domains": [
+        "ai_red_team",
+        "ai_security"
+      ],
+      "review_date": "2026-11-19",
+      "review_note": "Página oficial NIST, abstract y metadatos inspeccionados. PDF completo pendiente de lectura; no implica evaluación de eficacia de controles."
+    },
+    {
+      "id": "MITRE-ATLAS-LIVE-2026-11-19",
+      "title": "MITRE ATLAS",
+      "publisher": "MITRE",
+      "type": "living_adversary_knowledge_base",
+      "url": "https://atlas.mitre.org/",
+      "version": "Snapshot web consultado 2026-11-19; dataset STIX versionado pendiente",
+      "verification_status": "official_live_knowledge_base_page_reviewed",
+      "verified_scope": "Taxonomía viva de tácticas y técnicas contra sistemas predictivos, generativos y agénticos; incluye mitigaciones y casos.",
+      "domains": [
+        "ai_red_team",
+        "ai_security"
+      ],
+      "review_date": "2026-11-19",
+      "review_note": "Página oficial inspeccionada. No se ha descargado ni revisado cada objeto STIX; congelar versión/hash antes de análisis reproducible."
+    },
+    {
+      "id": "OWASP-GENAI-LLM-TOP10-2026",
+      "title": "OWASP GenAI LLM Top 10 2026",
+      "publisher": "OWASP GenAI Security Project",
+      "type": "community_security_risk_guidance",
+      "url": "https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/",
+      "version": "2026",
+      "published": "2026-08-03",
+      "verification_status": "official_publication_page_reviewed",
+      "verified_scope": "Guía comunitaria de riesgos críticos de aplicaciones LLM; mapea a NIST, MITRE ATLAS, CWE y riesgos de agentes.",
+      "domains": [
+        "ai_red_team",
+        "ai_security",
+        "appsec"
+      ],
+      "review_date": "2026-11-19",
+      "review_note": "Página oficial de publicación revisada. Las diez entradas canónicas, referencias y mappings requieren lectura individual; no es certificación ni benchmark."
+    },
+    {
+      "id": "OWASP-AGENTIC-TOP10-2026",
+      "title": "OWASP Top 10 for Agentic Applications 2026",
+      "publisher": "OWASP GenAI Security Project",
+      "type": "community_agentic_security_guidance",
+      "url": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+      "version": "2026",
+      "published": "2025-12-09",
+      "verification_status": "official_resource_page_reviewed",
+      "verified_scope": "Riesgos de sistemas autónomos/agénticos y guía práctica para identificar y reducirlos.",
+      "domains": [
+        "ai_red_team",
+        "ai_security"
+      ],
+      "review_date": "2026-11-19",
+      "review_note": "Página oficial y propósito inspeccionados. Requiere revisar entradas, amenazas, mitigaciones y referencias de la publicación."
+    },
+    {
+      "id": "TANG-LLM-AGENT-SECURITY-SURVEY-2026",
+      "title": "Security of LLM-based agents regarding attacks, defenses, and applications: A comprehensive survey",
+      "publisher": "Information Fusion / Elsevier",
+      "type": "peer_reviewed_survey",
+      "url": "https://www.sciencedirect.com/science/article/pii/S1566253525010036",
+      "version": "Volume 127, Part C, Article 103941",
+      "published": "2026-03",
+      "verification_status": "metadata_and_abstract_reviewed",
+      "verified_scope": "Taxonomía de ataques/defensas de agentes LLM y criterios de evaluación según abstract editorial.",
+      "domains": [
+        "ai_red_team",
+        "ai_security"
+      ],
+      "review_date": "2026-11-19",
+      "review_note": "Metadatos y abstract consultados; el acceso al texto completo falló en esta revisión. No declarar full_text_reviewed."
+    },
+    {
+      "id": "GENG-PROMPT-INJECTION-SURVEY-2026",
+      "title": "Prompt Injection Attacks on Large Language Models: A Survey of Attack Methods, Root Causes, and Defense Strategies",
+      "publisher": "Computers, Materials & Continua",
+      "type": "peer_reviewed_systematic_review",
+      "url": "https://doi.org/10.32604/cmc.2025.074081",
+      "version": "87(1), Article 4",
+      "published": "2026-02-10",
+      "verification_status": "metadata_and_abstract_reviewed",
+      "verified_scope": "Revisión sistemática de literatura sobre prompt injection; abstract declara 128 estudios de 2022–2025 y método basado en Kitchenham.",
+      "domains": [
+        "ai_red_team",
+        "ai_security"
+      ],
+      "review_date": "2026-11-19",
+      "review_note": "Abstract/metadatos consultados. Método, corpus, criterios, evaluación de calidad y cifras deben verificarse en texto completo."
+    },
+    {
+      "id": "DUARTE-PROMPT-INJECTION-REVIEW-2026",
+      "title": "A Systematic Review of Prompt Injection Attacks on Large Language Models: Trends, Taxonomy, Evaluation, Defenses, and Opportunities",
+      "publisher": "IEEE Access",
+      "type": "peer_reviewed_systematic_review",
+      "url": "https://doi.org/10.1109/ACCESS.2026.3656849",
+      "version": "Volume 14, pages 12875–12899",
+      "published": "2026-01-21",
+      "verification_status": "metadata_and_abstract_reviewed",
+      "verified_scope": "Revisión de técnicas, contextos, benchmarks y mitigaciones de prompt injection según abstract y metadatos IEEE.",
+      "domains": [
+        "ai_red_team",
+        "ai_security"
+      ],
+      "review_date": "2026-11-19",
+      "review_note": "Abstract y metadatos consultados; texto completo, protocolo y calidad de síntesis pendientes."
+    },
+    {
+      "id": "BIGDIA-PROMPT-INJECTION-SOK-2026",
+      "title": "A Systematic Survey of Prompt Injection Attacks and Defenses in LLM-Integrated Applications and Agentic Systems",
+      "publisher": "IEEE BigDIA",
+      "type": "peer_reviewed_conference_survey",
+      "url": "https://doi.org/10.1109/BigDIA71496.2026.11684636",
+      "version": "BigDIA 2026",
+      "published": "2026-08",
+      "verification_status": "metadata_and_abstract_reviewed",
+      "verified_scope": "SoK sobre procedencia, flujo de información, ataques de prompt injection y evaluación en aplicaciones/agents según abstract.",
+      "domains": [
+        "ai_red_team",
+        "ai_security"
+      ],
+      "review_date": "2026-11-19",
+      "review_note": "Abstract y metadatos consultados; texto completo pendiente."
+    },
+    {
+      "id": "PROMPT-TO-API-CALL-INJECTION-2026",
+      "title": "Prompt-to-API-Call injection: Systematic attack generation and semantic defense in LLM agents",
+      "publisher": "Journal of Systems and Software / Elsevier",
+      "type": "peer_reviewed_journal_preprint_online",
+      "url": "https://doi.org/10.1016/j.jss.2026.113164",
+      "version": "Article 113164",
+      "published": "2026-10-27",
+      "verification_status": "metadata_and_abstract_reviewed",
+      "verified_scope": "Estudio sobre inyección hacia llamadas API, confused deputy, RBAC y generación sistemática de vectores según abstract.",
+      "domains": [
+        "ai_red_team",
+        "ai_security",
+        "api"
+      ],
+      "review_date": "2026-11-19",
+      "review_note": "Abstract y metadatos consultados; artículo completo, metodología, dataset y resultados deben revisarse antes de reutilizar cifras."
     }
   ],
   "last_updated": "2026-11-19"
