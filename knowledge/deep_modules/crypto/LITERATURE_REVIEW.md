@@ -4,7 +4,7 @@
 **Estado:** revisión documental inicial de metadatos y alcance oficial; no revisión sistemática ni lectura integral de todas las fuentes.  
 **Madurez:** M2 editorial; M3/M4/M5 pendientes.
 
-## 1. Pregunta y alcance
+## Pregunta
 
 ¿Cómo preservar las garantías de confidencialidad, integridad y autenticidad al integrar primitivas, protocolos y gestión de claves en sistemas de software y hardware, considerando errores de implementación, cambios de estándares y transición poscuántica?
 
@@ -21,7 +21,7 @@ Se consultaron registros y páginas oficiales NIST y RFC Editor para verificar i
 
 Las fuentes normativas deben leerse en su edición y erratas vigentes antes de derivar requisitos de producción.
 
-## 3. Síntesis por línea de conocimiento
+## Síntesis
 
 ### 3.1 Aleatoriedad y entropía
 
@@ -89,7 +89,7 @@ La gestión cubre generación, distribución, activación, almacenamiento, uso, 
 
 IDs de registro: `NIST-SP-800-90A-r1`, `NIST-SP-800-90B`, `NIST-SP-800-90C`, `NIST-FIPS-197`, `NIST-SP-800-56A-r3`, `NIST-SP-800-57p1r5`, `NIST-FIPS-203`, `NIST-FIPS-204`, `NIST-FIPS-205`, `RFC-5869`, `RFC-8439`, `RFC-8446`, `RFC-9106`, `RFC-8032`, `RFC-9180`.
 
-## 7. Brechas y plan de revisión completa
+## Brechas
 
 - Obtener y leer texto íntegro de cada norma/RFC; capturar versión, secciones, erratas y hash del archivo cuando la licencia lo permita.
 - Extraer requisitos por afirmación y enlazarlos con subtemas y pruebas.
@@ -100,3 +100,21 @@ IDs de registro: `NIST-SP-800-90A-r1`, `NIST-SP-800-90B`, `NIST-SP-800-90C`, `NI
 - Solicitar revisión independiente por especialista en criptografía aplicada.
 
 **Conclusión limitada:** la base editorial cubre las principales familias de criptografía y sus superficies de integración. La evidencia consultada sustenta el mapa de estándares y las alertas de vigencia descritas, pero no certifica seguridad de un producto ni madurez científica M3/M4/M5.
+
+
+## Identificadores del registro de fuentes
+- `NIST-SP-800-90A-r1`
+- `NIST-SP-800-90B`
+- `NIST-SP-800-90C`
+- `NIST-FIPS-197`
+- `NIST-SP-800-56A-r3`
+- `NIST-SP-800-57p1r5`
+- `NIST-FIPS-203`
+- `NIST-FIPS-204`
+- `NIST-FIPS-205`
+- `RFC-5869`
+- `RFC-8439`
+- `RFC-8446`
+- `RFC-9106`
+- `RFC-8032`
+- `RFC-9180`
