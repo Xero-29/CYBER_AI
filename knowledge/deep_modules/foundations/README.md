@@ -27,6 +27,7 @@ El desarrollo se organiza en doce bloques disciplinares:
 ## Documentos del módulo
 
 - [Mapa curricular exhaustivo V2](FOUNDATIONS_CURRICULUM_MAP_V2.md): nueve unidades disciplinares, 102 subunidades, dependencias, fronteras y brechas G1. Mapa en progreso; no es aprobación de cobertura.
+- [Primera unidad desarrollada: FND-01.01](topics/FND-01-01_SECURITY_SAFETY_PRIVACY_RELIABILITY_RESILIENCE.md): doce capas y cuatro capacidades en borrador; no aprobada.
 - [Matriz granular de subunidades JSON](FOUNDATIONS_SUBTOPIC_AUDIT_V2.json) y [vista Markdown](FOUNDATIONS_SUBTOPIC_AUDIT_V2.md): 1.224 comprobaciones capa×subunidad y 408 comprobaciones de capacidad, todas `not_assessed` al crear la línea base.
 - [Registro de ejecución en frío](../../COLD_KNOWLEDGE_EXECUTION_LOG_2026-11-19.md): línea base y cambios verificados.
 
