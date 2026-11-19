@@ -13,7 +13,7 @@ Los 48 compendios existen y contienen ampliaciones específicas, pero **no se pu
 - Los tamaños observados van aproximadamente de 10.7 kB a 31 kB. El tamaño no es una métrica de profundidad.
 - Fundamentos, AppSec y API muestran estructuras más extensas y laboratorios/casos más concretos en la inspección realizada.
 - 37 áreas adicionales muestran encabezados disciplinares específicos y una estructura técnica diferenciada; esto prueba especialización editorial, no que cada mecanismo esté explicado con rigor suficiente.
-- Ocho áreas contenían un bloque repetido de siete apartados genéricos: `mobile`, `crypto`, `identity`, `malware`, `forensics`, `incident_response`, `threat_intel` y `reverse`. Las áreas `mobile` y `crypto` ya recibieron remediación editorial; quedan seis áreas pendientes.
+- Ocho áreas contenían un bloque repetido de siete apartados genéricos: `mobile`, `crypto`, `identity`, `malware`, `forensics`, `incident_response`, `threat_intel` y `reverse`. Las ocho han recibido sustitución editorial de los bloques genéricos; esto no demuestra profundidad experta ni validación.
 - La agenda de investigación de 48 áreas mantiene hipótesis y diseños propuestos, no resultados.
 - El tracker reconoce fuentes integrales, laboratorios ejecutados y revisión independiente como pendientes.
 
@@ -63,7 +63,7 @@ La estructura actual es mayormente un documento por especialidad. El estándar r
 
 ## 5. Orden de ejecución recomendado
 
-1. Completar los seis compendios que aún conservan bloques plantilla: `identity`, `malware`, `forensics`, `incident_response`, `threat_intel` y `reverse`.
+1. Verificar la remediación editorial de `identity`, `malware`, `forensics`, `incident_response`, `threat_intel` y `reverse`; después, auditar granularmente las 48 áreas.
 2. Desarrollar los protocolos concretos de AppSec, API, redes, Linux, Windows/AD, cloud, contenedores, criptografía, forense, IR, malware y seguridad de IA.
 3. Construir la matriz tema×12 capas×K1–K5 para las 48 especialidades.
 4. Leer y sintetizar fuentes primarias antes de elevar estados de revisión.
@@ -81,7 +81,7 @@ Hasta completar estas tareas, la clasificación correcta es **biblioteca estruct
 
 - Se reescribió el bloque de desarrollo de los siete subtemas de `mobile`: Android sandbox/Keystore, iOS sandbox/Keychain, almacenamiento/backups, TLS/OAuth, deep links/IPC/WebView, MASVS/MASTG y MDM/respuesta.
 - Se sustituyó el texto genérico repetido por mecanismos, riesgos, controles y casos de prueba específicos de seguridad móvil.
-- El módulo `crypto` también fue remediado: sus siete temas ahora contienen desarrollo disciplinar, se añadieron protocolos experimentales por tema, una agenda específica y una revisión documental ampliada. Quedan seis áreas pendientes: `identity`, `malware`, `forensics`, `incident_response`, `threat_intel` y `reverse`.
+- El módulo `crypto` también fue remediado: sus siete temas ahora contienen desarrollo disciplinar, se añadieron protocolos experimentales por tema, una agenda específica y una revisión documental ampliada. Las seis áreas restantes recibieron remediación editorial en la actualización del 19-11-2026; sus fuentes integrales, laboratorios y revisión independiente siguen pendientes.
 - La sustitución editorial de móvil no representa laboratorio ejecutado ni validación independiente. Sus fuentes y pruebas siguen pendientes de revisión y ejecución.
 
 
@@ -95,3 +95,19 @@ Hasta completar estas tareas, la clasificación correcta es **biblioteca estruct
 - Se reemplazó la agenda genérica por protocolos con hipótesis, corpus, variables, controles, métricas y amenazas a validez.
 - Se amplió la revisión bibliográfica y se registraron 12 nuevas referencias primarias/RFC; el registro pasa de 90 a **102 entradas**, sin IDs duplicados esperados (requiere auditoría automática posterior).
 - El tracker ahora refleja el estado editorial M2 propuesto. No se eleva el conteo de fuentes íntegramente verificadas; los laboratorios, revisión independiente y validación M3–M5 siguen pendientes.
+
+
+### 9. Remediación P0 de seis especialidades — 2026-11-19
+
+Se sustituyeron los siete bloques repetidos por contenido disciplinar específico en:
+
+- **identity:** IAM/IGA/PAM, MFA/WebAuthn, OAuth/OIDC/SAML/Kerberos, RBAC/ABAC/ReBAC, workload identity, SoD y recuperación de cuentas.
+- **malware:** PE/ELF/Mach-O/documentos, análisis estático, sandbox, persistencia/memoria, YARA/Sigma, familias y contención.
+- **forensics:** cadena de custodia, adquisición/write blockers, filesystems/timeline, memoria, red/correo/browser, cloud/móvil e informes.
+- **incident_response:** preparación, triage, contención/preservación, erradicación/recuperación, escenarios sectoriales, comunicación y postmortem.
+- **threat_intel:** PIR/ciclo, OSINT y fiabilidad, STIX/TAXII/MISP, ATT&CK/TTP, IOC/caducidad, atribución y productos.
+- **reverse:** ABI/arquitectura, desensamblado/decompilación, CFG/data flow, parsers, emulación, firmware, fuzzing y divulgación.
+
+Para los seis módulos se reemplazaron también las agendas genéricas por protocolos con unidad de análisis, variables, controles, métricas y amenazas a validez. Se actualizaron las revisiones exploratorias de literatura y sus IDs de fuentes existentes. Se diseñaron laboratorios fríos con datasets sintéticos, ground truth, criterios de aceptación y límites de seguridad.
+
+**Estado de evidencia:** contenido y protocolos editoriales M2; las fuentes no se declaran leídas íntegramente, los laboratorios no se declaran ejecutados, y no hay revisión independiente ni reproducción externa. La reescritura no elimina la prioridad P1 de auditar las otras 42 áreas por tema×12 capas.
