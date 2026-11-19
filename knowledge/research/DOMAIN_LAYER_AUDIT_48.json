@@ -161,7 +161,7 @@
         "G8_independent_review": "not_assessed"
       },
       "maturity": "M2_editorial_draft_only",
-      "notes": "El compendio existente contiene una ruta inicial por subtemas, pero conserva bloques transversales repetidos; requiere desarrollo disciplinar tema por tema."
+      "notes": "Se incorporó FOUNDATIONS_DEEP_DEVELOPMENT_V1.md y se limpió el índice; las 84 comprobaciones heredadas (7 temas x 12 capas) siguen not_assessed hasta mapear evidencia específica por tema. El desarrollo general no equivale a aprobar esas comprobaciones."
     },
     {
       "id": "ai_security",
@@ -2469,7 +2469,7 @@
     },
     {
       "id": "foundations",
-      "previous_editorial_status": "generic_or_initial_compendium_requires_deep_audit",
+      "previous_editorial_status": "expanded_development_document_added_topic_layer_audit_pending",
       "topics": [
         {
           "topic_id": "foundations-01",
