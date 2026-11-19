@@ -23,6 +23,14 @@ STUDIES = {
     "cloud",
     "containers",
     "mobile",
+    "identity",
+    "malware",
+    "forensics",
+    "threat_intel",
+    "reverse",
+    "iot_hardware",
+    "governance",
+    "data_security",
 }
 
 
