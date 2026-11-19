@@ -122,3 +122,24 @@ Cada estudio debe definir H0/H1, variables, muestra, comparadores, refutación, 
 
 ## Madurez
 M0/M1 estructural. No prueba profundidad ni madurez M3/M4/M5. Avanzar exige lectura crítica, artefactos específicos, experimentos ejecutados y evidencia auditable.
+
+
+## Profundización técnica específica: Seguridad inalámbrica
+
+### RF y modelo de amenaza
+Modelar bandas, canales, potencia, antenas, APs, controladoras, clientes, roaming, backhaul, espectro y entorno físico. Amenazas incluyen rogue AP, evil twin, deauth, jamming, spoofing, replay, credential theft y misconfiguration. Distinguir ataque lógico de interferencia física.
+
+### Wi-Fi y autenticación
+Evaluar WPA2/WPA3 Personal/Enterprise, 802.1X, EAP methods, RADIUS, certificados, PMF/802.11w, SAE, roaming y onboarding. Evitar PSK compartidas para entornos empresariales; proteger credenciales EAP y validar certificados del servidor. Revisar transición WPA, compatibilidad legacy y segmentación de invitados/IoT.
+
+### Bluetooth y protocolos cercanos
+Revisar pairing, bonding, LE Secure Connections, GATT permissions, privacy addresses, key lifecycle y firmware. BLE no es seguro por estar cerca ni por usar pairing. Zigbee/Thread/NFC/UWB requieren análisis de commissioning, claves, replay, relay y acceso físico.
+
+### Detección y operación
+WIDS/WIPS requiere sensores, ubicación, cobertura, baseline y procedimientos para no bloquear dispositivos legítimos. Medir falsos positivos, precisión de localización, latencia y cobertura. No realizar deauth/jamming ni transmisiones disruptivas fuera de laboratorio autorizado.
+
+### Laboratorios
+APs aislados y clientes de prueba para validar configuración, certificados, PMF, roaming y segmentación; capturas sintéticas y análisis offline. Registrar región regulatoria, canales, potencia y equipos.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.
