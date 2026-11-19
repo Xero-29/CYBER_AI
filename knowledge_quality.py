@@ -75,7 +75,7 @@ def audit_library(root: Path = ROOT) -> dict:
             deep = {k: has_heading(deep_text,v) for k,v in DEEP.items()}
             deep_words = {}
             for key, alternatives in DEEP.items():
-                heading = next((h for h in alternatives if has_heading(deep_text, (h,))), None)
+                heading = next((line.strip() for line in deep_text.splitlines() if any(line.strip().startswith(h) and (len(line.strip()) == len(h) or line.strip()[len(h)].isspace()) for h in alternatives)), None)
                 deep_words[key] = section_word_count(deep_text, heading) if heading else 0
         missing = [k for k,v in base.items() if not v]
         missing_deep = [k for k,v in deep.items() if not v or deep_words[k] < 20]

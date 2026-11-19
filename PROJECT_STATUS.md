@@ -1,16 +1,3 @@
-# Estado de profundización de las 48 áreas — 2026-11-19
-
-## Secciones profundas incorporadas
-
-- Se añadieron 48 dossiers específicos en knowledge/deep_modules/<area>/DEEP_SECTIONS.md.
-- Cada dossier desarrolla cinco dimensiones: modelo de amenazas, detección, respuesta a incidentes, caso práctico y referencias.
-- Los escenarios son de laboratorio y usan datos sintéticos o entornos autorizados; se indican límites donde el resultado no puede extrapolarse a producción.
-- Se corrigió knowledge_quality.py: ahora inspecciona el dossier profundo real, no solo el README del pack. Comprueba los cinco encabezados y un mínimo de 20 palabras por sección, además de que el estudio asociado tenga al menos dos referencias HTTPS.
-- Se añadió una regresión que exige 48/48 dominios y 240/240 secciones con contenido mínimo.
-- Límite: este gate es editorial/estructural. No demuestra exactitud semántica, lectura integral de las fuentes, revisión experta, ejecución de laboratorios ni madurez M3–M5.
-
----
-
 # Estado canónico vigente — actualización de biblioteca 2026-11-19
 
 ## Fundamentos de las 48 áreas: ampliación estructural

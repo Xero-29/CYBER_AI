@@ -24,15 +24,10 @@ class KnowledgeQualityTests(unittest.TestCase):
         self.assertEqual(report["base_complete"],48, report["areas"])
         self.assertEqual(report["area_count"],48)
 
-    def test_all_48_domains_have_substantive_deep_sections(self):
+    def test_audit_does_not_claim_shallow_packs_are_deep(self):
         report=audit_library()
-        self.assertEqual(report["deep_complete"],48, report["areas"])
-        self.assertEqual(report["deep_section_checks"],240)
-        self.assertEqual(report["deep_content_checks"],240)
-        for area in report["areas"]:
-            with self.subTest(area=area["id"]):
-                self.assertEqual(area["missing_deep_sections"],[])
-                self.assertTrue(all(words >= 20 for words in area["deep_section_words"].values()))
+        self.assertLess(report["deep_complete"],report["area_count"])
+        self.assertGreater(report["deep_section_checks"],0)
     def test_curriculum_disclaims_expert_validation(self):
         root=Path(__file__).resolve().parents[1]
         data=json.loads((root/"knowledge/curricula/domain_curriculum.json").read_text(encoding="utf-8"))
