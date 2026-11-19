@@ -158,3 +158,12 @@ La madurez se reportará en dos ejes separados: teórico T0–T5 y operativo O0�
 **Regla de estado:** no asignar T4 sin revisión independiente; no asignar O2–O5 sin evidencia de ejecución. Un módulo puede quedar T3/O0 o T4/O0, sin confundir profundidad teórica con capacidad operativa.
 
 Norma y secuencia completas: [THEORETICAL_LIBRARY_COMPLETION_PROGRAM_48.md](THEORETICAL_LIBRARY_COMPLETION_PROGRAM_48.md).
+
+
+### Primer módulo bajo el programa teórico — AI Red Team (2026-11-19)
+
+- Se creó `knowledge/deep_modules/ai_red_team/AI_RED_TEAM_THEORETICAL_DEVELOPMENT_V1.md`, con desarrollo diferenciado de doce capas para los siete temas de línea base.
+- Se identificaron límites de confianza, modelos de amenaza, arquitectura, controles, trade-offs, preguntas de investigación, diseño de laboratorios/datasets, métricas, especificaciones de Skills y evaluación en frío.
+- Se enlazó el dossier desde el README y el compendio técnico previo.
+- **Estado:** avance documental sustancial, todavía incompleto. El inventario de siete temas debe ampliarse, la lectura integral de fuentes sigue pendiente, no se ha completado la auditoría adversarial de las 84 celdas y no hay revisión independiente ni laboratorios nuevos ejecutados.
+- **Madurez:** M2 editorial; no declarar T4, G1–G8 aprobadas ni madurez operativa. La salida del módulo permanece bloqueada hasta cerrar su completitud teórica.
