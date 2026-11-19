@@ -2,7 +2,7 @@
 
 **Unidad curricular:** Foundations / FND-01 Propiedades, conceptos y modelos de seguridad  
 **Estado:** desarrollo inicial evaluable; no aprobado.  
-**Madurez:** T1 en construcción / O0. No asignar T1 formal hasta completar la revisión de fuentes y la evaluación en frío.  
+**Madurez:** T0 / O0. Borrador documental no evaluado; no se asigna T1 hasta cumplir los criterios de evidencia y evaluación en frío.  
 **Norma:** `knowledge/COLD_KNOWLEDGE_EXECUTION_PROTOCOL.md`.
 
 ## Objetivos de aprendizaje
