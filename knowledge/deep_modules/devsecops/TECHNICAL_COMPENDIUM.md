@@ -122,3 +122,27 @@ Todo estudio debe definir H0/H1, variables, muestra, comparadores, criterio de r
 
 ## Madurez
 M0/M1 estructural. Este documento no prueba profundidad cubierta ni madurez M3/M4/M5. Siguiente puerta: lectura crítica de fuentes completas, artefactos específicos, ejecución de laboratorio y evidencia verificable.
+
+
+## Profundización técnica específica: DevSecOps
+
+### Pipeline y trust boundaries
+Modelar repositorio, developer workstation, SCM, CI runners, artifact registry, signing service, deployment controller y runtime. Cada transición es una frontera de confianza. Proteger tokens, runners efímeros, branch protection, approvals, webhooks, caches, secrets y permisos de workflow. Evitar que código de PR no confiable acceda a secretos o credenciales de producción.
+
+### SAST, SCA, DAST y secretos
+Definir política por lenguaje y riesgo; ajustar reglas, baseline, suppressions con vencimiento y triage. SCA correlaciona dependencias directas/transitivas, licencias, reachability y exploitability. Secret scanning requiere revocación/rotación, no solo borrar del commit. DAST en entornos aislados con datos sintéticos y scope explícito.
+
+### IaC y policy-as-code
+Analizar Terraform, Kubernetes manifests, Helm, cloud templates y scripts. Validar exposición pública, IAM excesivo, cifrado, logging, redes, secretos y drift. Policy-as-code debe versionarse, probarse con casos permitidos/denegados y tener excepciones auditables. Separar plan y apply; proteger state y backend.
+
+### Supply chain y procedencia
+SBOM, provenance, build isolation, pinned dependencies, signature verification, reproducible builds y attestations. Proteger dependencias, actions/plugins, base images y package registries. SLSA levels y frameworks son modelos de garantías, no sustituyen evaluación de amenaza. Firmar artefacto y verificar firma en deployment, vinculando digest a build.
+
+### Release y operación
+Separar entornos, credenciales y aprobaciones; usar progressive delivery, canary, rollback y feature flags seguros. Monitorear runtime, configuración y drift; conectar hallazgos con tickets y retest. El objetivo no es maximizar cantidad de scanners, sino reducir riesgo con baja fricción y evidencia.
+
+### Métricas y laboratorios
+Medir tiempo de feedback, vulnerabilidades escapadas, tasa de falsos positivos, cobertura de repos, porcentaje de builds firmadas, provenance verificable y tiempo de remediación. Laboratorios: pipeline con secreto sintético, IaC insegura, dependencia vulnerable y verificación de firma. Documentar runners, versiones, reglas y outputs.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.
