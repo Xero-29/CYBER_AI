@@ -51,3 +51,12 @@ NIST SP 800-61 Rev. 3, CISA Incident Response Playbooks, FIRST CSIRT Services Fr
 
 ## Instrucciones para agentes IA
 No aísles, apagues, borres ni restaures activos por iniciativa propia. Recomienda opciones con impacto y reversibilidad; la autoridad humana decide. Separa hechos, hipótesis y recomendaciones.
+
+## Biblioteca técnica e agenda de investigación
+
+- [Compendio técnico específico](../../deep_modules/incident_response/TECHNICAL_COMPENDIUM.md)
+- [Agenda de investigación y protocolos](../../deep_modules/incident_response/RESEARCH_AGENDA.md)
+- [Revisión exploratoria de literatura](../../deep_modules/incident_response/LITERATURE_REVIEW.md)
+- [Seguimiento global de madurez y evidencia](../../EXPERT_LIBRARY_COMPLETION_TRACKER.md)
+
+**Estado:** desarrollo editorial M2; las fuentes integrales, laboratorios ejecutados y revisión independiente siguen pendientes. No interpretar laboratorios diseñados como pruebas ejecutadas.
