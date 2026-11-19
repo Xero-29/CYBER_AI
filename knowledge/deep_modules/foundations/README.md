@@ -1,3 +1,38 @@
+# Foundations — índice de desarrollo disciplinar (v1.1.0)
+
+> **Actualización 2026-11-19:** se añadió el desarrollo disciplinar profundo en [FOUNDATIONS_DEEP_DEVELOPMENT_V1.md](FOUNDATIONS_DEEP_DEVELOPMENT_V1.md). Ese documento amplía el contenido existente sin sustituirlo y contiene modelos formales, ingeniería de sistemas seguros, riesgo e incertidumbre, assurance, gobierno, privacidad, safety, resiliencia, métricas, casos y protocolos de laboratorio.
+
+## Mapa disciplinar vigente
+
+1. Naturaleza de seguridad, safety, privacidad, confiabilidad y resiliencia.
+2. Sistemas, misión, activos, stakeholders, pérdidas y consecuencias.
+3. Confianza, políticas, mecanismos, estados, grafos y límites.
+4. Ingeniería de sistemas seguros y ciclo de vida.
+5. Amenazas adversariales, fallos, accidentes y análisis causal.
+6. Debilidades, vulnerabilidades, exposición y riesgo contextual.
+7. Probabilidad condicionada, incertidumbre, pérdida y sensibilidad.
+8. Controles, verificación, validación y assurance cases.
+9. Gobierno, responsabilidades, terceros y cadena de suministro.
+10. Privacidad, safety, continuidad y recuperación.
+11. Estándares y marcos: alcance, versiones y no equivalencia.
+12. Observabilidad, métricas, evaluación y método científico.
+
+## Regla de uso
+
+El currículo previo de siete unidades se conserva como ruta introductoria, pero ya no representa por sí solo el alcance total de Foundations. Para estudio avanzado, usar el mapa anterior y el desarrollo profundo vinculado. No marcar un tema o puerta como aprobado por la existencia de este índice.
+
+## Estado tras la ampliación documental
+
+- Desarrollo técnico adicional: incorporado en el documento vinculado.
+- Brechas documentales: tratadas y clasificadas una por una en la matriz FND-01 a FND-15 del desarrollo profundo.
+- Fuentes: referencias primarias identificadas; la lectura integral y extracción por página/sección sigue pendiente.
+- Laboratorios: cinco protocolos diseñados; ejecución no acreditada.
+- Evaluaciones: métricas y rúbricas especificadas; aplicación/benchmark pendiente.
+- Revisión externa: pendiente.
+- Madurez: M2 editorial ampliado; no K4/K5 ni M4/M5.
+
+---
+
 # Módulo de profundización: Fundamentos
 
 > **Estado editorial:** borrador estructurado para desarrollo y revisión. No equivale a contenido experto validado ni a fuente externa verificada.
