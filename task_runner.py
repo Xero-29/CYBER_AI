@@ -267,9 +267,7 @@ def main():
             "tool_allowlist": binary_provenance["allowlist"],
             "templates_used": [item["path"] for item in selected],
             "findings_count": len(findings),
-            "discarded_findings_count": (
-                len(findings) if binary_modified else 0
-            ),
+            "discarded_findings_count": discarded_findings_count,
             "findings": findings,
             "scanner_output": (process.stdout + "\n" + process.stderr)[-12000:],
             "note": "Los resultados son indicios y requieren validación.",
