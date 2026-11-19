@@ -284,3 +284,10 @@ Soluciones modelo ampliadas para las cuatro capacidades: [FND-01-01_CAPABILITY_W
 ## Control de versión de evaluación
 
 La V1 de evaluación en frío queda supersedida: sus ponderaciones sumaban 110 puntos. La V2 corrige los pesos a 100 puntos, añade variantes de transferencia y se acompaña de un protocolo de doble calificación ciega. Ninguna versión se ha administrado; la no conformidad de evaluación sigue abierta.
+
+
+## Síntesis de fuentes primarias y guía de evaluación V2
+
+La revisión dirigida ampliada de NIST SP 800-160 Vol. 1 Rev. 1, Vol. 2 Rev. 1 y NISTIR 8062 se documenta en [FND_01_01_PRIMARY_SOURCE_SYNTHESIS_2026-11-19.md](../FND_01_01_PRIMARY_SOURCE_SYNTHESIS_2026-11-19.md). Se inspeccionaron secciones sobre propiedades emergentes, confianza composicional, assurance, resiliencia y riesgo de privacidad. Esta revisión mejora el soporte de las afirmaciones, pero no es lectura lineal integral ni revisión de todas las referencias.
+
+La guía reservada de corrección [FND-01-01_ASSESSOR_GUIDE_V2.md](FND-01-01_ASSESSOR_GUIDE_V2.md) complementa el instrumento V2 con anclas por bloque, respuestas mínimas esperadas por variante, criterios de fallas críticas, hoja de puntuación y adjudicación. No debe entregarse al candidato. No es una validación psicométrica ni reemplaza el pilotaje y la doble evaluación independiente.
