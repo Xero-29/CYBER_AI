@@ -8,7 +8,7 @@
 
 ¿Cómo caracterizar binarios y firmware de forma reproducible, reconstruir comportamiento y limitar inferencias no sustentadas?
 
-## Síntesis crítica inicial
+## Síntesis
 
 Ghidra es una plataforma de ingeniería inversa que integra desensamblado, decompilación, scripting y análisis de binarios. Sus resultados dependen de arquitectura, formato, símbolos, compilación y configuración. El pseudocódigo es una reconstrucción aproximada y no recupera de forma garantizada el fuente original. La investigación debe contrastar hipótesis con ground truth y ejecución controlada.
 
