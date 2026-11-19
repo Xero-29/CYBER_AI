@@ -88,3 +88,6 @@ Puntuación ponderada: A 20, B 20, C 30, D 30, E 10 (normalizar a 100 si se dese
 ## Registro del evaluador
 
 Registrar candidato/fecha/versión del instrumento, tiempo, respuestas originales, puntaje por dimensión, errores críticos, preguntas de seguimiento, evaluador y conflicto de interés. No publicar datos personales del candidato en la biblioteca. La evaluación aún no ha sido administrada.
+
+
+> **Estado de versión:** este instrumento V1 queda supersedido por [FND-01-01_COLD_ASSESSMENT_V2.md](FND-01-01_COLD_ASSESSMENT_V2.md). Se detectó que sus ponderaciones sumaban 110 puntos. V2 corrige el total a 100 y añade variantes A/B/C. No usar V1 para nuevas administraciones.
