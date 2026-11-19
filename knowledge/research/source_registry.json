@@ -1840,6 +1840,282 @@
       ],
       "verification_status": "official_specification_portal_registered",
       "review_note": "Review exact specification and licensing/access requirements."
+    },
+    {
+      "id": "NIST-SP800-201",
+      "title": "NIST Cloud Computing Forensic Reference Architecture",
+      "publisher": "NIST",
+      "version": "SP 800-201",
+      "published": "2024-07-30",
+      "url": "https://doi.org/10.6028/NIST.SP.800-201",
+      "domains": [
+        "cloud_forensics",
+        "forensics"
+      ],
+      "verification_status": "official_final_metadata_and_abstract_reviewed",
+      "review_note": "Final architecture for forensic readiness; customize to provider/service and jurisdiction."
+    },
+    {
+      "id": "NIST-SP800-184",
+      "title": "Guide for Cybersecurity Event Recovery",
+      "publisher": "NIST",
+      "version": "SP 800-184",
+      "published": "2016-12-22",
+      "url": "https://doi.org/10.6028/NIST.SP.800-184",
+      "domains": [
+        "business_continuity",
+        "incident_response"
+      ],
+      "verification_status": "official_final_metadata_and_abstract_reviewed",
+      "review_note": "Recovery planning/playbooks; complement with current cloud and ransomware practice."
+    },
+    {
+      "id": "NIST-SP800-34R1",
+      "title": "Contingency Planning Guide for Federal Information Systems",
+      "publisher": "NIST",
+      "version": "SP 800-34 Rev. 1",
+      "published": "2010-11-11",
+      "url": "https://doi.org/10.6028/NIST.SP.800-34r1",
+      "domains": [
+        "business_continuity"
+      ],
+      "verification_status": "official_final_metadata_reviewed",
+      "review_note": "Foundational but old; supplement with current resilience requirements."
+    },
+    {
+      "id": "NIST-FIPS-140-3",
+      "title": "Security Requirements for Cryptographic Modules",
+      "publisher": "NIST",
+      "version": "FIPS 140-3",
+      "published": "2019-03-22",
+      "url": "https://doi.org/10.6028/NIST.FIPS.140-3",
+      "domains": [
+        "pki_hsm",
+        "crypto",
+        "hardware_security"
+      ],
+      "verification_status": "official_final_standard_page_reviewed",
+      "review_note": "Validation applies to exact module/version/operating environment and certificate scope."
+    },
+    {
+      "id": "NIST-SP800-131A-R2",
+      "title": "Transitioning the Use of Cryptographic Algorithms and Key Lengths",
+      "publisher": "NIST",
+      "version": "SP 800-131A Rev. 2",
+      "published": "2019-03-21",
+      "url": "https://doi.org/10.6028/NIST.SP.800-131Ar2",
+      "domains": [
+        "post_quantum_crypto",
+        "crypto",
+        "pki_hsm"
+      ],
+      "verification_status": "official_final_page_reviewed_with_newer_draft_note",
+      "review_note": "Rev. 3 IPD appeared in 2024; verify whether a final revision supersedes this before policy use."
+    },
+    {
+      "id": "RFC-9989",
+      "title": "Domain-Based Message Authentication, Reporting, and Conformance (DMARC)",
+      "publisher": "IETF/RFC Editor",
+      "version": "RFC 9989",
+      "url": "https://www.rfc-editor.org/rfc/rfc9989.html",
+      "domains": [
+        "email_dns_security"
+      ],
+      "verification_status": "official_rfc_editor_status_reviewed",
+      "review_note": "New DMARC specification; RFC 7489 is obsolete."
+    },
+    {
+      "id": "RFC-9990",
+      "title": "DMARC Aggregate Reporting",
+      "publisher": "IETF/RFC Editor",
+      "version": "RFC 9990",
+      "url": "https://www.rfc-editor.org/rfc/rfc9990.html",
+      "domains": [
+        "email_dns_security"
+      ],
+      "verification_status": "official_rfc_editor_status_reviewed",
+      "review_note": "DMARC aggregate reporting specification; coordinate with RFC 9989."
+    },
+    {
+      "id": "RFC-9991",
+      "title": "DMARC Failure Reporting",
+      "publisher": "IETF/RFC Editor",
+      "version": "RFC 9991",
+      "url": "https://www.rfc-editor.org/rfc/rfc9991.html",
+      "domains": [
+        "email_dns_security"
+      ],
+      "verification_status": "official_rfc_editor_status_reviewed",
+      "review_note": "DMARC failure reporting specification; coordinate with RFC 9989."
+    },
+    {
+      "id": "RFC-7208",
+      "title": "Sender Policy Framework (SPF)",
+      "publisher": "IETF/RFC Editor",
+      "version": "RFC 7208",
+      "published": "2014-04",
+      "url": "https://www.rfc-editor.org/rfc/rfc7208.html",
+      "domains": [
+        "email_dns_security"
+      ],
+      "verification_status": "official_rfc_and_updates_reviewed",
+      "review_note": "Review RFC 7372/8553/8616 updates and current deployment guidance."
+    },
+    {
+      "id": "RFC-6376",
+      "title": "DomainKeys Identified Mail (DKIM) Signatures",
+      "publisher": "IETF/RFC Editor",
+      "version": "RFC 6376",
+      "published": "2011-09",
+      "url": "https://www.rfc-editor.org/rfc/rfc6376.html",
+      "domains": [
+        "email_dns_security"
+      ],
+      "verification_status": "official_rfc_and_updates_reviewed",
+      "review_note": "Updated by RFC 8301, 8463, 8553 and 8616."
+    },
+    {
+      "id": "NIST-SP800-147",
+      "title": "BIOS Protection Guidelines",
+      "publisher": "NIST",
+      "version": "SP 800-147",
+      "url": "https://csrc.nist.gov/pubs/sp/800/147/final",
+      "domains": [
+        "hardware_security"
+      ],
+      "verification_status": "official_publication_reference_registered",
+      "review_note": "Legacy BIOS-era guidance; complement with UEFI/platform-specific current vendor guidance."
+    },
+    {
+      "id": "NIST-SP800-213",
+      "title": "IoT Device Cybersecurity Guidance for the Federal Government",
+      "publisher": "NIST",
+      "version": "SP 800-213",
+      "published": "2021-11-29",
+      "url": "https://doi.org/10.6028/NIST.SP.800-213",
+      "domains": [
+        "iot_hardware",
+        "hardware_security"
+      ],
+      "verification_status": "official_final_metadata_and_abstract_reviewed",
+      "review_note": "A Rev. 1 initial public draft was published June 2026; do not label the draft final."
+    },
+    {
+      "id": "NIST-SP800-213R1-IPD",
+      "title": "IoT Product Cybersecurity Guidelines Rev. 1 Initial Public Draft",
+      "publisher": "NIST",
+      "version": "SP 800-213 Rev. 1 IPD",
+      "published": "2026-06-24",
+      "url": "https://csrc.nist.gov/pubs/sp/800/213/r1/ipd",
+      "domains": [
+        "iot_hardware",
+        "hardware_security"
+      ],
+      "verification_status": "official_initial_public_draft_reviewed",
+      "review_note": "Comment period closed Aug 24 2026; not a final publication."
+    },
+    {
+      "id": "ISO-SAE-21434-2021",
+      "title": "Road vehicles — Cybersecurity engineering",
+      "publisher": "ISO/SAE",
+      "version": "ISO/SAE 21434:2021",
+      "published": "2021-08",
+      "url": "https://www.iso.org/standard/70918.html",
+      "domains": [
+        "automotive_security"
+      ],
+      "verification_status": "official_standard_page_reviewed",
+      "review_note": "Edition 1 final; standard full text may require purchase."
+    },
+    {
+      "id": "ISO-SAE-21434-ED2-AWI",
+      "title": "Road vehicles — Cybersecurity engineering Edition 2 work item",
+      "publisher": "ISO/SAE",
+      "version": "AWI 21434 Edition 2",
+      "url": "https://www.iso.org/es/contents/data/standard/09/54/95437.html",
+      "domains": [
+        "automotive_security"
+      ],
+      "verification_status": "official_work_item_page_reviewed_not_final",
+      "review_note": "Approved work item in development; must not be treated as a published standard."
+    },
+    {
+      "id": "UNECE-R155",
+      "title": "UN Regulation No. 155 — Cyber security and cybersecurity management systems",
+      "publisher": "UNECE/UN Treaty Collection",
+      "version": "UN R155",
+      "published": "2021-01-22",
+      "url": "https://treaties.un.org/Pages/ViewDetails.aspx?chapter=11&clang=_en&mtdsg_no=XI-B-16-155&src=TREATY",
+      "domains": [
+        "automotive_security"
+      ],
+      "verification_status": "official_treaty_status_page_reviewed",
+      "review_note": "Review current amendments, contracting parties and vehicle type approval requirements."
+    },
+    {
+      "id": "3GPP-TS-33.501-R19",
+      "title": "Security architecture and procedures for 5G System",
+      "publisher": "3GPP/ETSI",
+      "version": "TS 33.501 Release 19 v19.7.0",
+      "published": "2026-08-21",
+      "url": "https://portal.etsi.org/webapp/WorkProgram/Frame_WorkItemList.asp?SearchPage=TRUE+++&qTITLE=TS+33.501",
+      "domains": [
+        "telecom_5g"
+      ],
+      "verification_status": "official_work_program_publication_status_reviewed",
+      "review_note": "Pin exact release/version; standard text is extensive and may be subject to access terms."
+    },
+    {
+      "id": "CCSDS-311.0-M-2",
+      "title": "Reference Architecture for Space Data Systems",
+      "publisher": "CCSDS",
+      "version": "311.0-M-2",
+      "published": "2024-12",
+      "url": "https://ccsds.org/Pubs/311x0m2.pdf",
+      "domains": [
+        "satellite_security"
+      ],
+      "verification_status": "official_publication_pdf_registered",
+      "review_note": "Architecture reference; pair with mission-specific security standards and threat model."
+    },
+    {
+      "id": "OWASP-VULN-DISCLOSURE",
+      "title": "Vulnerability Disclosure Cheat Sheet",
+      "publisher": "OWASP",
+      "version": "Current project guidance",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Vulnerability_Disclosure_Cheat_Sheet.html",
+      "domains": [
+        "bug_bounty",
+        "vulnerability_research"
+      ],
+      "verification_status": "official_cheat_sheet_reviewed",
+      "review_note": "Guidance for researchers and organizations; legal safe harbor requires local counsel."
+    },
+    {
+      "id": "OWASP-AUTOMATED-THREATS",
+      "title": "Automated Threats to Web Applications",
+      "publisher": "OWASP",
+      "version": "Current project handbook",
+      "url": "https://owasp.org/www-project-automated-threats-to-web-applications/",
+      "domains": [
+        "fraud_abuse",
+        "api",
+        "appsec"
+      ],
+      "verification_status": "official_project_taxonomy_reviewed",
+      "review_note": "Covers misuse of valid functionality and automated abuse, not only software vulnerabilities."
+    },
+    {
+      "id": "OWASP-DATABASE-CHEAT",
+      "title": "Database Security Cheat Sheet",
+      "publisher": "OWASP",
+      "version": "Current project guidance",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Database_Security_Cheat_Sheet.html",
+      "domains": [
+        "database_security"
+      ],
+      "verification_status": "official_cheat_sheet_reviewed",
+      "review_note": "Relational database security guidance; supplement with engine-specific docs and NoSQL controls."
     }
   ],
   "last_updated": "2026-11-17"
