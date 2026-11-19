@@ -83,3 +83,13 @@ No conformidades abiertas: lectura integral de fuentes primarias; normas de safe
 - La fila FND-01.01 coincide entre JSON y Markdown: 12 capas y 4 capacidades en progreso.
 - Las ejecuciones CI asociadas a un commit intermedio de este ciclo terminaron canceladas; el commit más reciente de documentación no tiene ejecuciones CI asociadas al momento de esta verificación. Por tanto, no se declara CI verde ni validación automatizada del ciclo completo.
 - La rama `knowledge/develop-foundations` sigue existiendo. No se fusionó PR #14 y no se escribió en `main`.
+
+### Paso 3 — FND-01.02: propiedades CIA y ampliadas
+**Estado:** borrador de doce capas y cuatro capacidades incorporado; no aprobado.
+
+- Documento: `knowledge/deep_modules/foundations/topics/FND-01-02_SECURITY_PROPERTIES_CIA_EXTENDED.md`.
+- Desarrolla confidencialidad, integridad, disponibilidad, autenticidad, autenticación, accountability, trazabilidad, auditabilidad, no repudio, frescura, secuencia y unicidad; incluye invariantes, lógica temporal esquemática, arquitectura, trade-offs, amenazas, pregunta de investigación, laboratorio conceptual, métricas, Skill conceptual y evaluación.
+- Se actualizó el registro de fuentes: se identificó NIST Privacy Framework 1.1 CSWP 40 IPD (14-04-2025) como borrador público inicial, distinto de PF 1.0 final. Se revisaron secciones 1.2.1–1.2.3, Core y Appendix D por líneas; no se afirma lectura integral.
+- FND-01.01 recibió una actualización documental que diferencia PF 1.0 final de PF 1.1 IPD y explica que el riesgo de privacidad puede surgir sin incidente cibernético.
+- La matriz granular refleja FND-01.01 y FND-01.02 en progreso: 24/1.224 comprobaciones de capas y 8/408 capacidades; 0 aprobadas. Las otras 100 subunidades permanecen sin evaluar.
+- No conformidades de FND-01.02: lectura integral de estándares; evaluación en frío; revisión independiente; aplicabilidad sectorial/colombiana.
