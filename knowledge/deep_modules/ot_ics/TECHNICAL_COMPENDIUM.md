@@ -122,3 +122,27 @@ Cada estudio debe definir H0/H1, variables, muestra, comparadores, refutación, 
 
 ## Madurez
 M0/M1 estructural. No prueba profundidad ni madurez M3/M4/M5. Avanzar exige lectura crítica, artefactos específicos, experimentos ejecutados y evidencia auditable.
+
+
+## Profundización técnica específica: Seguridad OT/ICS
+
+### Arquitectura y seguridad funcional
+Modelar PLC, RTU, DCS, SCADA, HMI, SIS, historians, engineering workstations, safety systems, remote access y enterprise IT. Clasificar procesos, zonas, conduits, safety functions, disponibilidad y consecuencias físicas. Cambios de seguridad deben evaluarse junto a ingeniería de control y seguridad funcional.
+
+### Protocolos y legado
+Evaluar Modbus, DNP3, OPC UA, Profinet, EtherNet/IP, IEC 60870-5-104, IEC 61850 y protocolos propietarios. Analizar autenticación, integridad, replay, segmentación, gateways y modos de fallo. Muchos protocolos legacy carecen de seguridad nativa; controles compensatorios deben documentarse y probarse en simulación.
+
+### Segmentación y acceso remoto
+Usar zonas/conduits, DMZ industrial, jump hosts, MFA, acceso temporal, recording, vendor accounts y allowlisting. Revisar rutas de mantenimiento, modem/cellular, Wi-Fi y trust con proveedores. No asumir air gap absoluto. Inventario pasivo y monitoreo deben evitar escaneos activos que afecten procesos.
+
+### Gestión de vulnerabilidades y cambios
+Priorizar por impacto físico, exposición, explotabilidad, safety, disponibilidad y ventana de mantenimiento. Patching requiere pruebas con vendor, backup, rollback y aprobación de operaciones. Gestionar firmware, obsolescencia, compensating controls y repuestos. CISA/NIST guidance no sustituye evaluación del proceso concreto.
+
+### Detección y respuesta
+Correlacionar cambios de lógica PLC, comandos HMI, engineering workstation, remote access, firmware, historian y tráfico industrial. Incidentes pueden exigir operación manual segura, aislamiento gradual y coordinación con safety. Criterios de parada deben ser aprobados por operador del proceso.
+
+### Laboratorios
+Usar digital twin, PLC simulator y protocolos sintéticos; probar segmentación, cambios de lógica y detección sin conectar a planta. Medir visibilidad, falsos positivos, impacto y recuperación. Nunca ejecutar pruebas disruptivas sobre proceso activo.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.
