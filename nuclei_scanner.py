@@ -29,8 +29,17 @@ from safe_io import SafeWriteError, ensure_private_directory
 
 def validate_target(target):
     """Acepta únicamente URLs HTTP/HTTPS bien formadas."""
+    if (
+        not isinstance(target, str)
+        or not target.strip()
+        or any(ord(char) < 0x20 or ord(char) == 0x7F for char in target)
+    ):
+        raise ValueError("El objetivo debe ser una URL HTTP/HTTPS válida.")
+    try:
+        parsed = urlparse(target.strip())
+    except ValueError as error:
+        raise ValueError("El objetivo debe ser una URL HTTP/HTTPS válida.") from error
     target = target.strip()
-    parsed = urlparse(target)
 
     if (
         parsed.scheme not in ("http", "https")
@@ -111,6 +120,8 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
     target = validate_target(target)
     if not isinstance(require_ledger, bool):
         raise TypeError("require_ledger debe ser booleano.")
+    if type(timeout) is not int or not 5 <= timeout <= 3600:
+        raise ValueError("timeout debe estar entre 5 y 3600 segundos.")
     started = time.monotonic()
     start_event_id = None
     if authorized is not True or not authorization_id:
@@ -299,7 +310,10 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
             elif output_info.st_size > 20 * 1024 * 1024:
                 output_limit_exceeded = True
             else:
-                os.chmod(output_file, 0o600, follow_symlinks=False)
+                try:
+                    os.chmod(output_file, 0o600, follow_symlinks=False)
+                except NotImplementedError:
+                    os.chmod(output_file, 0o600)
                 with output_file.open("r", encoding="utf-8") as stream:
                     for line in stream:
                         if len(line.encode("utf-8")) > 1024 * 1024:
