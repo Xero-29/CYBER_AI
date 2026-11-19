@@ -46,3 +46,6 @@ NIST AI RMF, MITRE ATLAS, OWASP ML Security Top 10, ISO/IEC 23894, Google Secure
 
 ## Instrucciones para agentes IA
 No entrenes ni subas datasets con datos sensibles. Separa robustez, privacidad y fairness. No afirmes que un modelo es seguro por una sola métrica.
+
+## Arquitectura
+Un sistema ML incluye fuentes y derechos de datos, ingesta/validación, almacenamiento y versionado de datasets, preparación de características, entrenamiento, evaluación, registro de modelos, artefactos/pesos, serving, APIs, feedback y monitorización. Trazar linaje de datos/modelo, identidades de pipelines, secretos, dependencias, hardware y proveedores. Separar entrenamiento de inferencia, datos confiables de entradas externas y telemetría de contenido sensible; definir controles para poisoning, extracción, inversión, fuga y abuso de recursos.
