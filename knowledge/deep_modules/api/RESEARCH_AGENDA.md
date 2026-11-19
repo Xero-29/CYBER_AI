@@ -1,129 +1,99 @@
-# Agenda de investigación: Seguridad de API
+# Agenda de investigación: seguridad de APIs
 
-**Dominio:** `api` · **Nivel objetivo:** L4 investigación · **Madurez actual:** agenda propuesta, no investigación concluida.
+**Dominio:** `api` · **Objetivo:** K5 investigación · **Estado:** hipótesis y protocolos propuestos; estudios no ejecutados.  
+**Límite empírico:** no M3/M4/M5.
 
-## Problema de investigación
+## Problema y estrategia de revisión
 
-Investigar autorización, identidad de servicio, contratos, abuso de recursos y observabilidad en el contexto de Seguridad de API. La agenda identifica líneas de trabajo a partir del currículo del dominio; no afirma resultados empíricos ni sustituye una revisión sistemática de literatura.
+Las APIs se protegen con gateways, contratos, tokens y límites, pero su presencia no demuestra autorización contextual ni resistencia a abuso. La investigación debe medir resultados en entornos reproducibles y distinguir cumplimiento de especificación, implementación y eficacia.
 
-## Pregunta central
+Fuentes iniciales: OWASP API Security Top 10 2023, OWASP ASVS 5.0.0, IETF RFC 9700, OpenAPI Specification 3.2.1 y documentación gRPC Authentication. Se inspeccionaron páginas oficiales y partes de documentos; no se declara revisión sistemática ni lectura integral. Para estado del arte ampliar con IEEE Xplore, ACM Digital Library, USENIX, IETF RFCs y artículos revisados por pares. Guardar consultas, fecha, criterios de inclusión/exclusión y versiones.
 
-¿Qué enfoques técnicos ofrecen la mejor combinación demostrable de seguridad, resiliencia, rendimiento, coste y operabilidad para Seguridad de API, bajo amenazas, arquitecturas y restricciones explícitas?
+## Línea 1 — Autorización multi-tenant y BOLA/BOPLA/BFLA
 
-## Líneas de investigación por tema
+**Pregunta:** ¿Qué estrategia de generación de pruebas detecta más fallos de autorización con coste de ejecución y mantenimiento razonable?
 
-### T1. REST, GraphQL, gRPC y contratos
+- H1: matriz sujeto–acción–objeto–tenant y pruebas basadas en relaciones detectan más defectos sembrados que pruebas endpoint-centric.
+- H0: no hay mejora relevante en recall o el coste adicional excede el umbral predefinido.
+- Diseño: API local con dos o más tenants, roles, recursos propios/ajenos, operaciones de lectura/escritura/exportación y fallos sembrados.
+- Variables: método de prueba; recall, precision, cobertura combinatoria, defectos escapados, tiempo de ejecución/triage.
+- Controles: mismos endpoints, fixtures, versiones, orden aleatorizado y ground truth revisado por dos evaluadores.
+- Amenaza: fallos sembrados pueden favorecer el enfoque relacional; publicar corpus y limitaciones.
 
-**Pregunta de investigación:** ¿Qué propiedades de seguridad, fiabilidad y observabilidad de *REST, GraphQL, gRPC y contratos* dependen de la arquitectura y configuración, y cómo se pueden medir de forma reproducible?
+## Línea 2 — Seguridad de flujos OAuth y tokens
 
-**Hipótesis de trabajo:** un diseño/configuración con controles explícitos y verificables mejora la métrica de seguridad definida frente a una línea base sin dichos controles, con un coste medible en rendimiento, complejidad o usabilidad. La hipótesis debe ser reformulada y falsable tras revisar literatura específica.
+**Pregunta:** ¿Qué errores de implementación OAuth se detectan con pruebas basadas en RFC 9700 frente a validaciones de conformidad superficiales?
 
-**Diseño propuesto:** definir sistema/población y versión; documentar baseline; variar una dimensión por experimento; mantener constantes factores de confusión; usar casos positivos, negativos y límite; repetir pruebas; registrar logs y artefactos con hashes; aplicar análisis estadístico apropiado.
+- H1: un conjunto de pruebas de protocolo con PKCE, state, nonce, redirect exacta, issuer y audience detecta más errores críticos que pruebas de login funcional.
+- H0: no existe diferencia material bajo el protocolo.
+- Diseño: authorization server y clientes sintéticos; inyectar errores de configuración y token controlados.
+- Variables: clase de fallo; tasa de detección, falsos positivos, tiempo y compatibilidad.
+- Controles: mismo issuer, clock, claves, clientes y versiones.
+- Amenaza: entorno de referencia no representa proveedores comerciales ni federaciones complejas.
 
-**Métricas candidatas:** eficacia del control, cobertura, tasa de error/falsos positivos, latencia/coste, reproducibilidad y degradación ante cambios. Elegir solo métricas pertinentes y justificar la operacionalización.
+## Línea 3 — Rate limiting y equidad
 
-**Resultado exigido:** mapa de literatura, taxonomía, protocolo, datos sintéticos/autorizados, resultados, intervalos de incertidumbre, amenazas a validez, limitaciones y artefactos para replicación.
+**Pregunta:** ¿Qué algoritmo y clave de partición ofrece mejor equilibrio entre protección, latencia y equidad multi-tenant?
 
-### T2. OAuth 2.0, OIDC, JWT y tokens
+- H1: token bucket por tenant+identidad+coste ofrece control de ráfagas y menor bloqueo de usuarios legítimos que límites globales o por IP.
+- H0: no mejora equidad o añade inconsistencia distribuida inaceptable.
+- Diseño: simulador local con fixed window, sliding window y token bucket; carga sintética reproducible.
+- Métricas: requests admitidas/rechazadas, falsos bloqueos, latencia p95/p99, throughput, equidad y recuperación tras burst.
+- Controles: carga idéntica, reloj fijo, número de workers y política de coste.
+- Amenaza: el simulador no representa todos los patrones de red ni fallos de almacenamiento distribuido.
 
-**Pregunta de investigación:** ¿Qué propiedades de seguridad, fiabilidad y observabilidad de *OAuth 2.0, OIDC, JWT y tokens* dependen de la arquitectura y configuración, y cómo se pueden medir de forma reproducible?
+## Línea 4 — Contrato vs implementación
 
-**Hipótesis de trabajo:** un diseño/configuración con controles explícitos y verificables mejora la métrica de seguridad definida frente a una línea base sin dichos controles, con un coste medible en rendimiento, complejidad o usabilidad. La hipótesis debe ser reformulada y falsable tras revisar literatura específica.
+**Pregunta:** ¿Qué clases de defectos se correlacionan con divergencias entre OpenAPI y el comportamiento observado?
 
-**Diseño propuesto:** definir sistema/población y versión; documentar baseline; variar una dimensión por experimento; mantener constantes factores de confusión; usar casos positivos, negativos y límite; repetir pruebas; registrar logs y artefactos con hashes; aplicar análisis estadístico apropiado.
+- H1: validación continua de contrato más pruebas negativas reduce regresiones de esquema y exposición de propiedades.
+- H0: no reduce defectos escapados frente a tests funcionales.
+- Diseño: versiones congeladas de contrato/servicio y cambios deliberadamente compatibles/incompatibles.
+- Métricas: divergencias detectadas, cobertura de operaciones, cambios rotos, falsos positivos y tiempo.
+- Controles: misma versión de servicio, fixtures y reglas de compatibilidad.
+- Amenaza: la validez del contrato depende de su calidad y actualización.
 
-**Métricas candidatas:** eficacia del control, cobertura, tasa de error/falsos positivos, latencia/coste, reproducibilidad y degradación ante cambios. Elegir solo métricas pertinentes y justificar la operacionalización.
+## Línea 5 — Webhooks, idempotencia y replay
 
-**Resultado exigido:** mapa de literatura, taxonomía, protocolo, datos sintéticos/autorizados, resultados, intervalos de incertidumbre, amenazas a validez, limitaciones y artefactos para replicación.
+**Pregunta:** ¿Qué combinación de firma, timestamp, deduplicación e idempotency keys previene replay sin descartar reintentos legítimos?
 
-### T3. BOLA, BFLA y autorización por objeto
+- H1: firma sobre cuerpo exacto + timestamp + event ID persistente reduce replay exitoso sin aumentar duplicados legítimos.
+- H0: la combinación no mejora seguridad o provoca pérdida de eventos.
+- Diseño: productor/receptor local con reintentos, duplicados, retrasos y firmas inválidas.
+- Métricas: replay aceptado, evento legítimo perdido, efectos duplicados, latencia y recuperación.
+- Controles: secuencia de eventos, ventana temporal y política de reintentos fijas.
+- Amenaza: sistemas distribuidos reales presentan particiones y desorden más complejos.
 
-**Pregunta de investigación:** ¿Qué propiedades de seguridad, fiabilidad y observabilidad de *BOLA, BFLA y autorización por objeto* dependen de la arquitectura y configuración, y cómo se pueden medir de forma reproducible?
+## Línea 6 — Identidad de servicio y mTLS
 
-**Hipótesis de trabajo:** un diseño/configuración con controles explícitos y verificables mejora la métrica de seguridad definida frente a una línea base sin dichos controles, con un coste medible en rendimiento, complejidad o usabilidad. La hipótesis debe ser reformulada y falsable tras revisar literatura específica.
+**Pregunta:** ¿Qué diseño de identidad y autorización servicio-a-servicio minimiza bypass y complejidad operativa?
 
-**Diseño propuesto:** definir sistema/población y versión; documentar baseline; variar una dimensión por experimento; mantener constantes factores de confusión; usar casos positivos, negativos y límite; repetir pruebas; registrar logs y artefactos con hashes; aplicar análisis estadístico apropiado.
+- H1: mTLS con identidad workload explícita más autorización por método/recurso reduce llamadas no autorizadas frente a TLS de servidor más confianza de red.
+- H0: no mejora detección o el coste de emisión/rotación afecta disponibilidad por encima del umbral.
+- Diseño: microservicios locales con certificados de prueba, expiración, rotación y políticas deliberadamente incompletas.
+- Métricas: llamadas no autorizadas admitidas, fallos de rotación, latencia, tiempo de recuperación y bypass.
+- Controles: CA de laboratorio, reloj, política, versiones y topología fijas.
+- Amenaza: simulación no prueba todos los escenarios de service mesh/PKI empresarial.
 
-**Métricas candidatas:** eficacia del control, cobertura, tasa de error/falsos positivos, latencia/coste, reproducibilidad y degradación ante cambios. Elegir solo métricas pertinentes y justificar la operacionalización.
+## Protocolo común
 
-**Resultado exigido:** mapa de literatura, taxonomía, protocolo, datos sintéticos/autorizados, resultados, intervalos de incertidumbre, amenazas a validez, limitaciones y artefactos para replicación.
+Antes de ejecutar:
+1. fijar hipótesis, outcomes primarios y plan de análisis;
+2. registrar muestra, unidad de análisis, baseline y criterios de exclusión;
+3. congelar commit, contratos, claves sintéticas, versiones, configuración y semillas;
+4. separar desarrollo y evaluación para evitar fuga;
+5. definir ground truth y resolver desacuerdos de etiquetado;
+6. registrar resultados brutos, logs saneados, hashes y desviaciones;
+7. reportar tamaños de efecto e incertidumbre, no solo promedios;
+8. publicar resultados negativos y limitaciones;
+9. solicitar revisión independiente y reproducción.
 
-### T4. rate limiting, cuotas y anti-automatización
+## Umbrales de madurez
 
-**Pregunta de investigación:** ¿Qué propiedades de seguridad, fiabilidad y observabilidad de *rate limiting, cuotas y anti-automatización* dependen de la arquitectura y configuración, y cómo se pueden medir de forma reproducible?
+- M1: páginas y abstracts identificados, agenda exploratoria.
+- M2: lectura crítica y protocolo completo.
+- M3: ejecución y análisis de datos trazables.
+- M4: revisión independiente y reproducción equivalente.
+- M5: réplica externa y contribución revisada.
 
-**Hipótesis de trabajo:** un diseño/configuración con controles explícitos y verificables mejora la métrica de seguridad definida frente a una línea base sin dichos controles, con un coste medible en rendimiento, complejidad o usabilidad. La hipótesis debe ser reformulada y falsable tras revisar literatura específica.
-
-**Diseño propuesto:** definir sistema/población y versión; documentar baseline; variar una dimensión por experimento; mantener constantes factores de confusión; usar casos positivos, negativos y límite; repetir pruebas; registrar logs y artefactos con hashes; aplicar análisis estadístico apropiado.
-
-**Métricas candidatas:** eficacia del control, cobertura, tasa de error/falsos positivos, latencia/coste, reproducibilidad y degradación ante cambios. Elegir solo métricas pertinentes y justificar la operacionalización.
-
-**Resultado exigido:** mapa de literatura, taxonomía, protocolo, datos sintéticos/autorizados, resultados, intervalos de incertidumbre, amenazas a validez, limitaciones y artefactos para replicación.
-
-### T5. validación de esquemas y mass assignment
-
-**Pregunta de investigación:** ¿Qué propiedades de seguridad, fiabilidad y observabilidad de *validación de esquemas y mass assignment* dependen de la arquitectura y configuración, y cómo se pueden medir de forma reproducible?
-
-**Hipótesis de trabajo:** un diseño/configuración con controles explícitos y verificables mejora la métrica de seguridad definida frente a una línea base sin dichos controles, con un coste medible en rendimiento, complejidad o usabilidad. La hipótesis debe ser reformulada y falsable tras revisar literatura específica.
-
-**Diseño propuesto:** definir sistema/población y versión; documentar baseline; variar una dimensión por experimento; mantener constantes factores de confusión; usar casos positivos, negativos y límite; repetir pruebas; registrar logs y artefactos con hashes; aplicar análisis estadístico apropiado.
-
-**Métricas candidatas:** eficacia del control, cobertura, tasa de error/falsos positivos, latencia/coste, reproducibilidad y degradación ante cambios. Elegir solo métricas pertinentes y justificar la operacionalización.
-
-**Resultado exigido:** mapa de literatura, taxonomía, protocolo, datos sintéticos/autorizados, resultados, intervalos de incertidumbre, amenazas a validez, limitaciones y artefactos para replicación.
-
-### T6. mTLS, CORS, gateway y service mesh
-
-**Pregunta de investigación:** ¿Qué propiedades de seguridad, fiabilidad y observabilidad de *mTLS, CORS, gateway y service mesh* dependen de la arquitectura y configuración, y cómo se pueden medir de forma reproducible?
-
-**Hipótesis de trabajo:** un diseño/configuración con controles explícitos y verificables mejora la métrica de seguridad definida frente a una línea base sin dichos controles, con un coste medible en rendimiento, complejidad o usabilidad. La hipótesis debe ser reformulada y falsable tras revisar literatura específica.
-
-**Diseño propuesto:** definir sistema/población y versión; documentar baseline; variar una dimensión por experimento; mantener constantes factores de confusión; usar casos positivos, negativos y límite; repetir pruebas; registrar logs y artefactos con hashes; aplicar análisis estadístico apropiado.
-
-**Métricas candidatas:** eficacia del control, cobertura, tasa de error/falsos positivos, latencia/coste, reproducibilidad y degradación ante cambios. Elegir solo métricas pertinentes y justificar la operacionalización.
-
-**Resultado exigido:** mapa de literatura, taxonomía, protocolo, datos sintéticos/autorizados, resultados, intervalos de incertidumbre, amenazas a validez, limitaciones y artefactos para replicación.
-
-### T7. inventario, versionado y retirada segura
-
-**Pregunta de investigación:** ¿Qué propiedades de seguridad, fiabilidad y observabilidad de *inventario, versionado y retirada segura* dependen de la arquitectura y configuración, y cómo se pueden medir de forma reproducible?
-
-**Hipótesis de trabajo:** un diseño/configuración con controles explícitos y verificables mejora la métrica de seguridad definida frente a una línea base sin dichos controles, con un coste medible en rendimiento, complejidad o usabilidad. La hipótesis debe ser reformulada y falsable tras revisar literatura específica.
-
-**Diseño propuesto:** definir sistema/población y versión; documentar baseline; variar una dimensión por experimento; mantener constantes factores de confusión; usar casos positivos, negativos y límite; repetir pruebas; registrar logs y artefactos con hashes; aplicar análisis estadístico apropiado.
-
-**Métricas candidatas:** eficacia del control, cobertura, tasa de error/falsos positivos, latencia/coste, reproducibilidad y degradación ante cambios. Elegir solo métricas pertinentes y justificar la operacionalización.
-
-**Resultado exigido:** mapa de literatura, taxonomía, protocolo, datos sintéticos/autorizados, resultados, intervalos de incertidumbre, amenazas a validez, limitaciones y artefactos para replicación.
-
-## Método transversal
-
-1. Formular pregunta delimitada, alcance, hipótesis falsable y criterios de refutación.
-2. Ejecutar búsqueda bibliográfica reproducible: repositorios académicos, normas, advisories y documentación primaria; registrar términos, bases, fecha y criterios de selección.
-3. Clasificar evidencia por tipo, autoridad, actualidad, método, sesgo y reproducibilidad.
-4. Sintetizar estado del arte, taxonomía, desacuerdos, limitaciones y brecha de conocimiento.
-5. Diseñar experimento con baseline, comparadores, variables, muestras, versiones, repeticiones y métricas justificadas.
-6. Ejecutar solo en laboratorio aislado o activos autorizados; preservar cadena de custodia y minimización de datos.
-7. Analizar resultados, intervalos de confianza cuando proceda, falsos positivos/negativos y amenazas a validez.
-8. Publicar artefactos, configuración, dependencias, hashes, datos permitidos y procedimiento de reproducción.
-9. Solicitar revisión técnica independiente y reproducción por otro operador antes de declarar M5.
-
-## Entregables de investigación
-
-- Revisión de literatura con estrategia y tabla de evidencia.
-- Estado del arte y taxonomía comparativa.
-- Preguntas, hipótesis, variables y protocolo pre-registrado cuando sea viable.
-- Arquitectura del experimento, threat model y análisis de riesgos.
-- Dataset sintético o autorizado, diccionario de datos y procedencia.
-- Código, configuración, dependencias fijadas, SBOM y hashes.
-- Resultados brutos saneados, análisis, gráficos/tablas y scripts.
-- Discusión, limitaciones, amenazas a validez y trabajo futuro.
-- Revisión independiente y registro de reproducción.
-
-## Seguridad y ética
-
-Autorización escrita para toda evaluación activa; alcance, exclusiones, límites de impacto y kill switch. No probar infraestructura de terceros, sistemas críticos ni dispositivos físicos en producción. En OT, automoción, satélites y hardware, usar simuladores o bancos de prueba. No publicar secretos, datos personales ni artefactos peligrosos sin saneamiento y revisión.
-
-## Estado editorial
-
-`research_agenda_defined` — preguntas y diseño inicial propuestos. No equivale a estado del arte terminado, paper reproducido ni resultado validado. Para avanzar a M4 se requiere literatura revisada, experimento ejecutado y análisis; M5 requiere revisión y reproducción externa.
+**Estado actual M1; no M3/M4/M5.** Ninguna de las seis líneas se ha ejecutado.
