@@ -8,14 +8,14 @@
 
 | Dominio | Estudio | Alcance de esta entrega |
 |---|---|---|
-| Redes | [RESEARCH_STUDY](../deep_modules/network/RESEARCH_STUDY.md) | Arquitectura, switching, routing, TCP/UDP, DNS, TLS, VPN, Wi-Fi, amenazas y laboratorios |
-| Criptografía | [RESEARCH_STUDY](../deep_modules/crypto/RESEARCH_STUDY.md) | Primitivas, AEAD, PKI, lifecycle de claves, PQC, pruebas y erratas |
-| Seguridad de IA | [RESEARCH_STUDY](../deep_modules/ai_security/RESEARCH_STUDY.md) | Prompt injection, RAG, agentes, tool security, poisoning, privacidad y evaluación |
-| OT/ICS/SCADA | [RESEARCH_STUDY](../deep_modules/ot_ics/RESEARCH_STUDY.md) | Zonas, protocolos, safety, controles, operación y actualización SP 800-82 Rev. 4 |
-| Respuesta a incidentes | [RESEARCH_STUDY](../deep_modules/incident_response/RESEARCH_STUDY.md) | Preparación, detección, contención, forense, recuperación, playbooks y métricas |
-| Gestión de vulnerabilidades | [RESEARCH_STUDY](../deep_modules/vuln_management/RESEARCH_STUDY.md) | CVE/CWE/CVSS/EPSS/KEV, matching, priorización y evaluación |
-| DevSecOps | [RESEARCH_STUDY](../deep_modules/devsecops/RESEARCH_STUDY.md) | CI/CD, supply chain, SBOM, provenance, firma y pipelines |
-| Arquitectura segura | [RESEARCH_STUDY](../deep_modules/secure_arch/RESEARCH_STUDY.md) | Threat modeling, Zero Trust, requisitos y validación |
+| Redes | [RESEARCH_STUDY](../../deep_modules/network/RESEARCH_STUDY.md) | Arquitectura, switching, routing, TCP/UDP, DNS, TLS, VPN, Wi-Fi, amenazas y laboratorios |
+| Criptografía | [RESEARCH_STUDY](../../deep_modules/crypto/RESEARCH_STUDY.md) | Primitivas, AEAD, PKI, lifecycle de claves, PQC, pruebas y erratas |
+| Seguridad de IA | [RESEARCH_STUDY](../../deep_modules/ai_security/RESEARCH_STUDY.md) | Prompt injection, RAG, agentes, tool security, poisoning, privacidad y evaluación |
+| OT/ICS/SCADA | [RESEARCH_STUDY](../../deep_modules/ot_ics/RESEARCH_STUDY.md) | Zonas, protocolos, safety, controles, operación y actualización SP 800-82 Rev. 4 |
+| Respuesta a incidentes | [RESEARCH_STUDY](../../deep_modules/incident_response/RESEARCH_STUDY.md) | Preparación, detección, contención, forense, recuperación, playbooks y métricas |
+| Gestión de vulnerabilidades | [RESEARCH_STUDY](../../deep_modules/vuln_management/RESEARCH_STUDY.md) | CVE/CWE/CVSS/EPSS/KEV, matching, priorización y evaluación |
+| DevSecOps | [RESEARCH_STUDY](../../deep_modules/devsecops/RESEARCH_STUDY.md) | CI/CD, supply chain, SBOM, provenance, firma y pipelines |
+| Arquitectura segura | [RESEARCH_STUDY](../../deep_modules/secure_arch/RESEARCH_STUDY.md) | Threat modeling, Zero Trust, requisitos y validación |
 
 ## Procedencia
 
