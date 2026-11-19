@@ -19,10 +19,11 @@ class FoundationsLabTests(unittest.TestCase):
         self.assertIn("not proof of exploitability",r["warning"])
     def test_04_signed_jwt_rejects_invalid_tokens(self):
         r=lab04_identity(); self.assertTrue(r["all_expected"])
-        self.assertEqual(r["negative_cases"],9)
+        self.assertEqual(r["negative_cases"],10)
         self.assertTrue(r["signature_verified"])
         self.assertFalse(r["outcomes"]["wrong_signature"])
         self.assertFalse(r["outcomes"]["alg_none_rejected"])
+        self.assertFalse(r["outcomes"]["unsupported_header_parameter"])
     def test_05_hmac_detects_tampering_and_key_change(self):
         r=lab05_crypto_integrity(); self.assertTrue(r["tamper_rejected"])
         self.assertTrue(r["new_key_verified"]); self.assertIn("no confidentiality",r["scope"])
