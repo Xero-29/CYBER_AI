@@ -66,3 +66,18 @@ Se incorporaron ocho dominios adicionales:
 - [Seguridad de datos](../../deep_modules/data_security/RESEARCH_STUDY.md)
 
 Se incorporan referencias NIST SP 800-63-4, NISTIR 8259A/B/Rev.1, SP 800-193, SP 800-86 y marco de privacidad, manteniendo visibles las fechas y antigüedad de las guías.
+
+
+## Cuarta entrega de estudios profundos (2026-11-18)
+
+Se incorporaron ocho dominios:
+- [Aprendizaje automático e ingeniería de IA](../../deep_modules/machine_learning/RESEARCH_STUDY.md)
+- [Matemáticas y métodos cuantitativos](../../deep_modules/mathematics/RESEARCH_STUDY.md)
+- [Ingeniería de software y calidad](../../deep_modules/software_engineering/RESEARCH_STUDY.md)
+- [SOC, SIEM y SOAR](../../deep_modules/soc_siem/RESEARCH_STUDY.md)
+- [EDR/XDR y endpoints](../../deep_modules/edr_xdr/RESEARCH_STUDY.md)
+- [Threat hunting](../../deep_modules/threat_hunting/RESEARCH_STUDY.md)
+- [Red Team autorizado](../../deep_modules/red_team/RESEARCH_STUDY.md)
+- [Wireless, Bluetooth y NFC](../../deep_modules/wireless_security/RESEARCH_STUDY.md)
+
+La biblioteca incorpora NIST AI 100-2 E2025 (actualiza E2023), y registra límites de antigüedad de NIST SP 800-94/115/137. Se documentan MITRE CAPEC/D3FEND, Sigma, Zeek, Suricata y especificaciones inalámbricas como referencias que requieren fijar versión.
