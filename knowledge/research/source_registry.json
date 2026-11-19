@@ -544,14 +544,26 @@
         "secure_arch",
         "governance"
       ],
-      "review_note": "Inspección dirigida por secciones del PDF oficial el 2026-11-19. No marcar full_text_reviewed: no se realizó lectura lineal de las 195 páginas ni revisión de todas las referencias.",
+      "review_note": "Inspección dirigida por secciones del PDF oficial el 2026-11-19. No marcar full_text_reviewed: no se realizó lectura lineal de las 195 páginas ni revisión de todas las referencias. La página oficial CSRC de la publicación final también fue inspeccionada el 2026-11-19; se verificaron título, revisión, fecha final, DOI y enlace de descarga. Esto verifica metadatos de versión, no equivale a lectura integral del PDF.",
       "sections_reviewed": [
         "PDF oficial, páginas impresas 31–32: actividades de ingeniería de seguridad y seguridad como propiedad emergente (sección Systems Security Engineering Framework).",
         "PDF oficial, páginas impresas 35–36: contexto de trustworthiness y assurance case (claims, argumentos, evidencia y supuestos).",
         "PDF oficial, páginas impresas 87–88: rigor proporcional, confianza composicional y protección continua (Appendix E).",
         "PDF oficial, páginas impresas 102–103: assurance, confianza y evidencia objetiva; requisitos verificables (Appendix F)."
       ],
-      "review_date": "2026-11-19"
+      "review_date": "2026-11-19",
+      "official_metadata_reviewed_on": "2026-11-19",
+      "official_publication_page": "https://csrc.nist.gov/pubs/sp/800/160/v1/r1/final",
+      "publication_status": "final",
+      "publication_page_verified_fields": [
+        "official title",
+        "revision",
+        "publication month/year",
+        "superseded predecessor",
+        "DOI",
+        "official download URL",
+        "publication history"
+      ]
     },
     {
       "id": "NIST-SP-800-190",
@@ -2078,7 +2090,19 @@
         "PDF oficial, páginas impresas 8–10: framework, goals, objectives, techniques, implementation approaches and design principles (Chapter 2, §§2.1–2.1.1).",
         "PDF oficial, páginas impresas 136–137: aplicación de constructs y complementariedad de anticipar/resistir/recuperar/adaptar con CIA (Appendix D, §D.7)."
       ],
-      "review_note": "Inspección dirigida por secciones del PDF oficial el 2026-11-19. No marcar full_text_reviewed: no se realizó lectura lineal de las 310 páginas ni revisión completa de las referencias."
+      "review_note": "Inspección dirigida por secciones del PDF oficial el 2026-11-19. No marcar full_text_reviewed: no se realizó lectura lineal de las 310 páginas ni revisión completa de las referencias. La página oficial CSRC de la publicación final también fue inspeccionada el 2026-11-19; se verificaron título, revisión, fecha final, DOI y enlace de descarga. Esto verifica metadatos de versión, no equivale a lectura integral del PDF.",
+      "official_metadata_reviewed_on": "2026-11-19",
+      "official_publication_page": "https://csrc.nist.gov/pubs/sp/800/160/v2/r1/final",
+      "publication_status": "final",
+      "publication_page_verified_fields": [
+        "official title",
+        "revision",
+        "publication month/year",
+        "superseded predecessor",
+        "DOI",
+        "official download URL",
+        "publication history"
+      ]
     },
     {
       "id": "CO-LEY-1581-2012",
