@@ -25,6 +25,11 @@ from binary_integrity import (
     require_approved_executable,
 )
 from safe_io import SafeWriteError, ensure_private_directory
+from template_integrity import (
+    TemplateIntegrityError,
+    hash_selected_templates,
+    resolve_template_path,
+)
 
 
 def validate_target(target):
@@ -181,11 +186,34 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
             "findings": [],
         }
 
+    template_root = Path.home() / "nuclei-templates"
+    template_candidates = [
+        template_root / "http/technologies/bulma-detect.yaml",
+        template_root / "http/misconfiguration/http-missing-security-headers.yaml",
+    ]
+    try:
+        templates_before = hash_selected_templates(
+            [{"path": str(path)} for path in template_candidates],
+            template_root,
+        )
+        template_paths = [
+            resolve_template_path(path, template_root)
+            for path in template_candidates
+        ]
+    except TemplateIntegrityError as error:
+        result = {
+            "target": target,
+            "status": "template_denied",
+            "error": str(error),
+            "findings": [],
+        }
+        return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)
+
     command = [
         executable,
         "-u", target,
-        "-t", str(Path.home() / "nuclei-templates/http/technologies/bulma-detect.yaml"),
-        "-t", str(Path.home() / "nuclei-templates/http/misconfiguration/http-missing-security-headers.yaml"),
+        "-t", str(template_paths[0]),
+        "-t", str(template_paths[1]),
         "-jsonl",
         "-stats",
         "-stats-interval", "5",
@@ -264,17 +292,30 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
                 except BinaryIntegrityError:
                     binary_after = None
                     binary_modified = True
+                try:
+                    templates_after = hash_selected_templates(
+                        [{"path": str(path)} for path in template_candidates],
+                        template_root,
+                    )
+                    templates_modified = templates_after != templates_before
+                except TemplateIntegrityError:
+                    templates_after = []
+                    templates_modified = True
+                integrity_failed = binary_modified or templates_modified
                 result = {
                     "target": target,
-                    "status": "integrity_error" if binary_modified else "timeout",
+                    "status": "integrity_error" if integrity_failed else "timeout",
                     "error": (
-                        "La integridad del binario cambió durante el escaneo."
-                        if binary_modified else f"El escaneo superó {timeout} segundos."
+                        "La integridad del binario o de las plantillas cambió durante el escaneo."
+                        if integrity_failed else f"El escaneo superó {timeout} segundos."
                     ),
                     "tool_binary_sha256": binary_provenance["sha256"],
                     "tool_binary_sha256_after": binary_after["sha256"] if binary_after else None,
                     "tool_binary_modified": binary_modified,
                     "tool_allowlist": binary_provenance["allowlist"],
+                    "templates_before": templates_before,
+                    "templates_after": templates_after,
+                    "templates_modified": templates_modified,
                     "findings": [],
                 }
                 return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)
@@ -292,6 +333,9 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
             "error": str(error),
             "tool_binary_sha256": binary_provenance["sha256"],
             "tool_allowlist": binary_provenance["allowlist"],
+            "templates_before": templates_before,
+            "templates_after": [],
+            "templates_modified": False,
             "findings": [],
         }
         return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)
@@ -305,6 +349,16 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
     except BinaryIntegrityError:
         binary_after = None
         binary_modified = True
+
+    try:
+        templates_after = hash_selected_templates(
+            [{"path": str(path)} for path in template_candidates],
+            template_root,
+        )
+        templates_modified = templates_after != templates_before
+    except TemplateIntegrityError:
+        templates_after = []
+        templates_modified = True
 
     findings = []
     output_limit_exceeded = False
@@ -331,10 +385,14 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
                             output_limit_exceeded = True
                             findings = []
                             break
+                        if not line.strip():
+                            continue
                         try:
                             findings.append(json.loads(line))
                         except json.JSONDecodeError:
-                            continue
+                            evidence_invalid = True
+                            findings = []
+                            break
         except OSError:
             evidence_invalid = True
 
@@ -346,7 +404,7 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
         status = "evidence_invalid"
         findings = []
     discarded_findings = 0
-    if binary_modified:
+    if binary_modified or templates_modified:
         discarded_findings = len(findings)
         findings = []
         status = "integrity_error"
@@ -364,6 +422,9 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
         "tool_binary_sha256_after": binary_after["sha256"] if binary_after else None,
         "tool_binary_modified": binary_modified,
         "tool_allowlist": binary_provenance["allowlist"],
+        "templates_before": templates_before,
+        "templates_after": templates_after,
+        "templates_modified": templates_modified,
         "discarded_findings_count": discarded_findings,
         "findings_count": len(findings),
         "findings": findings,

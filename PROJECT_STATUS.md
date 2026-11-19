@@ -2,50 +2,50 @@
 
 **Repositorio:** `Xero-29/CYBER_AI`  
 **Rama auditada:** `codex/security-integrity-audit`  
-**HEAD inspeccionado:** `fff154812ad488d4d8acfe4e49bca7767d7d54b1`  
+**HEAD inspeccionado:** `411fbd1131738045d01aec96bab5a5c3605fe229`  
 **main:** `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`  
-**Merge-base:** `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. La rama tiene **151 commits exclusivos** y `main` **573 commits exclusivos**; el diff neto afecta 59 rutas en auditoría y 291 en `main`. La premisa de un único commit exclusivo de `main` no coincide con el grafo actual: hay 573 commits que deben preservarse.
+**Merge-base:** `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. La rama tiene **152 commits exclusivos** y `main` **573 commits exclusivos**; el diff neto afecta 59 rutas de auditoría y 291 de `main`. No existe un único commit exclusivo de `main`.
 
 ## Ramas y PRs
 
 - **PR #2:** cerrado y fusionado el 2026-11-17; merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. No se duplica.
 - **PR #11:** abierto para locks hash-verified/SBOM; HEAD `04c001a206cde98613cf9c151ce4f6a95fb86a21`, Python y Docker exitosos.
-- **PR #12:** abierto como reconciliación selectiva desde `main`; HEAD `c2a397caf36f2661b6f0307168a0a24eee2f6d38`, Python y Docker exitosos. Aún no integra las modificaciones de seguridad en archivos compartidos.
-- **PR #13:** abierto para biblioteca profunda; HEAD `d0a3934a473e3d1117c7410df253f659d5f475c3`, Python y Docker exitosos. Sus gates no equivalen a revisión experta de fuentes.
-- **PR #1 y #3–#10:** abiertos; las actualizaciones de Dependabot/Actions necesitan revisión individual.
-- No se hizo merge, rebase, force-push ni modificación de `main`. PR #12 ya es el vehículo de reconciliación; no se crea otro.
-- La API no devolvió rulesets; la lectura de branch protection devolvió 403 a esta integración. No se afirma que la protección de rama esté configurada.
+- **PR #12:** abierto como reconciliación selectiva desde `main`; HEAD `c2a397caf36f2661b6f0307168a0a24eee2f6d38`, Python y Docker exitosos. Todavía no integra los cambios de seguridad en archivos compartidos.
+- **PR #13:** abierto para biblioteca profunda; HEAD `d0a3934a473e3d1117c7410df253f659d5f475c3`, Python y Docker exitosos; sus gates no equivalen a revisión experta.
+- **PR #1 y #3–#10:** abiertos; revisar cada actualización de Dependabot/Actions individualmente.
+- No se hizo merge, rebase, force-push ni modificación de `main`. PR #12 sigue siendo el único vehículo de reconciliación.
+- No se devolvieron rulesets; la lectura de branch protection está bloqueada con 403 para esta integración.
 
-## CI del HEAD exacto inspeccionado
+## CI del HEAD exacto
 
-SHA `fff154812ad488d4d8acfe4e49bca7767d7d54b1`:
+SHA `411fbd1131738045d01aec96bab5a5c3605fe229`:
 
-- Python Tests — [run 44552841784](https://github.com/Xero-29/CYBER_AI/actions/runs/44552841784): **completed/failure**, 582 pruebas, 1 fallo y 1 error.
-- Docker Sandbox — [run 44552841448](https://github.com/Xero-29/CYBER_AI/actions/runs/44552841448): **completed/failure**, 582 pruebas, 1 fallo y 1 error; la imagen Docker se construyó, pero la verificación completa falló.
-- Causas exactas: la raíz de plantillas inexistente escapaba como `FileNotFoundError` en vez de convertirse en `TemplateIntegrityError`; dos fixtures escribían secuencias `\\n` literales, no saltos de línea, por lo que el JSONL de prueba no contenía un registro JSON válido.
+- Python Tests — [run 44553197879](https://github.com/Xero-29/CYBER_AI/actions/runs/44553197879): **completed/failure**, 583 pruebas, 3 fallos.
+- Docker Sandbox — [run 44553197861](https://github.com/Xero-29/CYBER_AI/actions/runs/44553197861): **completed/failure**, 583 pruebas, 3 fallos; la imagen se construyó, pero la verificación falló.
+- Los fallos muestran que el escáner aún no aplica en su flujo principal el control de plantillas y el rechazo estricto de JSONL. El módulo común y sus pruebas sí están presentes; se integra ahora el control en `nuclei_scanner.py`.
 - El SHA anterior `b2aaddb72faf99c99b8272887e67d516725697f0` sí pasó Python y Docker (572 pruebas, Ruff y SBOM); esa evidencia no se traslada al HEAD actual.
 
-## Cambios y correcciones en curso
+## Cambios de esta iteración
 
-- Se centralizó la validación de plantillas: límite de tamaño, raíz no enlazada, rechazo de traversal/symlinks/puntos de reanálisis, hash SHA-256 mediante descriptor abierto sin seguir symlink y comprobación de identidad/tamaño/mtime antes y después de leer.
-- `task_runner.py` reutiliza el módulo común; `nuclei_scanner.py` verifica las dos plantillas explícitas antes y después del escaneo y descarta hallazgos si cambia el binario o una plantilla.
-- El JSONL malformado deja de ignorarse silenciosamente: invalida la evidencia y descarta los hallazgos.
-- La iteración actual corrige el error de raíz ausente, evita bloquear al abrir rutas reemplazadas por FIFO y corrige los fixtures de newline. El nuevo SHA debe validarse en Actions antes de aceptar estas mejoras.
-- No existe checkout local completo disponible; no se afirma ejecución local.
+- Se corrigieron los fixtures de ejecutables para que usen rutas temporales existentes y una allowlist explícita.
+- Se centralizó la validación de plantillas con límite de tamaño, rechazo de traversal/symlinks/reparse points, apertura sin seguir symlinks y comprobación de identidad/tamaño/mtime durante el hash.
+- `task_runner.py` ya reutiliza el módulo común; el escáner directo debe aplicar la misma verificación antes y después del proceso.
+- La evidencia JSONL debe ser estricta: una línea no JSON invalida el informe y no se acepta como ausencia de hallazgos.
+- No existe checkout local completo disponible; la validación se realiza mediante Actions.
 
 ## Pendientes reales
 
-1. Confirmar Python Tests y Docker Sandbox exitosos sobre el próximo SHA exacto.
+1. Reejecutar Python Tests y Docker Sandbox sobre el próximo SHA exacto.
 2. Auditar cierre de pipes/procesos descendientes y límites de salida del ejecutor Nuclei.
-3. Revisar el PR #12 y reconciliar por archivo, preservando los 573 commits de `main`; no integrar automáticamente.
+3. Revisar PR #12 y reconciliar por archivo, preservando los 573 commits de `main`; no integrar automáticamente.
 4. Validar locks por plataforma/arquitectura y provenance antes de integrar PR #11.
 5. Conectar KMS/HSM, RBAC/IdP/MFA, WORM/offsite y cifrado de backups; ejecutar simulacros DR con RPO/RTO.
 6. Ejecutar pruebas reales de microVM/VM, egress, escape de sandbox, concurrencia, carga/soak, disco lleno y recuperación del host.
 7. Conectar proveedores/modelos reales y medir calidad, coste, latencia, cuotas, fallos y políticas de datos.
-8. Revisar las 138 fuentes y 276 verificaciones pendientes con especialistas; validar licencia, exactitud, vigencia y calidad semántica.
+8. Revisar las 138 fuentes y 276 verificaciones pendientes con especialistas; validar licencias, exactitud, vigencia y calidad semántica.
 9. Verificar ACL Windows, protección de rama, observabilidad, alertas y respuesta a incidentes en infraestructura real.
 
-**Conclusión:** la rama todavía no está lista para validación final. La integridad de plantillas se ha reforzado, pero el HEAD inspeccionado tiene CI rojo y la divergencia con `main` permanece sin reconciliar. No se declara certificación institucional ni preparación para producción.
+**Conclusión:** el proyecto aún no está listo para validación final. El módulo común de integridad de plantillas ya existe, pero el escáner directo debe aplicar sus controles y CI del HEAD actual sigue rojo. La divergencia con `main` y las dependencias operacionales/experta permanecen pendientes.
 
 ---
 
