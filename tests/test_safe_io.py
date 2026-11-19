@@ -3,6 +3,7 @@ import stat
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from safe_io import SafeWriteError, atomic_write_text, ensure_private_directory
 
@@ -94,7 +95,7 @@ class SafeIoTests(unittest.TestCase):
             directory = Path(temp) / "private"
             directory.mkdir(mode=0o700)
             other_uid = os.geteuid() + 1
-            with unittest.mock.patch("safe_io.os.geteuid", return_value=other_uid):
+            with patch("safe_io.os.geteuid", return_value=other_uid):
                 with self.assertRaisesRegex(SafeWriteError, "usuario efectivo"):
                     ensure_private_directory(directory)
 
