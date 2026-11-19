@@ -10,7 +10,7 @@ Los seis módulos P0 (identity, malware, forensics, incident_response, threat_in
 ## Matriz de áreas
 | ID | Área | Compendio | Agenda específica | Fuentes integrales | Laboratorio ejecutado | Revisión independiente |
 |---|---|---|---|---|---|---|
-| `foundations` | Fundamentos | Siete temas auditados documentalmente contra 12 capas; 84/84 en progreso; M2 | Agenda alineada a los siete temas; siete protocolos específicos | Metadatos/abstracts NIST inspeccionados; lectura integral pendiente | 7 protocolos diseñados, 0 ejecuciones acreditadas | Pendiente |
+| `foundations` | Fundamentos | Siete temas auditados documentalmente contra 12 capas; 84/84 en progreso; M2 | Agenda alineada a los siete temas; siete protocolos específicos | Metadatos/abstracts NIST inspeccionados; lectura integral pendiente | 7 protocolos ejecutados localmente con datos sintéticos; 8 tests pasan; revisión independiente pendiente | Pendiente |
 | `appsec` | Seguridad de aplicaciones | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
 | `api` | Seguridad de API | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
 | `network` | Seguridad de redes | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
@@ -134,3 +134,14 @@ La matriz contiene 48 especialidades, 7 unidades temáticas iniciales por especi
 - Se registraron referencias oficiales NIST SP 800-160 Vol. 1 Rev. 1, SP 800-207, SP 800-37 Rev. 2, SP 800-61 Rev. 3 y SP 800-53 Release 5.2.0, además de SP 800-30 Rev. 1. Solo se inspeccionaron páginas oficiales/abstracts/anuncio de versión; no se declara lectura integral.
 - Siete laboratorios diseñados, cero ejecutados. Las siete Skills siguen candidatas, no validadas.
 - Madurez se mantiene M2. No declarar K3/K4/K5 ni validación científica.
+
+
+### Evidencia experimental local de Foundations — 2026-11-19
+
+- Runner: `knowledge/deep_modules/foundations/labs/runner.py`.
+- Pruebas: `tests/test_foundations_labs.py` (8/8 pasan en ejecución local).
+- Resultados: `knowledge/deep_modules/foundations/labs/results.json`.
+- Semilla: `20261119`; solo datos sintéticos.
+- G5–G7: `in_progress`, no `passed`; G8: `blocked`.
+- Límite: los resultados no prueban eficacia real, interoperabilidad, seguridad de implementaciones criptográficas, validez externa ni revisión experta. Requiere CI del HEAD, réplica en segundo entorno y revisión independiente.
+- Revisión de fuentes: `knowledge/deep_modules/foundations/SOURCE_REVIEW_AND_CLAIM_EVIDENCE_2026-11-19.md`.
