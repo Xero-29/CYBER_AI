@@ -94,5 +94,19 @@ class KnowledgeFieldStudiesTests(unittest.TestCase):
         self.assertIn("no equivale a 48 dominios investigados", index)
 
 
+    def test_every_domain_maps_to_registered_sources(self):
+        root = Path(__file__).resolve().parents[1]
+        mapping = json.loads((root / "knowledge/research/field_studies/DOMAIN_SOURCE_MAP.json").read_text(encoding="utf-8"))
+        registry = json.loads((root / "knowledge/research/source_registry.json").read_text(encoding="utf-8"))
+        manifest = json.loads((root / "knowledge/packs/manifest.json").read_text(encoding="utf-8"))
+        known_ids = {item["id"] for item in registry["sources"]}
+        self.assertEqual(len(mapping["areas"]), manifest["area_count"])
+        self.assertEqual({item["area_id"] for item in mapping["areas"]}, {item["id"] for item in manifest["areas"]})
+        for area in mapping["areas"]:
+            with self.subTest(area=area["area_id"]):
+                self.assertGreaterEqual(len(area["source_ids"]), 2)
+                self.assertEqual(len(area["source_ids"]), len(set(area["source_ids"])))
+                self.assertTrue(set(area["source_ids"]).issubset(known_ids))
+
 if __name__ == "__main__":
     unittest.main()
