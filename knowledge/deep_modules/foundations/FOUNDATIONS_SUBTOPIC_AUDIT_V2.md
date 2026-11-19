@@ -128,5 +128,5 @@ La matriz histórica de siete temas se conserva. Esta matriz añade granularidad
 
 - **FND-01.01:** evaluación V2 con puntuación corregida a 100 puntos y tres variantes de transferencia; protocolo de administración ciega y doble calificación. Preparados, no administrados; NC-03 sigue abierta.
 
-- **FND-01.01:** `FND_01_01_PRIMARY_SOURCE_SYNTHESIS_2026-11-19.md` consolida una revisión dirigida de SP 800-160 Vol. 1 Rev. 1, Vol. 2 Rev. 1 y NISTIR 8062, con contraste de sus modelos y límites. Mejora trazabilidad; no equivale a lectura integral ni cierra NC-01/05/06.
+- **FND-01.01:** `FND_01_01_PRIMARY_SOURCE_SYNTHESIS_2026-11-19.md` consolida una revisión dirigida de SP 800-160 Vol. 1 Rev. 1, Vol. 2 Rev. 1 y NISTIR 8062, con contraste de sus modelos y límites. Mejora trazabilidad; no equivale a lectura integral ni cierra NC-01/05.
 - **FND-01.01:** `topics/FND-01-01_ASSESSOR_GUIDE_V2.md` añade anclas de corrección y calibración por variante para el instrumento V2. La administración, pilotaje, doble calificación y revisión independiente siguen pendientes; NC-03 permanece abierta.
