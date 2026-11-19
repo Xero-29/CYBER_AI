@@ -122,3 +122,24 @@ Definir H0/H1, variables, población, comparadores, criterio de refutación, an�
 
 ## Madurez
 M0/M1 estructural. No acredita profundidad ni M3/M4/M5. Para avanzar: revisar fuentes completas, elaborar artefactos específicos, ejecutar casos y registrar evidencia auditable.
+
+
+## Profundización técnica específica: Seguridad de hardware
+
+### Modelo físico y raíz de confianza
+Modelar CPU, microcode, firmware, boot ROM, TPM, secure element, HSM, buses, memoria, periféricos, debug interfaces y cadena de suministro. Definir atacante remoto/local/físico, acceso temporal, equipo, presupuesto y objetivos. Distinguir vulnerabilidad de diseño, implementación, fabricación y configuración.
+
+### Arranque, firmware y microarquitectura
+Evaluar secure/measured boot, firmware signing, rollback protection, UEFI, BMC, option ROMs, DMA, IOMMU, SMM y actualizaciones. Firmware obsoleto puede mantener persistencia fuera del OS. Proteger BMC/management plane con red separada, MFA, logging y ciclo de parcheo. Verificar firmware exacto y cadena de confianza.
+
+### Side channels y fault attacks
+Timing, cache, power, electromagnetic, acoustic y fault injection pueden filtrar secretos o alterar cómputo. Evaluación requiere laboratorio especializado, dispositivos propios, límites eléctricos y análisis de safety. Mitigaciones incluyen constant-time, masking, blinding, shielding y detección de fallos, cada una con costes y límites.
+
+### Supply chain y fabricación
+Controlar componentes, firmware, proveedores, serialización, provisioning, claves únicas, test points y cadena de custodia. Evaluar counterfeit, malicious implant, debug left enabled y claves compartidas. Secure manufacturing requiere separación de roles, auditoría, trazabilidad y destrucción segura de secretos de producción.
+
+### Laboratorios
+Analizar firmware didáctico, validar secure boot simulado, revisar interfaces de debug y medir timing de código de juguete con secretos sintéticos. Reportar equipo, entorno, repetibilidad y riesgo físico.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.
