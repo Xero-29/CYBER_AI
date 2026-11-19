@@ -2,43 +2,42 @@
 
 **Repositorio:** `Xero-29/CYBER_AI`  
 **Rama auditada:** `codex/security-integrity-audit`  
-**HEAD verificado:** `c7dceaa95481d2b5c940a254b22c293403693a3d`  
+**HEAD inspeccionado:** `cd7e70754957938a640969c0b34ed84ab6634d16`  
 **main:** `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`  
-**Merge-base:** `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. La rama tiene **156 commits exclusivos** y `main` **573 commits exclusivos**. El diff neto afecta 61 rutas de auditoría y 291 de `main`. La divergencia no es un único commit y no se debe integrar a ciegas.
+**Merge-base:** `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. La rama tiene 157 commits exclusivos y `main` 573 commits exclusivos; el diff neto afecta 61 rutas de auditoría y 291 de `main`.
 
 ## Ramas y PRs
 
 - **PR #2:** cerrado y fusionado el 2026-11-17; merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`.
 - **PR #11:** abierto para locks hash-verified/SBOM; HEAD `04c001a206cde98613cf9c151ce4f6a95fb86a21`, Python y Docker exitosos.
-- **PR #12:** abierto como reconciliación selectiva desde `main`; HEAD `c2a397caf36f2661b6f0307168a0a24eee2f6d38`, Python y Docker exitosos. Aún no integra los cambios de seguridad en archivos compartidos.
+- **PR #12:** abierto como reconciliación selectiva desde `main`; HEAD `c2a397caf36f2661b6f0307168a0a24eee2f6d38`, Python y Docker exitosos; aún no integra los cambios de seguridad en archivos compartidos.
 - **PR #13:** abierto para biblioteca profunda; HEAD `d0a3934a473e3d1117c7410df253f659d5f475c3`, Python y Docker exitosos; sus gates no sustituyen revisión experta.
 - **PR #1 y #3–#10:** abiertos; revisar individualmente las actualizaciones de Dependabot/Actions.
-- No se hizo merge, rebase, force-push ni modificación de `main`. PR #12 sigue siendo el vehículo existente de reconciliación; no se crea otro.
+- No se hizo merge, rebase, force-push ni modificación de `main`. PR #12 sigue siendo el vehículo existente de reconciliación; no se duplica.
 - No se devolvieron rulesets; la lectura de branch protection está bloqueada con 403 para esta integración.
 
 ## CI del HEAD exacto
 
-SHA `c7dceaa95481d2b5c940a254b22c293403693a3d`:
+SHA `cd7e70754957938a640969c0b34ed84ab6634d16`:
 
-- Python Tests — [run 44555033211](https://github.com/Xero-29/CYBER_AI/actions/runs/44555033211): **completed/success**, 590 pruebas; suite base con 4 skips explícitos y suite completa **OK**.
-- Docker Sandbox — [run 44555033131](https://github.com/Xero-29/CYBER_AI/actions/runs/44555033131): **completed/success**, 590 pruebas y Ruff dentro del contenedor endurecido.
-- Se generaron SBOM CycloneDX y procedencia de build para el SHA exacto.
-- No existe checkout local completo; no se afirma ejecución local.
+- Python Tests — [run 44555718989](https://github.com/Xero-29/CYBER_AI/actions/runs/44555718989): **completed/failure**, 593 pruebas, 1 error.
+- Docker Sandbox — [run 44555718951](https://github.com/Xero-29/CYBER_AI/actions/runs/44555718951): **in progress** al cerrar esta inspección; no se declara verde.
+- El error está en el test nuevo de `ProcessIsolationError`: faltaba importar `json` en el archivo de pruebas al leer el informe generado. Se corrige solo el fixture.
+- El SHA anterior `c7dceaa95481d2b5c940a254b22c293403693a3d` pasó Python y Docker con 590 pruebas y Ruff.
 
 ## Cambios de esta iteración
 
-- Se centralizó la integridad de plantillas con límites de tamaño, rechazo de traversal/symlinks/reparse points y hash con verificación de identidad.
-- `nuclei_scanner.py` valida sus plantillas antes y después del proceso, descarta hallazgos si cambia el binario/plantillas, rechaza JSONL malformado y acota stdout.
-- Se añadió `process_isolation.py`: `task_runner.py` ya no usa `subprocess.run(capture_output=True)`; ahora captura stdout/stderr con límite, ejecuta sin shell, usa grupo POSIX y termina descendientes al agotar el tiempo o retener pipes.
-- El ejecutor heredado comparte el módulo de integridad de plantillas.
-- El nuevo SHA bloquea la ejecución de los runners Nuclei en plataformas sin aislamiento de árbol de procesos. La integración de Job Objects para Windows queda como requisito externo.
-- Las pruebas locales no se ejecutaron por falta de checkout; los 590 tests se ejecutaron en GitHub Actions.
+- Se añadieron gates fail-closed en Windows: `task_runner.py`, `nuclei_scanner.py` y `tool_adapters.py` no ejecutan herramientas en host sin Job Objects.
+- La ejecución POSIX usa grupo de procesos, captura de salida acotada y cierre de pipes; se registra `isolation_required` si el runtime no garantiza aislamiento.
+- Se mantienen integridad de binarios/plantillas y rechazo de evidencia JSONL malformada.
+- La red de las herramientas locales todavía no está aislada: los adaptadores informan `network_isolation_enforced=false`. Requiere un runtime/egress policy externo verificable.
+- No existe checkout local completo; no se afirma ejecución local.
 
 ## Pendientes reales
 
-1. Validar los cambios nuevos de bloqueo Windows en el siguiente SHA exacto.
-2. Implementar Job Objects de Windows si se exige ejecución local en ese sistema.
-3. Conectar aislamiento de red real para herramientas locales; los adaptadores reportan `network_isolation_enforced=false` mientras no exista runtime/egress policy verificable.
+1. Corregir el import del test y verificar Python Tests, Docker Sandbox y Ruff sobre el siguiente SHA exacto.
+2. Implementar Job Objects de Windows si se exige ejecución local allí.
+3. Conectar aislamiento de red real para herramientas locales.
 4. Revisar PR #12 y reconciliar por archivo, preservando los 573 commits de `main`; no integrar automáticamente.
 5. Validar locks por plataforma/arquitectura y provenance antes de integrar PR #11.
 6. Conectar KMS/HSM, RBAC/IdP/MFA, WORM/offsite y cifrado de backups; ejecutar simulacros DR con RPO/RTO.
@@ -47,7 +46,7 @@ SHA `c7dceaa95481d2b5c940a254b22c293403693a3d`:
 9. Revisar las 138 fuentes y 276 verificaciones pendientes con especialistas; validar licencias, exactitud, vigencia y calidad semántica.
 10. Verificar ACL Windows, protección de rama, observabilidad, alertas y respuesta a incidentes en infraestructura real.
 
-**Conclusión:** el HEAD `c7dceaa95481d2b5c940a254b22c293403693a3d` pasó Python y Docker. El runner Nuclei heredado ya tiene captura acotada y terminación POSIX; faltan los gates de Windows/egress, la reconciliación segura de 573 commits de `main` y las integraciones operacionales/experta. No se declara certificación institucional ni preparación para producción.
+**Conclusión:** la rama aún no está lista para validación final. El nuevo gate Windows y el runner POSIX requieren checks verdes sobre su SHA actual; el aislamiento de red, la reconciliación con `main` y las integraciones operacionales/experta siguen pendientes.
 
 ---
 

@@ -32,6 +32,8 @@ from template_integrity import (
 
 MAX_SCAN_OUTPUT_BYTES = 20 * 1024 * 1024
 MAX_FINDINGS = 10000
+
+
 def _record_task_scan(task, target, report, started, authorization_id=None, start_event_id=None):
     """Registra ejecuciones del runner de plantillas Nuclei."""
     status = report.get("status")
