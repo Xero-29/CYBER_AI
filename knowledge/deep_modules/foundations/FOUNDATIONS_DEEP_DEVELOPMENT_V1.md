@@ -311,13 +311,13 @@ Puertas G1–G8: no se declaran aprobadas por este cambio. G1/G3 tienen evidenci
 
 ## 17. Fuentes primarias y estado de lectura
 
-- NIST CSWP 29, Cybersecurity Framework 2.0 (2024), https://doi.org/10.6028/NIST.CSWP.29 — página oficial y contenido consultado; lectura integral no certificada.
-- NIST SP 800-30 Rev. 1 (2012), https://doi.org/10.6028/NIST.SP.800-30r1 — secciones de modelo de riesgo inspeccionadas; no lectura lineal certificada.
-- NIST SP 800-37 Rev. 2 (2018), https://doi.org/10.6028/NIST.SP.800-37r2 — descripción oficial y extractos de RMF consultados; texto completo pendiente de lectura registrada.
-- NIST SP 800-160 Vol. 1 Rev. 1 (2022), https://doi.org/10.6028/NIST.SP.800-160v1r1 — descripción oficial y contenido previamente inspeccionado; lectura integral pendiente.
-- NIST SP 800-61 Rev. 3 (2025), https://doi.org/10.6028/NIST.SP.800-61r3 — descripción oficial consultada; lectura por secciones y trazabilidad pendiente.
+- NIST CSWP 29, Cybersecurity Framework 2.0 (2024), https://doi.org/10.6028/NIST.CSWP.29 — metadatos y página oficial consultados; lectura integral y extracción por sección no acreditadas.
+- NIST SP 800-30 Rev. 1 (2012), https://doi.org/10.6028/NIST.SP.800-30r1 — ficha y resumen oficial consultados; lectura íntegra y extracción por sección pendientes.
+- NIST SP 800-37 Rev. 2 (2018), https://doi.org/10.6028/NIST.SP.800-37r2 — metadatos y descripción oficial consultados; lectura integral y extracción por sección pendientes.
+- NIST SP 800-160 Vol. 1 Rev. 1 (2022), https://doi.org/10.6028/NIST.SP.800-160v1r1 — metadatos y descripción oficial consultados; lectura integral y extracción por sección pendientes.
+- NIST SP 800-61 Rev. 3 (2025), https://doi.org/10.6028/NIST.SP.800-61r3 — ficha oficial consultada; lectura integral, extracción y trazabilidad pendientes.
 - ISO 31000:2018, https://www.iso.org/standard/65694.html — ficha oficial; texto normativo completo no incluido ni declarado leído.
-- MITRE ATT&CK Enterprise Introduction, https://attack.mitre.org/resources/enterprise-introduction/ — introducción oficial consultada; versión y fecha de captura deben registrarse en el registro de fuentes.
+- MITRE ATT&CK Enterprise Introduction, https://attack.mitre.org/resources/enterprise-introduction/ — referencia oficial identificada; versión, fecha de captura y lectura por secciones pendientes.
 
 La consulta de una ficha oficial no equivale a lectura completa. No se atribuyen a estas fuentes resultados experimentales.
 
