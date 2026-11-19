@@ -122,3 +122,27 @@ Cada estudio debe definir H0/H1, variables, muestra, comparadores, refutación, 
 
 ## Madurez
 M0/M1 estructural. No demuestra cobertura profunda ni M3/M4/M5. Próxima puerta: revisar fuentes completas, producir artefactos específicos, ejecutar pruebas y registrar evidencia.
+
+
+## Profundización técnica específica: Gestión de identidad y acceso
+
+### Modelo de identidad y ciclo de vida
+Modelar identidades humanas, workload, servicio, dispositivo, máquina, federadas y externas. El ciclo joiner-mover-leaver debe automatizar alta, cambio, suspensión y baja con propietario, fuente autoritativa, sincronización, expiración y reconciliación. Identidades huérfanas, duplicadas y compartidas degradan trazabilidad. Distinguir sujeto, principal, credencial, autenticador, sesión y autorización.
+
+### Autenticación y federación
+Evaluar MFA resistente a phishing, passkeys/WebAuthn, FIDO2, certificados, OTP y recuperación de cuenta. OAuth 2.0 es framework de autorización; OIDC agrega identidad; SAML se usa en federación empresarial. Revisar issuer, audience, redirect URI, nonce, state, PKCE, token lifetime, refresh rotation, revocation y validación de firma/algoritmo. No aceptar tokens por decodificación sin validar firma, issuer, audience, expiración y contexto.
+
+### Autorización y privilegios
+RBAC simplifica roles; ABAC usa atributos; ReBAC modela relaciones. Aplicar deny-by-default, separación de funciones, mínimo privilegio, scopes y políticas centralizadas con decisión auditable. Revisar herencia, roles anidados, permisos efectivos, service accounts, delegación y privilegios transitivos. PAM/JIT/JEA reduce permanencia de privilegios; break-glass requiere control, alertas, caducidad y revisión.
+
+### Sesiones, credenciales y secretos
+Proteger cookies, session binding, expiración, rotación, revocación, logout y dispositivos confiables. Almacenar contraseñas con KDF adecuados y parámetros actualizados; evitar secretos en código, logs, variables expuestas y tickets. Gestión de claves/certificados requiere emisión, rotación, inventario y revocación. Detectar credential stuffing y abuso con límites adaptativos sin bloquear injustamente usuarios.
+
+### Directorios y gobierno
+AD, LDAP, Entra/IdP y directorios cloud deben mapear trusts, sincronización, fuentes autoritativas, grupos privilegiados, políticas de acceso condicional y cuentas de emergencia. Revisar SCIM provisioning, atributos, grupos dinámicos, claims y riesgo de sobreasignación. La identidad de workload requiere federación y rotación, no secretos estáticos incrustados.
+
+### Métricas y laboratorios
+Medir cobertura MFA, phishing-resistant MFA, cuentas huérfanas, privilegios permanentes, tiempo de baja, tokens de larga vida, autenticaciones anómalas y falsos positivos. Laboratorios: ciclo de vida sintético, autorización con matriz de sujetos/recursos/acciones, validación de OIDC/OAuth con tokens de prueba y recuperación segura de cuenta. No probar credenciales reales ni capturar secretos.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.
