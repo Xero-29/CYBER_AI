@@ -125,3 +125,38 @@ Para cada estudio definir H0/H1, variables, muestra, comparadores, criterio de r
 
 ## Madurez
 Estado actual: M0/M1 estructural. Este compendio no demuestra profundidad cubierta ni madurez M3/M4/M5. La siguiente puerta es leer y evaluar fuentes completas, producir artefactos específicos, ejecutar los laboratorios y registrar evidencia revisable.
+
+
+## Profundización técnica específica: Seguridad cloud
+
+### Modelo de responsabilidad y arquitectura
+Separar responsabilidades del proveedor, cliente y terceros según IaaS, PaaS, SaaS, serverless y servicios gestionados. Identificar control plane, data plane, management plane, regiones, zonas, cuentas/proyectos/subscriptions, landing zones, redes, identidades y límites de confianza. Un control disponible en proveedor no implica que esté habilitado, configurado o monitorizado en la cuenta. Mantener matriz de servicios, propietario, criticidad, datos, exposición y responsabilidad compartida.
+
+### Identidad cloud y control plane
+Priorizar federación, MFA resistente a phishing, roles temporales, workload identity, credenciales de corta duración y separación de funciones. Analizar trust policies, permisos efectivos, resource policies, service principals, cross-account access, impersonation y rutas de escalada por combinación de permisos. Evitar claves estáticas; cuando sean inevitables, limitar alcance, rotar y detectar uso. Evaluar break-glass con custodia, alertas y pruebas periódicas.
+
+### Red y exposición
+Modelar VPC/VNet, subnets, route tables, security groups, NACL, peering, transit gateways, private endpoints, gateways, DNS privado y balanceadores. Identificar exposición pública involuntaria, egress irrestricto, rutas transitivas, metadata services, bypass de perímetro y conectividad híbrida. Cloud firewall/WAF no reemplaza autorización de workload. Revisar IPv6, endpoints de administración, service endpoints y reglas por defecto.
+
+### Datos, cifrado y secretos
+Clasificar datos en reposo, tránsito y uso; mapear almacenamiento, snapshots, backups, colas, logs, caches y réplicas. Gestionar KMS/HSM, envelope encryption, rotación, grants, políticas de claves, separación de duties y recuperación. Secret managers deben controlar identidad consumidora, versionado, expiración y auditoría. Evaluar borrado lógico/físico, retención, residencia, tokenización y exposición por logs o telemetry.
+
+### Compute, serverless y servicios gestionados
+Para VM revisar imágenes base, metadata, agentes, discos, patching y acceso administrativo. En serverless evaluar permisos de función, variables, dependencias, eventos, cold start, aislamiento, secretos y límites de ejecución. En servicios gestionados revisar endpoints públicos, roles de servicio, snapshots, backups, cifrado, exportación de datos y dependencia de proveedor. Evitar asumir que la responsabilidad operativa desaparece con PaaS/SaaS.
+
+### Logging, detección y respuesta
+Habilitar audit trail de control plane, logs de identidad, flujo de red, DNS, almacenamiento, KMS y workloads. Centralizar en cuenta/proyecto separado con retención protegida, integridad y acceso de solo escritura desde producción. Crear detecciones para cambios de IAM, desactivación de logs, creación de credenciales, exposición pública, uso anómalo de regiones, snapshots compartidos y cambios de claves. La respuesta debe preservar snapshots, metadata y logs antes de destruir recursos.
+
+### IaC, postura y cadena de suministro
+Tratar Terraform/CloudFormation/Bicep y pipelines como código privilegiado. Revisar state files, secretos, módulos, providers, drift, plan/apply, aprobaciones, firma de artefactos y separación de entornos. CSPM/CNAPP genera hallazgos que requieren contexto y deduplicación; medir precisión y tiempo de remediación. Usar policy-as-code con pruebas unitarias, excepciones justificadas y pruebas de regresión.
+
+### Laboratorios específicos
+- Landing zone multi-account sintética con roles, logging y SCP/guardrails.
+- Simulación de exposición pública y rutas de red erróneas en cuenta de pruebas.
+- Evaluación de políticas IAM con casos permitidos/denegados y privilegio efectivo.
+- Incidente cloud sintético: preservar snapshots/logs, reconstruir línea temporal y recuperar.
+- Pipeline IaC con detección de secretos, misconfigurations y drift.
+Documentar proveedor, región, servicios, SKU, versiones, permisos, costes y límites; usar presupuestos y teardown verificado.
+
+## Estado de validación de la ampliación
+Contenido técnico editorial añadido para orientar revisión disciplinar; no implica lectura integral de fuentes, revisión externa ni ejecución de laboratorio. Mantener madurez M1/M2 hasta completar puertas G1–G8 con evidencias.
