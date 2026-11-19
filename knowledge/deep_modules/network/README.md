@@ -1,7 +1,7 @@
 # Módulo de profundización: Redes
 
-> **Estado editorial:** borrador estructurado para desarrollo y revisión. No equivale a contenido experto validado ni a fuente externa verificada.
-> **Dominio:** `network` · **Currículo:** 2.0.0
+> **Estado editorial:** contenido técnico ampliado v2.1.0; validación de fuentes, laboratorios y revisión independiente pendientes. No equivale a contenido experto validado ni a fuente externa verificada.
+> **Dominio:** `network` · **Currículo:** 2.1.0
 
 ## Propósito y límites
 
@@ -169,3 +169,7 @@ No se declaran fuentes verificadas por la mera inclusión de nombres o enlaces. 
 ## Madurez
 
 `draft_structured_not_expert_validated` — este documento organiza el trabajo de profundización; no acredita dominio experto, exactitud de todos los procedimientos ni validación operacional.
+
+
+## Estándar de investigación y madurez
+Este módulo adopta `knowledge/EXPERT_RESEARCH_STANDARD.md`: madurez por tema K1–K5 y puertas G1–G8. El contenido redactado no equivale a fuente leída ni experimento ejecutado. Estado actual: M1/M2 editorial; no M3/M4/M5. G5–G8 permanecen pendientes.
