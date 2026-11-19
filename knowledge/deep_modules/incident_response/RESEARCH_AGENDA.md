@@ -1,90 +1,101 @@
-# Agenda de investigación: Respuesta a incidentes
+# Agenda de investigación: incident_response
 
-**Dominio:** `incident_response` · **Objetivo:** L4 investigación · **Estado:** propuesta, no resultados concluidos.
+**Dominio:** `incident_response` · **Estado:** protocolo específico propuesto; no ejecutado.  
+**Objetivo de diseño:** L4; la madurez efectiva permanece M2 editorial hasta disponer de fuentes leídas y resultados.  
+**Hipótesis central:** ¿Qué diseño de playbook reduce el tiempo y el impacto de respuesta sin producir acciones irreversibles, pérdida de evidencia o interrupción innecesaria?
 
 ## Pregunta central
 
-¿Qué métodos, arquitecturas y controles para Respuesta a incidentes ofrecen mejoras reproducibles y medibles frente a las prácticas de referencia, considerando coste, contexto, amenazas y limitaciones?
+¿Qué diseño de playbook reduce el tiempo y el impacto de respuesta sin producir acciones irreversibles, pérdida de evidencia o interrupción innecesaria?
 
-## Líneas de investigación
+## Alcance, exclusiones y ética
 
-### 1. preparación, roles y severidad
+Los estudios se limitan a datos sintéticos, datasets con licencia y activos propios o expresamente autorizados. No se ejecutarán acciones contra terceros, no se usarán credenciales ni datos personales reales y no se desplegarán muestras/payloads operativos fuera de entornos controlados. Cada experimento debe declarar responsable, autorización, límites de recursos, regla de parada y procedimiento de rollback.
 
-- **Pregunta:** ¿Qué fallos, supuestos y condiciones límite de preparación, roles y severidad no quedan cubiertos por las prácticas actuales y cómo pueden observarse?
-- **Hipótesis:** una taxonomía y controles derivados de evidencia mejoran la cobertura o reducen errores frente a baseline documentada.
-- **Método:** revisión de literatura; análisis de estándares y documentación; construir taxonomía; seleccionar casos reproducibles; comparar baseline y propuesta; registrar datos y versiones; análisis crítico.
-- **Métricas:** cobertura, precisión, reproducibilidad, tasa de fallo, coste operacional y robustez; operacionalizar antes del experimento.
-- **Producto:** tabla comparativa, protocolo, resultados, análisis de incertidumbre, limitaciones y artefactos de reproducción.
+## Protocolos específicos
 
-### 2. detección, triage y validación
+### R1 — Preparación y severidad
 
-- **Pregunta:** ¿Qué fallos, supuestos y condiciones límite de detección, triage y validación no quedan cubiertos por las prácticas actuales y cómo pueden observarse?
-- **Hipótesis:** una taxonomía y controles derivados de evidencia mejoran la cobertura o reducen errores frente a baseline documentada.
-- **Método:** revisión de literatura; análisis de estándares y documentación; construir taxonomía; seleccionar casos reproducibles; comparar baseline y propuesta; registrar datos y versiones; análisis crítico.
-- **Métricas:** cobertura, precisión, reproducibilidad, tasa de fallo, coste operacional y robustez; operacionalizar antes del experimento.
-- **Producto:** tabla comparativa, protocolo, resultados, análisis de incertidumbre, limitaciones y artefactos de reproducción.
+Unidad: escenario tabletop. Variar criticidad, autoridad, roles y dependencia de proveedor. Comparar matriz de severidad contra criterios explícitos. Métricas: consistencia de clasificación, escalamiento y tiempo de decisión.
 
-### 3. contención y preservación
+**Hipótesis falsable:** la intervención definida mejora la métrica primaria respecto de la baseline sin superar el umbral de daño/coste predefinido. **H0:** no existe diferencia bajo el protocolo y la muestra definidos.  
+**Análisis:** informar tamaño muestral, distribución, intervalos de confianza y casos excluidos; no generalizar fuera del corpus.
 
-- **Pregunta:** ¿Qué fallos, supuestos y condiciones límite de contención y preservación no quedan cubiertos por las prácticas actuales y cómo pueden observarse?
-- **Hipótesis:** una taxonomía y controles derivados de evidencia mejoran la cobertura o reducen errores frente a baseline documentada.
-- **Método:** revisión de literatura; análisis de estándares y documentación; construir taxonomía; seleccionar casos reproducibles; comparar baseline y propuesta; registrar datos y versiones; análisis crítico.
-- **Métricas:** cobertura, precisión, reproducibilidad, tasa de fallo, coste operacional y robustez; operacionalizar antes del experimento.
-- **Producto:** tabla comparativa, protocolo, resultados, análisis de incertidumbre, limitaciones y artefactos de reproducción.
+### R2 — Detección y triage
 
-### 4. erradicación y recuperación
+Unidad: alerta sintética etiquetada. Variar ruido, duplicados, telemetría ausente y contexto de activo. Métricas: precision/recall, tiempo de triage y confianza calibrada.
 
-- **Pregunta:** ¿Qué fallos, supuestos y condiciones límite de erradicación y recuperación no quedan cubiertos por las prácticas actuales y cómo pueden observarse?
-- **Hipótesis:** una taxonomía y controles derivados de evidencia mejoran la cobertura o reducen errores frente a baseline documentada.
-- **Método:** revisión de literatura; análisis de estándares y documentación; construir taxonomía; seleccionar casos reproducibles; comparar baseline y propuesta; registrar datos y versiones; análisis crítico.
-- **Métricas:** cobertura, precisión, reproducibilidad, tasa de fallo, coste operacional y robustez; operacionalizar antes del experimento.
-- **Producto:** tabla comparativa, protocolo, resultados, análisis de incertidumbre, limitaciones y artefactos de reproducción.
+**Hipótesis falsable:** la intervención definida mejora la métrica primaria respecto de la baseline sin superar el umbral de daño/coste predefinido. **H0:** no existe diferencia bajo el protocolo y la muestra definidos.  
+**Análisis:** informar tamaño muestral, distribución, intervalos de confianza y casos excluidos; no generalizar fuera del corpus.
 
-### 5. comunicaciones y notificación
+### R3 — Contención y preservación
 
-- **Pregunta:** ¿Qué fallos, supuestos y condiciones límite de comunicaciones y notificación no quedan cubiertos por las prácticas actuales y cómo pueden observarse?
-- **Hipótesis:** una taxonomía y controles derivados de evidencia mejoran la cobertura o reducen errores frente a baseline documentada.
-- **Método:** revisión de literatura; análisis de estándares y documentación; construir taxonomía; seleccionar casos reproducibles; comparar baseline y propuesta; registrar datos y versiones; análisis crítico.
-- **Métricas:** cobertura, precisión, reproducibilidad, tasa de fallo, coste operacional y robustez; operacionalizar antes del experimento.
-- **Producto:** tabla comparativa, protocolo, resultados, análisis de incertidumbre, limitaciones y artefactos de reproducción.
+Unidad: incidente simulado en tenant/host demo. Comparar playbook lineal con gates de autorización/evidencia. Métricas: acciones fuera de alcance, evidencia preservada, reversibilidad y tiempo.
 
-### 6. tabletop y simulacros
+**Hipótesis falsable:** la intervención definida mejora la métrica primaria respecto de la baseline sin superar el umbral de daño/coste predefinido. **H0:** no existe diferencia bajo el protocolo y la muestra definidos.  
+**Análisis:** informar tamaño muestral, distribución, intervalos de confianza y casos excluidos; no generalizar fuera del corpus.
 
-- **Pregunta:** ¿Qué fallos, supuestos y condiciones límite de tabletop y simulacros no quedan cubiertos por las prácticas actuales y cómo pueden observarse?
-- **Hipótesis:** una taxonomía y controles derivados de evidencia mejoran la cobertura o reducen errores frente a baseline documentada.
-- **Método:** revisión de literatura; análisis de estándares y documentación; construir taxonomía; seleccionar casos reproducibles; comparar baseline y propuesta; registrar datos y versiones; análisis crítico.
-- **Métricas:** cobertura, precisión, reproducibilidad, tasa de fallo, coste operacional y robustez; operacionalizar antes del experimento.
-- **Producto:** tabla comparativa, protocolo, resultados, análisis de incertidumbre, limitaciones y artefactos de reproducción.
+### R4 — Erradicación/recuperación
 
-### 7. lecciones aprendidas
+Unidad: snapshots y backups sintéticos. Variar vector no corregido, backup contaminado simulado, dependencia y RTO/RPO. Métricas: recuperación, recurrencia y cumplimiento de objetivos.
 
-- **Pregunta:** ¿Qué fallos, supuestos y condiciones límite de lecciones aprendidas no quedan cubiertos por las prácticas actuales y cómo pueden observarse?
-- **Hipótesis:** una taxonomía y controles derivados de evidencia mejoran la cobertura o reducen errores frente a baseline documentada.
-- **Método:** revisión de literatura; análisis de estándares y documentación; construir taxonomía; seleccionar casos reproducibles; comparar baseline y propuesta; registrar datos y versiones; análisis crítico.
-- **Métricas:** cobertura, precisión, reproducibilidad, tasa de fallo, coste operacional y robustez; operacionalizar antes del experimento.
-- **Producto:** tabla comparativa, protocolo, resultados, análisis de incertidumbre, limitaciones y artefactos de reproducción.
+**Hipótesis falsable:** la intervención definida mejora la métrica primaria respecto de la baseline sin superar el umbral de daño/coste predefinido. **H0:** no existe diferencia bajo el protocolo y la muestra definidos.  
+**Análisis:** informar tamaño muestral, distribución, intervalos de confianza y casos excluidos; no generalizar fuera del corpus.
 
-## Revisión sistemática / mapeo de literatura
+### R5 — Ransomware/BEC/cloud/supply chain
 
-Registrar pregunta, bases consultadas, consultas exactas, rango temporal, idioma, fecha, criterios de inclusión/exclusión, proceso de deduplicación y motivos de descarte. Priorizar normas, papers revisados por pares, especificaciones, advisories y fuentes primarias. Evaluar calidad metodológica y conflicto de interés; no contar referencias sin lectura.
+Unidad: escenario de mesa separado por tipo. Medir decisiones, alcance, revocación, comunicación y coordinación.
 
-## Diseño de investigación
+**Hipótesis falsable:** la intervención definida mejora la métrica primaria respecto de la baseline sin superar el umbral de daño/coste predefinido. **H0:** no existe diferencia bajo el protocolo y la muestra definidos.  
+**Análisis:** informar tamaño muestral, distribución, intervalos de confianza y casos excluidos; no generalizar fuera del corpus.
 
-- Formular hipótesis nula y alternativa falsables.
-- Definir población, unidad de análisis, variables, confusores y muestreo.
-- Definir comparadores, baseline, métricas y análisis estadístico previo.
-- Registrar entorno, versiones, hardware, dependencias y semillas.
-- Realizar pruebas en laboratorio aislado y con autorización; documentar desviaciones.
-- Evaluar validez interna, externa, de constructo y de conclusión.
+### R6 — Postmortem/mejora
 
-## Artefactos de publicación
+Unidad: informe de ejercicio. Revisores ciegos califican causalidad, evidencia, acciones y métricas. Medir concordancia entre revisores y cierre de acciones.
 
-Estado del arte, taxonomía, threat model, protocolo, dataset/diccionario permitido, scripts, configuración, dependencias fijadas, SBOM, hashes, resultados brutos saneados, análisis, limitaciones, instrucciones de reproducción y revisión independiente.
+**Hipótesis falsable:** la intervención definida mejora la métrica primaria respecto de la baseline sin superar el umbral de daño/coste predefinido. **H0:** no existe diferencia bajo el protocolo y la muestra definidos.  
+**Análisis:** informar tamaño muestral, distribución, intervalos de confianza y casos excluidos; no generalizar fuera del corpus.
 
-## Ética y seguridad
+## Protocolo común de ejecución
 
-No ampliar alcance ni realizar pruebas sobre terceros sin autorización. Minimizar datos y riesgo; en forense preservar cadena de custodia; en malware usar sandbox; en sistemas críticos simular; aplicar divulgación coordinada y proteger secretos.
+1. Congelar pregunta, hipótesis, unidad de análisis, métrica primaria y criterio de exclusión antes de ejecutar.
+2. Registrar versiones de OS, herramientas, librerías, datasets, configuración y hardware.
+3. Fijar corpus y su procedencia, licencia, etiquetas, hash y particiones; evitar fuga entre train/test o entre versiones.
+4. Construir baseline reproducible y controles positivos/negativos.
+5. Aislar entorno, registrar reloj y verificar salvaguardas antes de introducir casos.
+6. Ejecutar piloto para comprobar instrumentación; no mezclar resultados del piloto con la muestra confirmatoria sin declararlo.
+7. Ejecutar repeticiones predefinidas y conservar salidas brutas, logs saneados y errores.
+8. Analizar incertidumbre, sesgo de selección, variables de confusión y resultados negativos.
+9. Reproducir desde entorno limpio y registrar diferencias.
 
-## Umbral de madurez
+## Métricas y análisis
 
-M4 exige estudio de literatura, experimento ejecutado y análisis crítico. M5 exige revisión y reproducción independiente. Esta agenda solo define el plan inicial: `research_agenda_defined`.
+Cada protocolo define su métrica primaria. Cuando se evalúe clasificación, reportar matriz de confusión, precision, recall, F1 cuando sea pertinente y prevalencia; no usar accuracy aislada con clases desbalanceadas. Para tiempos, informar mediana, p50/p95, tamaño muestral y condiciones. Para reproducibilidad, declarar qué constituye una repetición válida. Los resultados deben incluir falsos positivos, falsos negativos, intervalos y casos no concluyentes.
+
+## Amenazas a la validez
+
+- **Interna:** versiones, reloj, instrumentación, operador, orden de pruebas y variables no controladas.
+- **Externa:** muestras sintéticas o un proveedor no representan todos los entornos.
+- **Constructo:** cobertura, alerta o puntuación no equivalen automáticamente a seguridad.
+- **Selección:** corpus sesgado, duplicados y contaminación entre particiones.
+- **Reproducibilidad:** cambios de herramienta, firmware, dependencias o datos.
+- **Ética/legal:** autorización, privacidad, licencias, divulgación y retención.
+
+## Entregables
+
+- Protocolo preregistrado y baseline.
+- Dataset/corpus con procedencia, licencia, hash y ground truth.
+- Scripts, configuración y versiones fijadas.
+- Resultados brutos, métricas y análisis estadístico.
+- Registro de falsos positivos/negativos y casos no concluyentes.
+- Limitaciones, amenazas a validez y plan de reproducción.
+- Revisión independiente.
+
+## Puertas de madurez
+
+- **M2:** contenido específico y protocolo reproducible diseñado.
+- **M3:** fuentes primarias leídas con extracción de requisitos y síntesis crítica.
+- **M4:** experimentos ejecutados, resultados conservados y reproducción interna.
+- **M5:** revisión independiente y reproducción por un segundo operador.
+
+**Estado actual:** agenda M2 propuesta. No se declaran experimentos ejecutados ni validación científica.
