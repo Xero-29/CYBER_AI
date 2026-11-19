@@ -109,3 +109,10 @@ No conformidades abiertas: lectura integral de fuentes primarias; normas de safe
 - Verificación editorial estática: estructura de nueve secciones, cuatro variantes nuevas, cinco requisitos de ejemplo y límites de evidencia explícitos.
 - Matriz: el anexo se enlaza como evidencia; FND-01.01 permanece con 12 capas y 4 capacidades `in_progress`, T0/O0; se añade NC-FND-01.01-05.
 - No se declara lectura integral de fuentes, cumplimiento legal colombiano, revisión sectorial, evaluación administrada, revisión independiente ni ejecución de laboratorio.
+
+## Ciclo de investigación primaria — NIST SP 800-160 Vol. 1/2
+
+- Inspeccionadas secciones oficiales seleccionadas de los PDF NIST SP 800-160 Vol. 1 Rev. 1 (195 páginas) y Vol. 2 Rev. 1 (310 páginas).
+- Hallazgos aplicados: seguridad como propiedad emergente; contexto y assurance case; confianza composicional; protección continua en transiciones; objetivos de resiliencia anticipar/resistir/recuperar/adaptar; complementariedad con CIA.
+- Añadido `knowledge/deep_modules/foundations/SOURCE_REVIEW_ADDENDUM_NIST_800_160_2026-11-19.md` y actualizado `knowledge/research/source_registry.json` con estado `selected_sections_reviewed`.
+- No se afirma lectura lineal integral, ni revisión de todas las referencias, ni ejecución. FND-01.01 sigue T0/O0 y no aprobado.
