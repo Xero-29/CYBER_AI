@@ -248,3 +248,14 @@ Se añadieron estudios para Aprendizaje automático, Matemáticas, Ingeniería d
 - Se registran límites de antigüedad de NIST SP 800-94/115/137 y versiones de CAPEC, D3FEND, Sigma, Zeek, Suricata y estándares inalámbricos.
 
 **Pendiente:** 16 dominios del manifiesto, además de profundidad adicional en todos los estudios, lectura íntegra de fuentes, experimentos, laboratorios y revisión independiente. No declarar M4/M5 ni cobertura experta sin evidencia.
+
+
+### Quinta tanda — cobertura inicial de los 48 dominios
+
+Se añadieron los 16 dominios restantes: Bug bounty/divulgación, Satélites, Seguridad física, Correo/DNS, Fraude/abuso, Ingeniería de privacidad, Forense cloud, Red Team de IA, PKI/HSM, Criptografía poscuántica, Continuidad, Bases de datos, Investigación de vulnerabilidades, Telecom/5G, Automoción y Hardware.
+
+**Resultado estructural:** los 48 IDs del manifiesto tienen ahora un archivo RESEARCH_STUDY.md, enlazado desde el índice y desde knowledge/deep_modules/README.md. El registro específico de esta entrega contiene 81 fuentes y el registro central 143 fuentes únicas. Se añadió cobertura de pruebas estructurales para los 48 dominios y se corrigió la referencia DMARC: RFC 7489 está obsoleto y el estudio utiliza RFC 9989/9990/9991.
+
+**No equivale a investigación exhaustiva:** la cobertura 48/48 confirma existencia, no profundidad homogénea. Los documentos son una primera síntesis de cada dominio; muchos siguen en M1/M2. Faltan lectura íntegra de estándares/papers, desarrollo de subtemas, referencias de investigación primaria por subárea, laboratorios ejecutados, resultados cuantitativos, revisión especializada y niveles M4/M5.
+
+**Pendiente:** CI del HEAD actual, validación editorial y técnica, desarrollo profundo de cada dominio, ejecución/reproducción de laboratorios y revisión independiente. No promover a biblioteca validada ni fusionar hasta completar gates.
