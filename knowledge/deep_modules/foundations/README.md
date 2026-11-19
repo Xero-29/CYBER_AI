@@ -28,7 +28,7 @@ El desarrollo se organiza en doce bloques disciplinares:
 
 - [Compendio técnico base](TECHNICAL_COMPENDIUM.md): modelos, procedimientos, ejemplos y laboratorio introductorio.
 - [Desarrollo disciplinar ampliado y auditoría por tema](FOUNDATIONS_DEEP_DEVELOPMENT_V1.md): siete dossiers alineados con el currículo, doce capas, protocolos, métricas y límites.
-- [Revisión de fuentes y trazabilidad](SOURCE_REVIEW_AND_CLAIM_EVIDENCE_2026-11-19.md): secciones primarias inspeccionadas, hallazgos aplicados, afirmación→fuente→capa y brechas abiertas.
+- [Revisión de fuentes y trazabilidad](SOURCE_REVIEW_AND_CLAIM_EVIDENCE_2026-11-19.md): secciones primarias inspeccionadas, hallazgos aplicados, afirmación→fuente→capa y brechas abiertas.\n- [Dictamen de auditoría interna](FOUNDATIONS_AUDIT_VERDICT_2026-11-19.md): resultado, evidencias CI/labs, no conformidades y criterios obligatorios para aceptación.
 - [Laboratorios reproducibles](labs/README.md): siete simulaciones sintéticas, runner, pruebas y resultados.
 - [Agenda de investigación](RESEARCH_AGENDA.md): preguntas, hipótesis y diseños experimentales propuestos.
 - [Revisión exploratoria de literatura](LITERATURE_REVIEW.md): mapa bibliográfico y estado real de lectura.
