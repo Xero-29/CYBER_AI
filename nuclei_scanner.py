@@ -61,15 +61,48 @@ def validate_target(target):
 
 
 def _terminate_process_tree(process):
-    """Detiene el grupo completo del escáner para no dejar procesos huérfanos."""
+    """Detiene el grupo POSIX del escáner; en otros sistemas termina el proceso directo."""
     if os.name == "posix":
         try:
             os.killpg(process.pid, signal.SIGKILL)
         except ProcessLookupError:
             pass
-    else:
+    elif process.poll() is None:
         process.kill()
     process.wait()
+
+
+def _iter_output_chunks(stream, max_chars=2001):
+    """Lee salida en fragmentos acotados para evitar líneas de tamaño ilimitado."""
+    readline = getattr(stream, "readline", None)
+    if callable(readline):
+        while True:
+            chunk = readline(max_chars)
+            if not chunk:
+                break
+            yield chunk
+    else:
+        yield from stream
+
+
+def _close_process_output(process, reader, join_timeout=3):
+    """Drena, termina descendientes que retengan stdout y cierra el pipe."""
+    if process is None:
+        return
+    if reader is not None:
+        reader.join(timeout=join_timeout)
+        if reader.is_alive():
+            _terminate_process_tree(process)
+            reader.join(timeout=join_timeout)
+    stream = getattr(process, "stdout", None)
+    close = getattr(stream, "close", None)
+    if callable(close):
+        try:
+            close()
+        except (OSError, ValueError):
+            pass
+    if reader is not None and reader.is_alive():
+        reader.join(timeout=1)
 
 
 def _record_scan_event(target, result, started, *, authorization_id=None, start_event_id=None):
@@ -241,6 +274,8 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
 
     messages = deque(maxlen=100)
     isolated_home = None
+    process = None
+    reader = None
 
     try:
         isolated_home = tempfile.TemporaryDirectory(prefix="cyber-ai-nuclei-")
@@ -261,16 +296,19 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
         )
 
         def show_output():
-            """Muestra cada mensaje de Nuclei conforme llega."""
+            """Muestra salida acotada de Nuclei conforme llega."""
             if process.stdout is None:
                 return
 
-            for line in process.stdout:
-                line = line.rstrip()
-                if line:
-                    safe_line = line[:2000]
-                    messages.append(safe_line)
-                    print(f"[Nuclei] {safe_line}", flush=True)
+            try:
+                for line in _iter_output_chunks(process.stdout):
+                    line = line.rstrip()
+                    if line:
+                        safe_line = line[:2000]
+                        messages.append(safe_line)
+                        print(f"[Nuclei] {safe_line}", flush=True)
+            except (OSError, ValueError):
+                return
 
         reader = threading.Thread(target=show_output, daemon=True)
         reader.start()
@@ -322,7 +360,6 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
 
             time.sleep(1)
 
-        reader.join(timeout=3)
         elapsed = round(time.monotonic() - started, 1)
         print(f"\n[3/4] Escaneo terminado en {elapsed} segundos.", flush=True)
 
@@ -340,6 +377,10 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
         }
         return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)
     finally:
+        try:
+            _close_process_output(process, reader)
+        except OSError as cleanup_error:
+            print("AVISO: no se pudo cerrar completamente la salida del escáner:", cleanup_error, file=sys.stderr)
         if isolated_home is not None:
             isolated_home.cleanup()
 

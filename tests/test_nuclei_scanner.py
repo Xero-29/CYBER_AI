@@ -1,12 +1,20 @@
+import io
 import json
 import os
 import tempfile
+import threading
 import unittest
 from pathlib import Path
 import signal
 from unittest.mock import patch
 
-from nuclei_scanner import scan_target, validate_target, _terminate_process_tree
+from nuclei_scanner import (
+    scan_target,
+    validate_target,
+    _close_process_output,
+    _iter_output_chunks,
+    _terminate_process_tree,
+)
 from execution_ledger import ExecutionLedger
 from binary_integrity import BinaryIntegrityError
 
@@ -162,6 +170,41 @@ class NucleiScannerTests(unittest.TestCase):
         with patch("nuclei_scanner.os.name", "nt"):
             _terminate_process_tree(process)
         self.assertEqual(process.returncode, -9)
+
+    def test_output_chunks_are_bounded(self):
+        stream = io.StringIO("x" * 5000 + "\\n")
+        chunks = list(_iter_output_chunks(stream, max_chars=2001))
+        self.assertGreater(len(chunks), 1)
+        self.assertTrue(all(len(chunk) <= 2001 for chunk in chunks))
+
+    def test_output_reader_is_closed_after_drain(self):
+        process = FakeProcess()
+        process.stdout = io.StringIO("scanner output\\n")
+        reader = threading.Thread(target=lambda: list(process.stdout), daemon=True)
+        reader.start()
+        _close_process_output(process, reader)
+        self.assertTrue(process.stdout.closed)
+
+    def test_stuck_output_reader_triggers_process_tree_cleanup(self):
+        released = threading.Event()
+
+        class BlockingStream:
+            def readline(self, _size):
+                released.wait(timeout=1)
+                return ""
+
+            def close(self):
+                released.set()
+
+        process = FakeProcess()
+        process.pid = 1234
+        process.stdout = BlockingStream()
+        reader = threading.Thread(target=lambda: list(_iter_output_chunks(process.stdout)), daemon=True)
+        reader.start()
+        with patch("nuclei_scanner._terminate_process_tree") as terminate:
+            _close_process_output(process, reader, join_timeout=0.01)
+        terminate.assert_called_once_with(process)
+        self.assertFalse(reader.is_alive())
 
     def test_process_start_error_is_reported(self):
         with tempfile.TemporaryDirectory() as tmp:

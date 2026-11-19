@@ -2,41 +2,41 @@
 
 **Repositorio:** `Xero-29/CYBER_AI`  
 **Rama auditada:** `codex/security-integrity-audit`  
-**HEAD inspeccionado:** `411fbd1131738045d01aec96bab5a5c3605fe229`  
+**HEAD verificado:** `c48c5c04c5b8c407cef8a65d47a058ec3722c634`  
 **main:** `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`  
-**Merge-base:** `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. La rama tiene **152 commits exclusivos** y `main` **573 commits exclusivos**; el diff neto afecta 59 rutas de auditoría y 291 de `main`. No existe un único commit exclusivo de `main`.
+**Merge-base:** `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. La rama tiene **153 commits exclusivos** y `main` **573 commits exclusivos**; el diff neto afecta 59 rutas de auditoría y 291 de `main`. No existe un único commit exclusivo de `main`.
 
 ## Ramas y PRs
 
 - **PR #2:** cerrado y fusionado el 2026-11-17; merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. No se duplica.
 - **PR #11:** abierto para locks hash-verified/SBOM; HEAD `04c001a206cde98613cf9c151ce4f6a95fb86a21`, Python y Docker exitosos.
-- **PR #12:** abierto como reconciliación selectiva desde `main`; HEAD `c2a397caf36f2661b6f0307168a0a24eee2f6d38`, Python y Docker exitosos. Todavía no integra los cambios de seguridad en archivos compartidos.
-- **PR #13:** abierto para biblioteca profunda; HEAD `d0a3934a473e3d1117c7410df253f659d5f475c3`, Python y Docker exitosos; sus gates no equivalen a revisión experta.
+- **PR #12:** abierto como reconciliación selectiva desde `main`; HEAD `c2a397caf36f2661b6f0307168a0a24eee2f6d38`, Python y Docker exitosos. Aún no integra los cambios de seguridad en archivos compartidos.
+- **PR #13:** abierto para biblioteca profunda; HEAD `d0a3934a473e3d1117c7410df253f659d5f475c3`, Python y Docker exitosos; sus gates no sustituyen revisión experta.
 - **PR #1 y #3–#10:** abiertos; revisar cada actualización de Dependabot/Actions individualmente.
 - No se hizo merge, rebase, force-push ni modificación de `main`. PR #12 sigue siendo el único vehículo de reconciliación.
 - No se devolvieron rulesets; la lectura de branch protection está bloqueada con 403 para esta integración.
 
 ## CI del HEAD exacto
 
-SHA `411fbd1131738045d01aec96bab5a5c3605fe229`:
+SHA `c48c5c04c5b8c407cef8a65d47a058ec3722c634`:
 
-- Python Tests — [run 44553197879](https://github.com/Xero-29/CYBER_AI/actions/runs/44553197879): **completed/failure**, 583 pruebas, 3 fallos.
-- Docker Sandbox — [run 44553197861](https://github.com/Xero-29/CYBER_AI/actions/runs/44553197861): **completed/failure**, 583 pruebas, 3 fallos; la imagen se construyó, pero la verificación falló.
-- Los fallos muestran que el escáner aún no aplica en su flujo principal el control de plantillas y el rechazo estricto de JSONL. El módulo común y sus pruebas sí están presentes; se integra ahora el control en `nuclei_scanner.py`.
-- El SHA anterior `b2aaddb72faf99c99b8272887e67d516725697f0` sí pasó Python y Docker (572 pruebas, Ruff y SBOM); esa evidencia no se traslada al HEAD actual.
+- Python Tests — [run 44553522313](https://github.com/Xero-29/CYBER_AI/actions/runs/44553522313): **completed/success**, 583 pruebas; suite base con 4 skips explícitos y suite documental completa **OK**.
+- Docker Sandbox — [run 44553522845](https://github.com/Xero-29/CYBER_AI/actions/runs/44553522845): **completed/success**, 583 pruebas y Ruff dentro del contenedor endurecido.
+- El workflow Python generó SBOM CycloneDX y procedencia del build para este SHA exacto.
+- No existe checkout local completo disponible; la evidencia de ejecución es GitHub Actions.
 
 ## Cambios de esta iteración
 
-- Se corrigieron los fixtures de ejecutables para que usen rutas temporales existentes y una allowlist explícita.
-- Se centralizó la validación de plantillas con límite de tamaño, rechazo de traversal/symlinks/reparse points, apertura sin seguir symlinks y comprobación de identidad/tamaño/mtime durante el hash.
-- `task_runner.py` ya reutiliza el módulo común; el escáner directo debe aplicar la misma verificación antes y después del proceso.
-- La evidencia JSONL debe ser estricta: una línea no JSON invalida el informe y no se acepta como ausencia de hallazgos.
-- No existe checkout local completo disponible; la validación se realiza mediante Actions.
+- Se centralizó la integridad de plantillas: límite de tamaño, rechazo de traversal/symlinks/reparse points, apertura sin seguir symlinks, hash SHA-256 y verificación de identidad/tamaño/mtime antes y después de la lectura.
+- `task_runner.py` y `nuclei_scanner.py` reutilizan el módulo común. El escáner directo valida sus plantillas antes de lanzar Nuclei y vuelve a verificar al terminar; si cambia el binario o una plantilla, descarta los hallazgos.
+- El JSONL malformado invalida la evidencia en vez de ignorar silenciosamente la línea.
+- El nuevo trabajo acota la lectura de stdout y cierra pipes; si un descendiente retiene el descriptor, termina el grupo POSIX antes de cerrar el lector. La cobertura de esta limpieza queda pendiente del siguiente CI.
+- No se afirma ejecución local.
 
 ## Pendientes reales
 
-1. Reejecutar Python Tests y Docker Sandbox sobre el próximo SHA exacto.
-2. Auditar cierre de pipes/procesos descendientes y límites de salida del ejecutor Nuclei.
+1. Verificar Python Tests, Docker Sandbox y Ruff sobre el próximo SHA exacto.
+2. Confirmar el comportamiento de terminación de procesos descendientes en Windows con Job Objects; la implementación POSIX usa grupo de procesos.
 3. Revisar PR #12 y reconciliar por archivo, preservando los 573 commits de `main`; no integrar automáticamente.
 4. Validar locks por plataforma/arquitectura y provenance antes de integrar PR #11.
 5. Conectar KMS/HSM, RBAC/IdP/MFA, WORM/offsite y cifrado de backups; ejecutar simulacros DR con RPO/RTO.
@@ -45,7 +45,7 @@ SHA `411fbd1131738045d01aec96bab5a5c3605fe229`:
 8. Revisar las 138 fuentes y 276 verificaciones pendientes con especialistas; validar licencias, exactitud, vigencia y calidad semántica.
 9. Verificar ACL Windows, protección de rama, observabilidad, alertas y respuesta a incidentes en infraestructura real.
 
-**Conclusión:** el proyecto aún no está listo para validación final. El módulo común de integridad de plantillas ya existe, pero el escáner directo debe aplicar sus controles y CI del HEAD actual sigue rojo. La divergencia con `main` y las dependencias operacionales/experta permanecen pendientes.
+**Conclusión:** el HEAD `c48c5c04c5b8c407cef8a65d47a058ec3722c634` pasó Python y Docker, pero la limpieza de procesos, la reconciliación con `main` y las integraciones operacionales/experta siguen pendientes. No se declara certificación institucional ni preparación para producción.
 
 ---
 
