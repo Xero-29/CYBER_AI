@@ -26,7 +26,8 @@ El desarrollo se organiza en doce bloques disciplinares:
 
 ## Documentos del módulo
 
-- [Mapa curricular exhaustivo V2](FOUNDATIONS_CURRICULUM_MAP_V2.md): nueve unidades disciplinares, subunidades, dependencias, fronteras y brechas G1. Mapa en progreso; no es aprobación de cobertura.
+- [Mapa curricular exhaustivo V2](FOUNDATIONS_CURRICULUM_MAP_V2.md): nueve unidades disciplinares, 102 subunidades, dependencias, fronteras y brechas G1. Mapa en progreso; no es aprobación de cobertura.
+- [Matriz granular de subunidades JSON](FOUNDATIONS_SUBTOPIC_AUDIT_V2.json) y [vista Markdown](FOUNDATIONS_SUBTOPIC_AUDIT_V2.md): 1.224 comprobaciones capa×subunidad y 408 comprobaciones de capacidad, todas `not_assessed` al crear la línea base.
 - [Registro de ejecución en frío](../../COLD_KNOWLEDGE_EXECUTION_LOG_2026-11-19.md): línea base y cambios verificados.
 
 - [Protocolo obligatorio de aceptación en frío](../../COLD_KNOWLEDGE_EXECUTION_PROTOCOL.md): enseñanza, explicación, análisis, diseño, rúbrica, corrección iterativa y gate de salida.
