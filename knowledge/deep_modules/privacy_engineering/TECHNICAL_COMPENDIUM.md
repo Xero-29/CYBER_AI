@@ -122,3 +122,27 @@ Definir H0/H1, variables, población, comparadores, criterio de refutación, an�
 
 ## Madurez
 M0/M1 estructural. No acredita profundidad ni M3/M4/M5. Para avanzar: leer fuentes completas, producir artefactos específicos, ejecutar laboratorios y registrar evidencia auditable.
+
+
+## Profundización técnica específica: Ingeniería de privacidad
+
+### Modelo de datos y privacidad
+Mapear sujetos, datos personales/sensibles, finalidades, bases legales, procesadores, transferencias, retención, decisiones automatizadas y derechos. Evaluar contexto y expectativa razonable, no solo etiquetas. Privacy by design traduce principios en controles verificables durante diseño, operación y retiro.
+
+### Minimización y ciclo de vida
+Recolectar solo lo necesario, limitar granularidad, separar identificadores, pseudonimizar y definir retención/borrado. Pseudonimización no equivale a anonimización. Analizar backups, logs, caches, embeddings, telemetría y copias derivadas. Borrado requiere propagación y evidencia razonable, con excepciones legales documentadas.
+
+### Riesgo de reidentificación
+Evaluar linkage, singling out, inference, membership, composición y datos auxiliares. k-anonymity/l-diversity/t-closeness tienen supuestos y límites; differential privacy requiere parámetros y contabilidad de composición. No afirmar anonimato sin threat model, datos auxiliares y evaluación independiente.
+
+### Controles de arquitectura
+Consentimiento/preferencias cuando corresponda, purpose limitation, access control, encryption, tokenization, privacy filters, data clean rooms y differential privacy. Minimizar exposición en analytics, logs y sistemas IA. Revisar transferencias internacionales, subprocesadores, acceso de soporte y residencia.
+
+### Gobernanza y derechos
+DPIA/PIA, registros de tratamiento, solicitudes de acceso/corrección/borrado, incident response y breach notification deben tener roles, plazos y evidencia. La aplicabilidad legal depende de jurisdicción; no generalizar un régimen. Medir tiempo de respuesta, cobertura de inventario, retención excedida y hallazgos de reidentificación.
+
+### Laboratorios
+Dataset sintético para linkage/reidentification; comparar masking, tokenization y DP con utilidad; simular solicitud de borrado en pipeline de datos. Documentar supuestos y límites.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.
