@@ -1,11 +1,11 @@
 # Seguimiento de aplicación del estándar experto — Biblioteca CYBER_AI
 
 **Corte editorial:** 2026-11-19  
-**Áreas:** 48/48 con compendio editorial; seis módulos P0 recibieron reescritura disciplinar específica en esta rama.  
-**Estado global:** borradores técnicos ampliados; investigación documental y validación experimental pendientes.
+**Áreas:** 48/48 inspeccionadas; 336 unidades temáticas iniciales y 4.032 comprobaciones tema×capa registradas en la auditoría granular. Seis módulos P0 recibieron reescritura disciplinar específica; los otros 42 conservan desarrollo inicial y requieren ampliación profunda.  
+**Estado global:** M2 editorial; auditoría estructural aplicada, pero cobertura por capa todavía no demostrada. Investigación documental, experimentación y validación independiente pendientes.
 
 ## Alcance aplicado
-Los seis módulos P0 (identity, malware, forensics, incident_response, threat_intel y reverse) fueron reescritos para sustituir bloques genéricos por mecanismos, casos límite, pruebas negativas, métricas y laboratorios específicos. Cada uno dispone ahora de agenda experimental y revisión exploratoria de literatura. Esto es avance editorial M2, no validación disciplinar. Las otras 42 áreas conservan el estado editorial previo y requieren auditoría granular.
+Los seis módulos P0 (identity, malware, forensics, incident_response, threat_intel y reverse) fueron reescritos para sustituir bloques genéricos por mecanismos, casos límite, pruebas negativas, métricas y laboratorios específicos. Cada uno dispone ahora de agenda experimental y revisión exploratoria de literatura. Esto es avance editorial M2, no validación disciplinar. Las otras 42 áreas conservan el estado editorial previo y requieren ampliación disciplinar tema por tema. La auditoría granular inicial ya se registró en `knowledge/research/DOMAIN_LAYER_AUDIT_48.md` y su matriz `DOMAIN_LAYER_AUDIT_48.json`.
 
 ## Matriz de áreas
 | ID | Área | Compendio | Agenda específica | Fuentes integrales | Laboratorio ejecutado | Revisión independiente |
@@ -90,3 +90,24 @@ Ningún área se declara completa hasta satisfacer las ocho puertas G1–G8 con 
 | reverse | 7 temas reescritos | 7 protocolos | Mapa de fuentes; lectura integral pendiente | 7 diseñados, no ejecutados |
 
 **Límite:** el número de temas/protocolos/laboratorios describe artefactos de diseño, no pruebas completadas. No asignar M3/M4/M5 ni declarar biblioteca completa.
+
+
+## Auditoría granular del estándar — corte 2026-11-19
+
+Se inspeccionaron los 48 compendios técnicos y se creó una línea base legible por humanos y máquinas:
+- `knowledge/research/DOMAIN_LAYER_AUDIT_48.md`
+- `knowledge/research/DOMAIN_LAYER_AUDIT_48.json`
+
+La matriz contiene 48 especialidades, 7 unidades temáticas iniciales por especialidad, 12 capas por tema (4.032 estados) y ocho puertas G1–G8 por especialidad. Los estados se inicializan como `not_assessed`: significa que todavía no existe una comprobación trazable tema×capa, no que el tema carezca absolutamente de contenido.
+
+### Hallazgo de la inspección
+- Seis módulos (identity, malware, forensics, incident_response, threat_intel y reverse) tienen reescritura disciplinar inicial, pero todavía requieren auditoría tema×capa y evidencia.
+- Los otros 42 compendios contienen rutas temáticas iniciales, pero presentan bloques metodológicos repetidos y profundidad insuficiente para afirmar aplicación exhaustiva del estándar.
+- Los 48 módulos permanecen en M2 editorial. No se elevan niveles K ni puertas G por presencia de documentos, títulos o palabras clave.
+
+### Siguiente ejecución
+1. Desarrollar en profundidad los 42 módulos restantes, tema por tema y con perfil disciplinar propio.
+2. Auditar también los seis módulos ya reescritos contra las 12 capas.
+3. Vincular cada afirmación relevante a fuentes realmente consultadas.
+4. Ejecutar laboratorios y evaluaciones; conservar evidencia y resultados negativos.
+5. Solicitar revisión independiente y reproducción externa antes de declarar K4/K5.
