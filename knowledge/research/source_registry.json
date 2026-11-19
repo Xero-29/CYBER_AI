@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "policy": "Los registros verificados se limitarán a documentos oficiales inspeccionados en la revisión editorial. Los candidatos requieren comprobación documental antes de usarse como evidencia. Los estados de revisión son específicos al alcance y fecha registrados; metadatos/changelog no equivalen a lectura integral ni validación de implementación.",
+  "policy": "Los registros verificados se limitarán a documentos oficiales inspeccionados en la revisión editorial. Los candidatos requieren comprobación documental antes de usarse como evidencia. Los estados de revisión son específicos al alcance y fecha registrados; metadatos/changelog no equivalen a lectura integral ni validación de implementación. Los avisos de errata de FIPS 203 y FIPS 204 se registran por separado y con fecha del emisor; no inferir que FIPS 205 tenga el mismo aviso.",
   "sources": [
     {
       "id": "AWS-WELLARCH-SECURITY-PILLAR",
@@ -432,14 +432,14 @@
       "url": "https://doi.org/10.6028/NIST.FIPS.204",
       "version": "Final",
       "published": "2024-08-13",
-      "verification_status": "selected_sections_reviewed",
+      "verification_status": "official_metadata_and_errata_notice_reviewed",
       "verified_scope": "Estándar ML-DSA para firmas digitales.",
       "domains": [
         "crypto",
         "secure_arch",
         "identity"
       ],
-      "review_note": "ML-DSA is a post-quantum digital signature scheme, not a KEM. Full algorithm review and conformance testing pending.",
+      "review_note": "NIST planning note dated 2026-07-31 links an Errata (potential updates) spreadsheet listing several minor issues intended for future update/revision. Metadata/notice reviewed; spreadsheet and full algorithm text/conformance not reviewed.",
       "sections_reviewed": [
         "Cover, abstract, announcement, applicability and signature-use sections"
       ],
@@ -766,7 +766,7 @@
       "url": "https://csrc.nist.gov/pubs/sp/800/57/pt1/r6/ipd",
       "version": "Revision 6 Initial Public Draft",
       "published": "2025-12-05",
-      "verification_status": "official_draft_metadata_and_comment_status_reviewed",
+      "verification_status": "selected_sections_reviewed",
       "verified_scope": "Borrador de revisión de gestión de claves que incorpora Ascon y algoritmos post-cuánticos FIPS 203/204/205; distingue claves de establecimiento y almacenamiento.",
       "domains": [
         "crypto",
@@ -774,10 +774,16 @@
         "identity"
       ],
       "sections_reviewed": [
-        "Official publication metadata, abstract, proposed changes and planning note dated 2026-03-02"
+        "PDF title/authority/abstract and reviewer notes (pp. i–iii)",
+        "Section 4.3.6 cryptoperiod recommendations (pp. 27–39)",
+        "Section 5.2.3 key metadata (pp. 87–89)",
+        "Section 6 key states/transitions (pp. 89–96)",
+        "Section 7 key-management phases/functions (pp. 97–126)",
+        "Section 7.2.3 key change/re-keying vs key update (pp. 119–120)",
+        "Section 8.2 key inventory management (pp. 129–130)"
       ],
       "review_date": "2026-11-19",
-      "review_note": "Periodo de comentarios cerrado 2026-02-05; NIST publicó comentarios recibidos. Es IPD, no publicación final. No sustituye SP 800-57 Part 1 Rev. 5 hasta que NIST publique una versión final."
+      "review_note": "Selected sections of the 201-page IPD PDF inspected, not linear full reading. It describes four lifecycle phases; key-state transitions should be recorded in audit logs/metadata; long-term key inventory uses references/pointers, not secret/private key values (unless inventory also serves backup/archive); key change distinguishes independent re-keying from dependent key update. Draft only; Rev. 5 remains final."
     },
     {
       "id": "NIST-SP-800-61r3",
