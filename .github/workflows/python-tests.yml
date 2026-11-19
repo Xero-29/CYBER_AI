@@ -40,6 +40,8 @@ jobs:
           fi
       - name: Run complete local verification
         run: bash verify.sh
+      - name: Audit research study coverage
+        run: python knowledge_quality.py --require-research-studies
       - name: Capture hashes for resolved dependency wheels
         run: |
           mkdir -p "$RUNNER_TEMP/cyber-ai-wheelhouse"
