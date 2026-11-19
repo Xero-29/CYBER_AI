@@ -205,8 +205,9 @@ def authorize_target(target, action, authorization_id):
     if not address.is_global:
         raise AuthorizationError("El destino no es una IP pública global.")
 
+    grants = _load_grants()
     now = datetime.now(timezone.utc)
-    for grant in _load_grants():
+    for grant in grants:
         if grant["id"] != authorization_id:
             continue
         expires = datetime.fromisoformat(grant["expires_at"].replace("Z", "+00:00"))
