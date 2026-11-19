@@ -70,8 +70,8 @@
       "id": "network",
       "name": "Redes",
       "path": "knowledge/packs/network/README.md",
-      "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "version": "2.1.0",
+      "status": "expanded_technical_content_validation_pending",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -84,14 +84,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "Compendio y agenda específicos ampliados; fuentes localizadas pero lectura integral, experimentos y revisión independiente pendientes."
     },
     {
       "id": "linux",
       "name": "Linux y Unix",
       "path": "knowledge/packs/linux/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -104,14 +105,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "windows_ad",
       "name": "Windows y Active Directory",
       "path": "knowledge/packs/windows_ad/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -124,14 +126,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "cloud",
       "name": "Seguridad cloud",
       "path": "knowledge/packs/cloud/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -144,14 +147,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "containers",
       "name": "Contenedores y Kubernetes",
       "path": "knowledge/packs/containers/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -164,14 +168,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "mobile",
       "name": "Seguridad móvil",
       "path": "knowledge/packs/mobile/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -184,14 +189,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "crypto",
       "name": "Criptografía",
       "path": "knowledge/packs/crypto/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -204,14 +210,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "identity",
       "name": "Identidad y acceso",
       "path": "knowledge/packs/identity/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -224,14 +231,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "malware",
       "name": "Análisis de malware",
       "path": "knowledge/packs/malware/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -244,14 +252,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "forensics",
       "name": "Forense digital",
       "path": "knowledge/packs/forensics/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -264,14 +273,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "incident_response",
       "name": "Respuesta a incidentes",
       "path": "knowledge/packs/incident_response/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -284,14 +294,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "threat_intel",
       "name": "Inteligencia de amenazas",
       "path": "knowledge/packs/threat_intel/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -304,14 +315,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "reverse",
       "name": "Ingeniería inversa",
       "path": "knowledge/packs/reverse/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -324,14 +336,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "iot_hardware",
       "name": "IoT y hardware",
       "path": "knowledge/packs/iot_hardware/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -344,14 +357,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "devsecops",
       "name": "DevSecOps y supply chain",
       "path": "knowledge/packs/devsecops/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -364,14 +378,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "ai_security",
       "name": "Seguridad de IA",
       "path": "knowledge/packs/ai_security/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -384,14 +399,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "governance",
       "name": "GRC, privacidad y auditoría",
       "path": "knowledge/packs/governance/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -404,14 +420,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "vuln_management",
       "name": "Gestión de vulnerabilidades",
       "path": "knowledge/packs/vuln_management/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -424,14 +441,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "bug_bounty",
       "name": "Bug bounty autorizado",
       "path": "knowledge/packs/bug_bounty/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -444,14 +462,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "secure_arch",
       "name": "Arquitectura segura",
       "path": "knowledge/packs/secure_arch/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -464,14 +483,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "data_security",
       "name": "Seguridad de datos",
       "path": "knowledge/packs/data_security/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -484,14 +504,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "software_engineering",
       "name": "Ingeniería de software y calidad",
       "path": "knowledge/packs/software_engineering/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -504,14 +525,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "machine_learning",
       "name": "Aprendizaje automático e ingeniería de IA",
       "path": "knowledge/packs/machine_learning/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -524,14 +546,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "hardware_security",
       "name": "Hardware, firmware y sistemas embebidos",
       "path": "knowledge/packs/hardware_security/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -544,14 +567,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "mathematics",
       "name": "Matemáticas, estadística y métodos numéricos",
       "path": "knowledge/packs/mathematics/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -564,14 +588,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "soc_siem",
       "name": "SOC, SIEM y SOAR",
       "path": "knowledge/packs/soc_siem/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -584,14 +609,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "edr_xdr",
       "name": "EDR, XDR y endpoints",
       "path": "knowledge/packs/edr_xdr/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -604,14 +630,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "threat_hunting",
       "name": "Threat hunting",
       "path": "knowledge/packs/threat_hunting/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -624,14 +651,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "red_team",
       "name": "Red Team autorizado",
       "path": "knowledge/packs/red_team/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -644,14 +672,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "wireless_security",
       "name": "Wireless, Bluetooth y NFC",
       "path": "knowledge/packs/wireless_security/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -664,14 +693,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "ot_ics",
       "name": "OT, ICS y SCADA",
       "path": "knowledge/packs/ot_ics/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -684,14 +714,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "telecom_5g",
       "name": "Telecomunicaciones y 5G",
       "path": "knowledge/packs/telecom_5g/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -704,14 +735,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "automotive_security",
       "name": "Ciberseguridad automotriz y CAN",
       "path": "knowledge/packs/automotive_security/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -724,14 +756,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "satellite_security",
       "name": "Satélites y sistemas espaciales",
       "path": "knowledge/packs/satellite_security/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -744,14 +777,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "physical_security",
       "name": "Seguridad física ciberfísica",
       "path": "knowledge/packs/physical_security/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -764,14 +798,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "email_dns_security",
       "name": "Correo, DNS y dominios",
       "path": "knowledge/packs/email_dns_security/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -784,14 +819,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "fraud_abuse",
       "name": "Fraude digital y abuso",
       "path": "knowledge/packs/fraud_abuse/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -804,14 +840,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "privacy_engineering",
       "name": "Ingeniería de privacidad",
       "path": "knowledge/packs/privacy_engineering/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -824,14 +861,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "cloud_forensics",
       "name": "Forense cloud",
       "path": "knowledge/packs/cloud_forensics/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -844,14 +882,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "ai_red_team",
       "name": "Red teaming de IA y agentes",
       "path": "knowledge/packs/ai_red_team/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -864,14 +903,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "pki_hsm",
       "name": "PKI, certificados y HSM",
       "path": "knowledge/packs/pki_hsm/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -884,14 +924,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "post_quantum_crypto",
       "name": "Criptografía poscuántica",
       "path": "knowledge/packs/post_quantum_crypto/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -904,14 +945,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "business_continuity",
       "name": "Continuidad y recuperación",
       "path": "knowledge/packs/business_continuity/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -924,14 +966,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "database_security",
       "name": "Seguridad de bases de datos",
       "path": "knowledge/packs/database_security/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -944,14 +987,15 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     },
     {
       "id": "vulnerability_research",
       "name": "Investigación de vulnerabilidades",
       "path": "knowledge/packs/vulnerability_research/README.md",
       "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "status": "structured_content_depth_audit_required",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -964,7 +1008,8 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "El estándar K1-K5/G1-G8 está asignado; profundidad real, lectura de fuentes y evidencia por tema requieren auditoría y desarrollo. No inferir validación por plantilla o existencia de dossier."
     }
   ]
 }
