@@ -7,7 +7,7 @@
 
 ## Resultado de la inspección documental
 
-Se inspeccionaron los 48 compendios técnicos. Todos tienen documentos y rutas de subtemas; sin embargo, la mera existencia de secciones no demuestra cobertura de las doce capas. En varios compendios se repiten bloques metodológicos transversales sin suficiente contenido disciplinar específico. En particular, 42 compendios requieren una ampliación profunda; seis (identity, malware, forensics, incident_response, threat_intel y reverse) ya recibieron reescritura disciplinar inicial, pero todavía no tienen auditoría tema×capa ni evidencia suficiente para elevar su madurez.
+Se inspeccionaron los 48 compendios técnicos. Todos tienen documentos y rutas de subtemas; sin embargo, la mera existencia de secciones no demuestra cobertura de las doce capas. En varios compendios se repiten bloques metodológicos transversales sin suficiente contenido disciplinar específico. En particular, 41 compendios siguen con contenido inicial y requieren ampliación profunda; seis (identity, malware, forensics, incident_response, threat_intel y reverse) recibieron reescritura disciplinar inicial. Foundations recibió además un documento de desarrollo general ampliado, pero todavía no tiene auditoría tema×capa ni evidencia suficiente para elevar su madurez.
 
 **Conclusión:** las 48 áreas siguen en M2 editorial. No hay base para declarar K3/K4/K5 ni G1–G8 aprobadas globalmente. La matriz JSON registra 7 unidades temáticas iniciales por área y 12 capas por tema. Todos los estados empiezan en `not_assessed` para evitar inferir cumplimiento desde encabezados o texto genérico.
 
@@ -49,7 +49,7 @@ Se inspeccionaron los 48 compendios técnicos. Todos tienen documentos y rutas d
 6. Evaluación adversarial
 7. Retest y reporte
 
-**Estado:** generic_or_initial_compendium_requires_deep_audit; 12 capas por tema: `not_assessed`; G1–G8: `not_assessed`; madurez: M2.
+**Estado:** expanded_development_document_added_topic_layer_audit_pending; 12 capas por tema: `not_assessed`; G1–G8: `not_assessed`; madurez: M2.
 
 ### 2. `ai_security`
 
