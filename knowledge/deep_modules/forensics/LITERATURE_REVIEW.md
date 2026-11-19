@@ -1,40 +1,43 @@
-# Revisión de literatura inicial — Forense digital
+# Revisión de literatura — forensics
 
-**Corte:** 2026-11-17 · **Madurez:** M1 documental; no M3/M4.
+**Corte editorial:** 2026-11-19  
+**Estado:** revisión exploratoria de fuentes registradas y alcance oficial; no revisión sistemática ni lectura integral de todas las fuentes.  
+**Madurez:** M2 editorial como máximo; M3/M4/M5 pendientes.
 
 ## Pregunta
-¿Cómo preservar y analizar evidencia digital de forma repetible, proporcional y legalmente defendible, distinguiendo adquisición, análisis e inferencia?
 
-## Síntesis
-NIST SP 800-86 (2006) aporta orientación de forense de computación y redes desde una perspectiva de TI/IR, cubriendo archivos, sistemas operativos, tráfico y aplicaciones. El propio documento indica que no es una guía exhaustiva paso a paso ni asesoría legal y recomienda consultar gestión y asesoría jurídica para cumplir la legislación aplicable. Debe complementarse con requisitos locales, políticas de evidencia, cadena de custodia y técnicas actuales para cloud, móviles y memoria.
+¿Qué procedimientos de adquisición, preservación y análisis producen evidencia digital íntegra, reproducible y correctamente limitada en su interpretación?
 
-## Método de evidencia
-1. Autoridad, alcance, objetivo y reglas de privacidad.
-2. Identificación y priorización de fuentes volátiles/no volátiles.
-3. Preservación y adquisición con herramienta/versión documentada.
-4. Hash criptográfico antes/después y copias de trabajo verificadas.
-5. Registro de operador, UTC, reloj, método, dispositivo, errores y transferencias.
-6. Análisis sobre copia, herramientas validadas y procedimientos reproducibles.
-7. Separar hechos observados, inferencias, hipótesis y atribución.
-8. Informe con limitaciones, falsos positivos, cadena de custodia y anexos.
+## Síntesis crítica inicial
 
-## Hipótesis / experimento (no ejecutado)
-H1: una plantilla automatizada de cadena de custodia y verificación de hashes reduce omisiones de metadatos frente a un registro manual libre. H0: sin diferencia.
-Banco: imágenes forenses sintéticas y archivos benignos; dos métodos de documentación, múltiples operadores. Métricas: campos obligatorios completos, coincidencia de hash, reproducibilidad de hallazgos, tiempo y errores de transcripción. No usar evidencia real ni datos personales.
+NIST SP 800-86 integra técnicas forenses en respuesta a incidentes y aborda archivos, sistemas operativos, tráfico y aplicaciones. El documento advierte que no es una guía exhaustiva paso a paso ni asesoría legal; los requisitos de admisibilidad y privacidad dependen de la jurisdicción. NIST SP 800-61 Rev. 3 conecta respuesta con gestión de riesgo del CSF 2.0. NIST SP 800-92 trata la gestión de logs; el proyecto de revisión de log management debe distinguirse del documento final vigente. Un hash verifica igualdad de bytes entre mediciones, no demuestra por sí solo origen, autenticidad ni corrección de adquisición. La agenda propone datasets de entrenamiento y evidencia sintética; no autoriza adquisición de sistemas ajenos.
 
-## Brechas
-Actualizar prácticas para cloud snapshots, contenedores, móviles, memoria y SaaS; contrastar herramientas independientes; revisar legislación colombiana y jurisdicciones de operación con asesoría competente; probar formatos de exportación y preservación.
+## Fuentes primarias y técnicas que orientan el módulo
 
-## Fuentes
-- NIST SP 800-86: https://doi.org/10.6028/NIST.SP.800-86
-- NIST SP 800-61 Rev. 3: https://doi.org/10.6028/NIST.SP.800-61r3
-
-## Identificadores del registro de fuentes
-- `NIST-SP-800-86`
-- `NIST-SP-800-61r3`
-
+NIST SP 800-86 (https://doi.org/10.6028/NIST.SP.800-86), NIST SP 800-61 Rev. 3 (https://doi.org/10.6028/NIST.SP.800-61r3), NIST SP 800-92 (https://doi.org/10.6028/NIST.SP.800-92).
 
 ## Identificadores del registro de fuentes
 
 - `NIST-SP-800-86`
 - `NIST-SP-800-61r3`
+- `NIST-SP-800-92`
+- `NIST-SP-800-92R1-IPD`
+
+## Límites de esta revisión
+
+- Los identificadores anteriores acreditan que existe una referencia en el registro; no demuestran lectura íntegra.
+- No se afirma evaluación de conformidad, certificación ni validación de producto.
+- Las afirmaciones normativas deben comprobarse contra edición, erratas, jurisdicción y fecha vigentes.
+- Las taxonomías y guías organizan el análisis; no sustituyen evidencia observada.
+- No se ha ejecutado el protocolo experimental ni se han obtenido resultados confirmatorios.
+
+## Brechas de investigación
+
+1. Recuperar texto completo de cada fuente primaria y registrar páginas/secciones efectivamente leídas.
+2. Extraer requisitos y afirmaciones concretas con vínculo a subtema y criterio de prueba.
+3. Incorporar estudios empíricos revisados por pares con criterios de inclusión/exclusión reproducibles.
+4. Contrastar recomendaciones, contradicciones, supuestos y limitaciones entre fuentes.
+5. Ejecutar protocolos con corpus autorizado, ground truth, controles negativos y resultados brutos.
+6. Someter el análisis a revisión independiente y registrar correcciones.
+
+**Conclusión limitada:** esta revisión constituye un mapa inicial de literatura y fuentes. No permite afirmar exhaustividad documental ni madurez científica superior a M2.
