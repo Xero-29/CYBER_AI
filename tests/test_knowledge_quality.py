@@ -28,4 +28,15 @@ class KnowledgeQualityTests(unittest.TestCase):
         data=json.loads((root/"knowledge/curricula/domain_curriculum.json").read_text(encoding="utf-8"))
         self.assertIn("no declara",data["disclaimer"])
 
+    def test_all_manifest_domains_have_research_studies_with_references(self):
+        report = audit_library()
+        self.assertEqual(report["research_studies_complete"], 48)
+        self.assertGreater(report["research_study_words_total"], 12000)
+        self.assertGreater(report["research_study_references_total"], 100)
+        for area in report["areas"]:
+            with self.subTest(area=area["id"]):
+                self.assertTrue(area["research_study_present"])
+                self.assertGreaterEqual(area["research_study_words"], 250)
+                self.assertGreaterEqual(area["research_study_references"], 2)
+
 if __name__ == "__main__": unittest.main()
