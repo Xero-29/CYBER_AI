@@ -25,7 +25,7 @@ class KnowledgeFieldStudiesTests(unittest.TestCase):
         for area in STUDIES:
             study = ROOT / "knowledge/deep_modules" / area / "RESEARCH_STUDY.md"
             self.assertTrue(study.is_file(), f"Missing field study: {area}")
-            self.assertIn(f"../deep_modules/{area}/RESEARCH_STUDY.md", index)
+            self.assertIn(f"../../deep_modules/{area}/RESEARCH_STUDY.md", index)
 
     def test_study_sources_are_registered_and_https(self) -> None:
         field_registry = json.loads(
