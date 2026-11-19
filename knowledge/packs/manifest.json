@@ -10,7 +10,8 @@
       "path": "knowledge/packs/foundations/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/foundations/RESEARCH_STUDY.md"
     },
     {
       "id": "appsec",
@@ -18,7 +19,8 @@
       "path": "knowledge/packs/appsec/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/appsec/RESEARCH_STUDY.md"
     },
     {
       "id": "api",
@@ -26,7 +28,8 @@
       "path": "knowledge/packs/api/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/api/RESEARCH_STUDY.md"
     },
     {
       "id": "network",
@@ -34,7 +37,8 @@
       "path": "knowledge/packs/network/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/network/RESEARCH_STUDY.md"
     },
     {
       "id": "linux",
@@ -42,7 +46,8 @@
       "path": "knowledge/packs/linux/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/linux/RESEARCH_STUDY.md"
     },
     {
       "id": "windows_ad",
@@ -50,7 +55,8 @@
       "path": "knowledge/packs/windows_ad/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/windows_ad/RESEARCH_STUDY.md"
     },
     {
       "id": "cloud",
@@ -58,7 +64,8 @@
       "path": "knowledge/packs/cloud/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/cloud/RESEARCH_STUDY.md"
     },
     {
       "id": "containers",
@@ -66,7 +73,8 @@
       "path": "knowledge/packs/containers/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/containers/RESEARCH_STUDY.md"
     },
     {
       "id": "mobile",
@@ -74,7 +82,8 @@
       "path": "knowledge/packs/mobile/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/mobile/RESEARCH_STUDY.md"
     },
     {
       "id": "crypto",
@@ -82,7 +91,8 @@
       "path": "knowledge/packs/crypto/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/crypto/RESEARCH_STUDY.md"
     },
     {
       "id": "identity",
@@ -90,7 +100,8 @@
       "path": "knowledge/packs/identity/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/identity/RESEARCH_STUDY.md"
     },
     {
       "id": "malware",
@@ -98,7 +109,8 @@
       "path": "knowledge/packs/malware/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/malware/RESEARCH_STUDY.md"
     },
     {
       "id": "forensics",
@@ -106,7 +118,8 @@
       "path": "knowledge/packs/forensics/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/forensics/RESEARCH_STUDY.md"
     },
     {
       "id": "incident_response",
@@ -114,7 +127,8 @@
       "path": "knowledge/packs/incident_response/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/incident_response/RESEARCH_STUDY.md"
     },
     {
       "id": "threat_intel",
@@ -122,7 +136,8 @@
       "path": "knowledge/packs/threat_intel/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/threat_intel/RESEARCH_STUDY.md"
     },
     {
       "id": "reverse",
@@ -130,7 +145,8 @@
       "path": "knowledge/packs/reverse/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/reverse/RESEARCH_STUDY.md"
     },
     {
       "id": "iot_hardware",
@@ -138,7 +154,8 @@
       "path": "knowledge/packs/iot_hardware/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/iot_hardware/RESEARCH_STUDY.md"
     },
     {
       "id": "devsecops",
@@ -146,7 +163,8 @@
       "path": "knowledge/packs/devsecops/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/devsecops/RESEARCH_STUDY.md"
     },
     {
       "id": "ai_security",
@@ -154,7 +172,8 @@
       "path": "knowledge/packs/ai_security/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/ai_security/RESEARCH_STUDY.md"
     },
     {
       "id": "governance",
@@ -162,7 +181,8 @@
       "path": "knowledge/packs/governance/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/governance/RESEARCH_STUDY.md"
     },
     {
       "id": "vuln_management",
@@ -170,7 +190,8 @@
       "path": "knowledge/packs/vuln_management/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/vuln_management/RESEARCH_STUDY.md"
     },
     {
       "id": "bug_bounty",
@@ -178,7 +199,8 @@
       "path": "knowledge/packs/bug_bounty/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/bug_bounty/RESEARCH_STUDY.md"
     },
     {
       "id": "secure_arch",
@@ -186,7 +208,8 @@
       "path": "knowledge/packs/secure_arch/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/secure_arch/RESEARCH_STUDY.md"
     },
     {
       "id": "data_security",
@@ -194,7 +217,8 @@
       "path": "knowledge/packs/data_security/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/data_security/RESEARCH_STUDY.md"
     },
     {
       "id": "software_engineering",
@@ -202,7 +226,8 @@
       "path": "knowledge/packs/software_engineering/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/software_engineering/RESEARCH_STUDY.md"
     },
     {
       "id": "machine_learning",
@@ -210,7 +235,8 @@
       "path": "knowledge/packs/machine_learning/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/machine_learning/RESEARCH_STUDY.md"
     },
     {
       "id": "hardware_security",
@@ -218,7 +244,8 @@
       "path": "knowledge/packs/hardware_security/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/hardware_security/RESEARCH_STUDY.md"
     },
     {
       "id": "mathematics",
@@ -226,7 +253,8 @@
       "path": "knowledge/packs/mathematics/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/mathematics/RESEARCH_STUDY.md"
     },
     {
       "id": "soc_siem",
@@ -234,7 +262,8 @@
       "path": "knowledge/packs/soc_siem/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/soc_siem/RESEARCH_STUDY.md"
     },
     {
       "id": "edr_xdr",
@@ -242,7 +271,8 @@
       "path": "knowledge/packs/edr_xdr/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/edr_xdr/RESEARCH_STUDY.md"
     },
     {
       "id": "threat_hunting",
@@ -250,7 +280,8 @@
       "path": "knowledge/packs/threat_hunting/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/threat_hunting/RESEARCH_STUDY.md"
     },
     {
       "id": "red_team",
@@ -258,7 +289,8 @@
       "path": "knowledge/packs/red_team/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/red_team/RESEARCH_STUDY.md"
     },
     {
       "id": "wireless_security",
@@ -266,7 +298,8 @@
       "path": "knowledge/packs/wireless_security/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/wireless_security/RESEARCH_STUDY.md"
     },
     {
       "id": "ot_ics",
@@ -274,7 +307,8 @@
       "path": "knowledge/packs/ot_ics/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/ot_ics/RESEARCH_STUDY.md"
     },
     {
       "id": "telecom_5g",
@@ -282,7 +316,8 @@
       "path": "knowledge/packs/telecom_5g/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/telecom_5g/RESEARCH_STUDY.md"
     },
     {
       "id": "automotive_security",
@@ -290,7 +325,8 @@
       "path": "knowledge/packs/automotive_security/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/automotive_security/RESEARCH_STUDY.md"
     },
     {
       "id": "satellite_security",
@@ -298,7 +334,8 @@
       "path": "knowledge/packs/satellite_security/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/satellite_security/RESEARCH_STUDY.md"
     },
     {
       "id": "physical_security",
@@ -306,7 +343,8 @@
       "path": "knowledge/packs/physical_security/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/physical_security/RESEARCH_STUDY.md"
     },
     {
       "id": "email_dns_security",
@@ -314,7 +352,8 @@
       "path": "knowledge/packs/email_dns_security/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/email_dns_security/RESEARCH_STUDY.md"
     },
     {
       "id": "fraud_abuse",
@@ -322,7 +361,8 @@
       "path": "knowledge/packs/fraud_abuse/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/fraud_abuse/RESEARCH_STUDY.md"
     },
     {
       "id": "privacy_engineering",
@@ -330,7 +370,8 @@
       "path": "knowledge/packs/privacy_engineering/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/privacy_engineering/RESEARCH_STUDY.md"
     },
     {
       "id": "cloud_forensics",
@@ -338,7 +379,8 @@
       "path": "knowledge/packs/cloud_forensics/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/cloud_forensics/RESEARCH_STUDY.md"
     },
     {
       "id": "ai_red_team",
@@ -346,7 +388,8 @@
       "path": "knowledge/packs/ai_red_team/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/ai_red_team/RESEARCH_STUDY.md"
     },
     {
       "id": "pki_hsm",
@@ -354,7 +397,8 @@
       "path": "knowledge/packs/pki_hsm/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/pki_hsm/RESEARCH_STUDY.md"
     },
     {
       "id": "post_quantum_crypto",
@@ -362,7 +406,8 @@
       "path": "knowledge/packs/post_quantum_crypto/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/post_quantum_crypto/RESEARCH_STUDY.md"
     },
     {
       "id": "business_continuity",
@@ -370,7 +415,8 @@
       "path": "knowledge/packs/business_continuity/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/business_continuity/RESEARCH_STUDY.md"
     },
     {
       "id": "database_security",
@@ -378,7 +424,8 @@
       "path": "knowledge/packs/database_security/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/database_security/RESEARCH_STUDY.md"
     },
     {
       "id": "vulnerability_research",
@@ -386,7 +433,8 @@
       "path": "knowledge/packs/vulnerability_research/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "research_study_path": "knowledge/deep_modules/vulnerability_research/RESEARCH_STUDY.md"
     }
   ]
 }
