@@ -66,12 +66,14 @@
         "topics/FND-01-01_TECHNICAL_DEEPENING_CASEBOOK_V1.md",
         "SOURCE_REVIEW_ADDENDUM_NIST_800_160_2026-11-19.md",
         "COLOMBIA_APPLICABILITY_FND_01_01_2026-11-19.md",
-        "topics/FND-01-01_CAPABILITY_WORKED_SOLUTIONS_V1.md"
+        "topics/FND-01-01_CAPABILITY_WORKED_SOLUTIONS_V1.md",
+        "topics/FND-01-01_COLD_ASSESSMENT_V2.md",
+        "topics/FND-01-01_INDEPENDENT_ASSESSOR_PROTOCOL_V1.md"
       ],
       "nonconformities": [
         "NC-FND-01.01-01: revisión integral de fuentes primarias pendiente",
         "NC-FND-01.01-02: mapa colombiano parcial para Ley 1581/2012 y agua de consumo humano; normas de safety funcional/sectoriales y validación jurídica independiente pendientes.",
-        "NC-FND-01.01-03: instrumento de evaluación preparado; administración y calificación independiente pendientes",
+        "NC-FND-01.01-03: instrumento V2 corregido y protocolo de doble calificación preparados; faltan administración supervisada, dos evaluadores independientes cualificados, hojas originales y adjudicación.",
         "NC-FND-01.01-04: revisión disciplinar independiente pendiente",
         "NC-FND-01.01-05: contraste integral de modelos de confiabilidad/safety y revisión primaria pendiente; anexo técnico no cierra madurez.",
         "NC-FND-01.01-06: revisión NIST 800-160 limitada a secciones seleccionadas; lectura integral y contraste de referencias pendientes."
