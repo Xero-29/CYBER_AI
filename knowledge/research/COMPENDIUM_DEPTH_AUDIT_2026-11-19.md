@@ -73,3 +73,13 @@ La estructura actual es mayormente un documento por especialidad. El estándar r
 ## 6. Regla de publicación
 
 Hasta completar estas tareas, la clasificación correcta es **biblioteca estructurada con compendios editoriales ampliados y profundidad desigual, validación científica pendiente**. No declarar “biblioteca experta completa”. Las pruebas de software del repositorio validan el comportamiento del código cubierto por esos tests; no validan la verdad científica del contenido de conocimiento.
+
+
+## 7. Remediación posterior a la auditoría
+
+**Actualización:** 2026-11-19, después del diagnóstico inicial.
+
+- Se reescribió el bloque de desarrollo de los siete subtemas de `mobile`: Android sandbox/Keystore, iOS sandbox/Keychain, almacenamiento/backups, TLS/OAuth, deep links/IPC/WebView, MASVS/MASTG y MDM/respuesta.
+- Se sustituyó el texto genérico repetido por mecanismos, riesgos, controles y casos de prueba específicos de seguridad móvil.
+- El resto de las siete áreas con bloques plantilla permanece pendiente de la misma remediación: `crypto`, `identity`, `malware`, `forensics`, `incident_response`, `threat_intel` y `reverse`.
+- La sustitución editorial de móvil no representa laboratorio ejecutado ni validación independiente. Sus fuentes y pruebas siguen pendientes de revisión y ejecución.
