@@ -13,7 +13,7 @@ Los 48 compendios existen y contienen ampliaciones específicas, pero **no se pu
 - Los tamaños observados van aproximadamente de 10.7 kB a 31 kB. El tamaño no es una métrica de profundidad.
 - Fundamentos, AppSec y API muestran estructuras más extensas y laboratorios/casos más concretos en la inspección realizada.
 - 37 áreas adicionales muestran encabezados disciplinares específicos y una estructura técnica diferenciada; esto prueba especialización editorial, no que cada mecanismo esté explicado con rigor suficiente.
-- Ocho áreas contienen un bloque repetido de siete apartados genéricos (fundamentos/modelo, amenazas, controles, pruebas, investigación y evidencia) que requiere sustitución por análisis específico: `mobile`, `crypto`, `identity`, `malware`, `forensics`, `incident_response`, `threat_intel` y `reverse`.
+- Ocho áreas contenían un bloque repetido de siete apartados genéricos: `mobile`, `crypto`, `identity`, `malware`, `forensics`, `incident_response`, `threat_intel` y `reverse`. Las áreas `mobile` y `crypto` ya recibieron remediación editorial; quedan seis áreas pendientes.
 - La agenda de investigación de 48 áreas mantiene hipótesis y diseños propuestos, no resultados.
 - El tracker reconoce fuentes integrales, laboratorios ejecutados y revisión independiente como pendientes.
 
@@ -63,7 +63,7 @@ La estructura actual es mayormente un documento por especialidad. El estándar r
 
 ## 5. Orden de ejecución recomendado
 
-1. Corregir primero los ocho compendios con repetición plantilla.
+1. Completar los seis compendios que aún conservan bloques plantilla: `identity`, `malware`, `forensics`, `incident_response`, `threat_intel` y `reverse`.
 2. Desarrollar los protocolos concretos de AppSec, API, redes, Linux, Windows/AD, cloud, contenedores, criptografía, forense, IR, malware y seguridad de IA.
 3. Construir la matriz tema×12 capas×K1–K5 para las 48 especialidades.
 4. Leer y sintetizar fuentes primarias antes de elevar estados de revisión.
@@ -81,5 +81,17 @@ Hasta completar estas tareas, la clasificación correcta es **biblioteca estruct
 
 - Se reescribió el bloque de desarrollo de los siete subtemas de `mobile`: Android sandbox/Keystore, iOS sandbox/Keychain, almacenamiento/backups, TLS/OAuth, deep links/IPC/WebView, MASVS/MASTG y MDM/respuesta.
 - Se sustituyó el texto genérico repetido por mecanismos, riesgos, controles y casos de prueba específicos de seguridad móvil.
-- El resto de las siete áreas con bloques plantilla permanece pendiente de la misma remediación: `crypto`, `identity`, `malware`, `forensics`, `incident_response`, `threat_intel` y `reverse`.
+- El módulo `crypto` también fue remediado: sus siete temas ahora contienen desarrollo disciplinar, se añadieron protocolos experimentales por tema, una agenda específica y una revisión documental ampliada. Quedan seis áreas pendientes: `identity`, `malware`, `forensics`, `incident_response`, `threat_intel` y `reverse`.
 - La sustitución editorial de móvil no representa laboratorio ejecutado ni validación independiente. Sus fuentes y pruebas siguen pendientes de revisión y ejecución.
+
+
+### 8. Remediación posterior: Criptografía
+
+**Actualización:** 2026-11-19.
+
+- Se sustituyeron los siete bloques plantilla por desarrollo específico: entropía/DRBG; hash, MAC, KDF, password hashing y firmas; cifrado simétrico/AEAD; DH/ECDH/KEM; TLS/SSH/IPsec; ciclo de vida de claves; fallos de implementación y side channels.
+- Se añadieron fórmulas y límites de interpretación, pruebas negativas, requisitos de nonce, análisis de transcript y advertencias de vigencia de SP 800-90C, SP 800-56A Rev. 3, FIPS 197 y FIPS 203.
+- Se definieron siete laboratorios fríos (RBG, primitivas, AEAD, KEM, protocolos, rotación/PKI y fuzzing/side channels), con criterios de aceptación y evidencia mínima. **No se han ejecutado.**
+- Se reemplazó la agenda genérica por protocolos con hipótesis, corpus, variables, controles, métricas y amenazas a validez.
+- Se amplió la revisión bibliográfica y se registraron 12 nuevas referencias primarias/RFC; el registro pasa de 90 a **102 entradas**, sin IDs duplicados esperados (requiere auditoría automática posterior).
+- El tracker ahora refleja el estado editorial M2 propuesto. No se eleva el conteo de fuentes íntegramente verificadas; los laboratorios, revisión independiente y validación M3–M5 siguen pendientes.
