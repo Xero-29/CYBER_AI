@@ -223,3 +223,15 @@ Se añadieron estudios de campo para Fundamentos, AppSec, APIs, Linux/Unix, Wind
 - Se fijaron estados/versiones: OWASP ASVS 5.0.0 estable; WSTG 4.2 estable y 5.0 en desarrollo; API Top 10 2023; baseline Windows Server 2025; referencias cloud, Kubernetes y móvil.
 
 **Pendiente:** CI del HEAD actualizado, revisión editorial de cada estudio, lectura integral de estándares y documentos de proveedor, laboratorios reproducibles, revisión independiente y desarrollo de los 32 dominios restantes. No declarar estas áreas validadas solo por existir el documento.
+
+
+### Tercera tanda — ocho dominios adicionales
+
+Se añadieron estudios para Identidad y acceso, Análisis de malware, Forense digital, Inteligencia de amenazas, Ingeniería inversa, IoT/hardware, Gobernanza y Seguridad de datos. Las tres tandas suman **24 de 48 dominios** del manifiesto con estudios técnicos propios enlazados.
+
+- El registro específico de la entrega contiene 48 referencias.
+- El registro central contiene 110 fuentes únicas (98 antes de esta tanda; 12 incorporadas ahora).
+- Se amplió la prueba estructural para exigir los 24 estudios y verificar referencias, IDs y enlaces.
+- Se incorporaron NIST SP 800-63-4/63B-4, NISTIR 8259A/B/Rev.1, SP 800-193, SP 800-86, SP 800-83 Rev.1 y el NIST Privacy Framework, con advertencias sobre antigüedad y alcance.
+
+**Pendiente:** CI del HEAD final, revisión de texto completo y erratas, validación por especialistas, ejecución de laboratorios, reproducción independiente y desarrollo de los 24 dominios restantes. Los estudios siguen en madurez documental inicial; no son certificaciones ni pruebas operativas.
