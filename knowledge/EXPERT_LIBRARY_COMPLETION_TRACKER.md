@@ -145,3 +145,16 @@ La matriz contiene 48 especialidades, 7 unidades temáticas iniciales por especi
 - G5–G7: `in_progress`, no `passed`; G8: `blocked`.
 - Límite: los resultados no prueban eficacia real, interoperabilidad, seguridad de implementaciones criptográficas, validez externa ni revisión experta. Requiere CI del HEAD, réplica en segundo entorno y revisión independiente.
 - Revisión de fuentes: `knowledge/deep_modules/foundations/SOURCE_REVIEW_AND_CLAIM_EVIDENCE_2026-11-19.md`.
+
+
+## Programa de completitud teórica para las 48 especialidades — 2026-11-19
+
+Se establece una primera etapa obligatoria de capacidades en frío para las 48 especialidades. La matriz de 48 áreas × 7 temas iniciales × 12 capas (4.032 comprobaciones) es línea base, no techo curricular: G1 debe descubrir subtemas, dependencias y especializaciones ausentes.
+
+La madurez se reportará en dos ejes separados: teórico T0–T5 y operativo O0–O5. El objetivo de esta etapa es completar el conocimiento teórico, no afirmar que herramientas o laboratorios ya fueron ejecutados. Las capas de implementación, laboratorio, evaluación y Skills se documentan con código revisable, protocolos, datasets diseñados, métricas y especificaciones; la ejecución queda pendiente y explícita.
+
+**Secuencia:** módulo por módulo; no avanzar hasta cerrar la auditoría documental adversarial del módulo actual. El primer módulo activo es `ai_red_team`, con investigación de brechas inicial ya registrada en `knowledge/research/domain_investigations/AI_RED_TEAM_GAP_RESEARCH_2026-11-19.md`. Esa investigación no cierra el módulo: hay que profundizar sus siete temas, corregir contenido genérico y completar las doce capas con fuentes, explicaciones, casos resueltos y evaluación en frío.
+
+**Regla de estado:** no asignar T4 sin revisión independiente; no asignar O2–O5 sin evidencia de ejecución. Un módulo puede quedar T3/O0 o T4/O0, sin confundir profundidad teórica con capacidad operativa.
+
+Norma y secuencia completas: [THEORETICAL_LIBRARY_COMPLETION_PROGRAM_48.md](THEORETICAL_LIBRARY_COMPLETION_PROGRAM_48.md).
