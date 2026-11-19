@@ -15,6 +15,7 @@ from urllib.parse import urlparse
 
 from execution_policy import AuthorizationError, authorize_target
 from execution_ledger import ExecutionLedger
+from binary_integrity import BinaryIntegrityError, hash_executable, require_approved_executable
 
 
 def validate_target(target):
@@ -96,7 +97,7 @@ def _finalize_scan(target, result, started, authorization_id, start_event_id, re
 
 
 def scan_target(target, timeout=45, authorized=False, authorization_id=None,
-                require_ledger=False):
+                require_ledger=True):
     """Ejecuta Nuclei solo con un permiso local, específico y vigente."""
     target = validate_target(target)
     if not isinstance(require_ledger, bool):
@@ -128,6 +129,18 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
             "target": target,
             "status": "error",
             "error": "Nuclei no se encuentra en el PATH.",
+            "findings": [],
+        }
+        return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)
+
+    try:
+        binary_provenance = require_approved_executable(executable, "nuclei")
+        executable = binary_provenance["resolved_path"]
+    except BinaryIntegrityError as error:
+        result = {
+            "target": target,
+            "status": "binary_denied",
+            "error": str(error),
             "findings": [],
         }
         return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)
@@ -205,10 +218,23 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
             if elapsed >= timeout:
                 _terminate_process_tree(process)
                 print("\n[Tiempo agotado] Se detuvo el escaneo.", flush=True)
+                try:
+                    binary_after = hash_executable(executable)
+                    binary_modified = binary_after["sha256"] != binary_provenance["sha256"]
+                except BinaryIntegrityError:
+                    binary_after = None
+                    binary_modified = True
                 result = {
                     "target": target,
-                    "status": "timeout",
-                    "error": f"El escaneo superó {timeout} segundos.",
+                    "status": "integrity_error" if binary_modified else "timeout",
+                    "error": (
+                        "La integridad del binario cambió durante el escaneo."
+                        if binary_modified else f"El escaneo superó {timeout} segundos."
+                    ),
+                    "tool_binary_sha256": binary_provenance["sha256"],
+                    "tool_binary_sha256_after": binary_after["sha256"] if binary_after else None,
+                    "tool_binary_modified": binary_modified,
+                    "tool_allowlist": binary_provenance["allowlist"],
                     "findings": [],
                 }
                 return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)
@@ -224,10 +250,18 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
             "target": target,
             "status": "error",
             "error": str(error),
+            "tool_binary_sha256": binary_provenance["sha256"],
+            "tool_allowlist": binary_provenance["allowlist"],
             "findings": [],
         }
-        _record_scan_event(target, result, started, authorization_id=authorization_id)
-        return result
+        return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)
+
+    try:
+        binary_after = hash_executable(executable)
+        binary_modified = binary_after["sha256"] != binary_provenance["sha256"]
+    except BinaryIntegrityError:
+        binary_after = None
+        binary_modified = True
 
     findings = []
     if output_file.is_file():
@@ -238,6 +272,11 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
                 continue
 
     status = "completed" if process.returncode == 0 else "scanner_error"
+    discarded_findings = 0
+    if binary_modified:
+        discarded_findings = len(findings)
+        findings = []
+        status = "integrity_error"
 
     print(f"[4/4] Hallazgos registrados: {len(findings)}", flush=True)
     print(f"Estado final: {status}", flush=True)
@@ -248,6 +287,11 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
         "status": status,
         "return_code": process.returncode,
         "elapsed_seconds": elapsed,
+        "tool_binary_sha256": binary_provenance["sha256"],
+        "tool_binary_sha256_after": binary_after["sha256"] if binary_after else None,
+        "tool_binary_modified": binary_modified,
+        "tool_allowlist": binary_provenance["allowlist"],
+        "discarded_findings_count": discarded_findings,
         "findings_count": len(findings),
         "findings": findings,
         "scanner_messages": messages[-100:],
