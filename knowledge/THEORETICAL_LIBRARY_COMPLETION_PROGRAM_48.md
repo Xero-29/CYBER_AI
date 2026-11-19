@@ -6,6 +6,10 @@
 **Secuencia:** módulo por módulo; el módulo actual no se da por cerrado hasta superar sus criterios de completitud teórica.  
 **Límite:** esta etapa no declara validación operativa, eficacia en producción ni resultados experimentales no ejecutados.
 
+## Protocolo obligatorio de ejecución
+
+La ejecución paso a paso, la rúbrica de enseñanza/explicación/análisis/diseño, los criterios de no conformidad y el gate de salida se rigen por [`knowledge/COLD_KNOWLEDGE_EXECUTION_PROTOCOL.md`](COLD_KNOWLEDGE_EXECUTION_PROTOCOL.md). Ese protocolo es normativo para cada una de las 48 especialidades y prevalece sobre cualquier interpretación basada en volumen documental o presencia de encabezados.
+
 ## 1. Objetivo
 
 Construir primero una biblioteca teórica, técnica y analítica de profundidad experta para todas las especialidades de ciberseguridad de CYBER_AI. La IA conectada debe poder consultar el conocimiento, reconstruir mecanismos, razonar sobre escenarios, comparar alternativas, diseñar soluciones y explicar sus límites sin depender de que el sistema haya ejecutado previamente cada herramienta.
