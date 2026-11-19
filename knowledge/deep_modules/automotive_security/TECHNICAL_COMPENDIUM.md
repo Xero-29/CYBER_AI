@@ -122,3 +122,24 @@ Cada estudio debe definir H0/H1, variables, muestra, comparadores, refutación, 
 
 ## Madurez
 M0/M1 estructural. No prueba profundidad ni madurez M3/M4/M5. Avanzar exige lectura crítica, artefactos específicos, experimentos ejecutados y evidencia auditable.
+
+
+## Profundización técnica específica: Ciberseguridad automotriz
+
+### Arquitectura y zonas
+Modelar ECU, domain/zonal controllers, CAN/CAN-FD, LIN, FlexRay, Automotive Ethernet, gateways, telematics, infotainment, ADAS, V2X, OTA y backend. Separar safety, security y privacy; un fallo cibernético puede producir riesgo físico. Identificar activos, interfaces, propietarios, dependencias, modos degradados y límites de confianza del vehículo y fábrica.
+
+### Protocolos y comunicaciones
+Evaluar CAN sin autenticación nativa, segmentación por gateway, filtrado de mensajes, diagnósticos UDS/DoIP, SOME/IP, TLS y V2X según arquitectura. Analizar spoofing, replay, bus flooding, diagnóstico no autorizado, gateway pivot y manipulación de señales. Las pruebas requieren banco/HIL o vehículo propio inmovilizado, simulación de señales y medidas de seguridad funcional.
+
+### ECU, firmware y secure boot
+Revisar secure boot, HSM automotriz, claves por ECU, debug ports, firmware signing, anti-rollback, diagnostic sessions y provisioning. La cadena debe proteger diseño, fabricación, mantenimiento y fin de vida. OTA exige autenticidad, atomicidad, recuperación, campañas graduales y compatibilidad de versiones.
+
+### Seguridad funcional y ciclo de vida
+Integrar ISO/SAE 21434, UNECE R155/R156 y análisis TARA con safety engineering. Evaluar impacto en seguridad, privacidad, disponibilidad y operación. Mantener cybersecurity case, claims, argumentos, evidencia, supplier assurance y monitoring post-production. Una evaluación de laboratorio no certifica vehículo.
+
+### Laboratorios
+Simular CAN con datos sintéticos, probar reglas de gateway y detectar replay/flood; analizar firmware didáctico y validar firma OTA en HIL. Medir detección, latencia, falsos positivos y fail-safe behavior. No intervenir vehículos en circulación ni sistemas de seguridad activos.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.
