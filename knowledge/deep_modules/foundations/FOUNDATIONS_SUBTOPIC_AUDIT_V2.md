@@ -115,3 +115,9 @@ La matriz histórica de siete temas se conserva. Esta matriz añade granularidad
 | FND-09.10 | Hipótesis falsables, reproducibilidad, resultados negativos y límites de generalización. | 12 × not_assessed | not_assessed | not_assessed | not_assessed | not_assessed |
 | FND-09.11 | Investigación aplicada: pregunta, método, datos, análisis, incertidumbre y conclusión. | 12 × not_assessed | not_assessed | not_assessed | not_assessed | not_assessed |
 | FND-09.12 | Comunicación técnica y visualización sin falsa precisión. | 12 × not_assessed | not_assessed | not_assessed | not_assessed | not_assessed |
+
+
+## Evidencia añadida en el ciclo 2026-11-19
+
+- **FND-01.01:** `topics/FND-01-01_TECHNICAL_DEEPENING_CASEBOOK_V1.md` (modelos cuantitativos con supuestos, análisis causal, caso OT hipotético, requisitos verificables y variantes de evaluación). La evidencia amplía el dossier, pero no cambia el estado: 12 capas y 4 capacidades `in_progress`; T0/O0; no aprobado.
+- No se cierran las no conformidades de revisión integral de fuentes, aplicabilidad sectorial/legal, administración independiente de evaluación ni revisión disciplinar independiente.
