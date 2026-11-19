@@ -191,11 +191,11 @@ class NucleiScannerTests(unittest.TestCase):
                 "sha256": "a" * 64,
                 "allowlist": {"enforced": True, "status": "approved"},
             }
-            fake_process = FakeProcess(stdout_lines=["Nuclei iniciado\\n"])
+            fake_process = FakeProcess(stdout_lines=["Nuclei iniciado\n"])
 
             def fake_popen(command, **kwargs):
                 output_index = command.index("-o") + 1
-                Path(command[output_index]).write_text(json.dumps(finding) + "\\n", encoding="utf-8")
+                Path(command[output_index]).write_text(json.dumps(finding) + "\n", encoding="utf-8")
                 return fake_process
 
             with patch("nuclei_scanner.shutil.which", return_value="/usr/bin/nuclei"):
