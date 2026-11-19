@@ -65,6 +65,12 @@ El cargador valida la política antes de considerar cualquier permiso:
 
 Una política vacía no concede permisos y puede permanecer como plantilla versionada. No agregues permisos reales a ese archivo dentro del repositorio: crea una copia local privada y configura `CYBER_AI_AUTHORIZATIONS_FILE`.
 
+## Integridad del escáner Nuclei
+
+Los dos puntos de entrada activos (`nuclei_scanner.py` y `task_runner.py`) exigen una entrada HMAC firmada para el identificador `nuclei`; si falta la política, el binario no coincide o el archivo no puede verificarse, el proceso no inicia. El ejecutable se resuelve y se hashea antes de ejecutarlo; después se vuelve a hashear y, si cambió o no puede verificarse, se descartan los hallazgos y el resultado queda como `integrity_error`.
+
+La allowlist general puede seguir en modo de compatibilidad para herramientas locales, pero Nuclei —por realizar conexiones activas— no admite ese modo. Consulta [la guía de allowlist firmada](TOOL_ALLOWLIST.md) para enrolar el binario fuera del repositorio. La clave HMAC y el manifiesto real deben permanecer fuera de Git.
+
 ## Ejecución
 
 ```bash
