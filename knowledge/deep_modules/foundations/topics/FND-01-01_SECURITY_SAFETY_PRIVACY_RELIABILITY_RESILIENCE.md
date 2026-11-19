@@ -271,3 +271,8 @@ Entregables: diagrama de contexto, DFD, flujo de autorización, matriz de requis
 La página oficial de NIST presenta PF 1.1 como Initial Public Draft (IPD), publicado el 14 de abril de 2025; PF 1.0 permanece disponible como versión 1.0 final. Por tanto, no se debe citar PF 1.1 como norma final ni asumir que sustituye formalmente a PF 1.0. La IPD alinea su estructura con CSF 2.0 y agrega una sección explícita sobre riesgos de privacidad asociados a IA. Su sección 1.2.1 declara que gestionar riesgo de ciberseguridad contribuye a gestionar riesgo de privacidad, pero no es suficiente: problemas de privacidad pueden surgir sin incidentes cibernéticos. Su sección 1.2.2 analiza problemas derivados de acciones de datos a lo largo del ciclo de vida de IA. Esta distinción fortalece la regla de esta unidad: cifrado y controles de acceso no demuestran por sí solos privacidad. La revisión de la IPD fue dirigida a secciones concretas, no integral; el registro de fuentes mantiene esa limitación.
 
 Fuente: NIST CSWP 40 IPD, *NIST Privacy Framework 1.1*, 2025-04-14, secciones 1.2.1–1.2.3 y apéndices A/D, https://doi.org/10.6028/NIST.CSWP.40.ipd. Estado: revisión selectiva, no lectura integral ni revisión legal colombiana.
+
+
+## Análisis preliminar de aplicabilidad colombiana
+
+El mapeo condicional de Ley 1581/2012 y, cuando corresponda, Decreto 1575/2007 y Resolución 2115/2007 se documenta en [COLOMBIA_APPLICABILITY_FND_01_01_2026-11-19.md](../COLOMBIA_APPLICABILITY_FND_01_01_2026-11-19.md). La aplicabilidad depende del tratamiento real de datos y de que el proceso esté dentro del ámbito de agua para consumo humano. No es concepto jurídico ni norma general de seguridad funcional. La brecha de safety sectorial y revisión legal independiente permanece abierta.
