@@ -12,89 +12,63 @@ Investigar comparación de modelos, evaluación de controles y gestión de incer
 
 ## Líneas de investigación por tema
 
-### T1. modelos de seguridad y confianza
+Las preguntas siguientes son agendas propuestas. No son resultados ni conclusiones; deben afinarse después de revisar literatura primaria y delimitar una población o sistema experimental.
 
-**Pregunta de investigación:** ¿Qué propiedades de seguridad, fiabilidad y observabilidad de *modelos de seguridad y confianza* dependen de la arquitectura y configuración, y cómo se pueden medir de forma reproducible?
+### T1. Modelos de seguridad y confianza
 
-**Hipótesis de trabajo:** un diseño/configuración con controles explícitos y verificables mejora la métrica de seguridad definida frente a una línea base sin dichos controles, con un coste medible en rendimiento, complejidad o usabilidad. La hipótesis debe ser reformulada y falsable tras revisar literatura específica.
+**Pregunta:** ¿Qué errores de arquitectura aparecen con mayor frecuencia al definir límites de confianza en aplicaciones con varios servicios, identidades y proveedores?
 
-**Diseño propuesto:** definir sistema/población y versión; documentar baseline; variar una dimensión por experimento; mantener constantes factores de confusión; usar casos positivos, negativos y límite; repetir pruebas; registrar logs y artefactos con hashes; aplicar análisis estadístico apropiado.
+**Hipótesis falsable:** un análisis basado en flujos de datos y fronteras de confianza identifica más rutas de acceso no previstas que una revisión de componentes aislados, bajo el mismo tiempo de análisis.
 
-**Métricas candidatas:** eficacia del control, cobertura, tasa de error/falsos positivos, latencia/coste, reproducibilidad y degradación ante cambios. Elegir solo métricas pertinentes y justificar la operacionalización.
+**Diseño:** construir modelos sintéticos equivalentes; asignar evaluadores; comparar rutas descubiertas, falsos positivos, tiempo y acuerdo entre evaluadores. Predefinir criterios de ruta válida.
 
-**Resultado exigido:** mapa de literatura, taxonomía, protocolo, datos sintéticos/autorizados, resultados, intervalos de incertidumbre, amenazas a validez, limitaciones y artefactos para replicación.
+### T2. Inventario y clasificación de activos
 
-### T2. inventario y clasificación de activos
+**Pregunta:** ¿Qué combinación de fuentes pasivas mejora cobertura, atribución y frescura de inventario en entornos híbridos sin introducir escaneo intrusivo?
 
-**Pregunta de investigación:** ¿Qué propiedades de seguridad, fiabilidad y observabilidad de *inventario y clasificación de activos* dependen de la arquitectura y configuración, y cómo se pueden medir de forma reproducible?
+**Hipótesis falsable:** la reconciliación de CMDB, cloud inventory, identidad, EDR y DNS reduce activos no atribuidos frente a una única fuente, bajo un alcance y periodo definidos.
 
-**Hipótesis de trabajo:** un diseño/configuración con controles explícitos y verificables mejora la métrica de seguridad definida frente a una línea base sin dichos controles, con un coste medible en rendimiento, complejidad o usabilidad. La hipótesis debe ser reformulada y falsable tras revisar literatura específica.
+**Diseño:** dataset sintético con activos duplicados, efímeros, huérfanos y mal etiquetados; comparar fuentes individuales y combinadas; medir precisión, recall, duplicados y latencia.
 
-**Diseño propuesto:** definir sistema/población y versión; documentar baseline; variar una dimensión por experimento; mantener constantes factores de confusión; usar casos positivos, negativos y límite; repetir pruebas; registrar logs y artefactos con hashes; aplicar análisis estadístico apropiado.
+### T3. Superficie de ataque y modelado de amenazas
 
-**Métricas candidatas:** eficacia del control, cobertura, tasa de error/falsos positivos, latencia/coste, reproducibilidad y degradación ante cambios. Elegir solo métricas pertinentes y justificar la operacionalización.
+**Pregunta:** ¿Qué combinación de DFD, STRIDE y árboles de ataque produce escenarios más completos y accionables para una arquitectura multi-tier?
 
-**Resultado exigido:** mapa de literatura, taxonomía, protocolo, datos sintéticos/autorizados, resultados, intervalos de incertidumbre, amenazas a validez, limitaciones y artefactos para replicación.
+**Hipótesis falsable:** combinar DFD y análisis de abuso reduce omisiones de rutas entre componentes frente a STRIDE aplicado sin modelo de flujo.
 
-### T3. superficie de ataque y modelado de amenazas
+**Diseño:** casos sintéticos con ground truth elaborado por expertos; evaluación ciega; medir cobertura, falsos positivos, severidad de omisiones y acuerdo interevaluador.
 
-**Pregunta de investigación:** ¿Qué propiedades de seguridad, fiabilidad y observabilidad de *superficie de ataque y modelado de amenazas* dependen de la arquitectura y configuración, y cómo se pueden medir de forma reproducible?
+### T4. Identidad, privilegios y autenticación
 
-**Hipótesis de trabajo:** un diseño/configuración con controles explícitos y verificables mejora la métrica de seguridad definida frente a una línea base sin dichos controles, con un coste medible en rendimiento, complejidad o usabilidad. La hipótesis debe ser reformulada y falsable tras revisar literatura específica.
+**Pregunta:** ¿Qué patrones de identidad no humana producen mayor exposición por exceso de privilegios, duración de credenciales y ausencia de propietario?
 
-**Diseño propuesto:** definir sistema/población y versión; documentar baseline; variar una dimensión por experimento; mantener constantes factores de confusión; usar casos positivos, negativos y límite; repetir pruebas; registrar logs y artefactos con hashes; aplicar análisis estadístico apropiado.
+**Hipótesis falsable:** credenciales efímeras y scopes mínimos reducen la ventana de exposición en escenarios controlados frente a secretos estáticos de larga duración, sin degradar la función prevista fuera de umbral.
 
-**Métricas candidatas:** eficacia del control, cobertura, tasa de error/falsos positivos, latencia/coste, reproducibilidad y degradación ante cambios. Elegir solo métricas pertinentes y justificar la operacionalización.
+**Diseño:** laboratorio con identidades de servicio simuladas; medir duración de credenciales, permisos efectivos, revocación, disponibilidad y fallos de autorización.
 
-**Resultado exigido:** mapa de literatura, taxonomía, protocolo, datos sintéticos/autorizados, resultados, intervalos de incertidumbre, amenazas a validez, limitaciones y artefactos para replicación.
+### T5. Seguridad de redes y sistemas
 
-### T4. identidad, privilegios y autenticación
+**Pregunta:** ¿Qué fallos de segmentación lógica persisten cuando se consideran rutas administrativas, identidades y dependencias además de reglas de firewall?
 
-**Pregunta de investigación:** ¿Qué propiedades de seguridad, fiabilidad y observabilidad de *identidad, privilegios y autenticación* dependen de la arquitectura y configuración, y cómo se pueden medir de forma reproducible?
+**Hipótesis falsable:** un modelo de flujos e identidades descubre caminos no contemplados por una revisión exclusiva de reglas de red.
 
-**Hipótesis de trabajo:** un diseño/configuración con controles explícitos y verificables mejora la métrica de seguridad definida frente a una línea base sin dichos controles, con un coste medible en rendimiento, complejidad o usabilidad. La hipótesis debe ser reformulada y falsable tras revisar literatura específica.
+**Diseño:** topología simulada con rutas directas/indirectas, cuentas administrativas y servicios compartidos; comparar revisión de reglas con análisis combinado; medir rutas válidas omitidas.
 
-**Diseño propuesto:** definir sistema/población y versión; documentar baseline; variar una dimensión por experimento; mantener constantes factores de confusión; usar casos positivos, negativos y límite; repetir pruebas; registrar logs y artefactos con hashes; aplicar análisis estadístico apropiado.
+### T6. Gestión de vulnerabilidades
 
-**Métricas candidatas:** eficacia del control, cobertura, tasa de error/falsos positivos, latencia/coste, reproducibilidad y degradación ante cambios. Elegir solo métricas pertinentes y justificar la operacionalización.
+**Pregunta:** ¿Cómo cambia la priorización cuando CVSS, EPSS, exposición, criticidad del activo y controles compensatorios se analizan conjuntamente?
 
-**Resultado exigido:** mapa de literatura, taxonomía, protocolo, datos sintéticos/autorizados, resultados, intervalos de incertidumbre, amenazas a validez, limitaciones y artefactos para replicación.
+**Hipótesis falsable:** un modelo contextual produce un orden de remediación más alineado con pérdidas simuladas que el orden por CVSS aislado.
 
-### T5. seguridad de redes y sistemas
+**Diseño:** dataset sintético con etiquetas de impacto y escenarios; comparar ranking CVSS, ranking contextual y revisión experta; medir precision@k, estabilidad y sensibilidad a supuestos. No presentar dataset sintético como evidencia de eficacia real.
 
-**Pregunta de investigación:** ¿Qué propiedades de seguridad, fiabilidad y observabilidad de *seguridad de redes y sistemas* dependen de la arquitectura y configuración, y cómo se pueden medir de forma reproducible?
+### T7. Telemetría, respuesta y recuperación
 
-**Hipótesis de trabajo:** un diseño/configuración con controles explícitos y verificables mejora la métrica de seguridad definida frente a una línea base sin dichos controles, con un coste medible en rendimiento, complejidad o usabilidad. La hipótesis debe ser reformulada y falsable tras revisar literatura específica.
+**Pregunta:** ¿Qué campos de telemetría son mínimos para reconstruir una secuencia de acciones y atribuirla de forma reproducible?
 
-**Diseño propuesto:** definir sistema/población y versión; documentar baseline; variar una dimensión por experimento; mantener constantes factores de confusión; usar casos positivos, negativos y límite; repetir pruebas; registrar logs y artefactos con hashes; aplicar análisis estadístico apropiado.
+**Hipótesis falsable:** eventos con identidad, recurso, acción, timestamp sincronizado, resultado y origen permiten mayor reconstrucción correcta que logs sin uno o más de esos campos.
 
-**Métricas candidatas:** eficacia del control, cobertura, tasa de error/falsos positivos, latencia/coste, reproducibilidad y degradación ante cambios. Elegir solo métricas pertinentes y justificar la operacionalización.
-
-**Resultado exigido:** mapa de literatura, taxonomía, protocolo, datos sintéticos/autorizados, resultados, intervalos de incertidumbre, amenazas a validez, limitaciones y artefactos para replicación.
-
-### T6. gestión de vulnerabilidades
-
-**Pregunta de investigación:** ¿Qué propiedades de seguridad, fiabilidad y observabilidad de *gestión de vulnerabilidades* dependen de la arquitectura y configuración, y cómo se pueden medir de forma reproducible?
-
-**Hipótesis de trabajo:** un diseño/configuración con controles explícitos y verificables mejora la métrica de seguridad definida frente a una línea base sin dichos controles, con un coste medible en rendimiento, complejidad o usabilidad. La hipótesis debe ser reformulada y falsable tras revisar literatura específica.
-
-**Diseño propuesto:** definir sistema/población y versión; documentar baseline; variar una dimensión por experimento; mantener constantes factores de confusión; usar casos positivos, negativos y límite; repetir pruebas; registrar logs y artefactos con hashes; aplicar análisis estadístico apropiado.
-
-**Métricas candidatas:** eficacia del control, cobertura, tasa de error/falsos positivos, latencia/coste, reproducibilidad y degradación ante cambios. Elegir solo métricas pertinentes y justificar la operacionalización.
-
-**Resultado exigido:** mapa de literatura, taxonomía, protocolo, datos sintéticos/autorizados, resultados, intervalos de incertidumbre, amenazas a validez, limitaciones y artefactos para replicación.
-
-### T7. telemetría, respuesta y recuperación
-
-**Pregunta de investigación:** ¿Qué propiedades de seguridad, fiabilidad y observabilidad de *telemetría, respuesta y recuperación* dependen de la arquitectura y configuración, y cómo se pueden medir de forma reproducible?
-
-**Hipótesis de trabajo:** un diseño/configuración con controles explícitos y verificables mejora la métrica de seguridad definida frente a una línea base sin dichos controles, con un coste medible en rendimiento, complejidad o usabilidad. La hipótesis debe ser reformulada y falsable tras revisar literatura específica.
-
-**Diseño propuesto:** definir sistema/población y versión; documentar baseline; variar una dimensión por experimento; mantener constantes factores de confusión; usar casos positivos, negativos y límite; repetir pruebas; registrar logs y artefactos con hashes; aplicar análisis estadístico apropiado.
-
-**Métricas candidatas:** eficacia del control, cobertura, tasa de error/falsos positivos, latencia/coste, reproducibilidad y degradación ante cambios. Elegir solo métricas pertinentes y justificar la operacionalización.
-
-**Resultado exigido:** mapa de literatura, taxonomía, protocolo, datos sintéticos/autorizados, resultados, intervalos de incertidumbre, amenazas a validez, limitaciones y artefactos para replicación.
+**Diseño:** generar trazas sintéticas con pérdida, retraso y alteración de eventos; medir completitud de reconstrucción, atribución correcta, falsos enlaces y tiempo de análisis.
 
 ## Método transversal
 
