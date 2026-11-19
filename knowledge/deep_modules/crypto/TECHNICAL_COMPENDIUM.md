@@ -13,7 +13,7 @@ El documento organiza el desarrollo por subtema; no afirma investigación exhaus
 
 **Distinciones formales.** Una fuente de ruido produce observaciones físicas/no físicas; el estimador de min-entropía caracteriza el peor caso de probabilidad de una salida; un componente de conditioning transforma muestras; un DRBG expande una semilla en una secuencia determinista computacionalmente impredecible bajo sus supuestos. No confundir longitud de salida con entropía: 256 bits emitidos no implican 256 bits de entropía.
 
-Para una variable discreta (X), la min-entropía de Shannon en su forma clásica es:
+Para una variable discreta (X), la min-entropía (entropía de Rényi de orden infinito) es:
 \[
 H_\infty(X)=-\log_2\left(\max_x P[X=x]\right).
 \]
