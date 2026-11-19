@@ -2,7 +2,7 @@
 
 **Corte:** 2026-11-19  
 **Estado:** revisión documental inicial de metadatos y alcance oficial; no revisión sistemática ni lectura integral de todas las fuentes.  
-**Madurez:** M2 editorial; M3/M4/M5 pendientes.
+**Madurez:** M2 editorial; no M3/M4/M5: fuentes integrales, experimentos y revisión independiente pendientes.
 
 ## Pregunta
 
