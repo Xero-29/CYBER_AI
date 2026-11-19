@@ -1189,6 +1189,56 @@
         "database_security"
       ],
       "review_note": "Página oficial y recomendaciones primarias inspeccionadas el 2026-11-19; validar ejemplos por lenguaje/driver y no asumir equivalencia entre motores."
+    },
+    {
+      "id": "IETF-RFC9700",
+      "title": "Best Current Practice for OAuth 2.0 Security",
+      "publisher": "Internet Engineering Task Force",
+      "type": "internet_best_current_practice",
+      "url": "https://www.rfc-editor.org/rfc/rfc9700.html",
+      "version": "RFC 9700 / BCP 240",
+      "published": "2025-01",
+      "verification_status": "official_standard_metadata_reviewed",
+      "verified_scope": "OAuth 2.0 threat model and best current security practices; includes exact redirect matching, PKCE, CSRF/mix-up mitigations and sender-constrained tokens.",
+      "domains": [
+        "api",
+        "identity",
+        "appsec"
+      ],
+      "review_note": "RFC oficial y abstract/partes de recomendaciones inspeccionados el 2026-11-19; lectura integral, análisis de errata y evaluación de implementación pendientes."
+    },
+    {
+      "id": "OPENAPI-OAS-3.2.1",
+      "title": "OpenAPI Specification",
+      "publisher": "OpenAPI Initiative",
+      "type": "open_api_contract_specification",
+      "url": "https://spec.openapis.org/oas/v3.2.1.html",
+      "version": "3.2.1",
+      "published": "2026-11",
+      "verification_status": "official_specification_pages_reviewed",
+      "verified_scope": "Especificación oficial OpenAPI; catálogo oficial lista versiones 3.2.1/3.2.0 y advierte que los esquemas no capturan necesariamente todas las violaciones del texto normativo.",
+      "domains": [
+        "api",
+        "appsec",
+        "devsecops"
+      ],
+      "review_note": "Índice oficial de versiones inspeccionado el 2026-11-19; no se declara lectura integral de la especificación 3.2.1."
+    },
+    {
+      "id": "GRPC-AUTH-GUIDE",
+      "title": "gRPC Authentication",
+      "publisher": "gRPC Authors / Cloud Native Computing Foundation",
+      "type": "official_technical_documentation",
+      "url": "https://grpc.io/docs/guides/auth/",
+      "version": "Current online documentation",
+      "verification_status": "official_project_page_reviewed",
+      "verified_scope": "Documentación oficial sobre credenciales, TLS y mecanismos de autenticación para canales y llamadas gRPC.",
+      "domains": [
+        "api",
+        "network",
+        "identity"
+      ],
+      "review_note": "Página oficial de autenticación inspeccionada el 2026-11-19; validar API y opciones por lenguaje/versión antes de implementación."
     }
   ],
   "last_updated": "2026-11-17"
