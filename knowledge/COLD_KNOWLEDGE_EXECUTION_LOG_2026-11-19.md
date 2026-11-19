@@ -141,3 +141,9 @@ No conformidades abiertas: lectura integral de fuentes primarias; normas de safe
 - Añadido `topics/FND-01-01_INDEPENDENT_ASSESSOR_PROTOCOL_V1.md`: separación autor/evaluador, anonimización, calibración, doble puntuación, adjudicación y evidencia mínima.
 - V1 marcada como supersedida. Matriz enlaza V2 y protocolo; NC-FND-01.01-03 permanece abierta porque no se ha administrado la prueba ni existen evaluadores externos cualificados/independientes.
 - T0/O0 sin cambios. No se declara competencia demostrada.
+
+## Verificación de metadatos oficiales NIST — FND-01.01
+
+- Consultadas las páginas oficiales CSRC de SP 800-160 Vol. 1 Rev. 1 Final (noviembre de 2022) y Vol. 2 Rev. 1 Final (diciembre de 2021).
+- Se verificaron título, revisión, estado final, fecha, DOI y URL oficial de descarga; el registro refleja `official_metadata_reviewed_on` y `publication_status: final`.
+- Esta comprobación confirma versión y procedencia de las publicaciones; no equivale a lectura integral de sus PDF ni cierra NC-FND-01.01-01/06.
