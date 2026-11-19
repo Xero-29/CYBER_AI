@@ -2,6 +2,7 @@
 import os
 import stat
 import tempfile
+from contextlib import contextmanager
 from pathlib import Path
 
 
@@ -89,6 +90,95 @@ def ensure_private_directory(path, *, create=True):
         if mode & 0o077:
             raise SafeWriteError("El directorio debe ser privado (permisos 0700).")
     return destination
+
+
+
+@contextmanager
+def open_private_file(path, mode="r", *, encoding="utf-8"):
+    """Open a private regular file without following links or accepting hard links."""
+    if mode not in {"r", "rb", "a", "a+"}:
+        raise SafeWriteError("El modo de apertura privada no está permitido.")
+    destination = Path(os.path.abspath(os.fspath(path)))
+    ensure_private_directory(destination.parent, create=mode.startswith("a"))
+    before = None
+    try:
+        before = destination.lstat()
+        if stat.S_ISLNK(before.st_mode) or _is_reparse_point(before):
+            raise SafeWriteError("No se permiten enlaces en archivos privados.")
+    except FileNotFoundError:
+        if not mode.startswith("a"):
+            raise SafeWriteError("El archivo privado no existe.")
+
+    flags = getattr(os, "O_CLOEXEC", 0) | getattr(os, "O_NOFOLLOW", 0)
+    if mode in {"r", "rb"}:
+        flags |= os.O_RDONLY
+    elif mode == "a":
+        flags |= os.O_WRONLY | os.O_APPEND | os.O_CREAT
+    else:
+        flags |= os.O_RDWR | os.O_APPEND | os.O_CREAT
+
+    descriptor = None
+    stream = None
+    try:
+        descriptor = os.open(destination, flags, 0o600)
+        opened = os.fstat(descriptor)
+        if not stat.S_ISREG(opened.st_mode):
+            raise SafeWriteError("El archivo privado debe ser regular.")
+        if os.name == "posix":
+            if opened.st_uid != os.geteuid():
+                raise SafeWriteError(
+                    "El archivo privado debe pertenecer al usuario efectivo del proceso."
+                )
+            if opened.st_nlink != 1:
+                raise SafeWriteError("No se permiten enlaces duros en archivos privados.")
+            if stat.S_IMODE(opened.st_mode) & 0o077:
+                os.fchmod(descriptor, 0o600)
+
+        after = destination.lstat()
+        if (
+            stat.S_ISLNK(after.st_mode)
+            or _is_reparse_point(after)
+            or (opened.st_dev, opened.st_ino) != (after.st_dev, after.st_ino)
+            or (
+                before is not None
+                and (before.st_dev, before.st_ino) != (opened.st_dev, opened.st_ino)
+            )
+        ):
+            raise SafeWriteError("El archivo privado cambió durante su apertura.")
+
+        if mode == "rb":
+            stream = os.fdopen(descriptor, mode)
+        else:
+            stream = os.fdopen(descriptor, mode, encoding=encoding, newline="")
+        descriptor = None
+        try:
+            yield stream
+            if mode.startswith("a"):
+                stream.flush()
+                os.fsync(stream.fileno())
+            final_info = os.fstat(stream.fileno())
+            path_info = destination.lstat()
+            if (
+                stat.S_ISLNK(path_info.st_mode)
+                or _is_reparse_point(path_info)
+                or (final_info.st_dev, final_info.st_ino) !=
+                   (path_info.st_dev, path_info.st_ino)
+            ):
+                raise SafeWriteError("El archivo privado cambió durante su uso.")
+            if os.name == "posix" and (
+                final_info.st_uid != os.geteuid() or final_info.st_nlink != 1
+            ):
+                raise SafeWriteError("La propiedad o los enlaces del archivo privado cambiaron.")
+        finally:
+            stream.close()
+    except SafeWriteError:
+        raise
+    except OSError as error:
+        raise SafeWriteError("No se pudo abrir o actualizar el archivo privado.") from error
+    finally:
+        if descriptor is not None:
+            os.close(descriptor)
+
 
 
 def atomic_write_text(path, text, *, encoding="utf-8", mode=0o600, create_parents=False):

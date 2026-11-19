@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from safe_io import SafeWriteError, atomic_write_text, ensure_private_directory
+from safe_io import SafeWriteError, atomic_write_text, ensure_private_directory, open_private_file
 
 
 class SafeIoTests(unittest.TestCase):
@@ -109,6 +109,37 @@ class SafeIoTests(unittest.TestCase):
             directory.mkdir(mode=0o700)
             with self.assertRaisesRegex(SafeWriteError, "directorio padre"):
                 ensure_private_directory(directory)
+
+    def test_open_private_file_appends_and_reads_with_private_permissions(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "data" / "events.jsonl"
+            with open_private_file(path, "a") as stream:
+                stream.write('{"event":1}\\n')
+            with open_private_file(path, "r") as stream:
+                self.assertEqual(stream.read(), '{"event":1}\\n')
+            if os.name == "posix":
+                self.assertEqual(stat.S_IMODE(path.stat().st_mode), 0o600)
+                self.assertEqual(stat.S_IMODE(path.parent.stat().st_mode), 0o700)
+
+    def test_open_private_file_rejects_symlink_and_hard_link(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            target = root / "target.jsonl"
+            target.write_text('{"secret":"private"}\\n', encoding="utf-8")
+            symlink = root / "symlink.jsonl"
+            hardlink = root / "hardlink.jsonl"
+            try:
+                symlink.symlink_to(target)
+                os.link(target, hardlink)
+            except (OSError, NotImplementedError):
+                self.skipTest("symlinks or hard links unavailable")
+            with self.assertRaises(SafeWriteError):
+                with open_private_file(symlink, "r"):
+                    pass
+            if os.name == "posix":
+                with self.assertRaisesRegex(SafeWriteError, "enlaces duros"):
+                    with open_private_file(hardlink, "r"):
+                        pass
 
     def test_private_directory_rejects_symlink(self):
         with tempfile.TemporaryDirectory() as temp:
