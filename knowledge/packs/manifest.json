@@ -10,7 +10,19 @@
       "path": "knowledge/packs/foundations/README.md",
       "version": "2.1.0",
       "status": "expanded_technical_content_validation_pending",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "appsec",
@@ -18,7 +30,19 @@
       "path": "knowledge/packs/appsec/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "api",
@@ -26,7 +50,19 @@
       "path": "knowledge/packs/api/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "network",
@@ -34,7 +70,19 @@
       "path": "knowledge/packs/network/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "linux",
@@ -42,7 +90,19 @@
       "path": "knowledge/packs/linux/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "windows_ad",
@@ -50,7 +110,19 @@
       "path": "knowledge/packs/windows_ad/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "cloud",
@@ -58,7 +130,19 @@
       "path": "knowledge/packs/cloud/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "containers",
@@ -66,7 +150,19 @@
       "path": "knowledge/packs/containers/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "mobile",
@@ -74,7 +170,19 @@
       "path": "knowledge/packs/mobile/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "crypto",
@@ -82,7 +190,19 @@
       "path": "knowledge/packs/crypto/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "identity",
@@ -90,7 +210,19 @@
       "path": "knowledge/packs/identity/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "malware",
@@ -98,7 +230,19 @@
       "path": "knowledge/packs/malware/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "forensics",
@@ -106,7 +250,19 @@
       "path": "knowledge/packs/forensics/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "incident_response",
@@ -114,7 +270,19 @@
       "path": "knowledge/packs/incident_response/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "threat_intel",
@@ -122,7 +290,19 @@
       "path": "knowledge/packs/threat_intel/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "reverse",
@@ -130,7 +310,19 @@
       "path": "knowledge/packs/reverse/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "iot_hardware",
@@ -138,7 +330,19 @@
       "path": "knowledge/packs/iot_hardware/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "devsecops",
@@ -146,7 +350,19 @@
       "path": "knowledge/packs/devsecops/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "ai_security",
@@ -154,7 +370,19 @@
       "path": "knowledge/packs/ai_security/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "governance",
@@ -162,7 +390,19 @@
       "path": "knowledge/packs/governance/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "vuln_management",
@@ -170,7 +410,19 @@
       "path": "knowledge/packs/vuln_management/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "bug_bounty",
@@ -178,7 +430,19 @@
       "path": "knowledge/packs/bug_bounty/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "secure_arch",
@@ -186,7 +450,19 @@
       "path": "knowledge/packs/secure_arch/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "data_security",
@@ -194,7 +470,19 @@
       "path": "knowledge/packs/data_security/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "software_engineering",
@@ -202,7 +490,19 @@
       "path": "knowledge/packs/software_engineering/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "machine_learning",
@@ -210,7 +510,19 @@
       "path": "knowledge/packs/machine_learning/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "hardware_security",
@@ -218,7 +530,19 @@
       "path": "knowledge/packs/hardware_security/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "mathematics",
@@ -226,7 +550,19 @@
       "path": "knowledge/packs/mathematics/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "soc_siem",
@@ -234,7 +570,19 @@
       "path": "knowledge/packs/soc_siem/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "edr_xdr",
@@ -242,7 +590,19 @@
       "path": "knowledge/packs/edr_xdr/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "threat_hunting",
@@ -250,7 +610,19 @@
       "path": "knowledge/packs/threat_hunting/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "red_team",
@@ -258,7 +630,19 @@
       "path": "knowledge/packs/red_team/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "wireless_security",
@@ -266,7 +650,19 @@
       "path": "knowledge/packs/wireless_security/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "ot_ics",
@@ -274,7 +670,19 @@
       "path": "knowledge/packs/ot_ics/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "telecom_5g",
@@ -282,7 +690,19 @@
       "path": "knowledge/packs/telecom_5g/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "automotive_security",
@@ -290,7 +710,19 @@
       "path": "knowledge/packs/automotive_security/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "satellite_security",
@@ -298,7 +730,19 @@
       "path": "knowledge/packs/satellite_security/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "physical_security",
@@ -306,7 +750,19 @@
       "path": "knowledge/packs/physical_security/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "email_dns_security",
@@ -314,7 +770,19 @@
       "path": "knowledge/packs/email_dns_security/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "fraud_abuse",
@@ -322,7 +790,19 @@
       "path": "knowledge/packs/fraud_abuse/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "privacy_engineering",
@@ -330,7 +810,19 @@
       "path": "knowledge/packs/privacy_engineering/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "cloud_forensics",
@@ -338,7 +830,19 @@
       "path": "knowledge/packs/cloud_forensics/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "ai_red_team",
@@ -346,7 +850,19 @@
       "path": "knowledge/packs/ai_red_team/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "pki_hsm",
@@ -354,7 +870,19 @@
       "path": "knowledge/packs/pki_hsm/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "post_quantum_crypto",
@@ -362,7 +890,19 @@
       "path": "knowledge/packs/post_quantum_crypto/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "business_continuity",
@@ -370,7 +910,19 @@
       "path": "knowledge/packs/business_continuity/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "database_security",
@@ -378,7 +930,19 @@
       "path": "knowledge/packs/database_security/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     },
     {
       "id": "vulnerability_research",
@@ -386,7 +950,19 @@
       "path": "knowledge/packs/vulnerability_research/README.md",
       "version": "2.0.0",
       "status": "included_authored_expanded",
-      "verified_external_sources": 0
+      "verified_external_sources": 0,
+      "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
+      "quality_gates": [
+        "G1_coverage",
+        "G2_sources",
+        "G3_depth",
+        "G4_application",
+        "G5_experimentation",
+        "G6_evaluation",
+        "G7_reproducibility",
+        "G8_independent_review"
+      ]
     }
   ]
 }
