@@ -86,7 +86,12 @@ def _hash_resolved_template(path):
         ):
             raise TemplateIntegrityError("La plantilla dejó de ser un archivo regular permitido.")
 
-        flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_CLOEXEC", 0)
+        flags = (
+            os.O_RDONLY
+            | getattr(os, "O_NOFOLLOW", 0)
+            | getattr(os, "O_CLOEXEC", 0)
+            | getattr(os, "O_NONBLOCK", 0)
+        )
         descriptor = os.open(resolved, flags)
         opened = os.fstat(descriptor)
         identity = (opened.st_dev, opened.st_ino)
@@ -133,7 +138,10 @@ def _hash_resolved_template(path):
 
 def hash_selected_templates(selected, root):
     """Return deterministic relative-path/hash evidence for validated templates."""
-    root_resolved = Path(root).resolve(strict=True)
+    try:
+        root_resolved = Path(root).resolve(strict=True)
+    except (OSError, RuntimeError, ValueError) as error:
+        raise TemplateIntegrityError("La raíz de plantillas no está disponible.") from error
     evidence = []
     seen = set()
     for item in selected:

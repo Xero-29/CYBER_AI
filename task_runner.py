@@ -2,6 +2,7 @@
 """Ejecutor controlado de comprobaciones seleccionadas por CYBER_AI."""
 
 import argparse
+import hashlib
 import json
 import os
 import shutil
@@ -24,12 +25,60 @@ from binary_integrity import (
     require_approved_executable,
 )
 from safe_io import SafeWriteError, atomic_write_text, ensure_private_directory
-from template_integrity import hash_selected_templates as _hash_selected_templates
-from template_integrity import safe_template_path as _safe_template_path
 
 
 MAX_SCAN_OUTPUT_BYTES = 20 * 1024 * 1024
 MAX_FINDINGS = 10000
+MAX_TEMPLATE_BYTES = 2 * 1024 * 1024
+
+
+def _safe_template_path(path, root):
+    """Return a resolved, bounded template path inside the non-symlink root."""
+    try:
+        root = Path(root)
+        if root.is_symlink():
+            return None
+        root_resolved = root.resolve(strict=True)
+        candidate = Path(path)
+        if candidate.is_symlink():
+            return None
+        info = candidate.lstat()
+        if not stat.S_ISREG(info.st_mode) or info.st_size > MAX_TEMPLATE_BYTES:
+            return None
+        resolved = candidate.resolve(strict=True)
+        resolved.relative_to(root_resolved)
+        cursor = candidate
+        while cursor != root:
+            if cursor.is_symlink():
+                return None
+            cursor = cursor.parent
+        return resolved
+    except (OSError, RuntimeError, ValueError):
+        return None
+
+
+def _sha256_file(path):
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def _hash_selected_templates(selected, root):
+    root_resolved = Path(root).resolve(strict=True)
+    evidence = []
+    for item in selected:
+        safe_path = _safe_template_path(item["path"], root)
+        if safe_path is None:
+            raise ValueError("Una plantilla cambió o dejó de ser segura durante el escaneo.")
+        evidence.append({
+            "path": safe_path.relative_to(root_resolved).as_posix(),
+            "sha256": _sha256_file(safe_path),
+        })
+    return evidence
+
+
 def _record_task_scan(task, target, report, started, authorization_id=None, start_event_id=None):
     """Registra ejecuciones del runner de plantillas Nuclei."""
     status = report.get("status")

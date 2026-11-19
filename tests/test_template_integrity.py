@@ -31,6 +31,11 @@ class TemplateIntegrityTests(unittest.TestCase):
             hashlib.sha256(b"id: test-template\n").hexdigest(),
         )
 
+    def test_rejects_missing_root_with_domain_error(self):
+        missing = Path(self.temp.name) / "missing-root"
+        with self.assertRaises(TemplateIntegrityError):
+            hash_selected_templates([{"path": str(missing / "template.yaml")}], missing)
+
     def test_rejects_template_outside_root(self):
         outside = Path(self.temp.name) / "outside.yaml"
         outside.write_text("id: outside\n", encoding="utf-8")
