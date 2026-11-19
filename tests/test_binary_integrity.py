@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from binary_integrity import BinaryIntegrityError, hash_executable
+from binary_integrity import BinaryIntegrityError, hash_executable, require_approved_executable
 
 
 class BinaryIntegrityTests(unittest.TestCase):
@@ -69,6 +69,31 @@ class BinaryIntegrityTests(unittest.TestCase):
             result = hash_executable(link)
             self.assertEqual(result["resolved_path"], str(target.resolve()))
 
+
+
+    def test_active_scanner_requires_signed_allowlist(self):
+        with tempfile.TemporaryDirectory() as temp:
+            executable = Path(temp) / "nuclei"
+            executable.write_bytes(b"nuclei")
+            with patch("binary_integrity.verify_tool_allowed", return_value={
+                "enforced": True, "status": "approved", "sha256": "a" * 64,
+            }):
+                result = require_approved_executable(executable, "nuclei")
+            self.assertTrue(result["allowlist"]["enforced"])
+
+            with patch("binary_integrity.verify_tool_allowed", return_value={
+                "enforced": False, "status": "not_configured",
+            }):
+                with self.assertRaisesRegex(BinaryIntegrityError, "allowlist firmada"):
+                    require_approved_executable(executable, "nuclei")
+
+    def test_active_scanner_rejects_unapproved_binary(self):
+        with tempfile.TemporaryDirectory() as temp:
+            executable = Path(temp) / "nuclei"
+            executable.write_bytes(b"nuclei")
+            with patch("binary_integrity.verify_tool_allowed", side_effect=Exception("denied")):
+                with self.assertRaises(BinaryIntegrityError):
+                    require_approved_executable(executable, "nuclei")
 
 if __name__ == "__main__":
     unittest.main()
