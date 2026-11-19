@@ -43,7 +43,7 @@ En muchas entradas el diseño mínimo usa una formulación común (“definir ba
 ### H4 — Evidencia primaria y validación experimental aún no demostradas
 **Estado:** explícito en el tracker y manifiesto.
 
-No hay base para declarar lectura integral de las 90 fuentes, laboratorios ejecutados, revisión independiente ni reproducción externa. No asignar K4/K5 por el hecho de que el compendio o la agenda existan.
+No hay base para declarar lectura integral de las 102 referencias registradas, laboratorios ejecutados, revisión independiente ni reproducción externa. No asignar K4/K5 por el hecho de que el compendio o la agenda existan.
 
 ### H5 — Necesidad de granularidad por tema
 **Estado:** brecha de diseño prioritaria.
