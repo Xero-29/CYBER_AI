@@ -128,12 +128,21 @@ def main() -> int:
         print(f"Secciones base completas: {report.get('base_complete',0)}/{report['area_count']}")
         print(f"Secciones profundas completas: {report.get('deep_complete',0)}/{report['area_count']}")
         print(f"Comprobaciones profundas: {report.get('deep_section_present',0)}/{report.get('deep_section_checks',0)}")
+        print(f"Estudios con umbral mínimo: {report.get('research_studies_complete',0)}/{report['area_count']}")
+        print(f"Palabras en estudios: {report.get('research_study_words_total',0)}; referencias HTTPS: {report.get('research_study_references_total',0)}")
         for item in report.get("areas",[]):
             if item["errors"] or item["missing_deep_sections"]: print(f"- {item['id']}: {item['errors']}; faltan={item['missing_deep_sections']}")
         for item in report.get("limitations",[]): print("LIMITACIÓN: "+item)
-    if not report["ok"]: return 1
-    if args.require_deep and report.get("deep_complete") != report.get("area_count"): return 2
-    if args.require_research_studies and report.get("research_studies_complete") != report.get("area_count"): return 3
+    if args.require_research_studies:
+        if report.get("research_studies_complete") != report.get("area_count"):
+            return 3
+        if args.require_deep and report.get("deep_complete") != report.get("area_count"):
+            return 2
+        return 0
+    if not report["ok"]:
+        return 1
+    if args.require_deep and report.get("deep_complete") != report.get("area_count"):
+        return 2
     return 0
 
 if __name__ == "__main__":
