@@ -63,6 +63,10 @@ Cobertura activos; enlaces verificables; inconsistencias; riesgos sin dueño; ev
 
 ## Identificadores del registro de fuentes
 
+- `NIST-CSWP-29-CSF-2.0`
+- `NIST-SP-800-30r1`
+- `NIST-SP-800-53r5`
+- `CIS-CONTROLS-v8.1`
 - `RESEARCH-FOUNDATIONS`
 
 
