@@ -216,5 +216,21 @@ class NucleiScannerTests(unittest.TestCase):
             self.assertEqual(result["discarded_findings_count"], 1)
             self.assertEqual(result["findings"], [])
 
+
+    def test_validate_target_rejects_control_characters_and_non_strings(self):
+        for target in ("https://8.8.8.8\\n", None, 123):
+            with self.subTest(target=target):
+                with self.assertRaises(ValueError):
+                    validate_target(target)
+
+    def test_scan_rejects_out_of_range_timeout(self):
+        with self.assertRaisesRegex(ValueError, "timeout"):
+            scan_target(
+                "http://127.0.0.1:8765",
+                authorized=True,
+                authorization_id="test-grant",
+                timeout=0,
+            )
+
 if __name__ == "__main__":
     unittest.main()
