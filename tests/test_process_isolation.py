@@ -42,7 +42,10 @@ class ProcessIsolationTests(unittest.TestCase):
         self.assertTrue(result["process_tree_isolation_enforced"])
 
     def test_invalid_limits_are_rejected_before_process_start(self):
-        invalid_timeouts = (0, -1, float("nan"), float("inf"), float("-inf"), 10 ** 1000)
+        invalid_timeouts = (
+            0, -1, float("nan"), float("inf"), float("-inf"),
+            86_401, 1e308, 10 ** 1000,
+        )
         with patch("process_isolation.subprocess.Popen") as popen:
             for timeout in invalid_timeouts:
                 with self.subTest(timeout=str(timeout)[:40]):

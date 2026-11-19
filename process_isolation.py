@@ -7,6 +7,7 @@ import threading
 
 
 DEFAULT_MAX_OUTPUT_BYTES = 2_000_000
+MAX_PROCESS_TIMEOUT_SECONDS = 86_400
 
 
 class ProcessIsolationError(RuntimeError):
@@ -49,9 +50,9 @@ def run_bounded_process(
     if not isinstance(command, (list, tuple)) or not command:
         raise ValueError("command debe ser una lista no vacía de argumentos.")
     if isinstance(timeout, bool) or not isinstance(timeout, (int, float)):
-        raise ValueError("timeout debe ser un número positivo y finito.")
+        raise ValueError("timeout debe ser positivo, finito y no superar 86400 segundos.")
     try:
-        valid_timeout = math.isfinite(timeout) and timeout > 0
+        valid_timeout = math.isfinite(timeout) and 0 < timeout <= MAX_PROCESS_TIMEOUT_SECONDS
     except OverflowError:
         valid_timeout = False
     if not valid_timeout:
