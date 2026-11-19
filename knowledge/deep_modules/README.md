@@ -175,3 +175,15 @@ Estos estudios amplían los compendios estructurados con síntesis técnicas, am
 - [IoT y hardware](./iot_hardware/RESEARCH_STUDY.md)
 - [Gobernanza](./governance/RESEARCH_STUDY.md)
 - [Seguridad de datos](./data_security/RESEARCH_STUDY.md)
+
+
+## Cuarta tanda de estudios profundos (2026-11-18)
+
+- [Aprendizaje automático](./machine_learning/RESEARCH_STUDY.md)
+- [Matemáticas](./mathematics/RESEARCH_STUDY.md)
+- [Ingeniería de software](./software_engineering/RESEARCH_STUDY.md)
+- [SOC, SIEM y SOAR](./soc_siem/RESEARCH_STUDY.md)
+- [EDR/XDR](./edr_xdr/RESEARCH_STUDY.md)
+- [Threat hunting](./threat_hunting/RESEARCH_STUDY.md)
+- [Red Team](./red_team/RESEARCH_STUDY.md)
+- [Wireless/Bluetooth/NFC](./wireless_security/RESEARCH_STUDY.md)
