@@ -32,6 +32,8 @@ El desarrollo se organiza en doce bloques disciplinares:
 - [Dictamen de auditoría interna](FOUNDATIONS_AUDIT_VERDICT_2026-11-19.md): resultado, evidencias CI/labs, no conformidades y criterios obligatorios para aceptación.
 - [Remediación de no conformidades](NONCONFORMITY_REMEDIATION_2026-11-19.md): correcciones ejecutadas, evidencia nueva y bloqueos restantes.
 - [Actualización de fuentes](SOURCE_UPDATE_ADDENDUM_2026-11-19.md): versiones, erratas y cambios oficiales recientes.
+- [Evaluación de competencia](FOUNDATIONS_COMPETENCY_ASSESSMENT_V1.md): 21 ejercicios A/B/C para los siete temas.
+- [Clave del evaluador](FOUNDATIONS_ASSESSOR_KEY_V1.md): criterios de corrección; mantener separada durante evaluación ciega.
 - [Laboratorios reproducibles](labs/README.md): siete laboratorios de referencia local, pruebas, resultados y límites explícitos.
 - [Agenda de investigación](RESEARCH_AGENDA.md): preguntas, hipótesis y diseños experimentales propuestos.
 - [Revisión exploratoria de literatura](LITERATURE_REVIEW.md): mapa bibliográfico y estado real de lectura.
