@@ -180,5 +180,24 @@ class ExecutionPolicyTests(unittest.TestCase):
         with self.assertRaises(AuthorizationError):
             authorize_target(8.8, "nuclei_scan", "grant-001")
 
+
+    def test_policy_replacement_during_open_is_rejected(self):
+        if __import__("os").name != "posix":
+            self.skipTest("La sustitución de archivo abierto se prueba en POSIX.")
+        import os
+
+        real_open = os.open
+
+        def replace_after_open(path, flags):
+            descriptor = real_open(path, flags)
+            self.policy.unlink()
+            self.policy.write_text(json.dumps({"authorizations": []}), encoding="utf-8")
+            self.policy.chmod(0o600)
+            return descriptor
+
+        with patch("execution_policy.os.open", side_effect=replace_after_open):
+            with self.assertRaisesRegex(AuthorizationError, "estable"):
+                authorize_target("https://8.8.8.8", "nuclei_scan", "grant-001")
+
 if __name__ == "__main__":
     unittest.main()
