@@ -93,3 +93,11 @@ No conformidades abiertas: lectura integral de fuentes primarias; normas de safe
 - FND-01.01 recibió una actualización documental que diferencia PF 1.0 final de PF 1.1 IPD y explica que el riesgo de privacidad puede surgir sin incidente cibernético.
 - La matriz granular refleja FND-01.01 y FND-01.02 en progreso: 24/1.224 comprobaciones de capas y 8/408 capacidades; 0 aprobadas. Las otras 100 subunidades permanecen sin evaluar.
 - No conformidades de FND-01.02: lectura integral de estándares; evaluación en frío; revisión independiente; aplicabilidad sectorial/colombiana.
+
+### Paso 4 — instrumento de evaluación en frío para FND-01.01
+**Estado:** instrumento y guía del evaluador preparados; no administrados.
+
+- `knowledge/deep_modules/foundations/topics/FND-01-01_COLD_ASSESSMENT_V1.md`: prueba de transferencia con bloques de enseñanza, explicación, análisis, diseño e integración, más fallos críticos y criterios de evaluación.
+- `knowledge/deep_modules/foundations/topics/FND-01-01_ASSESSOR_GUIDE_V1.md`: criterios de corrección, elementos esperados y límites de la guía.
+- La matriz registra ambos documentos como evidencia. La no conformidad de evaluación sigue abierta porque no se ha administrado ni calificado por un evaluador independiente.
+- El instrumento no cambia T0/O0 ni aprueba la subunidad.
