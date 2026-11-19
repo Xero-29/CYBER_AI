@@ -49,4 +49,27 @@ class KnowledgeQualityTests(unittest.TestCase):
                 self.assertGreaterEqual(area["research_study_words"], 250)
                 self.assertGreaterEqual(area["research_study_references"], 2)
 
+
+    def test_all_192_advanced_gaps_have_substantive_development(self):
+        root = Path(__file__).resolve().parents[1]
+        register = json.loads((root / "knowledge/research/ADVANCED_GAP_REGISTER.json").read_text(encoding="utf-8"))
+        manifest = json.loads((root / "knowledge/packs/manifest.json").read_text(encoding="utf-8"))
+        doc = (root / "knowledge/research/ADVANCED_GAP_DEVELOPMENT.md").read_text(encoding="utf-8")
+        expected = {area["id"] for area in manifest["areas"]}
+        self.assertEqual({area["domain_id"] for area in register["domains"]}, expected)
+        self.assertEqual(len(register["domains"]), 48)
+        total = 0
+        for area in register["domains"]:
+            with self.subTest(domain=area["domain_id"]):
+                self.assertEqual(area["status"], "developed_initial_draft")
+                self.assertEqual(len(area["developed_topics"]), 4)
+                for item in area["developed_topics"]:
+                    self.assertEqual(item["status"], "developed_initial_draft")
+                    self.assertGreaterEqual(item["word_count"], 130)
+                    self.assertIn(item["topic"], doc)
+                    self.assertIn("### Laboratorio y evaluación", doc)
+                    self.assertIn("### Evidencia y limitaciones", doc)
+                    total += 1
+        self.assertEqual(total, 192)
+
 if __name__ == "__main__": unittest.main()

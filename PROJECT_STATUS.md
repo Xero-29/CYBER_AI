@@ -337,3 +337,12 @@ La validación estructural del nuevo corpus está aprobada. El informe de calida
 - Se añadieron actualizaciones técnicas a PQC, threat intelligence, SOC/SIEM, DevSecOps y seguridad de IA.
 - Se incorporaron al registro de fuentes NIST IR 8547 Final (27-oct-2026), MITRE ATT&CK v20.1 (13-oct-2026), NIST SP 800-207A y NIST SP 800-218A. La revisión fue a nivel de ficha/página oficial; no equivale a lectura integral.
 - No se declaran experimentos ejecutados, controles probados, ni áreas validadas. La siguiente fase debe convertir las 192 brechas en requisitos trazables, desarrollar el contenido y actualizar las pruebas semánticas.
+
+
+## Desarrollo de las 192 brechas avanzadas — 2026-11-19
+
+- 192/192 módulos desarrollados como borradores técnicos estructurados en `knowledge/research/ADVANCED_GAP_DEVELOPMENT.md`, organizados en 48 dominios.
+- Cada módulo contiene alcance, arquitectura, amenazas, controles, procedimiento, laboratorio seguro, métricas, evidencia y limitaciones.
+- El registro JSON conserva estado individual, ancla, conteo de palabras y fuentes de partida.
+- Se añadió una regresión para comprobar los 192 módulos y el umbral mínimo de contenido.
+- **No validado:** faltan lectura integral y trazabilidad claim-to-source, ejecución de laboratorios cuando aplique y revisión independiente. No elevar madurez por volumen documental.

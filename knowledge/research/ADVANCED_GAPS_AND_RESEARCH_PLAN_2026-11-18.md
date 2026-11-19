@@ -42,3 +42,10 @@ El manifiesto y el currículo cubren 48 dominios y siete temas iniciales por ár
 ## Fuente de datos
 
 La lista completa de brechas por dominio está en `ADVANCED_GAP_REGISTER.json`. El registro es un backlog de investigación, no un dataset de entrenamiento ni una afirmación de cobertura lograda.
+
+
+## Desarrollo documental de las 192 brechas — 2026-11-19
+
+Se incorporó `ADVANCED_GAP_DEVELOPMENT.md` con cuatro módulos por cada uno de los 48 dominios: **192/192 desarrollados como borradores técnicos iniciales**. Cada módulo incluye alcance, arquitectura, amenazas, controles, procedimiento reproducible, laboratorio seguro, métricas, evidencia y limitaciones. El registro JSON conserva el estado, ancla, conteo de palabras y fuentes de partida.
+
+**No se marca como validado:** los laboratorios no se han ejecutado, falta revisión independiente y las referencias aún requieren trazabilidad por afirmación. El contenido debe revisarse y contrastarse con fuentes primarias antes de considerarse conocimiento verificado.
