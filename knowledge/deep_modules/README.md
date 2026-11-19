@@ -1,6 +1,6 @@
 # Biblioteca de módulos de profundización
 
-Esta colección transforma los 48 currículos de dominio en módulos editoriales con ruta técnica, procedimiento, laboratorio, evaluación y control de procedencia.
+Esta colección contiene 48 compendios técnicos disciplinares ampliados como borradores, con agenda de investigación transversal específica por área y mapa de procedencia. La ampliación editorial no equivale a revisión experta ni validación experimental.
 
 ## Investigación nivel L4/L5
 
@@ -9,14 +9,14 @@ Cada especialidad dispone de una agenda de investigación en `./<area>/RESEARCH_
 - Auditoría global de cobertura: [informe](../research/GLOBAL_COVERAGE_AUDIT.md) y [matriz de 61 referencias](../research/global_coverage_matrix.json).
 - Ejecución: `python knowledge_global_coverage_audit.py` o `python knowledge_global_coverage_audit.py --json`.
 - Método obligatorio: `../research/RESEARCH_PROTOCOL.md`.
-- Registro inicial de fuentes oficiales: `../research/source_registry.json`.
+- Registro de fuentes: `../research/source_registry.json` (90 entradas registradas al corte; lectura integral no asumida).\n- Agenda de investigación por 48 áreas: [DOMAIN_RESEARCH_AGENDA_48.md](../research/DOMAIN_RESEARCH_AGENDA_48.md).\n- Mapa de evidencia por especialidad: [DOMAIN_EVIDENCE_MAP_48.md](../research/DOMAIN_EVIDENCE_MAP_48.md).\n- Seguimiento de puertas y brechas: [EXPERT_LIBRARY_COMPLETION_TRACKER.md](../EXPERT_LIBRARY_COMPLETION_TRACKER.md).
 - Auditoría estructural y de trazabilidad: `python knowledge_research_audit.py` o `python knowledge_research_audit.py --json`.
 - Revisiones iniciales: [AppSec/API](./appsec/LITERATURE_REVIEW.md), [respuesta a incidentes](./incident_response/LITERATURE_REVIEW.md), [DevSecOps](./devsecops/LITERATURE_REVIEW.md), [gestión de vulnerabilidades](./vuln_management/LITERATURE_REVIEW.md), [OT/ICS](./ot_ics/LITERATURE_REVIEW.md), [arquitectura segura](./secure_arch/LITERATURE_REVIEW.md) y [criptografía](./crypto/LITERATURE_REVIEW.md).
 
 ## Estado y uso
 
 - Un módulo por cada área declarada en `knowledge/packs/manifest.json`.
-- Los módulos son borradores estructurados para completar con teoría técnica específica, diagramas, casos, fuentes primarias verificadas y laboratorios reproducibles.
+- Los 48 compendios tienen ampliaciones técnicas específicas por disciplina; siguen siendo borradores que requieren contraste tema por tema, fuentes completas, diagramas/casos adicionales, laboratorios reproducibles y revisión independiente.\n- El manifiesto distingue contenido editorial, agenda, revisión bibliográfica, diseño de laboratorio y validación. `verified_external_sources` permanece en cero hasta que exista evidencia documental suficiente.
 - El estado `draft_structured_not_expert_validated` es deliberado: no confundir una guía de desarrollo con conocimiento experto ya validado.
 - No se deben marcar fuentes como verificadas hasta comprobar URL canónica, editor, versión, vigencia, licencia, integridad y correspondencia temática.
 - Las pruebas activas requieren autorización expresa, alcance, límites de impacto y criterio de parada.
