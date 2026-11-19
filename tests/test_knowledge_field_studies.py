@@ -15,6 +15,14 @@ STUDIES = {
     "vuln_management",
     "devsecops",
     "secure_arch",
+    "foundations",
+    "appsec",
+    "api",
+    "linux",
+    "windows_ad",
+    "cloud",
+    "containers",
+    "mobile",
 }
 
 
