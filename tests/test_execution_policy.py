@@ -50,6 +50,16 @@ class ExecutionPolicyTests(unittest.TestCase):
         self.assertEqual(result["ticket"], "CHANGE-123")
         self.assertEqual(result["approved_by"], "security-owner")
 
+    def test_non_root_trailing_slash_remains_part_of_authorization_scope(self):
+        self.grant["target"] = "https://8.8.8.8/api/"
+        self.write_policy([self.grant])
+        result = authorize_target(
+            "https://8.8.8.8/api/", "nuclei_scan", "grant-001"
+        )
+        self.assertEqual(result["target"], "https://8.8.8.8/api/")
+        with self.assertRaises(AuthorizationError):
+            authorize_target("https://8.8.8.8/api", "nuclei_scan", "grant-001")
+
     def test_wrong_target_is_denied(self):
         with self.assertRaises(AuthorizationError):
             authorize_target("https://1.1.1.1", "nuclei_scan", "grant-001")

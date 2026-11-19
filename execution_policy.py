@@ -103,7 +103,9 @@ def _canonical_target(target):
         normalized_host = f"[{normalized_host}]"
     default_port = 80 if parsed.scheme == "http" else 443
     netloc = normalized_host if port == default_port else f"{normalized_host}:{port}"
-    path = parsed.path.rstrip("/")
+    # Only collapse the empty path and root slash. A trailing slash on
+    # any other path can identify a different resource and must remain scoped.
+    path = "" if parsed.path in {"", "/"} else parsed.path
     return urlunsplit((parsed.scheme, netloc, path, "", "")), address
 
 
