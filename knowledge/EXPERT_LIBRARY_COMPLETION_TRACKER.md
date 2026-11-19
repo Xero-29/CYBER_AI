@@ -5,12 +5,12 @@
 **Estado global:** M2 editorial; auditoría estructural aplicada, pero cobertura por capa todavía no demostrada. Investigación documental, experimentación y validación independiente pendientes.
 
 ## Alcance aplicado
-Los seis módulos P0 (identity, malware, forensics, incident_response, threat_intel y reverse) fueron reescritos para sustituir bloques genéricos por mecanismos, casos límite, pruebas negativas, métricas y laboratorios específicos. Cada uno dispone ahora de agenda experimental y revisión exploratoria de literatura. Esto es avance editorial M2, no validación disciplinar. Las otras 41 áreas, aparte de Foundations, conservan el estado editorial previo y requieren ampliación disciplinar tema por tema. Foundations también requiere auditoría individual de sus siete temas contra las doce capas. La auditoría granular inicial ya se registró en `knowledge/research/DOMAIN_LAYER_AUDIT_48.md` y su matriz `DOMAIN_LAYER_AUDIT_48.json`.
+Los seis módulos P0 (identity, malware, forensics, incident_response, threat_intel y reverse) fueron reescritos para sustituir bloques genéricos por mecanismos, casos límite, pruebas negativas, métricas y laboratorios específicos. Cada uno dispone ahora de agenda experimental y revisión exploratoria de literatura. Esto es avance editorial M2, no validación disciplinar. Las otras 41 áreas, aparte de Foundations, conservan el estado editorial previo y requieren ampliación disciplinar tema por tema. Foundations ya recibió auditoría documental individual de sus siete temas contra doce capas por tema (84/84 en progreso, ninguna aprobada). La corrección se registra en `knowledge/deep_modules/foundations/FOUNDATIONS_DEEP_DEVELOPMENT_V1.md`, la agenda se alinea a esos siete IDs y las matrices Markdown/JSON registran los estados. Falta lectura integral de fuentes, ejecución de siete laboratorios, evaluación empírica, reproducción y revisión independiente.
 
 ## Matriz de áreas
 | ID | Área | Compendio | Agenda específica | Fuentes integrales | Laboratorio ejecutado | Revisión independiente |
 |---|---|---|---|---|---|---|
-| `foundations` | Fundamentos | Desarrollo disciplinar v1 incorporado; M2 ampliado, no validado | Mapa de 12 bloques y 5 protocolos específicos | Fuentes identificadas; lectura integral/extracción pendiente | 5 protocolos diseñados, 0 ejecuciones acreditadas | Pendiente |
+| `foundations` | Fundamentos | Siete temas auditados documentalmente contra 12 capas; 84/84 en progreso; M2 | Agenda alineada a los siete temas; siete protocolos específicos | Metadatos/abstracts NIST inspeccionados; lectura integral pendiente | 7 protocolos diseñados, 0 ejecuciones acreditadas | Pendiente |
 | `appsec` | Seguridad de aplicaciones | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
 | `api` | Seguridad de API | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
 | `network` | Seguridad de redes | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
@@ -122,3 +122,15 @@ La matriz contiene 48 especialidades, 7 unidades temáticas iniciales por especi
 **Verificación documental posterior:** el nuevo desarrollo contiene una matriz explícita FND-01 a FND-15 y una evaluación de L1–L12. Las brechas tienen tratamiento documental, pero varias permanecen abiertas por necesitar evidencia no generable mediante redacción: lectura integral de fuentes, ejecución experimental, benchmark, revisión independiente y reproducción externa.
 
 **Resultado de la puerta de salida:** Foundations NO se declara cerrado bajo el estándar completo. Madurez conservadora M2 editorial ampliado. K4/K5, M4/M5 y G1–G8 aprobadas no reclamadas. No avanzar al módulo 2 hasta cerrar las evidencias bloqueantes según el criterio del estándar.
+
+
+## Cierre de auditoría documental de Foundations — 2026-11-19
+
+- Siete temas identificados por sus IDs `foundations-01` a `foundations-07`.
+- Doce capas desarrolladas explícitamente por tema en `FOUNDATIONS_DEEP_DEVELOPMENT_V1.md`.
+- Agenda de investigación alineada uno a uno con los siete temas.
+- Matriz JSON: 84/84 celdas `in_progress`; ninguna `passed`.
+- G1–G4 `in_progress`; G5–G8 `blocked` por experimentación, evaluación, reproducción y revisión independiente pendientes.
+- Se registraron referencias oficiales NIST SP 800-160 Vol. 1 Rev. 1, SP 800-207, SP 800-37 Rev. 2, SP 800-61 Rev. 3 y SP 800-53 Release 5.2.0, además de SP 800-30 Rev. 1. Solo se inspeccionaron páginas oficiales/abstracts/anuncio de versión; no se declara lectura integral.
+- Siete laboratorios diseñados, cero ejecutados. Las siete Skills siguen candidatas, no validadas.
+- Madurez se mantiene M2. No declarar K3/K4/K5 ni validación científica.
