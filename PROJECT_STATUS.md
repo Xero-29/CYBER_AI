@@ -293,3 +293,12 @@ Sobre HEAD `0d79769fc793f295a31da4ea78656ed419e1ef93`:
 - El primer intento del gate falló porque el CLI mezclaba el estado de los compendios antiguos con el nuevo gate de estudios; se separó la condición para que --require-research-studies evalúe exclusivamente el nuevo corpus, sin ocultar el estado de los compendios previos. La ejecución final quedó verde.
 
 **No se ejecutó la ingesta vectorial real ni se probó recuperación semántica:** eso requiere proveedor ECO configurado y debe validarse localmente. Los estudios se conectan al bootstrap, pero la creación de embeddings queda pendiente.
+
+
+### CI final del corpus de investigación — HEAD c542cb77ad60a35bb49d8f25ec0f775ef7b0bcd9
+
+- [Python Tests](https://github.com/Xero-29/CYBER_AI/actions/runs/44436640073): **success** — 613 tests, 1 skipped; validación de fuentes/instalador, verificación local, dry-run del bootstrap (96 documentos), gate de estudios (48/48), SBOM y provenance.
+- [Docker Sandbox](https://github.com/Xero-29/CYBER_AI/actions/runs/44436640065): **success** — imágenes construidas, verificación local completa y Ruff dentro del sandbox endurecido.
+- Ejecución Python duplicada [run 44436630948](https://github.com/Xero-29/CYBER_AI/actions/runs/44436630948): success en el mismo SHA.
+
+La validación estructural del nuevo corpus está aprobada. El informe de calidad sigue mostrando que el material previo de los compendios no está completo: 18/48 secciones base y 0/48 conjuntos de secciones profundas; esto no se considera corregido por los nuevos estudios iniciales. La ingestión vectorial y la recuperación semántica siguen pendientes de proveedor ECO y evaluación local.
