@@ -1,53 +1,60 @@
-# Estado verificado más reciente — 2026-11-19
+# Estado de ingeniería y auditoría — 2026-11-19
 
 **Repositorio:** `Xero-29/CYBER_AI`  
-**Rama auditada:** `codex/security-integrity-audit`  
-**HEAD inspeccionado:** `cd7e70754957938a640969c0b34ed84ab6634d16`  
+**Rama de trabajo:** `codex/security-integrity-audit`  
+**HEAD de código auditado en esta iteración:** `af798647d3d68f7a61e8551ca4cc8011dca49620`  
 **main:** `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`  
-**Merge-base:** `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. La rama tiene 157 commits exclusivos y `main` 573 commits exclusivos; el diff neto afecta 61 rutas de auditoría y 291 de `main`.
+**Ancestro común verificado:** `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`
 
-## Ramas y PRs
+## Divergencia e integración
 
-- **PR #2:** cerrado y fusionado el 2026-11-17; merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`.
-- **PR #11:** abierto para locks hash-verified/SBOM; HEAD `04c001a206cde98613cf9c151ce4f6a95fb86a21`, Python y Docker exitosos.
-- **PR #12:** abierto como reconciliación selectiva desde `main`; HEAD `c2a397caf36f2661b6f0307168a0a24eee2f6d38`, Python y Docker exitosos; aún no integra los cambios de seguridad en archivos compartidos.
-- **PR #13:** abierto para biblioteca profunda; HEAD `d0a3934a473e3d1117c7410df253f659d5f475c3`, Python y Docker exitosos; sus gates no sustituyen revisión experta.
-- **PR #1 y #3–#10:** abiertos; revisar individualmente las actualizaciones de Dependabot/Actions.
-- No se hizo merge, rebase, force-push ni modificación de `main`. PR #12 sigue siendo el vehículo existente de reconciliación; no se duplica.
-- No se devolvieron rulesets; la lectura de branch protection está bloqueada con 403 para esta integración.
+- La comparación actual no muestra un único commit exclusivo de `main`: muestra **573 commits exclusivos de main y 158 exclusivos de la rama de auditoría** desde el ancestro común. El diff entre ambas líneas también abarca múltiples áreas y cientos de rutas.
+- PR #2 está **cerrado y fusionado**. Su merge commit es `478c6ddc676221e4c07b8c5780f127bc5a9e749e`; sus padres son `7b5ed033f1f6461b5780a10ac4ada67a444b93e5` y el ancestro común `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. La rama de auditoría continúa desde ese ancestro, no desde el merge commit.
+- `main` tiene otros 572 commits posteriores al merge de PR #2. Su HEAD actual `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea` añade pruebas de preflight para OSV-Scanner y Grype en `tests/test_tool_adapters.py`. Ese cambio y el resto de la línea de `main` quedan preservados.
+- No se realizó merge, rebase, cherry-pick, force-push ni escritura en `main`. No se integrará una divergencia de este tamaño automáticamente. La reconciliación debe hacerse en una rama separada, por archivo y con pruebas de tres vías.
+- PR #11 (locks/SBOM), PR #12 (reconciliación selectiva) y PR #13 (biblioteca de investigación) permanecen abiertos en borrador; se mantienen como vehículos existentes y no se crean PRs duplicados. PR #2 no se duplica ni se reabre.
 
-## CI del HEAD exacto
+## Incidencia detectada y corrección de esta iteración
 
-SHA `cd7e70754957938a640969c0b34ed84ab6634d16`:
+En el HEAD previo `bbdd21a36ebd36aae6d1154d1e6a1a4640982ba1`, Python Tests y Docker Sandbox fallaron en la misma prueba. El test buscaba un nombre de informe obsoleto y una ruta relativa después de restaurar el directorio de trabajo; el flujo de excepción tampoco persistía el informe.
 
-- Python Tests — [run 44555718989](https://github.com/Xero-29/CYBER_AI/actions/runs/44555718989): **completed/failure**, 593 pruebas, 1 error.
-- Docker Sandbox — [run 44555718951](https://github.com/Xero-29/CYBER_AI/actions/runs/44555718951): **in progress** al cerrar esta inspección; no se declara verde.
-- El error está en el test nuevo de `ProcessIsolationError`: faltaba importar `json` en el archivo de pruebas al leer el informe generado. Se corrige solo el fixture.
-- El SHA anterior `c7dceaa95481d2b5c940a254b22c293403693a3d` pasó Python y Docker con 590 pruebas y Ruff.
+Cambios publicados en la rama:
 
-## Cambios de esta iteración
+- `task_runner.py`: ahora persiste un informe privado también cuando falla la ejecución o el aislamiento. El informe registra tipo de excepción y causa normalizada, pero **no serializa el mensaje de excepción**, que podría contener credenciales u otros datos sensibles.
+- `tests/test_task_runner_ledger.py`: comprueba el nombre dinámico del informe, la persistencia en el workspace correcto, el cierre del ledger y que una cadena de prueba con apariencia de secreto no se filtre al informe.
+- Commits de corrección: `130d8d062f27f47a42af437a1b192c2d7675633f` y corrección del terminador JSON `af798647d3d68f7a61e8551ca4cc8011dca49620`.
+- La clonación local no estuvo disponible en este entorno porque no se pudo resolver `github.com`; por tanto no se afirma una ejecución local. La validación ejecutable debe provenir de Actions sobre el HEAD exacto.
 
-- Se añadieron gates fail-closed en Windows: `task_runner.py`, `nuclei_scanner.py` y `tool_adapters.py` no ejecutan herramientas en host sin Job Objects.
-- La ejecución POSIX usa grupo de procesos, captura de salida acotada y cierre de pipes; se registra `isolation_required` si el runtime no garantiza aislamiento.
-- Se mantienen integridad de binarios/plantillas y rechazo de evidencia JSONL malformada.
-- La red de las herramientas locales todavía no está aislada: los adaptadores informan `network_isolation_enforced=false`. Requiere un runtime/egress policy externo verificable.
-- No existe checkout local completo; no se afirma ejecución local.
+## Estado de CI
 
-## Pendientes reales
+- Último resultado observado antes de la corrección, SHA `bbdd21a36ebd36aae6d1154d1e6a1a4640982ba1`: Python Tests **failure** y Docker Sandbox **failure**, ambos por el mismo error de ruta del informe en una prueba; 593 pruebas ejecutadas, 1 error.
+- El commit de código `af798647d3d68f7a61e8551ca4cc8011dca49620` necesita checks concluidos. No se declara CI verde por anticipado.
+- La actualización documental actual también dispara workflows; el HEAD resultante debe validarse por separado. Consultar los checks vinculados al HEAD de la rama, no reutilizar resultados de commits anteriores.
 
-1. Corregir el import del test y verificar Python Tests, Docker Sandbox y Ruff sobre el siguiente SHA exacto.
-2. Implementar Job Objects de Windows si se exige ejecución local allí.
-3. Conectar aislamiento de red real para herramientas locales.
-4. Revisar PR #12 y reconciliar por archivo, preservando los 573 commits de `main`; no integrar automáticamente.
-5. Validar locks por plataforma/arquitectura y provenance antes de integrar PR #11.
-6. Conectar KMS/HSM, RBAC/IdP/MFA, WORM/offsite y cifrado de backups; ejecutar simulacros DR con RPO/RTO.
-7. Ejecutar pruebas reales de microVM/VM, egress, escape de sandbox, concurrencia, carga/soak, disco lleno y recuperación del host.
-8. Conectar proveedores/modelos reales y medir calidad, coste, latencia, cuotas, fallos y políticas de datos.
-9. Revisar las 138 fuentes y 276 verificaciones pendientes con especialistas; validar licencias, exactitud, vigencia y calidad semántica.
-10. Verificar ACL Windows, protección de rama, observabilidad, alertas y respuesta a incidentes en infraestructura real.
+## Capacidades y límites que siguen siendo reales
 
-**Conclusión:** la rama aún no está lista para validación final. El nuevo gate Windows y el runner POSIX requieren checks verdes sobre su SHA actual; el aislamiento de red, la reconciliación con `main` y las integraciones operacionales/experta siguen pendientes.
+- El runner de procesos falla cerrado cuando el entorno no garantiza aislamiento de árbol de procesos. Windows aún requiere implementación y pruebas reales de Job Objects para habilitar ejecución allí.
+- El aislamiento de red de las herramientas locales no está impuesto por el proyecto; el estado `network_isolation_enforced=false` no debe interpretarse como aislamiento.
+- El ledger local es tamper-evident, no WORM. KMS/HSM, identidad/RBAC/IdP/MFA y anclaje externo siguen dependiendo de infraestructura.
+- Los backups tienen verificaciones de integridad y restauración, pero faltan cifrado/firmado externo, almacenamiento offsite/WORM y simulacros DR medidos.
+- Docker reduce superficie, pero comparte kernel; no sustituye microVM/VM reforzada para muestras hostiles.
+- Los proveedores y embeddings requieren pruebas contra servicios/modelos reales, con políticas de datos, cuotas, coste, latencia y fallos.
+- La cobertura documental no equivale a validación científica: las fuentes deben leerse íntegramente, enlazarse con afirmaciones concretas, revisarse por especialistas y probarse en laboratorios reproducibles. PR #13 declara sus 192 módulos como borradores iniciales, no como conocimiento ya validado.
 
+## Pendientes para la siguiente iteración
+
+1. Obtener Python Tests y Docker Sandbox exitosos en el HEAD exacto que contiene esta actualización documental; inspeccionar pasos/logs si falla algo.
+2. Seguir auditando las rutas de ejecución, autorización, allowlist, aislamiento, ledger, backups, adaptadores, locks y SBOM; corregir defectos concretos con pruebas de regresión.
+3. Preparar reconciliación separada de la rama con los 573 commits exclusivos de `main`, preservando explícitamente el commit `9bab38f` y el resto de cambios actuales de `main`; no integrar hasta resolver conflictos y ejecutar la suite completa.
+4. Completar la implementación de aislamiento Windows y conectar aislamiento real de red/egress antes de habilitar herramientas locales que lo necesiten.
+5. Ejecutar pruebas operacionales de microVM/escape, concurrencia, carga/soak, disco lleno, fallos de host, backups y recuperación.
+6. Conectar KMS/HSM, RBAC/IdP/MFA, WORM/offsite, cifrado y monitorización/alertas en infraestructura controlada.
+7. Validar proveedores/modelos reales y medir calidad de recuperación por dominio con benchmarks revisados por especialistas.
+8. Completar lectura de fuentes primarias, trazabilidad claim-to-source, revisión experta, licencias y laboratorios reproducibles de la biblioteca.
+
+**Conclusión:** la rama no está lista para la validación final del usuario. Primero deben pasar los checks del HEAD actual y continuar la auditoría técnica. No se ha modificado `main` ni se ha fusionado ningún PR.
+
+---
 ---
 
 ## Registro histórico
