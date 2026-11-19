@@ -5,6 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from binary_integrity import BinaryIntegrityError, hash_executable, require_approved_executable
+from tool_allowlist import ToolAllowlistError
 
 
 class BinaryIntegrityTests(unittest.TestCase):
@@ -91,7 +92,7 @@ class BinaryIntegrityTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             executable = Path(temp) / "nuclei"
             executable.write_bytes(b"nuclei")
-            with patch("binary_integrity.verify_tool_allowed", side_effect=Exception("denied")):
+            with patch("binary_integrity.verify_tool_allowed", side_effect=ToolAllowlistError("denied")):
                 with self.assertRaises(BinaryIntegrityError):
                     require_approved_executable(executable, "nuclei")
 
