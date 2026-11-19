@@ -289,8 +289,8 @@ Estas son especificaciones candidatas, no Skills validadas ni automatizaciones a
 | FND-11 | Métricas, denominadores, sesgo e incertidumbre | Benchmark ejecutado y análisis estadístico |
 | FND-12 | Cuatro casos integradores definidos | Soluciones completas evaluadas |
 | FND-13 | Método de revisión reproducible descrito | Búsqueda ejecutada, cribado y extracción documentados |
-| FND-14 | Cinco protocolos de laboratorio definidos | Ejecución, datos, scripts y resultados |
-| FND-15 | Evaluación y rúbrica diseñadas | Pruebas aplicadas, resultados y evaluación externa |
+| FND-14 | Cinco protocolos generales y siete protocolos temáticos definidos; los siete temáticos ejecutados como simulaciones sintéticas | Integración real aislada, datasets representativos y réplica independiente |
+| FND-15 | Rúbricas definidas; ocho pruebas unitarias del harness ejecutadas | Evaluación de transferencia, revisión ciega y evaluación externa |
 
 ## 16. Estado de las 12 capas y puertas
 
@@ -302,26 +302,26 @@ L5 implementación: procedimientos y casos definidos; artefactos ejecutables par
 L6 análisis avanzado: límites, fallos y trade-offs desarrollados; pruebas de estrés pendientes.
 L7 seguridad: amenazas adversariales y no adversariales integradas; revisión especializada pendiente.
 L8 investigación: agenda y diseño de método; revisión sistemática no ejecutada.
-L9 laboratorios: cinco protocolos diseñados; cero ejecuciones acreditadas en este documento.
-L10 evaluación: métricas y rúbricas especificadas; benchmarks no ejecutados.
+L9 laboratorios: cinco protocolos generales diseñados; siete protocolos temáticos ejecutados localmente con datos sintéticos y resultados versionados. No son pruebas de eficacia en producción ni réplica independiente.
+L10 evaluación: métricas y rúbricas especificadas; ocho pruebas unitarias y métricas sintéticas ejecutadas; benchmarks externos/representativos pendientes.
 L11 operación/Skills: cinco Skills candidatas; no promovidas.
 L12 trazabilidad: referencias y estados documentados; lectura integral, hashes y revisión periódica incompletos.
 
-Puertas G1–G8: no se declaran aprobadas por este cambio. G1/G3 tienen evidencia documental ampliada que requiere auditoría de cobertura; G2 permanece parcial; G4 parcial; G5/G6/G7 pendientes de ejecución; G8 pendiente de revisión independiente. Madurez conservadora del módulo: M2 editorial ampliado, investigación exploratoria; no K4/K5 ni M4/M5.
+Puertas G1–G8: ninguna se declara `passed`. G1–G4 continúan en progreso por cobertura, lectura de fuentes, profundidad y aplicación. G5–G7 pasan a `in_progress` por siete simulaciones sintéticas, ocho pruebas unitarias, métricas y repetición determinista; falta réplica independiente e integración real aislada. G8 permanece `blocked` por revisión independiente. Madurez conservadora: M2 editorial ampliado, investigación exploratoria; no K3/K4/K5 ni M3/M4/M5.
 
 ## 17. Fuentes primarias y estado de lectura
 
 Revisión de secciones y trazabilidad afirmación→fuente→capa: [SOURCE_REVIEW_AND_CLAIM_EVIDENCE_2026-11-19.md](SOURCE_REVIEW_AND_CLAIM_EVIDENCE_2026-11-19.md).
 
-- NIST CSWP 29, Cybersecurity Framework 2.0 (2024), https://doi.org/10.6028/NIST.CSWP.29 — metadatos y página oficial consultados; lectura integral y extracción por sección no acreditadas.
-- NIST SP 800-30 Rev. 1 (2012), https://doi.org/10.6028/NIST.SP.800-30r1 — ficha y resumen oficial consultados; lectura íntegra y extracción por sección pendientes.
-- NIST SP 800-37 Rev. 2 (2018), https://doi.org/10.6028/NIST.SP.800-37r2 — metadatos y descripción oficial consultados; lectura integral y extracción por sección pendientes.
-- NIST SP 800-160 Vol. 1 Rev. 1 (2022), https://doi.org/10.6028/NIST.SP.800-160v1r1 — metadatos y descripción oficial consultados; lectura integral y extracción por sección pendientes.
-- NIST SP 800-61 Rev. 3 (2025), https://doi.org/10.6028/NIST.SP.800-61r3 — ficha oficial consultada; lectura integral, extracción y trazabilidad pendientes.
+- NIST CSWP 29, Cybersecurity Framework 2.0 (2024), https://doi.org/10.6028/NIST.CSWP.29 — secciones pertinentes del PDF oficial inspeccionadas; véase el dossier de revisión de fuentes.
+- NIST SP 800-30 Rev. 1 (2012), https://doi.org/10.6028/NIST.SP.800-30r1 — capítulos y apéndices pertinentes inspeccionados; véase el dossier de revisión.
+- NIST SP 800-37 Rev. 2 (2018), https://doi.org/10.6028/NIST.SP.800-37r2 — pasos RMF y tareas Prepare/Monitor pertinentes inspeccionados; véase el dossier de revisión.
+- NIST SP 800-160 Vol. 1 Rev. 1 (2022), https://doi.org/10.6028/NIST.SP.800-160v1r1 — marco SSE, assurance case, requisitos, principios de diseño y procesos pertinentes inspeccionados; véase el dossier.
+- NIST SP 800-61 Rev. 3 (2025), https://doi.org/10.6028/NIST.SP.800-61r3 — sección 2 y modelo CSF 2.0 de respuesta inspeccionados; véase el dossier.
 - ISO 31000:2018, https://www.iso.org/standard/65694.html — ficha oficial; texto normativo completo no incluido ni declarado leído.
-- MITRE ATT&CK Enterprise Introduction, https://attack.mitre.org/resources/enterprise-introduction/ — referencia oficial identificada; versión, fecha de captura y lectura por secciones pendientes.
+- MITRE ATT&CK Version History/Updates, https://attack.mitre.org/resources/versions/ — v20.1 vigente al corte 2026-11-19; changelog inspeccionado, objetos de catálogo no revisados exhaustivamente.
 
-La consulta de una ficha oficial no equivale a lectura completa. No se atribuyen a estas fuentes resultados experimentales.
+La consulta de una ficha oficial no equivale a lectura completa. Las secciones pertinentes y sus hallazgos están trazados en `SOURCE_REVIEW_AND_CLAIM_EVIDENCE_2026-11-19.md`. No se atribuyen a las fuentes resultados experimentales.
 
 ## 18. Criterio de salida de Foundations
 
