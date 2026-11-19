@@ -124,3 +124,12 @@ No conformidades abiertas: lectura integral de fuentes primarias; normas de safe
 - Registradas las tres fuentes en `knowledge/research/source_registry.json` como `selected_articles_reviewed`.
 - NC-FND-01.01-02 se reduce parcialmente: privacidad y agua de consumo humano tienen un mapa inicial; safety funcional y obligaciones sectoriales siguen sin determinarse para un caso concreto y requieren revisión competente.
 - No se emite dictamen legal ni se declara cumplimiento; T0/O0 sin cambios.
+
+## Ciclo de demostración de capacidades — FND-01.01
+
+- Añadido `knowledge/deep_modules/foundations/topics/FND-01-01_CAPABILITY_WORKED_SOLUTIONS_V1.md`.
+- Enseñar: resultados observables, progresión, errores conceptuales y ejercicios graduados con solución.
+- Explicar: reconstrucción del flujo funcional, autorización, estados y propiedades emergentes.
+- Analizar: escenario nuevo de pérdida de IdP, discrepancia de sensores, regiones con causa común y telemetría personal; alternativas y condiciones de decisión.
+- Diseñar: requisitos trazables, arquitectura, plan de verificación por etapa y argumento de assurance con claims/evidencia/derrotadores.
+- Matriz enlaza el documento, pero las cuatro capacidades siguen `in_progress`; la evaluación ciega y la revisión independiente no se han realizado.
