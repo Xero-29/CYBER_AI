@@ -122,3 +122,24 @@ Definir H0/H1, variables, población, comparadores, criterio de refutación, an�
 
 ## Madurez
 M0/M1 estructural. No acredita profundidad ni M3/M4/M5. Para avanzar: leer fuentes completas, producir artefactos específicos, ejecutar laboratorios y registrar evidencia auditable.
+
+
+## Profundización técnica específica: Red Team de sistemas de IA
+
+### Alcance y threat model
+Evaluar modelo, wrapper, system prompt, RAG, memoria, herramientas, agentes, plugins, sandbox, conectores, usuarios y políticas de datos. Definir atacante, acceso, objetivo, capacidades, impacto y restricciones. Separar pruebas de seguridad de calidad general del modelo.
+
+### Vectores de ataque
+Probar prompt injection directo/indirecto, retrieval poisoning, data exfiltration, tool misuse, privilege escalation, insecure output handling, excessive agency, model extraction, denial of service, training data leakage y supply chain. Usar canary secrets sintéticos, documentos controlados y herramientas simuladas.
+
+### Controles y límites
+Instrucciones no son frontera de seguridad. Aplicar autorización fuera del modelo, allowlists, validación de esquema, sandbox, separación tenant, egress control, secret isolation, approval gates y logging. El modelo debe recibir solo datos necesarios. La salida se valida antes de ejecutar acciones.
+
+### Evaluación adversarial
+Crear casos reproducibles por modelo/version, prompt, corpus, herramientas y configuración. Medir attack success rate, leakage rate, tool misuse, false refusal, utility, severity y reproducibility. Reportar tasa por categoría y severidad; no generalizar de un modelo a otro. Registrar fallos y mitigaciones.
+
+### Laboratorios
+RAG con documentos maliciosos sintéticos, herramientas mock, secrets canary, tenant isolation y aprobación humana. No intentar extraer datos reales ni atacar proveedores externos.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.
