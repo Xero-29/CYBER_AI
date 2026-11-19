@@ -123,3 +123,5 @@ La matriz histórica de siete temas se conserva. Esta matriz añade granularidad
 - No se cierran las no conformidades de revisión integral de fuentes, aplicabilidad sectorial/legal, administración independiente de evaluación ni revisión disciplinar independiente.
 
 - **FND-01.01:** `COLOMBIA_APPLICABILITY_FND_01_01_2026-11-19.md` mapea aplicabilidad condicional de Ley 1581/2012, Decreto 1575/2007 y Resolución 2115/2007; no constituye concepto legal ni cierra NC sectorial.
+
+- **FND-01.01:** `topics/FND-01-01_CAPABILITY_WORKED_SOLUTIONS_V1.md` añade soluciones modelo desarrolladas para enseñar, explicar, analizar y diseñar; no sustituye evaluación ciega ni cambia los estados `in_progress`.
