@@ -1,5 +1,5 @@
 import unittest
-from research_validation import audit_research_assets, validate_claim
+from research_validation import audit_research_assets, validate_claim_record
 
 
 class ResearchValidationTests(unittest.TestCase):
@@ -24,19 +24,19 @@ class ResearchValidationTests(unittest.TestCase):
         return claim
 
     def test_supported_claim_requires_full_text_review(self):
-        errors = validate_claim(
+        errors = validate_claim_record(
             self.valid_claim(source_ids=["nist"]), self.sources, self.tasks
         )
         self.assertIn("claim_source_not_full_text_reviewed", errors)
 
     def test_supported_claim_requires_exact_locator_and_excerpt(self):
         claim = self.valid_claim(locator="", evidence_excerpt="")
-        errors = validate_claim(claim, self.sources, self.tasks)
+        errors = validate_claim_record(claim, self.sources, self.tasks)
         self.assertIn("missing_locator", errors)
         self.assertIn("missing_evidence_excerpt", errors)
 
     def test_claim_cannot_reference_unknown_task_or_source(self):
-        errors = validate_claim(
+        errors = validate_claim_record(
             self.valid_claim(task_id="unknown", source_ids=["ghost"]),
             self.sources, self.tasks
         )
@@ -44,14 +44,14 @@ class ResearchValidationTests(unittest.TestCase):
         self.assertIn("unknown_source:ghost", errors)
 
     def test_experimental_claim_requires_evidence_artifact(self):
-        errors = validate_claim(
+        errors = validate_claim_record(
             self.valid_claim(evidence_type="experiment", evidence_refs=[]),
             self.sources, self.tasks
         )
         self.assertIn("experimental_claim_requires_evidence_refs", errors)
 
     def test_inconclusive_claim_does_not_require_approval(self):
-        errors = validate_claim(
+        errors = validate_claim_record(
             self.valid_claim(status="inconclusive", source_ids=["nist"]),
             self.sources, self.tasks
         )
