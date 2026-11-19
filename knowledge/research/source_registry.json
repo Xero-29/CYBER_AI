@@ -2171,6 +2171,30 @@
         "Artículos 2–5: características físicas, conductividad, pH y sustancias químicas"
       ],
       "review_note": "Aplicación condicionada al agua para consumo humano y al ámbito sectorial. No es norma general de seguridad funcional OT; vigencia, modificaciones y obligaciones concretas deben verificarse para el caso."
+    },
+    {
+      "id": "NISTIR-8062",
+      "title": "An Introduction to Privacy Engineering and Risk Management in Federal Systems",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_interagency_internal_report",
+      "url": "https://doi.org/10.6028/NIST.IR.8062",
+      "version": "NISTIR 8062",
+      "published": "2017-01",
+      "verification_status": "selected_sections_reviewed",
+      "verified_scope": "PDF oficial de 49 páginas; inspección dirigida del abstract, Executive Summary, §2.1, §3.1 (objetivos predictability/manageability/disassociability), §3.2 y §3.2.2 (acciones de datos, PII y contexto). No lectura integral de todas las secciones ni revisión completa de referencias.",
+      "domains": [
+        "foundations",
+        "privacy_engineering",
+        "data_security"
+      ],
+      "review_date": "2026-11-19",
+      "sections_reviewed": [
+        "Executive Summary: diferencia seguridad de la información/privacidad y riesgos para individuos más allá del acceso no autorizado",
+        "§2.1: relación y distinción entre seguridad y privacidad",
+        "§3.1.1: objetivos de ingeniería de privacidad",
+        "§3.2 y §3.2.2: acciones problemáticas de datos, factores de riesgo y contexto"
+      ],
+      "review_note": "El informe aporta un modelo técnico-conceptual de privacidad para sistemas federales de EE. UU.; no es norma legal colombiana. Revisión selectiva de texto primario, no lectura integral."
     }
   ],
   "last_updated": "2026-11-19"
