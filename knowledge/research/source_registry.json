@@ -1239,6 +1239,72 @@
         "identity"
       ],
       "review_note": "Página oficial de autenticación inspeccionada el 2026-11-19; validar API y opciones por lenguaje/versión antes de implementación."
+    },
+    {
+      "id": "NIST-SP800-41R1",
+      "title": "Guidelines on Firewalls and Firewall Policy",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_primary_reference",
+      "url": "https://csrc.nist.gov/pubs/sp/800/41/r1/final",
+      "version": "SP 800-41 Rev. 1",
+      "published": "2009-09-28",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verified_scope": "Guía histórica de tecnologías, políticas, selección, configuración, pruebas, despliegue y gestión de firewalls.",
+      "domains": [
+        "network"
+      ],
+      "review_note": "Metadatos y abstract oficial inspeccionados; documento completo pendiente. Tratar como referencia fundacional de 2009, no como cobertura de arquitecturas modernas."
+    },
+    {
+      "id": "NIST-SP800-94",
+      "title": "Guide to Intrusion Detection and Prevention Systems (IDPS)",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_primary_reference",
+      "url": "https://csrc.nist.gov/pubs/sp/800/94/final",
+      "version": "SP 800-94",
+      "published": "2007-02-20",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verified_scope": "Guía histórica para diseño, implementación, configuración, operación y mantenimiento de IDPS de red, inalámbricos, host y análisis de comportamiento.",
+      "domains": [
+        "network",
+        "soc_siem",
+        "edr_xdr"
+      ],
+      "review_note": "Metadatos y abstract oficial inspeccionados; documento completo pendiente. NIST señala que el borrador Rev. 1 de 2012 fue retirado y nunca finalizado."
+    },
+    {
+      "id": "NSA-ZT-NETWORK-2024",
+      "title": "Advancing Zero Trust Maturity Throughout the Network and Environment Pillar",
+      "publisher": "National Security Agency",
+      "type": "official_cybersecurity_information_sheet",
+      "url": "https://media.defense.gov/2024/Mar/05/2003405462/-1/-1/0/CSI-ZERO-TRUST-NETWORK-ENVIRONMENT-PILLAR.PDF",
+      "version": "1.0",
+      "published": "2024-03-05",
+      "verification_status": "official_document_metadata_and_summary_reviewed",
+      "verified_scope": "Madurez Zero Trust de red/entorno, segmentación, aislamiento, mapeo de flujos y contención de movimiento lateral.",
+      "domains": [
+        "network",
+        "secure_arch",
+        "identity"
+      ],
+      "review_note": "Resumen y metadatos oficiales inspeccionados; lectura completa y aplicación experimental pendientes."
+    },
+    {
+      "id": "ENISA-TECH-GUIDANCE-2025",
+      "title": "Technical Implementation Guidance on Cybersecurity Risk Management Measures",
+      "publisher": "European Union Agency for Cybersecurity",
+      "type": "official_technical_guidance",
+      "url": "https://www.enisa.europa.eu/sites/default/files/2025-06/ENISA_Technical_implementation_guidance_on_cybersecurity_risk_management_measures_version_1.0.pdf",
+      "version": "1.0",
+      "published": "2025-06",
+      "verification_status": "official_document_metadata_and_excerpt_reviewed",
+      "verified_scope": "Guía técnica de medidas de gestión de riesgo, incluyendo segmentación de redes y evidencia de implementación.",
+      "domains": [
+        "network",
+        "governance",
+        "ot_ics"
+      ],
+      "review_note": "Metadatos y extracto de segmentación inspeccionados; documento completo y aplicabilidad jurisdiccional pendientes."
     }
   ],
   "last_updated": "2026-11-17"
