@@ -101,3 +101,11 @@ No conformidades abiertas: lectura integral de fuentes primarias; normas de safe
 - `knowledge/deep_modules/foundations/topics/FND-01-01_ASSESSOR_GUIDE_V1.md`: criterios de corrección, elementos esperados y límites de la guía.
 - La matriz registra ambos documentos como evidencia. La no conformidad de evaluación sigue abierta porque no se ha administrado ni calificado por un evaluador independiente.
 - El instrumento no cambia T0/O0 ni aprueba la subunidad.
+
+## Ciclo adicional — FND-01.01 profundización técnica
+
+- Añadido `knowledge/deep_modules/foundations/topics/FND-01-01_TECHNICAL_DEEPENING_CASEBOOK_V1.md`.
+- Contenido: delimitación de propiedades; modelos de confiabilidad/disponibilidad con supuestos; árbol de fallos; análisis de safety y privacidad; caso hipotético de dosificación de agua; escenarios causales; requisitos verificables; modos degradados; variantes de evaluación en frío y diseño de investigación.
+- Verificación editorial estática: estructura de nueve secciones, cuatro variantes nuevas, cinco requisitos de ejemplo y límites de evidencia explícitos.
+- Matriz: el anexo se enlaza como evidencia; FND-01.01 permanece con 12 capas y 4 capacidades `in_progress`, T0/O0; se añade NC-FND-01.01-05.
+- No se declara lectura integral de fuentes, cumplimiento legal colombiano, revisión sectorial, evaluación administrada, revisión independiente ni ejecución de laboratorio.
