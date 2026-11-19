@@ -74,30 +74,38 @@
       "id": "FND-01.02",
       "name": "CIA y propiedades ampliadas: autenticidad, responsabilidad, trazabilidad, no repudio, integridad de origen y seguridad funcional.",
       "layers": {
-        "L1": "not_assessed",
-        "L2": "not_assessed",
-        "L3": "not_assessed",
-        "L4": "not_assessed",
-        "L5": "not_assessed",
-        "L6": "not_assessed",
-        "L7": "not_assessed",
-        "L8": "not_assessed",
-        "L9": "not_assessed",
-        "L10": "not_assessed",
-        "L11": "not_assessed",
-        "L12": "not_assessed"
+        "L1": "in_progress",
+        "L2": "in_progress",
+        "L3": "in_progress",
+        "L4": "in_progress",
+        "L5": "in_progress",
+        "L6": "in_progress",
+        "L7": "in_progress",
+        "L8": "in_progress",
+        "L9": "in_progress",
+        "L10": "in_progress",
+        "L11": "in_progress",
+        "L12": "in_progress"
       },
       "capabilities": {
-        "teach": "not_assessed",
-        "explain": "not_assessed",
-        "analyze": "not_assessed",
-        "design": "not_assessed"
+        "teach": "in_progress",
+        "explain": "in_progress",
+        "analyze": "in_progress",
+        "design": "in_progress"
       },
       "theoretical_maturity": "T0",
       "operational_maturity": "O0",
-      "evidence": [],
-      "nonconformities": [],
-      "review": "pending"
+      "evidence": [
+        "topics/FND-01-02_SECURITY_PROPERTIES_CIA_EXTENDED.md",
+        "../../research/source_registry.json"
+      ],
+      "nonconformities": [
+        "NC-FND-01.02-01: lectura integral de estándares y fuentes primarias pendiente",
+        "NC-FND-01.02-02: evaluación en frío no administrada",
+        "NC-FND-01.02-03: revisión disciplinar independiente pendiente",
+        "NC-FND-01.02-04: normas de aplicación sectorial/colombiana pendientes"
+      ],
+      "review": "internal_draft_not_assessed"
     },
     {
       "id": "FND-01.03",
