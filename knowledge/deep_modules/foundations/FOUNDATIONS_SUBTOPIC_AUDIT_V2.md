@@ -125,3 +125,5 @@ La matriz histórica de siete temas se conserva. Esta matriz añade granularidad
 - **FND-01.01:** `COLOMBIA_APPLICABILITY_FND_01_01_2026-11-19.md` mapea aplicabilidad condicional de Ley 1581/2012, Decreto 1575/2007 y Resolución 2115/2007; no constituye concepto legal ni cierra NC sectorial.
 
 - **FND-01.01:** `topics/FND-01-01_CAPABILITY_WORKED_SOLUTIONS_V1.md` añade soluciones modelo desarrolladas para enseñar, explicar, analizar y diseñar; no sustituye evaluación ciega ni cambia los estados `in_progress`.
+
+- **FND-01.01:** evaluación V2 con puntuación corregida a 100 puntos y tres variantes de transferencia; protocolo de administración ciega y doble calificación. Preparados, no administrados; NC-03 sigue abierta.
