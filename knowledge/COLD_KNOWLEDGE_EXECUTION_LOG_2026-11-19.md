@@ -133,3 +133,11 @@ No conformidades abiertas: lectura integral de fuentes primarias; normas de safe
 - Analizar: escenario nuevo de pérdida de IdP, discrepancia de sensores, regiones con causa común y telemetría personal; alternativas y condiciones de decisión.
 - Diseñar: requisitos trazables, arquitectura, plan de verificación por etapa y argumento de assurance con claims/evidencia/derrotadores.
 - Matriz enlaza el documento, pero las cuatro capacidades siguen `in_progress`; la evaluación ciega y la revisión independiente no se han realizado.
+
+## Ciclo de corrección del instrumento — FND-01.01
+
+- Auditoría detectó error aritmético en V1: los pesos 20+20+30+30+10 sumaban 110, pese a indicar 100 normalizados.
+- Añadido `topics/FND-01-01_COLD_ASSESSMENT_V2.md`: pesos 15+15+30+30+10=100, cinco capacidades, tres variantes nuevas, criterios de transferencia y fallas críticas.
+- Añadido `topics/FND-01-01_INDEPENDENT_ASSESSOR_PROTOCOL_V1.md`: separación autor/evaluador, anonimización, calibración, doble puntuación, adjudicación y evidencia mínima.
+- V1 marcada como supersedida. Matriz enlaza V2 y protocolo; NC-FND-01.01-03 permanece abierta porque no se ha administrado la prueba ni existen evaluadores externos cualificados/independientes.
+- T0/O0 sin cambios. No se declara competencia demostrada.
