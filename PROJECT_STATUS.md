@@ -1,3 +1,15 @@
+# Estado canónico vigente — actualización de biblioteca 2026-11-19
+
+## Fundamentos de las 48 áreas: ampliación estructural
+
+- Se añadieron secciones explícitas de arquitectura contextual a los 30 paquetes que no exponían esa sección con un encabezado reconocido por el auditor.
+- Se completaron secciones de controles en Fundamentos, Respuesta a incidentes, Arquitectura segura y Matemáticas aplicadas a seguridad.
+- Las adiciones describen componentes, límites de confianza, flujos, dependencias, riesgos y controles específicos del dominio; no convierten los estudios en investigación empírica ni declaran fuentes leídas.
+- Se añadió una regresión que exige que los 48 paquetes superen el gate fundamental de `knowledge_quality.py`.
+- Estado: cambio implementado en la rama de investigación; pendiente ejecutar la auditoría y CI sobre el HEAD resultante. El gate es estructural, no una certificación semántica ni una validación experta.
+
+---
+
 # Estado canónico vigente — 2026-11-17
 
 **Rama:** `main`  

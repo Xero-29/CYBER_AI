@@ -19,6 +19,11 @@ class KnowledgeQualityTests(unittest.TestCase):
                 self.assertIn("L4",area["learning_levels"])
                 self.assertTrue(area["lab_blueprint"]["scenarios"])
                 self.assertTrue(area["evaluation"]["pass_rule"])
+    def test_all_48_fundamental_packs_pass_structural_gate(self):
+        report=audit_library()
+        self.assertEqual(report["base_complete"],48, report["areas"])
+        self.assertEqual(report["area_count"],48)
+
     def test_audit_does_not_claim_shallow_packs_are_deep(self):
         report=audit_library()
         self.assertLess(report["deep_complete"],report["area_count"])
