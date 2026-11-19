@@ -77,3 +77,9 @@ Continuar Foundations, no saltar a AI Red Team: convertir FND-01 a FND-09 en uni
 - La matriz granular refleja FND-01.01 en `in_progress` para doce capas y cuatro capacidades. Madurez T permanece T0 hasta evaluación; O0.
 
 No conformidades abiertas: lectura integral de fuentes primarias; normas de safety sectoriales; análisis de aplicabilidad legal colombiana; administración de evaluación en frío; revisión disciplinar independiente. No se aprobó la unidad.
+
+### Verificación automatizada del ciclo
+- La matriz JSON se volvió a leer y parsear correctamente: 102 subunidades, 1.224 comprobaciones de capas, 408 comprobaciones de capacidades y 0 aprobaciones.
+- La fila FND-01.01 coincide entre JSON y Markdown: 12 capas y 4 capacidades en progreso.
+- Las ejecuciones CI asociadas a un commit intermedio de este ciclo terminaron canceladas; el commit más reciente de documentación no tiene ejecuciones CI asociadas al momento de esta verificación. Por tanto, no se declara CI verde ni validación automatizada del ciclo completo.
+- La rama `knowledge/develop-foundations` sigue existiendo. No se fusionó PR #14 y no se escribió en `main`.
