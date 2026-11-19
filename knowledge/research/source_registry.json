@@ -2079,6 +2079,74 @@
         "PDF oficial, páginas impresas 136–137: aplicación de constructs y complementariedad de anticipar/resistir/recuperar/adaptar con CIA (Appendix D, §D.7)."
       ],
       "review_note": "Inspección dirigida por secciones del PDF oficial el 2026-11-19. No marcar full_text_reviewed: no se realizó lectura lineal de las 310 páginas ni revisión completa de las referencias."
+    },
+    {
+      "id": "CO-LEY-1581-2012",
+      "title": "Ley Estatutaria 1581 de 2012 — protección de datos personales",
+      "publisher": "Congreso de Colombia; Normograma oficial de Cancillería",
+      "type": "official_colombian_statute",
+      "url": "https://cancilleria.gov.co/normograma/compilacion/docs/ley_1581_2012.htm",
+      "version": "Ley Estatutaria 1581 de 2012; texto consultado en compilación oficial",
+      "published": "2012-10-17",
+      "verification_status": "selected_articles_reviewed",
+      "verified_scope": "Consulta de artículos 1–4, 6 y 8–10: objeto, ámbito, definiciones, principios, datos sensibles, derechos, autorización y excepciones.",
+      "domains": [
+        "foundations",
+        "privacy_engineering",
+        "governance"
+      ],
+      "review_date": "2026-11-19",
+      "sections_reviewed": [
+        "Artículos 1–3: objeto, ámbito y definiciones",
+        "Artículo 4: principios rectores",
+        "Artículo 6: tratamiento de datos sensibles",
+        "Artículos 8–10: derechos, autorización y excepciones"
+      ],
+      "review_note": "Consulta del texto oficial en Normograma de Cancillería; no constituye análisis jurisprudencial ni concepto jurídico. Aplicabilidad depende de tratamiento de datos personales, actores y ámbito."
+    },
+    {
+      "id": "CO-DECREE-1575-2007",
+      "title": "Decreto 1575 de 2007 — sistema para la protección y control de la calidad del agua para consumo humano",
+      "publisher": "Presidencia de la República de Colombia; Normograma oficial de Cancillería",
+      "type": "official_colombian_decree",
+      "url": "https://cancilleria.gov.co/normograma/compilacion/docs/decreto_1575_2007.htm",
+      "version": "Decreto 1575 de 2007; texto consultado en compilación oficial",
+      "published": "2007-05-09",
+      "verification_status": "selected_articles_reviewed",
+      "verified_scope": "Consulta de artículos 1–2: objeto, campo de aplicación y definiciones relevantes para prestadores de agua para consumo humano.",
+      "domains": [
+        "foundations",
+        "ot_security",
+        "safety"
+      ],
+      "review_date": "2026-11-19",
+      "sections_reviewed": [
+        "Artículo 1: objeto y campo de aplicación",
+        "Artículo 2: definiciones, agua para consumo humano, análisis de vulnerabilidad y calidad del agua"
+      ],
+      "review_note": "Aplicación condicionada al ámbito de suministro/distribución de agua para consumo humano; se excluye agua envasada del objeto del decreto. No se hizo análisis integral de modificaciones ni concepto jurídico."
+    },
+    {
+      "id": "CO-RES-2115-2007",
+      "title": "Resolución 2115 de 2007 — características, instrumentos básicos y frecuencias del sistema de control y vigilancia de calidad del agua",
+      "publisher": "Ministerios de la Protección Social y de Ambiente, Vivienda y Desarrollo Territorial; Normograma oficial de Cancillería",
+      "type": "official_colombian_resolution",
+      "url": "https://cancilleria.gov.co/sites/default/files/Normograma/docs/resolucion_minproteccion_2115_2007.htm",
+      "version": "Resolución 2115 de 2007; texto consultado en compilación oficial",
+      "published": "2007-06-22",
+      "verification_status": "selected_articles_reviewed",
+      "verified_scope": "Consulta de artículos 1–5 y tablas iniciales sobre análisis básicos/complementarios, definiciones y características físicas/químicas.",
+      "domains": [
+        "foundations",
+        "ot_security",
+        "safety"
+      ],
+      "review_date": "2026-11-19",
+      "sections_reviewed": [
+        "Artículo 1: definiciones de análisis microbiológico/básico/complementario",
+        "Artículos 2–5: características físicas, conductividad, pH y sustancias químicas"
+      ],
+      "review_note": "Aplicación condicionada al agua para consumo humano y al ámbito sectorial. No es norma general de seguridad funcional OT; vigencia, modificaciones y obligaciones concretas deben verificarse para el caso."
     }
   ],
   "last_updated": "2026-11-19"
