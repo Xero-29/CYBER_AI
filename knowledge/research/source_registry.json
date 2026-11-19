@@ -1628,6 +1628,59 @@
         "crypto"
       ],
       "review_note": "Metadatos oficiales del RFC revisados; lectura integral y análisis de uso/protocolo pendientes."
+    },
+    {
+      "id": "NIST-SP-800-160v1r1",
+      "title": "Engineering Trustworthy Secure Systems",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_systems_security_engineering_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.800-160v1r1",
+      "version": "Volume 1 Revision 1 Final",
+      "published": "2022-11-16",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verified_scope": "Principios, conceptos, actividades y tareas de ingeniería de sistemas seguros a lo largo del ciclo de vida.",
+      "domains": [
+        "foundations",
+        "secure_arch",
+        "governance"
+      ],
+      "review_note": "Página oficial NIST y abstract inspeccionados el 2026-11-19. Texto completo, extracción por sección, licencia del artefacto y lectura integral pendientes."
+    },
+    {
+      "id": "NIST-SP-800-37r2",
+      "title": "Risk Management Framework for Information Systems and Organizations: A System Life Cycle Approach for Security and Privacy",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_risk_management_framework",
+      "url": "https://doi.org/10.6028/NIST.SP.800-37r2",
+      "version": "Revision 2 Final",
+      "published": "2018-12-20",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verified_scope": "Proceso RMF que conecta categorización, selección, implementación, evaluación, autorización y monitoreo continuo con el ciclo de vida.",
+      "domains": [
+        "foundations",
+        "governance",
+        "secure_arch"
+      ],
+      "review_note": "Página oficial NIST y abstract inspeccionados el 2026-11-19. Texto completo, lectura por sección y análisis de aplicabilidad local pendientes."
+    },
+    {
+      "id": "NIST-SP-800-53r5-2.0",
+      "title": "Security and Privacy Controls for Information Systems and Organizations",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_security_privacy_control_catalog",
+      "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/final",
+      "version": "Release 5.2.0",
+      "published": "2025-08-27",
+      "verification_status": "official_release_announcement_and_metadata_reviewed",
+      "verified_scope": "Release 5.2.0 incorpora cambios sobre resiliencia, pruebas de desarrollo, despliegue/gestión de actualizaciones e integridad de software; SP 800-53A 5.2.0 se actualiza en correspondencia.",
+      "domains": [
+        "foundations",
+        "governance",
+        "secure_arch",
+        "identity",
+        "data_security"
+      ],
+      "review_note": "Anuncio oficial NIST inspeccionado el 2026-11-19. Consultar CPRT/OSCAL para la edición y controles exactos; no usar la ficha Rev.5 de 2020 como sustituto de Release 5.2.0. Lectura integral pendiente."
     }
   ],
   "last_updated": "2026-11-19"
