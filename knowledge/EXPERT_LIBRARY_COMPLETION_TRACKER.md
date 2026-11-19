@@ -98,10 +98,10 @@ Se inspeccionaron los 48 compendios técnicos y se creó una línea base legible
 - `knowledge/research/DOMAIN_LAYER_AUDIT_48.md`
 - `knowledge/research/DOMAIN_LAYER_AUDIT_48.json`
 
-La matriz contiene 48 especialidades, 7 unidades temáticas iniciales por especialidad, 12 capas por tema (4.032 estados) y ocho puertas G1–G8 por especialidad. Los estados se inicializan como `not_assessed`: significa que todavía no existe una comprobación trazable tema×capa, no que el tema carezca absolutamente de contenido.
+La matriz contiene 48 especialidades, 7 unidades temáticas iniciales por especialidad, 12 capas por tema (4.032 estados) y ocho puertas G1–G8 por especialidad. Los estados restantes se mantienen `not_assessed` cuando no hay comprobación trazable; Foundations es la excepción actual, con sus 84 celdas `in_progress` por desarrollo documental mapeado, sin aprobación.
 
 ### Hallazgo de la inspección
-- Seis módulos (identity, malware, forensics, incident_response, threat_intel y reverse) tienen reescritura disciplinar inicial. Foundations tiene un desarrollo general ampliado. Los siete requieren auditoría tema×capa y evidencia.
+- Seis módulos (identity, malware, forensics, incident_response, threat_intel y reverse) tienen reescritura disciplinar inicial. Foundations tiene siete dossiers tema×capa documentados; los seis módulos P0 y Foundations aún requieren evidencia de lectura, experimentación y revisión independiente.
 - Los otros 42 compendios contienen rutas temáticas iniciales, pero presentan bloques metodológicos repetidos y profundidad insuficiente para afirmar aplicación exhaustiva del estándar.
 - Los 48 módulos permanecen en M2 editorial. No se elevan niveles K ni puertas G por presencia de documentos, títulos o palabras clave.
 
