@@ -59,17 +59,37 @@ Todo trabajo que se presente como investigación debe registrar:
 
 No inventar resultados, métricas, muestras, revisiones por pares ni reproducibilidad. Las hipótesis no son conclusiones.
 
-## 4. Escala de madurez del conocimiento
+## 4. Escala de madurez: teoría y operación por separado
+
+La madurez se registra por tema en dos ejes independientes. La antigua escala única K1–K5 mezclaba conocimiento con ejecución y queda sustituida por T (teoría) y O (operación).
+
+### 4.1 Madurez teórica (T)
 
 | Nivel | Significado | Evidencia mínima |
 |---|---|---|
-| K1 — Fundamental | Vocabulario y fundamentos correctos | Fuentes identificadas, conceptos contrastados, alcance y límites |
-| K2 — Técnico | Mecanismos e implementación | Ejemplos completos, configuraciones/código, pruebas de comprensión |
-| K3 — Avanzado | Diagnóstico y aplicación compleja | Casos límite, análisis de fallos, laboratorios ejecutados y evaluación práctica |
-| K4 — Experto | Dominio técnico demostrado | Revisión experta independiente, benchmarks pertinentes, trade-offs y resultados reproducibles |
-| K5 — Investigación | Conocimiento nuevo o síntesis científica rigurosa | Estado del arte, método explícito, datos/resultados trazables, análisis crítico y reproducción independiente |
+| T0 — No evaluada | Sin evidencia suficiente para juzgar el tema | Estado y brechas declarados |
+| T1 — Fundamental | Conceptos, terminología, alcance, fuentes y límites correctos | Fuentes identificadas y contrastadas; vocabulario y supuestos precisos |
+| T2 — Técnica | Mecanismos, arquitectura, estándares, variantes y procedimientos diseñados | Explicación reconstruible, diagramas, ejemplos completos y análisis estático |
+| T3 — Avanzada | Casos límite, fallos, trade-offs, modelos pertinentes, ejercicios resueltos y síntesis crítica | Evidencia trazable, comparaciones, contraejemplos, evaluación en frío y revisión documental |
+| T4 — Experta teórica | Dominio disciplinar defendible y revisión independiente por especialista | Fuentes primarias revisadas en profundidad, cobertura esencial, razonamiento avanzado, afirmaciones trazables y cierre de hallazgos |
+| T5 — Investigación teórica | Contribución original o síntesis científica de alto rigor | Método explícito, argumentación/proposición formal o análisis conceptual novedoso, límites demostrados y revisión independiente; si requiere datos empíricos, ejecutar y analizar el estudio |
 
-La madurez se asigna **por tema**, no por promedio ni por especialidad completa. Se puede usar un estado mixto, por ejemplo: K2 con laboratorios pendientes. No elevar un tema por tener muchas páginas.
+T4/T5 describen conocimiento y razonamiento teórico; no implican que herramientas o laboratorios hayan sido ejecutados. No asignar T4 sin revisión disciplinar independiente.
+
+### 4.2 Madurez operativa (O)
+
+| Nivel | Significado | Evidencia mínima |
+|---|---|---|
+| O0 — No ejecutada | No hay ejecución acreditada | Estado explícito |
+| O1 — Diseño | Prueba/laboratorio especificado | Alcance, entorno, datos, controles, resultados esperados y parada |
+| O2 — Laboratorio | Ejecución controlada | Logs, datos, versiones, resultados observados y limpieza |
+| O3 — Integración | Interoperabilidad verificada | Integraciones reales, pruebas de contrato y fallos |
+| O4 — Operación representativa | Rendimiento, recuperación y operación evaluados | Carga, resiliencia, rollback, observabilidad y riesgos residuales |
+| O5 — Reproducción independiente | Réplica externa y validación de desempeño | Segundo entorno/operador, método y resultados comparables |
+
+No asignar O2–O5 sin evidencia de ejecución correspondiente. Una configuración escrita, un script no ejecutado o un resultado esperado no constituyen ejecución.
+
+Ejemplo: **T4/O0** significa conocimiento teórico experto revisado, todavía sin validación operativa. No promediar T y O ni convertir uno en el otro. La madurez editorial M2/M3 es un estado de desarrollo del artefacto y no sustituye T u O.
 
 ## 5. Ocho puertas de calidad
 
@@ -155,13 +175,12 @@ No crear archivos vacíos para simular cobertura. Mantener los documentos existe
 
 Una especialidad solo puede declararse:
 - **Estructurada:** perfil y mapa de temas definidos.
-- **Desarrollada:** contenido técnico real en sus temas prioritarios.
-- **Validada:** fuentes y pruebas revisadas, con brechas explícitas.
-- **Experta (K4):** los temas esenciales cumplen las evidencias K4 y las puertas aplicables.
-- **Investigación (K5):** existe investigación con método y evidencia reproducible.
+- **Desarrollada teóricamente:** los temas esenciales tienen las doce capas específicas o justificadamente no aplicables, fuentes revisadas en el alcance declarado, ejemplos y evaluación en frío; la ejecución puede seguir en O0/O1.
+- **Teóricamente experta (T4):** los temas esenciales cumplen evidencias T4 y revisión disciplinar independiente.
+- **Investigación teórica (T5):** existe contribución original o síntesis científica rigurosa, método explícito, límites y revisión independiente; los resultados empíricos requieren experimentación real.
+- **Operativamente validada (O2–O5):** solo cuando existen pruebas ejecutadas e integraciones/reproducciones acreditadas según el nivel.
 
-El estado global debe mostrar distribución por tema y puertas pendientes. Nunca resumir el estado como “completo” si hay brechas críticas o validaciones no ejecutadas.
-
+El estado global debe mostrar distribución por tema en ambos ejes T/O y puertas pendientes. Nunca resumir el estado como “completo” si hay brechas críticas o validaciones no ejecutadas. El cierre teórico no certifica operación.
 
 ## 11. Separación obligatoria entre madurez teórica y operativa
 
