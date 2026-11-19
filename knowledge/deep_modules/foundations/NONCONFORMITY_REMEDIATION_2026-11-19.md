@@ -12,7 +12,7 @@ Este documento registra correcciones y evidencia nueva. No borra el dictamen pre
 
 | NC | Acción de esta iteración | Resultado |
 |---|---|---|
-| NC-01 Fuentes incompletas/vigencia | Añadido control de versiones y cambios oficiales para SP 800-57 Rev. 6 IPD, FIPS 203 errata, SP 800-53 5.2.0, ASVS 5.0.0 y ATT&CK v20.1 | Parcial: metadatos/changelog trazados; lectura integral sigue pendiente |
+| NC-01 Fuentes incompletas/vigencia | Añadido control de versiones y cambios oficiales para SP 800-57 Rev. 6 IPD (secciones técnicas), FIPS 203/204 errata, SP 800-53 5.2.0, ASVS 5.0.0, ATT&CK v20.1 y NIST SP 800-63-4 | Parcial: metadatos/changelog trazados; lectura integral sigue pendiente |
 | NC-02 Simulación vs implementación | JWS HS256 real con verificación de firma y claims; cadena de auditoría HMAC con detección de alteración/reordenamiento; assurance exige evidencia estructurada | Parcial: prototipos locales fieles; sin IdP/KMS/SIEM externo |
 | NC-03 Reproducción independiente | CI dedicado en runners limpios Python 3.11/3.12/3.13 y comparación exacta contra results.json | Parcial: reproducibilidad multi-runtime CI; segundo operador externo aún pendiente |
 | NC-04 Evaluación de conocimiento | Añadido instrumento de 21 ejercicios A/B/C y clave separada para evaluador | Instrumento y clave creados; no se ha administrado ni hay resultados de participantes |
@@ -27,14 +27,17 @@ Este documento registra correcciones y evidencia nueva. No borra el dictamen pre
 - El IPD incluye propuestas relativas a Ascon, algoritmos post-cuánticos FIPS 203/204/205 y distinción de claves para establecimiento y almacenamiento.
 - Decisión: no reemplazar Rev. 5 por un borrador. Mantener ambas entradas, etiquetar IPD y revalidar cuando NIST publique una revisión final.
 
-### FIPS 203
-NIST mantiene una nota de planificación del 2025-11-17 que indica un problema identificado para corrección en futura actualización/revisión y enlaza hoja de erratas potenciales. La biblioteca lo registra como aviso de errata pendiente de inspección del spreadsheet y seguimiento, no como estándar inmutable.
+### FIPS 203 y FIPS 204
+NIST mantiene una nota de planificación del 2025-11-17 que indica un problema identificado para corrección en futura actualización/revisión y enlaza hoja de erratas potenciales. La biblioteca lo registra como aviso de errata pendiente de inspección del spreadsheet y seguimiento, no como estándar inmutable. FIPS 204 tiene un aviso distinto fechado 2026-07-31 que señala varios issues menores para futura actualización/revisión; la hoja de erratas también queda pendiente de inspección.
 
 ### SP 800-53 Release 5.2.0
 La revisión de la nota de cambios identifica, entre otros, SA-24 Design for Cyber Resiliency, SA-15(13) Logging Syntax, SI-02(07) Root Cause Analysis y cambio en SI-07(12). El registro marca explícitamente que no se leyó el catálogo completo.
 
 ### OWASP ASVS 5.0.0
 La página oficial confirma publicación estable el 2025-05-30 y descargas PDF/DOCX/CSV. El registro no convierte esto en lectura de todos los requisitos.
+
+### NIST SP 800-63-4 para Identity
+La Rev. 4 final (2025-07-31) sustituye SP 800-63-3 y cubre identity proofing, enrollment, autenticadores, autenticación, federación y assertions. Se registran también SP 800-63B-4 y SP 800-63C-4. Solo se verificaron metadatos y abstracts; los requisitos técnicos completos siguen pendientes.
 
 ### MITRE ATT&CK v20.1
 La versión oficial actual a fecha de revisión es v20.1 (2026-10-13). Se añadió referencia a las release notes de octubre 2026; las cifras/cambios de catálogo no se usan como probabilidades ni como prueba de aplicabilidad universal.
@@ -69,7 +72,7 @@ El revisor debe declarar experiencia y conflictos; seleccionar al menos dos tema
 Ninguna Skill se promueve por documentación o un ejemplo feliz. Debe incluir precondiciones, permisos mínimos, I/O, pasos, pruebas negativas, límites, parada, rollback, logging, secretos, evidencias, versiones y owner. La promoción exige ejecución reproducible y revisión independiente. Las Skills siguen `candidate`.
 
 ## Próximos criterios de cierre
-- NC-01: lectura técnica de fuentes prioritarias y claims por página/sección.
+- NC-01: lectura técnica de fuentes prioritarias y claims por página/sección; inspeccionar hojas XLSX de erratas FIPS 203/204 y requisitos completos SP 800-63.
 - NC-02: integrar IdP de laboratorio y stack de logs/KMS aislado, versiones fijadas, interoperabilidad y teardown seguro.
 - NC-03: segundo operador en otro entorno con resultado registrado.
 - NC-04: evaluación ciega real y análisis.
