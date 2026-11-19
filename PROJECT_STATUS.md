@@ -235,3 +235,16 @@ Se añadieron estudios para Identidad y acceso, Análisis de malware, Forense di
 - Se incorporaron NIST SP 800-63-4/63B-4, NISTIR 8259A/B/Rev.1, SP 800-193, SP 800-86, SP 800-83 Rev.1 y el NIST Privacy Framework, con advertencias sobre antigüedad y alcance.
 
 **Pendiente:** CI del HEAD final, revisión de texto completo y erratas, validación por especialistas, ejecución de laboratorios, reproducción independiente y desarrollo de los 24 dominios restantes. Los estudios siguen en madurez documental inicial; no son certificaciones ni pruebas operativas.
+
+
+### Cuarta tanda — ocho dominios adicionales
+
+Se añadieron estudios para Aprendizaje automático, Matemáticas, Ingeniería de software, SOC/SIEM/SOAR, EDR/XDR, Threat hunting, Red Team autorizado y Wireless/Bluetooth/NFC. Las cuatro tandas suman **32 de 48 dominios** del manifiesto con estudios técnicos propios.
+
+- Registro de esta entrega: 60 referencias.
+- Registro central: 122 fuentes únicas (110 antes de esta tanda; 12 añadidas ahora).
+- Prueba estructural ampliada para los 32 estudios y sus enlaces/fuentes.
+- Se actualizó el estudio de seguridad de IA para priorizar NIST AI 100-2 E2025 sobre E2023.
+- Se registran límites de antigüedad de NIST SP 800-94/115/137 y versiones de CAPEC, D3FEND, Sigma, Zeek, Suricata y estándares inalámbricos.
+
+**Pendiente:** 16 dominios del manifiesto, además de profundidad adicional en todos los estudios, lectura íntegra de fuentes, experimentos, laboratorios y revisión independiente. No declarar M4/M5 ni cobertura experta sin evidencia.
