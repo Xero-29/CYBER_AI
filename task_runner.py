@@ -220,8 +220,17 @@ def main():
         )
         return 3 if args.require_ledger and recorded is None else 2
 
-    output_dir = Path("reports")
-    output_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        output_dir = ensure_private_directory(Path("reports"))
+    except SafeWriteError as error:
+        print("ERROR: directorio de informes inseguro:", error, file=sys.stderr)
+        recorded = _record_task_scan(
+            args.task, args.target,
+            {"task": args.task, "target": args.target, "status": "failed",
+             "reason": "unsafe_report_directory"},
+            task_started, args.authorization_id,
+        )
+        return 3 if args.require_ledger and recorded is None else 2
     scan_id = uuid.uuid4().hex
     results_file = output_dir / f"task_scan_{scan_id}.jsonl"
     report_file = output_dir / f"task_scan_{scan_id}_report.json"
@@ -253,9 +262,21 @@ def main():
         print("\nIniciando comprobaciones limitadas...")
         started = time.monotonic()
         try:
-            process = subprocess.run(
-                command, capture_output=True, text=True, timeout=90
-            )
+            with tempfile.TemporaryDirectory(prefix="cyber-ai-nuclei-") as isolated_home:
+                if os.name == "posix":
+                    os.chmod(isolated_home, 0o700)
+                process_env = build_minimal_environment(isolated_home, nuclei)
+                process = subprocess.run(
+                    command,
+                    capture_output=True,
+                    text=True,
+                    timeout=90,
+                    stdin=subprocess.DEVNULL,
+                    env=process_env,
+                    cwd=isolated_home,
+                    close_fds=True,
+                    shell=False,
+                )
             elapsed = round(time.monotonic() - started, 2)
         except subprocess.TimeoutExpired:
             try:
@@ -274,9 +295,9 @@ def main():
                 "tool_allowlist": binary_provenance["allowlist"],
                 "findings": [],
             }
-            report_file.write_text(
+            atomic_write_text(
+                report_file,
                 json.dumps(report, indent=2, ensure_ascii=False) + "\n",
-                encoding="utf-8",
             )
             recorded = _record_task_scan(args.task, args.target, report, task_started, args.authorization_id, start_event_id)
             if args.require_ledger and recorded is None:
@@ -284,22 +305,58 @@ def main():
             print("Tiempo agotado. Informe:", report_file)
             return 1
     
+        try:
+            binary_after = hash_executable(nuclei)
+            binary_modified = binary_after["sha256"] != binary_provenance["sha256"]
+        except BinaryIntegrityError:
+            binary_after = None
+            binary_modified = True
+
         findings = []
-        if results_file.is_file():
-            for line in results_file.read_text(encoding="utf-8").splitlines():
-                try:
-                    findings.append(json.loads(line))
-                except json.JSONDecodeError:
-                    pass
-    
+        output_limit_exceeded = False
+        evidence_invalid = False
+        if results_file.exists() or results_file.is_symlink():
+            try:
+                output_info = results_file.lstat()
+                if stat.S_ISLNK(output_info.st_mode) or not stat.S_ISREG(output_info.st_mode):
+                    evidence_invalid = True
+                elif output_info.st_size > MAX_SCAN_OUTPUT_BYTES:
+                    output_limit_exceeded = True
+                else:
+                    with results_file.open("r", encoding="utf-8") as stream:
+                        for line in stream:
+                            if len(line.encode("utf-8")) > 1024 * 1024:
+                                evidence_invalid = True
+                                findings = []
+                                break
+                            if len(findings) >= MAX_FINDINGS:
+                                output_limit_exceeded = True
+                                findings = []
+                                break
+                            try:
+                                findings.append(json.loads(line))
+                            except json.JSONDecodeError:
+                                pass
+            except OSError:
+                evidence_invalid = True
+
+        discarded_findings_count = 0
+        if binary_modified:
+            discarded_findings_count = len(findings)
+            findings = []
+
+        report_status = (
+            "integrity_error" if binary_modified
+            else "output_limit_exceeded" if output_limit_exceeded
+            else "evidence_invalid" if evidence_invalid
+            else "completed" if process.returncode == 0 else "scanner_error"
+        )
+
         report = {
             "task": args.task,
             "target": args.target,
             "authorization": grant,
-            "status": (
-                "integrity_error" if binary_modified
-                else "completed" if process.returncode == 0 else "scanner_error"
-            ),
+            "status": report_status,
             "elapsed_seconds": elapsed,
             "tool_binary_sha256": binary_provenance["sha256"],
             "tool_binary_sha256_after": binary_after["sha256"] if binary_after else None,
@@ -308,13 +365,15 @@ def main():
             "templates_used": [item["path"] for item in selected],
             "findings_count": len(findings),
             "discarded_findings_count": discarded_findings_count,
+            "output_limit_exceeded": output_limit_exceeded,
+            "evidence_invalid": evidence_invalid,
             "findings": findings,
             "scanner_output": (process.stdout + "\n" + process.stderr)[-12000:],
             "note": "Los resultados son indicios y requieren validación.",
         }
-        report_file.write_text(
+        atomic_write_text(
+            report_file,
             json.dumps(report, indent=2, ensure_ascii=False) + "\n",
-            encoding="utf-8",
         )
         recorded = _record_task_scan(args.task, args.target, report, task_started, args.authorization_id, start_event_id)
         if args.require_ledger and recorded is None:
