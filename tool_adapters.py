@@ -184,6 +184,10 @@ def _probe_tool_version(binary, tool_id, env):
 
 def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
     """Ejecuta el adaptador con HOME/TMP efímeros y entorno mínimo."""
+    if os.name != "posix":
+        raise ToolExecutionError(
+            "Ejecución bloqueada: se requiere un Job Object para aislar procesos descendientes en Windows."
+        )
     with tempfile.TemporaryDirectory(prefix="cyber-ai-tool-home-") as isolated_home:
         if os.name == "posix":
             os.chmod(isolated_home, 0o700)

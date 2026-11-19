@@ -23,7 +23,7 @@ from binary_integrity import (
     require_approved_executable,
 )
 from safe_io import SafeWriteError, atomic_write_text, ensure_private_directory
-from process_isolation import run_bounded_process
+from process_isolation import ProcessIsolationError, run_bounded_process
 from template_integrity import (
     hash_selected_templates as _hash_selected_templates,
     safe_template_path as _safe_template_path,
@@ -397,7 +397,11 @@ def main():
         report = {
             "task": args.task,
             "target": args.target,
-            "status": "failed",
+            "status": (
+                "isolation_required"
+                if isinstance(error, ProcessIsolationError)
+                else "failed"
+            ),
             "error_type": type(error).__name__,
             "error": str(error),
             "findings": [],

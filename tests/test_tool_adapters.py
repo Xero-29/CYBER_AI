@@ -255,6 +255,13 @@ class ToolAdapterTests(unittest.TestCase):
 
 
     @patch("tool_adapters.shutil.which")
+    def test_windows_requires_job_object_before_host_execution(self, which):
+        with patch("tool_adapters.os.name", "nt"):
+            with self.assertRaisesRegex(ToolExecutionError, "Job Object"):
+                run_local_tool("ruff", "sample.py")
+        which.assert_not_called()
+
+    @patch("tool_adapters.shutil.which")
     def test_yara_requires_isolation_before_host_execution(self, which):
         with self.assertRaisesRegex(ToolExecutionError, "sandbox aislado"):
             run_local_tool("yara", "sample.py", config_path="sample.py")

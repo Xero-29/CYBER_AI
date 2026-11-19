@@ -63,6 +63,20 @@ class NucleiScannerTests(unittest.TestCase):
             path.write_text("id: test-template\ninfo:\n  name: test\n  severity: info\n", encoding="utf-8")
         return paths
 
+    def test_scan_fails_closed_without_windows_job_object(self):
+        with patch("nuclei_scanner.authorize_target", return_value={"authorization_id": "grant"}):
+            with patch("nuclei_scanner.os.name", "nt"):
+                with patch("nuclei_scanner.ExecutionLedger") as ledger:
+                    ledger.return_value.append.return_value = {"event_id": "terminal"}
+                    with patch("nuclei_scanner.shutil.which") as which:
+                        result = scan_target(
+                            "http://127.0.0.1:8765",
+                            authorized=True,
+                            authorization_id="test-grant",
+                        )
+        self.assertEqual(result["status"], "isolation_required")
+        which.assert_not_called()
+
     def test_scan_requires_explicit_authorization(self):
         result = scan_target("http://127.0.0.1:8765")
         self.assertEqual(result["status"], "authorization_required")

@@ -180,6 +180,16 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
             "findings": [],
         }
         return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)
+
+    if os.name != "posix":
+        result = {
+            "target": target,
+            "status": "isolation_required",
+            "error": "Ejecución bloqueada: se requiere un Job Object para aislar procesos descendientes en Windows.",
+            "findings": [],
+        }
+        return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)
+
     executable = shutil.which("nuclei")
 
     if not executable:

@@ -109,6 +109,47 @@ class TaskRunnerLedgerTests(unittest.TestCase):
         self.assertEqual(result, 0)
         scanner.assert_called_once()
 
+    def test_process_isolation_error_is_reported_as_required(self):
+        with tempfile.TemporaryDirectory() as workspace, tempfile.TemporaryDirectory() as home:
+            nuclei_executable = Path(workspace) / "nuclei"
+            nuclei_executable.write_bytes(b"fake nuclei binary")
+            provenance = {
+                "resolved_path": str(nuclei_executable),
+                "sha256": hashlib.sha256(nuclei_executable.read_bytes()).hexdigest(),
+                "allowlist": {"enforced": True, "status": "approved"},
+            }
+            template = Path(home) / "nuclei-templates/http/technologies/tech-detect.yaml"
+            template.parent.mkdir(parents=True)
+            template.write_text("id: test\n", encoding="utf-8")
+            ledger = unittest.mock.Mock()
+            ledger.append.side_effect = [{"event_id": "start"}, {"event_id": "terminal"}]
+            old_cwd = os.getcwd()
+            try:
+                os.chdir(workspace)
+                with (
+                    patch.object(Path, "home", return_value=Path(home)),
+                    patch.object(task_runner, "select_capabilities", return_value=[{"path": str(template)}]),
+                    patch.object(task_runner, "authorize_target", return_value={"authorization_id": "grant"}),
+                    patch.object(task_runner.shutil, "which", return_value=str(nuclei_executable)),
+                    patch.object(task_runner, "require_approved_executable", return_value=provenance),
+                    patch.object(task_runner, "ExecutionLedger", return_value=ledger),
+                    patch.object(
+                        task_runner, "run_bounded_process",
+                        side_effect=task_runner.ProcessIsolationError("Job Object required"),
+                    ),
+                    patch.object(sys, "argv", [
+                        "task_runner.py", "--task", "inspect web headers",
+                        "--target", "https://203.0.113.10", "--execute",
+                        "--confirm-authorized", "--authorization-id", "grant",
+                    ]),
+                ):
+                    result = task_runner.main()
+                self.assertEqual(result, 1)
+                report = json.loads(Path("reports/task_runner_report.json").read_text(encoding="utf-8"))
+                self.assertEqual(report["status"], "isolation_required")
+            finally:
+                os.chdir(old_cwd)
+
     def test_unexpected_scanner_exception_is_recorded_as_failed(self):
         ledger = unittest.mock.Mock()
         ledger.append.side_effect = [
