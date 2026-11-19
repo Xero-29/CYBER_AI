@@ -7,9 +7,9 @@
 
 ## Resultado de la inspección documental
 
-Se inspeccionaron los 48 compendios técnicos. Todos tienen documentos y rutas de subtemas; sin embargo, la mera existencia de secciones no demuestra cobertura de las doce capas. En varios compendios se repiten bloques metodológicos transversales sin suficiente contenido disciplinar específico. En particular, 41 compendios siguen con contenido inicial y requieren ampliación profunda; seis (identity, malware, forensics, incident_response, threat_intel y reverse) recibieron reescritura disciplinar inicial. Foundations recibió además un documento de desarrollo general ampliado, pero todavía no tiene auditoría tema×capa ni evidencia suficiente para elevar su madurez.
+Se inspeccionaron los 48 compendios técnicos. Todos tienen documentos y rutas de subtemas; sin embargo, la mera existencia de secciones no demuestra cobertura de las doce capas. En varios compendios se repiten bloques metodológicos transversales sin suficiente contenido disciplinar específico. En particular, 41 compendios siguen con contenido inicial y requieren ampliación profunda; seis (identity, malware, forensics, incident_response, threat_intel y reverse) recibieron reescritura disciplinar inicial. Foundations recibió una auditoría documental individual de sus siete temas contra las doce capas; las 84 celdas están en progreso, sin capas aprobadas, y la madurez permanece M2.
 
-**Conclusión:** las 48 áreas siguen en M2 editorial. No hay base para declarar K3/K4/K5 ni G1–G8 aprobadas globalmente. La matriz JSON registra 7 unidades temáticas iniciales por área y 12 capas por tema. Todos los estados empiezan en `not_assessed` para evitar inferir cumplimiento desde encabezados o texto genérico.
+**Conclusión:** las 48 áreas siguen en M2 editorial. No hay base para declarar K3/K4/K5 ni G1–G8 aprobadas globalmente. La matriz JSON registra 7 unidades temáticas iniciales por área y 12 capas por tema. Los estados iniciales permanecen `not_assessed` hasta que existe evidencia mapeada; Foundations es la excepción actual: sus 84 celdas pasan a `in_progress` tras incorporar dossiers específicos, sin inferir aprobación.
 
 ## Doce capas que deben verificarse en cada tema
 
@@ -61,7 +61,7 @@ Se inspeccionaron los 48 compendios técnicos. Todos tienen documentos y rutas d
 6. Robustez, sesgo y leakage
 7. Provenance y seguridad de inferencia
 
-**Estado:** generic_or_initial_compendium_requires_deep_audit; 12 capas por tema: `not_assessed`; G1–G8: `not_assessed`; madurez: M2.
+**Estado:** seven_topic_audits_documented_in_progress; 12 capas por tema: `in_progress` (84/84); G1–G4: `in_progress`; G5–G8: `blocked`; madurez: M2. Evidencia: [auditoría disciplinar por tema](../deep_modules/foundations/FOUNDATIONS_DEEP_DEVELOPMENT_V1.md). Siete protocolos diseñados; cero ejecuciones acreditadas; fuentes oficiales inspeccionadas a nivel de metadatos/abstract, lectura integral pendiente.
 
 ### 3. `api`
 
@@ -254,6 +254,20 @@ Se inspeccionaron los 48 compendios técnicos. Todos tienen documentos y rutas d
 7. Gobierno, riesgo y aseguramiento
 
 **Estado:** generic_or_initial_compendium_requires_deep_audit; 12 capas por tema: `not_assessed`; G1–G8: `not_assessed`; madurez: M2.
+
+### Estado detallado de Foundations — auditoría 2026-11-19
+
+| Tema | Capas | Corrección documental | Evidencia pendiente |
+|---|---:|---|---|
+| foundations-01 Modelos de seguridad y confianza | 12/12 en progreso | Modelo formal, arquitectura PDP/PEP, pruebas de autorización y fallos de confianza | Laboratorio y revisión independiente |
+| foundations-02 Inventario y clasificación de activos | 12/12 en progreso | Esquema de activos, reconciliación multi-fuente, métricas y dataset sintético | Ground truth ejecutado y validación |
+| foundations-03 Superficie de ataque y modelado de amenazas | 12/12 en progreso | DFD, attack graphs, STRIDE/abuse cases, evaluación ciega | Comparación empírica y acuerdo entre revisores |
+| foundations-04 Identidad y control de acceso | 12/12 en progreso | Ciclo de vida, federación, tokens, privilegios y revocación | Pruebas de laboratorio y evaluación |
+| foundations-05 Criptografía y protección de datos | 12/12 en progreso | Modelos criptográficos, ciclo de claves, AEAD, fallos y agilidad | Vectores de prueba, ejecución e interoperabilidad |
+| foundations-06 Detección, respuesta y recuperación | 12/12 en progreso | Pipeline de telemetría, respuesta, recuperación y métricas | Dataset/ejecución y evaluación de detección |
+| foundations-07 Gobierno, riesgo y aseguramiento | 12/12 en progreso | Registro de riesgos, assurance case, roles y trazabilidad | Revisión ciega y revisión independiente |
+
+**Dictamen:** la cobertura documental por tema y capa fue añadida; no equivale a K3/K4/K5. G1–G4 continúan en progreso. G5–G8 bloqueadas por falta de experimentos ejecutados, resultados, reproducción y revisión independiente. Las fuentes NIST inspeccionadas no se consideran lectura integral.
 
 ### 19. `fraud_abuse`
 
