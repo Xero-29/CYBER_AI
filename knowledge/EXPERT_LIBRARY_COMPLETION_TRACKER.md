@@ -1,3 +1,5 @@
+> **Actualización normativa 2026-11-19:** se incorpora `knowledge/COLD_KNOWLEDGE_EXECUTION_PROTOCOL.md`. Desde este corte, las 48 especialidades se evalúan explícitamente por enseñanza, explicación, análisis y diseño, además de las doce capas. El orden obligatorio es Foundations → AI Red Team → las otras 46. No se promueve ninguna celda por volumen, encabezados o presencia de archivos. La madurez T/O permanece separada. Este protocolo no cambia retroactivamente estados a `passed`.
+
 # Seguimiento de aplicación del estándar experto — Biblioteca CYBER_AI
 
 **Corte editorial:** 2026-11-19  
