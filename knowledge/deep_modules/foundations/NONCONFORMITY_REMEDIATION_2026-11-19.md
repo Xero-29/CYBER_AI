@@ -12,8 +12,8 @@ Este documento registra correcciones y evidencia nueva. No borra el dictamen pre
 
 | NC | Acción de esta iteración | Resultado |
 |---|---|---|
-| NC-01 Fuentes incompletas/vigencia | Añadido control de versiones y cambios oficiales para SP 800-57 Rev. 6 IPD (secciones técnicas), FIPS 203/204 errata, SP 800-53 5.2.0, ASVS 5.0.0, ATT&CK v20.1 y NIST SP 800-63-4 | Parcial: metadatos/changelog trazados; lectura integral sigue pendiente |
-| NC-02 Simulación vs implementación | JWS HS256 real con verificación de firma y claims; cadena de auditoría HMAC con detección de alteración/reordenamiento; assurance exige evidencia estructurada | Parcial: prototipos locales fieles; sin IdP/KMS/SIEM externo |
+| NC-01 Fuentes incompletas/vigencia | Añadido control de versiones y cambios oficiales para SP 800-57 Rev. 6 IPD (secciones técnicas), FIPS 203/204 errata, SP 800-53 5.2.0, ASVS 5.0.0, ATT&CK v20.1 y NIST SP 800-63-4/B-4/C-4 | Parcial: SP 800-57 IPD con secciones técnicas seleccionadas; NIST 800-63 y erratas FIPS con metadatos/avisos; lectura integral sigue pendiente |
+| NC-02 Simulación vs implementación | JWS HS256 con base64url estricto, allowlist JOSE, rechazo JSON duplicado, firma y claims; cadena HMAC con detección de alteración/reordenamiento; assurance exige evidencia estructurada | Parcial: prototipos locales fieles; sin IdP/KMS/SIEM externo |
 | NC-03 Reproducción independiente | CI dedicado en runners limpios Python 3.11/3.12/3.13 y comparación exacta contra results.json | Parcial: reproducibilidad multi-runtime CI; segundo operador externo aún pendiente |
 | NC-04 Evaluación de conocimiento | Añadido instrumento de 21 ejercicios A/B/C y clave separada para evaluador | Instrumento y clave creados; no se ha administrado ni hay resultados de participantes |
 | NC-05 Revisión externa | Definido paquete de revisión y checklist para tercero | Bloqueada hasta que una persona independiente revise y emita dictamen |
@@ -24,7 +24,7 @@ Este documento registra correcciones y evidencia nueva. No borra el dictamen pre
 ### NIST SP 800-57 Part 1
 - Rev. 5 sigue siendo la publicación final identificada en el registro consultado.
 - Rev. 6 Initial Public Draft se publicó el 2025-12-05; el periodo de comentarios cerró el 2026-02-05.
-- El IPD incluye propuestas relativas a Ascon, algoritmos post-cuánticos FIPS 203/204/205 y distinción de claves para establecimiento y almacenamiento.
+- El IPD incluye propuestas relativas a Ascon, algoritmos post-cuánticos FIPS 203/204/205 y distinción de claves para establecimiento y almacenamiento. Se revisaron secciones seleccionadas del PDF: fases y estados de clave, metadata, cryptoperiod, re-keying frente a key update e inventario. La salida técnica se incorporó al dossier de criptografía. El IPD continúa sin ser final.
 - Decisión: no reemplazar Rev. 5 por un borrador. Mantener ambas entradas, etiquetar IPD y revalidar cuando NIST publique una revisión final.
 
 ### FIPS 203 y FIPS 204
