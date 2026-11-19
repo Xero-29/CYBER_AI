@@ -106,9 +106,11 @@ def lab07_assurance():
       {"id":"C3","implemented":False,"evidence":"none","owner":"owner-c"},
       {"id":"C4","implemented":True,"evidence":"contradictory","owner":"owner-d"}]
     closed=[c["id"] for c in controls if c["implemented"] and c["evidence"]=="current_test" and c["owner"]]
+    rejected=[c for c in controls if c["id"] not in closed]
     return {"controls":len(controls),"validly_closed":closed,
-      "unsubstantiated_not_closed":[c["id"] for c in controls if c["id"] not in closed],
-      "false_closures_prevented":3,"coverage":round(len(closed)/len(controls),4)}
+      "unsubstantiated_not_closed":[c["id"] for c in rejected],
+      "false_closures_prevented":sum(c["evidence"] in {"expired_policy","contradictory","none"} for c in rejected),
+      "coverage":round(len(closed)/len(controls),4)}
 
 def run_all():
     labs={"LAB-FND-01A":lab01_authorization(),"LAB-FND-02A":lab02_asset_reconciliation(),
