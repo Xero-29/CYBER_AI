@@ -33,3 +33,6 @@ NIST SSDF SP 800-218 ofrece prácticas para reducir vulnerabilidades en el ciclo
 Leer documentación y fuentes completas; añadir estudios revisados por pares; comparar herramientas y arquitecturas; crear corpus de ground truth; ejecutar fuzzing y análisis diferencial en binarios propios; registrar falsos positivos y resultados negativos; obtener revisión independiente.
 
 **Conclusión limitada:** mapa bibliográfico inicial, no evidencia de cobertura exhaustiva ni de eficacia de herramientas. No se han ejecutado experimentos.
+
+
+**Límite empírico:** No se ha ejecutado experimento ni se dispone de validación empírica. La revisión no permite elevar la madurez por encima de M2.
