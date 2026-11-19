@@ -1367,6 +1367,139 @@
       ],
       "verification_status": "official_project_page_reviewed",
       "review_note": "Revisar el documento completo, edición, erratas, licencia y alcance antes de usar como evidencia específica."
+    },
+    {
+      "id": "OWASP-WSTG-4.2",
+      "title": "Web Security Testing Guide",
+      "publisher": "OWASP",
+      "version": "4.2 stable; 5.0 in development",
+      "url": "https://wstg.owasp.org/",
+      "domains": [
+        "appsec",
+        "api",
+        "bug_bounty"
+      ],
+      "verification_status": "official_project_release_status_reviewed",
+      "review_note": "v4.2 stable and v5.0 under development; do not mix scenario identifiers across versions."
+    },
+    {
+      "id": "MS-WINDOWS-SERVER-2025-BASELINE",
+      "title": "Configure Security Baselines for Windows Server 2025",
+      "publisher": "Microsoft",
+      "version": "Windows Server 2025",
+      "url": "https://learn.microsoft.com/windows-server/security/osconfig/osconfig-how-to-configure-security-baselines",
+      "domains": [
+        "windows_ad"
+      ],
+      "verification_status": "official_documentation_page_reviewed",
+      "review_note": "Apply by server role and supported OS; validate baseline impact before production rollout."
+    },
+    {
+      "id": "MS-AD-DS-DOCS",
+      "title": "Active Directory Domain Services documentation",
+      "publisher": "Microsoft",
+      "version": "Continuously updated",
+      "url": "https://learn.microsoft.com/windows-server/identity/ad-ds/",
+      "domains": [
+        "windows_ad",
+        "identity"
+      ],
+      "verification_status": "official_documentation_reference_registered",
+      "review_note": "Documentation portal; individual technical procedures need exact versioned pages."
+    },
+    {
+      "id": "NIST-SP800-144",
+      "title": "Guidelines on Security and Privacy in Public Cloud Computing",
+      "publisher": "NIST",
+      "version": "SP 800-144",
+      "published": "2011-12",
+      "url": "https://doi.org/10.6028/NIST.SP.800-144",
+      "domains": [
+        "cloud",
+        "secure_arch"
+      ],
+      "verification_status": "official_publication_reference_registered",
+      "review_note": "Foundational guidance; dated publication, complement with current provider-specific shared responsibility and controls."
+    },
+    {
+      "id": "NIST-SP800-190",
+      "title": "Application Container Security Guide",
+      "publisher": "NIST",
+      "version": "SP 800-190",
+      "published": "2017-09",
+      "url": "https://doi.org/10.6028/NIST.SP.800-190",
+      "domains": [
+        "containers",
+        "cloud",
+        "devsecops"
+      ],
+      "verification_status": "official_publication_reference_registered",
+      "review_note": "Foundational container guide; supplement with current Kubernetes/runtime guidance."
+    },
+    {
+      "id": "NSA-CISA-K8S-HARDENING",
+      "title": "Kubernetes Hardening Guidance",
+      "publisher": "NSA/CISA",
+      "version": "Current guidance",
+      "url": "https://www.cisa.gov/resources-tools/resources/kubernetes-hardening-guidance",
+      "domains": [
+        "containers",
+        "cloud"
+      ],
+      "verification_status": "official_guidance_reference_registered",
+      "review_note": "Validate revision date and cluster version applicability before operational use."
+    },
+    {
+      "id": "K8S-SECURITY-CHECKLIST",
+      "title": "Kubernetes Security Checklist",
+      "publisher": "Kubernetes project",
+      "version": "Current documentation",
+      "url": "https://kubernetes.io/docs/concepts/security/security-checklist/",
+      "domains": [
+        "containers"
+      ],
+      "verification_status": "official_project_documentation_reviewed",
+      "review_note": "Version-sensitive checklist; pin Kubernetes release and verify feature maturity."
+    },
+    {
+      "id": "OWASP-MAS",
+      "title": "OWASP Mobile Application Security (MAS)",
+      "publisher": "OWASP",
+      "version": "Current project",
+      "url": "https://owasp.org/projects/mobile-application-security/",
+      "domains": [
+        "mobile",
+        "api",
+        "privacy_engineering"
+      ],
+      "verification_status": "official_project_scope_reviewed",
+      "review_note": "Project includes MASVS, MASWE and MASTG; pin release versions for tests."
+    },
+    {
+      "id": "ANDROID-SECURITY",
+      "title": "Android Security documentation",
+      "publisher": "Google/Android Open Source Project",
+      "version": "Current documentation",
+      "url": "https://source.android.com/docs/security",
+      "domains": [
+        "mobile",
+        "iot_hardware"
+      ],
+      "verification_status": "official_documentation_reference_registered",
+      "review_note": "Version and device implementation specific; test OEM/platform variants."
+    },
+    {
+      "id": "APPLE-PLATFORM-SECURITY",
+      "title": "Apple Platform Security",
+      "publisher": "Apple",
+      "version": "Current guide",
+      "url": "https://support.apple.com/guide/security/welcome/web",
+      "domains": [
+        "mobile",
+        "hardware_security"
+      ],
+      "verification_status": "official_documentation_reference_registered",
+      "review_note": "Review current platform release and hardware generation before mapping controls."
     }
   ],
   "last_updated": "2026-11-17"
