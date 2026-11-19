@@ -1122,6 +1122,73 @@
         "devsecops"
       ],
       "review_note": "Página oficial CIS inspeccionada el 2026-11-19. Descarga, términos de uso, licencia y lectura del documento completo pendientes."
+    },
+    {
+      "id": "OWASP-WSTG-4.2",
+      "title": "Web Security Testing Guide",
+      "publisher": "OWASP Foundation",
+      "type": "web_application_security_testing_guide",
+      "url": "https://owasp.org/www-project-web-security-testing-guide/v42/",
+      "version": "4.2",
+      "published": "2020-12-03",
+      "verification_status": "official_specification_pages_reviewed",
+      "verified_scope": "La guía oficial identifica WSTG 4.2 como release versionado y documenta categorías y escenarios de pruebas; WSTG 5.0 aparece en desarrollo.",
+      "domains": [
+        "appsec",
+        "api"
+      ],
+      "review_note": "Página oficial del proyecto y estado de versiones inspeccionados el 2026-11-19; no se declara lectura integral de todos los escenarios."
+    },
+    {
+      "id": "NIST-SP-800-218-SSDF-1.1",
+      "title": "Secure Software Development Framework (SSDF) Version 1.1",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_secure_development_framework",
+      "url": "https://csrc.nist.gov/pubs/sp/800/218/final",
+      "version": "1.1",
+      "published": "2022-02-03",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verified_scope": "Metadatos y abstract oficiales confirman prácticas de desarrollo seguro integrables en distintos SDLC para reducir vulnerabilidades y abordar causas raíz.",
+      "domains": [
+        "appsec",
+        "devsecops",
+        "software_engineering"
+      ],
+      "review_note": "Página oficial NIST y abstract inspeccionados el 2026-11-19; texto íntegro y tablas de prácticas pendientes."
+    },
+    {
+      "id": "MITRE-CWE-TOP25-2025",
+      "title": "2025 CWE Top 25 Most Dangerous Software Weaknesses",
+      "publisher": "MITRE",
+      "type": "official_weakness_prioritization_list",
+      "url": "https://cwe.mitre.org/top25/archive/2025/2025_cwe_top25",
+      "version": "2025",
+      "published": "2025-12-11",
+      "verification_status": "official_specification_pages_reviewed",
+      "verified_scope": "Lista 2025 y metodología pública basadas en 39,080 registros CVE; destaca debilidades como XSS, SQLi, CSRF, autorización ausente, path traversal y SSRF.",
+      "domains": [
+        "appsec",
+        "api",
+        "vulnerability_research",
+        "vuln_management"
+      ],
+      "review_note": "Página oficial de lista y tabla de ranking inspeccionadas el 2026-11-19; no equivale a análisis de todos los CWE ni a prevalencia universal."
+    },
+    {
+      "id": "OWASP-SQLI-PREVENTION",
+      "title": "SQL Injection Prevention Cheat Sheet",
+      "publisher": "OWASP Foundation",
+      "type": "secure_coding_guidance",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html",
+      "version": "Current online series",
+      "verification_status": "official_project_page_reviewed",
+      "verified_scope": "Guía recomienda consultas parametrizadas, allowlists para identificadores estructurales y privilegio mínimo; explica límites de escaping manual.",
+      "domains": [
+        "appsec",
+        "api",
+        "database_security"
+      ],
+      "review_note": "Página oficial y recomendaciones primarias inspeccionadas el 2026-11-19; validar ejemplos por lenguaje/driver y no asumir equivalencia entre motores."
     }
   ],
   "last_updated": "2026-11-17"
