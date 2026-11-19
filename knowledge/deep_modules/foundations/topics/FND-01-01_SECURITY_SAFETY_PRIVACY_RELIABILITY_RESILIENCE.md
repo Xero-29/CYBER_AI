@@ -279,3 +279,8 @@ El mapeo condicional de Ley 1581/2012 y, cuando corresponda, Decreto 1575/2007 y
 
 
 Soluciones modelo ampliadas para las cuatro capacidades: [FND-01-01_CAPABILITY_WORKED_SOLUTIONS_V1.md](FND-01-01_CAPABILITY_WORKED_SOLUTIONS_V1.md). Estas soluciones son material de referencia para evaluación ciega, no respuestas de un candidato ni prueba de competencia.
+
+
+## Control de versión de evaluación
+
+La V1 de evaluación en frío queda supersedida: sus ponderaciones sumaban 110 puntos. La V2 corrige los pesos a 100 puntos, añade variantes de transferencia y se acompaña de un protocolo de doble calificación ciega. Ninguna versión se ha administrado; la no conformidad de evaluación sigue abierta.
