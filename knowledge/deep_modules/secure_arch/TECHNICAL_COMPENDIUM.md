@@ -122,3 +122,30 @@ Todo estudio debe definir H0/H1, variables, muestra, comparadores, criterio de r
 
 ## Madurez
 M0/M1 estructural. Este documento no prueba profundidad cubierta ni madurez M3/M4/M5. Siguiente puerta: lectura crítica de fuentes completas, artefactos específicos, ejecución de laboratorio y evidencia verificable.
+
+
+## Profundización técnica específica: Arquitectura segura
+
+### Principios y límites de confianza
+Definir dominios, actores, activos, flujos, límites, dependencias, invariantes y objetivos de seguridad. Aplicar least privilege, complete mediation, fail-safe defaults, separation of duties, defense in depth y secure by design. Documentar supuestos, riesgos residuales, decisiones y alternativas descartadas. Zero Trust exige decisiones explícitas por recurso/contexto, no solo segmentación.
+
+### Modelado de amenazas
+Usar STRIDE, attack trees, misuse cases, LINDDUN u otros métodos según objetivo. Identificar spoofing, tampering, repudiation, information disclosure, denial of service y elevation of privilege. Asociar amenazas a activos, precondiciones, controles, pruebas y evidencia. Revisar el modelo cuando cambien arquitectura, proveedor, datos o trust boundary.
+
+### Arquitectura distribuida y cloud-native
+Evaluar identidad de servicio, mTLS, service mesh, API gateway, event bus, queues, retries, circuit breakers, secrets, control plane y observabilidad. Fallos de red y consistencia generan ventanas de autorización; revisar cache invalidation, replay, idempotencia y mensajes duplicados. Seguridad debe mantenerse durante degradación y recuperación.
+
+### Resiliencia y fallos
+Modelar dependencias críticas, single points of failure, fail-open/fail-closed, graceful degradation, backups, restore, disaster recovery y aislamiento de incidentes. Definir RTO/RPO por servicio y probarlos. No diseñar seguridad que haga imposible recuperación ni disponibilidad que abra rutas inseguras.
+
+### Revisión y aceptación
+Architecture review debe incluir diagramas actualizados, threat model, requisitos, matriz de controles, análisis de privacidad, supply chain, operación, telemetría, coste y plan de pruebas. Registrar excepciones con dueño, vencimiento y compensating controls. La aceptación requiere evidencia técnica y operativa.
+
+### Laboratorios
+- Comparar dos diseños de autorización/segmentación con threat models.
+- Simular caída de identidad, DNS o proveedor y medir comportamiento seguro.
+- Evaluar arquitectura multi-tenant y rutas de datos.
+- Revisar un cambio de arquitectura y actualizar trazabilidad.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.
