@@ -16,6 +16,7 @@ from urllib.error import HTTPError, URLError
 
 from model_memory_manager import load_config, resolve_agent, record
 from execution_ledger import ExecutionLedger
+from safe_io import SafeWriteError, open_private_file
 
 
 def _ledger_required(environ=None):
@@ -218,7 +219,11 @@ def build_task_prompt(
             )
             checkpoint = get_checkpoint(task_id, session_id=session_id)
         except Exception as error:
-            print(f"AVISO: no se pudo consultar el grafo: {error}", flush=True)
+            print(
+                "AVISO: no se pudo consultar el grafo "
+                f"({type(error).__name__}).",
+                flush=True,
+            )
             graph_context = ""
             checkpoint = None
 
@@ -295,7 +300,7 @@ def build_task_prompt(
         if "recent_agent_tasks" not in settings.get("sources", []):
             return prompt
 
-    if not TASK_LOG.is_file():
+    if not TASK_LOG.exists() and not TASK_LOG.is_symlink():
         return prompt
 
     try:
@@ -308,7 +313,7 @@ def build_task_prompt(
             # Filtrar primero por sesión: tareas de otras sesiones no cuentan
             # para el límite ni pueden ocupar los lugares del historial.
             lines = []
-            with TASK_LOG.open(encoding="utf-8") as file:
+            with open_private_file(TASK_LOG, "r") as file:
                 for line in file:
                     try:
                         item = json.loads(line)
@@ -328,8 +333,12 @@ def build_task_prompt(
                         if len(lines) > limit:
                             lines.pop(0)
         else:
-            with TASK_LOG.open(encoding="utf-8") as file:
+            with open_private_file(TASK_LOG, "r") as file:
                 lines = list(deque(file, maxlen=limit))
+    except SafeWriteError:
+        raise
+    except FileNotFoundError:
+        return prompt
     except (OSError, ValueError):
         return prompt
 
@@ -642,8 +651,7 @@ def _run_agent_impl(
 
     # Serializa las tareas enviadas por CYBER_AI y evita cargas simultáneas
     # causadas por solicitudes concurrentes de este ejecutor.
-    LOCK_FILE.parent.mkdir(parents=True, exist_ok=True)
-    with LOCK_FILE.open("a+") as lock:
+    with open_private_file(LOCK_FILE, "a+") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         try:
             if provider["protocol"] == "ollama":
@@ -854,7 +862,8 @@ def _run_agent_impl(
                     )
                 except Exception as error:
                     print(
-                        f"AVISO: no se pudo actualizar el checkpoint: {error}",
+                        "AVISO: no se pudo actualizar el checkpoint "
+                        f"({type(error).__name__}).",
                         flush=True,
                     )
 
@@ -982,7 +991,11 @@ def _run_agent_impl(
                 )
                 print(f"Ledger: evento {ledger_result['sequence']} registrado", flush=True)
             except Exception as ledger_error:
-                print(f"AVISO: no se pudo registrar la ejecución en el ledger: {ledger_error}", flush=True)
+                print(
+                    "AVISO: no se pudo registrar la ejecución en el ledger "
+                    f"({type(ledger_error).__name__}).",
+                    flush=True,
+                )
                 if ledger_required:
                     raise RuntimeError("Ejecución no aceptada: no se pudo registrar el resultado en el ledger.") from ledger_error
             try:
@@ -1010,7 +1023,8 @@ def _run_agent_impl(
                 print(f"Tokens de salida acumulados: {usage_totals['eval_count']}", flush=True)
             except Exception as error:
                 print(
-                    f"AVISO: no se pudo guardar el checkpoint: {error}",
+                    "AVISO: no se pudo guardar el checkpoint "
+                    f"({type(error).__name__}).",
                     flush=True,
                 )
 
@@ -1085,7 +1099,7 @@ def run_agent(*args, **kwargs):
                         evidence={
                             "phase": "uncaught_agent_exception",
                             "error_type": type(execution_error).__name__,
-                            "error": str(execution_error),
+                            "reason": "uncaught_agent_exception",
                         },
                         metadata={
                             "task_id": invocation_task_id,
@@ -1095,7 +1109,8 @@ def run_agent(*args, **kwargs):
                     )
         except Exception as ledger_error:
             print(
-                f"AVISO: no se pudo cerrar el evento fallido del agente: {ledger_error}",
+                "AVISO: no se pudo cerrar el evento fallido del agente "
+                f"({type(ledger_error).__name__}).",
                 file=sys.stderr,
             )
             if ledger_required:
@@ -1119,8 +1134,7 @@ def embed_text(agent_name, text):
     if available_models is not None and model not in available_models:
         raise ValueError(f"El modelo no está instalado: {model}")
 
-    LOCK_FILE.parent.mkdir(parents=True, exist_ok=True)
-    with LOCK_FILE.open("a+") as lock:
+    with open_private_file(LOCK_FILE, "a+") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         try:
             if provider["protocol"] == "ollama":

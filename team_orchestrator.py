@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from execution_ledger import ExecutionLedger
+from safe_io import atomic_write_text, ensure_private_directory, open_private_file
 
 from model_memory_manager import load_config
 import experiment_engine
@@ -70,10 +71,10 @@ def load_workflow(name):
 
 def latest_record_after(offset):
     """Lee el registro que añadió el ejecutor durante una tarea."""
-    if not TASK_LOG.is_file():
+    if not TASK_LOG.exists() and not TASK_LOG.is_symlink():
         return None
 
-    with TASK_LOG.open("rb") as file:
+    with open_private_file(TASK_LOG, "rb") as file:
         file.seek(offset)
         added = file.read().decode("utf-8", errors="replace")
 
@@ -86,6 +87,14 @@ def latest_record_after(offset):
             continue
 
     return None
+
+
+def _task_log_offset():
+    if not TASK_LOG.exists() and not TASK_LOG.is_symlink():
+        return 0
+    with open_private_file(TASK_LOG, "rb") as file:
+        file.seek(0, os.SEEK_END)
+        return file.tell()
 
 
 def build_prompt(task, objective, history, max_chars):
@@ -153,7 +162,7 @@ def _invoke_objective_agent(
     agent, prompt, mode, token_budget, *, review_json=False
 ):
     """Ejecuta una llamada de agente y exige una respuesta completa."""
-    offset = TASK_LOG.stat().st_size if TASK_LOG.exists() else 0
+    offset = _task_log_offset()
     command = [
         sys.executable,
         str(PROJECT / "agent_runner.py"),
@@ -172,7 +181,7 @@ def _invoke_objective_agent(
             command, cwd=PROJECT, timeout=900, check=False
         )
     except (OSError, subprocess.TimeoutExpired) as error:
-        return None, f"No se completó la llamada a {agent}: {error}"
+        return None, f"No se completó la llamada a {agent} ({type(error).__name__})."
 
     record = latest_record_after(offset)
     if result.returncode != 0 or not isinstance(record, dict):
@@ -815,7 +824,11 @@ def execute_workflow(
             duration_ms=0, metadata={"workflow": workflow_name},
         )
     except Exception as error:
-        print(f"ERROR: no se pudo registrar el inicio del flujo: {error}", file=sys.stderr)
+        print(
+            "ERROR: no se pudo registrar el inicio del flujo "
+            f"({type(error).__name__}).",
+            file=sys.stderr,
+        )
         return 3
 
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
@@ -838,7 +851,7 @@ def execute_workflow(
         prompt = build_prompt(task, step["objective"], history, max_chars)
 
         print(f"\n=== ETAPA {number}/{len(steps)}: {agent} ===", flush=True)
-        offset = TASK_LOG.stat().st_size if TASK_LOG.exists() else 0
+        offset = _task_log_offset()
 
         initial_budget = int(step.get("num_predict", 450))
         max_retries = max(0, min(int(step.get("max_retries", 2)), 2))
@@ -906,7 +919,7 @@ def execute_workflow(
 
             command.extend(["--task-text", prompt])
 
-            offset = TASK_LOG.stat().st_size if TASK_LOG.exists() else 0
+            offset = _task_log_offset()
 
             print(
                 f"Intento {attempt_number}/{len(budgets)} "
@@ -1100,12 +1113,14 @@ def execute_workflow(
             if candidate:
                 report["skill_candidate"] = candidate
         except Exception as skill_error:
-            report["skill_candidate_warning"] = str(skill_error)[:500]
+            report["skill_candidate_warning"] = type(skill_error).__name__
     except Exception as error:
-        report["ledger_error"] = str(error)
+        report["ledger_error_type"] = type(error).__name__
+        report["reason"] = "ledger_persistence_failed"
         save_report(report_path, report)
         print(
-            f"ERROR: no se pudo registrar el flujo en el ledger: {error}",
+            "ERROR: no se pudo registrar el flujo en el ledger "
+            f"({type(error).__name__}).",
             file=sys.stderr,
         )
         return 3

@@ -54,7 +54,11 @@ def _record_task_scan(task, target, report, started, authorization_id=None, star
         )
         return event
     except Exception as error:
-        print(f"AVISO: no se pudo registrar el escaneo en el ledger: {error}", file=sys.stderr)
+        print(
+            "AVISO: no se pudo registrar el escaneo en el ledger "
+            f"({type(error).__name__}).",
+            file=sys.stderr,
+        )
         return None
 
 
@@ -162,7 +166,8 @@ def main():
         print("ERROR: autorización denegada:", error)
         recorded = _record_task_scan(args.task, args.target,
                                      {"task": args.task, "target": args.target,
-                                      "status": "authorization_denied", "error": str(error)},
+                                      "status": "authorization_denied", "error_type": type(error).__name__,
+                                      "reason": "authorization_denied"},
                                      task_started, args.authorization_id)
         return 3 if args.require_ledger and recorded is None else 2
 
