@@ -122,3 +122,24 @@ Cada estudio debe definir H0/H1, variables, muestra, comparadores, refutación, 
 
 ## Madurez
 M0/M1 estructural. No prueba profundidad ni madurez M3/M4/M5. Avanzar exige lectura crítica, artefactos específicos, experimentos ejecutados y evidencia auditable.
+
+
+## Profundización técnica específica: Seguridad satelital
+
+### Segmentos y activos
+Modelar segmento espacial, ground segment, user segment, TT&C, payload, gateways, estaciones, enlaces inter-satélite, proveedores, software de misión y supply chain. Identificar disponibilidad, safety, confidencialidad, integridad y restricciones de ventana orbital. La arquitectura depende de órbita, misión, operador y capacidades del enlace.
+
+### Enlaces y protocolos
+Evaluar RF, telemetría, telecommand, ranging, GNSS, enlaces ópticos y protocolos de misión. Amenazas incluyen jamming, spoofing, replay, command injection, key compromise y denial of service. Protección requiere autenticación de comandos, anti-replay, gestión de claves, control de acceso a estaciones y monitoreo de espectro.
+
+### Segmento terrestre y cadena de mando
+Ground systems suelen conectar redes corporativas, misión y proveedores. Segmentar, autenticar operadores, proteger estaciones, registrar comandos y aplicar doble aprobación para acciones críticas. Diseñar safe mode y recuperación bajo latencia, conectividad limitada y ventanas de contacto.
+
+### Firmware y supply chain
+Controlar firmware, FPGA bitstreams, boot chain, bibliotecas, toolchains, proveedores y actualizaciones. Firmar artefactos y validar antes de cargar; tener rollback seguro y control de configuración. Evaluar riesgo de componentes COTS y obsolescencia.
+
+### Laboratorios
+Simular telemetría/comandos y canal con retraso, pérdida y replay; validar autenticación y safe mode con simulador, nunca satélite operativo. Medir detección, disponibilidad, latencia y recuperación.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.
