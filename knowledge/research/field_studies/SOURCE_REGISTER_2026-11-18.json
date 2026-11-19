@@ -14,7 +14,10 @@
         "foundations",
         "governance",
         "secure_arch",
-        "incident_response"
+        "incident_response",
+        "satellite_security",
+        "telecom_5g",
+        "data_security"
       ],
       "verification_status": "official_scope_reviewed",
       "review_note": "Revisar el documento completo, edición, erratas, licencia y alcance antes de usar como evidencia específica."
@@ -45,7 +48,10 @@
         "foundations",
         "governance",
         "secure_arch",
-        "devsecops"
+        "devsecops",
+        "linux",
+        "containers",
+        "database_security"
       ],
       "verification_status": "official_version_page_reviewed",
       "review_note": "Revisar el documento completo, edición, erratas, licencia y alcance antes de usar como evidencia específica."
@@ -63,7 +69,9 @@
         "windows_ad",
         "linux",
         "soc_siem",
-        "threat_hunting"
+        "threat_hunting",
+        "malware",
+        "reverse"
       ],
       "verification_status": "official_matrix_page_reviewed",
       "review_note": "Revisar el documento completo, edición, erratas, licencia y alcance antes de usar como evidencia específica."
@@ -121,7 +129,8 @@
       "domains": [
         "ai_security",
         "machine_learning",
-        "governance"
+        "governance",
+        "fraud_abuse"
       ],
       "verification_status": "official_publication_reference_registered",
       "review_note": "Revisar el documento completo, edición, erratas, licencia y alcance antes de usar como evidencia específica."
@@ -209,7 +218,8 @@
       "url": "https://csrc.nist.gov/pubs/fips/203/final",
       "domains": [
         "crypto",
-        "post_quantum_crypto"
+        "post_quantum_crypto",
+        "mathematics"
       ],
       "verification_status": "official_final_standard_page_reviewed_with_errata_note",
       "review_note": "Revisar el documento completo, edición, erratas, licencia y alcance antes de usar como evidencia específica."
@@ -224,7 +234,8 @@
       "domains": [
         "crypto",
         "post_quantum_crypto",
-        "pki_hsm"
+        "pki_hsm",
+        "mathematics"
       ],
       "verification_status": "official_final_standard_page_reviewed_with_errata_note",
       "review_note": "Revisar el documento completo, edición, erratas, licencia y alcance antes de usar como evidencia específica."
@@ -238,7 +249,8 @@
       "url": "https://csrc.nist.gov/pubs/fips/205/final",
       "domains": [
         "crypto",
-        "post_quantum_crypto"
+        "post_quantum_crypto",
+        "mathematics"
       ],
       "verification_status": "official_final_standard_reference_registered",
       "review_note": "Revisar el documento completo, edición, erratas, licencia y alcance antes de usar como evidencia específica."
@@ -399,7 +411,8 @@
       "domains": [
         "api",
         "appsec",
-        "mobile"
+        "mobile",
+        "fraud_abuse"
       ],
       "verification_status": "official_project_risks_reviewed",
       "review_note": "Ten API risk categories; not a complete API verification standard."
@@ -575,7 +588,8 @@
       "domains": [
         "forensics",
         "incident_response",
-        "cloud_forensics"
+        "cloud_forensics",
+        "reverse"
       ],
       "verification_status": "official_final_metadata_and_abstract_reviewed",
       "review_note": "Older foundational guidance, not an all-inclusive forensic manual or legal advice."
@@ -646,7 +660,8 @@
       "url": "https://doi.org/10.6028/NIST.SP.800-193",
       "domains": [
         "hardware_security",
-        "iot_hardware"
+        "iot_hardware",
+        "satellite_security"
       ],
       "verification_status": "official_final_metadata_and_abstract_reviewed",
       "review_note": "Protect/detect/recover model for platform firmware; apply to hardware generation and OEM design."
@@ -700,7 +715,8 @@
       "domains": [
         "machine_learning",
         "ai_security",
-        "ai_red_team"
+        "ai_red_team",
+        "mathematics"
       ],
       "verification_status": "official_final_publication_metadata_and_abstract_reviewed",
       "review_note": "Supersedes E2023 as newer taxonomy; includes predictive and generative AI attacks and mitigations."
@@ -760,7 +776,8 @@
         "red_team",
         "appsec",
         "vulnerability_research",
-        "threat_intel"
+        "threat_intel",
+        "fraud_abuse"
       ],
       "verification_status": "official_catalog_version_page_reviewed",
       "review_note": "Catalog of attack patterns; fix version and map carefully to CWE/ATT&CK/OWASP."
@@ -1138,6 +1155,114 @@
       ],
       "verification_status": "official_cheat_sheet_reviewed",
       "review_note": "Relational database security guidance; supplement with engine-specific docs and NoSQL controls."
+    },
+    {
+      "id": "NIST-SP800-53R5",
+      "title": "Security and Privacy Controls for Information Systems and Organizations",
+      "publisher": "NIST",
+      "version": "SP 800-53 Rev. 5",
+      "published": "2020-09-23",
+      "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final",
+      "domains": [
+        "linux",
+        "data_security",
+        "secure_arch",
+        "governance",
+        "database_security",
+        "physical_security"
+      ],
+      "verification_status": "official_final_publication_page_reviewed",
+      "review_note": "Control catalog; tailor to system risk rather than checklist-only compliance."
+    },
+    {
+      "id": "CIS-BENCHMARKS",
+      "title": "CIS Benchmarks",
+      "publisher": "Center for Internet Security",
+      "version": "Continuously updated per platform",
+      "url": "https://www.cisecurity.org/cis-benchmarks",
+      "domains": [
+        "linux",
+        "containers",
+        "database_security",
+        "cloud"
+      ],
+      "verification_status": "official_catalog_page_reviewed",
+      "review_note": "Platform/version-specific configuration guidance; test compatibility and impact."
+    },
+    {
+      "id": "YARA-DOCS",
+      "title": "YARA Documentation",
+      "publisher": "VirusTotal",
+      "version": "Current documentation",
+      "url": "https://yara.readthedocs.io/",
+      "domains": [
+        "malware"
+      ],
+      "verification_status": "official_project_documentation_registered",
+      "review_note": "Pin version and test rules against benign and malicious corpora."
+    },
+    {
+      "id": "GHIDRA-DOCS",
+      "title": "Ghidra Documentation",
+      "publisher": "NSA",
+      "version": "Current release",
+      "url": "https://ghidra-sre.org/",
+      "domains": [
+        "reverse"
+      ],
+      "verification_status": "official_project_documentation_registered",
+      "review_note": "Record exact release, extensions and processor language packs."
+    },
+    {
+      "id": "LLVM-DOCS",
+      "title": "LLVM Documentation",
+      "publisher": "LLVM Project",
+      "version": "Current docs",
+      "url": "https://llvm.org/docs/",
+      "domains": [
+        "reverse"
+      ],
+      "verification_status": "official_project_documentation_registered",
+      "review_note": "Version toolchain and target architecture for reproducible reverse engineering."
+    },
+    {
+      "id": "OWASP-SQLI-PREVENTION",
+      "title": "SQL Injection Prevention Cheat Sheet",
+      "publisher": "OWASP",
+      "version": "Current project guidance",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html",
+      "domains": [
+        "database_security",
+        "appsec",
+        "api"
+      ],
+      "verification_status": "official_cheat_sheet_reviewed",
+      "review_note": "Use parameterized queries and context-specific controls."
+    },
+    {
+      "id": "CISA-MALWARE-RESOURCES",
+      "title": "CISA Malware Analysis and Incident Response resources",
+      "publisher": "CISA",
+      "version": "Current resource portal",
+      "url": "https://www.cisa.gov/",
+      "domains": [
+        "malware"
+      ],
+      "verification_status": "official_resource_portal_registered",
+      "review_note": "Cite specific advisories/publications with dates; portal alone is not claim-level evidence."
+    },
+    {
+      "id": "OWASP-THREAT-MODELING",
+      "title": "OWASP Threat Modeling Project",
+      "publisher": "OWASP",
+      "version": "Current project",
+      "url": "https://owasp.org/www-project-threat-modeling/",
+      "domains": [
+        "secure_arch",
+        "vulnerability_research"
+      ],
+      "verification_status": "official_project_page_reviewed",
+      "review_note": "Methodology resource; choose techniques for the specific system."
     }
   ]
 }
