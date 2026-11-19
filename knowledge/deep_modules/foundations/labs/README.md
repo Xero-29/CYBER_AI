@@ -7,7 +7,7 @@ Desde la raíz del repositorio:
 
 ```bash
 python -m knowledge.deep_modules.foundations.labs.runner
-python -m unittest tests.test_foundations_labs -v
+python -m unittest discover -s tests -p test_foundations_labs.py -v
 ```
 
 Semilla fija: `20261119`. El runner imprime JSON. Los resultados de referencia están en `results.json`.
