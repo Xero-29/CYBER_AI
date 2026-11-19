@@ -4,18 +4,27 @@
 import json
 import os
 import signal
+import stat
+import tempfile
 import uuid
 import shutil
 import subprocess
 import sys
 import threading
 import time
+from collections import deque
 from pathlib import Path
 from urllib.parse import urlparse
 
 from execution_policy import AuthorizationError, authorize_target
 from execution_ledger import ExecutionLedger
-from binary_integrity import BinaryIntegrityError, hash_executable, require_approved_executable
+from binary_integrity import (
+    BinaryIntegrityError,
+    build_minimal_environment,
+    hash_executable,
+    require_approved_executable,
+)
+from safe_io import SafeWriteError, ensure_private_directory
 
 
 def validate_target(target):
@@ -145,8 +154,11 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
         }
         return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)
 
-    output_dir = Path("reports")
-    output_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        output_dir = ensure_private_directory(Path("reports"))
+    except SafeWriteError as error:
+        result = {"target": target, "status": "error", "error": str(error), "findings": []}
+        return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)
     scan_id = uuid.uuid4().hex
     output_file = output_dir / f"nuclei_scan_{scan_id}.jsonl"
 
@@ -181,15 +193,24 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
     print("Límite de solicitudes: 2 por segundo; concurrencia: 2.", flush=True)
     print("[2/4] Iniciando Nuclei. La salida aparecerá debajo.", flush=True)
 
-    messages = []
+    messages = deque(maxlen=100)
+    isolated_home = None
 
     try:
+        isolated_home = tempfile.TemporaryDirectory(prefix="cyber-ai-nuclei-")
+        if os.name == "posix":
+            os.chmod(isolated_home.name, 0o700)
+        process_env = build_minimal_environment(isolated_home.name, executable)
         process = subprocess.Popen(
             command,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
             bufsize=1,
+            stdin=subprocess.DEVNULL,
+            env=process_env,
+            cwd=isolated_home.name,
+            close_fds=True,
             start_new_session=(os.name == "posix"),
         )
 
@@ -201,8 +222,9 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
             for line in process.stdout:
                 line = line.rstrip()
                 if line:
-                    messages.append(line)
-                    print(f"[Nuclei] {line}", flush=True)
+                    safe_line = line[:2000]
+                    messages.append(safe_line)
+                    print(f"[Nuclei] {safe_line}", flush=True)
 
         reader = threading.Thread(target=show_output, daemon=True)
         reader.start()
@@ -255,6 +277,9 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
             "findings": [],
         }
         return _finalize_scan(target, result, started, authorization_id, start_event_id, require_ledger)
+    finally:
+        if isolated_home is not None:
+            isolated_home.cleanup()
 
     try:
         binary_after = hash_executable(executable)
@@ -264,14 +289,41 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
         binary_modified = True
 
     findings = []
-    if output_file.is_file():
-        for line in output_file.read_text(encoding="utf-8").splitlines():
-            try:
-                findings.append(json.loads(line))
-            except json.JSONDecodeError:
-                continue
+    output_limit_exceeded = False
+    evidence_invalid = False
+    if output_file.exists() or output_file.is_symlink():
+        try:
+            output_info = output_file.lstat()
+            if stat.S_ISLNK(output_info.st_mode) or not stat.S_ISREG(output_info.st_mode):
+                evidence_invalid = True
+            elif output_info.st_size > 20 * 1024 * 1024:
+                output_limit_exceeded = True
+            else:
+                os.chmod(output_file, 0o600, follow_symlinks=False)
+                with output_file.open("r", encoding="utf-8") as stream:
+                    for line in stream:
+                        if len(line.encode("utf-8")) > 1024 * 1024:
+                            evidence_invalid = True
+                            findings = []
+                            break
+                        if len(findings) >= 10000:
+                            output_limit_exceeded = True
+                            findings = []
+                            break
+                        try:
+                            findings.append(json.loads(line))
+                        except json.JSONDecodeError:
+                            continue
+        except OSError:
+            evidence_invalid = True
 
     status = "completed" if process.returncode == 0 else "scanner_error"
+    if output_limit_exceeded:
+        status = "output_limit_exceeded"
+        findings = []
+    elif evidence_invalid:
+        status = "evidence_invalid"
+        findings = []
     discarded_findings = 0
     if binary_modified:
         discarded_findings = len(findings)
@@ -294,7 +346,7 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
         "discarded_findings_count": discarded_findings,
         "findings_count": len(findings),
         "findings": findings,
-        "scanner_messages": messages[-100:],
+        "scanner_messages": list(messages),
         "note": (
             "Los hallazgos son indicios que requieren validación manual. "
             "Cero hallazgos no demuestra que el objetivo sea seguro."
