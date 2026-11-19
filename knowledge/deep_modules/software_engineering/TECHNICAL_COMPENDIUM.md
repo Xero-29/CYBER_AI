@@ -122,3 +122,31 @@ Definir H0/H1, variables, población, comparadores, criterio de refutación, an�
 
 ## Madurez
 M0/M1 estructural. No acredita profundidad ni M3/M4/M5. Para avanzar: revisar fuentes completas, elaborar artefactos específicos, ejecutar casos y registrar evidencia auditable.
+
+
+## Profundización técnica específica: Ingeniería de software segura
+
+### Arquitectura y requisitos
+Definir atributos de calidad, trust boundaries, dominios, datos, actores, dependencias, contratos y modos de fallo. Convertir riesgos en requisitos de seguridad verificables y criterios de aceptación. Usar modelado de amenazas durante diseño y cambios; mantener trazabilidad requisito→control→test→evidencia. Revisar arquitectura evolutiva, deuda y decisiones ADR.
+
+### Lenguajes y memoria
+Analizar memory safety, ownership, lifetimes, bounds, integer arithmetic, concurrency, race conditions, unsafe blocks, FFI y deserialización. En lenguajes gestionados revisar reflexión, class loading, serialization, sandbox y dependencias nativas. Aplicar tipos y APIs que hagan inválidos estados inseguros cuando sea viable.
+
+### Diseño de APIs y datos
+Validar entrada en frontera, canonicalization, encoding, schema, límites, autorización por objeto/función/campo y transacciones. Evitar confiar en UI o gateway como control único. Revisar idempotencia, concurrencia, consistencia, caches, multi-tenancy y errores. Datos sensibles requieren clasificación, minimización, cifrado, retención y borrado.
+
+### Testing y verificación
+Combinar unit, integration, property-based, fuzz, mutation, contract, regression, SAST, DAST, IAST y revisión humana. Cada prueba define oráculo, cobertura, fixtures, entorno, semilla y límites. Fuzzing sin corpus ni triage no demuestra seguridad; SAST sin validación genera falsos positivos. Priorizar pruebas negativas, límites y autorización.
+
+### Supply chain y releases
+Pin dependencies, lockfiles, SBOM, provenance, firma, build reproducible, revisión de cambios, branch protection y separación de duties. Proteger CI runners, secrets, caches, artifacts y release keys. Versionar dependencias y evaluar typosquatting, dependency confusion y maintainer compromise. Tener proceso de disclosure y respuesta a CVE.
+
+### Laboratorios
+- Revisar aplicación de ejemplo con threat model y security requirements.
+- Fuzz de parser sintético con corpus versionado.
+- Pruebas de autorización multi-tenant y regresión.
+- Pipeline con SBOM, firma y verificación de provenance.
+Medir defectos confirmados, cobertura, mutation score, tiempo de detección y falsos positivos.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.
