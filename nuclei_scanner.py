@@ -124,7 +124,11 @@ def _record_scan_event(target, result, started, *, authorization_id=None, start_
         )
         return event
     except Exception as error:
-        print(f"AVISO: no se pudo registrar el escaneo en el ledger: {error}", file=sys.stderr)
+        print(
+            "AVISO: no se pudo registrar el escaneo en el ledger ("
+            f"{type(error).__name__}).",
+            file=sys.stderr,
+        )
         return None
 
 
@@ -137,7 +141,11 @@ def _record_scan_start(target, authorization_id):
         )
         return event["event_id"]
     except Exception as error:
-        print(f"AVISO: no se pudo registrar el inicio del escaneo: {error}", file=sys.stderr)
+        print(
+            "AVISO: no se pudo registrar el inicio del escaneo ("
+            f"{type(error).__name__}).",
+            file=sys.stderr,
+        )
         return None
 
 
@@ -373,11 +381,13 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
         elapsed = round(time.monotonic() - started, 1)
         print(f"\n[3/4] Escaneo terminado en {elapsed} segundos.", flush=True)
 
-    except OSError as error:
+    except Exception as error:
+        io_error = isinstance(error, OSError)
         result = {
             "target": target,
-            "status": "error",
-            "error": str(error),
+            "status": "error" if io_error else "failed",
+            "error_type": type(error).__name__,
+            "reason": "scanner_io_error" if io_error else "scanner_execution_failed",
             "tool_binary_sha256": binary_provenance["sha256"],
             "tool_allowlist": binary_provenance["allowlist"],
             "templates_before": templates_before,
@@ -390,9 +400,20 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
         try:
             _close_process_output(process, reader)
         except OSError as cleanup_error:
-            print("AVISO: no se pudo cerrar completamente la salida del escáner:", cleanup_error, file=sys.stderr)
+            print(
+                "AVISO: no se pudo cerrar completamente la salida del escáner ("
+                f"{type(cleanup_error).__name__}).",
+                file=sys.stderr,
+            )
         if isolated_home is not None:
-            isolated_home.cleanup()
+            try:
+                isolated_home.cleanup()
+            except OSError as cleanup_error:
+                print(
+                    "AVISO: no se pudo eliminar el directorio temporal del escáner ("
+                    f"{type(cleanup_error).__name__}).",
+                    file=sys.stderr,
+                )
 
     try:
         binary_after = hash_executable(executable)

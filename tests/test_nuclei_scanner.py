@@ -246,9 +246,61 @@ class NucleiScannerTests(unittest.TestCase):
                             )
 
         self.assertEqual(result["status"], "error")
-        self.assertIn("No se pudo iniciar", result["error"])
+        self.assertEqual(result["error_type"], "OSError")
+        self.assertEqual(result["reason"], "scanner_io_error")
+        self.assertNotIn("error", result)
 
 
+
+    def test_unexpected_scanner_exception_closes_ledger_without_leaking_message(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            workspace = root / "workspace"
+            workspace.mkdir()
+            home = root / "home"
+            home.mkdir()
+            executable = root / "nuclei"
+            executable.write_bytes(b"nuclei-test-binary")
+            self._create_templates(home)
+            provenance = {
+                "resolved_path": str(executable),
+                "sha256": "a" * 64,
+                "allowlist": {"enforced": True, "status": "approved"},
+            }
+            old_cwd = os.getcwd()
+            try:
+                os.chdir(workspace)
+                with (
+                    patch("nuclei_scanner.shutil.which", return_value=str(executable)),
+                    patch("nuclei_scanner.require_approved_executable", return_value=provenance),
+                    patch("nuclei_scanner.Path.home", return_value=home),
+                    patch(
+                        "nuclei_scanner.subprocess.Popen",
+                        side_effect=RuntimeError("scanner failed token=secret-value"),
+                    ),
+                    patch("nuclei_scanner.ExecutionLedger") as ledger,
+                ):
+                    ledger.return_value.append.side_effect = [
+                        {"event_id": "start"},
+                        {"event_id": "terminal"},
+                    ]
+                    result = scan_target(
+                        "http://127.0.0.1:8765",
+                        authorized=True,
+                        authorization_id="test-grant",
+                        require_ledger=True,
+                    )
+            finally:
+                os.chdir(old_cwd)
+
+        self.assertEqual(result["status"], "failed")
+        self.assertEqual(result["error_type"], "RuntimeError")
+        self.assertEqual(result["reason"], "scanner_execution_failed")
+        self.assertNotIn("error", result)
+        self.assertNotIn("secret-value", json.dumps(result))
+        calls = ledger.return_value.append.call_args_list
+        self.assertEqual([call.kwargs["status"] for call in calls], ["started", "failed"])
+        self.assertEqual(calls[1].kwargs["metadata"]["start_event_id"], "start")
 
     def test_unapproved_nuclei_binary_is_blocked_before_process_start(self):
         with patch("nuclei_scanner.shutil.which", return_value="/usr/bin/nuclei"):
