@@ -53,7 +53,7 @@ class TaskRunnerLedgerTests(unittest.TestCase):
                     patch.object(task_runner.shutil, "which", return_value=str(nuclei_executable)),
                     patch.object(task_runner, "require_approved_executable", return_value=provenance),
                     patch.object(task_runner, "ExecutionLedger", side_effect=OSError("ledger offline")),
-                    patch.object(task_runner.subprocess, "run") as scanner,
+                    patch.object(task_runner, "run_bounded_process") as scanner,
                     patch.object(sys, "argv", [
                         "task_runner.py", "--task", "inspect web headers",
                         "--target", "https://203.0.113.10", "--execute",
@@ -89,8 +89,12 @@ class TaskRunnerLedgerTests(unittest.TestCase):
                     patch.object(task_runner, "require_approved_executable", return_value=provenance),
                     patch.object(task_runner, "ExecutionLedger", side_effect=OSError("ledger offline")),
                     patch.object(
-                        task_runner.subprocess, "run",
-                        return_value=unittest.mock.Mock(returncode=0, stdout="", stderr=""),
+                        task_runner, "run_bounded_process",
+                        return_value={
+                            "returncode": 0, "stdout": "", "stderr": "",
+                            "timed_out": False, "output_truncated": False,
+                            "process_tree_isolation_enforced": True,
+                        },
                     ) as scanner,
                     patch.object(sys, "argv", [
                         "task_runner.py", "--task", "inspect web headers",
@@ -131,7 +135,7 @@ class TaskRunnerLedgerTests(unittest.TestCase):
                     patch.object(task_runner, "authorize_target", return_value={"authorization_id": "grant"}),
                     patch.object(task_runner.shutil, "which", return_value=str(nuclei_executable)),
                     patch.object(task_runner, "require_approved_executable", return_value=provenance),
-                    patch.object(task_runner.subprocess, "run", side_effect=RuntimeError("scanner crashed")),
+                    patch.object(task_runner, "run_bounded_process", side_effect=RuntimeError("scanner crashed")),
                     patch.object(task_runner, "ExecutionLedger", return_value=ledger),
                     patch.object(sys, "argv", [
                         "task_runner.py", "--task", "inspect web headers",

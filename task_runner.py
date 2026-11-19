@@ -2,12 +2,10 @@
 """Ejecutor controlado de comprobaciones seleccionadas por CYBER_AI."""
 
 import argparse
-import hashlib
 import json
 import os
 import shutil
 import stat
-import subprocess
 import sys
 import tempfile
 import time
@@ -25,60 +23,15 @@ from binary_integrity import (
     require_approved_executable,
 )
 from safe_io import SafeWriteError, atomic_write_text, ensure_private_directory
+from process_isolation import run_bounded_process
+from template_integrity import (
+    hash_selected_templates as _hash_selected_templates,
+    safe_template_path as _safe_template_path,
+)
 
 
 MAX_SCAN_OUTPUT_BYTES = 20 * 1024 * 1024
 MAX_FINDINGS = 10000
-MAX_TEMPLATE_BYTES = 2 * 1024 * 1024
-
-
-def _safe_template_path(path, root):
-    """Return a resolved, bounded template path inside the non-symlink root."""
-    try:
-        root = Path(root)
-        if root.is_symlink():
-            return None
-        root_resolved = root.resolve(strict=True)
-        candidate = Path(path)
-        if candidate.is_symlink():
-            return None
-        info = candidate.lstat()
-        if not stat.S_ISREG(info.st_mode) or info.st_size > MAX_TEMPLATE_BYTES:
-            return None
-        resolved = candidate.resolve(strict=True)
-        resolved.relative_to(root_resolved)
-        cursor = candidate
-        while cursor != root:
-            if cursor.is_symlink():
-                return None
-            cursor = cursor.parent
-        return resolved
-    except (OSError, RuntimeError, ValueError):
-        return None
-
-
-def _sha256_file(path):
-    digest = hashlib.sha256()
-    with Path(path).open("rb") as stream:
-        for block in iter(lambda: stream.read(1024 * 1024), b""):
-            digest.update(block)
-    return digest.hexdigest()
-
-
-def _hash_selected_templates(selected, root):
-    root_resolved = Path(root).resolve(strict=True)
-    evidence = []
-    for item in selected:
-        safe_path = _safe_template_path(item["path"], root)
-        if safe_path is None:
-            raise ValueError("Una plantilla cambió o dejó de ser segura durante el escaneo.")
-        evidence.append({
-            "path": safe_path.relative_to(root_resolved).as_posix(),
-            "sha256": _sha256_file(safe_path),
-        })
-    return evidence
-
-
 def _record_task_scan(task, target, report, started, authorization_id=None, start_event_id=None):
     """Registra ejecuciones del runner de plantillas Nuclei."""
     status = report.get("status")
@@ -293,24 +246,21 @@ def main():
     
         print("\nIniciando comprobaciones limitadas...")
         started = time.monotonic()
-        try:
-            with tempfile.TemporaryDirectory(prefix="cyber-ai-nuclei-") as isolated_home:
-                if os.name == "posix":
-                    os.chmod(isolated_home, 0o700)
-                process_env = build_minimal_environment(isolated_home, nuclei)
-                process = subprocess.run(
-                    command,
-                    capture_output=True,
-                    text=True,
-                    timeout=90,
-                    stdin=subprocess.DEVNULL,
-                    env=process_env,
-                    cwd=isolated_home,
-                    close_fds=True,
-                    shell=False,
-                )
-            elapsed = round(time.monotonic() - started, 2)
-        except subprocess.TimeoutExpired:
+        with tempfile.TemporaryDirectory(prefix="cyber-ai-nuclei-") as isolated_home:
+            if os.name == "posix":
+                os.chmod(isolated_home, 0o700)
+            process_env = build_minimal_environment(isolated_home, nuclei)
+            process_result = run_bounded_process(
+                command,
+                cwd=isolated_home,
+                env=process_env,
+                timeout=90,
+                max_output_bytes=2_000_000,
+            )
+        elapsed = round(time.monotonic() - started, 2)
+        scanner_output = (process_result["stdout"] + "\n" + process_result["stderr"])[-12000:]
+
+        if process_result["timed_out"]:
             try:
                 binary_after = hash_executable(nuclei)
                 binary_modified = binary_after["sha256"] != binary_provenance["sha256"]
@@ -323,10 +273,11 @@ def main():
             except (OSError, ValueError):
                 templates_after = []
                 templates_modified = True
+            integrity_failed = binary_modified or templates_modified
             report = {
                 "task": args.task, "target": args.target,
-                "status": "integrity_error" if binary_modified or templates_modified else "timeout",
-                "elapsed_seconds": 90,
+                "status": "integrity_error" if integrity_failed else "timeout",
+                "elapsed_seconds": elapsed,
                 "tool_binary_sha256": binary_provenance["sha256"],
                 "tool_binary_sha256_after": binary_after["sha256"] if binary_after else None,
                 "tool_binary_modified": binary_modified,
@@ -334,6 +285,9 @@ def main():
                 "templates_before": template_provenance,
                 "templates_after": templates_after,
                 "templates_modified": templates_modified,
+                "scanner_output": scanner_output,
+                "output_truncated": process_result["output_truncated"],
+                "process_tree_isolation_enforced": process_result["process_tree_isolation_enforced"],
                 "findings": [],
             }
             atomic_write_text(
@@ -345,7 +299,7 @@ def main():
                 return 3
             print("Tiempo agotado. Informe:", report_file)
             return 1
-    
+
         try:
             binary_after = hash_executable(nuclei)
             binary_modified = binary_after["sha256"] != binary_provenance["sha256"]
@@ -377,7 +331,9 @@ def main():
                             try:
                                 findings.append(json.loads(line))
                             except json.JSONDecodeError:
-                                pass
+                                evidence_invalid = True
+                                findings = []
+                                break
             except OSError:
                 evidence_invalid = True
 
@@ -397,7 +353,8 @@ def main():
             "integrity_error" if binary_modified or templates_modified
             else "output_limit_exceeded" if output_limit_exceeded
             else "evidence_invalid" if evidence_invalid
-            else "completed" if process.returncode == 0 else "scanner_error"
+            else "isolation_incomplete" if not process_result["process_tree_isolation_enforced"]
+            else "completed" if process_result["returncode"] == 0 else "scanner_error"
         )
 
         report = {
@@ -419,7 +376,9 @@ def main():
             "output_limit_exceeded": output_limit_exceeded,
             "evidence_invalid": evidence_invalid,
             "findings": findings,
-            "scanner_output": (process.stdout + "\n" + process.stderr)[-12000:],
+            "output_truncated": process_result["output_truncated"],
+            "process_tree_isolation_enforced": process_result["process_tree_isolation_enforced"],
+            "scanner_output": scanner_output,
             "note": "Los resultados son indicios y requieren validación.",
         }
         atomic_write_text(
