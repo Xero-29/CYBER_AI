@@ -43,8 +43,8 @@ El desarrollo se organiza en doce bloques disciplinares:
 | Compendio base | Existe; ampliación editorial pendiente de auditoría tema×capa |
 | Desarrollo disciplinar ampliado | Incorporado; revisión técnica independiente pendiente |
 | Brechas FND-01–FND-15 | Tratamiento documental descrito; evidencias externas pendientes |
-| Fuentes | Referencias oficiales identificadas; lectura integral no acreditada |
-| Laboratorios | Cinco protocolos diseñados; cero ejecuciones acreditadas |
+| Fuentes | Secciones pertinentes de fuentes primarias inspeccionadas y trazadas; lectura lineal integral de todas las obras no acreditada |
+| Laboratorios | Cinco protocolos generales más siete labs específicos ejecutados localmente con datos sintéticos; 8 tests pasan |
 | Evaluación | Rúbrica y métricas diseñadas; aplicación y benchmark pendientes |
 | Skills | Cinco especificaciones candidatas; no validadas ni promovidas |
 | Auditoría 7 temas × 12 capas | 84 estados `in_progress`; dossiers y fuentes por secciones; ningún estado `passed` |
@@ -52,6 +52,6 @@ El desarrollo se organiza en doce bloques disciplinares:
 
 ## Regla de cierre
 
-No avanzar al módulo siguiente hasta cerrar cada tema con evidencia trazable. La auditoría documental por siete temas ya fue incorporada, pero sigue en progreso: falta ampliar lectura integral de fuentes, réplica independiente, integración de controles reales en laboratorio aislado y revisión independiente. Los laboratorios que requieren ejecución, la revisión independiente y la reproducción externa deben permanecer expresamente pendientes hasta que se realicen.
+No avanzar al módulo siguiente hasta cerrar cada tema con evidencia trazable. La auditoría documental por siete temas ya fue incorporada, pero sigue en progreso: falta ampliar lectura integral de fuentes, réplica independiente, integración de controles reales en laboratorio aislado y revisión independiente. Los experimentos sintéticos locales están ejecutados; réplica independiente, integración real aislada y revisión externa permanecen pendientes.
 
 No declarar K4/K5, M4/M5 ni validación experta por la mera existencia de documentos, referencias, protocolos o Skills candidatas.
