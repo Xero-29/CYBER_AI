@@ -161,14 +161,18 @@
       "url": "https://doi.org/10.6028/NIST.FIPS.203",
       "version": "Final",
       "published": "2024-08-13",
-      "verification_status": "official_standard_metadata_reviewed",
+      "verification_status": "official_metadata_and_errata_notice_reviewed",
       "verified_scope": "Estándar ML-KEM para establecimiento de secreto compartido.",
       "domains": [
         "crypto",
         "secure_arch",
         "identity"
       ],
-      "review_note": "Metadatos y descripción oficial revisados; lectura integral y pruebas de implementación pendientes."
+      "review_note": "ML-KEM is a KEM for establishing shared secret keys, not direct bulk-data encryption. PDF full-text retrieval failed in this review; no full-text review claimed.",
+      "sections_reviewed": [
+        "Official publication abstract and planning note/errata notice"
+      ],
+      "review_date": "2026-11-19"
     },
     {
       "id": "NIST-FIPS-204",
@@ -178,14 +182,18 @@
       "url": "https://doi.org/10.6028/NIST.FIPS.204",
       "version": "Final",
       "published": "2024-08-13",
-      "verification_status": "official_standard_metadata_reviewed",
+      "verification_status": "selected_sections_reviewed",
       "verified_scope": "Estándar ML-DSA para firmas digitales.",
       "domains": [
         "crypto",
         "secure_arch",
         "identity"
       ],
-      "review_note": "Metadatos y descripción oficial revisados; lectura integral y pruebas de implementación pendientes."
+      "review_note": "ML-DSA is a post-quantum digital signature scheme, not a KEM. Full algorithm review and conformance testing pending.",
+      "sections_reviewed": [
+        "Cover, abstract, announcement, applicability and signature-use sections"
+      ],
+      "review_date": "2026-11-19"
     },
     {
       "id": "NIST-FIPS-205",
@@ -195,14 +203,18 @@
       "url": "https://doi.org/10.6028/NIST.FIPS.205",
       "version": "Final",
       "published": "2024-08-13",
-      "verification_status": "official_standard_metadata_reviewed",
+      "verification_status": "selected_sections_reviewed",
       "verified_scope": "Estándar SLH-DSA para firmas digitales basadas en hashes y sin estado.",
       "domains": [
         "crypto",
         "secure_arch",
         "identity"
       ],
-      "review_note": "Metadatos y descripción oficial revisados; lectura integral y pruebas de implementación pendientes."
+      "review_note": "SLH-DSA is a stateless hash-based digital signature scheme, not a KEM. Full algorithm review and conformance testing pending.",
+      "sections_reviewed": [
+        "Cover, abstract, announcement, applicability and signature-use sections"
+      ],
+      "review_date": "2026-11-19"
     },
     {
       "id": "NIST-IR-8176",
@@ -529,13 +541,17 @@
       "url": "https://asvs.owasp.org/",
       "version": "5.0.0",
       "published": "2025-05-30",
-      "verification_status": "official_project_page_reviewed",
+      "verification_status": "official_version_metadata_reviewed",
       "verified_scope": "Objetivos, versión estable y forma de uso del estándar de verificación de aplicaciones web.",
       "domains": [
         "appsec",
         "api"
       ],
-      "review_note": "Página oficial de proyecto y metadatos de release revisados; no se declara lectura integral del estándar."
+      "review_note": "Official site and version checked; requirement catalog not fully reviewed.",
+      "sections_reviewed": [
+        "Official overview, stable version and downloads page"
+      ],
+      "review_date": "2026-11-19"
     },
     {
       "id": "RESEARCH-AI-RED-TEAM",
