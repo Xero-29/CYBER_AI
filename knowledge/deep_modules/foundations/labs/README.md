@@ -17,7 +17,7 @@ Semilla fija: `20261119`. El runner imprime JSON. Los resultados de referencia e
 | LAB-FND-01A | Invalidación de caché y denegación por defecto | Consistencia distribuida real |
 | LAB-FND-02A | Claves estables frente a colisiones de hostname | Calidad de fuentes reales |
 | LAB-FND-03A | Cobertura de rutas de ataque modeladas | Explotabilidad o exhaustividad |
-| LAB-FND-04A | Verificación JWS HS256, alg/type estrictos, issuer, audience, exp, nbf, scope, jti/revocación y JSON duplicado | JWKS/rotación, firmas asimétricas, discovery OIDC, servidor OAuth, TLS o integración IdP |
+| LAB-FND-04A | Verificación JWS HS256, alg/type/header allowlist estrictos, base64url canónico, issuer, audience, exp, nbf, scope, jti/revocación y JSON duplicado | JWKS/rotación, firmas asimétricas, discovery OIDC, servidor OAuth, TLS o integración IdP |
 | LAB-FND-05A | HMAC-SHA-256, integridad/autenticidad y alteración | Cifrado, AES, KMS o validación FIPS |
 | LAB-FND-06A | Ordenamiento/deduplicación más cadena HMAC encadenada con detección de alteración/reordenamiento | Ingesta SIEM, timestamps confiables, atribución o no repudio |
 | LAB-FND-07A | Evidencia caducada/contradictoria no cierra controles | Auditoría organizacional real |
