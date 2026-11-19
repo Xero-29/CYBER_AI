@@ -218,7 +218,7 @@ class NucleiScannerTests(unittest.TestCase):
 
 
     def test_validate_target_rejects_control_characters_and_non_strings(self):
-        for target in ("https://8.8.8.8\\n", None, 123):
+        for target in ("https://8.8.8.8\n", None, 123):
             with self.subTest(target=target):
                 with self.assertRaises(ValueError):
                     validate_target(target)
