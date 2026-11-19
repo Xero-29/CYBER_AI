@@ -122,3 +122,34 @@ Cada estudio debe definir H0/H1, variables, muestra, comparadores, refutación, 
 
 ## Madurez
 M0/M1 estructural. No demuestra cobertura profunda ni M3/M4/M5. Próxima puerta: revisar fuentes completas, producir artefactos específicos, ejecutar pruebas y registrar evidencia.
+
+
+## Profundización técnica específica: Respuesta a incidentes
+
+### Preparación y gobierno operativo
+Definir autoridad de activación, severidad, criterios de escalamiento, RACI, suplencias, canales primarios/alternos, contactos externos, asesoría legal y comunicación ejecutiva. Preparación incluye inventario, logging, sincronización temporal, backups probados, playbooks, acceso break-glass, acuerdos con proveedores y ejercicios. Separar incidente confirmado, evento, vulnerabilidad y crisis operacional. Mantener criterios de decisión por impacto en confidencialidad, integridad, disponibilidad, seguridad física, obligaciones regulatorias y continuidad.
+
+### Detección, triage y clasificación
+Normalizar alertas con entidad, tiempo, fuente, confianza, técnica, activo, identidad, exposición y contexto de negocio. Triage debe validar señal, descartar errores de telemetría, establecer alcance inicial y preservar evidencia. Asignar identificador único, cronología UTC, custodio y nivel de sensibilidad. Evitar cerrar como falso positivo sin evidencia. Correlacionar endpoint, identidad, red, cloud, aplicaciones, DNS, correo y terceros.
+
+### Análisis y contención
+Construir hipótesis competidoras y línea temporal; distinguir indicador, observación, inferencia y conclusión. Contención debe limitar propagación sin destruir evidencia ni interrumpir servicios críticos más allá de lo autorizado. Opciones incluyen revocar sesiones/tokens, aislar endpoint, bloquear indicadores, suspender cuentas, segmentar red o detener pipeline. Cada acción registra aprobador, alcance, hora, efecto esperado, riesgo colateral y rollback.
+
+### Erradicación y recuperación
+Eliminar persistencia y causa raíz, corregir configuración, rotar credenciales comprometidas y reconstruir desde fuentes confiables. Validar integridad de imágenes, backups y artefactos antes de restaurar. Recuperación gradual por criticidad, monitorización reforzada y criterios de salida. No confundir restauración de servicio con erradicación del adversario. Mantener evidencia y cadena de custodia durante el ciclo.
+
+### Comunicación, regulación y terceros
+Preparar mensajes para dirección, usuarios, clientes, reguladores, aseguradoras, proveedores y autoridades según jurisdicción/contratos. No divulgar hipótesis como hechos. Documentar reloj de notificación, asesoría jurídica y base de decisión. Coordinar con proveedores cloud/MSP para logs y preservación de datos, entendiendo límites de acceso y retención.
+
+### Métricas y mejora
+Medir MTTD, MTTA, tiempo a contención, tiempo de recuperación, recurrencia, cobertura de logs, porcentaje de playbooks ejercitados, integridad de evidencia, impacto y coste. Definir inicio/fin consistentemente; reportar medianas y percentiles, no promedios aislados. Postmortem sin culpa debe convertir causas sistémicas en acciones con dueño, plazo y prueba de eficacia.
+
+### Ejercicios
+- Tabletop de ransomware con decisiones de continuidad y comunicación.
+- Simulación de compromiso de identidad cloud y revocación de sesiones.
+- Replay de eventos sintéticos para validar triage y correlación.
+- Recuperación de servicios desde backups aislados con verificación de integridad.
+Registrar injects, decisiones, retrasos, fallos de comunicación, métricas y mejoras. Los ejercicios diseñados no equivalen a incidentes reales ni a eficacia demostrada.
+
+## Estado de validación de la ampliación
+Contenido técnico editorial añadido; fuentes completas, revisión independiente y laboratorios ejecutados permanecen pendientes. No elevar por redacción a M3/M4/M5.
