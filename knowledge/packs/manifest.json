@@ -28,8 +28,8 @@
       "id": "appsec",
       "name": "Seguridad web y aplicaciones",
       "path": "knowledge/packs/appsec/README.md",
-      "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "version": "2.1.0",
+      "status": "expanded_technical_content_validation_pending",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -42,7 +42,8 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "Cuatro páginas/fuentes primarias adicionales inspeccionadas; no lectura integral, laboratorios ejecutados ni validación independiente."
     },
     {
       "id": "api",
