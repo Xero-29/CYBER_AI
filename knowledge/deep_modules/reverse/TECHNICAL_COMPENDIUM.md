@@ -122,3 +122,31 @@ Cada estudio debe definir H0/H1, variables, muestra, comparadores, refutación, 
 
 ## Madurez
 M0/M1 estructural. No demuestra cobertura profunda ni M3/M4/M5. Próxima puerta: revisar fuentes completas, producir artefactos específicos, ejecutar pruebas y registrar evidencia.
+
+
+## Profundización técnica específica: Ingeniería inversa
+
+### Flujo de análisis y preservación
+Registrar origen autorizado, hash, arquitectura, formato, compilador probable, símbolos, dependencias, empaquetado y entorno. Preservar original y derivar copias de trabajo. La ingeniería inversa debe respetar licencias, contratos y legislación; priorizar interoperabilidad, análisis defensivo, respuesta y evaluación autorizada.
+
+### Formatos y loaders
+Analizar PE, ELF, Mach-O, bytecode JVM, .NET, DEX y firmware. Entender headers, secciones, relocations, imports, exports, dynamic loader, linking, ASLR, DEP/NX, PIE, stack canaries y metadata. Identificar packers, overlays y recursos. Desempaquetar altera representación; guardar hashes de cada etapa y documentar herramienta/versión.
+
+### Desensamblado, decompilación y flujo
+Reconstruir CFG, funciones, calling conventions, ABI, stack frames, registers, exceptions, indirect calls y control-flow obfuscation. El pseudocódigo es hipótesis, no fuente original. Validar tipos, estructuras y límites con trazas, referencias cruzadas y datos observados. Distinguir análisis estático, emulación e instrumentación dinámica.
+
+### Análisis de datos y criptografía
+Seguir taint desde entrada a sinks, reconstruir parsers, serialización, formatos y protocolos. Identificar uso de RNG, claves embebidas, nonce, KDF y primitivas, sin asumir debilidad por apariencia. No extraer ni divulgar secretos ajenos; documentar exposición de manera mínima y responsable.
+
+### Vulnerabilidades y mitigaciones
+Buscar integer overflow, memory corruption, use-after-free, race conditions, deserialization, path traversal y validación deficiente. Formular precondiciones y demostrar impacto en harness local o PoC inocua. Mitigar con límites, safe APIs, hardening, fuzzing, tests y parche. Coordinar disclosure y no publicar artefactos que faciliten abuso real.
+
+### Laboratorios
+- Analizar binarios de juguete compilados con símbolos y sin símbolos.
+- Reconstruir parser de formato sintético y crear corpus fuzz.
+- Comparar decompilación con fuente conocida para estimar límites.
+- Trazar flujo de datos hacia una función sensible en código de laboratorio.
+Medir cobertura de funciones, precisión de hipótesis, crashes reproducibles y falsos positivos.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.
