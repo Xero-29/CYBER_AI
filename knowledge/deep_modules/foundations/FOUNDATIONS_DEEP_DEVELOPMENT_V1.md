@@ -326,3 +326,328 @@ La consulta de una ficha oficial no equivale a lectura completa. No se atribuyen
 No avanzar al módulo 2 hasta completar: revisión tema×capa con evidencia; lectura y extracción de fuentes prioritarias; solución documental de brechas críticas; casos integradores resueltos; laboratorios ejecutados y resultados reproducibles cuando proceda; auditoría de consistencia y duplicación; actualización del índice y tracker. Revisión independiente externa puede seguir pendiente, pero debe quedar explícitamente bloqueante para K4/K5 y no confundirse con cierre editorial.
 
 Este documento amplía la base técnica y define el trabajo restante. No certifica por sí mismo la finalización del estándar.
+
+
+---
+
+# Auditoría disciplinar por tema — versión 1.1 (2026-11-19)
+
+Esta sección convierte los siete temas del currículo inicial en unidades explícitas y trazables. Corrige una deficiencia de la versión anterior: el desarrollo transversal cubría conceptos relevantes, pero no demostraba qué contenido correspondía a cada tema ni cómo se satisfacían las doce capas. Cada capa que sigue contiene contenido disciplinar y una evidencia/artefacto exigible. **Estado de esta iteración: desarrollo documental ampliado; las capas quedan en `in_progress`, no `passed`, hasta que se adjunten fuentes de texto completo, artefactos y pruebas.**
+
+## Convenciones comunes para los siete temas
+
+- **Hecho normativo/documental:** describe lo que establece una publicación identificada; no demuestra eficacia local.
+- **Inferencia:** conclusión que depende de supuestos explícitos.
+- **Hipótesis:** proposición que debe ser probada.
+- **Resultado:** solo se usa cuando existe ejecución, datos y registro reproducible.
+- En todos los laboratorios: usar únicamente sistemas propios, simuladores o entornos con autorización expresa; definir alcance, límites, criterio de parada, limpieza y rollback.
+- El riesgo no se calcula multiplicando escalas ordinales como si fueran probabilidades. Si no hay datos para estimar probabilidades, usar escenarios, rangos, bandas y análisis de sensibilidad.
+
+## Tema 1 — Modelos de seguridad y confianza
+
+**ID:** `foundations-01`  
+**Objetivo:** representar propiedades de seguridad, sujetos, objetos, políticas, mecanismos, límites de confianza y fallos de mediación en un sistema sociotécnico.
+
+### L1. Fundamentos teóricos
+Distinguir seguridad (protección frente a acciones intencionales o no), safety (evitar daño accidental o peligroso), privacidad (tratamiento legítimo y limitado de datos personales), confiabilidad (cumplimiento consistente de funciones) y resiliencia (adaptación/recuperación). Definir sujeto, objeto, acción, autoridad, política, mecanismo de referencia, activo, frontera de confianza y dominio de fallo. Ninguna propiedad aislada garantiza las demás.
+
+### L2. Fundamentos matemáticos y formales
+Modelar el sistema como grafo dirigido y tipado (G=(V,E)), donde nodos representan identidades, procesos, datos, servicios y proveedores; aristas representan invocación, flujo, dependencia o delegación. Modelar autorización como predicado (P(s,o,a,c)ightarrow{permit,deny}), con sujeto (s), objeto (o), acción (a) y contexto (c). Las invariantes se expresan como propiedades sobre estados: por ejemplo, todo acceso a un objeto restringido debe estar mediado por una decisión válida. Usar lógica temporal cuando importe el orden; no fingir que una matriz de riesgo es una prueba formal.
+
+### L3. Arquitectura y funcionamiento interno
+Descomponer punto de decisión, punto de aplicación, proveedor de identidad, motor de políticas, almacén de atributos, recurso y telemetría. Seguir una petición de extremo a extremo: identidad autenticada → contexto/atributos → evaluación → enforcement → registro → revocación. Identificar planos de control y datos, trust boundaries, canales laterales y dependencias compartidas. Un gateway no protege rutas que lo eluden.
+
+### L4. Estándares y metodologías
+Contrastar NIST SP 800-207 (arquitectura Zero Trust) con modelos DAC, MAC, RBAC y ABAC: Zero Trust es una arquitectura/principios de decisión sobre recursos, no un modelo de permisos intercambiable ni un producto. Usar NIST SP 800-160 Vol. 1 Rev. 1 para integrar seguridad en el ciclo de ingeniería. Registrar edición y alcance; no declarar equivalencia entre marcos.
+
+### L5. Implementación técnica
+Construir una matriz sujeto–recurso–acción–contexto; convertirla en pruebas de autorización positivas y negativas. Instrumentar decisiones con identificador de petición, sujeto, recurso, acción, política/versión, resultado y motivo, minimizando datos personales. Implementar denegación por defecto para operaciones sensibles y rutas de revocación. Verificar bypass de API, acceso directo al backend, cachés y credenciales de servicio.
+
+### L6. Análisis avanzado
+Analizar confusión de identidad, atributos obsoletos, propagación excesiva de privilegios, TOCTOU, fail-open/fail-closed, caché de decisiones, reloj desincronizado, dependencia del IdP y fallos de política. Evaluar disponibilidad del plano de autorización, consistencia de revocación y degradación segura. La autenticación correcta no prueba que la autorización sea correcta.
+
+### L7. Perspectiva de seguridad
+Amenazas: suplantación, elevación de privilegios, confused deputy, abuso de delegación, bypass de enforcement, robo de sesión y abuso interno. Controles: MFA resistente a phishing cuando aplique, mínimo privilegio, separación de funciones, tokens acotados, validación en el recurso, auditoría protegida y revocación. Documentar riesgo residual y vías de fallo común.
+
+### L8. Investigación científica
+Pregunta: ¿qué combinación de evaluación centralizada y enforcement local reduce más las decisiones inconsistentes bajo cambios de atributos y revocación? Hipótesis falsable: un diseño con versión de política y expiración explícita reduce decisiones obsoletas frente a caché sin invalidación. Variables: latencia, tasa de decisión obsoleta, disponibilidad, falsos permisos/denegaciones. Controlar carga, reloj y topología; publicar resultados negativos y amenazas a validez.
+
+### L9. Laboratorios y datasets
+LAB-FND-01A: simulador de autorización con 3 roles, 4 recursos, 5 acciones, atributos y reglas conflictivas; generar casos permitidos, denegados, atributos nulos/obsoletos y revocación. Ground truth manual versionado. No conectar a identidad real. Registrar configuración, semilla, entradas, decisiones y logs.
+
+### L10. Evaluación y benchmarks
+Métricas: tasa de decisiones correctas respecto al ground truth, falsos permisos, falsas denegaciones, cobertura de rutas, latencia p50/p95/p99, tiempo de propagación de revocación y disponibilidad. Reportar matriz de confusión y resultados por clase; accuracy global no basta si los permisos indebidos son raros.
+
+### L11. Conocimiento operativo
+Skill candidata `FOUNDATIONS.AUTHZ-MODEL`: entradas (inventario, sujetos, recursos, acciones, contexto), precondiciones (alcance autorizado y propietario), pasos (modelar, derivar políticas, generar pruebas, revisar bypass), salidas (matriz, DFD, pruebas y hallazgos), parada (identidad/alcance incierto), rollback (restaurar política versionada). No promover hasta probarla en casos distintos.
+
+### L12. Trazabilidad y mantenimiento
+Mantener diagrama y matriz versionados, ID de política, responsable, fecha de revisión, dependencias, cambios y evidencia de prueba. Cada decisión relevante debe apuntar a requisito, política y test. Revisar cuando cambien identidades, proveedores, APIs, topología o clasificación de datos.
+
+## Tema 2 — Inventario y clasificación de activos
+
+**ID:** `foundations-02`  
+**Objetivo:** descubrir, reconciliar, clasificar y mantener activos y dependencias con procedencia y confianza explícitas.
+
+### L1. Fundamentos teóricos
+Distinguir activo, componente, servicio, dato, dependencia, propietario, custodio y operador. Un activo tiene valor por su relación con una misión; no todo host equivale a un activo y un activo lógico puede residir en varios componentes. Clasificar datos por sensibilidad, impacto y obligación, no solo por ubicación.
+
+### L2. Fundamentos matemáticos y formales
+Representar inventario como grafo de dependencias con atributos temporales. Para reconciliación, usar claves fuertes (UUID, cloud resource ID, serial) y reglas probabilísticas solo como sugerencia, nunca como fusión automática sin evidencia. Métricas: cobertura (C=|A_{observados}cap A_{referencia}|/|A_{referencia}|), duplicados, huérfanos, frescura y tasa de atribución. Declarar el ground truth y sus limitaciones.
+
+### L3. Arquitectura y funcionamiento interno
+Fuentes: EDR, MDM, CMDB, cloud APIs, DNS/DHCP, IAM, repositorios, SBOM, IaC, contratos y entrevistas. Pipeline: extracción → normalización → resolución de identidad → reconciliación → enriquecimiento → clasificación → asignación de dueño → ciclo de revisión. Conservar la fuente original, timestamp y método de descubrimiento.
+
+### L4. Estándares y metodologías
+Usar NIST CSF 2.0 como marco de resultados y NIST SP 800-53 Release 5.2.0 como catálogo de controles; no tratarlos como un esquema universal de inventario. Definir taxonomía local, criterios de clasificación y retención. Separar requisitos legales locales de guías estadounidenses y validar aplicabilidad en jurisdicción colombiana antes de declarar obligación.
+
+### L5. Implementación técnica
+Esquema mínimo: `asset_id`, `asset_type`, `source_id`, `source_record_id`, `owner`, `operator`, `environment`, `data_classes`, `criticality`, `dependencies`, `first_seen`, `last_seen`, `confidence`, `status`. Importar en staging, normalizar nombres y unidades, deduplicar por identificadores fuertes, generar cola de conflictos y exportar inventario con historial. No borrar registros huérfanos: marcarlos y resolverlos.
+
+### L6. Análisis avanzado
+Casos difíciles: activos efímeros, autoscaling, serverless, BYOD, shadow IT, cuentas de proveedor, entornos desconectados, dispositivos sin agente, clones de VM, recursos borrados y drift. Medir falsos merges y falsos splits. Un inventario aparentemente completo puede ocultar sesgo de observación si todas las fuentes comparten la misma omisión.
+
+### L7. Perspectiva de seguridad
+Riesgos: activo sin dueño, recurso expuesto olvidado, identidad huérfana, clasificación incorrecta, datos en backup/exportación no inventariados y dependencia crítica desconocida. Controles: reconciliación multi-fuente, owner obligatorio para activos críticos, expiración/revisión, detección de drift y clasificación heredada con validación humana.
+
+### L8. Investigación científica
+Pregunta: ¿la fusión de fuentes heterogéneas mejora la cobertura real sin aumentar falsos merges? Hipótesis: claves fuertes más reconciliación supervisada mejoran F1 frente a hostname como clave única. Diseñar dataset sintético con duplicados, cambios de nombre, clones y recursos efímeros; comparar algoritmos y analizar sesgo de fuentes.
+
+### L9. Laboratorios y datasets
+LAB-FND-02A: generar 500 registros sintéticos desde CMDB, cloud, EDR y DNS, con 10% de duplicados y 5% de activos sin dueño (parámetros configurables, no datos reales). Publicar esquema, generador, semilla y ground truth. Medir reconciliación y conservar conflictos.
+
+### L10. Evaluación y benchmarks
+Precision/recall/F1 de emparejamiento, cobertura frente al ground truth, tasa de falsos merges, duplicados residuales, activos sin propietario, antigüedad mediana, latencia de actualización y coste operativo. Separar métrica de calidad del inventario de métrica de seguridad real.
+
+### L11. Conocimiento operativo
+Skill candidata `FOUNDATIONS.ASSET-RECONCILIATION`: delimitar fuentes, validar permisos, extraer snapshots, normalizar, reconciliar, producir excepciones y asignar responsables. No ejecutar descubrimiento activo ni escaneo de red sin autorización y alcance documentados.
+
+### L12. Trazabilidad y mantenimiento
+Registrar conectores y versiones, consultas, timestamps, licencias, hashes de snapshots, reglas de matching, decisiones humanas y cambios de esquema. Definir SLA de frescura por criticidad y revisar cobertura cuando se incorpore una nueva nube, proveedor o unidad de negocio.
+
+## Tema 3 — Superficie de ataque y modelado de amenazas
+
+**ID:** `foundations-03`  
+**Objetivo:** identificar rutas de abuso y fallos desde el contexto de misión, arquitectura, datos, identidades y dependencias.
+
+### L1. Fundamentos teóricos
+Distinguir amenaza, actor, capacidad, intención, oportunidad, evento, vulnerabilidad, exposición, ataque, impacto y riesgo. La superficie incluye interfaces técnicas, humanas, físicas, organizativas y de proveedor. STRIDE clasifica amenazas; no es un método completo de priorización ni sustituye análisis de safety.
+
+### L2. Fundamentos matemáticos y formales
+Construir DFD con procesos, almacenes, entidades externas y flujos; marcar trust boundaries. Modelar attack graph como estados y transiciones condicionadas por precondiciones, permisos y vulnerabilidades. Árboles de ataque expresan combinaciones AND/OR. Probabilidades de rutas no se multiplican sin independencia justificada; usar análisis de sensibilidad cuando los datos sean escasos.
+
+### L3. Arquitectura y funcionamiento interno
+Proceso: contexto y activos → diagrama de contexto/DFD → límites → escenarios → rutas → controles → riesgo residual → requisitos y pruebas. Incluir plano de administración, CI/CD, identidad de workload, backups, soporte, observabilidad, proveedores y recuperación; no limitarse al tráfico externo.
+
+### L4. Estándares y metodologías
+Combinar STRIDE, attack trees, misuse/abuse cases y MITRE ATT&CK como taxonomías complementarias. ATT&CK describe comportamiento adversario observado/documentado; no certifica que una técnica sea aplicable a un sistema. NIST SP 800-30 guía la evaluación del riesgo; NIST SP 800-160 integra seguridad en ingeniería.
+
+### L5. Implementación técnica
+Plantilla de escenario: activo, actor, objetivo, precondiciones, vector, ruta, debilidad, control existente, evidencia, consecuencia, detección, mitigación, riesgo residual y prueba. Mantener DFD en formato versionable (p. ej. Mermaid/PlantUML) y asociar cada amenaza a test verificable.
+
+### L6. Análisis avanzado
+Buscar rutas alternativas, fallos comunes, abuso de privilegio, errores de configuración, amenazas internas, fallos de proveedor, cadenas de dependencias, degradación y recuperación. Evitar doble conteo de escenarios correlacionados. Priorizar rutas completas y factibles, no sumar listas de CVE sin contexto.
+
+### L7. Perspectiva de seguridad
+Considerar confidencialidad, integridad, disponibilidad, autenticidad, privacidad y safety. Para cada escenario especificar prevención, detección, respuesta y recuperación. Validar controles con pruebas negativas seguras; no demostrar una amenaza atacando sistemas de terceros.
+
+### L8. Investigación científica
+Pregunta: ¿DFD más análisis de abuso encuentra rutas críticas omitidas por STRIDE aplicado sin modelar flujos? Hipótesis: el enfoque combinado reduce omisiones de rutas del ground truth en sistemas de referencia. Evaluación ciega por revisores, medir cobertura, severidad de omisiones y acuerdo interevaluador.
+
+### L9. Laboratorios y datasets
+LAB-FND-03A: arquitectura sintética multi-tier con API, IdP, cola, base de datos, CI/CD y proveedor externo. Crear ground truth de 30 escenarios (benignos y adversariales), etiquetados por dos revisores. Probar solo diagramas y simulador, sin explotación de sistemas reales.
+
+### L10. Evaluación y benchmarks
+Cobertura de amenazas críticas, falsos positivos, severidad de omisiones, porcentaje de escenarios con evidencia y test asociado, tiempo de modelado y acuerdo interevaluador (Cohen's kappa cuando proceda). Publicar desacuerdos y reglas de adjudicación.
+
+### L11. Conocimiento operativo
+Skill candidata `FOUNDATIONS.THREAT-MODEL`: recopilar arquitectura y alcance; construir DFD; marcar límites; enumerar amenazas; derivar controles/tests; revisar con propietario. Salida obligatoria: modelo, registro de escenarios y riesgos no resueltos. Parar si faltan límites o autorización.
+
+### L12. Trazabilidad y mantenimiento
+Versionar arquitectura, supuestos, catálogo de amenazas, revisión, cambios, fecha y evidencia. Reabrir el modelo ante cambios de flujo, proveedor, privilegios, exposición, datos o misión; asociar cada hallazgo a un commit o release.
+
+## Tema 4 — Identidad y control de acceso
+
+**ID:** `foundations-04`  
+**Objetivo:** razonar sobre ciclo de vida de identidades humanas/no humanas, autenticación, autorización, delegación y privilegios.
+
+### L1. Fundamentos teóricos
+Distinguir identificación, autenticación, autenticidad, autorización, accounting, federación, sesión, credencial, factor, privilegio y delegación. Las identidades de máquina y workloads requieren propietario, propósito, ciclo de vida y rotación; no son cuentas humanas simplificadas.
+
+### L2. Fundamentos matemáticos y formales
+Representar autorización como relación sujeto–recurso–acción–contexto; analizar jerarquías RBAC, atributos ABAC y restricciones de separación de funciones. Usar entropía solo para propiedades probabilísticas de secretos; no confundir longitud con entropía efectiva. Modelar caducidad/revocación como estado temporal y analizar ventanas de exposición.
+
+### L3. Arquitectura y funcionamiento interno
+Componentes: IdP, directorio, MFA, federation broker, token issuer, policy decision/enforcement points, PAM, vault, workload identity y auditoría. Trazar OIDC/OAuth 2.0/SAML según uso y roles; distinguir autenticación de usuario de autorización API. Revisar issuer, audience, scope, expiry, nonce/state y validación de firma cuando corresponda.
+
+### L4. Estándares y metodologías
+NIST SP 800-207 para principios ZT; NIST SP 800-53 Release 5.2.0 para controles; FIDO/WebAuthn y OAuth/OIDC como especificaciones de protocolos/identidad, no equivalentes entre sí. Verificar versiones, perfiles y erratas antes de implementación.
+
+### L5. Implementación técnica
+Diseñar alta/cambio/baja (JML), MFA, recuperación, acceso privilegiado temporal, scopes mínimos, tokens de vida corta, rotación de secretos, revisión de acceso y cuentas break-glass. Incluir pruebas de expiración, revocación, audience incorrecta, issuer no confiable, scope excesivo y acceso cross-tenant.
+
+### L6. Análisis avanzado
+Riesgos de sincronización, replay, token confusion, consent phishing, session fixation, refresh-token theft, cuentas huérfanas, service principals olvidados, secretos en CI y dependencia del IdP. Evaluar disponibilidad de autenticación y modo de recuperación sin crear bypass permanente.
+
+### L7. Perspectiva de seguridad
+Amenazas: suplantación, elevación, persistencia, abuso de delegación, insider y robo de credenciales. Mitigar con phishing-resistant MFA cuando el riesgo lo exija, PAM, JIT/JEA, device posture, revisión de grants, detección de anomalías y revocación verificable.
+
+### L8. Investigación científica
+Pregunta: ¿credenciales efímeras y permisos mínimos reducen exposición sin degradar disponibilidad en workloads? Medir duración, permisos efectivos, fallos legítimos, tiempo de recuperación y tasa de acceso indebido en simulación. Separar eficacia técnica de experiencia de usuario.
+
+### L9. Laboratorios y datasets
+LAB-FND-04A: IdP simulado, dos aplicaciones, tres roles, dos workloads y tokens de prueba; inyectar expiración, audience errónea, revocación tardía y scopes excesivos. Usar secretos ficticios. Registrar eventos sin material sensible.
+
+### L10. Evaluación y benchmarks
+Cobertura MFA, cuentas sin dueño, privilegios excesivos, tiempo de revocación, duración de credenciales, tasa de decisiones erróneas, latencia y fallos de acceso legítimo. Segmentar humanos, servicios y workloads.
+
+### L11. Conocimiento operativo
+Skill candidata `FOUNDATIONS.IDENTITY-LIFECYCLE`: inventariar identidades, mapear dueño/propósito, revisar permisos, validar autenticación, probar revocación y emitir excepciones. No rotar ni revocar identidades productivas sin aprobación del dueño y plan de rollback.
+
+### L12. Trazabilidad y mantenimiento
+Guardar esquema de claims, issuer/audience, versiones de librerías, configuración no secreta, responsable, fecha, evidencias de pruebas y excepciones aprobadas. Nunca almacenar tokens, claves privadas o contraseñas en el repositorio.
+
+## Tema 5 — Criptografía y protección de datos
+
+**ID:** `foundations-05`  
+**Objetivo:** seleccionar y operar mecanismos criptográficos adecuados al propósito, modelo de amenaza y ciclo de vida de datos/llaves.
+
+### L1. Fundamentos teóricos
+Distinguir cifrado, hash, MAC, firma, KDF, KEM, aleatoriedad, secreto, autenticidad, integridad y no repudio. La criptografía protege propiedades concretas bajo supuestos; no corrige endpoints comprometidos, mala autorización, metadatos expuestos ni disponibilidad.
+
+### L2. Fundamentos matemáticos y formales
+Explicar seguridad como indistinguibilidad/ventaja del adversario en modelos pertinentes; entropía de Shannon/min-entropía para fuentes aleatorias; colisiones/preimagen para hash; composición AEAD y límites de nonce. Evitar derivar seguridad práctica solo de tamaño de clave. Documentar supuestos de adversario y modelo.
+
+### L3. Arquitectura y funcionamiento interno
+Ciclo de claves: generación → distribución → almacenamiento → uso → rotación → revocación → backup/recuperación → destrucción. Separar data keys y key-encryption keys; identificar KMS/HSM, trust boundaries, envelope encryption, certificados, PKI y gestión de secretos. Mapear datos en reposo, tránsito y uso.
+
+### L4. Estándares y metodologías
+Usar algoritmos y parámetros de estándares vigentes, como NIST FIPS 203/204/205 para criptografía poscuántica según su propósito; NIST SP 800-57 para gestión de claves y FIPS 140 para módulos criptográficos cuando aplique. No inventar cumplimiento ni asumir que usar un algoritmo aprobado hace segura toda la arquitectura. Revisar versiones y transición.
+
+### L5. Implementación técnica
+Preferir bibliotecas mantenidas y APIs de alto nivel; no diseñar primitivas propias. Usar AEAD con nonce único bajo el esquema del algoritmo; validar certificados/cadenas y hostname; almacenar claves en KMS/HSM cuando corresponda; separar secretos por entorno; probar rotación, revocación, backup y restauración. Evitar claves hardcodeadas.
+
+### L6. Análisis avanzado
+Analizar nonce reuse, downgrade, padding oracle, side channels, RNG defectuoso, validación parcial de certificados, confusión de algoritmos, mala separación de claves, pérdida de KMS, expiración y errores de migración. Incluir impacto de comprometer endpoint, operador, proveedor y backup.
+
+### L7. Perspectiva de seguridad
+Amenazas: robo de claves, sustitución de certificados, manipulación de ciphertext, exfiltración de secretos, replay y destrucción de material criptográfico. Controles: mínimo privilegio, rotación, dual control, auditoría, separación de duties, protección de backups y plan de recuperación. El cifrado no sustituye clasificación ni control de acceso.
+
+### L8. Investigación científica
+Pregunta: ¿qué política de rotación/recuperación minimiza exposición sin aumentar pérdida de disponibilidad? Hipótesis comparativa en simulación; variables: tiempo de rotación, fallo de recuperación, exposición acumulada, latencia y error de operación. No probar algoritmos débiles en producción.
+
+### L9. Laboratorios y datasets
+LAB-FND-05A: entorno aislado con biblioteca criptográfica estándar, certificados de prueba y KMS simulado; probar round-trip, modificación de ciphertext, nonce duplicado detectado por harness, expiración, rotación y recuperación. Datos ficticios; guardar versiones y hashes, nunca secretos.
+
+### L10. Evaluación y benchmarks
+Pruebas de interoperabilidad, vectores de prueba oficiales, tasa de verificación correcta, rechazo de mensajes alterados, latencia/throughput, uso de CPU, tiempo de rotación y recuperación. Benchmarks deben fijar hardware, versión, parámetros y tamaño de muestra.
+
+### L11. Conocimiento operativo
+Skill candidata `FOUNDATIONS.CRYPTO-REVIEW`: clasificar datos, definir propiedades, revisar algoritmos/parametría, mapa de llaves, ciclo de vida, dependencias y pruebas. Parar ante algoritmo propietario, parámetros desconocidos o llaves expuestas; escalar al especialista criptográfico.
+
+### L12. Trazabilidad y mantenimiento
+Registrar algoritmo, modo, parámetros, biblioteca/versión, política, key ID no secreto, dueño, fecha de rotación y evidencia. Prohibido incluir claves, tokens o material secreto. Mantener plan de agilidad criptográfica y revisión de obsolescencia.
+
+## Tema 6 — Detección, respuesta y recuperación
+
+**ID:** `foundations-06`  
+**Objetivo:** convertir telemetría en detección accionable y coordinar respuesta, contención, erradicación, recuperación y aprendizaje.
+
+### L1. Fundamentos teóricos
+Distinguir evento, alerta, incidente, evidencia, indicador, señal, hipótesis de investigación, contención, erradicación y recuperación. Un log no es evidencia suficiente por sí mismo: necesita integridad, contexto, tiempo, origen y cadena de custodia cuando corresponda.
+
+### L2. Fundamentos matemáticos y formales
+Usar correlación temporal, ventanas, grafos de eventos y modelos de secuencia. Medir precisión, recall, FPR, FNR, prevalencia, MTTD/MTTA/MTTR y cobertura; definir denominadores y unidad de análisis. La tasa base afecta el valor predictivo: una alerta con buen recall puede producir muchos falsos positivos en eventos raros.
+
+### L3. Arquitectura y funcionamiento interno
+Fuentes: endpoint, identidad, red, DNS, cloud control plane, aplicaciones, correo, CI/CD y sistemas físicos relevantes. Pipeline: recolección → normalización → enriquecimiento → correlación → detección → triage → caso → decisión → contención → recuperación → lecciones. Sincronizar tiempo y preservar fuente original.
+
+### L4. Estándares y metodologías
+NIST SP 800-61 Rev. 3 (2025) integra respuesta a incidentes en la gestión de riesgo alineada con CSF 2.0 y sustituye Rev. 2. Usar NIST SP 800-53 Release 5.2.0 para controles aplicables. Adaptar requisitos legales, privacidad y notificación a la jurisdicción y sector; no copiar plazos estadounidenses como si fueran colombianos.
+
+### L5. Implementación técnica
+Definir playbooks con disparador, alcance, severidad, autoridad, pasos, evidencia, comunicación, criterios de contención, rollback y validación de recuperación. Para cada alerta, conservar evento bruto, parser/version, reloj, regla, contexto y analista. Diseñar pruebas de detección con datos sintéticos y simuladores.
+
+### L6. Análisis avanzado
+Tratar evasión, telemetría faltante, retraso, duplicados, reloj sesgado, log poisoning, pérdida de colector, saturación, alert fatigue y dependencias de respuesta. La contención puede destruir evidencia o interrumpir misión; evaluar impacto antes de aislar. Incluir recuperación de identidad, llaves, backups y proveedores.
+
+### L7. Perspectiva de seguridad
+Amenazas: borrado/manipulación de logs, living-off-the-land, abuso de cuentas legítimas, movimiento lateral y ransomware. Respuesta: preservar, delimitar, contener proporcionalmente, erradicar, restaurar desde fuentes confiables y monitorizar reinfección. No atribuir actor sin evidencia suficiente.
+
+### L8. Investigación científica
+Pregunta: ¿qué campos mínimos de evento permiten reconstrucción robusta bajo pérdida/retraso? Hipótesis: identidad, recurso, acción, timestamp sincronizado, resultado y origen mejoran reconstrucción frente a eventos sin esos campos. Controlar pérdida y desorden; medir atribución correcta, secuencias reconstruidas y tiempo.
+
+### L9. Laboratorios y datasets
+LAB-FND-06A: generar trazas sintéticas normales y de incidente con pérdida, retraso, duplicados y alteración. Ground truth de secuencias; evaluar parsers y reglas en entorno desconectado. Los playbooks se prueban en tabletop o simulador, no ejecutando contención sobre sistemas productivos.
+
+### L10. Evaluación y benchmarks
+Precision/recall, FPR/FNR, MTTD/MTTA/MTTR, completitud de eventos, cobertura de fuentes, tasa de reconstrucción correcta, tiempo de contención simulado, porcentaje de recuperación validada y recurrencia. Reportar intervalos y distribución por escenario.
+
+### L11. Conocimiento operativo
+Skill candidata `FOUNDATIONS.IR-TRIAGE-RECOVER`: validar alerta, alcance y autoridad; preservar datos; construir línea temporal; decidir contención; coordinar recuperación; verificar; documentar. Requiere permisos explícitos, matriz de escalamiento y kill switch. No ejecutar acciones destructivas automáticamente.
+
+### L12. Trazabilidad y mantenimiento
+Conservar case ID, timeline, hashes, fuente, zona horaria, versiones de reglas/parsers, decisiones, aprobaciones, cadena de custodia y postmortem. Actualizar playbooks tras cambios de infraestructura, amenazas o lecciones aprendidas; retener datos según política y ley aplicable.
+
+## Tema 7 — Gobierno, riesgo y aseguramiento
+
+**ID:** `foundations-07`  
+**Objetivo:** asignar responsabilidad, decidir riesgo contextual, seleccionar controles y construir argumentos verificables de confianza.
+
+### L1. Fundamentos teóricos
+Distinguir gobierno, gestión, riesgo inherente/residual, apetito/tolerancia, obligación, política, control, evidencia, assurance, auditoría y autorización. El riesgo pertenece a una decisión y contexto; una puntuación no reemplaza al responsable que acepta el riesgo.
+
+### L2. Fundamentos matemáticos y formales
+Modelar escenario (R=(A,T,V,C,I,U)): activo, amenaza, vulnerabilidad, controles, impacto e incertidumbre. Usar árboles de escenarios, análisis bayesiano solo con priors/datos defendibles y Monte Carlo solo si las distribuciones están justificadas. Separar incertidumbre aleatoria de desconocimiento; realizar sensibilidad y análisis de rangos.
+
+### L3. Arquitectura y funcionamiento interno
+Estructura: órgano de gobierno → ejecutivo/risk owner → CISO/función de riesgo → propietarios de sistema/datos → control owners → operadores → auditoría independiente. Flujo: contexto → evaluación → tratamiento → implementación → assessment → autorización → monitoreo → reevaluación. Diferenciar primera, segunda y tercera línea según modelo organizativo.
+
+### L4. Estándares y metodologías
+NIST CSF 2.0 organiza resultados; NIST SP 800-30 Rev. 1 guía evaluaciones de riesgo; SP 800-37 Rev. 2 define RMF; SP 800-53 Release 5.2.0 cataloga controles. ISO 27001/27005, CIS Controls y regulación local tienen propósitos distintos. Mapear requisitos sin asumir equivalencia ni certificación automática.
+
+### L5. Implementación técnica
+Mantener registro de riesgos con escenario, causa, consecuencia, owner, controles, evidencia, residual, tratamiento, fecha, vencimiento y aceptación. Crear matriz requisito–control–prueba–evidencia. Construir assurance case con claim, subclaims, argumentos, supuestos y evidencia. Los controles deben tener criterio de operación y test.
+
+### L6. Análisis avanzado
+Analizar concentración de proveedores, riesgo sistémico, conflicto de interés, control compensatorio, riesgo de cambio, deuda técnica, incentivos perversos, métricas manipulables y riesgo residual correlacionado. Evitar falsa precisión en matrices 5×5 y riesgo agregado que oculte colas de impacto catastrófico.
+
+### L7. Perspectiva de seguridad
+Gobierno debe cubrir abuso interno, terceros, privacidad, safety, continuidad, supply chain y divulgación. Asegurar segregación entre quien opera y quien verifica, gestión de excepciones, protección de evidencia, canal de escalamiento y aceptación formal del riesgo por autoridad competente.
+
+### L8. Investigación científica
+Pregunta: ¿la trazabilidad requisito–control–prueba–evidencia mejora la detección de controles no operativos frente a revisión documental? Hipótesis: las pruebas basadas en escenarios detectan más fallos reproducibles que el checklist aislado. Diseño con casos sintéticos y revisores ciegos; controlar experiencia y sesgo de selección.
+
+### L9. Laboratorios y datasets
+LAB-FND-07A: caso organizacional sintético con 20 riesgos, owners, controles, evidencias válidas/obsoletas y excepciones. Construir matriz y assurance case; introducir evidencias contradictorias y controles no implementados. No usar información confidencial real.
+
+### L10. Evaluación y benchmarks
+Cobertura de riesgos críticos, porcentaje con dueño, evidencia vigente, controles probados, excepciones vencidas, tiempo de tratamiento, falsos cierres y acuerdo entre evaluadores. Evaluar calidad del argumento y suficiencia de evidencia, no cantidad de controles listados.
+
+### L11. Conocimiento operativo
+Skill candidata `FOUNDATIONS.RISK-ASSURANCE`: fijar contexto, facilitar identificación de escenarios, revisar controles/evidencia, analizar residual, proponer tratamiento y escalar aceptación. La IA puede asistir y documentar; no aceptar riesgo ni certificar cumplimiento en nombre del responsable.
+
+### L12. Trazabilidad y mantenimiento
+Versionar políticas, matriz de obligaciones, registro de riesgos, controles, evidencias, responsables, decisiones y excepciones. Mantener fecha de vigencia y jurisdicción. Revisar ante cambios legales, incidentes, proveedores, misión, arquitectura o apetito de riesgo.
+
+## Matriz de brechas y correcciones de esta iteración
+
+| Hallazgo de auditoría | Corrección aplicada | Estado verificable |
+|---|---|---|
+| El documento transversal no asignaba explícitamente sus bloques a los siete temas del currículo | Se añadieron siete dossiers con ID estable y alcance propio | Documental incorporado |
+| La capa formal estaba tratada de forma desigual | Cada tema incluye modelos, fórmulas o justificación formal y límites | Documental incorporado; revisión matemática independiente pendiente |
+| Los protocolos de laboratorio no estaban alineados uno a uno con los temas | Se añadieron LAB-FND-01A a LAB-FND-07A con datos sintéticos, ground truth y métricas | Diseñados; no ejecutados |
+| La agenda de investigación usaba siete líneas que no coincidían con el currículo | Debe alinearse a los siete IDs de esta auditoría | Corrección de agenda pendiente en este commit |
+| Fuentes citadas no tenían lectura integral acreditada | Se limita la afirmación a metadatos/abstract/página oficial inspeccionados | Lectura completa pendiente |
+| Skills no tenían pruebas de promoción | Se mantienen como candidatas con precondiciones, parada y rollback | No validadas |
+| No había trazabilidad por tema×capa | Se enlaza cada ID con este documento y estado `in_progress` en matriz JSON/Markdown | Pendiente de actualización de matrices |
+
+## Dictamen de auditoría documental
+
+- Siete temas identificados y desarrollados por separado: **sí, en esta versión documental**.
+- Doce capas descritas para cada tema: **sí, como contenido de trabajo y criterios verificables**.
+- K3/K4/K5: **no acreditados**.
+- M3/M4/M5: **no acreditados**.
+- Laboratorios ejecutados: **cero acreditados en esta iteración**.
+- Revisión independiente: **pendiente**.
+- G1–G8: **ninguna se declara aprobada**. Las puertas dependientes de ejecución o revisión externa permanecen bloqueadas hasta disponer de evidencia.
