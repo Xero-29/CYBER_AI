@@ -1,51 +1,102 @@
-# Revisión de literatura inicial — Criptografía y migración poscuántica
+# Revisión de literatura — Criptografía aplicada
 
-**Corte:** 2026-11-17 · **Madurez:** M1 documental; no M3/M4.
+**Corte:** 2026-11-19  
+**Estado:** revisión documental inicial de metadatos y alcance oficial; no revisión sistemática ni lectura integral de todas las fuentes.  
+**Madurez:** M2 editorial; M3/M4/M5 pendientes.
 
-## Pregunta
+## 1. Pregunta y alcance
 
-¿Cómo inventariar y migrar dependencias criptográficas a estándares poscuánticos sin introducir incompatibilidades, downgrade, pérdida de interoperabilidad o falsas garantías?
+¿Cómo preservar las garantías de confidencialidad, integridad y autenticidad al integrar primitivas, protocolos y gestión de claves en sistemas de software y hardware, considerando errores de implementación, cambios de estándares y transición poscuántica?
 
-## Síntesis y evidencia primaria
+Se cubren: generación aleatoria, hashes, MAC, KDF, password hashing, cifrado simétrico y AEAD, firmas, intercambio de claves/KEM, TLS/SSH/IPsec, PKI, gestión de claves, módulos criptográficos, side channels y criptoagilidad.
 
-NIST publicó en agosto de 2024 tres estándares FIPS principales:
-- **FIPS 203 / ML-KEM:** mecanismo de encapsulación de claves para establecer un secreto compartido.
-- **FIPS 204 / ML-DSA:** firmas digitales basadas en retículos.
-- **FIPS 205 / SLH-DSA:** firmas digitales basadas en hashes y sin estado.
+## 2. Método y límites de la revisión
 
-NIST indica que las organizaciones deben identificar dónde usan algoritmos vulnerables y planificar la sustitución. El proyecto NIST también mantiene trabajo de estandarización adicional; no asumir que el conjunto de algoritmos futuros está cerrado. La página oficial consultada menciona FIPS 206 en desarrollo para FALCON y selección de HQC para estandarización (marzo de 2025).
+Se consultaron registros y páginas oficiales NIST y RFC Editor para verificar identificación, alcance, estado y avisos de revisión de documentos. Se registraron URLs canónicas e IDs en `knowledge/research/source_registry.json`. Esta revisión no equivale a:
+- lectura integral de cada documento;
+- revisión sistemática con doble cribado;
+- evaluación de todas las implementaciones;
+- validación FIPS de un producto;
+- experimento ejecutado ni reproducción externa.
 
-## Estrategia de migración
+Las fuentes normativas deben leerse en su edición y erratas vigentes antes de derivar requisitos de producción.
 
-1. Inventariar algoritmos, tamaños de clave, certificados, protocolos, bibliotecas, HSM/KMS, firmware, backups y datos cifrados a largo plazo.
-2. Clasificar por confidencialidad requerida, vida útil de datos, exposición, criticidad e interoperabilidad.
-3. Distinguir intercambio/encapsulación de claves de firma digital: ML-KEM no sustituye firmas; ML-DSA/SLH-DSA no son KEM.
-4. Probar compatibilidad de extremo a extremo, tamaño de mensajes, rendimiento, latencia, consumo, límites de certificados y renovación.
-5. Evaluar modos híbridos solo cuando la especificación/protocolo los defina y exista interoperabilidad; no improvisar concatenaciones criptográficas.
-6. Planificar crypto-agility: identificadores de algoritmo, negociación segura, actualización, rollback controlado y telemetría.
-7. Validar implementaciones y módulos según requisitos aplicables; un benchmark no demuestra seguridad criptográfica.
+## 3. Síntesis por línea de conocimiento
 
-## Hipótesis y protocolo (no ejecutado)
+### 3.1 Aleatoriedad y entropía
 
-H1: una migración guiada por inventario de dependencias y pruebas de interoperabilidad reduce fallos de despliegue frente a reemplazo aislado de algoritmos. H0: no hay diferencia.
+La serie NIST SP 800-90 separa tres problemas: mecanismos deterministas DRBG (SP 800-90A), fuentes de entropía y health tests (SP 800-90B), y construcciones completas RBG (SP 800-90C). SP 800-90C fue publicada como final el 25 de septiembre de 2025. El catálogo NIST muestra SP 800-90A Rev. 2 como borrador/pre-draft en 2025, mientras Rev. 1 sigue siendo la versión final listada. Esto obliga a registrar el estado exacto y no citar un borrador como estándar final.
 
-Banco: dos servicios de prueba, certificados sintéticos, implementaciones compatibles con FIPS y versiones fijadas. Comparar flujo clásico, PQC y modo híbrido estandarizado disponible. Métricas: handshake success, latencia p50/p95, bytes transmitidos, CPU/memoria, tamaño de certificado, fallos de negociación, compatibilidad entre implementaciones y recuperación/rollback. Repetir en hardware declarado. No realizar afirmaciones de resistencia formal basadas solo en rendimiento.
+Implicación técnica: la seguridad de la salida depende del seed material, estimación de entropía, conditioning, DRBG, reseed y estado operativo. Las pruebas de frecuencia o uniformidad no demuestran por sí solas impredecibilidad ni entropía suficiente. El compendio exige pruebas de fork/snapshot, arranque, fallo de fuente y reseed.
 
-## Fuentes
+### 3.2 Primitivas, contraseñas y firmas
 
-- NIST Post-Quantum Cryptography project: https://csrc.nist.gov/Projects/Post-Quantum-Cryptography
-- FIPS 203: https://doi.org/10.6028/NIST.FIPS.203
-- FIPS 204: https://doi.org/10.6028/NIST.FIPS.204
-- FIPS 205: https://doi.org/10.6028/NIST.FIPS.205
-- NIST IR 8547, transición poscuántica (referencia para revisión completa): https://csrc.nist.gov/pubs/ir/8547/ipd
+La selección de primitivas debe considerar propiedades diferentes: resistencia a preimagen/colisión de hashes, autenticación de MAC, separación de contexto en KDF, resistencia a fuerza bruta de password hashing y validación de firmas. HKDF (RFC 5869) es una KDF extract-and-expand; Argon2 (RFC 9106) especifica una función memory-hard para hashing de contraseñas. EdDSA está descrita en RFC 8032. Las propiedades de algoritmo no sustituyen encoding canónico, validación, protección de claves y manejo correcto de errores.
 
-## Brechas
+### 3.3 Cifrado simétrico y AEAD
 
-Revisar los estándares FIPS completos, sus erratas y requisitos de validación; estudiar protocolos TLS/PKI y perfiles de transición; ejecutar pruebas cruzadas en implementaciones reales y revisión criptográfica independiente.
+FIPS 197 define AES; la actualización de 2023 fue editorial y NIST indicó que no modificó técnicamente el algoritmo. Los modos de operación tienen requisitos distintos de IV/nonce y autenticación. RFC 8439 especifica ChaCha20 y Poly1305 para protocolos IETF. La reutilización de nonce en construcciones AEAD como GCM puede comprometer confidencialidad e integridad; los wrappers deben garantizar unicidad, fallar cerrado y no liberar plaintext no autenticado. Los vectores conocidos deben complementarse con pruebas negativas y límites.
 
+### 3.4 Establecimiento de claves y KEM
 
-## Identificadores del registro de fuentes
+NIST SP 800-56A Rev. 3 cubre establecimiento de claves sobre logaritmo discreto, incluyendo DH y curvas elípticas. El 6 de enero de 2026 NIST anunció que actualizará esta publicación; los perfiles que la utilicen deben comprobar el proceso de revisión.
 
-- `NIST-FIPS-203`
-- `NIST-FIPS-204`
-- `NIST-FIPS-205`
+FIPS 203 especifica ML-KEM con parámetros 512, 768 y 1024. La página NIST consultada contiene una nota del 17 de noviembre de 2025 sobre un problema identificado que será corregido en una actualización/revisión. Esto es un aviso de mantenimiento que debe rastrearse; no permite inferir por sí solo el impacto en una implementación concreta. FIPS 204 y 205 definen ML-DSA y SLH-DSA. KEM y firmas resuelven problemas distintos y no son intercambiables.
+
+### 3.5 Protocolos y composición
+
+RFC 8446 especifica TLS 1.3. Su key schedule, transcript binding y autenticación de pares deben analizarse como un protocolo completo, no como una lista de algoritmos. 0-RTT puede ser replayable; la aplicación debe restringirlo según semántica de operaciones. HPKE (RFC 9180) define composición de KEM, KDF y AEAD con modos establecidos; no autoriza improvisar protocolos ni concatenar secretos sin análisis.
+
+### 3.6 Gestión de claves y assurance
+
+La gestión cubre generación, distribución, activación, almacenamiento, uso, rotación, revocación, backup, recuperación y destrucción. La certificación de un módulo criptográfico, la validación de un algoritmo, la revisión de código y la configuración correcta de un despliegue son niveles de evidencia diferentes. HSM/KMS no eliminan errores de autorización, exposición de plaintext, recuperación deficiente ni abuso de identidades.
+
+## 4. Cambios de estado y alertas normativas que deben rastrearse
+
+- **SP 800-90C:** final, septiembre de 2025; incluir en los diseños actuales de arquitectura RBG.
+- **SP 800-90A Rev. 2:** borrador/pre-draft en el catálogo consultado; no presentarlo como final.
+- **SP 800-56A Rev. 3:** NIST anunció actualización el 6 de enero de 2026.
+- **FIPS 203:** NIST publicó nota el 17 de noviembre de 2025 sobre un problema que será corregido en una actualización/revisión; revisar hoja de erratas vigente.
+- **FIPS 197:** actualización editorial de mayo de 2023, sin cambios técnicos declarados.
+- **FIPS 204/205:** estándares finales publicados en agosto de 2024; mantener vigilancia de erratas y guías de implementación.
+
+## 5. Preguntas abiertas
+
+1. ¿Qué mecanismos de detección identifican fallos de nonce y de estado DRBG sin generar falsos positivos inaceptables?
+2. ¿Cómo comparar configuraciones de password hashing con presupuestos de CPU/memoria y amenazas de hardware diferentes?
+3. ¿Qué controles evitan errores de validación y oráculos en wrappers de KEM?
+4. ¿Qué impacto medible tiene PQC en certificados, handshake, firmware, HSM, ancho de banda y latencia en distintos entornos?
+5. ¿Qué arquitectura de rotación minimiza exposición y riesgo de indisponibilidad en sistemas distribuidos?
+6. ¿Qué métodos de evaluación de side channels son reproducibles y comparables entre hardware?
+
+## 6. Fuentes primarias registradas
+
+- [NIST SP 800-90A Rev. 1](https://doi.org/10.6028/NIST.SP.800-90Ar1) — DRBG.
+- [NIST SP 800-90B](https://doi.org/10.6028/NIST.SP.800-90B) — fuentes de entropía.
+- [NIST SP 800-90C](https://doi.org/10.6028/NIST.SP.800-90C) — construcciones RBG.
+- [FIPS 197](https://doi.org/10.6028/NIST.FIPS.197) — AES.
+- [NIST SP 800-56A Rev. 3](https://doi.org/10.6028/NIST.SP.800-56Ar3) — establecimiento de claves.
+- [NIST SP 800-57 Part 1 Rev. 5](https://doi.org/10.6028/NIST.SP.800-57pt1r5) — gestión de claves.
+- [FIPS 203](https://doi.org/10.6028/NIST.FIPS.203) — ML-KEM.
+- [FIPS 204](https://doi.org/10.6028/NIST.FIPS.204) — ML-DSA.
+- [FIPS 205](https://doi.org/10.6028/NIST.FIPS.205) — SLH-DSA.
+- [RFC 5869](https://www.rfc-editor.org/rfc/rfc5869) — HKDF.
+- [RFC 8439](https://www.rfc-editor.org/rfc/rfc8439) — ChaCha20-Poly1305.
+- [RFC 8446](https://www.rfc-editor.org/rfc/rfc8446) — TLS 1.3.
+- [RFC 9106](https://www.rfc-editor.org/rfc/rfc9106) — Argon2.
+- [RFC 8032](https://www.rfc-editor.org/rfc/rfc8032) — EdDSA.
+- [RFC 9180](https://www.rfc-editor.org/rfc/rfc9180) — HPKE.
+
+IDs de registro: `NIST-SP-800-90A-r1`, `NIST-SP-800-90B`, `NIST-SP-800-90C`, `NIST-FIPS-197`, `NIST-SP-800-56A-r3`, `NIST-SP-800-57p1r5`, `NIST-FIPS-203`, `NIST-FIPS-204`, `NIST-FIPS-205`, `RFC-5869`, `RFC-8439`, `RFC-8446`, `RFC-9106`, `RFC-8032`, `RFC-9180`.
+
+## 7. Brechas y plan de revisión completa
+
+- Obtener y leer texto íntegro de cada norma/RFC; capturar versión, secciones, erratas y hash del archivo cuando la licencia lo permita.
+- Extraer requisitos por afirmación y enlazarlos con subtemas y pruebas.
+- Revisar literatura revisada por pares sobre side channels, fallos de implementación, composiciones y PQC.
+- Implementar banco de pruebas con vectores oficiales y casos negativos.
+- Comparar al menos dos implementaciones independientes donde proceda.
+- Registrar resultados negativos, incertidumbre y amenazas a validez.
+- Solicitar revisión independiente por especialista en criptografía aplicada.
+
+**Conclusión limitada:** la base editorial cubre las principales familias de criptografía y sus superficies de integración. La evidencia consultada sustenta el mapa de estándares y las alertas de vigencia descritas, pero no certifica seguridad de un producto ni madurez científica M3/M4/M5.
