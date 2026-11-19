@@ -1067,6 +1067,61 @@
         "software_engineering"
       ],
       "review_note": "Se revisaron páginas oficiales de especificación y provenance; no se afirma auditoría de un builder concreto."
+    },
+    {
+      "id": "NIST-SP-800-30r1",
+      "title": "Guide for Conducting Risk Assessments",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.800-30r1",
+      "version": "Revision 1",
+      "published": "2012-09-17",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verified_scope": "Guía para preparar, conducir y mantener evaluaciones de riesgo en sistemas y organizaciones; la aplicación requiere contexto y supuestos documentados.",
+      "domains": [
+        "foundations",
+        "governance",
+        "vuln_management"
+      ],
+      "review_note": "Página oficial NIST y abstract inspeccionados el 2026-11-19. Texto completo, extracción por sección y contraste independiente pendientes."
+    },
+    {
+      "id": "NIST-SP-800-53r5",
+      "title": "Security and Privacy Controls for Information Systems and Organizations",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_control_catalog",
+      "url": "https://doi.org/10.6028/NIST.SP.800-53r5",
+      "version": "Revision 5",
+      "published": "2020-09-23",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verified_scope": "Catálogo adaptable de controles de seguridad y privacidad; la selección de controles no demuestra implementación ni eficacia.",
+      "domains": [
+        "foundations",
+        "governance",
+        "secure_arch",
+        "identity",
+        "data_security"
+      ],
+      "review_note": "Página oficial NIST y abstract inspeccionados el 2026-11-19. Revisar erratas, SP 800-53A/53B y versión vigente antes de uso normativo."
+    },
+    {
+      "id": "CIS-CONTROLS-v8.1",
+      "title": "CIS Critical Security Controls Version 8.1",
+      "publisher": "Center for Internet Security",
+      "type": "official_prioritized_safeguards",
+      "url": "https://www.cisecurity.org/controls/v8-1",
+      "version": "8.1",
+      "published": "2024-06-24",
+      "verification_status": "official_project_page_reviewed",
+      "verified_scope": "Salvaguardas priorizadas y actualizaciones de alineación con NIST CSF 2.0, clases de activos y cadena de suministro.",
+      "domains": [
+        "foundations",
+        "governance",
+        "secure_arch",
+        "network",
+        "devsecops"
+      ],
+      "review_note": "Página oficial CIS inspeccionada el 2026-11-19. Descarga, términos de uso, licencia y lectura del documento completo pendientes."
     }
   ],
   "last_updated": "2026-11-17"
