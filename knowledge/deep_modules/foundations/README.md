@@ -32,6 +32,8 @@ El desarrollo se organiza en doce bloques disciplinares:
 - [Primera unidad desarrollada: FND-01.01](topics/FND-01-01_SECURITY_SAFETY_PRIVACY_RELIABILITY_RESILIENCE.md): doce capas y cuatro capacidades en borrador; no aprobada.
 - [Anexo técnico FND-01.01](topics/FND-01-01_TECHNICAL_DEEPENING_CASEBOOK_V1.md): modelos cuantitativos con supuestos, análisis causal y caso hipotético OT; material interno en revisión, no aprobado.
 - [Soluciones desarrolladas de las cuatro capacidades](topics/FND-01-01_CAPABILITY_WORKED_SOLUTIONS_V1.md): secuencia didáctica, reconstrucción de mecanismos, escenario nuevo resuelto y diseño con requisitos/assurance; no evaluación independiente.
+- [Evaluación en frío V2](topics/FND-01-01_COLD_ASSESSMENT_V2.md): 100 puntos exactos, cinco bloques, tres variantes de transferencia y fallas críticas.
+- [Protocolo de evaluadores independientes](topics/FND-01-01_INDEPENDENT_ASSESSOR_PROTOCOL_V1.md): administración ciega, doble calificación, calibración, adjudicación y evidencia mínima.
 - [Revisión dirigida NIST SP 800-160 Vol. 1/2](SOURCE_REVIEW_ADDENDUM_NIST_800_160_2026-11-19.md): secciones oficiales inspeccionadas y aplicación a la unidad; no lectura integral.
 - [Aplicabilidad normativa colombiana](COLOMBIA_APPLICABILITY_FND_01_01_2026-11-19.md): Ley 1581/2012 y normas de agua para consumo humano, con límites de alcance; no concepto jurídico.
 - [Matriz granular de subunidades JSON](FOUNDATIONS_SUBTOPIC_AUDIT_V2.json) y [vista Markdown](FOUNDATIONS_SUBTOPIC_AUDIT_V2.md): 1.224 comprobaciones capa×subunidad y 408 comprobaciones de capacidad, línea base ampliada: FND-01.01 y FND-01.02 están `in_progress`; las otras 100 subunidades siguen `not_assessed`.
