@@ -122,3 +122,30 @@ Definir H0/H1, variables, población, comparadores, criterio de refutación, an�
 
 ## Madurez
 M0/M1 estructural. No acredita profundidad ni M3/M4/M5. Para avanzar: revisar fuentes completas, elaborar artefactos específicos, ejecutar casos y registrar evidencia auditable.
+
+
+## Profundización técnica específica: SOC y SIEM
+
+### Arquitectura de datos
+Mapear fuentes, collectors, forwarders, parsers, queues, storage hot/warm/cold, search, detections, case management, SOAR e integraciones. Definir schema común, timezone UTC, identidad de host/usuario, deduplicación, enrichment, retención y control de acceso. Medir ingest lag, pérdida, parsing failures y coste por GB.
+
+### Ingeniería de detección
+Cada regla necesita objetivo, amenaza, fuente, query, ventana, umbral, agrupación, suppression, severity, owner, test cases y revisión. Distinguir indicador estático, secuencia, anomalía y correlación. Controlar data quality, baselines, drift y falsos positivos. ATT&CK mapping debe reflejar comportamiento detectado y evidencia, no solo etiqueta.
+
+### Triage y casos
+Normalizar alerta con contexto, activos, identidad, criticidad, eventos relacionados, confidence y playbook. Documentar hipótesis, evidencia, decisiones, escalamiento y cierre. Separar incidente, benign true positive, false positive y insufficient data. La automatización debe ser idempotente, auditable y reversible.
+
+### SOAR y automatización
+Limitar permisos por integración, validar inputs, evitar command injection, proteger secretos y exigir aprobación en acciones de alto impacto. Implementar timeouts, retries, rate limits, dedupe, rollback y circuit breakers. Simular errores de API, token expirado y datos malformados. Registrar quién/qué autorizó cada acción.
+
+### Métricas y capacidad
+Medir MTTD, MTTA, MTTR, alert-to-case ratio, precision/recall, backlog, SLA, coverage, ingest lag, data loss y toil. No premiar cierre rápido sin calidad. Normalizar por severidad, turno, volumen y fuente; auditar métricas y sesgo de muestreo.
+
+### Laboratorios
+- Pipeline de logs sintéticos con parsing y normalización.
+- Detección por secuencia con ground truth y tuning.
+- Playbook SOAR simulado con aprobación y rollback.
+- Caída de collector y medición de pérdida/recuperación.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.
