@@ -124,7 +124,9 @@ class KnowledgeFieldStudiesTests(unittest.TestCase):
         self.assertEqual(actual, expected)
         for item in entries:
             with self.subTest(domain=item["domain_id"]):
-                self.assertEqual(item["status"], "identified_not_yet_assessed")
+                self.assertEqual(item["status"], "developed_initial_draft")
+                self.assertEqual(len(item["developed_topics"]), 4)
+                self.assertTrue(all(topic["status"] == "developed_initial_draft" for topic in item["developed_topics"]))
                 self.assertGreaterEqual(len(item["missing_advanced_topics"]), 4)
                 self.assertEqual(len(item["missing_advanced_topics"]), len(set(item["missing_advanced_topics"])))
 
