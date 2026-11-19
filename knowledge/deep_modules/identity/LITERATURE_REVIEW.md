@@ -2,7 +2,7 @@
 
 **Corte:** 2026-11-19  
 **Estado:** revisión exploratoria de fuentes registradas y alcance oficial; no revisión sistemática ni lectura integral de todas las fuentes.  
-**Madurez:** M2 editorial como máximo; M3/M4/M5 pendientes.
+**Madurez:** M2 editorial como máximo; no M3/M4/M5.
 
 ## Pregunta
 
