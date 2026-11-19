@@ -311,6 +311,8 @@ Puertas G1–G8: no se declaran aprobadas por este cambio. G1/G3 tienen evidenci
 
 ## 17. Fuentes primarias y estado de lectura
 
+Revisión de secciones y trazabilidad afirmación→fuente→capa: [SOURCE_REVIEW_AND_CLAIM_EVIDENCE_2026-11-19.md](SOURCE_REVIEW_AND_CLAIM_EVIDENCE_2026-11-19.md).
+
 - NIST CSWP 29, Cybersecurity Framework 2.0 (2024), https://doi.org/10.6028/NIST.CSWP.29 — metadatos y página oficial consultados; lectura integral y extracción por sección no acreditadas.
 - NIST SP 800-30 Rev. 1 (2012), https://doi.org/10.6028/NIST.SP.800-30r1 — ficha y resumen oficial consultados; lectura íntegra y extracción por sección pendientes.
 - NIST SP 800-37 Rev. 2 (2018), https://doi.org/10.6028/NIST.SP.800-37r2 — metadatos y descripción oficial consultados; lectura integral y extracción por sección pendientes.
@@ -352,7 +354,7 @@ Esta sección convierte los siete temas del currículo inicial en unidades expl�
 Distinguir seguridad (protección frente a acciones intencionales o no), safety (evitar daño accidental o peligroso), privacidad (tratamiento legítimo y limitado de datos personales), confiabilidad (cumplimiento consistente de funciones) y resiliencia (adaptación/recuperación). Definir sujeto, objeto, acción, autoridad, política, mecanismo de referencia, activo, frontera de confianza y dominio de fallo. Ninguna propiedad aislada garantiza las demás.
 
 ### L2. Fundamentos matemáticos y formales
-Modelar el sistema como grafo dirigido y tipado (G=(V,E)), donde nodos representan identidades, procesos, datos, servicios y proveedores; aristas representan invocación, flujo, dependencia o delegación. Modelar autorización como predicado (P(s,o,a,c)ightarrow{permit,deny}), con sujeto (s), objeto (o), acción (a) y contexto (c). Las invariantes se expresan como propiedades sobre estados: por ejemplo, todo acceso a un objeto restringido debe estar mediado por una decisión válida. Usar lógica temporal cuando importe el orden; no fingir que una matriz de riesgo es una prueba formal.
+Modelar el sistema como grafo dirigido y tipado (G=(V,E)), donde nodos representan identidades, procesos, datos, servicios y proveedores; aristas representan invocación, flujo, dependencia o delegación. Modelar autorización como predicado (P(s,o,a,c) ∈ {permit, deny}), con sujeto (s), objeto (o), acción (a) y contexto (c). Las invariantes se expresan como propiedades sobre estados: por ejemplo, todo acceso a un objeto restringido debe estar mediado por una decisión válida. Usar lógica temporal cuando importe el orden; no fingir que una matriz de riesgo es una prueba formal.
 
 ### L3. Arquitectura y funcionamiento interno
 Descomponer punto de decisión, punto de aplicación, proveedor de identidad, motor de políticas, almacén de atributos, recurso y telemetría. Seguir una petición de extremo a extremo: identidad autenticada → contexto/atributos → evaluación → enforcement → registro → revocación. Identificar planos de control y datos, trust boundaries, canales laterales y dependencias compartidas. Un gateway no protege rutas que lo eluden.
@@ -384,6 +386,11 @@ Skill candidata `FOUNDATIONS.AUTHZ-MODEL`: entradas (inventario, sujetos, recurs
 ### L12. Trazabilidad y mantenimiento
 Mantener diagrama y matriz versionados, ID de política, responsable, fecha de revisión, dependencias, cambios y evidencia de prueba. Cada decisión relevante debe apuntar a requisito, política y test. Revisar cuando cambien identidades, proveedores, APIs, topología o clasificación de datos.
 
+### Profundización técnica derivada de fuentes primarias
+En ingeniería de sistemas seguros, no reducir el diseño a una cadena de controles. El marco SSE de NIST SP 800-160 Vol. 1 Rev. 1 organiza el razonamiento en contextos de problema, solución y trustworthiness que interactúan durante el ciclo de vida. Un requisito de seguridad debe definir capacidad/funcionamiento y evidencia verificable; una política prescribe comportamiento en el contexto operacional; un mecanismo implementa ese comportamiento. Confundirlos produce requisitos no verificables o controles sin objetivo trazable.
+
+Formalizar la decisión de acceso como P(s,o,a,c,t) y registrar política/versionado, identidad, contexto y tiempo. Una propiedad útil es: para toda transición que modifica un objeto protegido, existe una decisión válida que cubre sujeto, objeto, acción y contexto en ese instante. La caché de autorización debe estar vinculada a versión/epoch de política, identidad y atributos; la revocación debe invalidar o acotar explícitamente el TTL. El modo fail-closed reduce bypass pero puede afectar disponibilidad; definir excepciones de emergencia con alcance, expiración, auditoría y dueño, nunca un bypass permanente.
+
 ## Tema 2 — Inventario y clasificación de activos
 
 **ID:** `foundations-02`  
@@ -393,13 +400,13 @@ Mantener diagrama y matriz versionados, ID de política, responsable, fecha de r
 Distinguir activo, componente, servicio, dato, dependencia, propietario, custodio y operador. Un activo tiene valor por su relación con una misión; no todo host equivale a un activo y un activo lógico puede residir en varios componentes. Clasificar datos por sensibilidad, impacto y obligación, no solo por ubicación.
 
 ### L2. Fundamentos matemáticos y formales
-Representar inventario como grafo de dependencias con atributos temporales. Para reconciliación, usar claves fuertes (UUID, cloud resource ID, serial) y reglas probabilísticas solo como sugerencia, nunca como fusión automática sin evidencia. Métricas: cobertura (C=|A_{observados}cap A_{referencia}|/|A_{referencia}|), duplicados, huérfanos, frescura y tasa de atribución. Declarar el ground truth y sus limitaciones.
+Representar inventario como grafo de dependencias con atributos temporales. Para reconciliación, usar claves fuertes (UUID, cloud resource ID, serial) y reglas probabilísticas solo como sugerencia, nunca como fusión automática sin evidencia. Métricas: cobertura (C=|A_{observados} ∩ A_{referencia}|/|A_{referencia}|), duplicados, huérfanos, frescura y tasa de atribución. Declarar el ground truth y sus limitaciones.
 
 ### L3. Arquitectura y funcionamiento interno
 Fuentes: EDR, MDM, CMDB, cloud APIs, DNS/DHCP, IAM, repositorios, SBOM, IaC, contratos y entrevistas. Pipeline: extracción → normalización → resolución de identidad → reconciliación → enriquecimiento → clasificación → asignación de dueño → ciclo de revisión. Conservar la fuente original, timestamp y método de descubrimiento.
 
 ### L4. Estándares y metodologías
-Usar NIST CSF 2.0 como marco de resultados y NIST SP 800-53 Release 5.2.0 como catálogo de controles; no tratarlos como un esquema universal de inventario. Definir taxonomía local, criterios de clasificación y retención. Separar requisitos legales locales de guías estadounidenses y validar aplicabilidad en jurisdicción colombiana antes de declarar obligación.
+Usar NIST CSF 2.0 como taxonomía de resultados y NIST SP 800-53 Release 5.2.0 como catálogo de controles; no tratarlos como un esquema universal de inventario. Para ciclo de vida, retiro y reutilización de medios, contrastar NIST SP 800-88 Rev. 2 (2025), que reemplaza Rev. 1 y orienta un programa de sanitización con assurance, no solo la ejecución de un comando. Definir taxonomía local, criterios de clasificación y retención. Separar requisitos legales locales de guías estadounidenses y validar aplicabilidad en jurisdicción colombiana antes de declarar obligación.
 
 ### L5. Implementación técnica
 Esquema mínimo: `asset_id`, `asset_type`, `source_id`, `source_record_id`, `owner`, `operator`, `environment`, `data_classes`, `criticality`, `dependencies`, `first_seen`, `last_seen`, `confidence`, `status`. Importar en staging, normalizar nombres y unidades, deduplicar por identificadores fuertes, generar cola de conflictos y exportar inventario con historial. No borrar registros huérfanos: marcarlos y resolverlos.
@@ -425,6 +432,11 @@ Skill candidata `FOUNDATIONS.ASSET-RECONCILIATION`: delimitar fuentes, validar p
 ### L12. Trazabilidad y mantenimiento
 Registrar conectores y versiones, consultas, timestamps, licencias, hashes de snapshots, reglas de matching, decisiones humanas y cambios de esquema. Definir SLA de frescura por criticidad y revisar cobertura cuando se incorpore una nueva nube, proveedor o unidad de negocio.
 
+### Profundización técnica derivada de fuentes primarias
+La reconciliación es un problema de resolución de entidades con observaciones parciales, no una simple deduplicación de nombres. Mantener por registro: fuente, identificador nativo, instante de observación, confianza, entorno, estado y evidencia de correspondencia. Las claves fuertes (UUID de instancia, ID de recurso cloud, serial validado) permiten enlaces deterministas solo dentro de su ámbito de unicidad y ciclo de vida. Hostname, IP y etiquetas son atributos mutables; deben producir candidatos, no fusiones automáticas. Si dos fuentes comparten el mismo error de descubrimiento, su acuerdo no elimina el sesgo.
+
+Medir cobertura respecto de un ground truth explícito: C=|A_observados ∩ A_referencia|/|A_referencia|. Medir por separado precision/recall de emparejamiento, activos sin dueño, antigüedad de last_seen y proporción de registros ambiguos. La antigüedad debe evaluarse con SLA distinto por criticidad y volatilidad. SP 800-88 Rev. 2 añade una dimensión de cierre del ciclo: la disposición del medio exige programa, método adecuado a sensibilidad/reutilización, confianza en el proveedor y evidencia de sanitización; no inferir borrado seguro de la mera desaparición del inventario.
+
 ## Tema 3 — Superficie de ataque y modelado de amenazas
 
 **ID:** `foundations-03`  
@@ -440,7 +452,7 @@ Construir DFD con procesos, almacenes, entidades externas y flujos; marcar trust
 Proceso: contexto y activos → diagrama de contexto/DFD → límites → escenarios → rutas → controles → riesgo residual → requisitos y pruebas. Incluir plano de administración, CI/CD, identidad de workload, backups, soporte, observabilidad, proveedores y recuperación; no limitarse al tráfico externo.
 
 ### L4. Estándares y metodologías
-Combinar STRIDE, attack trees, misuse/abuse cases y MITRE ATT&CK como taxonomías complementarias. ATT&CK describe comportamiento adversario observado/documentado; no certifica que una técnica sea aplicable a un sistema. NIST SP 800-30 guía la evaluación del riesgo; NIST SP 800-160 integra seguridad en ingeniería.
+Combinar STRIDE, attack trees, misuse/abuse cases y MITRE ATT&CK como taxonomías complementarias. ATT&CK v20.1 (13-10-2026) describe comportamiento adversario documentado; no certifica que una técnica sea aplicable a un sistema ni proporciona probabilidad. NIST SP 800-30 Rev. 1 diferencia eventos adversariales y no adversariales y separa iniciación/ocurrencia de probabilidad de impacto; NIST SP 800-160 integra seguridad en ingeniería.
 
 ### L5. Implementación técnica
 Plantilla de escenario: activo, actor, objetivo, precondiciones, vector, ruta, debilidad, control existente, evidencia, consecuencia, detección, mitigación, riesgo residual y prueba. Mantener DFD en formato versionable (p. ej. Mermaid/PlantUML) y asociar cada amenaza a test verificable.
@@ -466,6 +478,11 @@ Skill candidata `FOUNDATIONS.THREAT-MODEL`: recopilar arquitectura y alcance; co
 ### L12. Trazabilidad y mantenimiento
 Versionar arquitectura, supuestos, catálogo de amenazas, revisión, cambios, fecha y evidencia. Reabrir el modelo ante cambios de flujo, proveedor, privilegios, exposición, datos o misión; asociar cada hallazgo a un commit o release.
 
+### Profundización técnica derivada de fuentes primarias
+El modelo de riesgo debe distinguir fuente de amenaza, evento, vulnerabilidad/condición predisponente, probabilidad de iniciación u ocurrencia, probabilidad de impacto e impacto. Para eventos adversariales se consideran capacidad, intención y targeting; para eventos no adversariales se consideran frecuencia/historial y condiciones operativas. La probabilidad global depende del modelo de la organización: NIST SP 800-30 Rev. 1 no impone una fórmula universal para combinar escalas semicuantitativas. Por ello, no convertir escalas ordinales en porcentajes ni multiplicar valores 1–5 como si fueran probabilidades calibradas.
+
+Un attack graph debe especificar estado inicial, precondiciones, transición, privilegio requerido, activo objetivo y condición de éxito. En rutas AND, todos los prerrequisitos deben satisfacerse; en rutas OR basta una alternativa. ATT&CK v20.1 debe registrarse con fecha y dominio (Enterprise/Mobile/ICS); mapear una técnica a un escenario significa compatibilidad analítica, no evidencia de que ocurrió ni estimación de likelihood. Las rutas deben terminar en consecuencias de misión y pruebas de control, no en listas descontextualizadas de técnicas.
+
 ## Tema 4 — Identidad y control de acceso
 
 **ID:** `foundations-04`  
@@ -481,7 +498,7 @@ Representar autorización como relación sujeto–recurso–acción–contexto; 
 Componentes: IdP, directorio, MFA, federation broker, token issuer, policy decision/enforcement points, PAM, vault, workload identity y auditoría. Trazar OIDC/OAuth 2.0/SAML según uso y roles; distinguir autenticación de usuario de autorización API. Revisar issuer, audience, scope, expiry, nonce/state y validación de firma cuando corresponda.
 
 ### L4. Estándares y metodologías
-NIST SP 800-207 para principios ZT; NIST SP 800-53 Release 5.2.0 para controles; FIDO/WebAuthn y OAuth/OIDC como especificaciones de protocolos/identidad, no equivalentes entre sí. Verificar versiones, perfiles y erratas antes de implementación.
+NIST SP 800-207 para principios ZT; NIST SP 800-53 Release 5.2.0 para controles; FIDO/WebAuthn y OAuth/OIDC como especificaciones de protocolos/identidad, no equivalentes entre sí. RFC 9700 (BCP 240, 2025) establece prácticas actuales para OAuth 2.0: redirect URI con coincidencia exacta, PKCE para clientes públicos (S256), evitar implicit grant, restringir audience/scope y considerar tokens sender-constrained o rotación de refresh tokens. Verificar versiones, perfiles y erratas antes de implementación.
 
 ### L5. Implementación técnica
 Diseñar alta/cambio/baja (JML), MFA, recuperación, acceso privilegiado temporal, scopes mínimos, tokens de vida corta, rotación de secretos, revisión de acceso y cuentas break-glass. Incluir pruebas de expiración, revocación, audience incorrecta, issuer no confiable, scope excesivo y acceso cross-tenant.
@@ -507,6 +524,11 @@ Skill candidata `FOUNDATIONS.IDENTITY-LIFECYCLE`: inventariar identidades, mapea
 ### L12. Trazabilidad y mantenimiento
 Guardar esquema de claims, issuer/audience, versiones de librerías, configuración no secreta, responsable, fecha, evidencias de pruebas y excepciones aprobadas. Nunca almacenar tokens, claves privadas o contraseñas en el repositorio.
 
+### Profundización técnica derivada de fuentes primarias
+Para OAuth 2.0, RFC 9700 exige coincidencia exacta de redirect URI (con excepción limitada para el puerto localhost de apps nativas) y PKCE para clientes públicos; S256 evita exponer el verifier. El implicit grant no debe ser el flujo predeterminado porque expone tokens en la respuesta/URL y complica sender constraint. En el resource server validar firma y algoritmo permitido, issuer, audience, expiración, scopes/claims, y estado de revocación cuando el diseño lo requiera; comprobar solo que un JWT está bien formado no autentica nada.
+
+Los tokens sender-constrained (mTLS o DPoP) reducen replay de tokens robados, pero no protegen cuando se compromete el cliente y se extraen tanto token como clave. La rotación de refresh tokens debe invalidar el anterior y detectar su reutilización, manteniendo la relación entre tokens para identificar compromiso. La simulación LAB-FND-04A prueba solo claims sintéticos: la implementación real requiere bibliotecas mantenidas, validación criptográfica, pruebas negativas de protocolo e interoperabilidad.
+
 ## Tema 5 — Criptografía y protección de datos
 
 **ID:** `foundations-05`  
@@ -522,7 +544,7 @@ Explicar seguridad como indistinguibilidad/ventaja del adversario en modelos per
 Ciclo de claves: generación → distribución → almacenamiento → uso → rotación → revocación → backup/recuperación → destrucción. Separar data keys y key-encryption keys; identificar KMS/HSM, trust boundaries, envelope encryption, certificados, PKI y gestión de secretos. Mapear datos en reposo, tránsito y uso.
 
 ### L4. Estándares y metodologías
-Usar algoritmos y parámetros de estándares vigentes, como NIST FIPS 203/204/205 para criptografía poscuántica según su propósito; NIST SP 800-57 para gestión de claves y FIPS 140 para módulos criptográficos cuando aplique. No inventar cumplimiento ni asumir que usar un algoritmo aprobado hace segura toda la arquitectura. Revisar versiones y transición.
+Separar mecanismos: AES (FIPS 197) es cifrado simétrico; HMAC es autenticación/integridad; ML-KEM (FIPS 203) es un mecanismo de encapsulación de claves, no cifrado de archivos; ML-DSA (FIPS 204) y SLH-DSA (FIPS 205) son firmas digitales. SP 800-57 Part 1 Rev. 5 guía gestión de claves y FIPS 140 aplica a validación de módulos criptográficos. FIPS 203 y 204 tienen avisos de errata/actualización; comprobar los avisos oficiales antes de fijar parámetros. No inventar cumplimiento ni asumir que usar un algoritmo aprobado hace segura toda la arquitectura.
 
 ### L5. Implementación técnica
 Preferir bibliotecas mantenidas y APIs de alto nivel; no diseñar primitivas propias. Usar AEAD con nonce único bajo el esquema del algoritmo; validar certificados/cadenas y hostname; almacenar claves en KMS/HSM cuando corresponda; separar secretos por entorno; probar rotación, revocación, backup y restauración. Evitar claves hardcodeadas.
@@ -548,6 +570,11 @@ Skill candidata `FOUNDATIONS.CRYPTO-REVIEW`: clasificar datos, definir propiedad
 ### L12. Trazabilidad y mantenimiento
 Registrar algoritmo, modo, parámetros, biblioteca/versión, política, key ID no secreto, dueño, fecha de rotación y evidencia. Prohibido incluir claves, tokens o material secreto. Mantener plan de agilidad criptográfica y revisión de obsolescencia.
 
+### Profundización técnica derivada de fuentes primarias
+No agrupar cifrado, firma y establecimiento de claves bajo una sola etiqueta. AES (FIPS 197) es un cifrador de bloque simétrico; el modo de operación determina propiedades y requisitos adicionales. HMAC-SHA-256 proporciona autenticación de mensaje e integridad con una clave compartida, pero no confidencialidad ni firma pública. ML-KEM (FIPS 203) establece un secreto compartido mediante encapsulación; ML-DSA (FIPS 204) y SLH-DSA (FIPS 205) generan/verifican firmas. No usar una firma como KEM ni presentar un KEM como cifrado directo de datos.
+
+El laboratorio actual usa deliberadamente HMAC del estándar de biblioteca para probar alteración y cambio de clave; no implementa AES, KMS, HSM, PKI ni valida conformidad FIPS. La producción requiere gestión de ciclo de vida de claves, aleatoriedad, separación de usos, control de acceso, backup/recuperación, rotación, revocación y destrucción. Para AEAD, el nonce debe cumplir las condiciones específicas del algoritmo y no reutilizarse con la misma clave cuando el modo lo prohíba. Un benchmark criptográfico debe registrar CPU, biblioteca, versión, parámetros, tamaños, número de repeticiones e intervalos; no extrapolar resultados de una sola máquina.
+
 ## Tema 6 — Detección, respuesta y recuperación
 
 **ID:** `foundations-06`  
@@ -563,7 +590,7 @@ Usar correlación temporal, ventanas, grafos de eventos y modelos de secuencia. 
 Fuentes: endpoint, identidad, red, DNS, cloud control plane, aplicaciones, correo, CI/CD y sistemas físicos relevantes. Pipeline: recolección → normalización → enriquecimiento → correlación → detección → triage → caso → decisión → contención → recuperación → lecciones. Sincronizar tiempo y preservar fuente original.
 
 ### L4. Estándares y metodologías
-NIST SP 800-61 Rev. 3 (2025) integra respuesta a incidentes en la gestión de riesgo alineada con CSF 2.0 y sustituye Rev. 2. Usar NIST SP 800-53 Release 5.2.0 para controles aplicables. Adaptar requisitos legales, privacidad y notificación a la jurisdicción y sector; no copiar plazos estadounidenses como si fueran colombianos.
+NIST SP 800-61 Rev. 3 (2025) integra respuesta a incidentes en CSF 2.0 y sustituye Rev. 2. El modelo conecta Govern, Identify y Protect (preparación), Detect, Respond y Recover (respuesta) con mejora continua en Identify/Improvement. Usar NIST SP 800-53 Release 5.2.0 para controles aplicables. Adaptar requisitos legales, privacidad y notificación a la jurisdicción y sector; no copiar plazos estadounidenses como si fueran colombianos.
 
 ### L5. Implementación técnica
 Definir playbooks con disparador, alcance, severidad, autoridad, pasos, evidencia, comunicación, criterios de contención, rollback y validación de recuperación. Para cada alerta, conservar evento bruto, parser/version, reloj, regla, contexto y analista. Diseñar pruebas de detección con datos sintéticos y simuladores.
@@ -589,6 +616,11 @@ Skill candidata `FOUNDATIONS.IR-TRIAGE-RECOVER`: validar alerta, alcance y autor
 ### L12. Trazabilidad y mantenimiento
 Conservar case ID, timeline, hashes, fuente, zona horaria, versiones de reglas/parsers, decisiones, aprobaciones, cadena de custodia y postmortem. Actualizar playbooks tras cambios de infraestructura, amenazas o lecciones aprendidas; retener datos según política y ley aplicable.
 
+### Profundización técnica derivada de fuentes primarias
+NIST SP 800-61 Rev. 3 reemplaza el enfoque aislado de Rev. 2 por integración con CSF 2.0: Govern, Identify y Protect sostienen preparación y reducción de impacto; Detect, Respond y Recover articulan la respuesta; la mejora continua retroalimenta las funciones. La respuesta depende de roles internos y externos, incluida dirección, responsables técnicos, legal, comunicaciones y proveedores. El modelo no obliga a todas las organizaciones a usar idéntico organigrama o playbook; el contexto y la misión determinan la adaptación.
+
+Un evento útil para reconstrucción requiere al menos identificador, fuente, sujeto/identidad, acción, objeto/recurso, resultado, timestamp con zona/precisión y contexto de correlación. Preservar el evento bruto y metadatos de parser; deduplicar por ID estable sin destruir procedencia. Un timeline ordenado no prueba causalidad: reloj sesgado, retraso, pérdida, duplicación y eventos fuera de banda deben representarse como incertidumbre. LAB-FND-06A comprueba ordenamiento y completitud sobre ground truth sintético, no detección ni atribución real.
+
 ## Tema 7 — Gobierno, riesgo y aseguramiento
 
 **ID:** `foundations-07`  
@@ -604,7 +636,7 @@ Modelar escenario (R=(A,T,V,C,I,U)): activo, amenaza, vulnerabilidad, controles,
 Estructura: órgano de gobierno → ejecutivo/risk owner → CISO/función de riesgo → propietarios de sistema/datos → control owners → operadores → auditoría independiente. Flujo: contexto → evaluación → tratamiento → implementación → assessment → autorización → monitoreo → reevaluación. Diferenciar primera, segunda y tercera línea según modelo organizativo.
 
 ### L4. Estándares y metodologías
-NIST CSF 2.0 organiza resultados; NIST SP 800-30 Rev. 1 guía evaluaciones de riesgo; SP 800-37 Rev. 2 define RMF; SP 800-53 Release 5.2.0 cataloga controles. ISO 27001/27005, CIS Controls y regulación local tienen propósitos distintos. Mapear requisitos sin asumir equivalencia ni certificación automática.
+NIST CSF 2.0 organiza resultados sin prescribir una única implementación; NIST SP 800-30 Rev. 1 guía evaluaciones de riesgo y exige hacer explícitos modelo, supuestos y reglas de combinación; SP 800-37 Rev. 2 define RMF en siete pasos (Prepare, Categorize, Select, Implement, Assess, Authorize, Monitor); SP 800-53 Release 5.2.0 cataloga controles. La autorización es una decisión del responsable competente sustentada en evidencia, no una aprobación automática por completar una checklist. ISO 27001/27005, CIS Controls y regulación local tienen propósitos distintos. Mapear requisitos sin asumir equivalencia ni certificación automática.
 
 ### L5. Implementación técnica
 Mantener registro de riesgos con escenario, causa, consecuencia, owner, controles, evidencia, residual, tratamiento, fecha, vencimiento y aceptación. Crear matriz requisito–control–prueba–evidencia. Construir assurance case con claim, subclaims, argumentos, supuestos y evidencia. Los controles deben tener criterio de operación y test.
@@ -751,3 +783,8 @@ Los protocolos siguientes son diseños reproducibles para ejecución posterior. 
 ## Rúbrica transversal de salida por tema
 
 Puntuar cada criterio 0–2: 0 ausente/incorrecto; 1 parcial o no reproducible; 2 completo y respaldado. Criterios: (a) definiciones y alcance; (b) modelo y supuestos; (c) arquitectura/flujo; (d) estándares y versión; (e) procedimiento reproducible; (f) fallos y límites; (g) controles y riesgo residual; (h) hipótesis y validez; (i) dataset/ground truth; (j) métricas y baselines; (k) Skill con permisos/parada/rollback; (l) trazabilidad. Un puntaje documental no aprueba G5/G7/G8: esas puertas requieren ejecución, reproducción y revisión real. Un cero en seguridad, procedencia o trazabilidad bloquea la promoción del tema.
+
+### Profundización técnica derivada de fuentes primarias
+El RMF de NIST SP 800-37 Rev. 2 consta de Prepare, Categorize, Select, Implement, Assess, Authorize y Monitor. La selección de controles y su implementación no equivalen a evaluación; evaluación tampoco equivale a autorización. La autoridad de riesgo recibe evidencia, limitaciones y riesgo residual y decide dentro de su competencia. Monitor observa cambios del sistema y entorno, y alimenta reevaluaciones. Los controles heredados necesitan proveedor, alcance y evidencia de que siguen aplicando.
+
+NIST SP 800-30 Rev. 1 requiere explicitar propósito, alcance, supuestos, restricciones, modelo de riesgo y regla de combinación. Separar la incertidumbre aleatoria (variabilidad) de la incertidumbre epistémica (falta de conocimiento); reportar rangos y sensibilidad cuando no existan frecuencias defendibles. El CSF 2.0 describe resultados deseables y Profiles/Tiers para contextualizar; no prescribe una receta técnica ni otorga certificación automática. Un crosswalk entre marcos es una relación orientativa, no equivalencia uno-a-uno ni prueba de cumplimiento.
