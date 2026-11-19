@@ -61,9 +61,9 @@
     },
     "LAB-FND-04A": {
       "all_expected": true,
-      "negative_cases": 9,
+      "negative_cases": 10,
       "signature_verified": true,
-      "limitations": "Faithful HS256 JWS verification prototype using Python stdlib; no JWKS rotation, asymmetric algs, OIDC discovery, nonce/state flow, TLS, IdP or OAuth server integration.",
+      "limitations": "Faithful HS256 JWS verification prototype using Python stdlib; strict unpadded base64url, duplicate JSON rejection and exact header allowlist; no JWKS rotation, asymmetric algs, OIDC discovery, nonce/state flow, TLS, IdP or OAuth server integration.",
       "outcomes": {
         "valid": true,
         "wrong_signature": false,
@@ -74,7 +74,8 @@
         "not_yet_valid": false,
         "missing_scope": false,
         "revoked": false,
-        "malformed": false
+        "malformed": false,
+        "unsupported_header_parameter": false
       }
     },
     "LAB-FND-05A": {
