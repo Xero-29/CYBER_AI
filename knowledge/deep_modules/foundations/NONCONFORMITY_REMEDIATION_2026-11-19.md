@@ -4,6 +4,8 @@
 **Base:** dictamen `FOUNDATIONS_AUDIT_VERDICT_2026-11-19.md`  
 **Rama:** `knowledge/develop-foundations`
 
+La suite CI se dispara sobre el commit de remediación; el estado de cada matriz se registrará en el historial de Actions, no se anticipa aquí.
+
 Este documento registra correcciones y evidencia nueva. No borra el dictamen previo ni cambia automáticamente puertas a `passed`.
 
 ## Resumen de estado
