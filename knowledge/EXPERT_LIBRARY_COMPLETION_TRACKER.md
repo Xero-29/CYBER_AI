@@ -1,11 +1,11 @@
 # Seguimiento de aplicación del estándar experto — Biblioteca CYBER_AI
 
 **Corte editorial:** 2026-11-19  
-**Áreas:** 48/48 inspeccionadas; 336 unidades temáticas iniciales y 4.032 comprobaciones tema×capa registradas en la auditoría granular. Seis módulos P0 recibieron reescritura disciplinar específica; los otros 42 conservan desarrollo inicial y requieren ampliación profunda.  
+**Áreas:** 48/48 inspeccionadas; 336 unidades temáticas iniciales y 4.032 comprobaciones tema×capa registradas en la auditoría granular. Seis módulos P0 recibieron reescritura disciplinar específica; Foundations recibió además un desarrollo general ampliado. Los otros 41 conservan desarrollo inicial y requieren ampliación profunda.  
 **Estado global:** M2 editorial; auditoría estructural aplicada, pero cobertura por capa todavía no demostrada. Investigación documental, experimentación y validación independiente pendientes.
 
 ## Alcance aplicado
-Los seis módulos P0 (identity, malware, forensics, incident_response, threat_intel y reverse) fueron reescritos para sustituir bloques genéricos por mecanismos, casos límite, pruebas negativas, métricas y laboratorios específicos. Cada uno dispone ahora de agenda experimental y revisión exploratoria de literatura. Esto es avance editorial M2, no validación disciplinar. Las otras 42 áreas conservan el estado editorial previo y requieren ampliación disciplinar tema por tema. La auditoría granular inicial ya se registró en `knowledge/research/DOMAIN_LAYER_AUDIT_48.md` y su matriz `DOMAIN_LAYER_AUDIT_48.json`.
+Los seis módulos P0 (identity, malware, forensics, incident_response, threat_intel y reverse) fueron reescritos para sustituir bloques genéricos por mecanismos, casos límite, pruebas negativas, métricas y laboratorios específicos. Cada uno dispone ahora de agenda experimental y revisión exploratoria de literatura. Esto es avance editorial M2, no validación disciplinar. Las otras 41 áreas, aparte de Foundations, conservan el estado editorial previo y requieren ampliación disciplinar tema por tema. Foundations también requiere auditoría individual de sus siete temas contra las doce capas. La auditoría granular inicial ya se registró en `knowledge/research/DOMAIN_LAYER_AUDIT_48.md` y su matriz `DOMAIN_LAYER_AUDIT_48.json`.
 
 ## Matriz de áreas
 | ID | Área | Compendio | Agenda específica | Fuentes integrales | Laboratorio ejecutado | Revisión independiente |
@@ -101,7 +101,7 @@ Se inspeccionaron los 48 compendios técnicos y se creó una línea base legible
 La matriz contiene 48 especialidades, 7 unidades temáticas iniciales por especialidad, 12 capas por tema (4.032 estados) y ocho puertas G1–G8 por especialidad. Los estados se inicializan como `not_assessed`: significa que todavía no existe una comprobación trazable tema×capa, no que el tema carezca absolutamente de contenido.
 
 ### Hallazgo de la inspección
-- Seis módulos (identity, malware, forensics, incident_response, threat_intel y reverse) tienen reescritura disciplinar inicial, pero todavía requieren auditoría tema×capa y evidencia.
+- Seis módulos (identity, malware, forensics, incident_response, threat_intel y reverse) tienen reescritura disciplinar inicial. Foundations tiene un desarrollo general ampliado. Los siete requieren auditoría tema×capa y evidencia.
 - Los otros 42 compendios contienen rutas temáticas iniciales, pero presentan bloques metodológicos repetidos y profundidad insuficiente para afirmar aplicación exhaustiva del estándar.
 - Los 48 módulos permanecen en M2 editorial. No se elevan niveles K ni puertas G por presencia de documentos, títulos o palabras clave.
 
