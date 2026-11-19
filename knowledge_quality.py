@@ -58,15 +58,67 @@ def audit_library(root: Path = ROOT) -> dict:
         missing = [k for k,v in base.items() if not v]
         missing_deep = [k for k,v in deep.items() if not v]
         if missing: item_errors.append("secciones base ausentes: " + ", ".join(missing))
-        results.append({"id":aid,"name":area.get("name"),"base_complete":not item_errors,"deep_section_coverage":sum(deep.values()),"deep_section_total":len(DEEP),"missing_deep_sections":missing_deep,"errors":item_errors,"curriculum_maturity":entry.get("maturity") if entry else "missing"})
-    base_complete=sum(x["base_complete"] for x in results)
-    deep_complete=sum(x["deep_section_coverage"] == len(DEEP) for x in results)
-    return {"ok":not errors and base_complete == len(results),"errors":errors,"area_count":len(results),"base_complete":base_complete,"deep_complete":deep_complete,"deep_section_checks":len(results)*len(DEEP),"deep_section_present":sum(x["deep_section_coverage"] for x in results),"curriculum_defined":len(cids),"areas":results,"limitations":["Mide estructura, no exactitud ni profundidad semántica.","No valida licencias, vigencia ni calidad de fuentes.","No prueba ejecución de laboratorios.","No certifica competencia de agentes o herramientas."]}
+        study_present = False
+        study_words = 0
+        study_references = 0
+        study_relative = area.get("research_study_path")
+        if not isinstance(study_relative, str) or not study_relative.strip():
+            item_errors.append("sin research_study_path en manifiesto")
+        else:
+            study_rel = Path(study_relative)
+            if study_rel.is_absolute() or ".." in study_rel.parts:
+                item_errors.append("ruta de RESEARCH_STUDY no permitida")
+            else:
+                study_path = (root / study_rel).resolve()
+                if root.resolve() not in study_path.parents or not study_path.is_file() or study_path.is_symlink():
+                    item_errors.append("RESEARCH_STUDY inexistente o fuera del repositorio")
+                else:
+                    study_text = study_path.read_text(encoding="utf-8")
+                    study_words = len(re.findall(r"\b[\w-]+\b", study_text))
+                    study_references = len(re.findall(r"https://", study_text))
+                    study_present = True
+                    if study_words < 250:
+                        item_errors.append("RESEARCH_STUDY demasiado corto para la cobertura mínima")
+                    if not has_heading(study_text, ("## Fuentes", "## Fuentes primarias", "## Referencias")):
+                        item_errors.append("RESEARCH_STUDY sin referencias")
+                    if study_references < 2:
+                        item_errors.append("RESEARCH_STUDY con menos de dos referencias HTTPS")
+        results.append({
+            "id": aid, "name": area.get("name"), "base_complete": not item_errors,
+            "deep_section_coverage": sum(deep.values()), "deep_section_total": len(DEEP),
+            "missing_deep_sections": missing_deep, "errors": item_errors,
+            "curriculum_maturity": entry.get("maturity") if entry else "missing",
+            "research_study_present": study_present, "research_study_words": study_words,
+            "research_study_references": study_references,
+        })
+    base_complete = sum(x["base_complete"] for x in results)
+    deep_complete = sum(x["deep_section_coverage"] == len(DEEP) for x in results)
+    research_studies_complete = sum(
+        x["research_study_present"] and x["research_study_words"] >= 250
+        and x["research_study_references"] >= 2 for x in results
+    )
+    return {
+        "ok": not errors and base_complete == len(results),
+        "errors": errors, "area_count": len(results), "base_complete": base_complete,
+        "deep_complete": deep_complete, "deep_section_checks": len(results) * len(DEEP),
+        "deep_section_present": sum(x["deep_section_coverage"] for x in results),
+        "research_studies_complete": research_studies_complete,
+        "research_study_words_total": sum(x["research_study_words"] for x in results),
+        "research_study_references_total": sum(x["research_study_references"] for x in results),
+        "curriculum_defined": len(cids), "areas": results,
+        "limitations": [
+            "Mide estructura y umbrales mínimos, no exactitud ni profundidad semántica.",
+            "No valida licencias, vigencia ni calidad experta de fuentes.",
+            "No prueba ejecución de laboratorios.",
+            "No certifica competencia de agentes o herramientas.",
+        ],
+    }
 
 def main() -> int:
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--json",action="store_true")
     parser.add_argument("--require-deep",action="store_true")
+    parser.add_argument("--require-research-studies",action="store_true")
     args=parser.parse_args()
     report=audit_library()
     if args.json: print(json.dumps(report,ensure_ascii=False,indent=2))
@@ -81,6 +133,7 @@ def main() -> int:
         for item in report.get("limitations",[]): print("LIMITACIÓN: "+item)
     if not report["ok"]: return 1
     if args.require_deep and report.get("deep_complete") != report.get("area_count"): return 2
+    if args.require_research_studies and report.get("research_studies_complete") != report.get("area_count"): return 3
     return 0
 
 if __name__ == "__main__":
