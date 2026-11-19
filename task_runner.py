@@ -2,10 +2,14 @@
 """Ejecutor controlado de comprobaciones seleccionadas por CYBER_AI."""
 
 import argparse
+import hashlib
 import json
+import os
 import shutil
+import stat
 import subprocess
 import sys
+import tempfile
 import time
 import uuid
 from pathlib import Path
@@ -14,7 +18,51 @@ from urllib.parse import urlparse
 from capability_selector import select_capabilities
 from execution_policy import AuthorizationError, authorize_target
 from execution_ledger import ExecutionLedger
-from binary_integrity import BinaryIntegrityError, hash_executable, require_approved_executable
+from binary_integrity import (
+    BinaryIntegrityError,
+    build_minimal_environment,
+    hash_executable,
+    require_approved_executable,
+)
+from safe_io import SafeWriteError, atomic_write_text, ensure_private_directory
+
+
+MAX_SCAN_OUTPUT_BYTES = 20 * 1024 * 1024
+MAX_FINDINGS = 10000
+MAX_TEMPLATE_BYTES = 2 * 1024 * 1024
+
+
+def _safe_template_path(path, root):
+    """Return a resolved, bounded template path inside the non-symlink root."""
+    try:
+        root = Path(root)
+        if root.is_symlink():
+            return None
+        root_resolved = root.resolve(strict=True)
+        candidate = Path(path)
+        if candidate.is_symlink():
+            return None
+        info = candidate.lstat()
+        if not stat.S_ISREG(info.st_mode) or info.st_size > MAX_TEMPLATE_BYTES:
+            return None
+        resolved = candidate.resolve(strict=True)
+        resolved.relative_to(root_resolved)
+        cursor = candidate
+        while cursor != root:
+            if cursor.is_symlink():
+                return None
+            cursor = cursor.parent
+        return resolved
+    except (OSError, RuntimeError, ValueError):
+        return None
+
+
+def _sha256_file(path):
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
 
 
 def _record_task_scan(task, target, report, started, authorization_id=None, start_event_id=None):
@@ -81,20 +129,11 @@ def main():
     # y configuraciones; excluimos otras familias de plantillas.
     root = Path.home() / "nuclei-templates"
     candidates = select_capabilities(args.task, limit=20000)
-    allowed = []
+    safe_candidates = []
     for item in candidates:
-        path = Path(item["path"])
-        try:
-            relative = path.relative_to(root)
-        except ValueError:
-            continue
-        if (
-            len(relative.parts) >= 3
-            and relative.parts[0] == "http"
-            and relative.parts[1] in ("technologies", "misconfiguration")
-            and path.is_file()
-        ):
-            allowed.append(item)
+        safe_path = _safe_template_path(item.get("path", ""), root)
+        if safe_path is not None:
+            safe_candidates.append({**item, "path": str(safe_path)})
 
     # Plantillas generales seleccionadas explícitamente para auditoría web.
     preferred = [
@@ -107,9 +146,10 @@ def main():
     ]
 
     by_relative_path = {}
-    for item in candidates:
+    root_resolved = root.resolve(strict=False)
+    for item in safe_candidates:
         try:
-            relative = Path(item["path"]).relative_to(root).as_posix()
+            relative = Path(item["path"]).relative_to(root_resolved).as_posix()
         except ValueError:
             continue
         by_relative_path[relative] = item
@@ -118,7 +158,7 @@ def main():
         by_relative_path[name]
         for name in preferred
         if name in by_relative_path
-        and Path(by_relative_path[name]["path"]).is_file()
+        and _safe_template_path(by_relative_path[name]["path"], root) is not None
     ][:10]
 
     if not selected:
