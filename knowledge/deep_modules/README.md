@@ -2,6 +2,10 @@
 
 Esta colección contiene 48 compendios técnicos disciplinares ampliados como borradores, con agenda de investigación transversal específica por área y mapa de procedencia. La ampliación editorial no equivale a revisión experta ni validación experimental.
 
+## Auditoría de profundidad (2026-11-19)
+
+- [Auditoría de profundidad de los 48 compendios](../research/COMPENDIUM_DEPTH_AUDIT_2026-11-19.md): detecta desigualdad de profundidad y bloques plantilla en ocho áreas; define prioridades de remediación. Es un diagnóstico editorial preliminar, no una certificación disciplinar.
+
 ## Investigación nivel L4/L5
 
 Cada especialidad dispone de una agenda de investigación en `./<area>/RESEARCH_AGENDA.md`. Los dossiers `LITERATURE_REVIEW.md` deben contarse mediante `knowledge_research_audit.py`; no confundir agendas con revisiones ejecutadas. Las revisiones exploratorias no representan revisiones sistemáticas completas ni experimentos ejecutados.
