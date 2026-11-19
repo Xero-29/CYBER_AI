@@ -156,3 +156,11 @@ No conformidades abiertas: lectura integral de fuentes primarias; normas de safe
 - Añadido `topics/FND-01-01_ASSESSOR_GUIDE_V2.md`: anclas de corrección, expectativas por variante, criterios observables para fallas críticas, puntuación y adjudicación. Es material reservado; no es pilotaje ni validación psicométrica.
 - Actualizados el documento principal, la matriz JSON/Markdown y el registro de fuentes. La matriz conserva FND-01.01 en 12 capas y 4 capacidades `in_progress`, T0/O0; no se cambió ninguna celda a `passed`.
 - Persisten las brechas no resolubles por edición documental: lectura integral de fuentes/referencias, determinación de normas sectoriales según alcance concreto, revisión jurídica competente, administración supervisada con dos evaluadores independientes cualificados, pilotaje y revisión disciplinar independiente.
+
+
+## Normalización de no conformidades — FND-01.01
+
+- Se detectó solapamiento entre NC-FND-01.01-01 (lectura integral de fuentes primarias) y NC-FND-01.01-06 (lectura integral específica de NIST SP 800-160).
+- Se consolidó el alcance de NC-01 para incluir expresamente NIST SP 800-160 y referencias críticas; se retiró NC-06 como duplicado. No se cerró ninguna brecha sustantiva.
+- NC-05 permanece separada porque exige contraste disciplinar de modelos de confiabilidad/safety, no solo lectura de publicaciones.
+- El número de NC abiertas de FND-01.01 pasa de seis a cinco por eliminación de duplicidad administrativa, no por aprobación de evidencia.
