@@ -2491,7 +2491,7 @@
           "audit_status": "topic_specific_documentation_added_evidence_pending",
           "audit_reference": "knowledge/deep_modules/foundations/FOUNDATIONS_DEEP_DEVELOPMENT_V1.md",
           "audit_section": "Tema 1 — Modelos de seguridad y confianza",
-          "audit_note": "Las doce capas se desarrollaron y mapearon documentalmente en la iteración 2026-11-19. No se marcan passed: lectura integral de fuentes, ejecución de laboratorio, evaluación empírica y revisión independiente pendientes."
+          "audit_note": "Dossier temático y fuentes revisadas por secciones; harness sintético local ejecutado para el área. No promover capa: faltan implementaciones reales aisladas, revisión externa y réplica independiente. Resultados en labs/results.json."
         },
         {
           "topic_id": "foundations-02",
@@ -2513,7 +2513,7 @@
           "audit_status": "topic_specific_documentation_added_evidence_pending",
           "audit_reference": "knowledge/deep_modules/foundations/FOUNDATIONS_DEEP_DEVELOPMENT_V1.md",
           "audit_section": "Tema 2 — Inventario y clasificación de activos",
-          "audit_note": "Las doce capas se desarrollaron y mapearon documentalmente en la iteración 2026-11-19. No se marcan passed: lectura integral de fuentes, ejecución de laboratorio, evaluación empírica y revisión independiente pendientes."
+          "audit_note": "Dossier temático y fuentes revisadas por secciones; harness sintético local ejecutado para el área. No promover capa: faltan implementaciones reales aisladas, revisión externa y réplica independiente. Resultados en labs/results.json."
         },
         {
           "topic_id": "foundations-03",
@@ -2535,7 +2535,7 @@
           "audit_status": "topic_specific_documentation_added_evidence_pending",
           "audit_reference": "knowledge/deep_modules/foundations/FOUNDATIONS_DEEP_DEVELOPMENT_V1.md",
           "audit_section": "Tema 3 — Superficie de ataque y modelado de amenazas",
-          "audit_note": "Las doce capas se desarrollaron y mapearon documentalmente en la iteración 2026-11-19. No se marcan passed: lectura integral de fuentes, ejecución de laboratorio, evaluación empírica y revisión independiente pendientes."
+          "audit_note": "Dossier temático y fuentes revisadas por secciones; harness sintético local ejecutado para el área. No promover capa: faltan implementaciones reales aisladas, revisión externa y réplica independiente. Resultados en labs/results.json."
         },
         {
           "topic_id": "foundations-04",
@@ -2557,7 +2557,7 @@
           "audit_status": "topic_specific_documentation_added_evidence_pending",
           "audit_reference": "knowledge/deep_modules/foundations/FOUNDATIONS_DEEP_DEVELOPMENT_V1.md",
           "audit_section": "Tema 4 — Identidad y control de acceso",
-          "audit_note": "Las doce capas se desarrollaron y mapearon documentalmente en la iteración 2026-11-19. No se marcan passed: lectura integral de fuentes, ejecución de laboratorio, evaluación empírica y revisión independiente pendientes."
+          "audit_note": "Dossier temático y fuentes revisadas por secciones; harness sintético local ejecutado para el área. No promover capa: faltan implementaciones reales aisladas, revisión externa y réplica independiente. Resultados en labs/results.json."
         },
         {
           "topic_id": "foundations-05",
@@ -2579,7 +2579,7 @@
           "audit_status": "topic_specific_documentation_added_evidence_pending",
           "audit_reference": "knowledge/deep_modules/foundations/FOUNDATIONS_DEEP_DEVELOPMENT_V1.md",
           "audit_section": "Tema 5 — Criptografía y protección de datos",
-          "audit_note": "Las doce capas se desarrollaron y mapearon documentalmente en la iteración 2026-11-19. No se marcan passed: lectura integral de fuentes, ejecución de laboratorio, evaluación empírica y revisión independiente pendientes."
+          "audit_note": "Dossier temático y fuentes revisadas por secciones; harness sintético local ejecutado para el área. No promover capa: faltan implementaciones reales aisladas, revisión externa y réplica independiente. Resultados en labs/results.json."
         },
         {
           "topic_id": "foundations-06",
@@ -2601,7 +2601,7 @@
           "audit_status": "topic_specific_documentation_added_evidence_pending",
           "audit_reference": "knowledge/deep_modules/foundations/FOUNDATIONS_DEEP_DEVELOPMENT_V1.md",
           "audit_section": "Tema 6 — Detección, respuesta y recuperación",
-          "audit_note": "Las doce capas se desarrollaron y mapearon documentalmente en la iteración 2026-11-19. No se marcan passed: lectura integral de fuentes, ejecución de laboratorio, evaluación empírica y revisión independiente pendientes."
+          "audit_note": "Dossier temático y fuentes revisadas por secciones; harness sintético local ejecutado para el área. No promover capa: faltan implementaciones reales aisladas, revisión externa y réplica independiente. Resultados en labs/results.json."
         },
         {
           "topic_id": "foundations-07",
@@ -2623,7 +2623,7 @@
           "audit_status": "topic_specific_documentation_added_evidence_pending",
           "audit_reference": "knowledge/deep_modules/foundations/FOUNDATIONS_DEEP_DEVELOPMENT_V1.md",
           "audit_section": "Tema 7 — Gobierno, riesgo y aseguramiento",
-          "audit_note": "Las doce capas se desarrollaron y mapearon documentalmente en la iteración 2026-11-19. No se marcan passed: lectura integral de fuentes, ejecución de laboratorio, evaluación empírica y revisión independiente pendientes."
+          "audit_note": "Dossier temático y fuentes revisadas por secciones; harness sintético local ejecutado para el área. No promover capa: faltan implementaciones reales aisladas, revisión externa y réplica independiente. Resultados en labs/results.json."
         }
       ],
       "evidence_gates": {
@@ -2631,13 +2631,13 @@
         "G2_sources": "in_progress",
         "G3_depth": "in_progress",
         "G4_application": "in_progress",
-        "G5_experimentation": "blocked",
-        "G6_evaluation": "blocked",
-        "G7_reproducibility": "blocked",
+        "G5_experimentation": "in_progress",
+        "G6_evaluation": "in_progress",
+        "G7_reproducibility": "in_progress",
         "G8_independent_review": "blocked"
       },
       "maturity": "M2_editorial_draft_only",
-      "notes": "Los siete temas se desarrollaron individualmente con 12 capas por tema y protocolos específicos en FOUNDATIONS_DEEP_DEVELOPMENT_V1.md. Los 84 estados pasan a in_progress para indicar auditoría y desarrollo documental, no aprobación. Fuentes oficiales: metadatos/abstracts inspeccionados; lectura integral pendiente. Siete laboratorios diseñados, cero ejecutados acreditados. G5-G8 bloqueadas hasta ejecución, evaluación, reproducción y revisión independiente. M2 se mantiene."
+      "notes": "Los siete temas tienen desarrollo documental y trazabilidad a secciones primarias. Se ejecutó localmente un harness determinista sintético para los siete temas (8 pruebas unitarias); resultados en knowledge/deep_modules/foundations/labs/results.json. G5-G7 pasan a in_progress, no passed: experimentos acotados, métricas y repetición local existen, pero falta réplica independiente, implementación real aislada y validación externa. G8 blocked. M2 se mantiene; no se afirma M3 ni validación científica."
     },
     {
       "id": "fraud_abuse",
