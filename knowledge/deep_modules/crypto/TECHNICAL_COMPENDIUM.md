@@ -96,22 +96,36 @@ En fuentes correlacionadas o con atacante, la evaluación debe considerar el mod
 **Respuesta ante vulnerabilidad.** Inventariar versiones afectadas, primitives, protocolos, claves/certificados y datos; establecer exposición y exploitability; definir mitigación compatible, rotación, revocación y migración; probar rollback y clientes legacy. Mantener crypto-agility sin habilitar negociación débil.
 
 ## Laboratorio reproducible
-Entorno: Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.
-Escenarios:
-1. establecer baseline seguro y recoger evidencia
-2. introducir un fallo/configuración sintética
-3. detectar y analizar con procedimiento documentado
-4. remediar de forma reversible y ejecutar regresión
-Salvaguardas: Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada.
 
-| ID | Caso | Evidencia exigida |
-|---|---|---|
-| crypto-LAB-01 | Baseline seguro | Versiones, configuración, hashes, salida |
-| crypto-LAB-02 | Fallo/abuso sintético | Precondiciones, entrada, logs, resultado |
-| crypto-LAB-03 | Detección y diagnóstico | Señal, regla, precisión, límites |
-| crypto-LAB-04 | Mitigación y regresión | Diff, antes/después, rollback |
+**Modo:** frío, aislado, sin credenciales ni datos reales.  
+**Estado:** protocolos diseñados; no ejecutados ni medidos.  
+**Requisitos comunes:** VM/contendor sin acceso a secretos; red deshabilitada salvo descarga controlada de vectores oficiales; reloj y versiones registrados; claves efímeras; snapshots; límites de CPU/memoria; logs saneados; limpieza verificable. Nunca se introduce una primitiva casera en un sistema real.
 
-Diseño definido; ejecución pendiente.
+| ID | Experimento | Procedimiento mínimo | Criterio de aceptación | Evidencia |
+|---|---|---|---|---|
+| crypto-LAB-01 | RBG/DRBG y estado | Ejecutar CSPRNG del SO; probar fork/snapshot con harness de test y RNG determinista inyectado solo en pruebas; simular fallo de reseed/health test | La aplicación falla cerrada; no se reutiliza estado entre instancias; los tests no confunden uniformidad con entropía | Versiones, configuración, eventos, semillas sintéticas, hashes y salidas |
+| crypto-LAB-02 | Hash/MAC/KDF/firmas | Ejecutar known-answer tests y casos negativos de vectores públicos; variar mensaje, salt, encoding, clave y firma | Todos los vectores válidos pasan y todos los negativos previstos se rechazan | ID y hash del vector, resultado esperado/observado, parámetros, logs |
+| crypto-LAB-03 | AEAD/nonce/AAD | Probar AES-GCM y ChaCha20-Poly1305 con vectores; alterar tag, AAD, ciphertext y longitudes; simular colisión nonce en harness aislado | Ningún ciphertext alterado se acepta; no se expone plaintext antes de autenticar; el wrapper previene colisión | Vector, nonce de test, AAD, resultado, latencia, memoria |
+| crypto-LAB-04 | DH/ECDH/KEM | Interoperabilidad entre dos implementaciones; inyectar claves y ciphertexts inválidos sintéticos; alterar transcript/contexto | Coincidencia de secreto en casos válidos; rechazo de entradas inválidas; error no distingue secretos | Versiones, parámetros, vectors, transcript de test, salida |
+| crypto-LAB-05 | TLS/SSH/IPsec | Endpoints de laboratorio y CA privada; probar hostname/chain inválidos, expiración, downgrade, host key alterada, rekey y replay 0-RTT | Fallo cerrado en autenticación; no aceptar downgrade prohibido; replay controlado por semántica de aplicación | Configuración efectiva, captura saneada, logs, métricas |
+| crypto-LAB-06 | PKI y rotación | KMS simulado, DEK/KEK sintéticas; rotación, revocación, caída de KMS, backup y rollback | Datos recuperables según política; claves revocadas no se usan; RTO/RPO medidos | Inventario, estados, eventos, diff, recovery report |
+| crypto-LAB-07 | Fuzzing y side channels | Fuzz parsers propios, pruebas diferenciales, sanitizers y timing bajo carga controlada | Crashes reproducibles corregidos; divergencias explicadas; mediciones reportan ruido/limitaciones | Corpus, seeds, cobertura, crash traces, distribuciones y análisis |
+
+### Registro mínimo por ejecución
+
+- Identificador de experimento y versión del protocolo.
+- Autorización, alcance, exclusiones, responsable y criterio de parada.
+- Sistema operativo, kernel, CPU, microcódigo si aplica, compilador, runtime, biblioteca y flags.
+- Procedencia/licencia/URL/versión/hash de cada vector o dataset.
+- Configuración exacta, variables, baseline, comparador, controles positivos y negativos.
+- Número de repeticiones y justificación de tamaño de muestra.
+- Datos brutos, logs saneados, scripts, hashes y resultados.
+- Falsos positivos/negativos, incertidumbre y amenazas a validez.
+- Limpieza, destrucción de claves efímeras y verificación del estado final.
+
+### Protocolo de parada
+
+Detener si aparece material secreto no sintético, salida a red no prevista, impacto fuera del entorno, consumo de recursos fuera del límite, corrupción de datos, comportamiento no explicado o pérdida de trazabilidad. Preservar evidencia mínima saneada y no reanudar hasta revisar causa.
 
 ## Métricas
 Elegir métricas específicas: cobertura, tasa de detección, falsos positivos/negativos, latencia, disponibilidad, impacto colateral, tiempo de remediación y repetibilidad. Toda cifra exige unidad de análisis, muestra, baseline, versiones, repeticiones y método de análisis.
