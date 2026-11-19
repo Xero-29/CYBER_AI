@@ -43,6 +43,41 @@ def _validate_destination(path):
         raise SafeWriteError("El destino debe ser un archivo regular, nunca un symlink.")
 
 
+
+def ensure_private_directory(path, *, create=True):
+    """Create or validate a directory that is private to the current POSIX user."""
+    destination = Path(os.path.abspath(os.fspath(path)))
+    if create:
+        missing = []
+        current = destination
+        while not current.exists() and not current.is_symlink():
+            missing.append(current)
+            current = current.parent
+        _reject_symlink_components(current)
+        if not current.is_dir():
+            raise SafeWriteError("Un componente de la ruta no es un directorio.")
+        for directory in reversed(missing):
+            try:
+                directory.mkdir(mode=0o700)
+            except FileExistsError:
+                pass
+            _reject_symlink_components(directory)
+            if not directory.is_dir():
+                raise SafeWriteError("Un componente de la ruta no es un directorio.")
+    _reject_symlink_components(destination)
+    if not destination.is_dir():
+        raise SafeWriteError("El destino debe ser un directorio existente.")
+    if os.name == "posix":
+        try:
+            os.chmod(destination, 0o700, follow_symlinks=False)
+            mode = stat.S_IMODE(destination.stat(follow_symlinks=False).st_mode)
+        except (OSError, NotImplementedError) as error:
+            raise SafeWriteError("No se pudieron restringir los permisos del directorio.") from error
+        if mode & 0o077:
+            raise SafeWriteError("El directorio debe ser privado (permisos 0700).")
+    return destination
+
+
 def atomic_write_text(path, text, *, encoding="utf-8", mode=0o600, create_parents=False):
     """Write text through a private temporary file and atomically replace a regular file."""
     if not isinstance(text, str):
