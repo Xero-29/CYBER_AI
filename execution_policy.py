@@ -157,6 +157,17 @@ def _load_grants():
     descriptor = None
     reparse_flag = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
     try:
+        parent_before = path.parent.lstat()
+        if (
+            stat.S_ISLNK(parent_before.st_mode)
+            or getattr(parent_before, "st_file_attributes", 0) & reparse_flag
+            or not stat.S_ISDIR(parent_before.st_mode)
+        ):
+            raise AuthorizationError("El directorio padre de autorizaciones no puede ser un enlace.")
+        if os.name != "nt" and stat.S_IMODE(parent_before.st_mode) & 0o022:
+            raise AuthorizationError(
+                "El directorio padre de autorizaciones no puede ser modificable por grupo u otros."
+            )
         before = path.lstat()
         if (
             stat.S_ISLNK(before.st_mode)
@@ -167,16 +178,25 @@ def _load_grants():
         descriptor = os.open(path, flags)
         opened = os.fstat(descriptor)
         after = path.lstat()
+        parent_after = path.parent.lstat()
         if (
             not stat.S_ISREG(opened.st_mode)
             or opened.st_size > MAX_POLICY_BYTES
             or stat.S_ISLNK(after.st_mode)
             or getattr(after, "st_file_attributes", 0) & reparse_flag
+            or stat.S_ISLNK(parent_after.st_mode)
+            or getattr(parent_after, "st_file_attributes", 0) & reparse_flag
+            or (parent_before.st_dev, parent_before.st_ino) !=
+               (parent_after.st_dev, parent_after.st_ino)
             or (before.st_dev, before.st_ino) != (opened.st_dev, opened.st_ino)
             or (opened.st_dev, opened.st_ino) != (after.st_dev, after.st_ino)
         ):
             raise AuthorizationError(
-                "El archivo de autorizaciones debe ser regular, estable y de hasta 1 MiB."
+                "El archivo de autorizaciones y su directorio deben ser regulares y estables."
+            )
+        if os.name != "nt" and opened.st_uid != os.geteuid():
+            raise AuthorizationError(
+                "El archivo de autorizaciones debe pertenecer al usuario efectivo del proceso."
             )
         insecure_mode = (
             os.name != "nt" and stat.S_IMODE(opened.st_mode) & 0o077
@@ -200,6 +220,7 @@ def _load_grants():
             (opened.st_dev, opened.st_ino) != (opened_after_read.st_dev, opened_after_read.st_ino)
             or opened.st_size != opened_after_read.st_size
             or opened.st_mtime_ns != opened_after_read.st_mtime_ns
+            or (os.name != "nt" and opened_after_read.st_uid != os.geteuid())
         ):
             raise AuthorizationError("La política cambió mientras se leía.")
     except AuthorizationError:
