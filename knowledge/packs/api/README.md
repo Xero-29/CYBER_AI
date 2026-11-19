@@ -49,3 +49,6 @@ OWASP API Security Top 10, OAuth 2.1, OpenID Connect, RFC 9700, OpenAPI, GraphQL
 
 ## Instrucciones para agentes IA
 No generes tokens reales ni envíes solicitudes a servicios productivos. Usa fixtures locales. No marques una API como segura por tener gateway o JWT: verifica autorización por objeto, tenant y operación.
+
+## Arquitectura
+Modelar el recorrido cliente → DNS/TLS/CDN o gateway → autenticación/autorización → servicio API → colas y servicios internos → almacenes de datos y terceros. Separar plano de control (registro, versionado, políticas y secretos) del plano de datos. Identificar límites entre tenants, servicios y zonas de confianza; registrar scopes, claims, identidad de workload, contratos, esquemas, límites de tamaño y operaciones con efectos laterales. Los callbacks/webhooks, resolvers GraphQL, endpoints administrativos y rutas internas son superficies distintas y requieren controles propios.
