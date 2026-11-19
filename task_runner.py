@@ -396,25 +396,38 @@ def main():
         print("Informe:", report_file)
         return 0 if report_status == "completed" else 1
     except Exception as error:
+        isolation_required = isinstance(error, ProcessIsolationError)
         report = {
             "task": args.task,
             "target": args.target,
-            "status": (
-                "isolation_required"
-                if isinstance(error, ProcessIsolationError)
-                else "failed"
-            ),
+            "status": "isolation_required" if isolation_required else "failed",
             "error_type": type(error).__name__,
-            "error": str(error),
+            "reason": (
+                "process_isolation_unavailable"
+                if isolation_required
+                else "execution_failed"
+            ),
             "findings": [],
+            "report_persisted": True,
         }
+        try:
+            atomic_write_text(
+                report_file,
+                json.dumps(report, indent=2, ensure_ascii=False) + "\\n",
+            )
+        except (SafeWriteError, OSError, ValueError):
+            report["report_persisted"] = False
+
         recorded = _record_task_scan(
             args.task, args.target, report, task_started,
             args.authorization_id, start_event_id,
         )
         if args.require_ledger and recorded is None:
             return 3
-        print("ERROR: la ejecución terminó inesperadamente:", error, file=sys.stderr)
+        if report["report_persisted"]:
+            print("ERROR: la ejecución terminó; informe privado:", report_file, file=sys.stderr)
+        else:
+            print("ERROR: la ejecución terminó y no se pudo persistir el informe privado.", file=sys.stderr)
         return 1
 
 

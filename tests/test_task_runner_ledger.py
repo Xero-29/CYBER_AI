@@ -146,8 +146,14 @@ class TaskRunnerLedgerTests(unittest.TestCase):
                 ):
                     result = task_runner.main()
                 self.assertEqual(result, 1)
-                report = json.loads(Path("reports/task_runner_report.json").read_text(encoding="utf-8"))
+                report_files = sorted((Path(workspace) / "reports").glob("task_scan_*_report.json"))
+                self.assertEqual(len(report_files), 1)
+                report = json.loads(report_files[0].read_text(encoding="utf-8"))
                 self.assertEqual(report["status"], "isolation_required")
+                self.assertEqual(report["error_type"], "ProcessIsolationError")
+                self.assertEqual(report["reason"], "process_isolation_unavailable")
+                self.assertTrue(report["report_persisted"])
+                self.assertNotIn("error", report)
             finally:
                 os.chdir(old_cwd)
 
@@ -177,7 +183,7 @@ class TaskRunnerLedgerTests(unittest.TestCase):
                     patch.object(task_runner, "authorize_target", return_value={"authorization_id": "grant"}),
                     patch.object(task_runner.shutil, "which", return_value=str(nuclei_executable)),
                     patch.object(task_runner, "require_approved_executable", return_value=provenance),
-                    patch.object(task_runner, "run_bounded_process", side_effect=RuntimeError("scanner crashed")),
+                    patch.object(task_runner, "run_bounded_process", side_effect=RuntimeError("scanner crashed token=secret-value")),
                     patch.object(task_runner, "ExecutionLedger", return_value=ledger),
                     patch.object(sys, "argv", [
                         "task_runner.py", "--task", "inspect web headers",
@@ -186,10 +192,19 @@ class TaskRunnerLedgerTests(unittest.TestCase):
                     ]),
                 ):
                     result = task_runner.main()
+                report_files = sorted((Path(workspace) / "reports").glob("task_scan_*_report.json"))
+                self.assertEqual(len(report_files), 1)
+                report = json.loads(report_files[0].read_text(encoding="utf-8"))
             finally:
                 os.chdir(old_cwd)
 
         self.assertEqual(result, 1)
+        self.assertEqual(report["status"], "failed")
+        self.assertEqual(report["error_type"], "RuntimeError")
+        self.assertEqual(report["reason"], "execution_failed")
+        self.assertTrue(report["report_persisted"])
+        self.assertNotIn("error", report)
+        self.assertNotIn("secret-value", json.dumps(report))
         self.assertEqual(
             [call.kwargs["status"] for call in ledger.append.call_args_list],
             ["started", "failed"],
