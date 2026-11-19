@@ -28,8 +28,9 @@ El desarrollo se organiza en doce bloques disciplinares:
 
 - [Compendio técnico base](TECHNICAL_COMPENDIUM.md): modelos, procedimientos, ejemplos y laboratorio introductorio.
 - [Desarrollo disciplinar ampliado y auditoría por tema](FOUNDATIONS_DEEP_DEVELOPMENT_V1.md): siete dossiers alineados con el currículo, doce capas, protocolos, métricas y límites.
-- [Revisión de fuentes y trazabilidad](SOURCE_REVIEW_AND_CLAIM_EVIDENCE_2026-11-19.md): secciones primarias inspeccionadas, hallazgos aplicados, afirmación→fuente→capa y brechas abiertas.\n- [Dictamen de auditoría interna](FOUNDATIONS_AUDIT_VERDICT_2026-11-19.md): resultado, evidencias CI/labs, no conformidades y criterios obligatorios para aceptación.
-- [Laboratorios reproducibles](labs/README.md): siete simulaciones sintéticas, runner, pruebas y resultados.
+- [Revisión de fuentes y trazabilidad](SOURCE_REVIEW_AND_CLAIM_EVIDENCE_2026-11-19.md): secciones primarias inspeccionadas, hallazgos aplicados, afirmación→fuente→capa y brechas abiertas.
+- [Dictamen de auditoría interna](FOUNDATIONS_AUDIT_VERDICT_2026-11-19.md): resultado, evidencias CI/labs, no conformidades y criterios obligatorios para aceptación.
+- [Laboratorios reproducibles](labs/README.md): siete laboratorios de referencia local, pruebas, resultados y límites explícitos.
 - [Agenda de investigación](RESEARCH_AGENDA.md): preguntas, hipótesis y diseños experimentales propuestos.
 - [Revisión exploratoria de literatura](LITERATURE_REVIEW.md): mapa bibliográfico y estado real de lectura.
 - [Pack de conocimiento](../../packs/foundations/README.md): guía de dominio para consumo por agentes y usuarios.
@@ -44,7 +45,7 @@ El desarrollo se organiza en doce bloques disciplinares:
 | Desarrollo disciplinar ampliado | Incorporado; revisión técnica independiente pendiente |
 | Brechas FND-01–FND-15 | Tratamiento documental descrito; evidencias externas pendientes |
 | Fuentes | Secciones pertinentes de fuentes primarias inspeccionadas y trazadas; lectura lineal integral de todas las obras no acreditada |
-| Laboratorios | Cinco protocolos generales más siete labs específicos ejecutados localmente con datos sintéticos; 8 tests pasan |
+| Laboratorios | Siete labs locales con datos sintéticos; JWS HS256 y cadena HMAC implementados como prototipos de referencia; suite ampliada en CI multi-Python |
 | Evaluación | Rúbrica y métricas diseñadas; aplicación y benchmark pendientes |
 | Skills | Cinco especificaciones candidatas; no validadas ni promovidas |
 | Auditoría 7 temas × 12 capas | 84 estados `in_progress`; dossiers y fuentes por secciones; ningún estado `passed` |
@@ -52,6 +53,6 @@ El desarrollo se organiza en doce bloques disciplinares:
 
 ## Regla de cierre
 
-No avanzar al módulo siguiente hasta cerrar cada tema con evidencia trazable. La auditoría documental por siete temas ya fue incorporada, pero sigue en progreso: falta ampliar lectura integral de fuentes, réplica independiente, integración de controles reales en laboratorio aislado y revisión independiente. Los experimentos sintéticos locales están ejecutados; réplica independiente, integración real aislada y revisión externa permanecen pendientes.
+No avanzar al módulo siguiente hasta cerrar cada tema con evidencia trazable. La auditoría documental por siete temas ya fue incorporada, pero sigue en progreso: falta ampliar lectura integral de fuentes, réplica independiente, integración con IdP/KMS/SIEM reales en laboratorio aislado y revisión independiente. Los experimentos sintéticos locales están ejecutados; réplica independiente, integración real aislada y revisión externa permanecen pendientes.
 
 No declarar K4/K5, M4/M5 ni validación experta por la mera existencia de documentos, referencias, protocolos o Skills candidatas.

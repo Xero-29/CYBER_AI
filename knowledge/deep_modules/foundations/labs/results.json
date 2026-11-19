@@ -1,24 +1,117 @@
 {
-  "all_checks_passed": true,
-  "checks": {
-    "asset_stable_id_beats_hostname": true,
-    "assurance_stale_evidence_rejected": true,
-    "authz_revocation": true,
-    "crypto_tamper_rejected": true,
-    "identity_negative_tests": true,
-    "threat_paths_represented": true,
-    "timeline_ordered": true
-  },
-  "labs": {
-    "LAB-FND-01A": {"checks": 3, "initial_allow": true, "policy_version": 2, "revoked_access_denied": true, "unknown_action_denied": true},
-    "LAB-FND-02A": {"assets": 250, "false_merge_reduction": 40, "hostname_baseline": {"f1": 0.9259, "fn": 0, "fp": 40, "precision": 0.8621, "recall": 1.0, "tp": 250}, "records": 500, "seed": 20261119, "stable_resource_id": {"f1": 1.0, "fn": 0, "fp": 0, "precision": 1.0, "recall": 1.0, "tp": 250}},
-    "LAB-FND-03A": {"control_map": {"api": "authz", "ci_runner": "ephemeral_runner", "deployment_secret": "secret_broker", "identity": "token_audience_validation", "worker": "workload_identity"}, "control_mapped_nodes": 5, "path_coverage": 1.0, "paths_found": 3, "required_paths": 3, "warning": "A graph path is a scenario candidate, not proof of exploitability."},
-    "LAB-FND-04A": {"all_expected": true, "limitation": "Claims validation simulation only; it does not verify JWT signatures or implement OAuth/OIDC.", "negative_cases": 5, "outcomes": {"excess_scope_missing": false, "expired": false, "revoked": false, "valid": true, "wrong_audience": false, "wrong_issuer": false}},
-    "LAB-FND-05A": {"new_key_verified": true, "old_tag_rejected_under_new_key": true, "scope": "HMAC-SHA-256 integrity/authenticity only; no confidentiality, AES, KMS, or FIPS validation.", "tamper_rejected": true, "valid_before": true},
-    "LAB-FND-06A": {"chronological": true, "duplicate_events_removed": 1, "event_completeness": 1.0, "missing_event_ids": [], "timeline_ids": ["e1", "e2", "e3", "e4"]},
-    "LAB-FND-07A": {"controls": 4, "coverage": 0.25, "false_closures_prevented": 3, "unsubstantiated_not_closed": ["C2", "C3", "C4"], "validly_closed": ["C1"]}
-  },
   "schema_version": "1.0.0",
   "seed": 20261119,
-  "synthetic_only": true
+  "synthetic_only": true,
+  "checks": {
+    "authz_revocation": true,
+    "asset_stable_id_beats_hostname": true,
+    "threat_paths_represented": true,
+    "identity_negative_tests": true,
+    "jwt_signature_verified": true,
+    "crypto_tamper_rejected": true,
+    "timeline_ordered": true,
+    "audit_chain_tamper_detected": true,
+    "audit_chain_reordering_detected": true,
+    "assurance_stale_evidence_rejected": true
+  },
+  "all_checks_passed": true,
+  "labs": {
+    "LAB-FND-01A": {
+      "checks": 3,
+      "initial_allow": true,
+      "policy_version": 2,
+      "revoked_access_denied": true,
+      "unknown_action_denied": true
+    },
+    "LAB-FND-02A": {
+      "assets": 250,
+      "false_merge_reduction": 40,
+      "hostname_baseline": {
+        "f1": 0.9259,
+        "fn": 0,
+        "fp": 40,
+        "precision": 0.8621,
+        "recall": 1,
+        "tp": 250
+      },
+      "records": 500,
+      "seed": 20261119,
+      "stable_resource_id": {
+        "f1": 1,
+        "fn": 0,
+        "fp": 0,
+        "precision": 1,
+        "recall": 1,
+        "tp": 250
+      }
+    },
+    "LAB-FND-03A": {
+      "control_map": {
+        "api": "authz",
+        "ci_runner": "ephemeral_runner",
+        "deployment_secret": "secret_broker",
+        "identity": "token_audience_validation",
+        "worker": "workload_identity"
+      },
+      "control_mapped_nodes": 5,
+      "path_coverage": 1,
+      "paths_found": 3,
+      "required_paths": 3,
+      "warning": "A graph path is a scenario candidate, not proof of exploitability."
+    },
+    "LAB-FND-04A": {
+      "all_expected": true,
+      "negative_cases": 9,
+      "signature_verified": true,
+      "limitations": "Faithful HS256 JWS verification prototype using Python stdlib; no JWKS rotation, asymmetric algs, OIDC discovery, nonce/state flow, TLS, IdP or OAuth server integration.",
+      "outcomes": {
+        "valid": true,
+        "wrong_signature": false,
+        "alg_none_rejected": false,
+        "wrong_issuer": false,
+        "wrong_audience": false,
+        "expired": false,
+        "not_yet_valid": false,
+        "missing_scope": false,
+        "revoked": false,
+        "malformed": false
+      }
+    },
+    "LAB-FND-05A": {
+      "new_key_verified": true,
+      "old_tag_rejected_under_new_key": true,
+      "scope": "HMAC-SHA-256 integrity/authenticity only; no confidentiality, AES, KMS, or FIPS validation.",
+      "tamper_rejected": true,
+      "valid_before": true
+    },
+    "LAB-FND-06A": {
+      "chronological": true,
+      "duplicate_events_removed": 1,
+      "event_completeness": 1,
+      "missing_event_ids": [],
+      "timeline_ids": [
+        "e1",
+        "e2",
+        "e3",
+        "e4"
+      ],
+      "hmac_chain_valid": true,
+      "tampering_detected": true,
+      "reordering_detected": true
+    },
+    "LAB-FND-07A": {
+      "controls": 4,
+      "coverage": 0.25,
+      "false_closures_prevented": 3,
+      "unsubstantiated_not_closed": [
+        "C2",
+        "C3",
+        "C4"
+      ],
+      "validly_closed": [
+        "C1"
+      ],
+      "as_of": "2026-11-19"
+    }
+  }
 }

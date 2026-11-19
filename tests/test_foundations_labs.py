@@ -2,7 +2,7 @@ import unittest
 from knowledge.deep_modules.foundations.labs.runner import (
     lab01_authorization, lab02_asset_reconciliation, lab03_threat_model,
     lab04_identity, lab05_crypto_integrity, lab06_event_reconstruction,
-    lab07_assurance, run_all,
+    lab07_assurance, run_all, encode_hs256_jwt, validate_hs256_jwt,
 )
 
 class FoundationsLabTests(unittest.TestCase):
@@ -17,19 +17,34 @@ class FoundationsLabTests(unittest.TestCase):
     def test_03_threat_model_covers_required_paths(self):
         r=lab03_threat_model(); self.assertEqual(r["paths_found"],r["required_paths"])
         self.assertIn("not proof of exploitability",r["warning"])
-    def test_04_identity_rejects_invalid_claims(self):
-        r=lab04_identity(); self.assertTrue(r["all_expected"]); self.assertEqual(r["negative_cases"],5)
+    def test_04_signed_jwt_rejects_invalid_tokens(self):
+        r=lab04_identity(); self.assertTrue(r["all_expected"])
+        self.assertEqual(r["negative_cases"],9)
+        self.assertTrue(r["signature_verified"])
+        self.assertFalse(r["outcomes"]["wrong_signature"])
+        self.assertFalse(r["outcomes"]["alg_none_rejected"])
     def test_05_hmac_detects_tampering_and_key_change(self):
         r=lab05_crypto_integrity(); self.assertTrue(r["tamper_rejected"])
         self.assertTrue(r["new_key_verified"]); self.assertIn("no confidentiality",r["scope"])
-    def test_06_timeline_is_sorted_and_deduplicated(self):
+    def test_06_hmac_audit_chain_detects_tampering_and_reordering(self):
         r=lab06_event_reconstruction(); self.assertTrue(r["chronological"])
         self.assertEqual(r["duplicate_events_removed"],1); self.assertEqual(r["missing_event_ids"],[])
-    def test_07_stale_or_missing_evidence_does_not_close_control(self):
+        self.assertTrue(r["hmac_chain_valid"]); self.assertTrue(r["tampering_detected"])
+        self.assertTrue(r["reordering_detected"])
+    def test_07_assurance_requires_fresh_scoped_evidence(self):
         r=lab07_assurance(); self.assertEqual(r["validly_closed"],["C1"])
         self.assertEqual(set(r["unsubstantiated_not_closed"]),{"C2","C3","C4"})
         self.assertEqual(r["false_closures_prevented"],3)
-    def test_full_suite(self):
+    def test_08_full_suite(self):
         r=run_all(); self.assertTrue(r["synthetic_only"]); self.assertTrue(r["all_checks_passed"])
+    def test_09_jwt_rejects_duplicate_json_members(self):
+        key=b"foundations-lab-hs256-key-32-bytes!"
+        token=encode_hs256_jwt({"iss":"issuer","aud":"api","exp":2000,"scope":"read","jti":"j1"},key)
+        head,_,_=token.split(".")
+        import base64, hmac, hashlib
+        duplicate_payload=base64.urlsafe_b64encode(b'{"iss":"issuer","iss":"evil","aud":"api","exp":2000,"scope":"read","jti":"j1"}').rstrip(b"=").decode()
+        signed=f"{head}.{duplicate_payload}"
+        signature=base64.urlsafe_b64encode(hmac.new(key,signed.encode(),hashlib.sha256).digest()).rstrip(b"=").decode()
+        self.assertFalse(validate_hs256_jwt(f"{signed}.{signature}",key=key,issuer="issuer",audience="api",now=1000,required_scope="read",revoked=set()))
 
 if __name__=="__main__": unittest.main()
