@@ -122,3 +122,34 @@ Todo estudio debe definir H0/H1, variables, muestra, comparadores, criterio de r
 
 ## Madurez
 M0/M1 estructural. Este documento no prueba profundidad cubierta ni madurez M3/M4/M5. Siguiente puerta: lectura crítica de fuentes completas, artefactos específicos, ejecución de laboratorio y evidencia verificable.
+
+
+## Profundización técnica específica: Gestión de vulnerabilidades
+
+### Inventario y descubrimiento
+La calidad del programa depende de cobertura y exactitud del inventario: activos físicos, virtuales, cloud, aplicaciones, APIs, dependencias, firmware, identidades y servicios externos. Normalizar hostname, IP, cloud resource ID, serial, package URL/CPE, propietario, criticidad, exposición, entorno y fecha de observación. Distinguir activo ausente de activo no escaneado. Medir cobertura por clase y frescura.
+
+### Detección y validación
+Combinar escáneres autenticados/no autenticados, SAST, DAST, SCA, IaC, container scanning, firmware analysis y avisos de proveedor. Validar hallazgos con versión afectada, configuración, reachability, precondiciones y evidencia mínima. CVE/CWE/CPE/PURL tienen semánticas diferentes; no inferir afectación solo por coincidencia de nombre. Evitar pruebas intrusivas fuera del alcance autorizado.
+
+### Priorización contextual
+CVSS describe severidad técnica bajo supuestos; EPSS estima probabilidad de explotación observada en horizonte definido; KEV identifica explotación conocida. Ninguno por sí solo es riesgo empresarial. Combinar exposición, criticidad, privilegio, datos, controles compensatorios, exploitability, KEV, EPSS, ventanas de parcheo y coste de indisponibilidad. Registrar razón y propietario de excepciones.
+
+### Remediación y verificación
+Definir SLA por riesgo y clase de activo; planificar parche, mitigación, aislamiento o aceptación formal con vencimiento. Verificar versión/configuración después del cambio, repetir detección y pruebas funcionales. El cierre requiere evidencia de remediación, no solo ticket cerrado. Gestionar excepciones con aprobador, riesgo residual, compensating control y revisión periódica.
+
+### Divulgación y coordinación
+Para vulnerabilidades propias, mantener política de disclosure, canal seguro, triage, coordinación con proveedor, embargo proporcional y publicación de advisory. Para bug bounty, definir alcance, safe harbor, límites de prueba y reglas de datos. Evitar publicar exploit details antes de mitigación coordinada cuando aumente riesgo real.
+
+### Métricas
+Medir MTTR por severidad y criticidad, exposición acumulada, reincidencia, cobertura autenticada, tasa de falsos positivos, vulnerabilidades reabiertas, deuda por excepción y porcentaje KEV mitigado dentro de SLA. Cohortes comparables, percentiles y denominadores explícitos evitan maquillar resultados.
+
+### Laboratorios
+- Dataset sintético de activos y CVE con versiones/alcance conocido.
+- Comparar priorización CVSS sola vs contexto EPSS/KEV/criticidad.
+- Validar falso positivo y remediación en imágenes vulnerables de laboratorio.
+- Medir tiempo y regresión de parche en servicios sintéticos.
+Registrar scanner version, plugins, autenticación, coverage, dataset, baseline y evidencia.
+
+## Estado de validación de la ampliación
+Contenido técnico editorial añadido; fuentes completas, revisión independiente y laboratorios ejecutados permanecen pendientes. No elevar por redacción a M3/M4/M5.
