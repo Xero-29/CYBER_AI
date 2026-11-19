@@ -97,3 +97,10 @@ Antes de ejecutar:
 - M5: réplica externa y contribución revisada.
 
 **Estado actual M1; no M3/M4/M5.** Ninguna de las seis líneas se ha ejecutado.
+
+
+## Declaración estructural de agenda
+
+research_agenda_defined: true
+
+**Madurez y umbral:** agenda de investigación propuesta; no representa resultados ni madurez M3/M4/M5. M5 exige revisión independiente y reproducción externa documentada. La reproducción debe conservar entorno, versiones, datos, semillas, scripts, hashes y desviaciones.
