@@ -80,3 +80,8 @@ Pendiente de curación. Registrar título, editor, URL canónica, versión, fech
 - [ ] Revisión técnica independiente y pruebas de reproducibilidad.
 
 **Madurez:** `draft_structured_not_expert_validated`.
+
+
+## Desarrollo teórico profundo
+
+El dossier disciplinar de 12 capas para los siete temas base se encuentra en [AI_RED_TEAM_THEORETICAL_DEVELOPMENT_V1.md](AI_RED_TEAM_THEORETICAL_DEVELOPMENT_V1.md). Incluye modelos, arquitectura, estándares, análisis avanzado, seguridad, investigación, diseño de laboratorios/datasets, métricas, especificaciones de Skills y evaluación en frío. Su estado sigue siendo V1 en desarrollo: el currículo ampliado, lectura integral de fuentes, auditoría de 84 celdas y revisión independiente permanecen pendientes. No declara ejecución de laboratorios.
