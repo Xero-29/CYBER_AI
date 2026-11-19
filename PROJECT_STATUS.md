@@ -2,51 +2,55 @@
 
 **Repositorio:** `Xero-29/CYBER_AI`  
 **Rama auditada:** `codex/security-integrity-audit`  
-**HEAD inspeccionado antes de corregir fixtures:** `f47820ec8715ac0853e67b976027363379eb313c`  
+**HEAD verificado:** `b2aaddb72faf99c99b8272887e67d516725697f0`  
 **main inspeccionada:** `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`  
-**Merge-base:** `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. Desde ese punto, la rama auditada tiene **149 commits exclusivos** y `main` tiene **573 commits exclusivos**. El diff neto de `main` afecta 291 rutas y el de auditoría 57. No existe un único commit exclusivo de `main`: la divergencia es sustancial y no lineal.
+**Merge-base:** `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. Desde ese punto, la rama auditada tiene **150 commits exclusivos** y `main` tiene **573 commits exclusivos**. El diff neto de `main` afecta 291 rutas y el de auditoría 57. No existe un único commit exclusivo de `main`: la divergencia es sustancial y no lineal.
 
 ## Ramas, PRs y preservación
 
-- **PR #2:** cerrado y fusionado el 2026-11-17; merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. Se verificó su estado y no se crea ni reabre otro PR equivalente.
-- **PR #12:** abierto para reconciliar cambios de seguridad y builds reproducibles con `main`; rama `codex/reconcile-main-security-audit-2026-11-18`, HEAD `c2a397caf36f2661b6f0307168a0a24eee2f6d38`.
-- **PR #13:** abierto para investigación profunda de la biblioteca; rama `codex/deep-research-library-2026-11-18`, HEAD `d0a3934a473e3d1117c7410df253f659d5f475c3`.
-- **PR #11:** abierto para locks con hashes/SBOM; no se ha modificado desde esta rama.
-- **PR #1 y #3–#10:** continúan abiertos; las actualizaciones de dependencias necesitan revisión individual.
-- La rama de auditoría contiene trabajo nuevo de aislamiento de Nuclei, límites de evidencia, validación de timeout/objetivo, verificación de plantillas y exclusión de plantillas intrusivas/código.
-- No se hizo merge, rebase, force-push ni modificación de `main`. La reconciliación de los 573 commits debe continuar en una rama separada y con revisión de archivos compartidos. El PR #12 ya es el vehículo existente; no se debe duplicar.
+- **PR #2:** cerrado y fusionado el 2026-11-17; merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. No se crea ni reabre un PR equivalente.
+- **PR #11:** abierto para locks hash-verified y SBOM; su HEAD `04c001a206cde98613cf9c151ce4f6a95fb86a21` tiene Python Tests y Docker Sandbox exitosos.
+- **PR #12:** abierto como vehículo existente para reconciliación selectiva desde `main`; HEAD `c2a397caf36f2661b6f0307168a0a24eee2f6d38`, checks Python/Docker exitosos. Su diff incorpora artefactos seguros y documentación, pero no integra todavía los cambios de seguridad en archivos compartidos.
+- **PR #13:** abierto para investigación de la biblioteca; HEAD `d0a3934a473e3d1117c7410df253f659d5f475c3`, checks Python/Docker exitosos. Sus gates son estructurales y no sustituyen revisión experta de fuentes.
+- **PR #1 y #3–#10:** continúan abiertos; revisar cada actualización de dependencia/acción antes de integrarla.
+- No se hizo merge, rebase, force-push ni modificación de `main`. Los 573 commits exclusivos de `main` deben preservarse. La reconciliación sigue en una rama separada y no debe duplicarse el PR #12.
+- El endpoint de reglas del repositorio no devuelve rulesets. La lectura de branch protection está bloqueada para esta integración; no se afirma que la protección de rama esté configurada.
 
-## CI del HEAD exacto inspeccionado
+## CI del HEAD exacto
 
-SHA `f47820ec8715ac0853e67b976027363379eb313c`:
+SHA `b2aaddb72faf99c99b8272887e67d516725697f0`:
 
-- Python Tests — [run 44550800655](https://github.com/Xero-29/CYBER_AI/actions/runs/44550800655): **completed/failure**, 572 pruebas, 5 fallos y 1 error.
-- Docker Sandbox — [run 44550800689](https://github.com/Xero-29/CYBER_AI/actions/runs/44550800689): **completed/failure** en la verificación completa; el build de imagen sí terminó correctamente y Ruff no llegó a ejecutarse.
-- Los fallos se deben a fixtures que aún usan `/usr/bin/nuclei` inexistente después de endurecer `build_minimal_environment` con resolución estricta y de exigir allowlist del binario. No se debe debilitar esa comprobación de producción para acomodar tests: se corrigen los fixtures para crear ejecutables temporales reales y simular una allowlist aprobada.
-- Los runs anteriores de commits intermedios fueron cancelados por la política de concurrencia; no se consideran evidencia de éxito.
+- Python Tests — [run 44551974731](https://github.com/Xero-29/CYBER_AI/actions/runs/44551974731): **completed/success**; 572 pruebas, suite base con 4 skips explícitos y suite con extractores documentales **OK**.
+- Docker Sandbox — [run 44551974743](https://github.com/Xero-29/CYBER_AI/actions/runs/44551974743): **completed/success**; 572 pruebas y Ruff dentro del contenedor endurecido.
+- El workflow Python generó y publicó los SBOM CycloneDX y la procedencia de build del SHA exacto. Los checks verdes corresponden a este SHA, no a un commit posterior.
+- No se dispuso de un checkout local completo; la evidencia de ejecución proviene de GitHub Actions.
 
 ## Cambios de esta iteración
 
-- Se actualizan los tests de `binary_integrity`, `nuclei_scanner` y `task_runner` para que utilicen ejecutables temporales existentes, rutas verificables y hashes coherentes.
-- Se mantiene el comportamiento fail-closed: una ruta de ejecutable inexistente no se acepta ni se resuelve de forma permisiva.
-- La validación GitHub Actions del nuevo HEAD queda pendiente hasta que concluyan los workflows disparados por este commit.
-- No se dispuso de un checkout local completo en este entorno; no se afirma ejecución local.
+- Se corrigieron los fixtures que usaban una ruta inexistente `/usr/bin/nuclei`; ahora crean ejecutables temporales y prueban una allowlist aprobada sin debilitar la resolución estricta en producción.
+- Se conserva el rechazo fail-closed de ejecutables inexistentes.
+- La revisión detectó que `task_runner.py` y `nuclei_scanner.py` validaban/hacheaban plantillas con comprobaciones de ruta menos robustas que el control de binarios. La siguiente corrección centraliza validación y hash con límites, rechazo de symlinks/traversal y comprobación de identidad del archivo durante lectura.
+- Los cambios nuevos de integridad de plantillas y evidencia JSONL quedan pendientes de CI sobre su propio SHA.
 
 ## Límites y trabajo restante
 
-1. Reejecutar y verificar Python Tests y Docker Sandbox sobre el nuevo SHA exacto; no declarar CI verde hasta que ambos terminen exitosamente.
-2. Continuar auditoría de aislamiento, procesos descendientes, integridad de plantillas y manejo de evidencia del escáner Nuclei.
-3. Revisar la reconciliación existente del PR #12, preservar los 573 commits de `main` y resolver cualquier conflicto en una rama separada; no integrar automáticamente.
-4. Verificar individualmente PR #11 y las actualizaciones de Dependabot antes de integrarlas.
-5. Validar locks hash-verified por plataforma/arquitectura y provenance de los artefactos.
-6. Conectar KMS/HSM, RBAC/IdP/MFA, WORM/offsite y cifrado de backups; ejecutar simulacros DR con RPO/RTO medidos.
-7. Ejecutar pruebas reales de microVM/VM, egress, escape de sandbox, concurrencia, carga/soak, disco lleno y recuperación ante caída/corrupción del host.
-8. Conectar proveedores/modelos reales y medir calidad, coste, latencia, cuotas, fallos y políticas de datos.
-9. Revisar las 138 fuentes y 276 verificaciones pendientes con especialistas; validar licencias, exactitud, vigencia y recuperación semántica con dataset experto.
-10. Verificar ACL Windows, protección de rama, observabilidad, alertas y respuesta a incidentes en infraestructura real.
+1. Ejecutar y revisar CI sobre el siguiente SHA tras centralizar la integridad de plantillas y añadir regresiones de manipulación/evidencia.
+2. Revisar el proceso Nuclei para evitar procesos descendientes huérfanos y mantener límites de salida bajo condiciones adversas.
+3. Revisar la reconciliación del PR #12; preservar los 573 commits de `main` y resolver conflictos por archivo en la rama separada. No integrar automáticamente.
+4. Verificar locks hash-verified por plataforma/arquitectura y provenance de artefactos antes de integrar PR #11.
+5. Conectar KMS/HSM, RBAC/IdP/MFA, WORM/offsite y cifrado de backups; ejecutar simulacros DR con RPO/RTO medidos.
+6. Ejecutar pruebas reales de microVM/VM, egress, escape de sandbox, concurrencia, carga/soak, disco lleno y recuperación tras caída/corrupción del host.
+7. Conectar proveedores/modelos reales y medir calidad, coste, latencia, cuotas, fallos y políticas de datos.
+8. Revisar las 138 fuentes y 276 verificaciones pendientes con especialistas; validar licencias, exactitud, vigencia y recuperación semántica con dataset experto.
+9. Verificar ACL Windows, protección de rama, observabilidad, alertas y respuesta a incidentes en infraestructura real.
 
-**Conclusión:** el proyecto todavía no está listo para la validación final del usuario: los checks del HEAD anterior fallan y la divergencia con `main` sigue sin reconciliarse. Se corrigen ahora los fixtures que provocaron el CI rojo y se continuará con la auditoría y verificación del nuevo HEAD. No se declara certificación institucional ni preparación para producción.
+**Conclusión:** el HEAD `b2aaddb72faf99c99b8272887e67d516725697f0` pasó los checks Python y Docker, pero el proyecto aún no está listo para validación final: falta cerrar la integridad de plantillas/evidencia, reconciliar de forma segura la divergencia con `main` y completar integraciones operacionales y revisión experta. No se declara certificación institucional ni preparación para producción.
 
+---
+
+## Registro histórico
+
+Los bloques siguientes documentan estados y validaciones de iteraciones anteriores. Si alguna cifra, pendiente o afirmación contradice esta cabecera, prevalece el estado verificado de esta sección superior.
 ---
 
 ## Registro histórico

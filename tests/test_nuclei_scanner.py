@@ -43,6 +43,18 @@ class NucleiScannerTests(unittest.TestCase):
         self.ledger_env.stop()
         self.temp.cleanup()
 
+    @staticmethod
+    def _create_templates(home):
+        root = Path(home) / "nuclei-templates"
+        paths = [
+            root / "http/technologies/bulma-detect.yaml",
+            root / "http/misconfiguration/http-missing-security-headers.yaml",
+        ]
+        for path in paths:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("id: test-template\ninfo:\n  name: test\n  severity: info\n", encoding="utf-8")
+        return paths
+
     def test_scan_requires_explicit_authorization(self):
         result = scan_target("http://127.0.0.1:8765")
         self.assertEqual(result["status"], "authorization_required")
@@ -88,6 +100,7 @@ class NucleiScannerTests(unittest.TestCase):
             root = Path(tmp)
             executable = root / "nuclei"
             executable.write_bytes(b"nuclei-test-binary")
+            self._create_templates(root)
             fake_process = FakeProcess(stdout_lines=["Nuclei iniciado\n"])
 
             def fake_popen(command, **kwargs):
@@ -152,8 +165,10 @@ class NucleiScannerTests(unittest.TestCase):
 
     def test_process_start_error_is_reported(self):
         with tempfile.TemporaryDirectory() as tmp:
-            executable = Path(tmp) / "nuclei"
+            root = Path(tmp)
+            executable = root / "nuclei"
             executable.write_bytes(b"nuclei-test-binary")
+            self._create_templates(root)
             provenance = {
                 "resolved_path": str(executable),
                 "sha256": "a" * 64,
@@ -161,15 +176,16 @@ class NucleiScannerTests(unittest.TestCase):
             }
             with patch("nuclei_scanner.shutil.which", return_value=str(executable)):
                 with patch("nuclei_scanner.require_approved_executable", return_value=provenance):
-                    with patch(
-                        "nuclei_scanner.subprocess.Popen",
-                        side_effect=OSError("No se pudo iniciar"),
-                    ):
-                        result = scan_target(
-                            "http://127.0.0.1:8765",
-                            authorized=True,
-                            authorization_id="test-grant",
-                        )
+                    with patch("nuclei_scanner.Path.home", return_value=root):
+                        with patch(
+                            "nuclei_scanner.subprocess.Popen",
+                            side_effect=OSError("No se pudo iniciar"),
+                        ):
+                            result = scan_target(
+                                "http://127.0.0.1:8765",
+                                authorized=True,
+                                authorization_id="test-grant",
+                            )
 
         self.assertEqual(result["status"], "error")
         self.assertIn("No se pudo iniciar", result["error"])
@@ -197,6 +213,7 @@ class NucleiScannerTests(unittest.TestCase):
             root = Path(tmp)
             executable = root / "nuclei"
             executable.write_bytes(b"nuclei-test-binary")
+            self._create_templates(root)
             provenance = {
                 "resolved_path": str(executable),
                 "sha256": "a" * 64,
@@ -227,6 +244,98 @@ class NucleiScannerTests(unittest.TestCase):
             self.assertEqual(result["discarded_findings_count"], 1)
             self.assertEqual(result["findings"], [])
 
+
+
+
+    def test_missing_or_unsafe_template_blocks_process_start(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            executable = root / "nuclei"
+            executable.write_bytes(b"nuclei-test-binary")
+            provenance = {
+                "resolved_path": str(executable),
+                "sha256": "a" * 64,
+                "allowlist": {"enforced": True, "status": "approved"},
+            }
+            with patch("nuclei_scanner.shutil.which", return_value=str(executable)):
+                with patch("nuclei_scanner.require_approved_executable", return_value=provenance):
+                    with patch("nuclei_scanner.Path.home", return_value=root):
+                        with patch("nuclei_scanner.subprocess.Popen") as popen:
+                            result = scan_target(
+                                "http://127.0.0.1:8765",
+                                authorized=True,
+                                authorization_id="test-grant",
+                            )
+            self.assertEqual(result["status"], "template_denied")
+            popen.assert_not_called()
+
+    def test_template_replacement_discards_scan_findings(self):
+        finding = {"template-id": "untrusted", "matched-at": "http://127.0.0.1:8765"}
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            executable = root / "nuclei"
+            executable.write_bytes(b"nuclei-test-binary")
+            templates = self._create_templates(root)
+            provenance = {
+                "resolved_path": str(executable),
+                "sha256": "a" * 64,
+                "allowlist": {"enforced": True, "status": "approved"},
+            }
+            fake_process = FakeProcess(stdout_lines=["Nuclei iniciado\\n"])
+
+            def fake_popen(command, **kwargs):
+                output_index = command.index("-o") + 1
+                Path(command[output_index]).write_text(json.dumps(finding) + "\\n", encoding="utf-8")
+                templates[0].write_text("id: modified-template\\n", encoding="utf-8")
+                return fake_process
+
+            with patch("nuclei_scanner.shutil.which", return_value=str(executable)):
+                with patch("nuclei_scanner.require_approved_executable", return_value=provenance):
+                    with patch("nuclei_scanner.hash_executable", return_value=provenance):
+                        with patch("nuclei_scanner.subprocess.Popen", side_effect=fake_popen):
+                            with patch("nuclei_scanner.Path.home", return_value=root):
+                                with patch("nuclei_scanner.time.sleep"):
+                                    result = scan_target(
+                                        "http://127.0.0.1:8765",
+                                        authorized=True,
+                                        authorization_id="test-grant",
+                                    )
+            self.assertEqual(result["status"], "integrity_error")
+            self.assertTrue(result["templates_modified"])
+            self.assertEqual(result["discarded_findings_count"], 1)
+            self.assertEqual(result["findings"], [])
+
+    def test_malformed_jsonl_is_rejected_as_invalid_evidence(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            executable = root / "nuclei"
+            executable.write_bytes(b"nuclei-test-binary")
+            self._create_templates(root)
+            provenance = {
+                "resolved_path": str(executable),
+                "sha256": "a" * 64,
+                "allowlist": {"enforced": True, "status": "approved"},
+            }
+            fake_process = FakeProcess(stdout_lines=["Nuclei iniciado\\n"])
+
+            def fake_popen(command, **kwargs):
+                output_index = command.index("-o") + 1
+                Path(command[output_index]).write_text("not-json\\n", encoding="utf-8")
+                return fake_process
+
+            with patch("nuclei_scanner.shutil.which", return_value=str(executable)):
+                with patch("nuclei_scanner.require_approved_executable", return_value=provenance):
+                    with patch("nuclei_scanner.hash_executable", return_value=provenance):
+                        with patch("nuclei_scanner.subprocess.Popen", side_effect=fake_popen):
+                            with patch("nuclei_scanner.Path.home", return_value=root):
+                                with patch("nuclei_scanner.time.sleep"):
+                                    result = scan_target(
+                                        "http://127.0.0.1:8765",
+                                        authorized=True,
+                                        authorization_id="test-grant",
+                                    )
+            self.assertEqual(result["status"], "evidence_invalid")
+            self.assertEqual(result["findings"], [])
 
     def test_validate_target_rejects_control_characters_and_non_strings(self):
         for target in ("https://8.8.8.8\n", None, 123):
