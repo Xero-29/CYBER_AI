@@ -122,3 +122,34 @@ Cada estudio debe definir H0/H1, variables, muestra, comparadores, refutación, 
 
 ## Madurez
 M0/M1 estructural. No demuestra cobertura profunda ni M3/M4/M5. Próxima puerta: revisar fuentes completas, producir artefactos específicos, ejecutar pruebas y registrar evidencia.
+
+
+## Profundización técnica específica: Inteligencia de amenazas
+
+### Requisitos e hipótesis
+Partir de PIR/EEI vinculados a decisiones concretas: proteger activos, priorizar vulnerabilidades, detectar actividad o preparar respuesta. Definir consumidor, horizonte, región/sector, nivel de confianza, coste de error y fecha de caducidad. Evitar recopilar indicadores sin pregunta operacional. Separar inteligencia estratégica, operacional, táctica y técnica.
+
+### Ciclo de inteligencia
+Planificar, dirigir, recopilar, procesar, analizar, difundir y retroalimentar. Registrar origen, método, fecha de observación, fecha de publicación, geografía, víctima/sector cuando sea lícito, confianza, corroboración y sesgo. Diferenciar fuente primaria, reporte secundario, inferencia analítica y rumor. Mantener hipótesis alternativas y nivel de confianza explícito.
+
+### Modelos y taxonomías
+ATT&CK describe tácticas/técnicas observadas; no es una lista de indicadores ni una escala de riesgo. CAPEC modela patrones de ataque y CWE debilidades; STIX estructura objetos y relaciones; TAXII facilita intercambio. Mapear entidades, software, infraestructura, campañas y técnicas con identificadores estables y versionado. Evitar equivalencias uno-a-uno cuando la relación es contextual.
+
+### Indicadores y enriquecimiento
+IP, dominio, URL, hash, certificado y artefactos deben incluir contexto temporal, infraestructura compartida, prevalencia, expiración y confianza. Un indicador puede ser legítimo, reutilizado o caducado. Enriquecimiento requiere fuentes independientes, resolución pasiva/activa autorizada, reputación, WHOIS/RDAP, certificados, DNS y contexto de hosting. No convertir coincidencia de IOC en atribución.
+
+### Análisis de actores y campañas
+Evaluar TTP, targeting, idioma, infraestructura, malware, timing y motivación con pesos y explicaciones. Separar atribución técnica, organizacional y geopolítica. Registrar hipótesis competidoras, evidencia contradictoria y umbral de confianza. Evitar sesgo de confirmación, circular reporting y atribuciones copiadas entre proveedores.
+
+### Calidad y medición
+Medir oportunidad, relevancia, precisión, cobertura, acción habilitada, coste de falsos positivos y caducidad de IOC. Evaluar inteligencia por decisiones mejoradas, no volumen de feeds. Controlar duplicados, normalización, drift, procedencia y licencias. Feedback de SOC/red team/IR actualiza PIR y confianza, pero no reescribe evidencia original.
+
+### Laboratorios
+- Procesar STIX bundle sintético y validar relaciones/esquema.
+- Correlacionar ATT&CK con telemetría sintética y medir cobertura.
+- Evaluar caducidad y falsos positivos de IOC sobre corpus controlado.
+- Redactar informe con hipótesis, evidencia contradictoria y confidence statement.
+No recolectar ni difundir datos personales o infraestructura sensible fuera de base legal.
+
+## Estado de validación de la ampliación
+Contenido técnico editorial añadido; fuentes completas, revisión independiente y laboratorios ejecutados permanecen pendientes. No elevar por redacción a M3/M4/M5.
