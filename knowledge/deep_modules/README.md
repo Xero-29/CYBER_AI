@@ -163,3 +163,15 @@ Estos estudios amplían los compendios estructurados con síntesis técnicas, am
 - [Seguridad cloud](./cloud/RESEARCH_STUDY.md)
 - [Contenedores y Kubernetes](./containers/RESEARCH_STUDY.md)
 - [Seguridad móvil](./mobile/RESEARCH_STUDY.md)
+
+
+## Tercera tanda de estudios profundos (2026-11-18)
+
+- [Identidad y acceso](./identity/RESEARCH_STUDY.md)
+- [Análisis de malware](./malware/RESEARCH_STUDY.md)
+- [Forense digital](./forensics/RESEARCH_STUDY.md)
+- [Inteligencia de amenazas](./threat_intel/RESEARCH_STUDY.md)
+- [Ingeniería inversa](./reverse/RESEARCH_STUDY.md)
+- [IoT y hardware](./iot_hardware/RESEARCH_STUDY.md)
+- [Gobernanza](./governance/RESEARCH_STUDY.md)
+- [Seguridad de datos](./data_security/RESEARCH_STUDY.md)
