@@ -34,3 +34,40 @@ Fuentes oficiales:
 - https://asvs.owasp.org/
 - https://attack.mitre.org/resources/versions/
 - https://attack.mitre.org/resources/updates/updates-october-2026/
+
+
+## Revisión dirigida de NIST SP 800-57 Part 1 Rev. 6 — Initial Public Draft
+
+Se descargó e inspeccionó el PDF oficial completo a nivel de disponibilidad (201 páginas) y se revisaron secciones técnicas seleccionadas; no se declara lectura lineal integral.
+
+Secciones examinadas:
+- Sección 4.3.6, cryptoperiod recommendations (pp. 27–39).
+- Sección 5.2.3, key metadata (pp. 87–89).
+- Sección 6, key states and transitions (pp. 89–96).
+- Sección 7, key-management phases and functions (pp. 97–126).
+- Sección 7.2.3, key change: re-keying vs key update (pp. 119–120).
+- Sección 8.2, inventory management (pp. 129–130).
+
+Hallazgos aplicados:
+1. El IPD describe cuatro fases de gestión de claves: pre-operational, operational, post-operational y destroyed. Estas fases no deben confundirse con estados individuales.
+2. Los estados de clave incluyen pre-activation, active, suspended, compromised y destroyed; la selección de estados depende del sistema.
+3. Las transiciones de estado deben registrarse en logs de auditoría y metadata.
+4. El inventario de claves de largo plazo debe contener referencias/punteros al material y metadata (owner/sponsor, tipo, algoritmo, longitud, uso, expiración); no debe copiar secretos o claves privadas salvo que también actúe como repositorio de backup/archivo.
+5. Re-keying genera una clave nueva independiente; key update deriva la nueva del valor anterior y puede propagar el compromiso de una clave en la cadena.
+
+El IPD no es final. La Rev. 5 sigue siendo la referencia final registrada hasta que NIST publique una revisión definitiva.
+
+## Actualización de erratas de FIPS 204
+
+La ficha oficial NIST consultada contiene planning note del 31 de julio de 2026 que remite a una hoja de erratas potenciales con varios problemas menores destinados a una futura actualización/revisión. Se registra como aviso oficial de errata; la hoja XLSX no pudo inspeccionarse en esta revisión. No afirmar conformidad algorítmica ni que los problemas estén corregidos.
+
+## Fuentes oficiales nuevas para Identity
+
+NIST SP 800-63-4 Rev. 4 final, publicada el 31 de julio de 2025, reemplaza SP 800-63-3 y cubre identity proofing, enrollment, authenticators, authentication management, federation y assertions. Sus partes SP 800-63B-4 (Authentication and Authenticator Management) y SP 800-63C-4 (Federation and Assertions) son referencias primarias para el tema Identity. Se verificaron metadatos y abstracts oficiales; los requisitos completos de cada parte siguen pendientes de revisión.
+
+Fuentes:
+- SP 800-57 Rev. 6 IPD PDF: https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57pt1r6.ipd.pdf
+- FIPS 204 errata notice: https://csrc.nist.gov/pubs/fips/204/final
+- SP 800-63-4: https://csrc.nist.gov/pubs/sp/800/63/4/final
+- SP 800-63B-4: https://csrc.nist.gov/pubs/sp/800/63/b/4/final
+- SP 800-63C-4: https://csrc.nist.gov/pubs/sp/800/63/c/4/final
