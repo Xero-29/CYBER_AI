@@ -6,7 +6,8 @@ de que una fuente respalde una afirmación. La herramienta no aprueba claims
 automáticamente ni transforma metadatos en lectura integral.
 """
 import argparse
-import jsonimport sys
+import json
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
