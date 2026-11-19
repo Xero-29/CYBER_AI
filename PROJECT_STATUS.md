@@ -280,3 +280,16 @@ Se conectaron los estudios al flujo de conocimiento, no solo al árbol documenta
 Se añadió DOMAIN_SOURCE_MAP.json: los 48 dominios enlazan a al menos dos IDs del registro de fuentes; se incorporaron ocho referencias técnicas adicionales y se ajustaron dominios de aplicabilidad en el registro central. Estado actual: 89 referencias en el registro de esta entrega y 151 fuentes únicas en el registro central.
 
 La matriz es una relación de pertinencia temática, no una afirmación de que cada fuente respalde todas las frases de un estudio. La revisión claim-to-source y la lectura integral de estándares siguen pendientes.
+
+
+### Validación CI de la integración documental/indexada
+
+Sobre HEAD `0d79769fc793f295a31da4ea78656ed419e1ef93`:
+
+- Python Tests: **success** — 613 tests ejecutados, 1 skipped.
+- Validación de bootstrap: **success** — dry-run validó 96 documentos (48 paquetes base + 48 estudios), con rutas y hashes; sin llamadas a IA ni escrituras.
+- Gate de estudios: **success** — 48/48 estudios superan el umbral estructural, 19.472 palabras y 206 referencias HTTPS.
+- El mismo informe evidencia brechas anteriores que siguen abiertas: solo 18/48 compendios base tienen secciones base completas; 0/48 cumplen todas las secciones profundas de la matriz (54/240 comprobaciones presentes).
+- El primer intento del gate falló porque el CLI mezclaba el estado de los compendios antiguos con el nuevo gate de estudios; se separó la condición para que --require-research-studies evalúe exclusivamente el nuevo corpus, sin ocultar el estado de los compendios previos. La ejecución final quedó verde.
+
+**No se ejecutó la ingesta vectorial real ni se probó recuperación semántica:** eso requiere proveedor ECO configurado y debe validarse localmente. Los estudios se conectan al bootstrap, pero la creación de embeddings queda pendiente.
