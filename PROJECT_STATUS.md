@@ -273,3 +273,10 @@ Se conectaron los estudios al flujo de conocimiento, no solo al árbol documenta
 - CI Python incorpora dry-run de la biblioteca y gate --require-research-studies.
 
 **No se ejecutó la ingestión vectorial real:** requiere que el usuario configure el proveedor ECO de embeddings. El dry-run no envía texto a proveedores ni crea vectores. El contenido de los estudios se enviará al proveedor configurado al ejecutar la ingestión; revisar la política de datos antes de hacerlo.
+
+
+### Trazabilidad de fuentes por dominio
+
+Se añadió DOMAIN_SOURCE_MAP.json: los 48 dominios enlazan a al menos dos IDs del registro de fuentes; se incorporaron ocho referencias técnicas adicionales y se ajustaron dominios de aplicabilidad en el registro central. Estado actual: 89 referencias en el registro de esta entrega y 151 fuentes únicas en el registro central.
+
+La matriz es una relación de pertinencia temática, no una afirmación de que cada fuente respalde todas las frases de un estudio. La revisión claim-to-source y la lectura integral de estándares siguen pendientes.
