@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from safe_io import SafeWriteError, atomic_write_text
+from safe_io import SafeWriteError, atomic_write_text, ensure_private_directory
 
 
 class SafeIoTests(unittest.TestCase):
@@ -77,6 +77,29 @@ class SafeIoTests(unittest.TestCase):
             with self.assertRaises(SafeWriteError):
                 atomic_write_text(destination, "no")
 
+
+
+    def test_private_directory_is_created_and_restricted(self):
+        with tempfile.TemporaryDirectory() as temp:
+            directory = Path(temp) / "reports" / "private"
+            result = ensure_private_directory(directory)
+            self.assertEqual(result, directory)
+            self.assertTrue(directory.is_dir())
+            if os.name == "posix":
+                self.assertEqual(stat.S_IMODE(directory.stat().st_mode), 0o700)
+
+    def test_private_directory_rejects_symlink(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            real = root / "real"
+            real.mkdir()
+            link = root / "linked"
+            try:
+                link.symlink_to(real, target_is_directory=True)
+            except (OSError, NotImplementedError):
+                self.skipTest("symlinks unavailable")
+            with self.assertRaises(SafeWriteError):
+                ensure_private_directory(link)
 
 if __name__ == "__main__":
     unittest.main()
