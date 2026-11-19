@@ -161,3 +161,23 @@ Una especialidad solo puede declararse:
 - **Investigación (K5):** existe investigación con método y evidencia reproducible.
 
 El estado global debe mostrar distribución por tema y puertas pendientes. Nunca resumir el estado como “completo” si hay brechas críticas o validaciones no ejecutadas.
+
+
+## 11. Separación obligatoria entre madurez teórica y operativa
+
+La biblioteca se construye en dos etapas. La primera cierra el conocimiento teórico (capacidades en frío) de todas las especialidades; la segunda desarrolla y valida la ejecución (capacidades en caliente). No mezclar los dos resultados en una sola etiqueta.
+
+- **Madurez teórica T0–T5:** mide cobertura disciplinar, precisión, profundidad, trazabilidad, razonamiento, síntesis crítica y revisión experta del conocimiento. T4 exige revisión independiente por especialista. T5 exige contribución o síntesis de investigación de alto rigor; si la contribución depende de datos experimentales, estos deben existir y analizarse.
+- **Madurez operativa O0–O5:** O0 no ejecutada; O1 diseño especificado; O2 laboratorio ejecutado con evidencia; O3 integración/interoperabilidad verificada; O4 operación representativa y recuperación evaluadas; O5 reproducción independiente y validación externa del desempeño.
+
+Un tema puede ser T4/O0: conocimiento teórico experto revisado, aún sin validación operativa. Esto no autoriza a afirmar que las herramientas funcionan en producción. Tampoco se puede asignar T4 solo por contenido escrito: exige fuentes primarias revisadas, cobertura disciplinar, afirmaciones trazables, análisis avanzado y revisión independiente.
+
+### Interpretación de las doce capas en la etapa teórica
+
+Las doce capas se desarrollan desde la primera etapa. En implementación se documentan algoritmos, código, configuraciones y ejemplos revisables estáticamente; en laboratorios/datasets se diseña el protocolo, corpus, ground truth y resultados esperados; en evaluación se definen rúbricas, métricas y benchmarks; en Skills se redactan especificaciones no promovidas. No se presentan estos artefactos como ejecución, medición o validación operativa.
+
+### Criterio de salida de la etapa fría
+
+Una especialidad puede declararse **teóricamente completa pendiente de revisión independiente** cuando sus temas esenciales tienen las doce capas desarrolladas o justificadas, mapa disciplinar ampliado, fuentes revisadas en el alcance declarado, ejemplos y contraejemplos resueltos, ejercicios con rúbrica, procedimientos detallados y brechas explícitas. Solo tras revisión independiente puede alcanzar T4. Las puertas G5/G7 y la madurez O no se aprueban por completar documentación.
+
+El procedimiento de aplicación a las 48 especialidades está en [THEORETICAL_LIBRARY_COMPLETION_PROGRAM_48.md](THEORETICAL_LIBRARY_COMPLETION_PROGRAM_48.md).
