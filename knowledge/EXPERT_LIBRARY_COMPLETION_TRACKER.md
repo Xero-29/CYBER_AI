@@ -19,7 +19,7 @@ Cada compendio existente recibió un apéndice disciplinar con arquitectura/meca
 | `cloud` | Seguridad cloud | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
 | `containers` | Contenedores y Kubernetes | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
 | `mobile` | Seguridad móvil | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
-| `crypto` | Criptografía | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
+| `crypto` | Criptografía | Ampliado con siete capítulos técnicos específicos, agenda experimental y mapa de fuentes; borrador M2 | Protocolo por subtema definido; ejecución pendiente | Metadatos de 15 fuentes primarias/RFC registradas; lectura integral pendiente | 7 protocolos de laboratorio diseñados; no ejecutados | Revisión independiente pendiente |
 | `identity` | Identidad y acceso | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
 | `malware` | Análisis de malware | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
 | `forensics` | Informática forense | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
