@@ -49,8 +49,8 @@
       "id": "api",
       "name": "Seguridad de API",
       "path": "knowledge/packs/api/README.md",
-      "version": "2.0.0",
-      "status": "included_authored_expanded",
+      "version": "2.1.0",
+      "status": "expanded_technical_content_validation_pending",
       "verified_external_sources": 0,
       "knowledge_standard": "knowledge/EXPERT_RESEARCH_STANDARD.md",
       "expert_profile_status": "blueprint_defined_content_and_evidence_pending",
@@ -63,7 +63,8 @@
         "G6_evaluation",
         "G7_reproducibility",
         "G8_independent_review"
-      ]
+      ],
+      "maturity_note": "Tres referencias primarias adicionales inspeccionadas; lectura integral, experimentos y revisión independiente pendientes."
     },
     {
       "id": "network",
