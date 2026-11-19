@@ -187,3 +187,23 @@ Estos estudios amplían los compendios estructurados con síntesis técnicas, am
 - [Threat hunting](./threat_hunting/RESEARCH_STUDY.md)
 - [Red Team](./red_team/RESEARCH_STUDY.md)
 - [Wireless/Bluetooth/NFC](./wireless_security/RESEARCH_STUDY.md)
+
+
+## Quinta tanda de estudios profundos (2026-11-18)
+
+- [Bug bounty](./bug_bounty/RESEARCH_STUDY.md)
+- [Seguridad satelital](./satellite_security/RESEARCH_STUDY.md)
+- [Seguridad física](./physical_security/RESEARCH_STUDY.md)
+- [Correo y DNS](./email_dns_security/RESEARCH_STUDY.md)
+- [Fraude y abuso](./fraud_abuse/RESEARCH_STUDY.md)
+- [Ingeniería de privacidad](./privacy_engineering/RESEARCH_STUDY.md)
+- [Forense cloud](./cloud_forensics/RESEARCH_STUDY.md)
+- [Red Team de IA](./ai_red_team/RESEARCH_STUDY.md)
+- [PKI/HSM](./pki_hsm/RESEARCH_STUDY.md)
+- [Criptografía poscuántica](./post_quantum_crypto/RESEARCH_STUDY.md)
+- [Continuidad de negocio](./business_continuity/RESEARCH_STUDY.md)
+- [Seguridad de bases de datos](./database_security/RESEARCH_STUDY.md)
+- [Investigación de vulnerabilidades](./vulnerability_research/RESEARCH_STUDY.md)
+- [Telecom/5G](./telecom_5g/RESEARCH_STUDY.md)
+- [Seguridad automotriz](./automotive_security/RESEARCH_STUDY.md)
+- [Seguridad de hardware](./hardware_security/RESEARCH_STUDY.md)
