@@ -1667,6 +1667,179 @@
       ],
       "verification_status": "official_implementation_hub_reviewed",
       "review_note": "Includes implementation resources, conformance criteria and reference architectures."
+    },
+    {
+      "id": "NIST-AI-100-2-E2025",
+      "title": "Adversarial Machine Learning: A Taxonomy and Terminology of Attacks and Mitigations",
+      "publisher": "NIST",
+      "version": "AI 100-2 E2025",
+      "published": "2025-03-24",
+      "url": "https://doi.org/10.6028/NIST.AI.100-2e2025",
+      "domains": [
+        "machine_learning",
+        "ai_security",
+        "ai_red_team"
+      ],
+      "verification_status": "official_final_publication_metadata_and_abstract_reviewed",
+      "review_note": "Supersedes E2023 as newer taxonomy; includes predictive and generative AI attacks and mitigations."
+    },
+    {
+      "id": "NIST-SP800-115",
+      "title": "Technical Guide to Information Security Testing and Assessment",
+      "publisher": "NIST",
+      "version": "SP 800-115",
+      "published": "2008-09-30",
+      "url": "https://doi.org/10.6028/NIST.SP.800-115",
+      "domains": [
+        "red_team",
+        "vulnerability_research",
+        "appsec"
+      ],
+      "verification_status": "official_final_metadata_and_abstract_reviewed",
+      "review_note": "Older overview of test planning and techniques; not a comprehensive modern assessment program."
+    },
+    {
+      "id": "NIST-SP800-94",
+      "title": "Guide to Intrusion Detection and Prevention Systems",
+      "publisher": "NIST",
+      "version": "SP 800-94",
+      "published": "2007-02-20",
+      "url": "https://doi.org/10.6028/NIST.SP.800-94",
+      "domains": [
+        "soc_siem",
+        "edr_xdr",
+        "wireless_security"
+      ],
+      "verification_status": "official_final_metadata_and_planning_note_reviewed",
+      "review_note": "2007 final; draft Rev. 1 was retired in 2022 and never finalized. Use only as historical foundation."
+    },
+    {
+      "id": "NIST-SP800-137",
+      "title": "Information Security Continuous Monitoring",
+      "publisher": "NIST",
+      "version": "SP 800-137",
+      "published": "2011-09-30",
+      "url": "https://doi.org/10.6028/NIST.SP.800-137",
+      "domains": [
+        "soc_siem",
+        "threat_hunting",
+        "governance"
+      ],
+      "verification_status": "official_final_metadata_and_abstract_reviewed",
+      "review_note": "Foundational continuous monitoring guidance; supplement with current architecture and telemetry practice."
+    },
+    {
+      "id": "CAPEC-3.9",
+      "title": "Common Attack Pattern Enumeration and Classification",
+      "publisher": "MITRE",
+      "version": "3.9",
+      "url": "https://capec.mitre.org/data/",
+      "domains": [
+        "red_team",
+        "appsec",
+        "vulnerability_research",
+        "threat_intel"
+      ],
+      "verification_status": "official_catalog_version_page_reviewed",
+      "review_note": "Catalog of attack patterns; fix version and map carefully to CWE/ATT&CK/OWASP."
+    },
+    {
+      "id": "MITRE-D3FEND",
+      "title": "D3FEND Defensive Countermeasure Knowledge Graph",
+      "publisher": "MITRE",
+      "version": "Current knowledge graph",
+      "url": "https://d3fend.mitre.org/",
+      "domains": [
+        "soc_siem",
+        "edr_xdr",
+        "threat_hunting",
+        "secure_arch"
+      ],
+      "verification_status": "official_faq_scope_reviewed",
+      "review_note": "Knowledge graph vocabulary of defensive techniques; does not prescribe, prioritize or rate effectiveness."
+    },
+    {
+      "id": "SIGMA-SPEC",
+      "title": "Sigma Rule Specification",
+      "publisher": "SigmaHQ",
+      "version": "Current specification",
+      "url": "https://sigmahq.io/",
+      "domains": [
+        "soc_siem",
+        "threat_hunting",
+        "edr_xdr"
+      ],
+      "verification_status": "official_project_reference_registered",
+      "review_note": "Portable detection rule format; backend conversion and semantic equivalence require tests."
+    },
+    {
+      "id": "ZEEK-DOCS",
+      "title": "Zeek Documentation",
+      "publisher": "Zeek Project",
+      "version": "Current docs",
+      "url": "https://docs.zeek.org/",
+      "domains": [
+        "network",
+        "soc_siem",
+        "threat_hunting"
+      ],
+      "verification_status": "official_project_reference_registered",
+      "review_note": "Network security monitoring platform; record version, scripts and data model."
+    },
+    {
+      "id": "SURICATA-DOCS",
+      "title": "Suricata User Guide",
+      "publisher": "OISF",
+      "version": "Current docs",
+      "url": "https://docs.suricata.io/",
+      "domains": [
+        "network",
+        "soc_siem",
+        "edr_xdr"
+      ],
+      "verification_status": "official_project_reference_registered",
+      "review_note": "IDS/IPS/NSM engine; test rule performance, false positives and version-specific features."
+    },
+    {
+      "id": "IEEE-80211-WG",
+      "title": "IEEE 802.11 Wireless LAN Working Group",
+      "publisher": "IEEE",
+      "version": "Current standards family",
+      "url": "https://www.ieee802.org/11/",
+      "domains": [
+        "wireless_security",
+        "network"
+      ],
+      "verification_status": "official_working_group_reference_registered",
+      "review_note": "Full standards may require access; cite exact amendment/edition for normative claims."
+    },
+    {
+      "id": "BLUETOOTH-CORE-SPEC",
+      "title": "Bluetooth Core Specification",
+      "publisher": "Bluetooth SIG",
+      "version": "Current specification family",
+      "url": "https://www.bluetooth.com/specifications/specs/",
+      "domains": [
+        "wireless_security",
+        "mobile",
+        "iot_hardware"
+      ],
+      "verification_status": "official_specification_portal_registered",
+      "review_note": "Pin exact Core version and feature set for security analysis."
+    },
+    {
+      "id": "NFC-FORUM-SPECS",
+      "title": "NFC Forum Specifications",
+      "publisher": "NFC Forum",
+      "version": "Current specification family",
+      "url": "https://nfc-forum.org/build/specifications/",
+      "domains": [
+        "wireless_security",
+        "mobile",
+        "iot_hardware"
+      ],
+      "verification_status": "official_specification_portal_registered",
+      "review_note": "Review exact specification and licensing/access requirements."
     }
   ],
   "last_updated": "2026-11-17"
