@@ -167,19 +167,20 @@ class NucleiScannerTests(unittest.TestCase):
 
     def test_timeout_termination_falls_back_to_process_kill(self):
         process = FakeProcess()
+        process.returncode = None
         with patch("nuclei_scanner.os.name", "nt"):
             _terminate_process_tree(process)
         self.assertEqual(process.returncode, -9)
 
     def test_output_chunks_are_bounded(self):
-        stream = io.StringIO("x" * 5000 + "\\n")
+        stream = io.StringIO("x" * 5000 + "\n")
         chunks = list(_iter_output_chunks(stream, max_chars=2001))
         self.assertGreater(len(chunks), 1)
         self.assertTrue(all(len(chunk) <= 2001 for chunk in chunks))
 
     def test_output_reader_is_closed_after_drain(self):
         process = FakeProcess()
-        process.stdout = io.StringIO("scanner output\\n")
+        process.stdout = io.StringIO("scanner output\n")
         reader = threading.Thread(target=lambda: list(process.stdout), daemon=True)
         reader.start()
         _close_process_output(process, reader)

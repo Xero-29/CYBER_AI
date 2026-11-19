@@ -2,9 +2,9 @@
 
 **Repositorio:** `Xero-29/CYBER_AI`  
 **Rama auditada:** `codex/security-integrity-audit`  
-**HEAD verificado:** `c48c5c04c5b8c407cef8a65d47a058ec3722c634`  
+**HEAD inspeccionado:** `70ca7c2d8a5d4b00a652e28e9c9b3422d682398f`  
 **main:** `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`  
-**Merge-base:** `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. La rama tiene **153 commits exclusivos** y `main` **573 commits exclusivos**; el diff neto afecta 59 rutas de auditoría y 291 de `main`. No existe un único commit exclusivo de `main`.
+**Merge-base:** `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. La rama tiene **154 commits exclusivos** y `main` **573 commits exclusivos**; el diff neto afecta aproximadamente 59 rutas de auditoría y 291 de `main`. No existe un único commit exclusivo de `main`.
 
 ## Ramas y PRs
 
@@ -13,30 +13,30 @@
 - **PR #12:** abierto como reconciliación selectiva desde `main`; HEAD `c2a397caf36f2661b6f0307168a0a24eee2f6d38`, Python y Docker exitosos. Aún no integra los cambios de seguridad en archivos compartidos.
 - **PR #13:** abierto para biblioteca profunda; HEAD `d0a3934a473e3d1117c7410df253f659d5f475c3`, Python y Docker exitosos; sus gates no sustituyen revisión experta.
 - **PR #1 y #3–#10:** abiertos; revisar cada actualización de Dependabot/Actions individualmente.
-- No se hizo merge, rebase, force-push ni modificación de `main`. PR #12 sigue siendo el único vehículo de reconciliación.
+- No se hizo merge, rebase, force-push ni modificación de `main`. PR #12 sigue siendo el vehículo existente de reconciliación.
 - No se devolvieron rulesets; la lectura de branch protection está bloqueada con 403 para esta integración.
 
 ## CI del HEAD exacto
 
-SHA `c48c5c04c5b8c407cef8a65d47a058ec3722c634`:
+SHA `70ca7c2d8a5d4b00a652e28e9c9b3422d682398f`:
 
-- Python Tests — [run 44553522313](https://github.com/Xero-29/CYBER_AI/actions/runs/44553522313): **completed/success**, 583 pruebas; suite base con 4 skips explícitos y suite documental completa **OK**.
-- Docker Sandbox — [run 44553522845](https://github.com/Xero-29/CYBER_AI/actions/runs/44553522845): **completed/success**, 583 pruebas y Ruff dentro del contenedor endurecido.
-- El workflow Python generó SBOM CycloneDX y procedencia del build para este SHA exacto.
-- No existe checkout local completo disponible; la evidencia de ejecución es GitHub Actions.
+- Python Tests — [run 44553811571](https://github.com/Xero-29/CYBER_AI/actions/runs/44553811571): **completed/failure**, 586 pruebas, 1 fallo.
+- Docker Sandbox — [run 44553811392](https://github.com/Xero-29/CYBER_AI/actions/runs/44553811392): **completed/failure**, 586 pruebas, 1 fallo; la imagen se construyó, pero la verificación falló.
+- Único fallo: el fixture de Windows simulaba un proceso ya terminado (`returncode=0`) y esperaba que `kill()` se ejecutara. Se ajusta el fixture para simular un proceso vivo; no se debilita la terminación de procesos.
+- El SHA anterior `c48c5c04c5b8c407cef8a65d47a058ec3722c634` pasó Python y Docker: 583 pruebas, Ruff y SBOM. Esa evidencia no se traslada al HEAD actual.
 
 ## Cambios de esta iteración
 
-- Se centralizó la integridad de plantillas: límite de tamaño, rechazo de traversal/symlinks/reparse points, apertura sin seguir symlinks, hash SHA-256 y verificación de identidad/tamaño/mtime antes y después de la lectura.
-- `task_runner.py` y `nuclei_scanner.py` reutilizan el módulo común. El escáner directo valida sus plantillas antes de lanzar Nuclei y vuelve a verificar al terminar; si cambia el binario o una plantilla, descarta los hallazgos.
-- El JSONL malformado invalida la evidencia en vez de ignorar silenciosamente la línea.
-- El nuevo trabajo acota la lectura de stdout y cierra pipes; si un descendiente retiene el descriptor, termina el grupo POSIX antes de cerrar el lector. La cobertura de esta limpieza queda pendiente del siguiente CI.
-- No se afirma ejecución local.
+- Se centralizó la integridad de plantillas con límites de tamaño, rechazo de traversal/symlinks/reparse points, apertura sin seguir symlinks y comprobación de identidad/tamaño/mtime durante el hash.
+- `task_runner.py` y `nuclei_scanner.py` usan el módulo común. El escáner verifica las plantillas antes y después y descarta hallazgos si cambia el binario o una plantilla.
+- El JSONL malformado invalida la evidencia en vez de ignorarse.
+- La salida del proceso se lee en fragmentos acotados; el pipe se cierra y, si un descendiente retiene stdout, se intenta terminar el grupo POSIX. Windows aún requiere Job Objects para garantizar el cierre del árbol completo.
+- El siguiente commit corrige el único fixture rojo y vuelve a ejecutar ambos workflows.
 
 ## Pendientes reales
 
-1. Verificar Python Tests, Docker Sandbox y Ruff sobre el próximo SHA exacto.
-2. Confirmar el comportamiento de terminación de procesos descendientes en Windows con Job Objects; la implementación POSIX usa grupo de procesos.
+1. Confirmar Python Tests, Docker Sandbox y Ruff exitosos sobre el próximo SHA exacto.
+2. Implementar/verificar Job Objects de Windows o mantener explícita la limitación del árbol de procesos.
 3. Revisar PR #12 y reconciliar por archivo, preservando los 573 commits de `main`; no integrar automáticamente.
 4. Validar locks por plataforma/arquitectura y provenance antes de integrar PR #11.
 5. Conectar KMS/HSM, RBAC/IdP/MFA, WORM/offsite y cifrado de backups; ejecutar simulacros DR con RPO/RTO.
@@ -45,7 +45,7 @@ SHA `c48c5c04c5b8c407cef8a65d47a058ec3722c634`:
 8. Revisar las 138 fuentes y 276 verificaciones pendientes con especialistas; validar licencias, exactitud, vigencia y calidad semántica.
 9. Verificar ACL Windows, protección de rama, observabilidad, alertas y respuesta a incidentes en infraestructura real.
 
-**Conclusión:** el HEAD `c48c5c04c5b8c407cef8a65d47a058ec3722c634` pasó Python y Docker, pero la limpieza de procesos, la reconciliación con `main` y las integraciones operacionales/experta siguen pendientes. No se declara certificación institucional ni preparación para producción.
+**Conclusión:** el proyecto aún no está listo para validación final. La integridad de plantillas y la limpieza de salida POSIX están implementadas, pero el HEAD inspeccionado tiene un fixture rojo, la terminación completa de procesos Windows requiere una solución de plataforma y la divergencia con `main` sigue sin reconciliarse.
 
 ---
 
