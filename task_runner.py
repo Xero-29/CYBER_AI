@@ -65,6 +65,20 @@ def _sha256_file(path):
     return digest.hexdigest()
 
 
+def _hash_selected_templates(selected, root):
+    root_resolved = Path(root).resolve(strict=True)
+    evidence = []
+    for item in selected:
+        safe_path = _safe_template_path(item["path"], root)
+        if safe_path is None:
+            raise ValueError("Una plantilla cambió o dejó de ser segura durante el escaneo.")
+        evidence.append({
+            "path": safe_path.relative_to(root_resolved).as_posix(),
+            "sha256": _sha256_file(safe_path),
+        })
+    return evidence
+
+
 def _record_task_scan(task, target, report, started, authorization_id=None, start_event_id=None):
     """Registra ejecuciones del runner de plantillas Nuclei."""
     status = report.get("status")
@@ -235,6 +249,18 @@ def main():
     results_file = output_dir / f"task_scan_{scan_id}.jsonl"
     report_file = output_dir / f"task_scan_{scan_id}_report.json"
 
+    try:
+        template_provenance = _hash_selected_templates(selected, root)
+    except (OSError, ValueError) as error:
+        print("ERROR: integridad de plantillas no válida:", error, file=sys.stderr)
+        recorded = _record_task_scan(
+            args.task, args.target,
+            {"task": args.task, "target": args.target, "status": "failed",
+             "reason": "unsafe_or_changed_templates"},
+            task_started, args.authorization_id,
+        )
+        return 3 if args.require_ledger and recorded is None else 2
+
     start_event_id = None
     try:
         start_event = ExecutionLedger().append(
@@ -285,14 +311,23 @@ def main():
             except BinaryIntegrityError:
                 binary_after = None
                 binary_modified = True
+            try:
+                templates_after = _hash_selected_templates(selected, root)
+                templates_modified = templates_after != template_provenance
+            except (OSError, ValueError):
+                templates_after = []
+                templates_modified = True
             report = {
                 "task": args.task, "target": args.target,
-                "status": "integrity_error" if binary_modified else "timeout",
+                "status": "integrity_error" if binary_modified or templates_modified else "timeout",
                 "elapsed_seconds": 90,
                 "tool_binary_sha256": binary_provenance["sha256"],
                 "tool_binary_sha256_after": binary_after["sha256"] if binary_after else None,
                 "tool_binary_modified": binary_modified,
                 "tool_allowlist": binary_provenance["allowlist"],
+                "templates_before": template_provenance,
+                "templates_after": templates_after,
+                "templates_modified": templates_modified,
                 "findings": [],
             }
             atomic_write_text(
@@ -340,13 +375,20 @@ def main():
             except OSError:
                 evidence_invalid = True
 
+        try:
+            templates_after = _hash_selected_templates(selected, root)
+            templates_modified = templates_after != template_provenance
+        except (OSError, ValueError):
+            templates_after = []
+            templates_modified = True
+
         discarded_findings_count = 0
-        if binary_modified:
+        if binary_modified or templates_modified:
             discarded_findings_count = len(findings)
             findings = []
 
         report_status = (
-            "integrity_error" if binary_modified
+            "integrity_error" if binary_modified or templates_modified
             else "output_limit_exceeded" if output_limit_exceeded
             else "evidence_invalid" if evidence_invalid
             else "completed" if process.returncode == 0 else "scanner_error"
@@ -363,6 +405,9 @@ def main():
             "tool_binary_modified": binary_modified,
             "tool_allowlist": binary_provenance["allowlist"],
             "templates_used": [item["path"] for item in selected],
+            "templates_before": template_provenance,
+            "templates_after": templates_after,
+            "templates_modified": templates_modified,
             "findings_count": len(findings),
             "discarded_findings_count": discarded_findings_count,
             "output_limit_exceeded": output_limit_exceeded,
@@ -382,7 +427,7 @@ def main():
         print("Tiempo:", elapsed, "segundos")
         print("Hallazgos:", len(findings))
         print("Informe:", report_file)
-        return 0 if process.returncode == 0 else 1
+        return 0 if report_status == "completed" else 1
     except Exception as error:
         report = {
             "task": args.task,
