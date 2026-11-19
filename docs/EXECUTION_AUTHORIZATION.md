@@ -52,6 +52,19 @@ Ejemplo de estructura (reemplaza todos los valores de ejemplo por un alcance rea
 
 La dirección reservada del ejemplo anterior es documental y será rechazada por el motor. Sustitúyela por una IP pública global realmente incluida en el alcance autorizado.
 
+## Integridad del archivo de política
+
+El cargador valida la política antes de considerar cualquier permiso:
+
+- solo acepta JSON UTF-8 con el esquema exacto `authorizations`;
+- rechaza claves JSON duplicadas, IDs repetidos, acciones que no sean listas de identificadores y campos desconocidos;
+- limita el archivo a 1 MiB y a 500 autorizaciones;
+- rechaza symlinks, puntos de reanálisis y archivos que no sean regulares; compara la identidad del archivo abierto con la ruta para detectar sustituciones durante la apertura;
+- cuando existen permisos, exige modo POSIX `0600`; la verificación de ACL NTFS debe realizarse en el sistema operativo;
+- rechaza destinos con dominios, credenciales, query, fragmentos, rutas ambiguas/escapadas y puertos fuera de rango. Solo se admiten IP públicas globales literales.
+
+Una política vacía no concede permisos y puede permanecer como plantilla versionada. No agregues permisos reales a ese archivo dentro del repositorio: crea una copia local privada y configura `CYBER_AI_AUTHORIZATIONS_FILE`.
+
 ## Ejecución
 
 ```bash
