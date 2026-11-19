@@ -17,8 +17,8 @@ PROJECT = Path(__file__).resolve().parent
 DEFAULT_AUTHORIZATIONS = PROJECT / "config" / "authorized_targets.json"
 MAX_POLICY_BYTES = 1024 * 1024
 MAX_GRANTS = 500
-IDENTIFIER = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,127}\\Z")
-ACTION = re.compile(r"[a-z][a-z0-9_-]{0,63}\\Z")
+IDENTIFIER = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,127}\Z")
+ACTION = re.compile(r"[a-z][a-z0-9_-]{0,63}\Z")
 
 
 class AuthorizationError(ValueError):
