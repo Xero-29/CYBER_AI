@@ -135,3 +135,19 @@ Se añadieron cuadernos técnicos para las 48 áreas. Son planes técnicos estru
 - [Continuidad y recuperación](./business_continuity/TECHNICAL_COMPENDIUM.md) — `business_continuity`
 - [Seguridad de bases de datos](./database_security/TECHNICAL_COMPENDIUM.md) — `database_security`
 - [Investigación de vulnerabilidades](./vulnerability_research/TECHNICAL_COMPENDIUM.md) — `vulnerability_research`
+
+
+## Estudios de investigación profunda (primera entrega, 2026-11-18)
+
+Estos estudios amplían los compendios estructurados con síntesis técnicas, amenazas, controles, evaluación, laboratorios y fuentes. Su madurez y limitaciones están declaradas en cada documento; no deben confundirse con validación experta.
+
+- [Investigaciones técnicas profundas](../research/field_studies/README.md)
+- [Registro de fuentes de esta entrega](../research/field_studies/SOURCE_REGISTER_2026-11-18.json)
+- [Redes](./network/RESEARCH_STUDY.md)
+- [Criptografía](./crypto/RESEARCH_STUDY.md)
+- [Seguridad de IA](./ai_security/RESEARCH_STUDY.md)
+- [OT/ICS/SCADA](./ot_ics/RESEARCH_STUDY.md)
+- [Respuesta a incidentes](./incident_response/RESEARCH_STUDY.md)
+- [Gestión de vulnerabilidades](./vuln_management/RESEARCH_STUDY.md)
+- [DevSecOps](./devsecops/RESEARCH_STUDY.md)
+- [Arquitectura segura](./secure_arch/RESEARCH_STUDY.md)
