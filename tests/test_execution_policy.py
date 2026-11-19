@@ -83,5 +83,79 @@ class ExecutionPolicyTests(unittest.TestCase):
             authorize_target("https://8.8.8.8", "nuclei_scan", "")
 
 
+
+    def test_duplicate_json_keys_are_rejected(self):
+        self.policy.write_text(
+            '{"authorizations":[],"authorizations":[]}', encoding="utf-8"
+        )
+        self.policy.chmod(0o600)
+        with self.assertRaisesRegex(AuthorizationError, "duplicadas"):
+            authorize_target("https://8.8.8.8", "nuclei_scan", "grant-001")
+
+    def test_insecure_empty_policy_remains_deny_by_default(self):
+        self.write_policy([])
+        self.policy.chmod(0o644)
+        with self.assertRaises(AuthorizationError):
+            authorize_target("https://8.8.8.8", "nuclei_scan", "grant-001")
+
+    def test_insecure_policy_with_grants_is_rejected(self):
+        self.policy.chmod(0o644)
+        with self.assertRaisesRegex(AuthorizationError, "0600"):
+            authorize_target("https://8.8.8.8", "nuclei_scan", "grant-001")
+
+    def test_policy_symlink_is_rejected(self):
+        link = Path(self.temp.name) / "policy-link.json"
+        try:
+            link.symlink_to(self.policy)
+        except (OSError, NotImplementedError):
+            self.skipTest("symlinks unavailable")
+        with patch.dict("os.environ", {"CYBER_AI_AUTHORIZATIONS_FILE": str(link)}):
+            with self.assertRaisesRegex(AuthorizationError, "enlace"):
+                authorize_target("https://8.8.8.8", "nuclei_scan", "grant-001")
+
+    def test_non_regular_policy_path_is_rejected(self):
+        directory = Path(self.temp.name) / "policy-directory"
+        directory.mkdir()
+        with patch.dict("os.environ", {"CYBER_AI_AUTHORIZATIONS_FILE": str(directory)}):
+            with self.assertRaises(AuthorizationError):
+                authorize_target("https://8.8.8.8", "nuclei_scan", "grant-001")
+
+    def test_oversized_policy_is_rejected(self):
+        self.policy.write_bytes(b" " * (1024 * 1024 + 1))
+        self.policy.chmod(0o600)
+        with self.assertRaisesRegex(AuthorizationError, "1 MiB"):
+            authorize_target("https://8.8.8.8", "nuclei_scan", "grant-001")
+
+    def test_action_string_cannot_match_by_substring(self):
+        self.grant["actions"] = "prefix_nuclei_scan_suffix"
+        self.write_policy([self.grant])
+        with self.assertRaises(AuthorizationError):
+            authorize_target("https://8.8.8.8", "nuclei_scan", "grant-001")
+
+    def test_duplicate_grant_ids_are_rejected(self):
+        duplicate = dict(self.grant)
+        duplicate["target"] = "https://1.1.1.1"
+        self.write_policy([self.grant, duplicate])
+        with self.assertRaisesRegex(AuthorizationError, "identificadores duplicados"):
+            authorize_target("https://8.8.8.8", "nuclei_scan", "grant-001")
+
+    def test_ambiguous_url_paths_and_zero_port_are_rejected(self):
+        for target in (
+            "https://8.8.8.8:0",
+            "https://8.8.8.8:/",
+            "https://8.8.8.8/%2e%2e/admin",
+            "https://8.8.8.8/a/../admin",
+            "https://8.8.8.8/a\\\\b",
+        ):
+            with self.subTest(target=target):
+                with self.assertRaises(AuthorizationError):
+                    authorize_target(target, "nuclei_scan", "grant-001")
+
+    def test_non_string_action_and_target_are_rejected(self):
+        with self.assertRaises(AuthorizationError):
+            authorize_target("https://8.8.8.8", ["nuclei_scan"], "grant-001")
+        with self.assertRaises(AuthorizationError):
+            authorize_target(8.8, "nuclei_scan", "grant-001")
+
 if __name__ == "__main__":
     unittest.main()
