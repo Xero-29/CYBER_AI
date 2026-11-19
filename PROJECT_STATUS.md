@@ -27,9 +27,10 @@ Cambios publicados en la rama:
 
 ## Estado de CI
 
-- Último resultado observado antes de la corrección, SHA `bbdd21a36ebd36aae6d1154d1e6a1a4640982ba1`: Python Tests **failure** y Docker Sandbox **failure**, ambos por el mismo error de ruta del informe en una prueba; 593 pruebas ejecutadas, 1 error.
-- El commit de código `af798647d3d68f7a61e8551ca4cc8011dca49620` necesita checks concluidos. No se declara CI verde por anticipado.
-- La actualización documental actual también dispara workflows; el HEAD resultante debe validarse por separado. Consultar los checks vinculados al HEAD de la rama, no reutilizar resultados de commits anteriores.
+- El HEAD previo `bbdd21a36ebd36aae6d1154d1e6a1a4640982ba1` falló en ambos workflows por la aserción obsoleta del informe (593 pruebas, 1 error).
+- Python Tests — **success** en `af798647d3d68f7a61e8551ca4cc8011dca49620`: [run 44557728672](https://github.com/Xero-29/CYBER_AI/actions/runs/44557728672). `verify.sh` pasó dos veces con 593 pruebas por ejecución (4 skipped); locks hash-verified, extractores opcionales, SBOM CycloneDX y provenance también pasaron.
+- Docker Sandbox — **success** en el mismo SHA: [run 44557728761](https://github.com/Xero-29/CYBER_AI/actions/runs/44557728761). Build, `verify.sh` y Ruff dentro del sandbox pasaron.
+- Estos resultados validan exactamente el commit de código `af798647d3d68f7a61e8551ca4cc8011dca49620`. Esta actualización documental crea un nuevo HEAD y requiere nuevos checks sobre ese SHA; no se reutilizan resultados anteriores.
 
 ## Capacidades y límites que siguen siendo reales
 
@@ -54,7 +55,6 @@ Cambios publicados en la rama:
 
 **Conclusión:** la rama no está lista para la validación final del usuario. Primero deben pasar los checks del HEAD actual y continuar la auditoría técnica. No se ha modificado `main` ni se ha fusionado ningún PR.
 
----
 ---
 
 ## Registro histórico
