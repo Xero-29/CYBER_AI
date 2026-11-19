@@ -49,8 +49,17 @@ def build_docker_command(tool_id, target, evidence_dir, image=DEFAULT_IMAGE, tim
     else:
         raise ToolExecutionError("La carpeta de evidencias debe estar fuera del repositorio.")
 
+    user_args = []
+    if os.name != "nt":
+        host_uid = os.getuid()
+        if host_uid == 0:
+            raise ToolExecutionError(
+                "La sandbox no se ejecuta desde un host root; usa una cuenta sin privilegios."
+            )
+        user_args = [f"--user={host_uid}:{os.getgid()}"]
+
     command = [
-        "docker", "run", "--rm",
+        "docker", "run", "--rm", "--pull=never",
         "--name", "cyber-ai-sandbox-" + uuid.uuid4().hex,
         "--network=none",
         "--read-only",
@@ -59,7 +68,7 @@ def build_docker_command(tool_id, target, evidence_dir, image=DEFAULT_IMAGE, tim
         "--pids-limit=128",
         "--memory=1g",
         "--cpus=2",
-        f"--user={os.getuid()}:{os.getgid()}",
+        *user_args,
         "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=64m",
         "--mount", f"type=bind,src={PROJECT_ROOT.resolve()},dst=/workspace,readonly",
         "--mount", f"type=bind,src={evidence},dst=/evidence",

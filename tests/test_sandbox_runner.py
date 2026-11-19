@@ -39,15 +39,36 @@ class SandboxRunnerTests(unittest.TestCase):
             "--memory=1g", "--cpus=2",
         ):
             self.assertIn(flag, command)
-        user_flag = next(item for item in command if item.startswith("--user="))
-        self.assertNotEqual(user_flag, "--user=0:0")
-        self.assertTrue(user_flag.startswith("--user="))
+        user_flags = [item for item in command if item.startswith("--user=")]
+        if os.name == "nt":
+            self.assertEqual(user_flags, [])
+        else:
+            self.assertEqual(len(user_flags), 1)
+            self.assertNotEqual(user_flags[0], "--user=0:0")
+        self.assertIn("--pull=never", command)
         self.assertIn("readonly", joined)
         self.assertIn("dst=/evidence", joined)
         self.assertIn("CYBER_AI_LEDGER_PATH=/evidence/execution_ledger.sqlite3", command)
         self.assertIn("--require-ledger", command)
         self.assertNotIn("--privileged", command)
         self.assertNotIn("/var/run/docker.sock", joined)
+
+    @unittest.skipIf(os.name == "nt", "El UID de host solo existe en POSIX.")
+    def test_root_host_is_rejected_instead_of_running_container_as_root(self):
+        evidence = self.root.parent / (self.root.name + "-root-evidence")
+        with patch.object(sandbox_runner.os, "getuid", return_value=0), \
+             patch.object(sandbox_runner.os, "getgid", return_value=0):
+            with self.assertRaisesRegex(ToolExecutionError, "host root"):
+                sandbox_runner.build_docker_command("ruff", "sample.py", evidence)
+
+    def test_windows_uses_non_root_image_user_without_posix_uid_calls(self):
+        evidence = self.root.parent / (self.root.name + "-windows-evidence")
+        with patch.object(sandbox_runner.os, "name", "nt"), \
+             patch.object(sandbox_runner.os, "getuid", create=True, side_effect=AssertionError("getuid called")), \
+             patch.object(sandbox_runner.os, "getgid", create=True, side_effect=AssertionError("getgid called")):
+            command = sandbox_runner.build_docker_command("ruff", "sample.py", evidence)
+        self.assertFalse(any(item.startswith("--user=") for item in command))
+        self.assertIn("--pull=never", command)
 
     def test_evidence_mount_is_created_with_private_permissions(self):
         evidence = self.root.parent / (self.root.name + "-private-evidence")
