@@ -1,7 +1,7 @@
 # Foundations — índice del módulo
 
 **ID:** `foundations`  
-**Versión del índice:** 1.2.0  
+**Versión del índice:** 1.3.0  
 **Corte:** 2026-11-19  
 **Madurez editorial:** M2 ampliado. No equivale a validación experta, experimental ni científica.
 
@@ -27,7 +27,7 @@ El desarrollo se organiza en doce bloques disciplinares:
 ## Documentos del módulo
 
 - [Compendio técnico base](TECHNICAL_COMPENDIUM.md): modelos, procedimientos, ejemplos y laboratorio introductorio.
-- [Desarrollo disciplinar ampliado v1](FOUNDATIONS_DEEP_DEVELOPMENT_V1.md): formalización, ingeniería de sistemas, riesgo, assurance, gobierno, privacidad, resiliencia, casos integradores, cinco protocolos de laboratorio, rúbrica y brechas FND-01–FND-15.
+- [Desarrollo disciplinar ampliado y auditoría por tema](FOUNDATIONS_DEEP_DEVELOPMENT_V1.md): desarrollo transversal y siete dossiers alineados con el currículo, cada uno con doce capas, protocolo, métricas, Skill candidata y límites de evidencia.
 - [Agenda de investigación](RESEARCH_AGENDA.md): preguntas, hipótesis y diseños experimentales propuestos.
 - [Revisión exploratoria de literatura](LITERATURE_REVIEW.md): mapa bibliográfico y estado real de lectura.
 - [Pack de conocimiento](../../packs/foundations/README.md): guía de dominio para consumo por agentes y usuarios.
@@ -45,11 +45,11 @@ El desarrollo se organiza en doce bloques disciplinares:
 | Laboratorios | Cinco protocolos diseñados; cero ejecuciones acreditadas |
 | Evaluación | Rúbrica y métricas diseñadas; aplicación y benchmark pendientes |
 | Skills | Cinco especificaciones candidatas; no validadas ni promovidas |
-| Auditoría 7 temas × 12 capas | 84 estados conservados como `not_assessed` hasta completar la evaluación trazable |
-| Puertas G1–G8 | No aprobadas; estados pendientes de evaluación |
+| Auditoría 7 temas × 12 capas | 84 estados `in_progress`: desarrollo y mapeo documental incorporados; ninguna capa aprobada |
+| Puertas G1–G8 | Ninguna aprobada; G1–G4 en progreso y G5–G8 bloqueadas por ejecución/evidencia/revisión pendientes |
 
 ## Regla de cierre
 
-No avanzar al módulo siguiente hasta completar la auditoría tema×capa de Foundations, corregir las brechas documentales críticas y dejar evidencia de fuentes, procedimientos y evaluación. Los laboratorios que requieren ejecución, la revisión independiente y la reproducción externa deben permanecer expresamente pendientes hasta que se realicen.
+No avanzar al módulo siguiente hasta cerrar cada tema con evidencia trazable. La auditoría documental por siete temas ya fue incorporada, pero sigue en progreso: falta lectura integral de fuentes, ejecución de laboratorios, aplicación de evaluación, reproducción y revisión independiente. Los laboratorios que requieren ejecución, la revisión independiente y la reproducción externa deben permanecer expresamente pendientes hasta que se realicen.
 
 No declarar K4/K5, M4/M5 ni validación experta por la mera existencia de documentos, referencias, protocolos o Skills candidatas.
