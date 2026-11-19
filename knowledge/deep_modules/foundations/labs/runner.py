@@ -156,7 +156,7 @@ def lab04_identity():
     expected = {name: case[3] for name, case in cases.items()}
     return {"outcomes": outcomes, "all_expected": outcomes == expected,
         "negative_cases": len(cases) - 1, "signature_verified": outcomes["valid"],
-        "limitations": "Faithful HS256 JWS verification prototype using Python stdlib; no JWKS rotation, asymmetric algs, OIDC discovery, nonce/state flow, TLS, IdP or OAuth server integration."}
+        "limitations": "Faithful HS256 JWS verification prototype using Python stdlib; strict unpadded base64url, duplicate JSON rejection and exact header allowlist; no JWKS rotation, asymmetric algs, OIDC discovery, nonce/state flow, TLS, IdP or OAuth server integration."}
 
 def lab05_crypto_integrity():
     old=b"synthetic-lab-key-v1-not-for-production"; new=b"synthetic-lab-key-v2-not-for-production"
