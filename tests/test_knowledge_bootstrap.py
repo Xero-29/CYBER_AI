@@ -214,15 +214,20 @@ class KnowledgeBootstrapTests(unittest.TestCase):
             data = json.loads(manifest.read_text(encoding="utf-8"))
             data["areas"][0]["research_study_path"] = "knowledge/deep_modules/x/RESEARCH_STUDY.md"
             manifest.write_text(json.dumps(data), encoding="utf-8")
-            with patch.object(bootstrap, "PROJECT", root), \\
-                 patch.object(bootstrap, "MANIFEST", manifest), \\
-                 patch("knowledge_embeddings.expected_embedding_space", return_value="provider::embed-v1"), \\
-                 patch("knowledge_registry.resource_inventory", return_value=[]), \\
-                 patch("knowledge_registry.register_resource", side_effect=[{"resource_id": "pack"}, {"resource_id": "study"}]), \\
-                 patch("knowledge_registry.update_resource_classification") as classify, \\
-                 patch("knowledge_registry.update_resource_processing_status"), \\
-                 patch("knowledge_library.document_chunk_count", return_value=1), \\
-                 patch("knowledge_ingest.ingest_document", side_effect=[{"document_id": "pack-doc", "chunks": 1}, {"document_id": "study-doc", "chunks": 1}]) as ingest:
+            with (
+                patch.object(bootstrap, "PROJECT", root),
+                patch.object(bootstrap, "MANIFEST", manifest),
+                patch("knowledge_embeddings.expected_embedding_space", return_value="provider::embed-v1"),
+                patch("knowledge_registry.resource_inventory", return_value=[]),
+                patch("knowledge_registry.register_resource", side_effect=[{"resource_id": "pack"}, {"resource_id": "study"}]),
+                patch("knowledge_registry.update_resource_classification") as classify,
+                patch("knowledge_registry.update_resource_processing_status"),
+                patch("knowledge_library.document_chunk_count", return_value=1),
+                patch("knowledge_ingest.ingest_document", side_effect=[
+                    {"document_id": "pack-doc", "chunks": 1},
+                    {"document_id": "study-doc", "chunks": 1},
+                ]) as ingest,
+            ):
                 result = bootstrap.bootstrap()
             self.assertEqual(result["ingested_count"], 2)
             self.assertEqual([item["kind"] for item in result["ingested"]], ["pack", "research_study"])
