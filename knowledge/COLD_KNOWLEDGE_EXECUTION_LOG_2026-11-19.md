@@ -45,6 +45,7 @@ Hallazgos:
 Evidencia:
 - Nueve unidades curriculares FND-01 a FND-09.
 - 102 subunidades identificadas.
+- Matriz granular añadida: 1.224 comprobaciones subunidad×capa y 408 comprobaciones de enseñanza/explicación/análisis/diseño; todas `not_assessed` como línea base.
 - Dependencias conceptuales y correspondencia con los siete IDs históricos.
 - Frontera explícita entre Foundations y las especialidades que profundizan IAM, Crypto, Network, AppSec, OT, AI, etc.
 
