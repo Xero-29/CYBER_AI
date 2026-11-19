@@ -8,68 +8,80 @@ Currículo técnico de Forense digital; adaptar a arquitectura, criticidad, cont
 El documento organiza el desarrollo por subtema; no afirma investigación exhaustiva ni lectura integral de referencias. Usar activos propios/autorizados, entornos aislados y datos sintéticos. Para sistemas físicos, usar simuladores o bancos controlados y priorizar seguridad funcional.
 
 ## Desarrollo técnico por subtema
-### 1. cadena de custodia y evidencia
 
-- **Fundamentos y modelo:** explicar arquitectura, componentes, estados, interfaces, identidades, datos y límites de confianza.
-- **Amenazas/fallos:** identificar abuso, errores de diseño e implementación, configuración insegura, dependencias y fallos operativos; indicar precondiciones.
-- **Controles:** relacionar prevención, detección, respuesta y recuperación con cada amenaza; explicitar riesgo residual y efectos secundarios.
-- **Pruebas:** definir casos positivos, negativos, límites y regresión con entradas sintéticas, resultado esperado, logs y criterio de parada.
-- **Investigación:** comparar enfoques, registrar desacuerdos y formular una pregunta falsable sin anticipar resultados.
-- **Evidencia:** entregar explicación técnica original, modelo/diagrama, tabla amenaza→control→evidencia, procedimiento reproducible y limitaciones.
+### 1. Cadena de custodia, integridad y admisibilidad
 
-### 2. adquisición forense y write blockers
+La evidencia digital debe conservar identidad, integridad, procedencia, contexto y trazabilidad desde la adquisición hasta la presentación. Registrar quién obtiene, cuándo, dónde, con qué autoridad, herramienta y versión, método, condiciones, hash inicial/final, transferencias, almacenamiento y accesos. Un hash prueba igualdad de bytes entre momentos, no autenticidad de origen ni corrección del procedimiento.
 
-- **Fundamentos y modelo:** explicar arquitectura, componentes, estados, interfaces, identidades, datos y límites de confianza.
-- **Amenazas/fallos:** identificar abuso, errores de diseño e implementación, configuración insegura, dependencias y fallos operativos; indicar precondiciones.
-- **Controles:** relacionar prevención, detección, respuesta y recuperación con cada amenaza; explicitar riesgo residual y efectos secundarios.
-- **Pruebas:** definir casos positivos, negativos, límites y regresión con entradas sintéticas, resultado esperado, logs y criterio de parada.
-- **Investigación:** comparar enfoques, registrar desacuerdos y formular una pregunta falsable sin anticipar resultados.
-- **Evidencia:** entregar explicación técnica original, modelo/diagrama, tabla amenaza→control→evidencia, procedimiento reproducible y limitaciones.
+Distinguir evidencia original, imagen forense, copia de trabajo, exportación lógica y artefacto derivado. Documentar transformaciones, zona horaria, reloj del sistema, errores y decisiones del examinador. Las reglas legales varían por jurisdicción; el laboratorio técnico no determina por sí solo admisibilidad.
 
-### 3. filesystem, artefactos y timeline
+### 2. Adquisición forense, write blockers y verificación
 
-- **Fundamentos y modelo:** explicar arquitectura, componentes, estados, interfaces, identidades, datos y límites de confianza.
-- **Amenazas/fallos:** identificar abuso, errores de diseño e implementación, configuración insegura, dependencias y fallos operativos; indicar precondiciones.
-- **Controles:** relacionar prevención, detección, respuesta y recuperación con cada amenaza; explicitar riesgo residual y efectos secundarios.
-- **Pruebas:** definir casos positivos, negativos, límites y regresión con entradas sintéticas, resultado esperado, logs y criterio de parada.
-- **Investigación:** comparar enfoques, registrar desacuerdos y formular una pregunta falsable sin anticipar resultados.
-- **Evidencia:** entregar explicación técnica original, modelo/diagrama, tabla amenaza→control→evidencia, procedimiento reproducible y limitaciones.
+Antes de adquirir, identificar medio, interfaz, capacidad, estado, cifrado, riesgos de encendido y autoridad. Preferir adquisición bit a bit cuando el caso lo requiere; adquisición lógica cuando alcance y limitaciones estén justificados. Usar write blocker validado, registrar modelo/firmware y comprobar que el origen no cambia. En medios defectuosos, usar herramientas que gestionen errores y registrar sectores no leídos; nunca ocultar huecos.
 
-### 4. memoria volátil y procesos
+Calcular hash de origen cuando sea posible y de imagen resultante; verificar copia, tamaño, logs y errores. La adquisición en vivo puede modificar RAM, procesos, conexiones y timestamps: documentar orden de volatilidad y toda interacción. Cifrado, TRIM, SSD, RAID y almacenamiento cloud imponen límites distintos.
 
-- **Fundamentos y modelo:** explicar arquitectura, componentes, estados, interfaces, identidades, datos y límites de confianza.
-- **Amenazas/fallos:** identificar abuso, errores de diseño e implementación, configuración insegura, dependencias y fallos operativos; indicar precondiciones.
-- **Controles:** relacionar prevención, detección, respuesta y recuperación con cada amenaza; explicitar riesgo residual y efectos secundarios.
-- **Pruebas:** definir casos positivos, negativos, límites y regresión con entradas sintéticas, resultado esperado, logs y criterio de parada.
-- **Investigación:** comparar enfoques, registrar desacuerdos y formular una pregunta falsable sin anticipar resultados.
-- **Evidencia:** entregar explicación técnica original, modelo/diagrama, tabla amenaza→control→evidencia, procedimiento reproducible y limitaciones.
+### 3. Filesystems, artefactos y timeline
 
-### 5. logs, navegador y endpoints
+Interpretar particiones, volúmenes, filesystem, metadata, journal y asignación de bloques. NTFS: MFT, USN Journal, $LogFile, ADS y timestamps; FAT/exFAT: directorios, allocation tables y limitaciones de metadata; ext4: superblocks, inodes, journal y extents; APFS: containers, snapshots, clones y encryption. La interpretación debe ser dependiente de versión y estado del filesystem.
 
-- **Fundamentos y modelo:** explicar arquitectura, componentes, estados, interfaces, identidades, datos y límites de confianza.
-- **Amenazas/fallos:** identificar abuso, errores de diseño e implementación, configuración insegura, dependencias y fallos operativos; indicar precondiciones.
-- **Controles:** relacionar prevención, detección, respuesta y recuperación con cada amenaza; explicitar riesgo residual y efectos secundarios.
-- **Pruebas:** definir casos positivos, negativos, límites y regresión con entradas sintéticas, resultado esperado, logs y criterio de parada.
-- **Investigación:** comparar enfoques, registrar desacuerdos y formular una pregunta falsable sin anticipar resultados.
-- **Evidencia:** entregar explicación técnica original, modelo/diagrama, tabla amenaza→control→evidencia, procedimiento reproducible y limitaciones.
+Construir timeline normalizando UTC y conservando valor original, zona, fuente y precisión. Correlacionar filesystem, logs, browser, endpoint, autenticación y red. MAC times pueden alterarse, copiarse o reflejar procesos legítimos. Registrar hipótesis alternativas y contradicciones; no ordenar eventos de distinta precisión como si fueran exactos.
 
-### 6. PCAP, móviles y cloud
+### 4. Memoria, procesos y artefactos volátiles
 
-- **Fundamentos y modelo:** explicar arquitectura, componentes, estados, interfaces, identidades, datos y límites de confianza.
-- **Amenazas/fallos:** identificar abuso, errores de diseño e implementación, configuración insegura, dependencias y fallos operativos; indicar precondiciones.
-- **Controles:** relacionar prevención, detección, respuesta y recuperación con cada amenaza; explicitar riesgo residual y efectos secundarios.
-- **Pruebas:** definir casos positivos, negativos, límites y regresión con entradas sintéticas, resultado esperado, logs y criterio de parada.
-- **Investigación:** comparar enfoques, registrar desacuerdos y formular una pregunta falsable sin anticipar resultados.
-- **Evidencia:** entregar explicación técnica original, modelo/diagrama, tabla amenaza→control→evidencia, procedimiento reproducible y limitaciones.
+Adquirir memoria con método compatible y documentar herramienta, versión, arquitectura, perfil y alteraciones. Analizar procesos, threads, módulos, handles, sockets, regiones, command lines, environment, credenciales residuales y objetos kernel cuando proceda. Un perfil incorrecto puede producir resultados plausibles pero erróneos. Volcado de memoria puede contener secretos y datos personales: acceso mínimo, cifrado y retención limitada.
 
-### 7. reproducibilidad y reporte
+La evidencia volátil desaparece con apagado o cambios; priorizar captura según objetivo y riesgo. En incidentes activos coordinar con respuesta para no destruir actividad crítica. Separar artefactos del sistema de artefactos de herramientas de adquisición.
 
-- **Fundamentos y modelo:** explicar arquitectura, componentes, estados, interfaces, identidades, datos y límites de confianza.
-- **Amenazas/fallos:** identificar abuso, errores de diseño e implementación, configuración insegura, dependencias y fallos operativos; indicar precondiciones.
-- **Controles:** relacionar prevención, detección, respuesta y recuperación con cada amenaza; explicitar riesgo residual y efectos secundarios.
-- **Pruebas:** definir casos positivos, negativos, límites y regresión con entradas sintéticas, resultado esperado, logs y criterio de parada.
-- **Investigación:** comparar enfoques, registrar desacuerdos y formular una pregunta falsable sin anticipar resultados.
-- **Evidencia:** entregar explicación técnica original, modelo/diagrama, tabla amenaza→control→evidencia, procedimiento reproducible y limitaciones.
+### 5. Forense de red, correo y navegador
+
+PCAP preserva paquetes capturados, pero la captura puede perder tráfico, omitir segmentos o sufrir asimetría. Documentar punto de captura, filtros, snaplen, reloj, drops y topología. Correlacionar DNS, TLS metadata, proxy, firewall, DHCP y autenticación. No atribuir contenido cifrado que no fue observado.
+
+Correo: conservar mensaje original con headers completos, Received chain, Message-ID, DKIM, SPF, DMARC y adjuntos con hashes; validar la cadena y reconocer que headers pueden falsificarse fuera de dominios confiables. Browser: historia, cache, cookies, downloads, local storage y sincronización; explicar artefactos de perfiles múltiples y borrado.
+
+### 6. Forense cloud, móvil y entornos distribuidos
+
+La evidencia cloud depende de proveedor, región, servicio, API, retención y permisos. Exportar audit logs, snapshots, objetos, identity events y configuración con IDs, timestamps, request IDs y cadena de custodia. La consola puede mostrar vistas transformadas; conservar exportación original y documentación de API. En contenedores, capturar metadata de orquestador, image digest, layers, runtime events, volumes y logs; una imagen no representa estado efímero.
+
+En móvil, documentar modelo, OS/build, estado de bloqueo, cifrado, aislamiento, método lógico/file-system/físico y limitaciones. No eludir controles ni adquirir dispositivos ajenos sin autorización. Backups sincronizados no equivalen a contenido íntegro del dispositivo.
+
+### 7. Análisis, informe y testimonio técnico
+
+Separar pregunta pericial, alcance, método, observación, inferencia, conclusión y limitación. Cada conclusión debe apuntar a artefactos identificados y método reproducible. Usar lenguaje calibrado: observado, consistente con, probable bajo supuestos, no determinado. Explicar herramientas, validación, errores conocidos y posibilidad de falsos positivos.
+
+## Laboratorio reproducible
+
+Usar imágenes de entrenamiento con licencia, discos virtuales creados por el equipo y datasets públicos autorizados. Nunca practicar sobre el disco de trabajo ni datos personales reales.
+
+| ID | Experimento frío | Diseño y criterio de aceptación |
+|---|---|---|
+| forensics-LAB-01 | Cadena de custodia | Crear evidencia sintética; completar transferencias y hashes; cualquier discrepancia queda detectada y explicada |
+| forensics-LAB-02 | Imagen y write blocker | Medio virtual read-only; demostrar que origen no cambia y que la imagen verifica |
+| forensics-LAB-03 | Timeline filesystem | Generar eventos conocidos; reconstruirlos con zonas horarias y precisión declaradas |
+| forensics-LAB-04 | PCAP y DNS | Capturar tráfico de laboratorio; identificar pérdidas, filtros y límites de inferencia |
+| forensics-LAB-05 | Memoria de entrenamiento | Analizar dump autorizado con perfil correcto/incorrecto; documentar sensibilidad a perfil |
+| forensics-LAB-06 | Evidencia cloud sintética | Exportar eventos de cuenta demo; verificar IDs, paginación, integridad y retención |
+| forensics-LAB-07 | Informe reproducible | Entregar conclusiones vinculadas a artefactos, alternativas y límites; revisión ciega por segundo analista |
+
+Registrar hashes, herramientas, versiones, comandos, configuración, operador, reloj, logs, errores y cadena de custodia. Diseño definido; ejecución pendiente.
+
+## Métricas y evaluación
+
+Medir integridad de adquisición, sectores no leídos, reproducibilidad entre analistas, porcentaje de afirmaciones trazables, errores de timeline, precisión de clasificación y tiempo. Evaluar falsos positivos/negativos con ground truth. No usar tasa de hash coincidente como única métrica de calidad pericial.
+
+## Artefactos de aceptación
+
+- Autoridad y alcance documentados.
+- Cadena de custodia completa.
+- Adquisición verificada y limitaciones declaradas.
+- Herramientas validadas con dataset controlado.
+- Timeline con zona horaria, precisión y fuente.
+- Informe que distingue hechos e inferencias.
+- Revisión independiente y retención segura.
+
+## Madurez
+
+Contenido editorial específico incorporado; no se ha adquirido ni analizado evidencia real. Lectura integral de fuentes, laboratorios, revisión independiente y validación jurídica siguen pendientes. M2 como máximo.
 
 ## Laboratorio reproducible
 Entorno: Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.
