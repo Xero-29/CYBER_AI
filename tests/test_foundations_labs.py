@@ -28,6 +28,7 @@ class FoundationsLabTests(unittest.TestCase):
     def test_07_stale_or_missing_evidence_does_not_close_control(self):
         r=lab07_assurance(); self.assertEqual(r["validly_closed"],["C1"])
         self.assertEqual(set(r["unsubstantiated_not_closed"]),{"C2","C3","C4"})
+        self.assertEqual(r["false_closures_prevented"],3)
     def test_full_suite(self):
         r=run_all(); self.assertTrue(r["synthetic_only"]); self.assertTrue(r["all_checks_passed"])
 
