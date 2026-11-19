@@ -39,6 +39,22 @@ STUDIES = {
     "threat_hunting",
     "red_team",
     "wireless_security",
+    "bug_bounty",
+    "satellite_security",
+    "physical_security",
+    "email_dns_security",
+    "fraud_abuse",
+    "privacy_engineering",
+    "cloud_forensics",
+    "ai_red_team",
+    "pki_hsm",
+    "post_quantum_crypto",
+    "business_continuity",
+    "database_security",
+    "vulnerability_research",
+    "telecom_5g",
+    "automotive_security",
+    "hardware_security",
 }
 
 
