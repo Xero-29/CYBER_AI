@@ -1,6 +1,6 @@
 # Compendio técnico: Criptografía
 
-ID: `crypto` · Versión 0.1.0 · Estado: cuaderno de desarrollo, no validación experta.
+ID: `crypto` · Versión 0.2.0 · Estado: cuaderno de desarrollo, no validación experta.
 
 ## Alcance
 Currículo técnico de Criptografía; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.
