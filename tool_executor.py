@@ -10,7 +10,7 @@ import time
 from pathlib import Path
 
 from tool_adapters import TOOL_SPECS, ToolExecutionError, run_local_tool, write_evidence
-from execution_ledger import MAX_SQLITE_INTEGER, ExecutionLedger
+from execution_ledger import MAX_SQLITE_INTEGER, ExecutionLedger, _redact_text
 
 
 def _terminal_status(evidence):
@@ -92,7 +92,11 @@ def main(argv=None):
             duration_ms=0, metadata={"target": args.target},
         )
     except Exception as ledger_error:
-        print(f"AVISO: no se pudo registrar el inicio: {ledger_error}", file=sys.stderr)
+        print(
+            "AVISO: no se pudo registrar el inicio ("
+            f"{type(ledger_error).__name__}).",
+            file=sys.stderr,
+        )
         if args.require_ledger:
             return 3
 
@@ -120,14 +124,24 @@ def main(argv=None):
             artifact_sha256 = hashlib.sha256(Path(evidence_path).read_bytes()).hexdigest()
             evidence["evidence_file"] = str(evidence_path)
         except (ToolExecutionError, OSError) as evidence_error:
-            evidence["evidence_write_error"] = str(evidence_error)
+            evidence["evidence_write_error_type"] = type(evidence_error).__name__
+            evidence["reason"] = "evidence_persistence_failed"
             evidence["status"] = "failed"
     except ToolExecutionError as exc:
-        evidence = {"status": "denied", "tool": args.tool, "target": args.target,
-                    "reason": str(exc)}
+        evidence = {
+            "status": "denied",
+            "tool": args.tool,
+            "target": args.target,
+            "reason": _redact_text(str(exc)),
+        }
     except Exception as exc:
-        evidence = {"status": "failed", "tool": args.tool, "target": args.target,
-                    "error_type": type(exc).__name__, "error": str(exc)}
+        evidence = {
+            "status": "failed",
+            "tool": args.tool,
+            "target": args.target,
+            "error_type": type(exc).__name__,
+            "reason": "unexpected_adapter_error",
+        }
     finally:
         if ledger is not None and start_event is not None:
             try:
@@ -182,7 +196,7 @@ def main(argv=None):
                 )
                 evidence["ledger_event"] = terminal
             except Exception as ledger_error:
-                evidence["ledger_error"] = str(ledger_error)
+                evidence["ledger_error_type"] = type(ledger_error).__name__
                 if args.require_ledger:
                     print(json.dumps(evidence, ensure_ascii=False, indent=2))
                     return 3

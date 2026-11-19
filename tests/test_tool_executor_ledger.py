@@ -55,6 +55,7 @@ class ToolExecutorLedgerTests(unittest.TestCase):
         self.assertEqual(result, 3)
         runner.assert_not_called()
         self.assertIn("no se pudo registrar el inicio", error.getvalue())
+        self.assertNotIn("ledger unavailable", error.getvalue())
 
     def test_unlogged_execution_requires_explicit_override(self):
         output = io.StringIO()
@@ -75,10 +76,15 @@ class ToolExecutorLedgerTests(unittest.TestCase):
 
     def test_unexpected_adapter_exception_closes_started_event(self):
         ledger = FakeLedger()
-        result, output = self.invoke(ledger, RuntimeError("unexpected adapter failure"))
+        result, output = self.invoke(
+            ledger, RuntimeError("unexpected adapter failure token=secret-value")
+        )
         self.assertEqual(result, 1)
         self.assertEqual(ledger.statuses, ["started", "failed"])
         self.assertIn("RuntimeError", output)
+        self.assertIn("unexpected_adapter_error", output)
+        self.assertNotIn("secret-value", output)
+        self.assertNotIn("unexpected adapter failure", output)
         self.assertIn("terminal-1", output)
 
     def test_binary_integrity_error_is_failed_and_validators_fail(self):
@@ -142,7 +148,8 @@ class ToolExecutorLedgerTests(unittest.TestCase):
         result, output = self.invoke(ledger, RuntimeError("unexpected adapter failure"))
         self.assertEqual(result, 3)
         self.assertEqual(ledger.statuses, ["started", "failed"])
-        self.assertIn("ledger_error", output)
+        self.assertIn("ledger_error_type", output)
+        self.assertNotIn("ledger unavailable", output)
 
     def test_duration_uses_adapter_measurement_and_validates_fallback(self):
         self.assertEqual(tool_executor._duration_ms({"elapsed_seconds": 0.25}, 10.0), 250)
