@@ -1,6 +1,6 @@
 # Agenda de investigación: threat_intel
 
-**Dominio:** `threat_intel` · **Estado:** protocolo específico propuesto; no ejecutado.  
+**Dominio:** threat_intel · **Corte:** 2026-11-19 · **Madurez:** M2 editorial; no M3/M4/M5 · **Estado:** `research_agenda_defined`, protocolo propuesto; no ejecutado.
 **Objetivo de diseño:** L4; la madurez efectiva permanece M2 editorial hasta disponer de fuentes leídas y resultados.  
 **Hipótesis central:** ¿Qué métodos producen inteligencia accionable, calibrada y trazable, y reducen errores de correlación, caducidad y atribución?
 
@@ -56,6 +56,10 @@ Unidad: hipótesis de actor/campaña y producto. Contraponer hipótesis rivales 
 **Hipótesis falsable:** la intervención definida mejora la métrica primaria respecto de la baseline sin superar el umbral de daño/coste predefinido. **H0:** no existe diferencia bajo el protocolo y la muestra definidos.  
 **Análisis:** informar tamaño muestral, distribución, intervalos de confianza y casos excluidos; no generalizar fuera del corpus.
 
+## Método
+
+Diseño experimental controlado, con hipótesis falsable, unidad de análisis, variables, baseline, controles, corpus versionado y criterios de exclusión definidos antes de ejecutar.
+
 ## Protocolo común de ejecución
 
 1. Congelar pregunta, hipótesis, unidad de análisis, métrica primaria y criterio de exclusión antes de ejecutar.
@@ -80,6 +84,10 @@ Cada protocolo define su métrica primaria. Cuando se evalúe clasificación, re
 - **Selección:** corpus sesgado, duplicados y contaminación entre particiones.
 - **Reproducibilidad:** cambios de herramienta, firmware, dependencias o datos.
 - **Ética/legal:** autorización, privacidad, licencias, divulgación y retención.
+
+## Reproducibilidad
+
+Conservar scripts, datos, hashes, versiones, configuración, logs y pasos de ejecución para permitir repetición independiente.
 
 ## Entregables
 
