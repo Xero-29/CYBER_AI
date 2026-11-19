@@ -1,68 +1,57 @@
-# Estado verificado más reciente — 2026-11-18
+# Estado verificado más reciente — 2026-11-19
 
 **Repositorio:** `Xero-29/CYBER_AI`  
 **Rama auditada:** `codex/security-integrity-audit`  
-**HEAD de código probado antes de esta actualización documental:** `a4d548004b63cdd2fddb4e437f8102a533f422ce`  
+**HEAD inspeccionado antes de corregir fixtures:** `f47820ec8715ac0853e67b976027363379eb313c`  
 **main inspeccionada:** `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`  
-**Divergencia observada en ese HEAD:** `diverged`, rama auditada **110 commits adelante y 573 detrás**. Merge-base: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.
+**Merge-base:** `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. Desde ese punto, la rama auditada tiene **149 commits exclusivos** y `main` tiene **573 commits exclusivos**. El diff neto de `main` afecta 291 rutas y el de auditoría 57. No existe un único commit exclusivo de `main`: la divergencia es sustancial y no lineal.
 
-## Ramas, commits y PRs
+## Ramas, PRs y preservación
 
-- **PR #2:** cerrado y fusionado el 2026-11-17. Merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. No debe duplicarse ni reabrirse.
-- **PR #11:** abierto en draft, rama `codex/integration-hash-locks-2026-11-17-v2`, HEAD `d9ce6eb26fa018330e5890c3632f963912a6626e`, base `main`. GitHub lo reporta mergeable, pero sus checks fallan:
-  - Python Tests — run [44335073066](https://github.com/Xero-29/CYBER_AI/actions/runs/44335073066): 627 tests, **5 errors**.
-  - Docker Sandbox — run [44335073344](https://github.com/Xero-29/CYBER_AI/actions/runs/44335073344): 627 tests, **5 errors**.
-  - Los cinco errores son los tests de `dependency_artifact_manifest`: el fixture crea `requirements.txt` con `requests==2.0` sin hash y el parser de lock exige SHA-256. El job Windows de allowlist terminó correctamente. No se modificó esa rama ni se duplicó el PR.
-- **PR #1 y PR #3–#10:** siguen abiertos; las actualizaciones de Dependabot requieren revisión individual.
-- El commit histórico `7b5ed033f1f6461b5780a10ac4ada67a444b93e5` es ancestro común de `main` y de la rama auditada; ya no es exclusivo de `main`. Existe una rama de respaldo de `main`.
-- Desde el merge-base, el diff de `main` contiene 291 rutas y el de auditoría 49. `main` incorpora currículos y módulos profundos de conocimiento, fuentes de adquisición y ejecutores nuevos (`agent_simulation.py`, `custom_tool_runner.py`, `isolated_tool_runner.py`), y elimina archivos antiguos (`agent_core.py`, `agent_benchmark.py`, `audit_target.py`). La integración debe preservar estos cambios y revisar especialmente los archivos compartidos; no es una actualización lineal.
-- No se hizo merge, rebase, force-push ni modificación de `main`. La divergencia de 573 commits requiere reconciliación en una rama separada y revisión por archivo; no es seguro actualizar esta rama directamente.
+- **PR #2:** cerrado y fusionado el 2026-11-17; merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. Se verificó su estado y no se crea ni reabre otro PR equivalente.
+- **PR #12:** abierto para reconciliar cambios de seguridad y builds reproducibles con `main`; rama `codex/reconcile-main-security-audit-2026-11-18`, HEAD `c2a397caf36f2661b6f0307168a0a24eee2f6d38`.
+- **PR #13:** abierto para investigación profunda de la biblioteca; rama `codex/deep-research-library-2026-11-18`, HEAD `d0a3934a473e3d1117c7410df253f659d5f475c3`.
+- **PR #11:** abierto para locks con hashes/SBOM; no se ha modificado desde esta rama.
+- **PR #1 y #3–#10:** continúan abiertos; las actualizaciones de dependencias necesitan revisión individual.
+- La rama de auditoría contiene trabajo nuevo de aislamiento de Nuclei, límites de evidencia, validación de timeout/objetivo, verificación de plantillas y exclusión de plantillas intrusivas/código.
+- No se hizo merge, rebase, force-push ni modificación de `main`. La reconciliación de los 573 commits debe continuar en una rama separada y con revisión de archivos compartidos. El PR #12 ya es el vehículo existente; no se debe duplicar.
 
-## CI del HEAD exacto
+## CI del HEAD exacto inspeccionado
 
-SHA `a4d548004b63cdd2fddb4e437f8102a533f422ce`:
+SHA `f47820ec8715ac0853e67b976027363379eb313c`:
 
-- Python Tests — **completed/success, 540 pruebas**: [run 44338941062](https://github.com/Xero-29/CYBER_AI/actions/runs/44338941062).
-- Docker Sandbox — **completed/success, 540 pruebas y Ruff dentro del contenedor**: [run 44338940887](https://github.com/Xero-29/CYBER_AI/actions/runs/44338940887).
-- Ambos checks validaron exactamente el mismo SHA. El workflow Python ejecutó primero el entorno base y después instaló las dependencias documentales con hashes; los cuatro tests de extracción real PDF/DOCX/XLSX/PPTX pasaron en la segunda ejecución.
-- Se generaron tres SBOM CycloneDX (núcleo, sandbox y documentos) y manifiestos de artefactos de wheels. No se observaron `ResourceWarning` de pipes abiertos en esta ejecución.
-- No se dispuso de entorno local con el checkout completo; la evidencia de ejecución es GitHub Actions.
+- Python Tests — [run 44550800655](https://github.com/Xero-29/CYBER_AI/actions/runs/44550800655): **completed/failure**, 572 pruebas, 5 fallos y 1 error.
+- Docker Sandbox — [run 44550800689](https://github.com/Xero-29/CYBER_AI/actions/runs/44550800689): **completed/failure** en la verificación completa; el build de imagen sí terminó correctamente y Ruff no llegó a ejecutarse.
+- Los fallos se deben a fixtures que aún usan `/usr/bin/nuclei` inexistente después de endurecer `build_minimal_environment` con resolución estricta y de exigir allowlist del binario. No se debe debilitar esa comprobación de producción para acomodar tests: se corrigen los fixtures para crear ejecutables temporales reales y simular una allowlist aprobada.
+- Los runs anteriores de commits intermedios fueron cancelados por la política de concurrencia; no se consideran evidencia de éxito.
 
-## Implementaciones concretas de esta iteración
+## Cambios de esta iteración
 
-- **Ledger SQLite y duración:**
-  - `duration_ms` y `cost_microunits` quedan limitados a `0..2^63-1`; umbrales de reconciliación gigantes se rechazan con `LedgerError`.
-  - Las duraciones de adaptadores se validan sin convertir enteros arbitrariamente grandes a float; valores no finitos o fuera de rango usan el reloj monotónico.
-  - El ledger rechaza symlinks y archivos no regulares en DB/WAL/SHM. En POSIX exige directorio padre privado (0700) y restringe archivos a 0600. La comprobación se repite antes de abrir cada conexión.
-- **Ejecución de herramientas:**
-  - `tool_adapters.py` cierra stdout/stderr, drena los pipes y elimina procesos descendientes que mantengan abiertos los descriptores tras terminar el proceso principal.
-  - `sandbox_runner.py` crea el montaje de evidencias con permisos privados (0700), requisito para que el ledger del contenedor pueda escribirse sin abrir el directorio a otros usuarios.
-- **Dependencias documentales:**
-  - `requirements-documents.in` fija las dependencias directas; `requirements-documents.lock` fija dependencias transitivas y SHA-256. `requirements-documents.txt` conserva un alias de compatibilidad.
-  - CI descarga exclusivamente wheels, valida el manifiesto y publica un SBOM documental separado. README y `docs/LOCAL_PREFLIGHT.md` describen instalación y regeneración.
-- **Pruebas de regresión:** límites y desbordamientos SQLite; symlinks DB/WAL/SHM; permisos POSIX; limpieza de pipes; montaje privado de Docker; extracción real de PDF, DOCX, XLSX y PPTX.
+- Se actualizan los tests de `binary_integrity`, `nuclei_scanner` y `task_runner` para que utilicen ejecutables temporales existentes, rutas verificables y hashes coherentes.
+- Se mantiene el comportamiento fail-closed: una ruta de ejecutable inexistente no se acepta ni se resuelve de forma permisiva.
+- La validación GitHub Actions del nuevo HEAD queda pendiente hasta que concluyan los workflows disparados por este commit.
+- No se dispuso de un checkout local completo en este entorno; no se afirma ejecución local.
 
-## Límites de lo implementado
+## Límites y trabajo restante
 
-- La allowlist HMAC sigue siendo opcional para compatibilidad. Sin ruta/clave y sin `CYBER_AI_TOOL_ALLOWLIST_REQUIRED=1`, `not_configured` no equivale a binario aprobado. Custodia, rotación y segregación de claves requieren KMS/HSM o firma asimétrica.
-- En Windows el código no inspecciona ACL; deben configurarse y verificarse en la infraestructura. El lock documental actual cubre CPython 3.12, Linux x86_64 y glibc >= 2.26, no otras plataformas.
-- El ledger es tamper-evident, no WORM ni tamper-proof; un administrador privilegiado puede reemplazar la base. Checkpoints externos, KMS/HSM y almacenamiento inmutable siguen siendo externos.
-- El preflight refleja 138 fuentes de conocimiento, 0 revisadas y 276 verificaciones pendientes. El catálogo no demuestra exactitud, vigencia, licencia ni calidad experta.
+1. Reejecutar y verificar Python Tests y Docker Sandbox sobre el nuevo SHA exacto; no declarar CI verde hasta que ambos terminen exitosamente.
+2. Continuar auditoría de aislamiento, procesos descendientes, integridad de plantillas y manejo de evidencia del escáner Nuclei.
+3. Revisar la reconciliación existente del PR #12, preservar los 573 commits de `main` y resolver cualquier conflicto en una rama separada; no integrar automáticamente.
+4. Verificar individualmente PR #11 y las actualizaciones de Dependabot antes de integrarlas.
+5. Validar locks hash-verified por plataforma/arquitectura y provenance de los artefactos.
+6. Conectar KMS/HSM, RBAC/IdP/MFA, WORM/offsite y cifrado de backups; ejecutar simulacros DR con RPO/RTO medidos.
+7. Ejecutar pruebas reales de microVM/VM, egress, escape de sandbox, concurrencia, carga/soak, disco lleno y recuperación ante caída/corrupción del host.
+8. Conectar proveedores/modelos reales y medir calidad, coste, latencia, cuotas, fallos y políticas de datos.
+9. Revisar las 138 fuentes y 276 verificaciones pendientes con especialistas; validar licencias, exactitud, vigencia y recuperación semántica con dataset experto.
+10. Verificar ACL Windows, protección de rama, observabilidad, alertas y respuesta a incidentes en infraestructura real.
 
-## Pendientes que aún requieren integración, infraestructura o validación real
+**Conclusión:** el proyecto todavía no está listo para la validación final del usuario: los checks del HEAD anterior fallan y la divergencia con `main` sigue sin reconciliarse. Se corrigen ahora los fixtures que provocaron el CI rojo y se continuará con la auditoría y verificación del nuevo HEAD. No se declara certificación institucional ni preparación para producción.
 
-1. Reconciliar los 573 commits de `main` desde el merge-base en una rama separada; preservar los cambios de auditoría y revisar conflictos por archivo. No integrar automáticamente.
-2. Corregir los cinco fixtures de hash en PR #11 en su propia rama y volver a ejecutar sus workflows antes de considerar esa integración.
-3. Añadir locks hash-verified para plataformas adicionales y validar wheels específicos de cada arquitectura.
-4. Configurar KMS/HSM, RBAC/IdP/MFA, WORM/offsite y cifrado de backups; ejecutar simulacros de restauración y DR con RPO/RTO medidos.
-5. Ejecutar pruebas reales de microVM/VM, egress, escape de sandbox, concurrencia, carga/soak, disco lleno y recuperación tras caída/corrupción del host.
-6. Conectar proveedores/modelos reales y medir calidad, coste, latencia, cuotas, fallos y políticas de datos.
-7. Revisar las 138 fuentes y 276 verificaciones pendientes con especialistas; validar licencias, exactitud, vigencia y recuperación semántica con un dataset experto.
-8. Verificar ACL Windows, protección de rama, alertas, observabilidad y respuesta a incidentes en la infraestructura de despliegue.
+---
 
-**Conclusión:** el código del SHA `a4d548004b63cdd2fddb4e437f8102a533f422ce` pasó 540 pruebas en Python y Docker, incluyendo los extractores documentales reales, y Ruff aprobó dentro del sandbox. Esto acredita los checks automatizados de ese SHA, no una certificación ni preparación para producción. La rama continúa divergente de `main`, PR #11 sigue fallando y permanecen pendientes operacionales y de revisión experta. `main` no fue modificada.
+## Registro histórico
 
-
+Los bloques siguientes documentan estados y validaciones de iteraciones anteriores. Si alguna cifra, pendiente o afirmación contradice esta cabecera, prevalece el estado verificado de esta sección superior.
 ---
 
 ## Registro histórico

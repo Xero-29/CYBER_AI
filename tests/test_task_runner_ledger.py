@@ -1,3 +1,4 @@
+import hashlib
 import os
 import sys
 import tempfile
@@ -32,6 +33,13 @@ class TaskRunnerLedgerTests(unittest.TestCase):
 
     def test_execute_blocks_when_ledger_cannot_start_by_default(self):
         with tempfile.TemporaryDirectory() as workspace, tempfile.TemporaryDirectory() as home:
+            nuclei_executable = Path(workspace) / "nuclei"
+            nuclei_executable.write_bytes(b"fake nuclei binary")
+            provenance = {
+                "resolved_path": str(nuclei_executable),
+                "sha256": hashlib.sha256(nuclei_executable.read_bytes()).hexdigest(),
+                "allowlist": {"enforced": True, "status": "approved"},
+            }
             template = Path(home) / "nuclei-templates/http/technologies/tech-detect.yaml"
             template.parent.mkdir(parents=True)
             template.write_text("id: test\n", encoding="utf-8")
@@ -42,7 +50,8 @@ class TaskRunnerLedgerTests(unittest.TestCase):
                     patch.object(Path, "home", return_value=Path(home)),
                     patch.object(task_runner, "select_capabilities", return_value=[{"path": str(template)}]),
                     patch.object(task_runner, "authorize_target", return_value={"authorization_id": "grant"}),
-                    patch.object(task_runner.shutil, "which", return_value="/usr/bin/nuclei"),
+                    patch.object(task_runner.shutil, "which", return_value=str(nuclei_executable)),
+                    patch.object(task_runner, "require_approved_executable", return_value=provenance),
                     patch.object(task_runner, "ExecutionLedger", side_effect=OSError("ledger offline")),
                     patch.object(task_runner.subprocess, "run") as scanner,
                     patch.object(sys, "argv", [
@@ -59,6 +68,13 @@ class TaskRunnerLedgerTests(unittest.TestCase):
 
     def test_unlogged_scan_requires_explicit_override(self):
         with tempfile.TemporaryDirectory() as workspace, tempfile.TemporaryDirectory() as home:
+            nuclei_executable = Path(workspace) / "nuclei"
+            nuclei_executable.write_bytes(b"fake nuclei binary")
+            provenance = {
+                "resolved_path": str(nuclei_executable),
+                "sha256": hashlib.sha256(nuclei_executable.read_bytes()).hexdigest(),
+                "allowlist": {"enforced": True, "status": "approved"},
+            }
             template = Path(home) / "nuclei-templates/http/technologies/tech-detect.yaml"
             template.parent.mkdir(parents=True)
             template.write_text("id: test\n", encoding="utf-8")
@@ -69,7 +85,8 @@ class TaskRunnerLedgerTests(unittest.TestCase):
                     patch.object(Path, "home", return_value=Path(home)),
                     patch.object(task_runner, "select_capabilities", return_value=[{"path": str(template)}]),
                     patch.object(task_runner, "authorize_target", return_value={"authorization_id": "grant"}),
-                    patch.object(task_runner.shutil, "which", return_value="/usr/bin/nuclei"),
+                    patch.object(task_runner.shutil, "which", return_value=str(nuclei_executable)),
+                    patch.object(task_runner, "require_approved_executable", return_value=provenance),
                     patch.object(task_runner, "ExecutionLedger", side_effect=OSError("ledger offline")),
                     patch.object(
                         task_runner.subprocess, "run",
@@ -98,6 +115,13 @@ class TaskRunnerLedgerTests(unittest.TestCase):
             old_cwd = os.getcwd()
             try:
                 os.chdir(workspace)
+                nuclei_executable = Path(workspace) / "nuclei"
+                nuclei_executable.write_bytes(b"fake nuclei binary")
+                provenance = {
+                    "resolved_path": str(nuclei_executable),
+                    "sha256": hashlib.sha256(nuclei_executable.read_bytes()).hexdigest(),
+                    "allowlist": {"enforced": True, "status": "approved"},
+                }
                 template = Path(home) / "nuclei-templates/http/technologies/tech-detect.yaml"
                 template.parent.mkdir(parents=True)
                 template.write_text("id: test\n", encoding="utf-8")
@@ -105,7 +129,8 @@ class TaskRunnerLedgerTests(unittest.TestCase):
                     patch.object(Path, "home", return_value=Path(home)),
                     patch.object(task_runner, "select_capabilities", return_value=[{"path": str(template)}]),
                     patch.object(task_runner, "authorize_target", return_value={"authorization_id": "grant"}),
-                    patch.object(task_runner.shutil, "which", return_value="/usr/bin/nuclei"),
+                    patch.object(task_runner.shutil, "which", return_value=str(nuclei_executable)),
+                    patch.object(task_runner, "require_approved_executable", return_value=provenance),
                     patch.object(task_runner.subprocess, "run", side_effect=RuntimeError("scanner crashed")),
                     patch.object(task_runner, "ExecutionLedger", return_value=ledger),
                     patch.object(sys, "argv", [

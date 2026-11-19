@@ -86,6 +86,8 @@ class NucleiScannerTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
+            executable = root / "nuclei"
+            executable.write_bytes(b"nuclei-test-binary")
             fake_process = FakeProcess(stdout_lines=["Nuclei iniciado\n"])
 
             def fake_popen(command, **kwargs):
@@ -97,11 +99,11 @@ class NucleiScannerTests(unittest.TestCase):
                 return fake_process
 
             provenance = {
-                "resolved_path": "/usr/bin/nuclei",
+                "resolved_path": str(executable),
                 "sha256": "a" * 64,
                 "allowlist": {"enforced": True, "status": "approved"},
             }
-            with patch("nuclei_scanner.shutil.which", return_value="/usr/bin/nuclei"):
+            with patch("nuclei_scanner.shutil.which", return_value=str(executable)):
                 with patch("nuclei_scanner.require_approved_executable", return_value=provenance):
                     with patch("nuclei_scanner.hash_executable", return_value=provenance):
                         with patch("nuclei_scanner.subprocess.Popen", side_effect=fake_popen):
@@ -149,18 +151,25 @@ class NucleiScannerTests(unittest.TestCase):
         self.assertEqual(process.returncode, -9)
 
     def test_process_start_error_is_reported(self):
-        provenance = {
-            "resolved_path": "/usr/bin/nuclei",
-            "sha256": "a" * 64,
-            "allowlist": {"enforced": True, "status": "approved"},
-        }
-        with patch("nuclei_scanner.shutil.which", return_value="/usr/bin/nuclei"):
-            with patch("nuclei_scanner.require_approved_executable", return_value=provenance):
-                with patch(
-                    "nuclei_scanner.subprocess.Popen",
-                    side_effect=OSError("No se pudo iniciar"),
-                ):
-                    result = scan_target("http://127.0.0.1:8765", authorized=True, authorization_id="test-grant")
+        with tempfile.TemporaryDirectory() as tmp:
+            executable = Path(tmp) / "nuclei"
+            executable.write_bytes(b"nuclei-test-binary")
+            provenance = {
+                "resolved_path": str(executable),
+                "sha256": "a" * 64,
+                "allowlist": {"enforced": True, "status": "approved"},
+            }
+            with patch("nuclei_scanner.shutil.which", return_value=str(executable)):
+                with patch("nuclei_scanner.require_approved_executable", return_value=provenance):
+                    with patch(
+                        "nuclei_scanner.subprocess.Popen",
+                        side_effect=OSError("No se pudo iniciar"),
+                    ):
+                        result = scan_target(
+                            "http://127.0.0.1:8765",
+                            authorized=True,
+                            authorization_id="test-grant",
+                        )
 
         self.assertEqual(result["status"], "error")
         self.assertIn("No se pudo iniciar", result["error"])
@@ -186,8 +195,10 @@ class NucleiScannerTests(unittest.TestCase):
         finding = {"template-id": "untrusted", "matched-at": "http://127.0.0.1:8765"}
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
+            executable = root / "nuclei"
+            executable.write_bytes(b"nuclei-test-binary")
             provenance = {
-                "resolved_path": "/usr/bin/nuclei",
+                "resolved_path": str(executable),
                 "sha256": "a" * 64,
                 "allowlist": {"enforced": True, "status": "approved"},
             }
@@ -198,10 +209,10 @@ class NucleiScannerTests(unittest.TestCase):
                 Path(command[output_index]).write_text(json.dumps(finding) + "\n", encoding="utf-8")
                 return fake_process
 
-            with patch("nuclei_scanner.shutil.which", return_value="/usr/bin/nuclei"):
+            with patch("nuclei_scanner.shutil.which", return_value=str(executable)):
                 with patch("nuclei_scanner.require_approved_executable", return_value=provenance):
                     with patch("nuclei_scanner.hash_executable", return_value={
-                        "resolved_path": "/usr/bin/nuclei", "sha256": "b" * 64,
+                        "resolved_path": str(executable), "sha256": "b" * 64,
                     }):
                         with patch("nuclei_scanner.subprocess.Popen", side_effect=fake_popen):
                             with patch("nuclei_scanner.Path.home", return_value=root):

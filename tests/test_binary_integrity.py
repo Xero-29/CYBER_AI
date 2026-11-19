@@ -104,6 +104,8 @@ class BinaryIntegrityTests(unittest.TestCase):
 
     def test_minimal_environment_excludes_application_secrets_and_proxy_settings(self):
         with tempfile.TemporaryDirectory() as temp:
+            executable = Path(temp) / "nuclei"
+            executable.write_bytes(b"nuclei-test-binary")
             with patch.dict(os.environ, {
                 "OPENAI_API_KEY": "must-not-be-forwarded",
                 "AWS_SECRET_ACCESS_KEY": "must-not-be-forwarded",
@@ -111,7 +113,7 @@ class BinaryIntegrityTests(unittest.TestCase):
                 "PATH": "/attacker/path",
                 "LANG": "C.UTF-8",
             }):
-                env = build_minimal_environment(temp, "/usr/bin/nuclei")
+                env = build_minimal_environment(temp, str(executable))
         self.assertEqual(env["HOME"], str(Path(temp).resolve()))
         self.assertEqual(env["TMPDIR"], env["HOME"])
         self.assertNotIn("OPENAI_API_KEY", env)
