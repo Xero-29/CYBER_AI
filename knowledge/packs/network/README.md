@@ -1,6 +1,6 @@
 # Seguridad de redes — Guía de dominio
 
-**ID:** `network` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio incluido offline.
+**ID:** `network` · **Versión:** 2.1.0 · **Idioma:** español · **Distribución:** contenido editorial propio incluido offline.
 
 ## Propósito y límites
 Diseña y verifica redes empresariales, centros de datos, campus, WAN y segmentos cloud. La seguridad depende de identidad, segmentación, rutas, resolución de nombres, cifrado, administración y visibilidad. El escaneo activo, captura de tráfico y pruebas de disponibilidad requieren alcance autorizado y ventanas acordadas.
