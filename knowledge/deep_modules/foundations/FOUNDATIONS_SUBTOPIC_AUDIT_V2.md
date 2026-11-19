@@ -6,13 +6,14 @@
 - Comprobaciones subunidad×capa: 1224
 - Comprobaciones de capacidad: 408
 - Celdas aprobadas: 0
+- FND-01.01: 12 capas y 4 capacidades en `in_progress`; 11.?? comprobaciones de capas y 404 capacidades continúan `not_assessed`.
 - Interpretación: `not_assessed` indica que la evidencia todavía no se ha vinculado y evaluado; no significa ausencia de contenido.
 
 La matriz histórica de siete temas se conserva. Esta matriz añade granularidad y no reemplaza los IDs históricos.
 
 | ID | Subunidad | Capas | Enseñar | Explicar | Analizar | Diseñar |
 |---|---|---|---|---|---|---|
-| FND-01.01 | Seguridad, safety, privacidad, confiabilidad, disponibilidad y resiliencia: definiciones, diferencias y conflictos. | 12 × not_assessed | not_assessed | not_assessed | not_assessed | not_assessed |
+| FND-01.01 | Seguridad, safety, privacidad, confiabilidad, disponibilidad y resiliencia: definiciones, diferencias y conflictos. | 12 × in_progress | in_progress | in_progress | in_progress | in_progress |
 | FND-01.02 | CIA y propiedades ampliadas: autenticidad, responsabilidad, trazabilidad, no repudio, integridad de origen y seguridad funcional. | 12 × not_assessed | not_assessed | not_assessed | not_assessed | not_assessed |
 | FND-01.03 | Activo, sujeto, objeto, recurso, dato, proceso, servicio, misión y stakeholder. | 12 × not_assessed | not_assessed | not_assessed | not_assessed | not_assessed |
 | FND-01.04 | Política, mecanismo, control, salvaguarda, requisito, garantía, evidencia y riesgo residual. | 12 × not_assessed | not_assessed | not_assessed | not_assessed | not_assessed |
