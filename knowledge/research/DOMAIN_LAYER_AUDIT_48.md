@@ -61,7 +61,7 @@ Se inspeccionaron los 48 compendios técnicos. Todos tienen documentos y rutas d
 6. Robustez, sesgo y leakage
 7. Provenance y seguridad de inferencia
 
-**Estado:** seven_topic_audits_documented_in_progress; 12 capas por tema: `in_progress` (84/84); G1–G4: `in_progress`; G5–G8: `blocked`; madurez: M2. Evidencia: [auditoría disciplinar por tema](../deep_modules/foundations/FOUNDATIONS_DEEP_DEVELOPMENT_V1.md). Siete protocolos diseñados; cero ejecuciones acreditadas; fuentes oficiales inspeccionadas a nivel de metadatos/abstract, lectura integral pendiente.
+**Estado:** generic_or_initial_compendium_requires_deep_audit; 12 capas por tema: `not_assessed`; G1–G8: `not_assessed`; madurez: M2.
 
 ### 3. `api`
 
@@ -253,7 +253,7 @@ Se inspeccionaron los 48 compendios técnicos. Todos tienen documentos y rutas d
 6. Detección, respuesta y recuperación
 7. Gobierno, riesgo y aseguramiento
 
-**Estado:** generic_or_initial_compendium_requires_deep_audit; 12 capas por tema: `not_assessed`; G1–G8: `not_assessed`; madurez: M2.
+**Estado:** seven_topic_audits_documented_in_progress; 12 capas por tema: `in_progress` (84/84); G1–G4: `in_progress`; G5–G8: `blocked`; madurez: M2. Evidencia: [auditoría disciplinar por tema](../deep_modules/foundations/FOUNDATIONS_DEEP_DEVELOPMENT_V1.md). Siete protocolos diseñados; cero ejecuciones acreditadas; fuentes oficiales inspeccionadas a nivel de metadatos/abstract, lectura integral pendiente.
 
 ### Estado detallado de Foundations — auditoría 2026-11-19
 
