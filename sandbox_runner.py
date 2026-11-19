@@ -17,6 +17,22 @@ DEFAULT_IMAGE = "cyber-ai-tool-sandbox:local"
 # Debe coincidir con los binarios realmente instalados en sandbox/Dockerfile.
 SANDBOX_TOOLS = frozenset({"ruff", "bandit"})
 
+def _docker_user_args(platform_name=None):
+    """Keep the container non-root without assuming POSIX APIs on Windows."""
+    platform_name = os.name if platform_name is None else platform_name
+    if platform_name == "nt":
+        # sandbox/Dockerfile declares USER 65532:65532.
+        return []
+    if platform_name != "posix":
+        raise ToolExecutionError("Plataforma no compatible con la política de usuario Docker.")
+    host_uid = os.getuid()
+    if host_uid == 0:
+        raise ToolExecutionError(
+            "La sandbox no se ejecuta desde un host root; usa una cuenta sin privilegios."
+        )
+    return [f"--user={host_uid}:{os.getgid()}"]
+
+
 
 def build_docker_command(tool_id, target, evidence_dir, image=DEFAULT_IMAGE, timeout=None, config=None):
     if tool_id not in TOOL_SPECS:
@@ -49,14 +65,7 @@ def build_docker_command(tool_id, target, evidence_dir, image=DEFAULT_IMAGE, tim
     else:
         raise ToolExecutionError("La carpeta de evidencias debe estar fuera del repositorio.")
 
-    user_args = []
-    if os.name != "nt":
-        host_uid = os.getuid()
-        if host_uid == 0:
-            raise ToolExecutionError(
-                "La sandbox no se ejecuta desde un host root; usa una cuenta sin privilegios."
-            )
-        user_args = [f"--user={host_uid}:{os.getgid()}"]
+    user_args = _docker_user_args()
 
     command = [
         "docker", "run", "--rm", "--pull=never",

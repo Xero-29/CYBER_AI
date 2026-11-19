@@ -62,10 +62,12 @@ class SandboxRunnerTests(unittest.TestCase):
                 sandbox_runner.build_docker_command("ruff", "sample.py", evidence)
 
     def test_windows_uses_non_root_image_user_without_posix_uid_calls(self):
+        with patch.object(sandbox_runner.os, "getuid", side_effect=AssertionError("getuid called")), \
+             patch.object(sandbox_runner.os, "getgid", side_effect=AssertionError("getgid called")):
+            self.assertEqual(sandbox_runner._docker_user_args("nt"), [])
+
         evidence = self.root.parent / (self.root.name + "-windows-evidence")
-        with patch.object(sandbox_runner.os, "name", "nt"), \
-             patch.object(sandbox_runner.os, "getuid", create=True, side_effect=AssertionError("getuid called")), \
-             patch.object(sandbox_runner.os, "getgid", create=True, side_effect=AssertionError("getgid called")):
+        with patch.object(sandbox_runner, "_docker_user_args", return_value=[]):
             command = sandbox_runner.build_docker_command("ruff", "sample.py", evidence)
         self.assertFalse(any(item.startswith("--user=") for item in command))
         self.assertIn("--pull=never", command)
