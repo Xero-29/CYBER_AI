@@ -31,6 +31,14 @@ STUDIES = {
     "iot_hardware",
     "governance",
     "data_security",
+    "machine_learning",
+    "mathematics",
+    "software_engineering",
+    "soc_siem",
+    "edr_xdr",
+    "threat_hunting",
+    "red_team",
+    "wireless_security",
 }
 
 
