@@ -60,12 +60,14 @@
       "operational_maturity": "O0",
       "evidence": [
         "topics/FND-01-01_SECURITY_SAFETY_PRIVACY_RELIABILITY_RESILIENCE.md",
-        "../../research/source_registry.json"
+        "../../research/source_registry.json",
+        "topics/FND-01-01_COLD_ASSESSMENT_V1.md",
+        "topics/FND-01-01_ASSESSOR_GUIDE_V1.md"
       ],
       "nonconformities": [
         "NC-FND-01.01-01: revisión integral de fuentes primarias pendiente",
         "NC-FND-01.01-02: normas sectoriales de safety y aplicabilidad legal colombiana pendientes",
-        "NC-FND-01.01-03: evaluación en frío aún no administrada",
+        "NC-FND-01.01-03: instrumento de evaluación preparado; administración y calificación independiente pendientes",
         "NC-FND-01.01-04: revisión disciplinar independiente pendiente"
       ],
       "review": "internal_draft_not_assessed"
