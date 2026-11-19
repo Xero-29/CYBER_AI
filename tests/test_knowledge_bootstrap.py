@@ -173,5 +173,63 @@ class KnowledgeBootstrapTests(unittest.TestCase):
                 "new-provider::embed-v2",
             )
 
+
+    def test_loads_research_study_as_separate_indexable_document(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            pack, manifest = self._setup(root)
+            study = root / "knowledge/deep_modules/x/RESEARCH_STUDY.md"
+            study.parent.mkdir(parents=True, exist_ok=True)
+            study.write_text("# Investigación técnica\\nEstudio profundo", encoding="utf-8")
+            data = json.loads(manifest.read_text(encoding="utf-8"))
+            data["areas"][0]["research_study_path"] = "knowledge/deep_modules/x/RESEARCH_STUDY.md"
+            manifest.write_text(json.dumps(data), encoding="utf-8")
+            with patch.object(bootstrap, "PROJECT", root), patch.object(bootstrap, "MANIFEST", manifest):
+                result = bootstrap.bootstrap(dry_run=True)
+            self.assertEqual(result["selected"], 2)
+            by_kind = {item["document_kind"]: item for item in result["items"]}
+            self.assertEqual(set(by_kind), {"pack", "research_study"})
+            self.assertNotEqual(by_kind["pack"]["document_id"], by_kind["research_study"]["document_id"])
+            self.assertEqual(by_kind["research_study"]["topic_id"], "research")
+            self.assertEqual(by_kind["research_study"]["subtopic_id"], "field_study")
+
+    def test_rejects_unsafe_research_study_path(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            _, manifest = self._setup(root)
+            data = json.loads(manifest.read_text(encoding="utf-8"))
+            data["areas"][0]["research_study_path"] = "../outside.md"
+            manifest.write_text(json.dumps(data), encoding="utf-8")
+            with patch.object(bootstrap, "PROJECT", root), patch.object(bootstrap, "MANIFEST", manifest):
+                with self.assertRaisesRegex(ValueError, "Ruta no permitida"):
+                    bootstrap.load_packs()
+
+    def test_bootstrap_ingests_pack_and_research_study_with_separate_metadata(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            _, manifest = self._setup(root)
+            study = root / "knowledge/deep_modules/x/RESEARCH_STUDY.md"
+            study.parent.mkdir(parents=True, exist_ok=True)
+            study.write_text("# Investigación técnica\\nContenido", encoding="utf-8")
+            data = json.loads(manifest.read_text(encoding="utf-8"))
+            data["areas"][0]["research_study_path"] = "knowledge/deep_modules/x/RESEARCH_STUDY.md"
+            manifest.write_text(json.dumps(data), encoding="utf-8")
+            with patch.object(bootstrap, "PROJECT", root), \\
+                 patch.object(bootstrap, "MANIFEST", manifest), \\
+                 patch("knowledge_embeddings.expected_embedding_space", return_value="provider::embed-v1"), \\
+                 patch("knowledge_registry.resource_inventory", return_value=[]), \\
+                 patch("knowledge_registry.register_resource", side_effect=[{"resource_id": "pack"}, {"resource_id": "study"}]), \\
+                 patch("knowledge_registry.update_resource_classification") as classify, \\
+                 patch("knowledge_registry.update_resource_processing_status"), \\
+                 patch("knowledge_library.document_chunk_count", return_value=1), \\
+                 patch("knowledge_ingest.ingest_document", side_effect=[{"document_id": "pack-doc", "chunks": 1}, {"document_id": "study-doc", "chunks": 1}]) as ingest:
+                result = bootstrap.bootstrap()
+            self.assertEqual(result["ingested_count"], 2)
+            self.assertEqual([item["kind"] for item in result["ingested"]], ["pack", "research_study"])
+            self.assertEqual(ingest.call_count, 2)
+            self.assertIn("research_study", ingest.call_args_list[1].kwargs["tags"])
+            self.assertEqual(classify.call_args_list[1].kwargs["topic_id"], "research")
+            self.assertEqual(classify.call_args_list[1].kwargs["subtopic_id"], "field_study")
+
 if __name__ == "__main__":
     unittest.main()
