@@ -1,6 +1,6 @@
 # Revisión de literatura — identity
 
-**Corte editorial:** 2026-11-19  
+**Corte:** 2026-11-19  
 **Estado:** revisión exploratoria de fuentes registradas y alcance oficial; no revisión sistemática ni lectura integral de todas las fuentes.  
 **Madurez:** M2 editorial como máximo; M3/M4/M5 pendientes.
 
@@ -8,7 +8,7 @@
 
 ¿Qué combinación de ciclo de vida, autenticación resistente a phishing, federación y autorización reduce accesos indebidos sin crear fallos inaceptables de disponibilidad o usabilidad?
 
-## Síntesis crítica inicial
+## Síntesis
 
 NIST SP 800-63-4 reorganiza las guías de identidad digital en prueba de identidad, autenticación/gestión de autenticadores y federación/assertions. La arquitectura debe seleccionar niveles y controles según riesgo, no asumir que MFA equivale a identidad confiable. SP 800-63B-4 trata autenticadores y autenticación; SP 800-63C-4 trata federación y assertions. SP 800-207 aporta el enfoque Zero Trust, donde la confianza no se concede por ubicación de red y la decisión de acceso considera sujeto, dispositivo, recurso y contexto. RFC 9700 recoge prácticas actuales de seguridad para OAuth 2.0; complementa, pero no sustituye, los perfiles OIDC/SAML ni la validación de implementación. La lectura de metadatos y alcances oficiales no demuestra que se hayan revisado todas las cláusulas ni que un IdP cumpla los requisitos.
 
@@ -25,6 +25,8 @@ NIST SP 800-63-4 (https://doi.org/10.6028/NIST.SP.800-63-4), NIST SP 800-63B-4 (
 - `NIST-SP-800-53r5`
 - `IETF-RFC9700`
 
+No se ha ejecutado experimento ni se dispone de validación empírica.
+
 ## Límites de esta revisión
 
 - Los identificadores anteriores acreditan que existe una referencia en el registro; no demuestran lectura íntegra.
@@ -33,7 +35,7 @@ NIST SP 800-63-4 (https://doi.org/10.6028/NIST.SP.800-63-4), NIST SP 800-63B-4 (
 - Las taxonomías y guías organizan el análisis; no sustituyen evidencia observada.
 - No se ha ejecutado el protocolo experimental ni se han obtenido resultados confirmatorios.
 
-## Brechas de investigación
+## Brechas
 
 1. Recuperar texto completo de cada fuente primaria y registrar páginas/secciones efectivamente leídas.
 2. Extraer requisitos y afirmaciones concretas con vínculo a subtema y criterio de prueba.
