@@ -4,7 +4,12 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from binary_integrity import BinaryIntegrityError, hash_executable, require_approved_executable
+from binary_integrity import (
+    BinaryIntegrityError,
+    build_minimal_environment,
+    hash_executable,
+    require_approved_executable,
+)
 from tool_allowlist import ToolAllowlistError
 
 
@@ -95,6 +100,26 @@ class BinaryIntegrityTests(unittest.TestCase):
             with patch("binary_integrity.verify_tool_allowed", side_effect=ToolAllowlistError("denied")):
                 with self.assertRaises(BinaryIntegrityError):
                     require_approved_executable(executable, "nuclei")
+
+
+    def test_minimal_environment_excludes_application_secrets_and_proxy_settings(self):
+        with tempfile.TemporaryDirectory() as temp:
+            with patch.dict(os.environ, {
+                "OPENAI_API_KEY": "must-not-be-forwarded",
+                "AWS_SECRET_ACCESS_KEY": "must-not-be-forwarded",
+                "HTTPS_PROXY": "http://proxy.invalid",
+                "PATH": "/attacker/path",
+                "LANG": "C.UTF-8",
+            }):
+                env = build_minimal_environment(temp, "/usr/bin/nuclei")
+        self.assertEqual(env["HOME"], str(Path(temp).resolve()))
+        self.assertEqual(env["TMPDIR"], env["HOME"])
+        self.assertNotIn("OPENAI_API_KEY", env)
+        self.assertNotIn("AWS_SECRET_ACCESS_KEY", env)
+        self.assertNotIn("HTTPS_PROXY", env)
+        self.assertNotIn("/attacker/path", env["PATH"])
+        self.assertIn("/usr/bin", env["PATH"])
+        self.assertEqual(env["LANG"], "C.UTF-8")
 
 if __name__ == "__main__":
     unittest.main()
