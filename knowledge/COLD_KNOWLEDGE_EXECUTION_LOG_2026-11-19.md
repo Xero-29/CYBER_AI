@@ -116,3 +116,11 @@ No conformidades abiertas: lectura integral de fuentes primarias; normas de safe
 - Hallazgos aplicados: seguridad como propiedad emergente; contexto y assurance case; confianza composicional; protección continua en transiciones; objetivos de resiliencia anticipar/resistir/recuperar/adaptar; complementariedad con CIA.
 - Añadido `knowledge/deep_modules/foundations/SOURCE_REVIEW_ADDENDUM_NIST_800_160_2026-11-19.md` y actualizado `knowledge/research/source_registry.json` con estado `selected_sections_reviewed`.
 - No se afirma lectura lineal integral, ni revisión de todas las referencias, ni ejecución. FND-01.01 sigue T0/O0 y no aprobado.
+
+## Ciclo de alcance colombiano — FND-01.01
+
+- Consultadas fuentes oficiales: Ley Estatutaria 1581/2012 (arts. 1–4, 6 y 8–10), Decreto 1575/2007 (arts. 1–2) y Resolución 2115/2007 (arts. 1–5 y tablas iniciales).
+- Añadido `knowledge/deep_modules/foundations/COLOMBIA_APPLICABILITY_FND_01_01_2026-11-19.md`, con árbol condicional de aplicabilidad y límites.
+- Registradas las tres fuentes en `knowledge/research/source_registry.json` como `selected_articles_reviewed`.
+- NC-FND-01.01-02 se reduce parcialmente: privacidad y agua de consumo humano tienen un mapa inicial; safety funcional y obligaciones sectoriales siguen sin determinarse para un caso concreto y requieren revisión competente.
+- No se emite dictamen legal ni se declara cumplimiento; T0/O0 sin cambios.
