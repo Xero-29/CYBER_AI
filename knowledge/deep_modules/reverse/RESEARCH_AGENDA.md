@@ -34,6 +34,10 @@ Unidad: fallo sintético en parser local. Confirmar causa, precondiciones, input
 
 H1: una metodología que combina ground truth, análisis estático y pruebas dinámicas controladas reduce errores de reconstrucción frente a análisis de una sola herramienta. H0: no existe diferencia bajo la muestra definida. Comparar al menos dos herramientas cuando sea técnicamente razonable; registrar versiones, arquitectura y compilador.
 
+## Método
+
+Diseño experimental controlado con hipótesis falsable, unidad de análisis, variables, baseline, controles, corpus versionado y criterios de exclusión definidos antes de ejecutar.
+
 ## Protocolo común
 
 1. Usar únicamente binarios, firmware y sistemas propios o autorizados.
