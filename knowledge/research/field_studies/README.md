@@ -36,3 +36,18 @@
 ## Próxima secuencia de investigación
 
 La siguiente tanda debe cubrir fundamentos, AppSec/API, Windows/AD, Linux, cloud, contenedores/Kubernetes, malware, forense, inteligencia de amenazas, SOC/SIEM, EDR/XDR y threat hunting. Después se abordarán las especialidades sectoriales: móvil, IoT, hardware, telecom/5G, automoción, satélites, OT y seguridad física, junto con las áreas de privacidad, fraude, continuidad, PKI, criptografía poscuántica y matemáticas aplicadas.
+
+
+## Segunda entrega de estudios profundos (2026-11-18)
+
+Se incorporaron ocho dominios adicionales:
+- [Fundamentos](../../deep_modules/foundations/RESEARCH_STUDY.md)
+- [Seguridad web y aplicaciones](../../deep_modules/appsec/RESEARCH_STUDY.md)
+- [Seguridad de API](../../deep_modules/api/RESEARCH_STUDY.md)
+- [Linux y Unix](../../deep_modules/linux/RESEARCH_STUDY.md)
+- [Windows y Active Directory](../../deep_modules/windows_ad/RESEARCH_STUDY.md)
+- [Seguridad cloud](../../deep_modules/cloud/RESEARCH_STUDY.md)
+- [Contenedores y Kubernetes](../../deep_modules/containers/RESEARCH_STUDY.md)
+- [Seguridad móvil](../../deep_modules/mobile/RESEARCH_STUDY.md)
+
+Las referencias de esta tanda distinguen ASVS 5.0.0 estable de WSTG 4.2 estable/WSTG 5.0 en desarrollo, y fijan fuentes oficiales por plataforma. La existencia del estudio no demuestra que se hayan probado todos los controles en sistemas reales.
