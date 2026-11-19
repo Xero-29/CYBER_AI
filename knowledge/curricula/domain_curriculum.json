@@ -36,7 +36,7 @@
       "id": "foundations",
       "name": "Fundamentos",
       "pack_path": "knowledge/packs/foundations/README.md",
-      "pack_version": "2.0.0",
+      "pack_version": "2.1.0",
       "scope": "Currículo técnico de Fundamentos; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.",
       "learning_levels": {
         "L0": "Vocabulario, alcance, activos, actores y límites.",
@@ -87,7 +87,7 @@
         "pass_rule": "No aprobar si falta autorización, procedencia, evidencia reproducible o verificación de la mitigación."
       },
       "reference_policy": "Usar fuentes primarias específicas; registrar URL canónica, editor, versión, fecha, licencia, SHA-256 y revisión humana. Referencia catalogada no equivale a fuente descargada o verificada.",
-      "maturity": "curriculum_defined_content_not_yet_expert_validated"
+      "maturity": "expanded_technical_compendium; primary_reference_metadata_reviewed; full_text_review_and_lab_validation_pending"
     },
     {
       "id": "appsec",
