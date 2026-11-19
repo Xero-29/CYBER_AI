@@ -68,7 +68,9 @@
         "COLOMBIA_APPLICABILITY_FND_01_01_2026-11-19.md",
         "topics/FND-01-01_CAPABILITY_WORKED_SOLUTIONS_V1.md",
         "topics/FND-01-01_COLD_ASSESSMENT_V2.md",
-        "topics/FND-01-01_INDEPENDENT_ASSESSOR_PROTOCOL_V1.md"
+        "topics/FND-01-01_INDEPENDENT_ASSESSOR_PROTOCOL_V1.md",
+        "FND_01_01_PRIMARY_SOURCE_SYNTHESIS_2026-11-19.md",
+        "topics/FND-01-01_ASSESSOR_GUIDE_V2.md"
       ],
       "nonconformities": [
         "NC-FND-01.01-01: revisión integral de fuentes primarias pendiente",
