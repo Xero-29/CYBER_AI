@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0.0",
+  "specialty": "foundations",
+  "generated_at": "2026-11-19",
+  "source": "FOUNDATIONS_CURRICULUM_MAP_V2.md",
+  "standard": "../../EXPERT_RESEARCH_STANDARD.md",
+  "protocol": "../../COLD_KNOWLEDGE_EXECUTION_PROTOCOL.md",
+  "interpretation": "Subtopic-level baseline. not_assessed means evidence has not yet been mapped and evaluated; it does not mean the subject has no content. No approval is inferred from document presence, headings, length or references.",
+  "summary": {
+    "subtopics": 0,
+    "layer_checks": 0,
+    "capability_checks": 0,
+    "approved": 0
+  },
+  "layers": {
+    "L1": "Fundamentos teóricos",
+    "L2": "Fundamentos matemáticos y formales",
+    "L3": "Arquitectura y funcionamiento interno",
+    "L4": "Estándares y metodologías",
+    "L5": "Implementación técnica",
+    "L6": "Análisis avanzado",
+    "L7": "Perspectiva de seguridad",
+    "L8": "Investigación científica",
+    "L9": "Laboratorios y datasets",
+    "L10": "Evaluación y benchmarks",
+    "L11": "Conocimiento operativo y Skills",
+    "L12": "Trazabilidad y mantenimiento"
+  },
+  "capabilities": {
+    "teach": "Enseñar",
+    "explain": "Explicar",
+    "analyze": "Analizar",
+    "design": "Diseñar"
+  },
+  "subtopics": []
+}
