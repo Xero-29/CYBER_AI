@@ -1,6 +1,6 @@
 # Agenda de investigación: Ingeniería inversa
 
-**Dominio:** reverse · **Estado:** protocolo específico propuesto; no ejecutado.  
+**Dominio:** reverse · **Corte:** 2026-11-19 · **Madurez:** M2 editorial; no M3/M4/M5 · **Estado:** `research_agenda_defined`, protocolo propuesto; no ejecutado.
 **Objetivo de diseño:** L4; madurez efectiva M2 editorial hasta lectura de fuentes y resultados reproducibles.
 
 ## Pregunta central
@@ -47,6 +47,10 @@ H1: una metodología que combina ground truth, análisis estático y pruebas din
 ## Métricas y amenazas a validez
 
 Medir exactitud de reconstrucción, cobertura CFG, precisión de clasificación, cobertura de fuzzing, bugs confirmados, reproducibilidad y coste. Reportar resultados por arquitectura, compilador, flags y herramienta. Amenazas: heurísticas del decompilador, símbolos, optimización, instrumentación, sesgo del corpus y diferencia entre emulación y hardware real.
+
+## Reproducibilidad
+
+Conservar scripts, datos, hashes, versiones, configuración, logs y pasos de ejecución para permitir repetición independiente.
 
 ## Entregables
 
