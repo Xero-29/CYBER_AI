@@ -276,3 +276,6 @@ Fuente: NIST CSWP 40 IPD, *NIST Privacy Framework 1.1*, 2025-04-14, secciones 1.
 ## Análisis preliminar de aplicabilidad colombiana
 
 El mapeo condicional de Ley 1581/2012 y, cuando corresponda, Decreto 1575/2007 y Resolución 2115/2007 se documenta en [COLOMBIA_APPLICABILITY_FND_01_01_2026-11-19.md](../COLOMBIA_APPLICABILITY_FND_01_01_2026-11-19.md). La aplicabilidad depende del tratamiento real de datos y de que el proceso esté dentro del ámbito de agua para consumo humano. No es concepto jurídico ni norma general de seguridad funcional. La brecha de safety sectorial y revisión legal independiente permanece abierta.
+
+
+Soluciones modelo ampliadas para las cuatro capacidades: [FND-01-01_CAPABILITY_WORKED_SOLUTIONS_V1.md](FND-01-01_CAPABILITY_WORKED_SOLUTIONS_V1.md). Estas soluciones son material de referencia para evaluación ciega, no respuestas de un candidato ni prueba de competencia.
