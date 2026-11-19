@@ -279,7 +279,13 @@ def main():
         command = [
             nuclei, "-u", args.target,
             "-jsonl", "-o", str(results_file.resolve()),
-            "-no-interactsh", "-disable-update-check", "-disable-redirects",
+            "-no-interactsh", "-no-stdin",
+            "-type", "http",
+            "-exclude-tags", "dos,intrusive,fuzz,code,headless",
+            "-disable-unsigned-templates",
+            "-omit-raw", "-omit-template",
+            "-disable-update-check", "-disable-redirects",
+            "-max-host-error", "5",
             "-rl", "2", "-c", "2", "-timeout", "5", "-retries", "0",
         ]
         for item in selected:
