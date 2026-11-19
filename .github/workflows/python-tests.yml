@@ -40,6 +40,8 @@ jobs:
           fi
       - name: Run complete local verification
         run: bash verify.sh
+      - name: Validate knowledge corpus paths and hashes
+        run: python knowledge_bootstrap.py --dry-run
       - name: Audit research study coverage
         run: python knowledge_quality.py --require-research-studies
       - name: Capture hashes for resolved dependency wheels
