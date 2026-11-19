@@ -182,3 +182,32 @@ El contenido histórico que sigue registra implementaciones y validaciones de co
 - Cada especialidad incluye un diseño de laboratorio con cuatro casos (baseline, fallo sintético, detección y mitigación/regresión), salvaguardas, métricas, preguntas de investigación y artefactos de aceptación.
 - Se añadió el índice de los 48 compendios.
 - **Límite:** son cuadernos técnicos y planes de trabajo, no libros exhaustivos ni revisiones sistemáticas completas. Los laboratorios están diseñados, no ejecutados; no se elevó la madurez de ninguna especialidad.
+
+
+## Ampliación de biblioteca: primera entrega de investigaciones profundas — 2026-11-18
+
+**Rama de trabajo:** `codex/deep-research-library-2026-11-18` (creada desde main SHA `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`).  
+**Estado:** contenido añadido; pendiente CI sobre el HEAD de esta rama y revisión editorial/experta independiente.
+
+### Estudios nuevos
+
+Se añadieron estudios de campo en ocho dominios:
+
+- Redes: switching, routing, TCP/UDP, DNS, TLS (incluye RFC 9846 de 2026), VPN, Wi-Fi, amenazas, controles, métricas y labs.
+- Criptografía: primitivas, AEAD, PKI, ciclo de vida de claves, PQC y erratas de FIPS.
+- Seguridad de IA: prompt injection, RAG, agentes, autorización de herramientas, poisoning, fuga, evaluación y labs.
+- OT/ICS: zonas, protocolos, safety, controles y estado separado de SP 800-82 Rev. 3 final frente a Rev. 4 IPD de 2026.
+- Respuesta a incidentes: preparación, detección, contención, forense, recuperación, playbooks y métricas.
+- Gestión de vulnerabilidades: CVE/CWE/CVSS/EPSS/KEV, correlación, priorización y falsos positivos.
+- DevSecOps: pipeline, supply chain, SBOM, provenance, firma y laboratorios.
+- Arquitectura segura: threat modeling, Zero Trust y requisitos verificables.
+
+Se añadió un índice de investigaciones, un registro de 24 fuentes primarias en esta entrega y se incorporaron 20 referencias nuevas al registro central existente (68 previas; 88 totales). Se añadió una prueba estructural para verificar que los ocho estudios existan, estén enlazados y que las fuentes tengan IDs únicos y URLs HTTPS.
+
+### Límites explícitos
+
+- Esto no significa que las 48 áreas estén investigadas; es una primera tanda de ocho dominios.
+- Los estudios son síntesis técnicas de trabajo basadas en páginas oficiales, metadatos y resúmenes consultados; no se afirma lectura íntegra de todos los estándares ni revisión por pares.
+- No se ejecutaron los laboratorios descritos ni se validaron implementaciones en redes, OT, proveedores de IA o producción.
+- No marcar fuentes como lectura integral ni módulos como M4/M5 hasta completar revisión de texto completo, metodología, resultados medidos, reproducción y revisión independiente.
+- La investigación debe continuar con los 40 dominios restantes y ampliar subtemas dentro de cada dominio, no limitarse a los títulos actuales del currículo.
