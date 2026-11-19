@@ -114,3 +114,10 @@ No escoger una prueba estadística por rutina: verificar supuestos, distribució
 - **M5:** reproducción externa/independiente, límites explicitados y contribución revisada.
 
 **Estado actual: M1. No M3/M4/M5.** No se ha ejecutado ninguno de los seis estudios.
+
+
+## Declaración estructural de agenda
+
+research_agenda_defined: true
+
+**Madurez y umbral:** agenda de investigación propuesta; no representa resultados ni madurez M3/M4/M5. M5 exige revisión independiente y reproducción externa documentada. La reproducción debe conservar entorno, versiones, datos, semillas, scripts, hashes y desviaciones.
