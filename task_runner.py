@@ -14,6 +14,7 @@ from urllib.parse import urlparse
 from capability_selector import select_capabilities
 from execution_policy import AuthorizationError, authorize_target
 from execution_ledger import ExecutionLedger
+from binary_integrity import BinaryIntegrityError, hash_executable, require_approved_executable
 
 
 def _record_task_scan(task, target, report, started, authorization_id=None, start_event_id=None):
@@ -165,6 +166,20 @@ def main():
                                      task_started, args.authorization_id)
         return 3 if args.require_ledger and recorded is None else 1
 
+    try:
+        binary_provenance = require_approved_executable(nuclei, "nuclei")
+        nuclei = binary_provenance["resolved_path"]
+    except BinaryIntegrityError as error:
+        print("ERROR: ejecución bloqueada; Nuclei no está aprobado:", error, file=sys.stderr)
+        recorded = _record_task_scan(
+            args.task, args.target,
+            {"task": args.task, "target": args.target,
+             "status": "authorization_denied",
+             "reason": "scanner_binary_not_approved"},
+            task_started, args.authorization_id,
+        )
+        return 3 if args.require_ledger and recorded is None else 2
+
     output_dir = Path("reports")
     output_dir.mkdir(parents=True, exist_ok=True)
     scan_id = uuid.uuid4().hex
@@ -203,9 +218,20 @@ def main():
             )
             elapsed = round(time.monotonic() - started, 2)
         except subprocess.TimeoutExpired:
+            try:
+                binary_after = hash_executable(nuclei)
+                binary_modified = binary_after["sha256"] != binary_provenance["sha256"]
+            except BinaryIntegrityError:
+                binary_after = None
+                binary_modified = True
             report = {
                 "task": args.task, "target": args.target,
-                "status": "timeout", "elapsed_seconds": 90,
+                "status": "integrity_error" if binary_modified else "timeout",
+                "elapsed_seconds": 90,
+                "tool_binary_sha256": binary_provenance["sha256"],
+                "tool_binary_sha256_after": binary_after["sha256"] if binary_after else None,
+                "tool_binary_modified": binary_modified,
+                "tool_allowlist": binary_provenance["allowlist"],
                 "findings": [],
             }
             report_file.write_text(
@@ -230,10 +256,20 @@ def main():
             "task": args.task,
             "target": args.target,
             "authorization": grant,
-            "status": "completed" if process.returncode == 0 else "scanner_error",
+            "status": (
+                "integrity_error" if binary_modified
+                else "completed" if process.returncode == 0 else "scanner_error"
+            ),
             "elapsed_seconds": elapsed,
+            "tool_binary_sha256": binary_provenance["sha256"],
+            "tool_binary_sha256_after": binary_after["sha256"] if binary_after else None,
+            "tool_binary_modified": binary_modified,
+            "tool_allowlist": binary_provenance["allowlist"],
             "templates_used": [item["path"] for item in selected],
             "findings_count": len(findings),
+            "discarded_findings_count": (
+                len(findings) if binary_modified else 0
+            ),
             "findings": findings,
             "scanner_output": (process.stdout + "\n" + process.stderr)[-12000:],
             "note": "Los resultados son indicios y requieren validación.",
