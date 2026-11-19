@@ -1445,7 +1445,190 @@
         "software_engineering"
       ],
       "review_note": "Página oficial de comparación y propósito inspeccionada; cada patrón requiere contexto y lectura de su definición."
+    },
+    {
+      "id": "NIST-SP-800-90A-r1",
+      "title": "Recommendation for Random Number Generation Using Deterministic Random Bit Generators",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.800-90Ar1",
+      "version": "Revision 1",
+      "published": "2015-06-24",
+      "verification_status": "official_metadata_reviewed",
+      "verified_scope": "Mecanismos DRBG basados en hash y cifrado; consultar el estado del borrador de revisión antes de seleccionar perfil.",
+      "domains": [
+        "crypto"
+      ],
+      "review_note": "Registro y metadatos oficiales revisados; lectura integral y validación de implementación pendientes."
+    },
+    {
+      "id": "NIST-SP-800-90B",
+      "title": "Recommendation for the Entropy Sources Used for Random Bit Generation",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.800-90B",
+      "version": "Final",
+      "published": "2018-01-10",
+      "verification_status": "official_metadata_reviewed",
+      "verified_scope": "Diseño, evaluación y validación de fuentes de entropía para generación de bits aleatorios.",
+      "domains": [
+        "crypto"
+      ],
+      "review_note": "Metadatos y alcance del catálogo oficial revisados; lectura integral y evaluación de una fuente concreta pendientes."
+    },
+    {
+      "id": "NIST-SP-800-90C",
+      "title": "Recommendation for Random Bit Generator (RBG) Constructions",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.800-90C",
+      "version": "Final",
+      "published": "2025-09-25",
+      "verification_status": "official_metadata_reviewed",
+      "verified_scope": "Construcciones RBG que integran DRBG y fuentes de entropía conforme a la serie SP 800-90.",
+      "domains": [
+        "crypto"
+      ],
+      "review_note": "Publicación final y metadatos oficiales revisados; lectura integral y evaluación de una construcción concreta pendientes."
+    },
+    {
+      "id": "NIST-FIPS-197",
+      "title": "Advanced Encryption Standard (AES)",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "federal_information_processing_standard",
+      "url": "https://doi.org/10.6028/NIST.FIPS.197",
+      "version": "Updated 2023-05-09",
+      "published": "2001-11-26; editorial update 2023-05-09",
+      "verification_status": "official_metadata_reviewed",
+      "verified_scope": "Especificación AES; actualización editorial 2023 sin cambios técnicos declarados por NIST.",
+      "domains": [
+        "crypto"
+      ],
+      "review_note": "Metadatos y nota oficial de actualización revisados; vectores e implementación concreta requieren verificación independiente."
+    },
+    {
+      "id": "NIST-SP-800-56A-r3",
+      "title": "Recommendation for Pair-Wise Key-Establishment Schemes Using Discrete Logarithm Cryptography",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.800-56Ar3",
+      "version": "Revision 3",
+      "published": "2018-04",
+      "verification_status": "official_metadata_reviewed_update_announced",
+      "verified_scope": "Esquemas de establecimiento de claves basados en logaritmo discreto, incluyendo DH y curvas elípticas.",
+      "domains": [
+        "crypto"
+      ],
+      "review_note": "Metadatos y alcance oficial revisados; NIST anunció el 2026-01-06 que la publicación será actualizada. Comprobar estado vigente antes de adoptar."
+    },
+    {
+      "id": "NIST-SP-800-57p1r5",
+      "title": "Recommendation for Key Management: Part 1 – General",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.800-57pt1r5",
+      "version": "Revision 5",
+      "published": "2020-05",
+      "verification_status": "official_metadata_reviewed",
+      "verified_scope": "Orientación general para gestión, protección, uso y ciclo de vida de material criptográfico.",
+      "domains": [
+        "crypto",
+        "pki_hsm"
+      ],
+      "review_note": "Metadatos y alcance oficial revisados; verificar suplementos y estado vigente antes de definir políticas."
+    },
+    {
+      "id": "RFC-5869",
+      "title": "HMAC-based Extract-and-Expand Key Derivation Function (HKDF)",
+      "publisher": "Internet Engineering Task Force",
+      "type": "standards_track_rfc",
+      "url": "https://www.rfc-editor.org/rfc/rfc5869",
+      "version": "RFC 5869",
+      "published": "2010-05",
+      "verification_status": "official_rfc_metadata_reviewed",
+      "verified_scope": "KDF basada en HMAC con etapas Extract y Expand.",
+      "domains": [
+        "crypto"
+      ],
+      "review_note": "Metadatos oficiales del RFC revisados; lectura integral y pruebas de interoperabilidad pendientes."
+    },
+    {
+      "id": "RFC-8439",
+      "title": "ChaCha20 and Poly1305 for IETF Protocols",
+      "publisher": "Internet Engineering Task Force",
+      "type": "standards_track_rfc",
+      "url": "https://www.rfc-editor.org/rfc/rfc8439",
+      "version": "RFC 8439",
+      "published": "2018-06",
+      "verification_status": "official_rfc_metadata_reviewed",
+      "verified_scope": "Cifrado de flujo ChaCha20 y autenticador Poly1305 para construcción AEAD.",
+      "domains": [
+        "crypto"
+      ],
+      "review_note": "Metadatos oficiales del RFC revisados; lectura integral y verificación de vectores pendientes."
+    },
+    {
+      "id": "RFC-8446",
+      "title": "The Transport Layer Security (TLS) Protocol Version 1.3",
+      "publisher": "Internet Engineering Task Force",
+      "type": "standards_track_rfc",
+      "url": "https://www.rfc-editor.org/rfc/rfc8446",
+      "version": "RFC 8446",
+      "published": "2018-08",
+      "verification_status": "official_rfc_metadata_reviewed",
+      "verified_scope": "Protocolo TLS 1.3, handshake, autenticación y derivación de secretos.",
+      "domains": [
+        "crypto",
+        "network"
+      ],
+      "review_note": "Metadatos oficiales del RFC revisados; lectura integral, erratas y perfil de implementación pendientes."
+    },
+    {
+      "id": "RFC-9106",
+      "title": "Argon2 Memory-Hard Function for Password Hashing and Proof-of-Work Applications",
+      "publisher": "Internet Engineering Task Force",
+      "type": "informational_rfc",
+      "url": "https://www.rfc-editor.org/rfc/rfc9106",
+      "version": "RFC 9106",
+      "published": "2021-09",
+      "verification_status": "official_rfc_metadata_reviewed",
+      "verified_scope": "Función de derivación de contraseñas Argon2 y perfiles de parametrización.",
+      "domains": [
+        "crypto",
+        "identity"
+      ],
+      "review_note": "Metadatos oficiales del RFC revisados; parametrización debe medirse en el hardware y amenaza objetivo."
+    },
+    {
+      "id": "RFC-8032",
+      "title": "Edwards-Curve Digital Signature Algorithm (EdDSA)",
+      "publisher": "Internet Engineering Task Force",
+      "type": "standards_track_rfc",
+      "url": "https://www.rfc-editor.org/rfc/rfc8032",
+      "version": "RFC 8032",
+      "published": "2017-01",
+      "verification_status": "official_rfc_metadata_reviewed",
+      "verified_scope": "EdDSA sobre curvas Edwards, incluyendo Ed25519 y Ed448.",
+      "domains": [
+        "crypto"
+      ],
+      "review_note": "Metadatos oficiales del RFC revisados; perfiles, validación de puntos y side channels requieren revisión de implementación."
+    },
+    {
+      "id": "RFC-9180",
+      "title": "Hybrid Public Key Encryption",
+      "publisher": "Internet Engineering Task Force",
+      "type": "standards_track_rfc",
+      "url": "https://www.rfc-editor.org/rfc/rfc9180",
+      "version": "RFC 9180",
+      "published": "2022-02",
+      "verification_status": "official_rfc_metadata_reviewed",
+      "verified_scope": "Composición HPKE de KEM, KDF y AEAD con modos definidos.",
+      "domains": [
+        "crypto"
+      ],
+      "review_note": "Metadatos oficiales del RFC revisados; lectura integral y análisis de uso/protocolo pendientes."
     }
   ],
-  "last_updated": "2026-11-17"
+  "last_updated": "2026-11-19"
 }
