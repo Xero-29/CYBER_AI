@@ -58,6 +58,12 @@ def lab03_threat_model():
 def _b64url(data: bytes) -> str:
     return base64.urlsafe_b64encode(data).rstrip(b"=").decode("ascii")
 
+def _decode_b64url(segment: str) -> bytes:
+    alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
+    if not segment or "=" in segment or len(segment) % 4 == 1 or any(ch not in alphabet for ch in segment):
+        raise ValueError("invalid unpadded base64url segment")
+    return base64.b64decode(segment + "=" * (-len(segment) % 4), altchars=b"-_", validate=True)
+
 def _strict_json_object(raw: bytes) -> dict[str, Any]:
     def reject_duplicates(pairs):
         result = {}
@@ -89,12 +95,12 @@ def validate_hs256_jwt(token: str, *, key: bytes, issuer: str, audience: str,
         parts = token.split(".")
         if len(parts) != 3 or any(not part for part in parts):
             return False
-        header = _strict_json_object(base64.urlsafe_b64decode(parts[0] + "=" * (-len(parts[0]) % 4)))
-        claims = _strict_json_object(base64.urlsafe_b64decode(parts[1] + "=" * (-len(parts[1]) % 4)))
-        if header.get("alg") != "HS256" or header.get("typ") != "JWT":
+        header = _strict_json_object(_decode_b64url(parts[0]))
+        claims = _strict_json_object(_decode_b64url(parts[1]))
+        if set(header) != {"alg", "typ"} or header.get("alg") != "HS256" or header.get("typ") != "JWT":
             return False
         signing_input = f"{parts[0]}.{parts[1]}".encode("ascii")
-        supplied = base64.urlsafe_b64decode(parts[2] + "=" * (-len(parts[2]) % 4))
+        supplied = _decode_b64url(parts[2])
         expected = hmac.new(key, signing_input, hashlib.sha256).digest()
         if not hmac.compare_digest(supplied, expected):
             return False
@@ -127,10 +133,15 @@ def lab04_identity():
     alg_none_header = _b64url(json.dumps({"alg": "none", "typ": "JWT"}).encode())
     payload = _b64url(json.dumps(base).encode())
     unsigned = f"{alg_none_header}.{payload}."
+    crit_header = _b64url(json.dumps({"alg": "HS256", "typ": "JWT", "crit": ["exp"]}, separators=(",", ":")).encode())
+    crit_input = f"{crit_header}.{payload}"
+    crit_signature = _b64url(hmac.new(key, crit_input.encode("ascii"), hashlib.sha256).digest())
+    unsupported_header = f"{crit_input}.{crit_signature}"
     cases = {
         "valid": (valid, "case:read", set(), True),
         "wrong_signature": (wrong_signature, "case:read", set(), False),
         "alg_none_rejected": (unsigned, "case:read", set(), False),
+        "unsupported_header_parameter": (unsupported_header, "case:read", set(), False),
         "wrong_issuer": (encode_hs256_jwt({**base, "iss": "https://evil.invalid"}, key), "case:read", set(), False),
         "wrong_audience": (encode_hs256_jwt({**base, "aud": "api-b"}, key), "case:read", set(), False),
         "expired": (encode_hs256_jwt({**base, "exp": 999}, key), "case:read", set(), False),
