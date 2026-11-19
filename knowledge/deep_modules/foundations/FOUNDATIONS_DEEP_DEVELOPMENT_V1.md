@@ -651,3 +651,103 @@ Versionar políticas, matriz de obligaciones, registro de riesgos, controles, ev
 - Laboratorios ejecutados: **cero acreditados en esta iteración**.
 - Revisión independiente: **pendiente**.
 - G1–G8: **ninguna se declara aprobada**. Las puertas dependientes de ejecución o revisión externa permanecen bloqueadas hasta disponer de evidencia.
+
+
+## Protocolos operativos y evaluación por tema — complemento obligatorio
+
+Los protocolos siguientes son diseños reproducibles para ejecución posterior. No se declara que se hayan ejecutado. En todos los casos, guardar artefactos en una carpeta de ejecución separada, registrar commit, versiones, fecha UTC, semilla y hashes; usar datos sintéticos; no conectar sistemas productivos.
+
+### LAB-FND-01A — Modelos de seguridad y confianza
+
+- **Precondiciones:** Python fijado por lockfile; simulador local; política de prueba versionada; sin credenciales reales.
+- **Datos:** matriz de 3 sujetos × 4 recursos × 5 acciones, atributos de contexto y un ground truth revisado manualmente.
+- **Pasos:** (1) validar esquema y tipos; (2) cargar políticas RBAC y ABAC de referencia; (3) generar casos permitidos/denegados; (4) mutar atributos, expirar sesiones y revocar permisos; (5) ejecutar motor de decisión; (6) comparar con ground truth; (7) introducir fallo de IdP/PDP y observar modo degradado.
+- **Salida esperada:** CSV de decisiones, matriz de confusión, latencias y lista de rutas no mediadas.
+- **Verificación:** repetir con la misma semilla y obtener el mismo conjunto de casos y decisiones; revisar manualmente todos los falsos permisos.
+- **Limpieza/rollback:** borrar contenedor y datos sintéticos; restaurar versión de política inicial. No hay cambios externos.
+
+**Ejemplo:** un usuario con rol de lectura puede consultar un expediente no restringido y no puede exportarlo. **Contraejemplo:** asumir que pertenecer a la VLAN corporativa autoriza una acción sobre cualquier recurso.
+
+**Evaluación:** explicar por qué autenticación no equivale a autorización; derivar una regla ABAC; identificar un bypass en un flujo API→backend. Rúbrica: modelo correcto, supuestos explícitos, prueba negativa, explicación de riesgo residual.
+
+### LAB-FND-02A — Inventario y clasificación de activos
+
+- **Precondiciones:** dataset generator local; esquema de inventario versionado; fuentes sintéticas CMDB/cloud/EDR/DNS.
+- **Datos:** 500 registros sintéticos; incluir duplicados, cambios de hostname, recursos efímeros, activos sin dueño y registros obsoletos. El generador crea el ground truth por separado.
+- **Pasos:** (1) validar esquema; (2) normalizar identificadores y timestamps; (3) reconciliar por claves fuertes; (4) poner coincidencias ambiguas en cola humana; (5) asignar clasificación y propietario; (6) comparar con ground truth; (7) repetir con una fuente deliberadamente incompleta.
+- **Salida esperada:** inventario reconciliado, conflictos, activos huérfanos, métricas precision/recall/F1 y reporte de frescura.
+- **Verificación:** no fusionar automáticamente registros ambiguos; preservar referencia a cada fuente; recalcular métricas desde datos brutos.
+- **Limpieza/rollback:** eliminar snapshots sintéticos y conservar solo el manifiesto/hash de ejecución.
+
+**Ejemplo:** dos recursos cloud con IDs distintos no se fusionan aunque compartan hostname. **Contraejemplo:** usar hostname como clave primaria global y descartar la procedencia de registros.
+
+**Evaluación:** resolver tres conflictos de identidad de activo y justificar la confianza de cada decisión. Rúbrica: precisión, procedencia, tratamiento de incertidumbre y conservación de huérfanos.
+
+### LAB-FND-03A — Superficie de ataque y modelado de amenazas
+
+- **Precondiciones:** arquitectura sintética multi-tier, herramienta de diagramación local y alcance escrito del escenario.
+- **Datos:** API, IdP, cola, base de datos, CI/CD, proveedor externo y 30 escenarios etiquetados; etiquetas revisadas por dos evaluadores.
+- **Pasos:** (1) delimitar misión y activos; (2) dibujar contexto y DFD; (3) marcar trust boundaries; (4) enumerar amenazas STRIDE y abuse cases; (5) construir rutas AND/OR; (6) asociar controles y pruebas; (7) comparar con ground truth; (8) resolver desacuerdos y registrar adjudicación.
+- **Salida esperada:** DFD versionado, threat register, attack graph y tabla de omisiones/falsos positivos.
+- **Verificación:** toda amenaza crítica debe tener activo, precondición, consecuencia y evidencia/test; repetir evaluación ciega.
+- **Limpieza/rollback:** retirar diagramas temporales y restaurar versión inicial del modelo.
+
+**Ejemplo:** una identidad de pipeline con permisos de escritura sobre producción introduce una ruta de compromiso de supply chain. **Contraejemplo:** marcar “SQL injection” como riesgo sin endpoint, dato, precondición, impacto ni prueba.
+
+**Evaluación:** producir un escenario completo y distinguir amenaza de vulnerabilidad y riesgo. Rúbrica: cobertura, factibilidad, causalidad, control y trazabilidad.
+
+### LAB-FND-04A — Identidad y control de acceso
+
+- **Precondiciones:** IdP de laboratorio aislado, dos aplicaciones demo, dos identidades de workload y secretos ficticios.
+- **Datos:** tres roles, dos tenants, tokens de prueba y casos de expiración/revocación/audience/scope.
+- **Pasos:** (1) configurar emisores y audiencias de prueba; (2) emitir tokens ficticios; (3) ejecutar flujos legítimos; (4) ejecutar pruebas negativas con issuer/audience/scope incorrectos; (5) revocar y medir propagación; (6) revisar cuentas sin owner; (7) verificar que no exista bypass directo al recurso.
+- **Salida esperada:** matriz de autorización, registros de rechazo, tiempo de revocación y fallos legítimos.
+- **Verificación:** todo caso negativo se rechaza; toda identidad tiene owner/propósito; no se almacenan tokens en artefactos.
+- **Limpieza/rollback:** destruir tenant de laboratorio, invalidar tokens ficticios y eliminar secretos de prueba.
+
+**Ejemplo:** un token válido para API-A se rechaza en API-B si el audience no coincide. **Contraejemplo:** aceptar cualquier JWT con firma válida sin validar issuer, audience, expiración y claims requeridos.
+
+**Evaluación:** analizar una delegación excesiva y proponer revocación segura. Rúbrica: protocolo correcto, mínimo privilegio, pruebas negativas y recuperación.
+
+### LAB-FND-05A — Criptografía y protección de datos
+
+- **Precondiciones:** biblioteca criptográfica mantenida, entorno aislado, KMS simulado y vectores de prueba publicados por el proveedor del algoritmo.
+- **Datos:** mensajes ficticios, certificados de prueba, claves efímeras generadas durante la ejecución; nunca guardar material secreto.
+- **Pasos:** (1) fijar biblioteca/versión y parámetros; (2) ejecutar vectores conocidos; (3) cifrar/descifrar con AEAD; (4) alterar ciphertext y verificar rechazo; (5) probar rotación y recuperación con llaves de laboratorio; (6) medir latencia y errores; (7) inspeccionar logs para confirmar ausencia de secretos.
+- **Salida esperada:** reporte de vectores, interoperabilidad, latencia, fallos y rotación; manifiesto sin claves.
+- **Verificación:** mensajes alterados se rechazan; parámetros/nonce cumplen el contrato del algoritmo; restauración funciona con claves ficticias.
+- **Limpieza/rollback:** destruir llaves temporales, limpiar KMS simulado y conservar únicamente resultados saneados.
+
+**Ejemplo:** AEAD protege confidencialidad e integridad del mensaje bajo sus supuestos y uso correcto del nonce. **Contraejemplo:** afirmar que cifrar una base de datos impide que una aplicación comprometida lea los datos descifrados.
+
+**Evaluación:** seleccionar mecanismo para confidencialidad, integridad o firma y explicar límites. Rúbrica: selección adecuada, gestión de claves, supuestos, vectores y ausencia de secretos.
+
+### LAB-FND-06A — Detección, respuesta y recuperación
+
+- **Precondiciones:** SIEM/simulador local, reloj de laboratorio controlado y reglas versionadas.
+- **Datos:** trazas sintéticas normales e incidentes con ground truth; variantes con pérdida, duplicación, retraso y timestamps alterados.
+- **Pasos:** (1) generar trazas; (2) registrar hashes; (3) ingerir y normalizar; (4) ejecutar reglas; (5) correlacionar eventos; (6) comparar detecciones y timeline con ground truth; (7) ejecutar tabletop de contención y recuperación; (8) verificar restauración y monitoreo posterior.
+- **Salida esperada:** alertas, timeline, matriz de confusión, métricas operativas y acta del tabletop.
+- **Verificación:** distinguir detección de atribución; preservar eventos brutos; calcular denominadores y FPR/FNR; documentar falsos positivos/negativos.
+- **Limpieza/rollback:** reiniciar simulador y borrar datos de ejecución; no realizar aislamiento real ni alterar sistemas externos.
+
+**Ejemplo:** eventos con identidad, recurso, acción y timestamp permiten enlazar una secuencia con mejor contexto. **Contraejemplo:** atribuir un incidente a un actor solo por una dirección IP o un IOC aislado.
+
+**Evaluación:** reconstruir una secuencia con eventos faltantes y decidir qué conclusiones no están justificadas. Rúbrica: integridad temporal, incertidumbre, preservación y decisión proporcional.
+
+### LAB-FND-07A — Gobierno, riesgo y aseguramiento
+
+- **Precondiciones:** caso organizacional ficticio, taxonomía de riesgos y plantilla de assurance case.
+- **Datos:** 20 escenarios, owners, controles, evidencia válida/obsoleta/contradictoria y excepciones con vencimiento.
+- **Pasos:** (1) fijar contexto y apetito de riesgo ficticio; (2) asignar owners; (3) construir registro de riesgos; (4) mapear requisito→control→prueba→evidencia; (5) marcar evidencia insuficiente/caducada; (6) construir claim/argument/evidence; (7) someter a revisión ciega; (8) adjudicar desacuerdos.
+- **Salida esperada:** risk register, matriz de trazabilidad, assurance case y reporte de falsos cierres.
+- **Verificación:** ningún riesgo crítico sin dueño; ninguna afirmación de control eficaz sin evidencia pertinente; excepciones con responsable y fecha.
+- **Limpieza/rollback:** archivar solo datos sintéticos y borrar copias de trabajo.
+
+**Ejemplo:** un control de backup se considera probado solo si hay restauración documentada y verificada. **Contraejemplo:** declarar continuidad porque existe una política escrita o un contrato de backup.
+
+**Evaluación:** revisar un claim y detectar evidencia que no lo sustenta. Rúbrica: trazabilidad, calidad de argumento, gestión de incertidumbre y autoridad de aceptación.
+
+## Rúbrica transversal de salida por tema
+
+Puntuar cada criterio 0–2: 0 ausente/incorrecto; 1 parcial o no reproducible; 2 completo y respaldado. Criterios: (a) definiciones y alcance; (b) modelo y supuestos; (c) arquitectura/flujo; (d) estándares y versión; (e) procedimiento reproducible; (f) fallos y límites; (g) controles y riesgo residual; (h) hipótesis y validez; (i) dataset/ground truth; (j) métricas y baselines; (k) Skill con permisos/parada/rollback; (l) trazabilidad. Un puntaje documental no aprueba G5/G7/G8: esas puertas requieren ejecución, reproducción y revisión real. Un cero en seguridad, procedencia o trazabilidad bloquea la promoción del tema.
