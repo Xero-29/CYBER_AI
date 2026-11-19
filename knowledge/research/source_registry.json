@@ -120,7 +120,7 @@
       "url": "https://doi.org/10.6028/NIST.CSWP.29",
       "version": "2.0",
       "published": "2024-02-26",
-      "verification_status": "official_metadata_verified",
+      "verification_status": "selected_sections_reviewed",
       "verified_scope": "Marco de resultados de gestión del riesgo; no prescribe por sí solo procedimientos técnicos.",
       "domains": [
         "foundations",
@@ -129,7 +129,12 @@
         "incident_response",
         "business_continuity"
       ],
-      "review_note": "Metadatos y alcance revisados en el registro oficial NIST; descargar y revisar texto completo antes de citar secciones concretas."
+      "review_note": "Metadatos y alcance revisados en el registro oficial NIST; descargar y revisar texto completo antes de citar secciones concretas. Selected official sections inspected and mapped in knowledge/deep_modules/foundations/SOURCE_REVIEW_AND_CLAIM_EVIDENCE_2026-11-19.md; this is not a claim of full linear reading.",
+      "sections_reviewed": [
+        "purpose, CSF Core, Profiles and Tiers",
+        "Selected sections of the official PDF inspected; not linearly read in full."
+      ],
+      "review_date": "2026-11-19"
     },
     {
       "id": "NIST-DEVSECOPS-IPD-2026",
@@ -325,7 +330,7 @@
       "url": "https://doi.org/10.6028/NIST.SP.800-61r3",
       "version": "Revision 3",
       "published": "2025-04-03",
-      "verification_status": "official_pdf_sections_inspected",
+      "verification_status": "selected_sections_reviewed",
       "verified_scope": "Integra recomendaciones de respuesta a incidentes en actividades de gestión del riesgo alineadas con CSF 2.0; sustituye SP 800-61 Rev. 2.",
       "domains": [
         "incident_response",
@@ -334,7 +339,12 @@
         "business_continuity",
         "forensics"
       ],
-      "review_note": "Se inspeccionaron portada, Executive Summary, modelo de ciclo de vida en páginas impresas 4–6 y fragmentos de contención/respuesta en páginas 31–32 del PDF oficial. No se declara lectura exhaustiva de todo el documento."
+      "review_note": "Se inspeccionaron portada, Executive Summary, modelo de ciclo de vida en páginas impresas 4–6 y fragmentos de contención/respuesta en páginas 31–32 del PDF oficial. No se declara lectura exhaustiva de todo el documento. Selected official sections inspected and mapped in knowledge/deep_modules/foundations/SOURCE_REVIEW_AND_CLAIM_EVIDENCE_2026-11-19.md; this is not a claim of full linear reading.",
+      "sections_reviewed": [
+        "Section 2 life-cycle model, CSF 2.0 Functions, roles/responsibilities and continuous improvement",
+        "Section 2 and selected profile material inspected; not linearly read in full."
+      ],
+      "review_date": "2026-11-19"
     },
     {
       "id": "NIST-SP-800-63-4",
@@ -1076,14 +1086,19 @@
       "url": "https://doi.org/10.6028/NIST.SP.800-30r1",
       "version": "Revision 1",
       "published": "2012-09-17",
-      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verification_status": "selected_sections_reviewed",
       "verified_scope": "Guía para preparar, conducir y mantener evaluaciones de riesgo en sistemas y organizaciones; la aplicación requiere contexto y supuestos documentados.",
       "domains": [
         "foundations",
         "governance",
         "vuln_management"
       ],
-      "review_note": "Página oficial NIST y abstract inspeccionados el 2026-11-19. Texto completo, extracción por sección y contraste independiente pendientes."
+      "review_note": "Página oficial NIST y abstract inspeccionados el 2026-11-19. Texto completo, extracción por sección y contraste independiente pendientes. Selected official sections inspected and mapped in knowledge/deep_modules/foundations/SOURCE_REVIEW_AND_CLAIM_EVIDENCE_2026-11-19.md; this is not a claim of full linear reading.",
+      "sections_reviewed": [
+        "risk framing/model, threat sources/events, vulnerabilities/predisposing conditions, likelihood, impact and risk determination",
+        "Chapters 2-3 and selected appendices inspected; not linearly read in full."
+      ],
+      "review_date": "2026-11-19"
     },
     {
       "id": "NIST-SP-800-53r5",
@@ -1637,14 +1652,19 @@
       "url": "https://doi.org/10.6028/NIST.SP.800-160v1r1",
       "version": "Volume 1 Revision 1 Final",
       "published": "2022-11-16",
-      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verification_status": "selected_sections_reviewed",
       "verified_scope": "Principios, conceptos, actividades y tareas de ingeniería de sistemas seguros a lo largo del ciclo de vida.",
       "domains": [
         "foundations",
         "secure_arch",
         "governance"
       ],
-      "review_note": "Página oficial NIST y abstract inspeccionados el 2026-11-19. Texto completo, extracción por sección, licencia del artefacto y lectura integral pendientes."
+      "review_note": "Página oficial NIST y abstract inspeccionados el 2026-11-19. Texto completo, extracción por sección, licencia del artefacto y lectura integral pendientes. Selected official sections inspected and mapped in knowledge/deep_modules/foundations/SOURCE_REVIEW_AND_CLAIM_EVIDENCE_2026-11-19.md; this is not a claim of full linear reading.",
+      "sections_reviewed": [
+        "abstract, SSE framework/context model, security requirements, requirement-policy-mechanism distinction, tailoring and life-cycle processes",
+        "Sections and pages inspected; not linearly read in full."
+      ],
+      "review_date": "2026-11-19"
     },
     {
       "id": "NIST-SP-800-37r2",
@@ -1654,14 +1674,19 @@
       "url": "https://doi.org/10.6028/NIST.SP.800-37r2",
       "version": "Revision 2 Final",
       "published": "2018-12-20",
-      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verification_status": "selected_sections_reviewed",
       "verified_scope": "Proceso RMF que conecta categorización, selección, implementación, evaluación, autorización y monitoreo continuo con el ciclo de vida.",
       "domains": [
         "foundations",
         "governance",
         "secure_arch"
       ],
-      "review_note": "Página oficial NIST y abstract inspeccionados el 2026-11-19. Texto completo, lectura por sección y análisis de aplicabilidad local pendientes."
+      "review_note": "Página oficial NIST y abstract inspeccionados el 2026-11-19. Texto completo, lectura por sección y análisis de aplicabilidad local pendientes. Selected official sections inspected and mapped in knowledge/deep_modules/foundations/SOURCE_REVIEW_AND_CLAIM_EVIDENCE_2026-11-19.md; this is not a claim of full linear reading.",
+      "sections_reviewed": [
+        "Prepare, Categorize, Select, Implement, Assess, Authorize, Monitor; privacy and supply-chain integration",
+        "Sections 3.1-3.7 and introductory material inspected; not linearly read in full."
+      ],
+      "review_date": "2026-11-19"
     },
     {
       "id": "NIST-SP-800-53r5-2.0",
@@ -1671,7 +1696,7 @@
       "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/final",
       "version": "Release 5.2.0",
       "published": "2025-08-27",
-      "verification_status": "official_release_announcement_and_metadata_reviewed",
+      "verification_status": "selected_sections_reviewed",
       "verified_scope": "Release 5.2.0 incorpora cambios sobre resiliencia, pruebas de desarrollo, despliegue/gestión de actualizaciones e integridad de software; SP 800-53A 5.2.0 se actualiza en correspondencia.",
       "domains": [
         "foundations",
@@ -1680,7 +1705,93 @@
         "identity",
         "data_security"
       ],
-      "review_note": "Anuncio oficial NIST inspeccionado el 2026-11-19. Consultar CPRT/OSCAL para la edición y controles exactos; no usar la ficha Rev.5 de 2020 como sustituto de Release 5.2.0. Lectura integral pendiente."
+      "review_note": "Anuncio oficial NIST inspeccionado el 2026-11-19. Consultar CPRT/OSCAL para la edición y controles exactos; no usar la ficha Rev.5 de 2020 como sustituto de Release 5.2.0. Lectura integral pendiente. Selected official sections inspected and mapped in knowledge/deep_modules/foundations/SOURCE_REVIEW_AND_CLAIM_EVIDENCE_2026-11-19.md; this is not a claim of full linear reading.",
+      "sections_reviewed": [
+        "official 5.2.0 release notice and changed-control summary",
+        "Release announcement and metadata reviewed; complete control catalog not read."
+      ],
+      "review_date": "2026-11-19"
+    },
+    {
+      "id": "NIST-SP-800-88r2",
+      "title": "Guidelines for Media Sanitization",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.800-88r2",
+      "version": "Revision 2 Final",
+      "published": "2025-09-26",
+      "verification_status": "selected_sections_reviewed",
+      "sections_reviewed": [
+        "Abstract, publication history, scope and program/assurance guidance"
+      ],
+      "review_date": "2026-11-19",
+      "domains": [
+        "foundations",
+        "asset_management",
+        "data_security",
+        "hardware"
+      ],
+      "review_note": "PDF and official publication record inspected; replaces Rev. 1. Selected sections only, not a full linear reading."
+    },
+    {
+      "id": "IETF-RFC-9700",
+      "title": "Best Current Practice for OAuth 2.0 Security",
+      "publisher": "Internet Engineering Task Force",
+      "type": "best_current_practice",
+      "url": "https://www.rfc-editor.org/rfc/rfc9700.html",
+      "version": "RFC 9700 / BCP 240",
+      "published": "2025-01",
+      "verification_status": "selected_sections_reviewed",
+      "sections_reviewed": [
+        "Sections 2.1-2.6; attacker model; Sections 4.1-4.17 attacks and mitigations, including PKCE, token replay, sender constraint and refresh token protection"
+      ],
+      "review_date": "2026-11-19",
+      "domains": [
+        "foundations",
+        "identity",
+        "api"
+      ],
+      "review_note": "Full RFC text opened; security recommendations and attack/mitigation sections inspected. Not an implementation test."
+    },
+    {
+      "id": "MITRE-ATTACK-v20.1",
+      "title": "MITRE ATT&CK Version History and October 2026 Update",
+      "publisher": "MITRE",
+      "type": "living_knowledge_base_release_record",
+      "url": "https://attack.mitre.org/resources/versions/",
+      "version": "v20.1",
+      "published": "2026-10-13",
+      "verification_status": "version_and_changelog_reviewed",
+      "sections_reviewed": [
+        "Version history and October 2026 changelog"
+      ],
+      "review_date": "2026-11-19",
+      "domains": [
+        "foundations",
+        "threat_intel",
+        "threat_hunting"
+      ],
+      "review_note": "v20.1 identified as current on review date. Catalog objects were not exhaustively reviewed; ATT&CK is not a likelihood model."
+    },
+    {
+      "id": "NIST-SP-800-57pt1r5",
+      "title": "Recommendation for Key Management: Part 1 – General",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_key_management_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.800-57pt1r5",
+      "version": "Part 1 Revision 5",
+      "published": "2020-05-04",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "sections_reviewed": [
+        "Official publication record and abstract"
+      ],
+      "review_date": "2026-11-19",
+      "domains": [
+        "foundations",
+        "crypto",
+        "identity"
+      ],
+      "review_note": "PDF retrieval timed out; do not claim full-text reading. Detailed key-management claims must be checked against the PDF before M3."
     }
   ],
   "last_updated": "2026-11-19"
