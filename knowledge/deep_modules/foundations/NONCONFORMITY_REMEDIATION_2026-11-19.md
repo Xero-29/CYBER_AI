@@ -15,7 +15,7 @@ Este documento registra correcciones y evidencia nueva. No borra el dictamen pre
 | NC-01 Fuentes incompletas/vigencia | Añadido control de versiones y cambios oficiales para SP 800-57 Rev. 6 IPD, FIPS 203 errata, SP 800-53 5.2.0, ASVS 5.0.0 y ATT&CK v20.1 | Parcial: metadatos/changelog trazados; lectura integral sigue pendiente |
 | NC-02 Simulación vs implementación | JWS HS256 real con verificación de firma y claims; cadena de auditoría HMAC con detección de alteración/reordenamiento; assurance exige evidencia estructurada | Parcial: prototipos locales fieles; sin IdP/KMS/SIEM externo |
 | NC-03 Reproducción independiente | CI dedicado en runners limpios Python 3.11/3.12/3.13 y comparación exacta contra results.json | Parcial: reproducibilidad multi-runtime CI; segundo operador externo aún pendiente |
-| NC-04 Evaluación de conocimiento | Añadida rúbrica de evaluación práctica y casos negativos como base para evaluación ciega | Diseño; no hay evaluador ni resultados de participantes |
+| NC-04 Evaluación de conocimiento | Añadido instrumento de 21 ejercicios A/B/C y clave separada para evaluador | Instrumento y clave creados; no se ha administrado ni hay resultados de participantes |
 | NC-05 Revisión externa | Definido paquete de revisión y checklist para tercero | Bloqueada hasta que una persona independiente revise y emita dictamen |
 | NC-06 Skills no validadas | Se mantienen como candidatas; promoción exige pruebas negativas, límites, permisos, rollback, evidencia y revisión | No promovidas |
 
@@ -59,8 +59,8 @@ El cierre requiere control implementado, propietario, evidencia de tipo aceptado
 ## NC-03 — Reproducción multi-runtime
 Se añade job CI aislado para Python 3.11, 3.12 y 3.13. Cada ejecución usa runtime limpio, ejecuta tests y compara el resultado calculado con `labs/results.json`. Esto no se etiqueta como réplica independiente: los jobs proceden del mismo repositorio, autoría y definición de pruebas.
 
-## NC-04 — Evaluación práctica propuesta
-Cada tema tendrá tres ejercicios: (A) explicación/derivación de modelo, (B) diagnóstico con datos incompletos y supuestos, (C) ejecución de procedimiento y pruebas negativas. Criterios 0–2: conceptos, supuestos/incertidumbre, razonamiento técnico, controles/trade-offs, pruebas negativas/diagnóstico y evidencia/trazabilidad/límites. Aprobación propuesta: mínimo 10/12, sin cero en seguridad, supuestos o evidencia. Es una regla de evaluación propuesta, no norma externa ni resultado ya alcanzado. Falta evaluador y participantes reales.
+## NC-04 — Evaluación práctica
+Se añadió `FOUNDATIONS_COMPETENCY_ASSESSMENT_V1.md` con 21 ejercicios A/B/C (tres por tema) y `FOUNDATIONS_ASSESSOR_KEY_V1.md` con criterios de corrección. La clave debe mantenerse separada durante la administración ciega. La rúbrica puntúa conceptos, supuestos/incertidumbre, razonamiento, controles/trade-offs, pruebas negativas y evidencia/límites. Umbral propuesto: 10/12 sin cero en exactitud, aplicación o evidencia. Es una regla interna provisional, no norma externa. La no conformidad no cierra hasta que un evaluador independiente administre el instrumento, califique respuestas y se analicen resultados.
 
 ## NC-05 — Paquete de revisión externa
 El revisor debe declarar experiencia y conflictos; seleccionar al menos dos temas y muestra de capas; verificar citas/versiones/claims; ejecutar labs desde checkout limpio; cuestionar supuestos y validez; registrar defectos y severidad; emitir approve/request_changes/reject; y confirmar resolución/retest. No se puede autoadjudicar esta revisión. G8 sigue bloqueada hasta que una persona distinta del autor emita revisión.
