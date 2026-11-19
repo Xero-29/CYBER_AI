@@ -60,3 +60,28 @@ Recall/precision; cobertura de operaciones/roles; defectos escapados; falsos pos
 ## Identificadores del registro de fuentes
 
 - `RESEARCH-API`
+
+
+## Fuentes primarias adicionales inspeccionadas el 2026-11-19
+
+| ID | Fuente | Qué se inspeccionó | Límite |
+|---|---|---|---|
+| `IETF-RFC9700` | RFC 9700 / BCP 240, OAuth 2.0 Security Best Current Practice (enero 2025) | RFC oficial y recomendaciones principales sobre redirect URI exacta, PKCE, CSRF/mix-up y sender-constrained tokens | No se declara lectura integral ni auditoría de todas las implementaciones |
+| `OPENAPI-OAS-3.2.1` | OpenAPI Specification 3.2.1 | Índice oficial de versiones y advertencia sobre límites de validación de esquemas | Texto completo pendiente; la especificación no demuestra conformidad del servicio |
+| `GRPC-AUTH-GUIDE` | gRPC Authentication | Guía oficial sobre credenciales y TLS | Validación de detalles por lenguaje/versión pendiente |
+
+### Síntesis crítica
+
+RFC 9700 es una Best Current Practice de IETF que actualiza el modelo de amenazas de OAuth y desaconseja modos de operación inseguros. La guía de API debe fijar la versión del protocolo y evaluar compatibilidad antes de cambiar flujos. OpenAPI define contratos, pero un schema validator no detecta todas las violaciones posibles y un contrato correcto no demuestra que el backend aplique autorización. La autenticación TLS/mTLS de gRPC protege el canal y puede autenticar el workload; no concede automáticamente autorización de negocio.
+
+La lista OWASP API Top 10 2023 se utiliza como taxonomía de riesgos, no como medida de prevalencia universal. Las conclusiones se mantienen proporcionales a las páginas oficiales inspeccionadas.
+
+## Límite de madurez empírica
+
+**Límite explícito: no M3/M4/M5.** Este dossier permanece en M1 exploratorio. Las fuentes fueron localizadas y sus páginas oficiales inspeccionadas; la lectura integral, revisión sistemática, ejecución de laboratorios, análisis experimental, revisión independiente y reproducción externa siguen pendientes. Las hipótesis y protocolos son propuestas, no resultados.
+
+- `IETF-RFC9700`
+
+- `OPENAPI-OAS-3.2.1`
+
+- `GRPC-AUTH-GUIDE`
