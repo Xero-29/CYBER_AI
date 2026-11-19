@@ -67,3 +67,23 @@ La autorización de objetivos y ejecución de herramientas debe estar en código
 - NIST NICE Framework v2.2.0: https://www.nist.gov/news-events/news/2026/04/nice-releases-nice-framework-components-v220
 
 **Estado de evidencia:** se revisaron páginas oficiales y resúmenes de proyectos/estándares. Las pruebas descritas son diseños de evaluación, no experimentos ejecutados ni certificación del sistema.
+
+
+## Actualización de arquitectura cloud-native y supply chain de modelos
+NIST SP 800-207A aporta una arquitectura de Zero Trust para aplicaciones cloud-native multi-cloud: la identidad de aplicación y servicio debe complementar la identidad de usuario y la ubicación de red. Para agentes de IA, cada llamada entre servicio, herramienta, conector y proveedor debe autenticarse y autorizarse de forma independiente.
+
+### Requisitos adicionales
+- Workload identity por servicio/agente/herramienta, credenciales de vida corta y rotación automática.
+- Autorización contextual en gateways/proxies o policy enforcement points; el LLM no concede permisos.
+- mTLS y políticas por identidad de servicio; revisar sidecars, service mesh, ingress/egress y API gateways.
+- Inventario de modelos y componentes (pesos, tokenizer, adapters, datasets, runtime, plugins, tools y evaluadores) con hashes, licencia y procedencia.
+- Verificación de provenance y attestations antes de cargar modelos o publicar un índice RAG.
+- Evaluación de contaminación y envenenamiento de datasets, corpus RAG, memoria, herramientas y outputs de evaluadores.
+- Aislamiento por tenant en retrieval, caches, logs, memoria y almacenamiento vectorial; probar lecturas cruzadas negativas.
+- Pruebas de fallback, retry storms, agent loops, agotamiento de presupuesto y revocación inmediata de herramientas.
+
+### Fuentes
+- NIST SP 800-207A: https://doi.org/10.6028/NIST.SP.800-207A
+- NIST AI RMF: https://doi.org/10.6028/NIST.AI.100-1
+- NIST Generative AI Profile: https://doi.org/10.6028/NIST.AI.600-1
+- NIST SSDF project / SP 800-218A: https://csrc.nist.gov/Projects/ssdf

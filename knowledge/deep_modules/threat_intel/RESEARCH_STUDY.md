@@ -36,3 +36,20 @@ Feed STIX sintético, TAXII server de prueba, IOC expirado, IP compartida, domin
 - FIRST EPSS: https://www.first.org/epss/
 
 **Límite:** no se descarga ni valida un feed en esta síntesis; toda fuente externa requiere reputación, licencia, privacidad y control de envenenamiento.
+
+
+## Actualización de catálogo — ATT&CK v20.1 (2026-10-13)
+La historia oficial de versiones de MITRE indica ATT&CK v20.1 como versión vigente desde el 13 de octubre de 2026 al corte de esta investigación. El mapeo de campañas, técnicas y grupos debe fijar versión y conservar la versión anterior para reproducibilidad; no utilizar una referencia "Live" como si fuera un snapshot estable.
+
+### Requisitos de calidad añadidos
+- Registrar versión del catálogo, fecha de extracción, hash del bundle STIX y dominio (Enterprise, Mobile, ICS).
+- Mantener relaciones y objetos revocados/deprecados; no borrar silenciosamente IDs históricos.
+- Distinguir técnica observada, hipótesis analítica y atribución; exigir evidencia y confianza.
+- Actualizar mapeos de CTI a detección y mitigación sin confundir ATT&CK coverage con eficacia defensiva.
+- Registrar procedencia, licencia, TLP/marking, expiración y restricciones de redistribución de cada feed.
+- Medir freshness, duplicados, conflictos, precisión, utilidad para decisiones y tasa de IOC expirados.
+
+### Fuentes
+- MITRE ATT&CK version history: https://attack.mitre.org/resources/versions/
+- MITRE ATT&CK updates: https://attack.mitre.org/resources/updates/
+La versión se verificó en la página oficial de historial. La extracción STIX, revisión de cambios y validación de mappings siguen pendientes.

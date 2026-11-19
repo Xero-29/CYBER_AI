@@ -31,3 +31,21 @@ Implementaciones verificadas de ML-KEM/ML-DSA/SLH-DSA, vectors, interoperability
 - NIST SP 800-57: https://doi.org/10.6028/NIST.SP.800-57pt1r5
 
 **Límite:** fijar implementaciones, parámetros, erratas y perfiles; los microbenchmarks no prueban seguridad.
+
+
+## Actualización de hoja de ruta de migración — NIST IR 8547 (2026-10-27)
+NIST publicó IR 8547 Final el 27 de octubre de 2026. El documento establece la hoja de ruta oficial para transición desde algoritmos vulnerables a computación cuántica hacia estándares PQC, identificando algoritmos afectados y estándares de destino. La biblioteca debe tratarlo como referencia central de planificación, no inferir fechas de migración de cada activo sin inventario y análisis de criticidad.
+
+### Requisitos que faltaban en el currículo operativo
+- Inventario criptográfico automatizable (algoritmo, tamaño/parámetro, biblioteca, protocolo, certificado, propietario, ubicación, uso, fecha de expiración y dependencia).
+- Clasificación por vida útil de confidencialidad, sensibilidad y exposición a captura; priorizar riesgo HNDL.
+- Mapa de dependencias criptográficas y terceros (PKI, HSM, firmware, appliances, SaaS, backups y archivos históricos).
+- Política de cripto-agilidad: negociación de algoritmos, perfiles permitidos, desactivación de algoritmos heredados, actualización de certificados y pruebas de downgrade.
+- Plan de transición con hitos, responsables, criterios de salida, excepciones, compensaciones y rollback.
+- Ensayos de interoperabilidad híbrida y de rendimiento en MTU, latencia, CPU, memoria, tamaño de certificados/firmas y dispositivos restringidos.
+- Gobernanza del riesgo de algoritmos legado y gestión de excepciones con fecha de caducidad.
+
+### Evidencia y límites
+- NIST IR 8547 Final: https://doi.org/10.6028/NIST.IR.8547
+- Ficha de publicación: https://csrc.nist.gov/pubs/ir/8547/final
+La ficha oficial y el resumen fueron revisados; el informe completo y sus hitos deben extraerse y revisarse antes de crear una política de fechas. No se ejecutaron pruebas de interoperabilidad.

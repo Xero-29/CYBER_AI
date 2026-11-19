@@ -1,0 +1,497 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-11-18",
+  "purpose": "Inventario de brechas avanzadas detectadas al contrastar el currículo de 48 dominios con marcos y fuentes oficiales. Las entradas son brechas a desarrollar, no conocimiento ya validado.",
+  "status_policy": {
+    "initial_status": "identified_not_yet_assessed",
+    "validated_requires": [
+      "contenido técnico desarrollado",
+      "fuente primaria con alcance de lectura declarado",
+      "procedimiento reproducible",
+      "laboratorio y resultados cuando aplique",
+      "revisión independiente"
+    ]
+  },
+  "domains": [
+    {
+      "domain_id": "foundations",
+      "missing_advanced_topics": [
+        "cuantificación de riesgo y análisis de incertidumbre",
+        "arquitectura de confianza y resiliencia sistémica",
+        "economía de seguridad y priorización basada en impacto",
+        "gestión de exposición externa y attack surface management"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "appsec",
+      "missing_advanced_topics": [
+        "seguridad de lógica de negocio y flujos transaccionales",
+        "seguridad de navegador, extensiones y aislamiento de origen",
+        "seguridad de componentes frontend y cadena de dependencias",
+        "pruebas de autorización y propiedades de seguridad por flujo"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "api",
+      "missing_advanced_topics": [
+        "GraphQL federation, introspection y autorización por resolver",
+        "gRPC, protobuf y seguridad de canales",
+        "API inventory, shadow APIs y contratos versionados",
+        "abuso de negocio, replay y límites distribuidos"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "network",
+      "missing_advanced_topics": [
+        "BGP, RPKI y validación de origen de rutas",
+        "IPv6, RA guard y superficies dual-stack",
+        "DNS moderno, DoH/DoT y seguridad de resolvers",
+        "SASE, SD-WAN, ZTNA y seguridad de borde"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "linux",
+      "missing_advanced_topics": [
+        "eBPF y observabilidad/seguridad del kernel",
+        "Linux namespaces, cgroups y escape de contenedores",
+        "PAM, sudo, systemd y hardening por distribución",
+        "firmware, boot chain y respuesta a compromisos"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "windows_ad",
+      "missing_advanced_topics": [
+        "AD CS, certificados y abuso de PKI empresarial",
+        "Entra ID/híbrido, OAuth y workload identities",
+        "Kerberos delegation, trusts y tiering avanzado",
+        "detección de identidad y recuperación forest-level"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "cloud",
+      "missing_advanced_topics": [
+        "SaaS security posture y control plane de identidades",
+        "serverless, event-driven y permisos por función",
+        "CNAPP, CSPM, CIEM y correlación de exposición",
+        "cloud-native zero trust y workload identity"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "containers",
+      "missing_advanced_topics": [
+        "Kubernetes supply chain y verificación de imágenes",
+        "runtime security, eBPF y detección de comportamiento",
+        "service mesh, SPIFFE/SPIRE y políticas de servicio",
+        "admission control, secrets y recuperación de control plane"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "mobile",
+      "missing_advanced_topics": [
+        "mobile app supply chain y firma de releases",
+        "runtime application self-protection y anti-tampering",
+        "baseband, eSIM y superficie de radio",
+        "privacidad, SDKs de terceros y telemetría móvil"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "crypto",
+      "missing_advanced_topics": [
+        "cripto-agilidad e inventario criptográfico empresarial",
+        "side-channel y fault attacks en implementaciones",
+        "protocolos híbridos y negociación segura",
+        "validación de bibliotecas, vectores y erratas"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "identity",
+      "missing_advanced_topics": [
+        "passkeys/WebAuthn y autenticación resistente a phishing",
+        "identidades no humanas y ciclo de vida de credenciales",
+        "CIEM y permisos efectivos multi-cloud",
+        "detección de ataques a identidad y recuperación segura"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "malware",
+      "missing_advanced_topics": [
+        "malware fileless y abuso de herramientas legítimas",
+        "firmware/UEFI y bootkits",
+        "análisis de memoria y artefactos multiplataforma",
+        "ransomware, exfiltración y recuperación coordinada"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "forensics",
+      "missing_advanced_topics": [
+        "forense de memoria multiplataforma",
+        "forense SaaS/cloud con APIs y retención distribuida",
+        "adquisición móvil moderna y cifrado",
+        "reproducibilidad, validación de herramientas y error forense"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "incident_response",
+      "missing_advanced_topics": [
+        "respuesta a ransomware y extorsión múltiple",
+        "respuesta cloud, SaaS e identidad comprometida",
+        "notificación regulatoria y coordinación sectorial",
+        "recuperación segura, validación de backups y crisis"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "threat_intel",
+      "missing_advanced_topics": [
+        "ATT&CK versionado, STIX y procedencia de objetos",
+        "calidad de inteligencia y evaluación de hipótesis",
+        "detección estratégica basada en cadenas de comportamiento",
+        "automatización de CTI con control de poisoning"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "reverse",
+      "missing_advanced_topics": [
+        "WebAssembly, bytecode y runtimes modernos",
+        "firmware, bootloaders y análisis de dispositivos",
+        "análisis de vulnerabilidades de memoria y compiladores",
+        "reproducibilidad de builds y artefactos"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "iot_hardware",
+      "missing_advanced_topics": [
+        "device identity y provisioning de confianza",
+        "SBOM/firmware BOM y vulnerabilidades de componentes",
+        "actualizaciones OTA, rollback y recuperación",
+        "seguridad de radios, gateways y protocolos industriales"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "devsecops",
+      "missing_advanced_topics": [
+        "provenance verificable, SLSA y attestations",
+        "OIDC, runners efímeros y permisos por job",
+        "seguridad de modelos/datasets en pipelines ML",
+        "verificación de artefactos y políticas de despliegue"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "ai_security",
+      "missing_advanced_topics": [
+        "model supply chain y model BOM",
+        "seguridad de agentes, tools y delegación de autoridad",
+        "aislamiento multi-tenant de RAG, memoria y vectores",
+        "evaluación continua de modelos y datasets contaminados"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "governance",
+      "missing_advanced_topics": [
+        "regulación colombiana y sectorial aplicable",
+        "riesgo de terceros, concentración y cadena de suministro",
+        "métricas cuantitativas, apetito y riesgo residual",
+        "gobierno de IA, privacidad y uso responsable"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "vuln_management",
+      "missing_advanced_topics": [
+        "exposure management y attack surface externo",
+        "correlación KEV, EPSS, CVSS y contexto de activo",
+        "priorización por ruta de ataque y explotabilidad",
+        "gestión de excepciones, deuda y remediación verificable"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "bug_bounty",
+      "missing_advanced_topics": [
+        "VDP, safe harbor y coordinación legal",
+        "triage reproducible y deduplicación de hallazgos",
+        "pruebas seguras de impacto sin exfiltración",
+        "métricas de programa y divulgación coordinada"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "secure_arch",
+      "missing_advanced_topics": [
+        "arquitectura cloud-native Zero Trust",
+        "resiliencia, degradación segura y blast-radius control",
+        "arquitectura multi-tenant y separación de datos",
+        "seguridad de APIs internas, service mesh y supply chain"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "data_security",
+      "missing_advanced_topics": [
+        "DSPM, clasificación automatizada y data lineage",
+        "confidential computing y protección de datos en uso",
+        "privacidad-preserving analytics y aprendizaje",
+        "borrado verificable, retención y gobernanza de backups"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "software_engineering",
+      "missing_advanced_topics": [
+        "memory safety y lenguajes seguros",
+        "concurrencia, race conditions y seguridad de runtime",
+        "reproducible builds y provenance de dependencias",
+        "fuzzing, property-based testing y verificación"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "machine_learning",
+      "missing_advanced_topics": [
+        "adversarial ML, poisoning y backdoors",
+        "privacy leakage, membership inference y extracción",
+        "model evaluation, calibration y uncertainty",
+        "MLOps, model registry y procedencia de datasets"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "hardware_security",
+      "missing_advanced_topics": [
+        "silicon assurance y cadena de fabricación",
+        "fault injection y side-channel avanzado",
+        "attestation, TEE y confidential computing",
+        "firmware lifecycle y recuperación de root of trust"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "mathematics",
+      "missing_advanced_topics": [
+        "estadística bayesiana y calibración de confianza",
+        "optimización robusta y detección de anomalías",
+        "teoría de información aplicada a privacidad",
+        "métodos formales y pruebas criptográficas"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "soc_siem",
+      "missing_advanced_topics": [
+        "ATT&CK Detection Strategies y Analytics versionados",
+        "detección de secuencias y causalidad temporal",
+        "calidad, cobertura y drift de telemetría",
+        "evaluación estadística de reglas y playbooks"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "edr_xdr",
+      "missing_advanced_topics": [
+        "telemetría kernel y eBPF multiplataforma",
+        "detección de identidad, SaaS y cloud workloads",
+        "resistencia a tampering y gaps de sensor",
+        "aislamiento reversible y recuperación del endpoint"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "threat_hunting",
+      "missing_advanced_topics": [
+        "hipótesis falsables y análisis de base rates",
+        "detección por comportamiento y cadenas de eventos",
+        "ATT&CK analytics y data components actuales",
+        "reproducibilidad y medición de valor del hunt"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "red_team",
+      "missing_advanced_topics": [
+        "adversary emulation con ATT&CK versionado",
+        "cloud, SaaS e identidad como superficies prioritarias",
+        "purple teaming y validación de detecciones",
+        "seguridad operacional, deconfliction y límites"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "wireless_security",
+      "missing_advanced_topics": [
+        "WPA3 Enterprise, 802.1X y roaming seguro",
+        "Bluetooth LE privacy y seguridad GATT",
+        "SDR, espectro y pruebas de radio autorizadas",
+        "Wi-Fi 6E/7 y segmentación de IoT"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "ot_ics",
+      "missing_advanced_topics": [
+        "IEC 62443 ciclo de vida y zonas/conduits",
+        "safety-security co-engineering y análisis de consecuencias",
+        "remote access, vendor access y control de cambios",
+        "detección pasiva y recuperación de lógica/firmware"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "telecom_5g",
+      "missing_advanced_topics": [
+        "Open RAN y seguridad de interfaces",
+        "5G SBA, APIs y service-based identity",
+        "slicing, roaming y aislamiento entre tenants",
+        "eSIM, supply chain y edge/MEC"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "automotive_security",
+      "missing_advanced_topics": [
+        "UNECE R155/R156 y CSMS/SUMS",
+        "CAN-FD, Automotive Ethernet y gateways zonales",
+        "V2X, telemática y backend cloud",
+        "OTA, HIL/SIL y análisis de seguridad funcional"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "satellite_security",
+      "missing_advanced_topics": [
+        "ground segment, TT&C y cadena de mando",
+        "GNSS spoofing/jamming y resiliencia de navegación",
+        "RF links, key management y anti-replay",
+        "supply chain y operaciones de constelaciones"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "physical_security",
+      "missing_advanced_topics": [
+        "convergencia de identidad física y lógica",
+        "controladores de acceso, firmware y redes de edificios",
+        "CCTV/IoT, privacidad y retención de evidencia",
+        "amenazas internas y respuesta ciberfísica"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "email_dns_security",
+      "missing_advanced_topics": [
+        "DMARC alignment, reporting y operación de políticas",
+        "MTA-STS, DANE, TLS-RPT y downgrade",
+        "BIMI, ARC y ecosistema de autenticación de correo",
+        "DNS registrar security, DNSSEC y account takeover"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "fraud_abuse",
+      "missing_advanced_topics": [
+        "identidad sintética y señales de dispositivo",
+        "detección de bots y fricción adaptativa",
+        "grafos de fraude y análisis temporal",
+        "apelación, fairness y medición de falsos positivos"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "privacy_engineering",
+      "missing_advanced_topics": [
+        "DPIA/PIA y evaluación de riesgo de reidentificación",
+        "PETs: differential privacy, MPC y federated learning",
+        "gobierno de SDKs, telemetría y terceros",
+        "retención, derechos y borrado verificable"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "cloud_forensics",
+      "missing_advanced_topics": [
+        "evidencia de control plane y auditoría cloud",
+        "serverless, containers y evidencia efímera",
+        "snapshots, object lock y cadena de custodia",
+        "correlación multi-cloud, SaaS e identidad"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "ai_red_team",
+      "missing_advanced_topics": [
+        "ataques multimodales y prompt injection indirecta",
+        "tool abuse, excessive agency y autorización",
+        "RAG poisoning, memory poisoning y cross-tenant",
+        "evaluación de agentes, costes y recuperación"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "pki_hsm",
+      "missing_advanced_topics": [
+        "ACME, CT logs y automatización de certificados",
+        "ceremonias de claves, quorum y recuperación HSM",
+        "CA compromise, revocation y trust store governance",
+        "PQC certificates y crypto-agility"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "post_quantum_crypto",
+      "missing_advanced_topics": [
+        "NIST IR 8547 y hoja de ruta de transición",
+        "inventario criptográfico y clasificación HNDL",
+        "interoperabilidad híbrida, rendimiento y fallback",
+        "gobierno de algoritmos heredados y fechas de retiro"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "business_continuity",
+      "missing_advanced_topics": [
+        "ransomware recovery y clean-room restoration",
+        "validación de backups inmutables y credenciales",
+        "dependencia de proveedores y continuidad SaaS",
+        "crisis exercises y recuperación de procesos"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "database_security",
+      "missing_advanced_topics": [
+        "vector databases y controles de acceso por fila/tenant",
+        "cloud-managed databases y control plane",
+        "auditoría, query abuse y detección de exfiltración",
+        "backup encryption, restore testing y secretos"
+      ],
+      "status": "identified_not_yet_assessed"
+    },
+    {
+      "domain_id": "vulnerability_research",
+      "missing_advanced_topics": [
+        "fuzzing coverage-guided y corpus minimization",
+        "memory corruption, sanitizers y exploitability",
+        "coordinated disclosure y gestión de CVE",
+        "supply-chain vulnerabilities y análisis de dependencias"
+      ],
+      "status": "identified_not_yet_assessed"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "research_cutoff": "2026-11-18",
-  "policy": "El registro diferencia fuentes oficiales inspeccionadas a nivel de página/metadatos de documentos leídos íntegramente. Una referencia no equivale a evidencia experimental ni validación experta.",
+  "policy": "El registro diferencia fuentes oficiales inspeccionadas a nivel de página/metadatos de documentos leídos íntegramente. Una referencia no equivale a evidencia experimental ni validación experta. Las referencias nuevas de esta ampliación se han verificado a nivel de ficha/versión oficial, no como lectura integral.",
   "sources": [
     {
       "id": "NIST-CSF-2.0",
@@ -1263,6 +1263,57 @@
       ],
       "verification_status": "official_project_page_reviewed",
       "review_note": "Methodology resource; choose techniques for the specific system."
+    },
+    {
+      "id": "NIST-IR-8547",
+      "title": "Transition to Post-Quantum Cryptography Standards",
+      "publisher": "NIST",
+      "version": "NIST IR 8547 Final",
+      "published": "2026-10-27",
+      "url": "https://doi.org/10.6028/NIST.IR.8547",
+      "domains": [
+        "post_quantum_crypto",
+        "crypto",
+        "pki_hsm",
+        "governance"
+      ],
+      "verification_status": "official_final_publication_page_reviewed",
+      "review_note": "Se revisó la ficha oficial y el resumen. Falta lectura integral del informe, extracción de hitos y análisis de aplicabilidad por sistema."
+    },
+    {
+      "id": "MITRE-ATTACK-20.1",
+      "title": "MITRE ATT&CK current version and release notes",
+      "publisher": "MITRE",
+      "version": "20.1",
+      "published": "2026-10-13",
+      "url": "https://attack.mitre.org/resources/versions/",
+      "domains": [
+        "threat_intel",
+        "soc_siem",
+        "threat_hunting",
+        "red_team",
+        "ot_ics",
+        "malware"
+      ],
+      "verification_status": "official_version_history_reviewed",
+      "review_note": "La ficha de versiones indica v20.1 como versión vigente al corte. Importar el catálogo versionado y revisar changelog antes de mapear detecciones."
+    },
+    {
+      "id": "NIST-SP800-207A",
+      "title": "A Zero Trust Architecture Model for Access Control in Cloud-Native Applications in Multi-Cloud Environments",
+      "publisher": "NIST",
+      "version": "SP 800-207A Final",
+      "published": "2023-09-13",
+      "url": "https://doi.org/10.6028/NIST.SP.800-207A",
+      "domains": [
+        "cloud",
+        "containers",
+        "api",
+        "identity",
+        "secure_arch"
+      ],
+      "verification_status": "official_final_metadata_and_abstract_reviewed",
+      "review_note": "Revisada ficha y resumen oficiales; falta lectura integral y validación de arquitectura en laboratorio."
     }
   ]
 }

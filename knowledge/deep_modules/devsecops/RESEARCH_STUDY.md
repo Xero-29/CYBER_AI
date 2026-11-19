@@ -49,3 +49,23 @@ Pipeline de ejemplo con dependencia fijada, lockfile, SBOM, firma y verificació
 - CIS Controls v8.1: https://www.cisecurity.org/controls/v8-1
 
 **Estado de evidencia:** página oficial NIST SSDF inspeccionada; otros proyectos son referencias de trabajo pendientes de revisión de versión/licencia. No se ha auditado un pipeline productivo.
+
+
+## Actualización de supply chain — perfiles de desarrollo seguro para IA
+La página oficial del proyecto NIST SSDF indica que SP 800-218A está finalizado y complementa SP 800-218 con prácticas específicas para desarrollo de IA generativa y modelos fundacionales de doble uso. No basta con aplicar controles de software tradicional sin modelar datasets, pesos, tokenizers, pipelines de entrenamiento, adaptadores y evaluación.
+
+### Controles adicionales para pipelines
+- Registrar dataset/model provenance: origen, licencia, consentimientos/restricciones, filtros, transformaciones, deduplicación y hash de snapshots.
+- Versionar pesos, tokenizer, configuración, adapters/LoRA, código de entrenamiento y evaluaciones como materiales distintos.
+- Separar identidades y permisos de ingestión, entrenamiento, publicación y despliegue.
+- Firmar artefactos y attestations de build; verificar identidad del builder y política, no solo que exista una firma.
+- Probar poisoning, backdoors, extracción, memorization y contaminación de evaluación.
+- Mantener inventario de modelos y dependencias, política de actualización y proceso de retirada/revocación.
+- Añadir controles sobre runners efímeros, OIDC de corta duración, aislamiento de jobs y egress limitado.
+
+### Zero Trust cloud-native
+NIST SP 800-207A describe identidad de aplicación/servicio, gateways, sidecars y service mesh para políticas granulares multi-cloud. Incluir workload identity, SPIFFE/SPIRE cuando aplique, mTLS, autorización entre servicios y rotación automática; no tratar segmentación IP como identidad.
+
+### Fuentes
+- NIST SSDF project / SP 800-218A: https://csrc.nist.gov/Projects/ssdf
+- NIST SP 800-207A: https://doi.org/10.6028/NIST.SP.800-207A

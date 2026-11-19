@@ -327,3 +327,13 @@ Sobre HEAD `0d79769fc793f295a31da4ea78656ed419e1ef93`:
 - Ejecución Python duplicada [run 44436630948](https://github.com/Xero-29/CYBER_AI/actions/runs/44436630948): success en el mismo SHA.
 
 La validación estructural del nuevo corpus está aprobada. El informe de calidad sigue mostrando que el material previo de los compendios no está completo: 18/48 secciones base y 0/48 conjuntos de secciones profundas; esto no se considera corregido por los nuevos estudios iniciales. La ingestión vectorial y la recuperación semántica siguen pendientes de proveedor ECO y evaluación local.
+
+
+## Auditoría comparativa y ampliación de brechas avanzadas — 2026-11-18
+
+- Se contrastó el currículo de 48 dominios, los estudios, el mapa de fuentes, la matriz global y el registro de 89 referencias.
+- Hallazgo: la cobertura 48/48 mide existencia de documentos. La matriz global conserva requisitos/artefactos/gates como `not_assessed`; la pertinencia temática del mapa de fuentes no prueba soporte frase-a-fuente.
+- Se identificaron 192 líneas de investigación avanzada (4 por dominio) en `knowledge/research/ADVANCED_GAP_REGISTER.json`; todas permanecen `identified_not_yet_assessed`.
+- Se añadieron actualizaciones técnicas a PQC, threat intelligence, SOC/SIEM, DevSecOps y seguridad de IA.
+- Se incorporaron al registro de fuentes NIST IR 8547 Final (27-oct-2026), MITRE ATT&CK v20.1 (13-oct-2026), NIST SP 800-207A y NIST SP 800-218A. La revisión fue a nivel de ficha/página oficial; no equivale a lectura integral.
+- No se declaran experimentos ejecutados, controles probados, ni áreas validadas. La siguiente fase debe convertir las 192 brechas en requisitos trazables, desarrollar el contenido y actualizar las pruebas semánticas.
