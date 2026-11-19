@@ -1,4 +1,5 @@
 import json
+import os
 import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
@@ -182,10 +183,8 @@ class ExecutionPolicyTests(unittest.TestCase):
 
 
     def test_policy_replacement_during_open_is_rejected(self):
-        if __import__("os").name != "posix":
+        if os.name != "posix":
             self.skipTest("La sustitución de archivo abierto se prueba en POSIX.")
-        import os
-
         real_open = os.open
 
         def replace_after_open(path, flags):
