@@ -81,3 +81,26 @@ Se incorporaron ocho dominios:
 - [Wireless, Bluetooth y NFC](../../deep_modules/wireless_security/RESEARCH_STUDY.md)
 
 La biblioteca incorpora NIST AI 100-2 E2025 (actualiza E2023), y registra límites de antigüedad de NIST SP 800-94/115/137. Se documentan MITRE CAPEC/D3FEND, Sigma, Zeek, Suricata y especificaciones inalámbricas como referencias que requieren fijar versión.
+
+
+## Quinta entrega de estudios profundos (2026-11-18)
+
+Se incorporaron los 16 dominios restantes del manifiesto:
+- [Bug bounty y divulgación responsable](../../deep_modules/bug_bounty/RESEARCH_STUDY.md)
+- [Seguridad satelital](../../deep_modules/satellite_security/RESEARCH_STUDY.md)
+- [Seguridad física](../../deep_modules/physical_security/RESEARCH_STUDY.md)
+- [Correo y DNS](../../deep_modules/email_dns_security/RESEARCH_STUDY.md)
+- [Fraude y abuso](../../deep_modules/fraud_abuse/RESEARCH_STUDY.md)
+- [Ingeniería de privacidad](../../deep_modules/privacy_engineering/RESEARCH_STUDY.md)
+- [Forense cloud](../../deep_modules/cloud_forensics/RESEARCH_STUDY.md)
+- [Red Team de IA](../../deep_modules/ai_red_team/RESEARCH_STUDY.md)
+- [PKI y HSM](../../deep_modules/pki_hsm/RESEARCH_STUDY.md)
+- [Criptografía poscuántica](../../deep_modules/post_quantum_crypto/RESEARCH_STUDY.md)
+- [Continuidad de negocio](../../deep_modules/business_continuity/RESEARCH_STUDY.md)
+- [Seguridad de bases de datos](../../deep_modules/database_security/RESEARCH_STUDY.md)
+- [Investigación de vulnerabilidades](../../deep_modules/vulnerability_research/RESEARCH_STUDY.md)
+- [Telecomunicaciones y 5G](../../deep_modules/telecom_5g/RESEARCH_STUDY.md)
+- [Seguridad automotriz](../../deep_modules/automotive_security/RESEARCH_STUDY.md)
+- [Seguridad de hardware](../../deep_modules/hardware_security/RESEARCH_STUDY.md)
+
+**Cobertura estructural:** los 48 dominios del manifiesto tienen ahora un RESEARCH_STUDY.md. Esto no significa que todos estén investigados exhaustivamente ni validados en laboratorio. Se registra el cambio de DMARC: RFC 7489 quedó obsoleto y se deben usar RFC 9989/9990/9991; también se distinguen los trabajos en desarrollo de ISO/SAE 21434 Ed. 2 y NIST SP 800-213 Rev. 1 IPD.
