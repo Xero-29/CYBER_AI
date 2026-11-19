@@ -1,7 +1,10 @@
 # Agenda de investigación: Criptografía
 
 **Dominio:** `crypto` · **Objetivo:** L4 · **Estado:** protocolo específico propuesto; no ejecutado.  
-**Corte:** 2026-11-19.
+**Corte:** 2026-11-19.  
+**Método:** protocolo experimental controlado por subtema; búsqueda de fuentes primarias y reproducción con versiones fijadas.  
+**Entregables:** corpus/vector versionado, scripts, logs, análisis, incertidumbre y plan de reproducción.  
+**Estado de madurez:** `research_agenda_defined` (agenda propuesta; experimentos pendientes).
 
 ## Pregunta central
 
