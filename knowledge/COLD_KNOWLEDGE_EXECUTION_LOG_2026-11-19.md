@@ -66,3 +66,14 @@ Brechas abiertas:
 
 ### Siguiente paso obligatorio
 Continuar Foundations, no saltar a AI Red Team: convertir FND-01 a FND-09 en unidades auditables, mapear sus subunidades a evidencia y detectar omisiones; después desarrollar y evaluar la primera unidad, iterando hasta cerrar no conformidades. Solo tras superar el gate completo de Foundations se inicia AI Red Team.
+
+### Paso 2 — primera unidad Foundations FND-01.01
+**Estado:** borrador disciplinar incorporado; todas las evidencias siguen en progreso.
+
+- Documento: `knowledge/deep_modules/foundations/topics/FND-01-01_SECURITY_SAFETY_PRIVACY_RELIABILITY_RESILIENCE.md`.
+- Desarrolla las doce capas y contiene una secuencia didáctica, errores conceptuales, explicación, escenario de análisis, desafío de diseño y rúbrica.
+- Se registró revisión parcial de NIST Privacy Framework 1.0 y de dos entradas del NIST CSRC Glossary; no se afirma lectura integral.
+- La fuente de privacidad existente se actualizó con alcance de revisión parcial; se añadió el registro del glosario NIST.
+- La matriz granular refleja FND-01.01 en `in_progress` para doce capas y cuatro capacidades. Madurez T permanece T0 hasta evaluación; O0.
+
+No conformidades abiertas: lectura integral de fuentes primarias; normas de safety sectoriales; análisis de aplicabilidad legal colombiana; administración de evaluación en frío; revisión disciplinar independiente. No se aprobó la unidad.
