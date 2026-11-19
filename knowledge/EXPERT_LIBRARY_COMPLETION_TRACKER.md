@@ -10,7 +10,7 @@ Los seis módulos P0 (identity, malware, forensics, incident_response, threat_in
 ## Matriz de áreas
 | ID | Área | Compendio | Agenda específica | Fuentes integrales | Laboratorio ejecutado | Revisión independiente |
 |---|---|---|---|---|---|---|
-| `foundations` | Fundamentos | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
+| `foundations` | Fundamentos | Desarrollo disciplinar v1 incorporado; M2 ampliado, no validado | Mapa de 12 bloques y 5 protocolos específicos | Fuentes identificadas; lectura integral/extracción pendiente | 5 protocolos diseñados, 0 ejecuciones acreditadas | Pendiente |
 | `appsec` | Seguridad de aplicaciones | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
 | `api` | Seguridad de API | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
 | `network` | Seguridad de redes | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
@@ -111,3 +111,14 @@ La matriz contiene 48 especialidades, 7 unidades temáticas iniciales por especi
 3. Vincular cada afirmación relevante a fuentes realmente consultadas.
 4. Ejecutar laboratorios y evaluaciones; conservar evidencia y resultados negativos.
 5. Solicitar revisión independiente y reproducción externa antes de declarar K4/K5.
+
+
+## Ejecución secuencial del estándar — Foundations (2026-11-19)
+
+**Cambio documental:** commit `3588344959da3cd50d923670d4f81d5de821e7a6` añadió `knowledge/deep_modules/foundations/FOUNDATIONS_DEEP_DEVELOPMENT_V1.md`. Commit `8c7ac8df9bbe2fe7ee079b49a9a633b057c65196` actualizó el índice README del módulo.
+
+**Contenido añadido:** ontología de seguridad; modelos de grafos y estados; probabilidad condicionada e incertidumbre; ingeniería de sistemas seguros; pérdidas y consecuencias; análisis de amenazas y fallos; assurance; gobierno y supply chain; privacidad, safety y resiliencia; alcance de marcos; métricas; cuatro casos integradores; cinco protocolos de laboratorio; evaluación y Skills candidatas.
+
+**Verificación documental posterior:** el nuevo desarrollo contiene una matriz explícita FND-01 a FND-15 y una evaluación de L1–L12. Las brechas tienen tratamiento documental, pero varias permanecen abiertas por necesitar evidencia no generable mediante redacción: lectura integral de fuentes, ejecución experimental, benchmark, revisión independiente y reproducción externa.
+
+**Resultado de la puerta de salida:** Foundations NO se declara cerrado bajo el estándar completo. Madurez conservadora M2 editorial ampliado. K4/K5, M4/M5 y G1–G8 aprobadas no reclamadas. No avanzar al módulo 2 hasta cerrar las evidencias bloqueantes según el criterio del estándar.
