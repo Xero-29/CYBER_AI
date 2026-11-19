@@ -1,0 +1,75 @@
+# Auditoría de profundidad de compendios — 2026-11-19
+
+**Rama auditada:** `knowledge/develop-foundations`  
+**Base:** commit `6ae2b4a9292e2ddea6ea4c7c196652143ee14e9f`  
+**Alcance:** inspección automatizada/manual de los 48 archivos `TECHNICAL_COMPENDIUM.md`, con lectura del estándar, tracker, agenda y muestras de contenido.  
+**Estado:** diagnóstico editorial preliminar; no es revisión disciplinar independiente ni validación científica.
+
+## 1. Resultado ejecutivo
+
+Los 48 compendios existen y contienen ampliaciones específicas, pero **no se puede concluir que las 48 áreas tengan profundidad experta**. La evidencia actual es desigual:
+
+- 48/48 archivos fueron recuperados y examinados en esta auditoría.
+- Los tamaños observados van aproximadamente de 10.7 kB a 31 kB. El tamaño no es una métrica de profundidad.
+- Fundamentos, AppSec y API muestran estructuras más extensas y laboratorios/casos más concretos en la inspección realizada.
+- 37 áreas adicionales muestran encabezados disciplinares específicos y una estructura técnica diferenciada; esto prueba especialización editorial, no que cada mecanismo esté explicado con rigor suficiente.
+- Ocho áreas contienen un bloque repetido de siete apartados genéricos (fundamentos/modelo, amenazas, controles, pruebas, investigación y evidencia) que requiere sustitución por análisis específico: `mobile`, `crypto`, `identity`, `malware`, `forensics`, `incident_response`, `threat_intel` y `reverse`.
+- La agenda de investigación de 48 áreas mantiene hipótesis y diseños propuestos, no resultados.
+- El tracker reconoce fuentes integrales, laboratorios ejecutados y revisión independiente como pendientes.
+
+## 2. Método y límites
+
+Se inspeccionaron los 48 compendios mediante recuperación del archivo completo, recuento de caracteres, extracción de encabezados y búsqueda de un patrón textual repetido. Se leyeron con mayor detalle el estándar normativo, el tracker, la agenda y muestras representativas (Fundamentos, AppSec, API, red, Linux, Windows/AD, cloud, contenedores, móvil, criptografía, identidad, malware y otros).
+
+Este método detecta ausencias estructurales y texto plantilla, pero **no demuestra** corrección técnica, exhaustividad temática, vigencia de cada afirmación ni profundidad K1–K5. Tampoco sustituye una lectura de cada línea por un especialista. La inspección de encabezados no debe confundirse con revisión del contenido completo de cada tema.
+
+## 3. Hallazgos concretos
+
+### H1 — Desigualdad de profundidad
+**Estado:** confirmado como hallazgo editorial.
+
+La profundidad no es uniforme. Algunos módulos presentan modelos, procedimientos y laboratorios detallados; otros consisten en una base común más un apéndice temático relativamente corto. Debe medirse por unidad temática y no por longitud total del archivo.
+
+### H2 — Bloques plantilla en ocho áreas
+**Estado:** confirmado por coincidencia textual.
+
+En las ocho áreas enumeradas se repite siete veces el mismo patrón genérico de explicación. Aunque el texto define qué debe cubrir un tema, no desarrolla los detalles disciplinares. Debe reemplazarse cada repetición con contenido técnico propio del tema: modelos, variantes, protocolos, algoritmos, comandos, casos límite, resultados esperados y contraejemplos.
+
+### H3 — Agenda de investigación transversal demasiado abstracta en el diseño experimental
+**Estado:** confirmado en la matriz central.
+
+En muchas entradas el diseño mínimo usa una formulación común (“definir baseline y dataset/topología/controlado, variar una dimensión…”). Sirve como recordatorio de método, pero no constituye protocolo ejecutable. Cada área necesita variables, unidad de análisis, corpus, criterios de inclusión/exclusión, baseline real, tamaño de muestra justificado, controles y análisis propios.
+
+### H4 — Evidencia primaria y validación experimental aún no demostradas
+**Estado:** explícito en el tracker y manifiesto.
+
+No hay base para declarar lectura integral de las 90 fuentes, laboratorios ejecutados, revisión independiente ni reproducción externa. No asignar K4/K5 por el hecho de que el compendio o la agenda existan.
+
+### H5 — Necesidad de granularidad por tema
+**Estado:** brecha de diseño prioritaria.
+
+La estructura actual es mayormente un documento por especialidad. El estándar requiere trazabilidad por tema: fuente → afirmación → mecanismo → amenaza → control → procedimiento → prueba → resultado → limitación. Sin esa granularidad, el índice puede recuperar el documento correcto pero no necesariamente la evidencia concreta que una IA necesita para responder o ejecutar.
+
+## 4. Priorización de remediación
+
+| Prioridad | Áreas/alcance | Trabajo requerido | Criterio de salida |
+|---|---|---|---|
+| P0 | Ocho áreas con bloques plantilla | Reescritura disciplinar de cada tema afectado; eliminar texto repetido | Ningún bloque de plantilla sustituye explicación técnica; ejemplos y límites propios |
+| P0 | Agenda de 48 áreas | Convertir diseños comunes en protocolos específicos | Variables, corpus, baseline, controles, muestra y métricas definidos |
+| P1 | 37 áreas con apéndices disciplinares | Auditar cada encabezado contra las 12 capas y el currículo | Matriz de cobertura tema×capa con evidencia y estado |
+| P1 | Las 48 áreas | Trazabilidad de afirmaciones y fuentes | Citas por afirmación, edición, fecha, licencia, páginas y estado de lectura |
+| P2 | Laboratorios prioritarios | Implementar en frío con datos sintéticos/entornos aislados | Scripts, hashes, ground truth, controles negativos, logs y resultados |
+| P2 | Todas las áreas prioritarias | Evaluación y revisión | Rúbrica, métricas, incertidumbre, revisión independiente y registro de correcciones |
+
+## 5. Orden de ejecución recomendado
+
+1. Corregir primero los ocho compendios con repetición plantilla.
+2. Desarrollar los protocolos concretos de AppSec, API, redes, Linux, Windows/AD, cloud, contenedores, criptografía, forense, IR, malware y seguridad de IA.
+3. Construir la matriz tema×12 capas×K1–K5 para las 48 especialidades.
+4. Leer y sintetizar fuentes primarias antes de elevar estados de revisión.
+5. Ejecutar laboratorios fríos reproducibles y conservar resultados negativos.
+6. Revisar independientemente y asignar madurez por tema, nunca por volumen de texto.
+
+## 6. Regla de publicación
+
+Hasta completar estas tareas, la clasificación correcta es **biblioteca estructurada con compendios editoriales ampliados y profundidad desigual, validación científica pendiente**. No declarar “biblioteca experta completa”. Las pruebas de software del repositorio validan el comportamiento del código cubierto por esos tests; no validan la verdad científica del contenido de conocimiento.
