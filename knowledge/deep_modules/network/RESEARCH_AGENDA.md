@@ -127,3 +127,43 @@ Autorización escrita para toda evaluación activa; alcance, exclusiones, límit
 ## Estado editorial
 
 `research_agenda_defined` — preguntas y diseño inicial propuestos. No equivale a estado del arte terminado, paper reproducido ni resultado validado. Para avanzar a M4 se requiere literatura revisada, experimento ejecutado y análisis; M5 requiere revisión y reproducción externa.
+
+
+## Protocolos de investigación específicos y falsables
+
+### RQ-NET-01 — Efectividad real de la segmentación
+**Pregunta:** ¿Cuánto reduce una política basada en identidad y contexto la reachability no autorizada frente a VLAN/ACL tradicionales en una topología virtual equivalente?
+**H1:** la política granular reduce destinos no autorizados alcanzables sin superar el umbral de latencia/operación predefinido.
+**Variables:** tipo de política (independiente); reachability prohibida, latencia p95, número de excepciones y tasa de fallos de cambio (dependientes).
+**Controles:** topología, carga, servicios, rutas, versión de software y matriz de flujos.
+**Diseño:** comparar baseline y tratamiento en laboratorio virtual; ejecutar conjunto fijo de pruebas permitidas/prohibidas y repetir con cambios de identidad.
+**Validez:** la topología no representa redes heterogéneas; las métricas de reachability no miden por sí solas compromiso o impacto.
+
+### RQ-NET-02 — Calidad de reglas de firewall
+**Pregunta:** ¿La revisión automatizada de shadowing, redundancia, permisos excesivos y falta de propietario reduce errores de política frente a revisión manual?
+**H1:** la combinación automatización + revisión humana encuentra más defectos confirmados que revisión manual sola, con tasa de falsos positivos aceptable.
+**Diseño:** corpus sintético de reglas con defectos etiquetados; evaluación ciega, baseline manual y herramienta; medir precision, recall, F1 y tiempo.
+**Controles:** mismos casos, criterios de etiquetado, versiones y experiencia de revisores.
+
+### RQ-NET-03 — Cobertura y calidad de telemetría
+**Pregunta:** ¿Qué combinación de PCAP, NetFlow/IPFIX, DNS y logs de firewall ofrece mejor detección por coste en escenarios etiquetados?
+**H1:** la fusión de fuentes mejora recall respecto a una fuente aislada, pero puede elevar coste y falsos positivos.
+**Diseño:** replay offline de tráfico sintético etiquetado; medir precision/recall, bytes almacenados, pérdida, latencia y carga de procesamiento.
+**Controles:** reloj sincronizado, mismos escenarios, reglas congeladas y dataset versionado.
+
+### RQ-NET-04 — Resiliencia de DNS y servicios de infraestructura
+**Pregunta:** ¿Qué configuraciones reducen fallos de resolución y exposición a manipulación sin degradar disponibilidad?
+**Diseño:** emular resolver primario/secundario, cambios de zona, expiración de caché, DNSSEC validación y fallos de upstream; medir disponibilidad, latencia y detección.
+**Límite:** no extrapolar a resolvers públicos o redes de producción sin validación externa.
+
+### RQ-NET-05 — VPN, mTLS y segmentación posterior a autenticación
+**Pregunta:** ¿La identidad de dispositivo/servicio y la autorización contextual limitan mejor el acceso lateral que la pertenencia a una VPN?
+**Diseño:** servicios sintéticos, certificados de prueba, identidades con roles distintos, expiración/revocación y rutas controladas; verificar acceso permitido/denegado y tiempo de revocación.
+**Seguridad:** claves efímeras de laboratorio; no usar credenciales reales.
+
+### RQ-NET-06 — Fallos de control y modos fail-open/fail-closed
+**Pregunta:** ¿Qué comportamiento ante caída de firewall, sensor, controlador SDN o servidor NAC conserva el equilibrio más seguro entre disponibilidad y contención?
+**Diseño:** inyección de fallos en emulador aislado; medir tráfico permitido indebidamente, indisponibilidad, tiempo de recuperación y pérdida de evidencia.
+**Criterio de parada:** cualquier salida de la red virtual, impacto no previsto o pérdida de control del entorno.
+
+Cada protocolo requiere preregistro, muestra/escenarios definidos, baseline, repetición, análisis de incertidumbre, resultados negativos, artefactos y revisión antes de elevar madurez.
