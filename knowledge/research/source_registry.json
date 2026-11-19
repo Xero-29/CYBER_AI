@@ -1606,11 +1606,12 @@
       "version": "Version 1.0",
       "published": "2020-01-16",
       "verification_status": "selected_sections_reviewed",
-      "verified_scope": "Texto oficial consultado por fragmentos; objetivos de ingeniería de privacidad, ciclo de vida de acciones de datos y riesgo de privacidad. Lectura integral pendiente.",
+      "verified_scope": "PF 1.0: consulta parcial de definiciones y objetivos de ingeniería. Para estado de desarrollo actual consultar también CSWP 40 IPD; no declarar lectura integral.",
       "domains": [
+        "foundations",
         "privacy_engineering"
       ],
-      "review_note": "El PDF oficial y fragmentos de secciones sobre predictability, manageability, disassociability, data actions y privacy risk fueron consultados el 2026-11-19. No se declara lectura integral ni aplicabilidad legal fuera de su contexto federal estadounidense.",
+      "review_note": "NIST Privacy Framework 1.0 (2020) es la versión final de referencia existente; NIST publicó después el CSWP 40 Privacy Framework 1.1 Initial Public Draft el 2025-04-14. La IPD no es final. La revisión 1.0 fue parcial; la 1.1 IPD se registra separadamente.",
       "sections_reviewed": [
         "NIST Privacy Framework Version 1.0: definiciones de Data Action/Data Processing, Predictability, Manageability y Disassociability; objetivos de privacidad; Privacy Risk y Privacy Risk Assessment (consulta parcial del texto oficial)."
       ],
@@ -2032,6 +2033,27 @@
         "https://csrc.nist.gov/glossary/term/system_privacy_requirement"
       ],
       "review_date": "2026-11-19"
+    },
+    {
+      "id": "NIST-PRIVACY-FRAMEWORK-1.1-IPD",
+      "title": "NIST Privacy Framework 1.1 — Initial Public Draft (CSWP 40 IPD)",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_initial_public_draft",
+      "url": "https://doi.org/10.6028/NIST.CSWP.40.ipd",
+      "version": "CSWP 40 IPD",
+      "published": "2025-04-14",
+      "verification_status": "selected_sections_reviewed",
+      "verified_scope": "PDF oficial de 51 páginas; consulta dirigida de Executive Summary, secciones 1.2.1 Cybersecurity and Privacy Risk Management, 1.2.2 AI and Privacy Risk Management, 1.2.3 Privacy Risk Assessment, Core y Appendix D. No lectura integral de todas las secciones.",
+      "domains": [
+        "foundations",
+        "privacy_engineering",
+        "ai_security"
+      ],
+      "review_date": "2026-11-19",
+      "sections_reviewed": [
+        "Páginas 1–2: propósito y estado IPD; páginas 5–8: relación riesgo cibernético/privacidad, privacidad e IA y evaluación de riesgo; Appendix A: Core; Appendix D: prácticas de gestión de riesgo."
+      ],
+      "review_note": "La propia página NIST presenta PF 1.1 como IPD; no tratar como versión final ni como norma legal. El texto indica que el riesgo de privacidad puede surgir sin incidentes de ciberseguridad y describe problemas para individuos por acciones de datos a lo largo del ciclo de vida. La lectura fue dirigida, no integral."
     }
   ],
   "last_updated": "2026-11-19"
