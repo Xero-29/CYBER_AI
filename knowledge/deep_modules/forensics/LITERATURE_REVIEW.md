@@ -4,11 +4,14 @@
 **Estado:** revisión exploratoria de fuentes registradas y alcance oficial; no revisión sistemática ni lectura integral de todas las fuentes.  
 **Madurez:** M2 editorial como máximo; M3/M4/M5 pendientes.
 
+**Corte:** 2026-11-19
+**Madurez:** M2 editorial; no M3/M4/M5. No se ha ejecutado experimento ni se dispone de validación empírica.
+
 ## Pregunta
 
 ¿Qué procedimientos de adquisición, preservación y análisis producen evidencia digital íntegra, reproducible y correctamente limitada en su interpretación?
 
-## Síntesis crítica inicial
+## Síntesis
 
 NIST SP 800-86 integra técnicas forenses en respuesta a incidentes y aborda archivos, sistemas operativos, tráfico y aplicaciones. El documento advierte que no es una guía exhaustiva paso a paso ni asesoría legal; los requisitos de admisibilidad y privacidad dependen de la jurisdicción. NIST SP 800-61 Rev. 3 conecta respuesta con gestión de riesgo del CSF 2.0. NIST SP 800-92 trata la gestión de logs; el proyecto de revisión de log management debe distinguirse del documento final vigente. Un hash verifica igualdad de bytes entre mediciones, no demuestra por sí solo origen, autenticidad ni corrección de adquisición. La agenda propone datasets de entrenamiento y evidencia sintética; no autoriza adquisición de sistemas ajenos.
 
@@ -31,7 +34,7 @@ NIST SP 800-86 (https://doi.org/10.6028/NIST.SP.800-86), NIST SP 800-61 Rev. 3 (
 - Las taxonomías y guías organizan el análisis; no sustituyen evidencia observada.
 - No se ha ejecutado el protocolo experimental ni se han obtenido resultados confirmatorios.
 
-## Brechas de investigación
+## Brechas
 
 1. Recuperar texto completo de cada fuente primaria y registrar páginas/secciones efectivamente leídas.
 2. Extraer requisitos y afirmaciones concretas con vínculo a subtema y criterio de prueba.
