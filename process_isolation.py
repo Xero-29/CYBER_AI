@@ -1,4 +1,5 @@
 """Ejecución local con captura acotada y terminación de grupos de procesos."""
+import math
 import os
 import signal
 import subprocess
@@ -47,8 +48,14 @@ def run_bounded_process(
         )
     if not isinstance(command, (list, tuple)) or not command:
         raise ValueError("command debe ser una lista no vacía de argumentos.")
-    if isinstance(timeout, bool) or not isinstance(timeout, (int, float)) or timeout <= 0:
-        raise ValueError("timeout debe ser un número positivo.")
+    if isinstance(timeout, bool) or not isinstance(timeout, (int, float)):
+        raise ValueError("timeout debe ser un número positivo y finito.")
+    try:
+        valid_timeout = math.isfinite(timeout) and timeout > 0
+    except OverflowError:
+        valid_timeout = False
+    if not valid_timeout:
+        raise ValueError("timeout debe ser un número positivo y finito.")
     if type(max_output_bytes) is not int or max_output_bytes < 2:
         raise ValueError("max_output_bytes debe ser un entero de al menos 2 bytes.")
 

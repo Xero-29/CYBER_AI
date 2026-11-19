@@ -69,6 +69,16 @@ class DataBackupTests(unittest.TestCase):
         with self.assertRaises(BackupError):
             verify_backup(snapshot)
 
+    @unittest.skipUnless(hasattr(os, "mkfifo"), "FIFO solo está disponible en POSIX.")
+    def test_rejects_fifo_sources_instead_of_blocking_on_copy(self):
+        fifo = self.data / "named-pipe"
+        os.mkfifo(fifo)
+        snapshot = self.root / "fifo-backup"
+        with self.assertRaisesRegex(BackupError, "archivos regulares"):
+            create_backup(self.data, snapshot)
+        self.assertFalse(snapshot.exists())
+        self.assertEqual(list(self.root.glob(".fifo-backup.tmp-*")), [])
+
     def test_refuses_symlinks_in_data(self):
         (self.data / "outside").symlink_to(self.root, target_is_directory=True)
         with self.assertRaises(BackupError):

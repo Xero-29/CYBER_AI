@@ -8,6 +8,7 @@ import os
 import re
 import shutil
 import sqlite3
+import stat
 import sys
 import uuid
 from datetime import datetime, timezone
@@ -202,8 +203,14 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None):
                     raise BackupError(f"No se permiten symlinks: {child.relative_to(data_dir)}")
             for name in sorted(files):
                 source = current_path / name
-                if source.is_symlink():
-                    raise BackupError(f"No se permiten symlinks: {source.relative_to(data_dir)}")
+                source_info = source.lstat()
+                relative_source = source.relative_to(data_dir)
+                if stat.S_ISLNK(source_info.st_mode):
+                    raise BackupError(f"No se permiten symlinks: {relative_source}")
+                if not stat.S_ISREG(source_info.st_mode):
+                    raise BackupError(
+                        f"Solo se respaldan archivos regulares: {relative_source}"
+                    )
                 if source.suffix in LOCK_SUFFIXES or source.name.endswith(("-wal", "-shm")):
                     continue
                 if len(entries) >= MAX_BACKUP_FILES:
