@@ -4,11 +4,14 @@
 **Estado:** revisión exploratoria de fuentes registradas y alcance oficial; no revisión sistemática ni lectura integral de todas las fuentes.  
 **Madurez:** M2 editorial como máximo; M3/M4/M5 pendientes.
 
+**Corte:** 2026-11-19
+**Madurez:** M2 editorial; no M3/M4/M5. No se ha ejecutado experimento ni se dispone de validación empírica.
+
 ## Pregunta
 
 ¿Qué diseño de playbook reduce el tiempo y el impacto de respuesta sin producir acciones irreversibles, pérdida de evidencia o interrupción innecesaria?
 
-## Síntesis crítica inicial
+## Síntesis
 
 NIST SP 800-61 Rev. 3 (abril de 2025) sustituye la edición Rev. 2 y sitúa la respuesta dentro del ciclo de gestión de riesgo del CSF 2.0. La respuesta no debe reducirse a una lista lineal de acciones: preparación, detección, respuesta, recuperación y mejora continua se conectan con funciones organizacionales. SP 800-83 Rev. 1 aporta orientación histórica para incidentes de malware; SP 800-86 vincula técnicas forenses con IR. CISA KEV es un catálogo de vulnerabilidades explotadas conocidas y sirve como señal de priorización, no como inventario completo ni puntuación de riesgo organizacional. La revisión de este módulo distingue diseño de playbook de eficacia demostrada: solo ejercicios medidos pueden aportar evidencia de desempeño.
 
@@ -32,7 +35,7 @@ NIST SP 800-61 Rev. 3 (https://doi.org/10.6028/NIST.SP.800-61r3), NIST CSF 2.0 (
 - Las taxonomías y guías organizan el análisis; no sustituyen evidencia observada.
 - No se ha ejecutado el protocolo experimental ni se han obtenido resultados confirmatorios.
 
-## Brechas de investigación
+## Brechas
 
 1. Recuperar texto completo de cada fuente primaria y registrar páginas/secciones efectivamente leídas.
 2. Extraer requisitos y afirmaciones concretas con vínculo a subtema y criterio de prueba.
