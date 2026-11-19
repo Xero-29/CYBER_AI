@@ -13,7 +13,7 @@ Se consultaron las versiones oficiales disponibles y se inspeccionaron el texto 
 ### S1 — NIST SP 800-160 Vol. 1 Rev. 1 (2022)
 - URL canónica: https://doi.org/10.6028/NIST.SP.800-160v1r1
 - Artefacto: https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-160v1r1.pdf
-- Secciones inspeccionadas: abstract y autoridad; marco de ingeniería de sistemas seguros; contextos problema/solución/trustworthiness; desarrollo de requisitos de seguridad; distinción requisito/política/mecanismo; tailoring y procesos del ciclo de vida.
+- Secciones inspeccionadas: abstract y autoridad; marco de ingeniería de sistemas seguros (pp. 32–36); assurance case (pp. 35–36 y apéndice F); desarrollo de requisitos de seguridad y distinción requisito/política/mecanismo (apéndice C.2–C.3); principios de diseño (apéndice D); tailoring y procesos del ciclo de vida (apéndices H–K).
 - Hallazgos aplicados:
   1. El framework de Systems Security Engineering se compone de contextos que interactúan; no es un flujo lineal universal.
   2. Los requisitos de seguridad incluyen capacidades, comportamiento, calidad, procesos de assurance y evidencia requerida.
@@ -25,12 +25,12 @@ Se consultaron las versiones oficiales disponibles y se inspeccionaron el texto 
 ### S2 — NIST SP 800-30 Rev. 1 (2012)
 - URL canónica: https://doi.org/10.6028/NIST.SP.800-30r1
 - Artefacto: https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-30r1.pdf
-- Secciones inspeccionadas: marco/modelo de evaluación; identificación de fuentes y eventos; vulnerabilidades y condiciones predisponentes; probabilidad de iniciación/ocurrencia y probabilidad de impacto; impacto; determinación y comunicación de riesgo.
+- Secciones inspeccionadas: marco/modelo de evaluación; identificación de fuentes y eventos; vulnerabilidades y condiciones predisponentes; probabilidad de iniciación/ocurrencia y probabilidad de impacto; impacto; determinación/comunicación del riesgo; tratamiento de incertidumbre y supuestos (cap. 2, cap. 3 y apéndices pertinentes).
 - Hallazgos aplicados:
   1. Amenazas adversariales y eventos no adversariales deben tratarse de forma diferenciada.
   2. La probabilidad de un evento dañino puede descomponerse en iniciación/ocurrencia y probabilidad de impacto, condicionada por vulnerabilidades y condiciones predisponentes.
   3. NIST no prescribe un algoritmo universal para combinar escalas semicuantitativas; el modelo y sus reglas dependen de la organización y deben explicitarse.
-  4. Riesgo incluye impacto y probabilidad, pero también incertidumbre, supuestos, restricciones y tolerancia.
+  4. Riesgo incluye impacto y probabilidad, pero también incertidumbre, supuestos, restricciones y tolerancia. La incertidumbre se propaga desde factores individuales a la evaluación final; debe documentarse y tratarse, no ocultarse en una cifra puntual.
 - Corrección aplicada: Tema 3 incluye fallos no adversariales y dependencias; Tema 7 prohíbe tratar matrices 5×5 como magnitudes cardinales o fórmulas universales.
 - Límite: no se declara lectura lineal de las 95 páginas.
 
@@ -42,6 +42,7 @@ Se consultaron las versiones oficiales disponibles y se inspeccionaron el texto 
   1. El RMF se organiza en siete pasos: Prepare, Categorize, Select, Implement, Assess, Authorize y Monitor.
   2. La autorización es una decisión de autoridad responsable con un paquete de riesgo/evidencia; no es un simple estado automático del sistema.
   3. Monitor requiere observar cambios del sistema/entorno y evaluaciones continuas.
+  4. Prepare-System incluye identificar misión, stakeholders, ciclo de vida de información, evaluación de riesgo y requisitos de seguridad/privacidad priorizados; el plan de monitoreo debe adaptarse a volatilidad y criticidad de controles.
   4. Los controles comunes, heredados y específicos necesitan responsables y evidencia de implantación/eficacia.
 - Corrección aplicada: Tema 7 explicita el ciclo y los roles; se separa assessment de aceptación del riesgo.
 - Límite: no se declara lectura lineal de las 183 páginas.
@@ -61,11 +62,12 @@ Se consultaron las versiones oficiales disponibles y se inspeccionaron el texto 
 ### S5 — NIST SP 800-88 Rev. 2 (2025)
 - URL canónica: https://doi.org/10.6028/NIST.SP.800-88r2
 - Artefacto: https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-88r2.pdf
-- Secciones inspeccionadas: autoridad, alcance, abstract, estructura del programa de sanitización y orientación de aseguramiento.
+- Secciones inspeccionadas: autoridad, alcance, executive summary; métodos de sanitización; uso de criptografía y cryptographic erase (sec. 3.2); programa general y sanitization validation (sec. 4.5.2).
 - Hallazgos aplicados:
   1. La sanitización es un programa de gobierno y aseguramiento, no solo ejecutar un comando de borrado.
   2. La selección depende de sensibilidad, reutilización/disposición, medio y confianza en la implementación del proveedor.
-  3. La revisión reemplaza SP 800-88 Rev. 1 (2014); no se debe usar la edición antigua como fuente vigente.
+  3. La validación de sanitización decide aprobar o rechazar la eficacia y puede exigir repetir con otra técnica o escalar a método más seguro; no es lo mismo que comprobar que el comando terminó sin error.
+  4. La revisión reemplaza SP 800-88 Rev. 1 (2014); no se debe usar la edición antigua como fuente vigente. Cryptographic erase depende de la procedencia/calidad de la criptografía, generación de claves, protección y condiciones previas; no es un botón mágico.
 - Corrección aplicada: Tema 2 incorpora ciclo de vida de retiro/sanitización y evidencia del proveedor; el inventario conserva el estado de disposición.
 - Límite: se inspeccionaron secciones pertinentes; no lectura lineal completa.
 
@@ -159,7 +161,7 @@ Los siete protocolos se implementaron como harness local determinista en:
 
 Semilla fija: 20261119. Ocho pruebas unitarias pasan en la ejecución local del harness. Los resultados sintéticos y límites se documentan en `labs/README.md`.
 
-**No inferir de estos resultados:** eficacia en producción, probabilidad real de incidentes, rendimiento general, seguridad criptográfica de una implementación, validez externa, ni aprobación de G5-G8. El laboratorio 4 solo simula validación de claims y no verifica firmas JWT. El laboratorio 5 usa HMAC-SHA-256 para integridad/autenticidad; no cifra ni valida AES/FIPS/KMS. El laboratorio 3 verifica rutas modeladas, no explotación.
+**No inferir de estos resultados:** eficacia en producción, probabilidad real de incidentes, rendimiento general, seguridad criptográfica de una implementación, validez externa, ni aprobación de G5-G8. El laboratorio 4 solo simula validación de claims y no verifica firmas JWT. El laboratorio 5 usa HMAC-SHA-256 para integridad/autenticidad; no cifra ni valida AES/FIPS/KMS. El laboratorio 3 verifica rutas modeladas, no explotación. Ninguno ejecuta sanitización de medios, assurance case independiente ni RMF organizacional real.
 
 ## 6. Brechas que siguen abiertas
 
