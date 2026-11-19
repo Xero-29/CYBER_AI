@@ -59,6 +59,7 @@ No introducir secretos reales ni probar proveedores externos con datos sensibles
 La autorización de objetivos y ejecución de herramientas debe estar en código determinista, no en el prompt. Documentos y salidas de herramientas deben marcarse como no confiables. Skillbook exige provenance, revisión y regresión; una conversación exitosa no basta para promover una Skill. Retrieval debe respetar ACL, versiones y estado editorial. Agentes deben citar fuentes, expresar incertidumbre y abstenerse ante evidencia insuficiente. CI debe incluir pruebas adversariales de prompt injection, tool misuse, RAG poisoning y cross-tenant.
 
 ## Fuentes primarias
+- NIST AI 100-2 E2025 (adversarial ML taxonomy, actualización de E2023): https://doi.org/10.6028/NIST.AI.100-2e2025
 - NIST AI RMF 1.0: https://doi.org/10.6028/NIST.AI.100-1
 - NIST Generative AI Profile AI 600-1: https://doi.org/10.6028/NIST.AI.600-1
 - OWASP Top 10 for LLM Applications: https://owasp.org/projects/top-10-for-large-language-model-applications
