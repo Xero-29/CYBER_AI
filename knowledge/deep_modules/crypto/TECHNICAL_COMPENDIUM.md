@@ -14,9 +14,9 @@ El documento organiza el desarrollo por subtema; no afirma investigación exhaus
 **Distinciones formales.** Una fuente de ruido produce observaciones físicas/no físicas; el estimador de min-entropía caracteriza el peor caso de probabilidad de una salida; un componente de conditioning transforma muestras; un DRBG expande una semilla en una secuencia determinista computacionalmente impredecible bajo sus supuestos. No confundir longitud de salida con entropía: 256 bits emitidos no implican 256 bits de entropía.
 
 Para una variable discreta (X), la min-entropía de Shannon en su forma clásica es:
-[
+\[
 H_\infty(X)=-\log_2\left(\max_x P[X=x]\right).
-]
+\]
 En fuentes correlacionadas o con atacante, la evaluación debe considerar el modelo de amenaza y estimadores conservadores; no basta asumir independencia.
 
 **Arquitectura de generación.** Documentar fuente, health tests, estimación de entropía, conditioning, acumulación de seed material, instanciación, generación, reseed, límites de request y zeroization. SP 800-90A describe DRBG basados en hash/HMAC/cifrado; SP 800-90B aborda fuentes de entropía y pruebas de salud; SP 800-90C especifica construcciones RBG que integran esas piezas. SP 800-90C fue finalizada en septiembre de 2025; SP 800-90A Rev. 2 sigue siendo borrador/pre-draft en el catálogo consultado, por lo que no se debe citar como norma final.
@@ -99,7 +99,7 @@ En fuentes correlacionadas o con atacante, la evaluación debe considerar el mod
 
 **Modo:** frío, aislado, sin credenciales ni datos reales.  
 **Estado:** protocolos diseñados; no ejecutados ni medidos.  
-**Requisitos comunes:** VM/contendor sin acceso a secretos; red deshabilitada salvo descarga controlada de vectores oficiales; reloj y versiones registrados; claves efímeras; snapshots; límites de CPU/memoria; logs saneados; limpieza verificable. Nunca se introduce una primitiva casera en un sistema real.
+**Requisitos comunes:** VM/contenedor sin acceso a secretos; red deshabilitada salvo descarga controlada de vectores oficiales; reloj y versiones registrados; claves efímeras; snapshots; límites de CPU/memoria; logs saneados; limpieza verificable. Nunca se introduce una primitiva casera en un sistema real.
 
 | ID | Experimento | Procedimiento mínimo | Criterio de aceptación | Evidencia |
 |---|---|---|---|---|
