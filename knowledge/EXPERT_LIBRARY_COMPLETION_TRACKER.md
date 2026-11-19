@@ -1,7 +1,7 @@
 # Seguimiento de aplicación del estándar experto — Biblioteca CYBER_AI
 
 **Corte editorial:** 2026-11-19  
-**Áreas:** 47/48 con compendio técnico específico ampliado en esta rama.  
+**Áreas:** 48/48 con compendio técnico específico ampliado en esta rama.  
 **Estado global:** borradores técnicos ampliados; investigación documental y validación experimental pendientes.
 
 ## Alcance aplicado

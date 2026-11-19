@@ -1305,6 +1305,146 @@
         "ot_ics"
       ],
       "review_note": "Metadatos y extracto de segmentación inspeccionados; documento completo y aplicabilidad jurisdiccional pendientes."
+    },
+    {
+      "id": "NIST-SP800-61R3",
+      "title": "Incident Response Recommendations and Considerations for Cybersecurity Risk Management: A CSF 2.0 Community Profile",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_final_publication",
+      "url": "https://csrc.nist.gov/pubs/sp/800/61/r3/final",
+      "version": "SP 800-61 Rev. 3",
+      "published": "2025-04-03",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verified_scope": "Integración de preparación, detección, respuesta y recuperación en la gestión de riesgo CSF 2.0.",
+      "domains": [
+        "incident_response",
+        "forensics",
+        "soc_siem",
+        "threat_intel",
+        "business_continuity"
+      ],
+      "review_note": "Metadatos y abstract oficiales inspeccionados; texto completo pendiente de lectura y extracción."
+    },
+    {
+      "id": "NIST-SP800-82R3",
+      "title": "Guide to Operational Technology (OT) Security",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_final_publication",
+      "url": "https://csrc.nist.gov/pubs/sp/800/82/r3/final",
+      "version": "SP 800-82 Rev. 3",
+      "published": "2023-09",
+      "verification_status": "official_document_metadata_and_excerpt_reviewed",
+      "verified_scope": "Seguridad de OT/ICS, arquitectura, riesgos, controles, monitorización y respuesta.",
+      "domains": [
+        "ot_ics",
+        "automotive_security",
+        "telecom_5g",
+        "satellite_security"
+      ],
+      "review_note": "Metadatos y extracto oficial inspeccionados; lectura integral y validación por sector pendientes."
+    },
+    {
+      "id": "NIST-SP800-227",
+      "title": "Recommendations for Key-Encapsulation Mechanisms",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_final_publication",
+      "url": "https://csrc.nist.gov/pubs/sp/800/227/final",
+      "version": "SP 800-227",
+      "published": "2025-09-18",
+      "verification_status": "official_catalog_metadata_reviewed",
+      "verified_scope": "Recomendaciones para uso seguro de mecanismos de encapsulación de claves.",
+      "domains": [
+        "crypto",
+        "post_quantum_crypto",
+        "pki_hsm"
+      ],
+      "review_note": "Entrada del catálogo oficial NIST localizada; texto completo pendiente."
+    },
+    {
+      "id": "K8S-POD-SECURITY-ADMISSION",
+      "title": "Pod Security Admission",
+      "publisher": "Kubernetes Documentation",
+      "type": "official_project_documentation",
+      "url": "https://kubernetes.io/docs/concepts/security/pod-security-admission/",
+      "version": "Kubernetes documentation v1.37",
+      "verification_status": "official_documentation_page_reviewed",
+      "verified_scope": "Aplicación de Pod Security Standards con modos enforce, audit y warn.",
+      "domains": [
+        "containers",
+        "cloud",
+        "devsecops"
+      ],
+      "review_note": "Página oficial inspeccionada; validar comportamiento contra la versión del cluster objetivo."
+    },
+    {
+      "id": "AWS-WELLARCH-SECURITY-PILLAR",
+      "title": "AWS Well-Architected Framework — Security Pillar",
+      "publisher": "Amazon Web Services",
+      "type": "official_vendor_architecture_guidance",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/",
+      "version": "Continuously maintained online guidance",
+      "verification_status": "official_documentation_page_reviewed",
+      "verified_scope": "Gobierno, identidad, protección de datos, infraestructura y operaciones de seguridad cloud en AWS.",
+      "domains": [
+        "cloud",
+        "cloud_forensics",
+        "data_security",
+        "governance"
+      ],
+      "review_note": "Página oficial inspeccionada; recomendaciones específicas deben contrastarse con arquitectura, región y servicios usados."
+    },
+    {
+      "id": "CISA-SECURE-BY-DEMAND-OT",
+      "title": "Secure by Demand: Priority Considerations for OT Owners and Operators",
+      "publisher": "CISA and international partners",
+      "type": "official_joint_guidance",
+      "url": "https://www.cisa.gov/sites/default/files/2025-01/joint-guide-secure-by-demand-priority-considerations-for-ot-owners-and-operators-508c.pdf",
+      "version": "2025-01-13",
+      "published": "2025-01-13",
+      "verification_status": "official_document_summary_reviewed",
+      "verified_scope": "Criterios de adquisición de productos OT con atributos secure-by-design, logging, autenticación y defaults seguros.",
+      "domains": [
+        "ot_ics",
+        "iot_hardware",
+        "automotive_security"
+      ],
+      "review_note": "Resumen oficial localizado; documento íntegro y aplicabilidad sectorial pendientes."
+    },
+    {
+      "id": "MITRE-ATTACK-KB",
+      "title": "MITRE ATT&CK Knowledge Base",
+      "publisher": "MITRE",
+      "type": "official_knowledge_base",
+      "url": "https://attack.mitre.org/",
+      "version": "Continuously versioned",
+      "verification_status": "official_framework_page_reviewed",
+      "verified_scope": "Tácticas y técnicas adversarias basadas en observaciones del mundo real.",
+      "domains": [
+        "threat_intel",
+        "threat_hunting",
+        "red_team",
+        "ai_red_team",
+        "soc_siem",
+        "edr_xdr"
+      ],
+      "review_note": "Página oficial y estructura general inspeccionadas; los datos STIX deben versionarse para análisis reproducible."
+    },
+    {
+      "id": "MITRE-CAPEC",
+      "title": "Common Attack Pattern Enumeration and Classification",
+      "publisher": "MITRE",
+      "type": "official_attack_pattern_knowledge_base",
+      "url": "https://capec.mitre.org/",
+      "version": "Continuously maintained",
+      "verification_status": "official_framework_page_reviewed",
+      "verified_scope": "Patrones de ataque y relaciones con CWE/ATT&CK.",
+      "domains": [
+        "appsec",
+        "vulnerability_research",
+        "bug_bounty",
+        "software_engineering"
+      ],
+      "review_note": "Página oficial de comparación y propósito inspeccionada; cada patrón requiere contexto y lectura de su definición."
     }
   ],
   "last_updated": "2026-11-17"

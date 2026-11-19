@@ -345,3 +345,10 @@ Cada línea debe convertirse en preregistro con población/sistema, unidad de an
 - M4: experimento ejecutado, analizado y reproducible internamente.
 - M5: revisión independiente y reproducción externa.
 La agenda no otorga madurez por sí misma.
+
+### 48. Threat hunting (`threat_hunting`)
+**Pregunta:** ¿Qué hipótesis de hunting y combinación de fuentes detectan actividad no cubierta por reglas existentes?
+**Hipótesis de trabajo:** un proceso guiado por hipótesis, con telemetría de calidad y revisión de hipótesis alternativas, produce hallazgos reproducibles y accionables con menos ruido que búsquedas ad hoc.
+**Diseño mínimo:** replay de dataset sintético etiquetado, hipótesis preregistradas, queries versionadas, control negativo y análisis de resultados no encontrados.
+**Métricas candidatas:** tiempo de descubrimiento, cobertura de fuentes, precision/recall, falsos positivos, reproducibilidad.
+**Entregables:** query, hipótesis, evidencia, hallazgos negativos, limitaciones y regla de detección con tests.
