@@ -346,3 +346,14 @@ La validación estructural del nuevo corpus está aprobada. El informe de calida
 - El registro JSON conserva estado individual, ancla, conteo de palabras y fuentes de partida.
 - Se añadió una regresión para comprobar los 192 módulos y el umbral mínimo de contenido.
 - **No validado:** faltan lectura integral y trazabilidad claim-to-source, ejecución de laboratorios cuando aplique y revisión independiente. No elevar madurez por volumen documental.
+
+
+### Sistema de trazabilidad y validación por afirmación — 2026-11-19
+
+- Se añadió \`research_validation.py\` para auditar la correspondencia entre el registro de 192 brechas, el mapa de fuentes y el registro de 92 fuentes.
+- Se generó \`VALIDATION_WORKLIST_192.json\`: 192 tareas (4 por cada uno de los 48 dominios), con IDs de fuentes candidatas y requisitos explícitos de revisión documental, evidencia localizada, contradicciones, experimentación cuando aplique y revisión independiente.
+- Se añadió \`CLAIM_EVIDENCE_REGISTER.json\` como registro vacío intencional de afirmaciones. Cada afirmación futura exige texto delimitado, módulo, fuentes, localizador exacto, extracto de evidencia, tipo de evidencia, estado, revisor y fecha.
+- La herramienta impide marcar como respaldada una afirmación documental si las fuentes solo tienen revisión de ficha/metadatos; exige estado de lectura integral. Para afirmaciones experimentales exige referencias a artefactos de evidencia.
+- Se integró la auditoría a \`verify.sh\` y se añadieron pruebas de regresión para estructura, cobertura, trazabilidad y puertas de validación.
+- Resultado esperado inicial: 48 dominios, 192 tareas, 92 fuentes candidatas, 0 afirmaciones respaldadas y 0 fuentes con lectura integral registrada. Esto es deliberado: el sistema expone el trabajo pendiente, no inventa validación.
+- **Límite:** la herramienta valida estructura y requisitos de evidencia; no decide semánticamente si una cita demuestra una afirmación. Esa revisión debe ser humana o independiente y documentada. No se descargaron recursos automáticamente ni se modificaron licencias. La ingesta vectorial real continúa dependiendo de configurar el proveedor ECO y ejecutar el bootstrap local.
