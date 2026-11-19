@@ -104,3 +104,14 @@ Se incorporaron los 16 dominios restantes del manifiesto:
 - [Seguridad de hardware](../../deep_modules/hardware_security/RESEARCH_STUDY.md)
 
 **Cobertura estructural:** los 48 dominios del manifiesto tienen ahora un RESEARCH_STUDY.md. Esto no significa que todos estén investigados exhaustivamente ni validados en laboratorio. Se registra el cambio de DMARC: RFC 7489 quedó obsoleto y se deben usar RFC 9989/9990/9991; también se distinguen los trabajos en desarrollo de ISO/SAE 21434 Ed. 2 y NIST SP 800-213 Rev. 1 IPD.
+
+
+## Actualización de investigación avanzada — 2026-11-18
+
+Se amplió el registro de fuentes y se documentaron brechas avanzadas para los 48 dominios. Nuevas referencias oficiales catalogadas:
+- NIST IR 8547 Final: transición a criptografía poscuántica.
+- MITRE ATT&CK v20.1: versión del catálogo vigente al corte.
+- NIST SP 800-207A: Zero Trust para aplicaciones cloud-native multi-cloud.
+- NIST SP 800-218A: prácticas de desarrollo seguro para IA generativa y modelos fundacionales.
+
+Estas referencias se revisaron a nivel de ficha/página oficial; no equivalen a lectura integral. El [registro de brechas avanzadas](../ADVANCED_GAPS_AND_RESEARCH_PLAN_2026-11-18.md) y su [versión estructurada](../ADVANCED_GAP_REGISTER.json) contienen 192 temas pendientes de desarrollo y evaluación.

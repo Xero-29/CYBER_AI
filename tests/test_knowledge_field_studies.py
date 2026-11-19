@@ -108,5 +108,25 @@ class KnowledgeFieldStudiesTests(unittest.TestCase):
                 self.assertEqual(len(area["source_ids"]), len(set(area["source_ids"])))
                 self.assertTrue(set(area["source_ids"]).issubset(known_ids))
 
+
+    def test_advanced_gap_register_covers_every_manifest_domain(self):
+        gaps = json.loads(
+            (ROOT / "knowledge/research/ADVANCED_GAP_REGISTER.json")
+            .read_text(encoding="utf-8")
+        )
+        manifest = json.loads(
+            (ROOT / "knowledge/packs/manifest.json").read_text(encoding="utf-8")
+        )
+        entries = gaps["domains"]
+        expected = {item["id"] for item in manifest["areas"]}
+        actual = {item["domain_id"] for item in entries}
+        self.assertEqual(len(entries), len(actual))
+        self.assertEqual(actual, expected)
+        for item in entries:
+            with self.subTest(domain=item["domain_id"]):
+                self.assertEqual(item["status"], "identified_not_yet_assessed")
+                self.assertGreaterEqual(len(item["missing_advanced_topics"]), 4)
+                self.assertEqual(len(item["missing_advanced_topics"]), len(set(item["missing_advanced_topics"])))
+
 if __name__ == "__main__":
     unittest.main()

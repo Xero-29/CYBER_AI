@@ -2241,6 +2241,63 @@
       ],
       "verification_status": "official_project_page_reviewed",
       "review_note": "Methodology resource; choose techniques for the specific system."
+    },
+    {
+      "id": "NIST-IR-8547",
+      "title": "Transition to Post-Quantum Cryptography Standards",
+      "publisher": "NIST",
+      "type": "official_primary_reference",
+      "url": "https://doi.org/10.6028/NIST.IR.8547",
+      "version": "NIST IR 8547 Final",
+      "published": "2026-10-27",
+      "verification_status": "official_final_publication_page_reviewed",
+      "verified_scope": "Ficha oficial y resumen: hoja de ruta para transición de algoritmos vulnerables a estándares PQC.",
+      "domains": [
+        "post_quantum_crypto",
+        "crypto",
+        "pki_hsm",
+        "governance"
+      ],
+      "review_note": "Lectura integral, extracción de hitos y análisis de aplicabilidad pendientes."
+    },
+    {
+      "id": "MITRE-ATTACK-20.1",
+      "title": "MITRE ATT&CK version history and v20.1 release",
+      "publisher": "MITRE",
+      "type": "official_version_reference",
+      "url": "https://attack.mitre.org/resources/versions/",
+      "version": "20.1",
+      "published": "2026-10-13",
+      "verification_status": "official_version_history_reviewed",
+      "verified_scope": "La página de versiones identifica v20.1 como versión vigente desde 13-oct-2026 al corte de esta ampliación.",
+      "domains": [
+        "threat_intel",
+        "soc_siem",
+        "threat_hunting",
+        "red_team",
+        "ot_ics",
+        "malware"
+      ],
+      "review_note": "Importación STIX, changelog y análisis de cambios pendientes."
+    },
+    {
+      "id": "NIST-SP800-207A",
+      "title": "A Zero Trust Architecture Model for Access Control in Cloud-Native Applications in Multi-Cloud Environments",
+      "publisher": "NIST",
+      "type": "official_primary_reference",
+      "url": "https://doi.org/10.6028/NIST.SP.800-207A",
+      "version": "SP 800-207A Final",
+      "published": "2023-09-13",
+      "verification_status": "official_final_metadata_and_abstract_reviewed",
+      "verified_scope": "Identidad de aplicación/servicio, gateways, sidecars, service mesh y políticas de acceso cloud-native multi-cloud.",
+      "domains": [
+        "cloud",
+        "containers",
+        "api",
+        "identity",
+        "secure_arch"
+      ],
+      "review_note": "Lectura integral y pruebas de arquitectura en laboratorio pendientes."
     }
   ],
   "last_updated": "2026-11-17"

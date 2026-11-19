@@ -37,7 +37,8 @@
         "OWASP-API-TOP10-2023",
         "OWASP-MAS",
         "OWASP-AUTOMATED-THREATS",
-        "OWASP-SQLI-PREVENTION"
+        "OWASP-SQLI-PREVENTION",
+        "NIST-SP800-207A"
       ]
     },
     {
@@ -80,7 +81,8 @@
         "NIST-SP800-144",
         "NIST-SP800-190",
         "NSA-CISA-K8S-HARDENING",
-        "CIS-BENCHMARKS"
+        "CIS-BENCHMARKS",
+        "NIST-SP800-207A"
       ]
     },
     {
@@ -91,7 +93,8 @@
         "NIST-SP800-190",
         "NSA-CISA-K8S-HARDENING",
         "K8S-SECURITY-CHECKLIST",
-        "CIS-BENCHMARKS"
+        "CIS-BENCHMARKS",
+        "NIST-SP800-207A"
       ]
     },
     {
@@ -117,7 +120,8 @@
         "NIST-FIPS-204",
         "NIST-FIPS-205",
         "NIST-FIPS-140-3",
-        "NIST-SP800-131A-R2"
+        "NIST-SP800-131A-R2",
+        "NIST-IR-8547"
       ]
     },
     {
@@ -130,7 +134,8 @@
         "MS-AD-DS-DOCS",
         "NIST-SP800-63-4",
         "NIST-SP800-63B-4",
-        "NIST-63-4-IMPLEMENTATION"
+        "NIST-63-4-IMPLEMENTATION",
+        "NIST-SP800-207A"
       ]
     },
     {
@@ -140,7 +145,8 @@
         "MITRE-ATTACK-ENTERPRISE",
         "NIST-SP800-83R1",
         "YARA-DOCS",
-        "CISA-MALWARE-RESOURCES"
+        "CISA-MALWARE-RESOURCES",
+        "MITRE-ATTACK-20.1"
       ]
     },
     {
@@ -172,7 +178,8 @@
         "MITRE-ATTACK-DATASOURCES",
         "CISA-KEV",
         "FIRST-EPSS",
-        "CAPEC-3.9"
+        "CAPEC-3.9",
+        "MITRE-ATTACK-20.1"
       ]
     },
     {
@@ -236,7 +243,8 @@
         "NISTIR-8259B",
         "NIST-PRIVACY-FRAMEWORK",
         "NIST-SP800-137",
-        "NIST-SP800-53R5"
+        "NIST-SP800-53R5",
+        "NIST-IR-8547"
       ]
     },
     {
@@ -267,7 +275,8 @@
         "NIST-SP800-144",
         "MITRE-D3FEND",
         "NIST-SP800-53R5",
-        "OWASP-THREAT-MODELING"
+        "OWASP-THREAT-MODELING",
+        "NIST-SP800-207A"
       ]
     },
     {
@@ -285,7 +294,8 @@
       "source_ids": [
         "NIST-NICE-2.2",
         "NIST-SP800-218",
-        "OWASP-ASVS-5.0.0"
+        "OWASP-ASVS-5.0.0",
+        "NIST-SP800-218A"
       ]
     },
     {
@@ -337,7 +347,8 @@
         "MITRE-D3FEND",
         "SIGMA-SPEC",
         "ZEEK-DOCS",
-        "SURICATA-DOCS"
+        "SURICATA-DOCS",
+        "MITRE-ATTACK-20.1"
       ]
     },
     {
@@ -359,7 +370,8 @@
         "NIST-SP800-137",
         "MITRE-D3FEND",
         "SIGMA-SPEC",
-        "ZEEK-DOCS"
+        "ZEEK-DOCS",
+        "MITRE-ATTACK-20.1"
       ]
     },
     {
@@ -367,7 +379,8 @@
       "study_path": "knowledge/deep_modules/red_team/RESEARCH_STUDY.md",
       "source_ids": [
         "NIST-SP800-115",
-        "CAPEC-3.9"
+        "CAPEC-3.9",
+        "MITRE-ATTACK-20.1"
       ]
     },
     {
@@ -385,7 +398,8 @@
       "study_path": "knowledge/deep_modules/ot_ics/RESEARCH_STUDY.md",
       "source_ids": [
         "NIST-SP800-82R3",
-        "NIST-SP800-82R4-IPD"
+        "NIST-SP800-82R4-IPD",
+        "MITRE-ATTACK-20.1"
       ]
     },
     {
@@ -476,7 +490,8 @@
         "NIST-SP800-57P1R5",
         "NIST-FIPS-204",
         "NIST-FIPS-140-3",
-        "NIST-SP800-131A-R2"
+        "NIST-SP800-131A-R2",
+        "NIST-IR-8547"
       ]
     },
     {
@@ -486,7 +501,8 @@
         "NIST-FIPS-203",
         "NIST-FIPS-204",
         "NIST-FIPS-205",
-        "NIST-SP800-131A-R2"
+        "NIST-SP800-131A-R2",
+        "NIST-IR-8547"
       ]
     },
     {
