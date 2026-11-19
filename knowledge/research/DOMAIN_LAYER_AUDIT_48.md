@@ -49,7 +49,7 @@ Se inspeccionaron los 48 compendios técnicos. Todos tienen documentos y rutas d
 6. Evaluación adversarial
 7. Retest y reporte
 
-**Estado:** generic_or_initial_compendium_requires_deep_audit; 12 capas por tema: `not_assessed`; G1–G8: `not_assessed`; madurez: M2.
+**Estado:** dossier teórico V1 de 12 capas para los siete temas base incorporado; 84/84 celdas `in_progress`, ninguna `passed`; G1–G4 y G6 `in_progress`; G5/G7 `not_started` (etapa caliente); G8 `blocked`; madurez M2.
 
 ### 2. `ai_security`
 
