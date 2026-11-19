@@ -151,3 +151,15 @@ Estos estudios amplían los compendios estructurados con síntesis técnicas, am
 - [Gestión de vulnerabilidades](./vuln_management/RESEARCH_STUDY.md)
 - [DevSecOps](./devsecops/RESEARCH_STUDY.md)
 - [Arquitectura segura](./secure_arch/RESEARCH_STUDY.md)
+
+
+## Segunda tanda de estudios profundos (2026-11-18)
+
+- [Fundamentos](./foundations/RESEARCH_STUDY.md)
+- [Seguridad web y aplicaciones](./appsec/RESEARCH_STUDY.md)
+- [Seguridad de API](./api/RESEARCH_STUDY.md)
+- [Linux y Unix](./linux/RESEARCH_STUDY.md)
+- [Windows y Active Directory](./windows_ad/RESEARCH_STUDY.md)
+- [Seguridad cloud](./cloud/RESEARCH_STUDY.md)
+- [Contenedores y Kubernetes](./containers/RESEARCH_STUDY.md)
+- [Seguridad móvil](./mobile/RESEARCH_STUDY.md)
