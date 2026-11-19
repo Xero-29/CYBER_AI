@@ -8,68 +8,82 @@ Currículo técnico de Seguridad móvil; adaptar a arquitectura, criticidad, con
 El documento organiza el desarrollo por subtema; no afirma investigación exhaustiva ni lectura integral de referencias. Usar activos propios/autorizados, entornos aislados y datos sintéticos. Para sistemas físicos, usar simuladores o bancos controlados y priorizar seguridad funcional.
 
 ## Desarrollo técnico por subtema
-### 1. Android sandbox, permisos y Keystore
 
-- **Fundamentos y modelo:** explicar arquitectura, componentes, estados, interfaces, identidades, datos y límites de confianza.
-- **Amenazas/fallos:** identificar abuso, errores de diseño e implementación, configuración insegura, dependencias y fallos operativos; indicar precondiciones.
-- **Controles:** relacionar prevención, detección, respuesta y recuperación con cada amenaza; explicitar riesgo residual y efectos secundarios.
-- **Pruebas:** definir casos positivos, negativos, límites y regresión con entradas sintéticas, resultado esperado, logs y criterio de parada.
-- **Investigación:** comparar enfoques, registrar desacuerdos y formular una pregunta falsable sin anticipar resultados.
-- **Evidencia:** entregar explicación técnica original, modelo/diagrama, tabla amenaza→control→evidencia, procedimiento reproducible y limitaciones.
+### 1. Android: sandbox, permisos y Android Keystore
 
-### 2. iOS sandbox, entitlements y Keychain
+**Modelo de ejecución.** Cada aplicación se ejecuta bajo un UID propio en el kernel Linux. El aislamiento combina UID/GID, permisos DAC, SELinux en modo enforcing, namespaces y restricciones del framework. No describir el sandbox como una única barrera: una vulnerabilidad del kernel, un servicio privilegiado o una interfaz IPC mal protegida puede cruzar límites de aplicación. ART ejecuta bytecode DEX; JNI y bibliotecas nativas introducen memoria y superficies adicionales.
 
-- **Fundamentos y modelo:** explicar arquitectura, componentes, estados, interfaces, identidades, datos y límites de confianza.
-- **Amenazas/fallos:** identificar abuso, errores de diseño e implementación, configuración insegura, dependencias y fallos operativos; indicar precondiciones.
-- **Controles:** relacionar prevención, detección, respuesta y recuperación con cada amenaza; explicitar riesgo residual y efectos secundarios.
-- **Pruebas:** definir casos positivos, negativos, límites y regresión con entradas sintéticas, resultado esperado, logs y criterio de parada.
-- **Investigación:** comparar enfoques, registrar desacuerdos y formular una pregunta falsable sin anticipar resultados.
-- **Evidencia:** entregar explicación técnica original, modelo/diagrama, tabla amenaza→control→evidencia, procedimiento reproducible y limitaciones.
+**Permisos y componentes.** Analizar el manifiesto efectivo del APK (no solo el fuente): activities, services, receivers y content providers; atributos `exported`, permisos de componente, intent filters, URI grants y permisos runtime. Desde Android 12, los componentes con intent filters deben declarar explícitamente `android:exported`. Los permisos normales, peligrosos, signature y special app access tienen semánticas distintas. Un permiso declarado no demuestra que el sistema lo conceda ni que la app lo use correctamente.
 
-### 3. almacenamiento local y backups
+**Keystore.** Android Keystore mantiene material de clave fuera del proceso de la aplicación; cuando el dispositivo lo soporta, operaciones pueden ejecutarse en TEE o StrongBox. La clave privada puede ser no exportable, pero el proceso autorizado aún puede pedir operaciones criptográficas mientras conserva acceso. Documentar alias, propósito, modos, padding, digest, autenticación requerida, validez temporal, invalidación por cambios biométricos y comportamiento ante ausencia de hardware seguro. No asumir StrongBox/TEE por versión de Android: comprobar capacidades en runtime.
 
-- **Fundamentos y modelo:** explicar arquitectura, componentes, estados, interfaces, identidades, datos y límites de confianza.
-- **Amenazas/fallos:** identificar abuso, errores de diseño e implementación, configuración insegura, dependencias y fallos operativos; indicar precondiciones.
-- **Controles:** relacionar prevención, detección, respuesta y recuperación con cada amenaza; explicitar riesgo residual y efectos secundarios.
-- **Pruebas:** definir casos positivos, negativos, límites y regresión con entradas sintéticas, resultado esperado, logs y criterio de parada.
-- **Investigación:** comparar enfoques, registrar desacuerdos y formular una pregunta falsable sin anticipar resultados.
-- **Evidencia:** entregar explicación técnica original, modelo/diagrama, tabla amenaza→control→evidencia, procedimiento reproducible y limitaciones.
+**Fallos típicos.** Secretos hardcodeados; tokens en SharedPreferences sin protección; exportación innecesaria de componentes; URI grants excesivos; validación débil de intents; WebView con JavaScript bridge expuesto; confiar en root detection como control de autorización; claves que no se rotan o que quedan inutilizables tras cambio de bloqueo/biometría.
 
-### 4. TLS y confianza del dispositivo
+**Verificación fría.** Construir una app de laboratorio con dos UIDs y componentes exportados/no exportados. Probar llamadas permitidas y denegadas, permisos revocados, intent explícito/implícito, URI grants y acceso a contenido. Registrar versión de OS, targetSdk, manifiesto fusionado, UID, AVC denials, resultado esperado/observado y logs saneados.
 
-- **Fundamentos y modelo:** explicar arquitectura, componentes, estados, interfaces, identidades, datos y límites de confianza.
-- **Amenazas/fallos:** identificar abuso, errores de diseño e implementación, configuración insegura, dependencias y fallos operativos; indicar precondiciones.
-- **Controles:** relacionar prevención, detección, respuesta y recuperación con cada amenaza; explicitar riesgo residual y efectos secundarios.
-- **Pruebas:** definir casos positivos, negativos, límites y regresión con entradas sintéticas, resultado esperado, logs y criterio de parada.
-- **Investigación:** comparar enfoques, registrar desacuerdos y formular una pregunta falsable sin anticipar resultados.
-- **Evidencia:** entregar explicación técnica original, modelo/diagrama, tabla amenaza→control→evidencia, procedimiento reproducible y limitaciones.
+### 2. iOS: sandbox, entitlements y Keychain
 
-### 5. deep links, IPC y WebView
+**Cadena de confianza.** Separar Secure Boot, firma de código, provisioning profile, entitlements, sandbox, Data Protection y Secure Enclave. La firma verifica integridad/origen del código según la cadena de confianza; no demuestra que la lógica de negocio sea segura. Los entitlements son capacidades firmadas y autorizadas por el sistema, no simples preferencias configurables por la app.
 
-- **Fundamentos y modelo:** explicar arquitectura, componentes, estados, interfaces, identidades, datos y límites de confianza.
-- **Amenazas/fallos:** identificar abuso, errores de diseño e implementación, configuración insegura, dependencias y fallos operativos; indicar precondiciones.
-- **Controles:** relacionar prevención, detección, respuesta y recuperación con cada amenaza; explicitar riesgo residual y efectos secundarios.
-- **Pruebas:** definir casos positivos, negativos, límites y regresión con entradas sintéticas, resultado esperado, logs y criterio de parada.
-- **Investigación:** comparar enfoques, registrar desacuerdos y formular una pregunta falsable sin anticipar resultados.
-- **Evidencia:** entregar explicación técnica original, modelo/diagrama, tabla amenaza→control→evidencia, procedimiento reproducible y limitaciones.
+**Sandbox y extensiones.** Mapear contenedor de app, grupos compartidos, App Groups, Keychain access groups, extensiones, URL schemes, Universal Links y servicios del sistema. Revisar qué proceso posee cada dato y qué entitlement habilita el acceso. La extensión tiene límites de ciclo de vida y recursos; no asumir que comparte todo el estado del proceso principal.
 
-### 6. MASVS/MSTG y análisis
+**Keychain y Data Protection.** Elegir clases de accesibilidad conforme a disponibilidad y amenaza: por ejemplo, datos disponibles solo cuando el dispositivo está desbloqueado frente a los que pueden sobrevivir a reinicios o migraciones. Evaluar sincronización iCloud, migración, backup, access group, Secure Enclave y requisitos de presencia del usuario. Separar secreto exportable de clave privada no exportable. Probar estados bloqueado/desbloqueado, reinicio, restauración y cambio de passcode.
 
-- **Fundamentos y modelo:** explicar arquitectura, componentes, estados, interfaces, identidades, datos y límites de confianza.
-- **Amenazas/fallos:** identificar abuso, errores de diseño e implementación, configuración insegura, dependencias y fallos operativos; indicar precondiciones.
-- **Controles:** relacionar prevención, detección, respuesta y recuperación con cada amenaza; explicitar riesgo residual y efectos secundarios.
-- **Pruebas:** definir casos positivos, negativos, límites y regresión con entradas sintéticas, resultado esperado, logs y criterio de parada.
-- **Investigación:** comparar enfoques, registrar desacuerdos y formular una pregunta falsable sin anticipar resultados.
-- **Evidencia:** entregar explicación técnica original, modelo/diagrama, tabla amenaza→control→evidencia, procedimiento reproducible y limitaciones.
+**Riesgos.** URL schemes que aceptan callbacks no autenticados; Universal Links mal asociados; grupos Keychain demasiado amplios; datos sensibles en logs, pasteboard, snapshots de UI o archivos temporales; entitlements excesivos; confundir biometría local con autenticación del servidor.
 
-### 7. MDM/MAM y respuesta
+**Verificación fría.** Inspeccionar firma, entitlements y provisioning profile de una app de laboratorio. Ejecutar pruebas con dos apps firmadas para distintos grupos, callback válido/alterado, estado bloqueado y restauración de backup. Preservar comandos, versión de Xcode/iOS, hashes y salida.
 
-- **Fundamentos y modelo:** explicar arquitectura, componentes, estados, interfaces, identidades, datos y límites de confianza.
-- **Amenazas/fallos:** identificar abuso, errores de diseño e implementación, configuración insegura, dependencias y fallos operativos; indicar precondiciones.
-- **Controles:** relacionar prevención, detección, respuesta y recuperación con cada amenaza; explicitar riesgo residual y efectos secundarios.
-- **Pruebas:** definir casos positivos, negativos, límites y regresión con entradas sintéticas, resultado esperado, logs y criterio de parada.
-- **Investigación:** comparar enfoques, registrar desacuerdos y formular una pregunta falsable sin anticipar resultados.
-- **Evidencia:** entregar explicación técnica original, modelo/diagrama, tabla amenaza→control→evidencia, procedimiento reproducible y limitaciones.
+### 3. Almacenamiento local, backups y ciclo de vida de datos
+
+Crear un inventario por tipo de dato: credenciales, tokens, PII, datos de negocio, cachés, claves, telemetría y contenido descargado. Para cada elemento registrar clasificación, ubicación, cifrado, propietario, retención, exportabilidad, backup, sincronización y borrado esperado.
+
+**Android.** Revisar almacenamiento interno/externo, scoped storage, SQLite/Room, archivos temporales, logs, preferencias, Auto Backup y reglas de extracción. Cifrar con claves gestionadas por Keystore y usar bibliotecas mantenidas; el cifrado de archivo no protege si la clave se almacena junto al ciphertext. Excluir secretos del backup cuando la política lo requiera y verificar el comportamiento real del target OS.
+
+**iOS.** Revisar Data Protection por archivo, protección de bases de datos, Keychain, caches, backups y sincronización. Asegurar que la clase de protección corresponde al estado de uso; evitar almacenar secretos en Documents si no deben sincronizarse. El borrado lógico de una fila no equivale necesariamente a borrado físico inmediato en flash, WAL o snapshots.
+
+**Amenazas y pruebas.** Extracción de backup, dispositivo desbloqueado, logs/crash reports, screenshots, clipboard, teclado de terceros, filesystem residual, sincronización accidental y restauración a otro dispositivo. Usar datos sintéticos marcados y buscar cada canario en ubicaciones previstas y no previstas. Medir exposición por superficie, persistencia tras logout/revocación y falsos positivos del escáner.
+
+### 4. TLS, confianza del dispositivo y autenticación
+
+**TLS.** Validar cadena, hostname, expiración, usos de certificado, protocolos y suites admitidos por la plataforma. Nunca aceptar todos los certificados ni sustituir hostname verification por pinning. Certificate pinning es una defensa adicional contra ciertos escenarios de CA comprometida; introduce riesgo de indisponibilidad y requiere estrategia de rotación, pins de respaldo y proceso de emergencia.
+
+**OAuth 2.0/OIDC.** Para clientes móviles públicos usar Authorization Code con PKCE; no incrustar un client secret como si fuera confidencial. Validar state, nonce cuando aplique, issuer, audience, expiración, redirect URI exacta y firma de tokens según especificación. Preferir navegador del sistema para SSO y evitar WebView embebida como agente de autenticación. Los access tokens deben tener alcance y duración mínimos; refresh tokens requieren rotación/revocación y detección de reutilización según el proveedor.
+
+**Confianza del dispositivo.** Attestation e indicadores de integridad aportan señales de riesgo, no prueba absoluta de que el dispositivo esté limpio. Definir política de degradación: step-up, limitar operaciones sensibles o pedir reautenticación; no bloquear automáticamente a todos los dispositivos modificados sin analizar falsos positivos y accesibilidad.
+
+**Pruebas.** Certificado caducado, hostname incorrecto, CA no confiable, proxy de laboratorio, redirect URI manipulada, state ausente/reutilizado, token de audiencia incorrecta, refresh revocado y reloj desfasado. La app debe fallar de forma segura sin filtrar tokens en logs.
+
+### 5. Deep links, IPC, intents y WebView
+
+Tratar cada frontera de IPC como entrada no confiable, incluso si la llamada procede de otra app instalada. Definir esquema, tipos, tamaño, autenticidad, autorización y validación de cada parámetro.
+
+**Android.** Revisar intents explícitos e implícitos, exported components, PendingIntent mutability, broadcast receivers, Binder, content providers, path permissions y URI permission flags. Preferir intents explícitos para flujos internos; validar caller/permiso donde sea posible. Un intent filter no es mecanismo de autenticación. En PendingIntent, usar inmutabilidad por defecto cuando el caso lo permita y comprobar identidad/alcance del token.
+
+**iOS.** Comparar URL schemes personalizados con Universal Links asociados a dominio y archivo de asociación. Validar parámetros, estado de sesión y autorización en backend; un deep link no debe ser una capacidad bearer sin caducidad. Revisar callbacks OAuth, universal link fallback y colisiones de esquemas.
+
+**WebView.** Desactivar JavaScript si no es necesario; restringir navegación, orígenes y carga de contenido mixto; no exponer bridges a contenido remoto no confiable; validar esquemas y descargas; evitar interfaces nativas invocables desde cualquier frame. No confiar en una allowlist superficial si redirecciones y subrecursos quedan fuera.
+
+**Casos de prueba.** Parámetros duplicados, Unicode/normalización, URL encodificada doble, esquema desconocido, host parecido, redirect externo, replay, payload sobredimensionado, componente exportado y contenido remoto que intenta invocar bridge. Registrar decisión de autorización y origen real.
+
+### 6. MASVS/MSTG, análisis estático/dinámico y evaluación
+
+Usar OWASP MASVS como estándar de requisitos y MASTG como guía de pruebas; fijar versión/commit de ambos y mapear cada caso a un identificador concreto. No declarar conformidad por ejecutar un escáner ni usar una checklist sin evidencia.
+
+**Análisis estático.** Inspeccionar manifiestos/entitlements, permisos, configuración de red, dependencias, SDKs, strings, endpoints, criptografía, logs y almacenamiento. Los hallazgos deben confirmarse con contexto y versión; los secretos de prueba no deben confundirse con credenciales activas.
+
+**Análisis dinámico.** Instrumentar solo apps propias/autorizadas en emulador o dispositivo de laboratorio. Observar filesystem, IPC, tráfico, logs, memoria accesible y comportamiento ante cambios de estado. Distinguir comportamiento del emulador del hardware real, especialmente Keystore/TEE, Secure Enclave, biometría y attestation.
+
+**Rúbrica.** Cada hallazgo incluye requisito MASVS/MASTG, activo, precondición, impacto, evidencia reproducible, severidad contextual, falso positivo posible, mitigación, retest y riesgo residual. Medir precision/recall sobre un corpus etiquetado; publicar denominadores y criterios de confirmación. No inferir cobertura total a partir de la cantidad de pruebas automatizadas.
+
+### 7. MDM/MAM, respuesta y ciclo de vida empresarial
+
+Separar gestión del dispositivo (MDM), gestión de aplicaciones (MAM), gestión de identidades, protección de datos y telemetría. Modelar BYOD, COPE y dispositivos corporativos como perfiles de privacidad y control distintos. Registrar qué datos puede ver el administrador y qué acciones son posibles: borrar perfil laboral, retirar app, revocar certificados, bloquear sesión o wipe total.
+
+**Controles.** Enrollment autenticado; compliance posture con versión/patch; configuración gestionada; distribución y actualización firmada; certificados por dispositivo; VPN/per-app networking cuando aplique; separación de datos laborales; remote lock/wipe; inventario y revocación al offboarding. No asumir que MDM impide extracción por cámara, capturas externas o dispositivos comprometidos.
+
+**Respuesta.** Ante pérdida/robo: revocar sesiones y certificados, bloquear acceso backend, evaluar sensibilidad de datos locales, aplicar wipe proporcional, preservar logs disponibles y notificar según política. Ante app comprometida: detener distribución, revocar credenciales/firmas si corresponde, publicar versión corregida, forzar reautenticación y medir dispositivos aún vulnerables.
+
+**Métricas.** Tiempo hasta revocación, cobertura de dispositivos administrados, cumplimiento de versión, porcentaje de apps con configuración gestionada, éxito de wipe, falsos bloqueos y tiempo de recuperación. Definir denominadores y separar BYOD de flota corporativa.
 
 ## Laboratorio reproducible
 Entorno: Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.
