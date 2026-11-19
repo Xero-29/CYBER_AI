@@ -1,0 +1,524 @@
+{
+  "schema_version": "1.0.0",
+  "generated_from": "knowledge/research/field_studies/SOURCE_REGISTER_2026-11-18.json",
+  "research_cutoff": "2026-11-18",
+  "policy": "Pertinencia temática; no implica que una fuente respalde todas las afirmaciones de un estudio.",
+  "areas": [
+    {
+      "area_id": "foundations",
+      "study_path": "knowledge/deep_modules/foundations/RESEARCH_STUDY.md",
+      "source_ids": [
+        "NIST-CSF-2.0",
+        "NIST-NICE-2.2",
+        "CIS-CONTROLS-8.1"
+      ]
+    },
+    {
+      "area_id": "appsec",
+      "study_path": "knowledge/deep_modules/appsec/RESEARCH_STUDY.md",
+      "source_ids": [
+        "OWASP-API-TOP10",
+        "OWASP-ASVS-5.0.0",
+        "OWASP-WSTG-4.2",
+        "OWASP-API-TOP10-2023",
+        "NIST-SP800-115",
+        "CAPEC-3.9",
+        "OWASP-AUTOMATED-THREATS",
+        "OWASP-SQLI-PREVENTION"
+      ]
+    },
+    {
+      "area_id": "api",
+      "study_path": "knowledge/deep_modules/api/RESEARCH_STUDY.md",
+      "source_ids": [
+        "OWASP-API-TOP10",
+        "OWASP-ASVS-5.0.0",
+        "OWASP-WSTG-4.2",
+        "OWASP-API-TOP10-2023",
+        "OWASP-MAS",
+        "OWASP-AUTOMATED-THREATS",
+        "OWASP-SQLI-PREVENTION"
+      ]
+    },
+    {
+      "area_id": "network",
+      "study_path": "knowledge/deep_modules/network/RESEARCH_STUDY.md",
+      "source_ids": [
+        "MITRE-ATTACK-ENTERPRISE",
+        "NIST-SP800-207",
+        "RFC-9293",
+        "RFC-9846",
+        "ZEEK-DOCS",
+        "SURICATA-DOCS",
+        "IEEE-80211-WG"
+      ]
+    },
+    {
+      "area_id": "linux",
+      "study_path": "knowledge/deep_modules/linux/RESEARCH_STUDY.md",
+      "source_ids": [
+        "CIS-CONTROLS-8.1",
+        "MITRE-ATTACK-ENTERPRISE",
+        "NIST-SP800-53R5",
+        "CIS-BENCHMARKS"
+      ]
+    },
+    {
+      "area_id": "windows_ad",
+      "study_path": "knowledge/deep_modules/windows_ad/RESEARCH_STUDY.md",
+      "source_ids": [
+        "MITRE-ATTACK-ENTERPRISE",
+        "MS-WINDOWS-SERVER-2025-BASELINE",
+        "MS-AD-DS-DOCS"
+      ]
+    },
+    {
+      "area_id": "cloud",
+      "study_path": "knowledge/deep_modules/cloud/RESEARCH_STUDY.md",
+      "source_ids": [
+        "NIST-SP800-207",
+        "NIST-SP800-144",
+        "NIST-SP800-190",
+        "NSA-CISA-K8S-HARDENING",
+        "CIS-BENCHMARKS"
+      ]
+    },
+    {
+      "area_id": "containers",
+      "study_path": "knowledge/deep_modules/containers/RESEARCH_STUDY.md",
+      "source_ids": [
+        "CIS-CONTROLS-8.1",
+        "NIST-SP800-190",
+        "NSA-CISA-K8S-HARDENING",
+        "K8S-SECURITY-CHECKLIST",
+        "CIS-BENCHMARKS"
+      ]
+    },
+    {
+      "area_id": "mobile",
+      "study_path": "knowledge/deep_modules/mobile/RESEARCH_STUDY.md",
+      "source_ids": [
+        "OWASP-API-TOP10-2023",
+        "OWASP-MAS",
+        "ANDROID-SECURITY",
+        "APPLE-PLATFORM-SECURITY",
+        "NIST-SP800-101R1",
+        "BLUETOOTH-CORE-SPEC",
+        "NFC-FORUM-SPECS"
+      ]
+    },
+    {
+      "area_id": "crypto",
+      "study_path": "knowledge/deep_modules/crypto/RESEARCH_STUDY.md",
+      "source_ids": [
+        "RFC-9846",
+        "NIST-SP800-57P1R5",
+        "NIST-FIPS-203",
+        "NIST-FIPS-204",
+        "NIST-FIPS-205",
+        "NIST-FIPS-140-3",
+        "NIST-SP800-131A-R2"
+      ]
+    },
+    {
+      "area_id": "identity",
+      "study_path": "knowledge/deep_modules/identity/RESEARCH_STUDY.md",
+      "source_ids": [
+        "NIST-SP800-207",
+        "RFC-9846",
+        "NIST-SP800-57P1R5",
+        "MS-AD-DS-DOCS",
+        "NIST-SP800-63-4",
+        "NIST-SP800-63B-4",
+        "NIST-63-4-IMPLEMENTATION"
+      ]
+    },
+    {
+      "area_id": "malware",
+      "study_path": "knowledge/deep_modules/malware/RESEARCH_STUDY.md",
+      "source_ids": [
+        "MITRE-ATTACK-ENTERPRISE",
+        "NIST-SP800-83R1",
+        "YARA-DOCS",
+        "CISA-MALWARE-RESOURCES"
+      ]
+    },
+    {
+      "area_id": "forensics",
+      "study_path": "knowledge/deep_modules/forensics/RESEARCH_STUDY.md",
+      "source_ids": [
+        "NIST-SP800-86",
+        "NIST-SP800-101R1",
+        "NIST-SP800-201"
+      ]
+    },
+    {
+      "area_id": "incident_response",
+      "study_path": "knowledge/deep_modules/incident_response/RESEARCH_STUDY.md",
+      "source_ids": [
+        "NIST-CSF-2.0",
+        "NIST-SP800-61R3",
+        "CISA-KEV",
+        "NIST-SP800-83R1",
+        "NIST-SP800-86",
+        "NIST-SP800-184"
+      ]
+    },
+    {
+      "area_id": "threat_intel",
+      "study_path": "knowledge/deep_modules/threat_intel/RESEARCH_STUDY.md",
+      "source_ids": [
+        "MITRE-ATTACK-ENTERPRISE",
+        "MITRE-ATTACK-DATASOURCES",
+        "CISA-KEV",
+        "FIRST-EPSS",
+        "CAPEC-3.9"
+      ]
+    },
+    {
+      "area_id": "reverse",
+      "study_path": "knowledge/deep_modules/reverse/RESEARCH_STUDY.md",
+      "source_ids": [
+        "MITRE-ATTACK-ENTERPRISE",
+        "NIST-SP800-86",
+        "GHIDRA-DOCS",
+        "LLVM-DOCS"
+      ]
+    },
+    {
+      "area_id": "iot_hardware",
+      "study_path": "knowledge/deep_modules/iot_hardware/RESEARCH_STUDY.md",
+      "source_ids": [
+        "NIST-SP800-82R3",
+        "NIST-SP800-82R4-IPD",
+        "ANDROID-SECURITY",
+        "NISTIR-8259A",
+        "NISTIR-8259B",
+        "NISTIR-8259-R1",
+        "NIST-SP800-193",
+        "NISTIR-8259-CATALOG",
+        "BLUETOOTH-CORE-SPEC",
+        "NFC-FORUM-SPECS",
+        "NIST-SP800-213",
+        "NIST-SP800-213R1-IPD"
+      ]
+    },
+    {
+      "area_id": "devsecops",
+      "study_path": "knowledge/deep_modules/devsecops/RESEARCH_STUDY.md",
+      "source_ids": [
+        "NIST-NICE-2.2",
+        "CIS-CONTROLS-8.1",
+        "NIST-SP800-218",
+        "NIST-SP800-218A",
+        "NIST-SP800-190"
+      ]
+    },
+    {
+      "area_id": "ai_security",
+      "study_path": "knowledge/deep_modules/ai_security/RESEARCH_STUDY.md",
+      "source_ids": [
+        "OWASP-LLM-TOP10",
+        "NIST-AI-RMF",
+        "NIST-AI-600-1",
+        "NIST-SP800-218A",
+        "NIST-AI-100-2-E2025"
+      ]
+    },
+    {
+      "area_id": "governance",
+      "study_path": "knowledge/deep_modules/governance/RESEARCH_STUDY.md",
+      "source_ids": [
+        "NIST-CSF-2.0",
+        "CIS-CONTROLS-8.1",
+        "NIST-AI-RMF",
+        "NIST-SP800-63-4",
+        "NISTIR-8259B",
+        "NIST-PRIVACY-FRAMEWORK",
+        "NIST-SP800-137",
+        "NIST-SP800-53R5"
+      ]
+    },
+    {
+      "area_id": "vuln_management",
+      "study_path": "knowledge/deep_modules/vuln_management/RESEARCH_STUDY.md",
+      "source_ids": [
+        "CISA-KEV",
+        "FIRST-CVSS-4",
+        "FIRST-EPSS"
+      ]
+    },
+    {
+      "area_id": "bug_bounty",
+      "study_path": "knowledge/deep_modules/bug_bounty/RESEARCH_STUDY.md",
+      "source_ids": [
+        "OWASP-WSTG-4.2",
+        "OWASP-VULN-DISCLOSURE"
+      ]
+    },
+    {
+      "area_id": "secure_arch",
+      "study_path": "knowledge/deep_modules/secure_arch/RESEARCH_STUDY.md",
+      "source_ids": [
+        "NIST-CSF-2.0",
+        "CIS-CONTROLS-8.1",
+        "NIST-SP800-207",
+        "RFC-9846",
+        "NIST-SP800-144",
+        "MITRE-D3FEND",
+        "NIST-SP800-53R5",
+        "OWASP-THREAT-MODELING"
+      ]
+    },
+    {
+      "area_id": "data_security",
+      "study_path": "knowledge/deep_modules/data_security/RESEARCH_STUDY.md",
+      "source_ids": [
+        "NIST-CSF-2.0",
+        "NIST-PRIVACY-FRAMEWORK",
+        "NIST-SP800-53R5"
+      ]
+    },
+    {
+      "area_id": "software_engineering",
+      "study_path": "knowledge/deep_modules/software_engineering/RESEARCH_STUDY.md",
+      "source_ids": [
+        "NIST-NICE-2.2",
+        "NIST-SP800-218",
+        "OWASP-ASVS-5.0.0"
+      ]
+    },
+    {
+      "area_id": "machine_learning",
+      "study_path": "knowledge/deep_modules/machine_learning/RESEARCH_STUDY.md",
+      "source_ids": [
+        "OWASP-LLM-TOP10",
+        "NIST-AI-RMF",
+        "FIRST-EPSS",
+        "NIST-SP800-218A",
+        "NIST-AI-100-2-E2025"
+      ]
+    },
+    {
+      "area_id": "hardware_security",
+      "study_path": "knowledge/deep_modules/hardware_security/RESEARCH_STUDY.md",
+      "source_ids": [
+        "APPLE-PLATFORM-SECURITY",
+        "NISTIR-8259A",
+        "NISTIR-8259B",
+        "NISTIR-8259-R1",
+        "NIST-SP800-193",
+        "NISTIR-8259-CATALOG",
+        "NIST-FIPS-140-3",
+        "NIST-SP800-147",
+        "NIST-SP800-213",
+        "NIST-SP800-213R1-IPD"
+      ]
+    },
+    {
+      "area_id": "mathematics",
+      "study_path": "knowledge/deep_modules/mathematics/RESEARCH_STUDY.md",
+      "source_ids": [
+        "NIST-FIPS-203",
+        "NIST-FIPS-204",
+        "NIST-FIPS-205",
+        "NIST-AI-100-2-E2025"
+      ]
+    },
+    {
+      "area_id": "soc_siem",
+      "study_path": "knowledge/deep_modules/soc_siem/RESEARCH_STUDY.md",
+      "source_ids": [
+        "MITRE-ATTACK-ENTERPRISE",
+        "MITRE-ATTACK-DATASOURCES",
+        "NIST-SP800-61R3",
+        "NIST-SP800-94",
+        "NIST-SP800-137",
+        "MITRE-D3FEND",
+        "SIGMA-SPEC",
+        "ZEEK-DOCS",
+        "SURICATA-DOCS"
+      ]
+    },
+    {
+      "area_id": "edr_xdr",
+      "study_path": "knowledge/deep_modules/edr_xdr/RESEARCH_STUDY.md",
+      "source_ids": [
+        "NIST-SP800-83R1",
+        "NIST-SP800-94",
+        "MITRE-D3FEND",
+        "SIGMA-SPEC",
+        "SURICATA-DOCS"
+      ]
+    },
+    {
+      "area_id": "threat_hunting",
+      "study_path": "knowledge/deep_modules/threat_hunting/RESEARCH_STUDY.md",
+      "source_ids": [
+        "MITRE-ATTACK-ENTERPRISE",
+        "NIST-SP800-137",
+        "MITRE-D3FEND",
+        "SIGMA-SPEC",
+        "ZEEK-DOCS"
+      ]
+    },
+    {
+      "area_id": "red_team",
+      "study_path": "knowledge/deep_modules/red_team/RESEARCH_STUDY.md",
+      "source_ids": [
+        "NIST-SP800-115",
+        "CAPEC-3.9"
+      ]
+    },
+    {
+      "area_id": "wireless_security",
+      "study_path": "knowledge/deep_modules/wireless_security/RESEARCH_STUDY.md",
+      "source_ids": [
+        "NIST-SP800-94",
+        "IEEE-80211-WG",
+        "BLUETOOTH-CORE-SPEC",
+        "NFC-FORUM-SPECS"
+      ]
+    },
+    {
+      "area_id": "ot_ics",
+      "study_path": "knowledge/deep_modules/ot_ics/RESEARCH_STUDY.md",
+      "source_ids": [
+        "NIST-SP800-82R3",
+        "NIST-SP800-82R4-IPD"
+      ]
+    },
+    {
+      "area_id": "telecom_5g",
+      "study_path": "knowledge/deep_modules/telecom_5g/RESEARCH_STUDY.md",
+      "source_ids": [
+        "NIST-CSF-2.0",
+        "3GPP-TS-33.501-R19"
+      ]
+    },
+    {
+      "area_id": "automotive_security",
+      "study_path": "knowledge/deep_modules/automotive_security/RESEARCH_STUDY.md",
+      "source_ids": [
+        "ISO-SAE-21434-2021",
+        "ISO-SAE-21434-ED2-AWI",
+        "UNECE-R155"
+      ]
+    },
+    {
+      "area_id": "satellite_security",
+      "study_path": "knowledge/deep_modules/satellite_security/RESEARCH_STUDY.md",
+      "source_ids": [
+        "NIST-CSF-2.0",
+        "NIST-SP800-193",
+        "CCSDS-311.0-M-2"
+      ]
+    },
+    {
+      "area_id": "physical_security",
+      "study_path": "knowledge/deep_modules/physical_security/RESEARCH_STUDY.md",
+      "source_ids": [
+        "NIST-SP800-82R3",
+        "NIST-SP800-82R4-IPD",
+        "NIST-SP800-53R5"
+      ]
+    },
+    {
+      "area_id": "email_dns_security",
+      "study_path": "knowledge/deep_modules/email_dns_security/RESEARCH_STUDY.md",
+      "source_ids": [
+        "RFC-9989",
+        "RFC-9990",
+        "RFC-9991",
+        "RFC-7208",
+        "RFC-6376"
+      ]
+    },
+    {
+      "area_id": "fraud_abuse",
+      "study_path": "knowledge/deep_modules/fraud_abuse/RESEARCH_STUDY.md",
+      "source_ids": [
+        "NIST-AI-RMF",
+        "OWASP-API-TOP10-2023",
+        "CAPEC-3.9",
+        "OWASP-AUTOMATED-THREATS"
+      ]
+    },
+    {
+      "area_id": "privacy_engineering",
+      "study_path": "knowledge/deep_modules/privacy_engineering/RESEARCH_STUDY.md",
+      "source_ids": [
+        "OWASP-MAS",
+        "NIST-PRIVACY-FRAMEWORK"
+      ]
+    },
+    {
+      "area_id": "cloud_forensics",
+      "study_path": "knowledge/deep_modules/cloud_forensics/RESEARCH_STUDY.md",
+      "source_ids": [
+        "NIST-SP800-86",
+        "NIST-SP800-201"
+      ]
+    },
+    {
+      "area_id": "ai_red_team",
+      "study_path": "knowledge/deep_modules/ai_red_team/RESEARCH_STUDY.md",
+      "source_ids": [
+        "OWASP-LLM-TOP10",
+        "NIST-AI-600-1",
+        "NIST-AI-100-2-E2025"
+      ]
+    },
+    {
+      "area_id": "pki_hsm",
+      "study_path": "knowledge/deep_modules/pki_hsm/RESEARCH_STUDY.md",
+      "source_ids": [
+        "NIST-SP800-57P1R5",
+        "NIST-FIPS-204",
+        "NIST-FIPS-140-3",
+        "NIST-SP800-131A-R2"
+      ]
+    },
+    {
+      "area_id": "post_quantum_crypto",
+      "study_path": "knowledge/deep_modules/post_quantum_crypto/RESEARCH_STUDY.md",
+      "source_ids": [
+        "NIST-FIPS-203",
+        "NIST-FIPS-204",
+        "NIST-FIPS-205",
+        "NIST-SP800-131A-R2"
+      ]
+    },
+    {
+      "area_id": "business_continuity",
+      "study_path": "knowledge/deep_modules/business_continuity/RESEARCH_STUDY.md",
+      "source_ids": [
+        "NIST-SP800-61R3",
+        "NIST-SP800-184",
+        "NIST-SP800-34R1"
+      ]
+    },
+    {
+      "area_id": "database_security",
+      "study_path": "knowledge/deep_modules/database_security/RESEARCH_STUDY.md",
+      "source_ids": [
+        "CIS-CONTROLS-8.1",
+        "OWASP-DATABASE-CHEAT",
+        "NIST-SP800-53R5",
+        "CIS-BENCHMARKS",
+        "OWASP-SQLI-PREVENTION"
+      ]
+    },
+    {
+      "area_id": "vulnerability_research",
+      "study_path": "knowledge/deep_modules/vulnerability_research/RESEARCH_STUDY.md",
+      "source_ids": [
+        "FIRST-CVSS-4",
+        "NIST-SP800-115",
+        "CAPEC-3.9",
+        "OWASP-VULN-DISCLOSURE",
+        "OWASP-THREAT-MODELING"
+      ]
+    }
+  ]
+}
