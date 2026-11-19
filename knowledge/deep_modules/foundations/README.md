@@ -26,6 +26,8 @@ El desarrollo se organiza en doce bloques disciplinares:
 
 ## Documentos del módulo
 
+- [Protocolo obligatorio de aceptación en frío](../../COLD_KNOWLEDGE_EXECUTION_PROTOCOL.md): enseñanza, explicación, análisis, diseño, rúbrica, corrección iterativa y gate de salida.
+
 - [Compendio técnico base](TECHNICAL_COMPENDIUM.md): modelos, procedimientos, ejemplos y laboratorio introductorio.
 - [Desarrollo disciplinar ampliado y auditoría por tema](FOUNDATIONS_DEEP_DEVELOPMENT_V1.md): siete dossiers alineados con el currículo, doce capas, protocolos, métricas y límites.
 - [Revisión de fuentes y trazabilidad](SOURCE_REVIEW_AND_CLAIM_EVIDENCE_2026-11-19.md): secciones primarias inspeccionadas, hallazgos aplicados, afirmación→fuente→capa y brechas abiertas.
@@ -38,10 +40,12 @@ El desarrollo se organiza en doce bloques disciplinares:
 - [Agenda de investigación](RESEARCH_AGENDA.md): preguntas, hipótesis y diseños experimentales propuestos.
 - [Revisión exploratoria de literatura](LITERATURE_REVIEW.md): mapa bibliográfico y estado real de lectura.
 - [Pack de conocimiento](../../packs/foundations/README.md): guía de dominio para consumo por agentes y usuarios.
-- [Estándar obligatorio](../../EXPERT_RESEARCH_STANDARD.md): doce capas, plantilla por tema, niveles K1–K5 y puertas G1–G8.
+- [Estándar obligatorio](../../EXPERT_RESEARCH_STANDARD.md): doce capas, plantilla por tema, niveles T0–T5 y O0–O5 separados, y puertas G1–G8.
 - [Auditoría de las 48 especialidades](../../research/DOMAIN_LAYER_AUDIT_48.md): línea base global de cobertura.
 
 ## Estado verificado
+
+**Criterio de aceptación actualizado:** las 84 celdas siguen en progreso; ninguna se aprueba por estructura o presencia documental. La evaluación en frío debe demostrar enseñanza, explicación, análisis y diseño por tema. La nueva rúbrica común está en `knowledge/COLD_KNOWLEDGE_EXECUTION_PROTOCOL.md`.
 
 | Elemento | Estado |
 |---|---|
