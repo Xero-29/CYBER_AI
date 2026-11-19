@@ -4,6 +4,8 @@ import os
 import stat
 from pathlib import Path
 
+from tool_allowlist import ToolAllowlistError, verify_tool_allowed
+
 
 MAX_EXECUTABLE_BYTES = 2 * 1024 * 1024 * 1024
 
@@ -72,4 +74,20 @@ def hash_executable(path):
             os.close(descriptor)
 
 
-__all__ = ["BinaryIntegrityError", "hash_executable"]
+def require_approved_executable(path, tool_id):
+    """Require a matching signed allowlist entry before launching a tool."""
+    provenance = hash_executable(path)
+    try:
+        allowlist = verify_tool_allowed(tool_id, provenance["sha256"])
+    except ToolAllowlistError as error:
+        raise BinaryIntegrityError("El ejecutable no está aprobado por la allowlist firmada.") from error
+    if allowlist.get("enforced") is not True:
+        raise BinaryIntegrityError("La ejecución requiere una allowlist firmada y obligatoria.")
+    return {**provenance, "allowlist": allowlist}
+
+
+__all__ = [
+    "BinaryIntegrityError",
+    "hash_executable",
+    "require_approved_executable",
+]
