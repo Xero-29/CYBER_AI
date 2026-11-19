@@ -28,13 +28,13 @@ def has_heading(content: str, alternatives: tuple[str, ...]) -> bool:
     return any(re.search(r"(?im)^" + re.escape(item) + r"(?:\s|$)", content) for item in alternatives)
 
 def section_word_count(content: str, heading: str) -> int:
-    match = re.search(r"(?m)^" + re.escape(heading) + r"\\s*$", content)
+    match = re.search(r"(?m)^" + re.escape(heading) + r"\s*$", content)
     if not match:
         return 0
     tail = content[match.end():]
-    next_heading = re.search(r"(?m)^##\\s+", tail)
+    next_heading = re.search(r"(?m)^##\s+", tail)
     section = tail[:next_heading.start()] if next_heading else tail
-    return len(re.findall(r"\\b[\\w-]+\\b", section))
+    return len(re.findall(r"\b[\w-]+\b", section))
 
 
 def audit_library(root: Path = ROOT) -> dict:
@@ -64,9 +64,10 @@ def audit_library(root: Path = ROOT) -> dict:
         try: content = (root / area.get("path", "")).read_text(encoding="utf-8")
         except OSError: item_errors.append("pack inexistente o ilegible")
         base = {k: has_heading(content,v) for k,v in BASE.items()}
-        deep_path = (root / "knowledge" / "deep_modules" / aid / "DEEP_SECTIONS.md").resolve()
+        deep_candidate = root / "knowledge" / "deep_modules" / aid / "DEEP_SECTIONS.md"
+        deep_path = deep_candidate.resolve()
         deep_text = ""
-        if root.resolve() not in deep_path.parents or deep_path.is_symlink() or not deep_path.is_file():
+        if root.resolve() not in deep_path.parents or deep_candidate.is_symlink() or not deep_path.is_file():
             deep = {k: False for k in DEEP}
             deep_words = {k: 0 for k in DEEP}
         else:
