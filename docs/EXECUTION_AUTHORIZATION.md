@@ -17,7 +17,7 @@ Cada entrada de `authorizations` debe declarar:
 - `ticket`: referencia de autorización/cambio.
 - `expires_at`: expiración ISO-8601 con zona horaria.
 
-No se admiten dominios en esta versión: hasta disponer de transporte con DNS fijado contra DNS rebinding, solo se aceptan IP literales públicas globales. Se rechazan IP privadas, loopback, link-local y reservadas. Los destinos deben coincidir exactamente con el permiso. Las comprobaciones HTTP no siguen redirecciones y no usan proxies ambientales; Nuclei se ejecuta con redirecciones deshabilitadas.
+No se admiten dominios en esta versión: hasta disponer de transporte con DNS fijado contra DNS rebinding, solo se aceptan IP literales. Se permiten IP públicas globales y, únicamente mediante un permiso exacto y vigente, rangos RFC1918, ULA IPv6 y loopback para laboratorios/redes internas. Se rechazan link-local, multicast, no especificadas y reservadas. Los destinos deben coincidir exactamente con el permiso. Las comprobaciones HTTP no siguen redirecciones y no usan proxies ambientales; Nuclei se ejecuta con redirecciones deshabilitadas.
 
 ## Configuración
 
@@ -61,7 +61,7 @@ El cargador valida la política antes de considerar cualquier permiso:
 - limita el archivo a 1 MiB y a 500 autorizaciones;
 - rechaza symlinks, puntos de reanálisis y archivos que no sean regulares; compara la identidad del archivo abierto con la ruta para detectar sustituciones durante la apertura;
 - cuando existen permisos, exige modo POSIX `0600`; la verificación de ACL NTFS debe realizarse en el sistema operativo;
-- rechaza destinos con dominios, credenciales, query, fragmentos, rutas ambiguas/escapadas y puertos fuera de rango. Solo se admiten IP públicas globales literales.
+- rechaza destinos con dominios, credenciales, query, fragmentos, rutas ambiguas/escapadas y puertos fuera de rango. Solo admite IP literales globales o privadas expresamente incluidas en el permiso; nunca link-local, multicast, no especificadas ni reservadas.
 
 Una política vacía no concede permisos y puede permanecer como plantilla versionada. No agregues permisos reales a ese archivo dentro del repositorio: crea una copia local privada y configura `CYBER_AI_AUTHORIZATIONS_FILE`.
 
