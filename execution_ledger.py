@@ -96,7 +96,12 @@ class ExecutionLedger:
                 raise LedgerError("No se permiten rutas padre con symlinks o no-directorios.")
 
         if os.name != "nt":
-            parent_mode = stat.S_IMODE(self.path.parent.stat().st_mode)
+            parent_info = self.path.parent.stat()
+            if parent_info.st_uid != os.geteuid():
+                raise LedgerError(
+                    "El directorio del ledger debe pertenecer al usuario efectivo del proceso."
+                )
+            parent_mode = stat.S_IMODE(parent_info.st_mode)
             if parent_mode & 0o077:
                 raise LedgerError(
                     "El directorio del ledger debe ser privado (permisos 0700)."
@@ -128,6 +133,15 @@ class ExecutionLedger:
                 raise LedgerError(
                     "El ledger y sus archivos auxiliares deben ser archivos regulares, no symlinks."
                 )
+            if os.name != "nt":
+                if info.st_uid != os.geteuid():
+                    raise LedgerError(
+                        "El ledger y sus archivos auxiliares deben pertenecer al usuario efectivo."
+                    )
+                if info.st_nlink != 1:
+                    raise LedgerError(
+                        "El ledger y sus archivos auxiliares no pueden tener enlaces duros."
+                    )
             if os.name != "nt" and stat.S_IMODE(info.st_mode) & 0o077:
                 try:
                     os.chmod(candidate, 0o600, follow_symlinks=False)

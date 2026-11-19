@@ -156,6 +156,26 @@ class ExecutionLedgerTests(unittest.TestCase):
         with self.assertRaisesRegex(LedgerError, "privado"):
             ExecutionLedger(parent / "ledger.sqlite3")
 
+    @unittest.skipIf(os.name == "nt", "La propiedad POSIX no se valida en Windows.")
+    def test_ledger_directory_must_belong_to_effective_user(self):
+        parent = Path(self.tmp.name) / "owned-by-other"
+        parent.mkdir(mode=0o700)
+        other_uid = os.geteuid() + 1
+        with patch("execution_ledger.os.geteuid", return_value=other_uid):
+            with self.assertRaisesRegex(LedgerError, "pertenecer al usuario"):
+                ExecutionLedger(parent / "ledger.sqlite3")
+
+    @unittest.skipIf(os.name == "nt", "Los hard links POSIX no representan ACL de Windows.")
+    def test_ledger_rejects_hard_linked_database_file(self):
+        parent = Path(self.tmp.name) / "hard-link-case"
+        parent.mkdir(mode=0o700)
+        original = parent / "original.db"
+        original.write_bytes(b"not a ledger")
+        linked = parent / "ledger.sqlite3"
+        os.link(original, linked)
+        with self.assertRaisesRegex(LedgerError, "enlaces duros"):
+            ExecutionLedger(linked)
+
     def test_ledger_rejects_symlinked_database_and_parent(self):
         target = Path(self.tmp.name) / "target.sqlite3"
         target.write_bytes(b"")
