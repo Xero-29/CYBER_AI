@@ -51,6 +51,10 @@ Cobertura activos; enlaces verificables; inconsistencias; riesgos sin dueño; ev
 4. Ejecutar el protocolo en laboratorio autorizado y publicar resultados negativos y análisis de incertidumbre.
 5. No elevar a M4 sin experimento ejecutado y analizado; no elevar a M5 sin revisión independiente y reproducción externa.
 
+## Límite de madurez empírica
+
+**Límite explícito: no M3/M4/M5.** Esta revisión está en M1 exploratorio: se inspeccionaron páginas oficiales y abstracts, pero no se ha completado lectura integral de todas las fuentes, revisión sistemática con criterios reproducibles, experimento ejecutado, análisis de resultados, revisión independiente ni reproducción externa. El diseño experimental descrito es una propuesta, no un resultado. No elevar la madurez hasta que existan esas evidencias.
+
 ## Referencias y procedencia
 
 | ID | Referencia | Estado editorial en este repositorio |
