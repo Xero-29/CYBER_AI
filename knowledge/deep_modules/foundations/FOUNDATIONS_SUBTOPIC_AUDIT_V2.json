@@ -73,12 +73,11 @@
         "topics/FND-01-01_ASSESSOR_GUIDE_V2.md"
       ],
       "nonconformities": [
-        "NC-FND-01.01-01: revisión integral de fuentes primarias pendiente",
+        "NC-FND-01.01-01: revisión integral de fuentes primarias y referencias críticas pendiente, incluidas las publicaciones NIST 800-160; las revisiones dirigidas no equivalen a lectura integral.",
         "NC-FND-01.01-02: mapa colombiano parcial para Ley 1581/2012 y agua de consumo humano; normas de safety funcional/sectoriales y validación jurídica independiente pendientes.",
         "NC-FND-01.01-03: instrumento V2 corregido y protocolo de doble calificación preparados; faltan administración supervisada, dos evaluadores independientes cualificados, hojas originales y adjudicación.",
         "NC-FND-01.01-04: revisión disciplinar independiente pendiente",
-        "NC-FND-01.01-05: contraste integral de modelos de confiabilidad/safety y revisión primaria pendiente; anexo técnico no cierra madurez.",
-        "NC-FND-01.01-06: revisión NIST 800-160 limitada a secciones seleccionadas; lectura integral y contraste de referencias pendientes."
+        "NC-FND-01.01-05: contraste integral de modelos de confiabilidad/safety y revisión primaria pendiente; anexo técnico no cierra madurez."
       ],
       "review": "internal_draft_not_assessed"
     },
