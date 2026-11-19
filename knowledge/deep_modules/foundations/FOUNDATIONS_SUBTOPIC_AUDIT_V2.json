@@ -63,14 +63,16 @@
         "../../research/source_registry.json",
         "topics/FND-01-01_COLD_ASSESSMENT_V1.md",
         "topics/FND-01-01_ASSESSOR_GUIDE_V1.md",
-        "topics/FND-01-01_TECHNICAL_DEEPENING_CASEBOOK_V1.md"
+        "topics/FND-01-01_TECHNICAL_DEEPENING_CASEBOOK_V1.md",
+        "../SOURCE_REVIEW_ADDENDUM_NIST_800_160_2026-11-19.md"
       ],
       "nonconformities": [
         "NC-FND-01.01-01: revisión integral de fuentes primarias pendiente",
         "NC-FND-01.01-02: normas sectoriales de safety y aplicabilidad legal colombiana pendientes",
         "NC-FND-01.01-03: instrumento de evaluación preparado; administración y calificación independiente pendientes",
         "NC-FND-01.01-04: revisión disciplinar independiente pendiente",
-        "NC-FND-01.01-05: contraste integral de modelos de confiabilidad/safety y revisión primaria pendiente; anexo técnico no cierra madurez."
+        "NC-FND-01.01-05: contraste integral de modelos de confiabilidad/safety y revisión primaria pendiente; anexo técnico no cierra madurez.",
+        "NC-FND-01.01-06: revisión NIST 800-160 limitada a secciones seleccionadas; lectura integral y contraste de referencias pendientes."
       ],
       "review": "internal_draft_not_assessed"
     },
