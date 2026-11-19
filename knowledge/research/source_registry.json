@@ -538,15 +538,18 @@
       "version": "Volume 1 Revision 1 Final",
       "published": "2022-11-16",
       "verification_status": "selected_sections_reviewed",
-      "verified_scope": "Principios, conceptos, actividades y tareas de ingeniería de sistemas seguros a lo largo del ciclo de vida.",
+      "verified_scope": "Inspección dirigida del PDF oficial completo (195 páginas) en secciones de ingeniería de seguridad como propiedad emergente, framework de contextos, assurance cases, confianza composicional, protección continua y evidencia; no lectura lineal integral.",
       "domains": [
         "foundations",
         "secure_arch",
         "governance"
       ],
-      "review_note": "Página oficial NIST y abstract inspeccionados el 2026-11-19. Texto completo, extracción por sección, licencia del artefacto y lectura integral pendientes. Selected official sections inspected and mapped in knowledge/deep_modules/foundations/SOURCE_REVIEW_AND_CLAIM_EVIDENCE_2026-11-19.md; this is not a claim of full linear reading.",
+      "review_note": "Inspección dirigida por secciones del PDF oficial el 2026-11-19. No marcar full_text_reviewed: no se realizó lectura lineal de las 195 páginas ni revisión de todas las referencias.",
       "sections_reviewed": [
-        "Abstract/authority; SSE framework contexts pp. 32-36; assurance case pp. 35-36 and Appendix F; security requirements and requirement-policy-mechanism distinction Appendix C.2-C.3; design principles Appendix D; tailoring/life-cycle processes Appendices H-K."
+        "PDF oficial, páginas impresas 31–32: actividades de ingeniería de seguridad y seguridad como propiedad emergente (sección Systems Security Engineering Framework).",
+        "PDF oficial, páginas impresas 35–36: contexto de trustworthiness y assurance case (claims, argumentos, evidencia y supuestos).",
+        "PDF oficial, páginas impresas 87–88: rigor proporcional, confianza composicional y protección continua (Appendix E).",
+        "PDF oficial, páginas impresas 102–103: assurance, confianza y evidencia objetiva; requisitos verificables (Appendix F)."
       ],
       "review_date": "2026-11-19"
     },
@@ -2054,6 +2057,28 @@
         "Páginas 1–2: propósito y estado IPD; páginas 5–8: relación riesgo cibernético/privacidad, privacidad e IA y evaluación de riesgo; Appendix A: Core; Appendix D: prácticas de gestión de riesgo."
       ],
       "review_note": "La propia página NIST presenta PF 1.1 como IPD; no tratar como versión final ni como norma legal. El texto indica que el riesgo de privacidad puede surgir sin incidentes de ciberseguridad y describe problemas para individuos por acciones de datos a lo largo del ciclo de vida. La lectura fue dirigida, no integral."
+    },
+    {
+      "id": "NIST-SP-800-160v2r1",
+      "title": "Developing Cyber-Resilient Systems: A Systems Security Engineering Approach",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_cyber_resiliency_engineering_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.800-160v2r1",
+      "version": "Volume 2 Revision 1 Final",
+      "published": "2021-12-09",
+      "verification_status": "selected_sections_reviewed",
+      "verified_scope": "Inspección dirigida del PDF oficial de 310 páginas: marco de ingeniería de resiliencia cibernética, objetivos, relación con objetivos CIA y ciclo de vida; no lectura lineal integral.",
+      "domains": [
+        "foundations",
+        "cyber_resilience",
+        "secure_arch"
+      ],
+      "review_date": "2026-11-19",
+      "sections_reviewed": [
+        "PDF oficial, páginas impresas 8–10: framework, goals, objectives, techniques, implementation approaches and design principles (Chapter 2, §§2.1–2.1.1).",
+        "PDF oficial, páginas impresas 136–137: aplicación de constructs y complementariedad de anticipar/resistir/recuperar/adaptar con CIA (Appendix D, §D.7)."
+      ],
+      "review_note": "Inspección dirigida por secciones del PDF oficial el 2026-11-19. No marcar full_text_reviewed: no se realizó lectura lineal de las 310 páginas ni revisión completa de las referencias."
     }
   ],
   "last_updated": "2026-11-19"
