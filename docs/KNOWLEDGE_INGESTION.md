@@ -28,3 +28,14 @@ La generación de embeddings se completa por lotes antes de publicar los fragmen
 ## Validación pendiente
 
 Las pruebas automatizadas cubren HTML, CSV, JSON, límites de tamaño, fragmentación y almacenamiento simulado. PDF y Office requieren fixtures de prueba adicionales y validación operacional con archivos reales.
+
+
+## Estudios técnicos profundos por dominio
+
+Cada entrada del manifiesto puede incluir research_study_path. El bootstrap valida esa ruta dentro del repositorio y la indexa como documento independiente, con categoría por dominio, tags research_study y clasificación research/field_study. Ejecuta primero:
+
+```bash
+python knowledge_bootstrap.py --dry-run
+```
+
+El dry-run valida las rutas y hashes sin llamar a proveedores ni escribir embeddings. Para crear fragmentos y vectores en la biblioteca local, ejecuta después python knowledge_bootstrap.py con el proveedor ECO configurado. Esta segunda operación sí necesita acceso al proveedor de embeddings y puede enviarle el contenido de los estudios; revisa antes la política de datos. La ingesta real no se ha ejecutado en CI ni en esta entrega.
