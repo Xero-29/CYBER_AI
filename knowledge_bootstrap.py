@@ -55,41 +55,54 @@ def load_packs(area_id=None):
         raise ValueError("Hay áreas duplicadas en el manifiesto.")
     if area_id and area_id not in ids:
         raise ValueError(f"Área desconocida: {area_id}")
+
     root = PROJECT.resolve()
     packs = []
     for item in areas:
         if area_id and item["id"] != area_id:
             continue
-        relative = item.get("path")
-        if not isinstance(relative, str) or not relative.strip():
-            raise ValueError(f"Ruta inválida: {item['id']}")
-        rel = Path(relative)
-        if rel.is_absolute() or ".." in rel.parts:
-            raise ValueError(f"Ruta no permitida: {relative}")
-        current = PROJECT
-        for part in rel.parts:
-            if part in {"", "."}:
-                continue
-            current = current / part
-            if current.is_symlink():
-                raise ValueError(f"No se permiten symlinks: {relative}")
-        path = (PROJECT / rel).resolve()
-        if root not in path.parents or not path.is_file():
-            raise ValueError(f"Ruta fuera del proyecto o inexistente: {relative}")
-        raw = path.read_bytes()
-        digest = hashlib.sha256(raw).hexdigest()
-        stable_id = "offline-" + hashlib.sha256(
-            (rel.as_posix() + ":" + digest).encode("utf-8")
-        ).hexdigest()
-        packs.append({
-            "id": item["id"], "name": item.get("name", item["id"]),
-            "path": path, "relative": path.relative_to(root).as_posix(),
-            "sha256": digest, "document_id": stable_id, "size": len(raw),
-            # Los paquetes versionados del repositorio son conocimiento compartido.
-            "visibility": "shared", "tenant_id": None,
-        })
-    return packs
+        area_name = item.get("name", item["id"])
+        documents = [
+            ("pack", item.get("path"), area_name, "baseline", "methodology"),
+        ]
+        research_path = item.get("research_study_path")
+        if research_path is not None:
+            documents.append((
+                "research_study", research_path,
+                f"{area_name} — investigación técnica",
+                "research", "field_study",
+            ))
 
+        for document_kind, relative, document_name, topic_id, subtopic_id in documents:
+            if not isinstance(relative, str) or not relative.strip():
+                raise ValueError(f"Ruta inválida: {item['id']}")
+            rel = Path(relative)
+            if rel.is_absolute() or ".." in rel.parts:
+                raise ValueError(f"Ruta no permitida: {relative}")
+            current = PROJECT
+            for part in rel.parts:
+                if part in {"", "."}:
+                    continue
+                current = current / part
+                if current.is_symlink():
+                    raise ValueError(f"No se permiten symlinks: {relative}")
+            path = (PROJECT / rel).resolve()
+            if root not in path.parents or not path.is_file():
+                raise ValueError(f"Ruta fuera del proyecto o inexistente: {relative}")
+            raw = path.read_bytes()
+            digest = hashlib.sha256(raw).hexdigest()
+            stable_id = "offline-" + hashlib.sha256(
+                (rel.as_posix() + ":" + digest).encode("utf-8")
+            ).hexdigest()
+            packs.append({
+                "id": item["id"], "name": document_name,
+                "document_kind": document_kind, "topic_id": topic_id,
+                "subtopic_id": subtopic_id, "path": path,
+                "relative": path.relative_to(root).as_posix(),
+                "sha256": digest, "document_id": stable_id, "size": len(raw),
+                "visibility": "shared", "tenant_id": None,
+            })
+    return packs
 
 def _bootstrap_locked(packs, dry_run=False):
     if dry_run:
@@ -118,26 +131,26 @@ def _bootstrap_locked(packs, dry_run=False):
                 pack["document_id"], embedding_model,
                 visibility=pack["visibility"], tenant_id=pack["tenant_id"],
             ) > 0):
-                skipped.append(pack["id"])
+                skipped.append(pack["id"] if pack.get("document_kind") == "pack" else f"{pack['id']}:research_study")
                 continue
             registered = register_resource(
                 pack["path"], sha256=pack["sha256"], file_size=pack["size"],
-                resource_type="knowledge_pack", title=pack["name"],
+                resource_type=("knowledge_research_study" if pack.get("document_kind") == "research_study" else "knowledge_pack"), title=pack["name"],
                 publisher="CYBER_AI", canonical_uri=f"repo://{pack['relative']}",
             )
             resource_id = registered["resource_id"]
             update_resource_classification(
                 resource_id, area_id=pack["id"], domain_id=pack["id"],
-                topic_id="baseline", subtopic_id="methodology",
+                topic_id=pack.get("topic_id", "baseline"), subtopic_id=pack.get("subtopic_id", "methodology"),
                 classification_status="provisional",
-                reason="Paquete propio offline indexado desde el manifiesto versionado.",
+                reason=("Estudio de investigación versionado del repositorio indexado para recuperación." if pack.get("document_kind") == "research_study" else "Paquete propio offline indexado desde el manifiesto versionado."),
             )
             update_resource_processing_status(resource_id, "processing")
             result = ingest_document(
                 pack["path"], title=pack["name"],
                 category=f"cybersecurity:{pack['id']}", source=pack["relative"],
                 license="UNSPECIFIED", visibility="shared",
-                tags=["cyber_ai", "offline_pack", pack["id"]],
+                tags=["cyber_ai", "offline_pack", pack["id"]] + (["research_study"] if pack.get("document_kind") == "research_study" else []),
                 document_id=pack["document_id"],
                 expected_embedding_model=embedding_model,
             )
@@ -148,7 +161,7 @@ def _bootstrap_locked(packs, dry_run=False):
                 raise RuntimeError("La ingestión no publicó fragmentos verificables.")
             update_resource_processing_status(resource_id, "completed")
             ingested.append({
-                "area": pack["id"], "document_id": result["document_id"],
+                "area": pack["id"], "kind": pack.get("document_kind", "pack"), "document_id": result["document_id"],
                 "chunks": result["chunks"], "sha256": pack["sha256"],
                 "already_present": bool(result.get("already_present", False)),
             })
