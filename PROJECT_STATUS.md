@@ -259,3 +259,17 @@ Se añadieron los 16 dominios restantes: Bug bounty/divulgación, Satélites, Se
 **No equivale a investigación exhaustiva:** la cobertura 48/48 confirma existencia, no profundidad homogénea. Los documentos son una primera síntesis de cada dominio; muchos siguen en M1/M2. Faltan lectura íntegra de estándares/papers, desarrollo de subtemas, referencias de investigación primaria por subárea, laboratorios ejecutados, resultados cuantitativos, revisión especializada y niveles M4/M5.
 
 **Pendiente:** CI del HEAD actual, validación editorial y técnica, desarrollo profundo de cada dominio, ejecución/reproducción de laboratorios y revisión independiente. No promover a biblioteca validada ni fusionar hasta completar gates.
+
+
+### Integración real en la biblioteca indexada — 2026-11-18
+
+Se conectaron los estudios al flujo de conocimiento, no solo al árbol documental:
+
+- Cada una de las 48 áreas del manifiesto incorpora research_study_path hacia su RESEARCH_STUDY.md.
+- knowledge_bootstrap.py valida ambas rutas (path y research_study_path), calcula hashes y genera IDs estables por archivo/contenido.
+- El bootstrap indexa por separado el paquete base y el estudio, con category por dominio, tags research_study y clasificación research/field_study en el registro de recursos.
+- El dry-run de bootstrap valida rutas y hashes sin embeddings ni escrituras; con el manifiesto actual debe seleccionar 96 documentos (48 paquetes base + 48 estudios).
+- knowledge_quality.py audita presencia, longitud mínima y referencias HTTPS de los estudios; tests/test_knowledge_quality.py exige cobertura 48/48.
+- CI Python incorpora dry-run de la biblioteca y gate --require-research-studies.
+
+**No se ejecutó la ingestión vectorial real:** requiere que el usuario configure el proveedor ECO de embeddings. El dry-run no envía texto a proveedores ni crea vectores. El contenido de los estudios se enviará al proveedor configurado al ejecutar la ingestión; revisar la política de datos antes de hacerlo.
