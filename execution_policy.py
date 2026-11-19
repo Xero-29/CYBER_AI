@@ -183,7 +183,6 @@ def _load_grants():
         parent_after = path.parent.lstat()
         if (
             not stat.S_ISREG(opened.st_mode)
-            or opened.st_size > MAX_POLICY_BYTES
             or stat.S_ISLNK(after.st_mode)
             or getattr(after, "st_file_attributes", 0) & reparse_flag
             or stat.S_ISLNK(parent_after.st_mode)
@@ -196,6 +195,8 @@ def _load_grants():
             raise AuthorizationError(
                 "El archivo de autorizaciones y su directorio deben ser regulares y estables."
             )
+        if opened.st_size > MAX_POLICY_BYTES:
+            raise AuthorizationError("El archivo de autorizaciones supera 1 MiB.")
         if os.name != "nt" and opened.st_uid != os.geteuid():
             raise AuthorizationError(
                 "El archivo de autorizaciones debe pertenecer al usuario efectivo del proceso."
