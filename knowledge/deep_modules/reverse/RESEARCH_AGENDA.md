@@ -1,90 +1,57 @@
 # Agenda de investigación: Ingeniería inversa
 
-**Dominio:** `reverse` · **Objetivo:** L4 investigación · **Estado:** propuesta, no resultados concluidos.
+**Dominio:** reverse · **Estado:** protocolo específico propuesto; no ejecutado.  
+**Objetivo de diseño:** L4; madurez efectiva M2 editorial hasta lectura de fuentes y resultados reproducibles.
 
 ## Pregunta central
 
-¿Qué métodos, arquitecturas y controles para Ingeniería inversa ofrecen mejoras reproducibles y medibles frente a las prácticas de referencia, considerando coste, contexto, amenazas y limitaciones?
+¿Qué combinación de análisis estático, dinámico, emulación y fuzzing permite reconstruir el comportamiento de binarios con precisión y límites de inferencia medibles?
 
-## Líneas de investigación
+## Protocolos específicos
 
-### 1. arquitecturas, ABI y calling conventions
+### R1 — ABI y arquitectura
+Unidad: funciones compiladas desde fuente conocida. Variar ISA, ABI, compilador, optimización y arquitectura. Baseline: símbolos y fuente disponibles para ground truth. Medir recuperación de argumentos, retornos, stack, registros y tipos. Casos: llamadas directas/indirectas, variádicas, excepciones e inlining.
 
-- **Pregunta:** ¿Qué fallos, supuestos y condiciones límite de arquitecturas, ABI y calling conventions no quedan cubiertos por las prácticas actuales y cómo pueden observarse?
-- **Hipótesis:** una taxonomía y controles derivados de evidencia mejoran la cobertura o reducen errores frente a baseline documentada.
-- **Método:** revisión de literatura; análisis de estándares y documentación; construir taxonomía; seleccionar casos reproducibles; comparar baseline y propuesta; registrar datos y versiones; análisis crítico.
-- **Métricas:** cobertura, precisión, reproducibilidad, tasa de fallo, coste operacional y robustez; operacionalizar antes del experimento.
-- **Producto:** tabla comparativa, protocolo, resultados, análisis de incertidumbre, limitaciones y artefactos de reproducción.
+### R2 — Desensamblado y decompilación
+Unidad: binario de ground truth. Comparar herramientas y configuración fijada. Medir funciones detectadas, límites de bloques, CFG, pseudocódigo equivalente y falsos límites. Controlar símbolos, stripping, optimización y relocations.
 
-### 2. desensamblado y depuración
+### R3 — Control flow y data flow
+Unidad: ruta de datos en programa propio. Variar aliasing, indirect calls, punteros, optimización y estado global. Medir rutas recuperadas, fuentes/sinks y falsos positivos de taint. Revisar manualmente muestra estratificada.
 
-- **Pregunta:** ¿Qué fallos, supuestos y condiciones límite de desensamblado y depuración no quedan cubiertos por las prácticas actuales y cómo pueden observarse?
-- **Hipótesis:** una taxonomía y controles derivados de evidencia mejoran la cobertura o reducen errores frente a baseline documentada.
-- **Método:** revisión de literatura; análisis de estándares y documentación; construir taxonomía; seleccionar casos reproducibles; comparar baseline y propuesta; registrar datos y versiones; análisis crítico.
-- **Métricas:** cobertura, precisión, reproducibilidad, tasa de fallo, coste operacional y robustez; operacionalizar antes del experimento.
-- **Producto:** tabla comparativa, protocolo, resultados, análisis de incertidumbre, limitaciones y artefactos de reproducción.
+### R4 — Formatos y parsers
+Unidad: parser propio y corpus válido/malformado. Variar endian, offsets, longitudes, truncamiento y campos duplicados. Fuzzing con sanitizers. Métricas: cobertura, crashes reproducibles, hangs, bugs confirmados y reducción de corpus.
 
-### 3. control flow y data flow
+### R5 — Emulación y anti-analysis didáctico
+Unidad: programa benigno que cambia comportamiento según reloj, archivos o entorno. Comparar ejecución nativa y emulada. Medir diferencias observables y falsos supuestos del analista. No desarrollar técnicas para evadir detección real.
 
-- **Pregunta:** ¿Qué fallos, supuestos y condiciones límite de control flow y data flow no quedan cubiertos por las prácticas actuales y cómo pueden observarse?
-- **Hipótesis:** una taxonomía y controles derivados de evidencia mejoran la cobertura o reducen errores frente a baseline documentada.
-- **Método:** revisión de literatura; análisis de estándares y documentación; construir taxonomía; seleccionar casos reproducibles; comparar baseline y propuesta; registrar datos y versiones; análisis crítico.
-- **Métricas:** cobertura, precisión, reproducibilidad, tasa de fallo, coste operacional y robustez; operacionalizar antes del experimento.
-- **Producto:** tabla comparativa, protocolo, resultados, análisis de incertidumbre, limitaciones y artefactos de reproducción.
+### R6 — Firmware y diffing
+Unidad: dos builds de firmware propio. Variar versión, flags y configuración. Medir diferencias de funciones, strings, particiones, configuración y falsos cambios. Documentar qué no emula el laboratorio.
 
-### 4. formatos binarios y linking
+### R7 — Vulnerabilidades y divulgación
+Unidad: fallo sintético en parser local. Confirmar causa, precondiciones, input mínimo, parche y regresión. Métricas: reproducibilidad, tiempo de diagnóstico, falsos positivos y regresión. No publicar PoC operativa contra sistemas de terceros.
 
-- **Pregunta:** ¿Qué fallos, supuestos y condiciones límite de formatos binarios y linking no quedan cubiertos por las prácticas actuales y cómo pueden observarse?
-- **Hipótesis:** una taxonomía y controles derivados de evidencia mejoran la cobertura o reducen errores frente a baseline documentada.
-- **Método:** revisión de literatura; análisis de estándares y documentación; construir taxonomía; seleccionar casos reproducibles; comparar baseline y propuesta; registrar datos y versiones; análisis crítico.
-- **Métricas:** cobertura, precisión, reproducibilidad, tasa de fallo, coste operacional y robustez; operacionalizar antes del experimento.
-- **Producto:** tabla comparativa, protocolo, resultados, análisis de incertidumbre, limitaciones y artefactos de reproducción.
+## Hipótesis y controles
 
-### 5. emulación y análisis aislado
+H1: una metodología que combina ground truth, análisis estático y pruebas dinámicas controladas reduce errores de reconstrucción frente a análisis de una sola herramienta. H0: no existe diferencia bajo la muestra definida. Comparar al menos dos herramientas cuando sea técnicamente razonable; registrar versiones, arquitectura y compilador.
 
-- **Pregunta:** ¿Qué fallos, supuestos y condiciones límite de emulación y análisis aislado no quedan cubiertos por las prácticas actuales y cómo pueden observarse?
-- **Hipótesis:** una taxonomía y controles derivados de evidencia mejoran la cobertura o reducen errores frente a baseline documentada.
-- **Método:** revisión de literatura; análisis de estándares y documentación; construir taxonomía; seleccionar casos reproducibles; comparar baseline y propuesta; registrar datos y versiones; análisis crítico.
-- **Métricas:** cobertura, precisión, reproducibilidad, tasa de fallo, coste operacional y robustez; operacionalizar antes del experimento.
-- **Producto:** tabla comparativa, protocolo, resultados, análisis de incertidumbre, limitaciones y artefactos de reproducción.
+## Protocolo común
 
-### 6. protecciones y empaquetado
+1. Usar únicamente binarios, firmware y sistemas propios o autorizados.
+2. Congelar fuente ground truth, compilador, flags, hash, herramientas y entorno.
+3. Preparar corpus positivo, negativo, truncado y casos límite.
+4. Fijar métrica primaria, exclusiones y tamaño de muestra antes de medir.
+5. Ejecutar en VM aislada, sin red por defecto y con snapshot.
+6. Conservar scripts, logs, crashes minimizados y resultados brutos.
+7. Repetir desde entorno limpio y revisar hipótesis alternativas.
 
-- **Pregunta:** ¿Qué fallos, supuestos y condiciones límite de protecciones y empaquetado no quedan cubiertos por las prácticas actuales y cómo pueden observarse?
-- **Hipótesis:** una taxonomía y controles derivados de evidencia mejoran la cobertura o reducen errores frente a baseline documentada.
-- **Método:** revisión de literatura; análisis de estándares y documentación; construir taxonomía; seleccionar casos reproducibles; comparar baseline y propuesta; registrar datos y versiones; análisis crítico.
-- **Métricas:** cobertura, precisión, reproducibilidad, tasa de fallo, coste operacional y robustez; operacionalizar antes del experimento.
-- **Producto:** tabla comparativa, protocolo, resultados, análisis de incertidumbre, limitaciones y artefactos de reproducción.
+## Métricas y amenazas a validez
 
-### 7. reproducibilidad y divulgación
+Medir exactitud de reconstrucción, cobertura CFG, precisión de clasificación, cobertura de fuzzing, bugs confirmados, reproducibilidad y coste. Reportar resultados por arquitectura, compilador, flags y herramienta. Amenazas: heurísticas del decompilador, símbolos, optimización, instrumentación, sesgo del corpus y diferencia entre emulación y hardware real.
 
-- **Pregunta:** ¿Qué fallos, supuestos y condiciones límite de reproducibilidad y divulgación no quedan cubiertos por las prácticas actuales y cómo pueden observarse?
-- **Hipótesis:** una taxonomía y controles derivados de evidencia mejoran la cobertura o reducen errores frente a baseline documentada.
-- **Método:** revisión de literatura; análisis de estándares y documentación; construir taxonomía; seleccionar casos reproducibles; comparar baseline y propuesta; registrar datos y versiones; análisis crítico.
-- **Métricas:** cobertura, precisión, reproducibilidad, tasa de fallo, coste operacional y robustez; operacionalizar antes del experimento.
-- **Producto:** tabla comparativa, protocolo, resultados, análisis de incertidumbre, limitaciones y artefactos de reproducción.
+## Entregables
 
-## Revisión sistemática / mapeo de literatura
+Protocolo, ground truth, corpus con hash/licencia, scripts, versiones, resultados, errores, incertidumbre, limitaciones, parche y test de regresión.
 
-Registrar pregunta, bases consultadas, consultas exactas, rango temporal, idioma, fecha, criterios de inclusión/exclusión, proceso de deduplicación y motivos de descarte. Priorizar normas, papers revisados por pares, especificaciones, advisories y fuentes primarias. Evaluar calidad metodológica y conflicto de interés; no contar referencias sin lectura.
+## Madurez
 
-## Diseño de investigación
-
-- Formular hipótesis nula y alternativa falsables.
-- Definir población, unidad de análisis, variables, confusores y muestreo.
-- Definir comparadores, baseline, métricas y análisis estadístico previo.
-- Registrar entorno, versiones, hardware, dependencias y semillas.
-- Realizar pruebas en laboratorio aislado y con autorización; documentar desviaciones.
-- Evaluar validez interna, externa, de constructo y de conclusión.
-
-## Artefactos de publicación
-
-Estado del arte, taxonomía, threat model, protocolo, dataset/diccionario permitido, scripts, configuración, dependencias fijadas, SBOM, hashes, resultados brutos saneados, análisis, limitaciones, instrucciones de reproducción y revisión independiente.
-
-## Ética y seguridad
-
-No ampliar alcance ni realizar pruebas sobre terceros sin autorización. Minimizar datos y riesgo; en forense preservar cadena de custodia; en malware usar sandbox; en sistemas críticos simular; aplicar divulgación coordinada y proteger secretos.
-
-## Umbral de madurez
-
-M4 exige estudio de literatura, experimento ejecutado y análisis crítico. M5 exige revisión y reproducción independiente. Esta agenda solo define el plan inicial: `research_agenda_defined`.
+M2: contenido y protocolo diseñados. M3 requiere lectura de fuentes; M4 requiere ejecución y reproducción interna; M5 requiere revisión independiente y reproducción por segundo operador. Estado actual: no ejecutado.
