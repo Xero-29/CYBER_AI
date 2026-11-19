@@ -2,7 +2,7 @@
 
 **Corte:** 2026-11-19  
 **Estado:** mapa exploratorio de fuentes y alcance; no revisión sistemática ni lectura integral.  
-**Madurez:** M2 editorial como máximo; M3/M4/M5 pendientes.
+**Madurez:** M2 editorial como máximo; no M3/M4/M5.
 
 ## Pregunta
 
