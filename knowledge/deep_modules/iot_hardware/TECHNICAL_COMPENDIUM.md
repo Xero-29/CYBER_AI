@@ -122,3 +122,31 @@ Todo estudio debe definir H0/H1, variables, muestra, comparadores, criterio de r
 
 ## Madurez
 M0/M1 estructural. Este documento no prueba profundidad cubierta ni madurez M3/M4/M5. Siguiente puerta: lectura crítica de fuentes completas, artefactos específicos, ejecución de laboratorio y evidencia verificable.
+
+
+## Profundización técnica específica: IoT y seguridad de hardware
+
+### Arquitectura de dispositivo
+Inventariar MCU/SoC, boot ROM, bootloader, firmware, periféricos, buses, sensores, actuadores, radio, debug ports, almacenamiento y servicios cloud. Definir trust boundaries entre hardware, firmware, aplicación, gateway y backend. Analizar amenazas de acceso físico, cadena de suministro, actualización maliciosa, clonación, extracción de secretos y manipulación de sensores.
+
+### Root of trust y secure boot
+Evaluar immutable root of trust, secure/measured boot, verificación de firmas, anti-rollback, protección de claves, debug lifecycle y recuperación. Secure boot demuestra cadena de autorización, no ausencia de vulnerabilidades. El modo de producción debe bloquear interfaces de debug según amenaza y permitir recuperación autenticada. Proteger claves únicas por dispositivo y evitar secretos globales compartidos.
+
+### Firmware y actualización OTA
+Diseñar manifest firmado, verificación de integridad/autenticidad, versionado, rollback policy, A/B partitions, recuperación ante fallo y rotación de claves. Validar compatibilidad, atomicidad, supply chain, SBOM, reproducibilidad y soporte de versiones. OTA debe tolerar pérdida de energía/conectividad y no degradar seguridad por rollback no autorizado.
+
+### Interfaces y buses
+Revisar UART, JTAG, SWD, SPI, I2C, CAN, USB, Ethernet, BLE, Wi-Fi, Zigbee/Thread y protocolos industriales. Evaluar autenticación, cifrado, replay, spoofing, fuzzing de parsers y control de acceso físico. Las pruebas de fault injection, side-channel o glitching requieren equipo y dispositivos propios, límites eléctricos y seguridad funcional.
+
+### Identidad y privacidad
+Usar identidad individual, certificados por dispositivo, provisioning seguro, rotación/revocación y attestation cuando aplique. Analizar onboarding, ownership transfer, factory reset, pérdida/robo, telemetry y exposición de datos. Un reset debe borrar secretos según modelo y no permitir re-enrolamiento fraudulento.
+
+### Laboratorios
+- Firmware de demostración con secure boot/anti-rollback simulado.
+- Análisis estático de imagen firmware y extracción de SBOM.
+- Fuzzing offline de parser de protocolo sintético.
+- Validación de provisioning/certificados de dispositivos ficticios.
+No aplicar pruebas eléctricas destructivas en equipos operativos o infraestructura crítica.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.
