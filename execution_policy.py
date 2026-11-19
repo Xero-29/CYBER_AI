@@ -35,7 +35,11 @@ def _unique_object(pairs):
 
 
 def _canonical_target(target):
-    if not isinstance(target, str) or not target.strip():
+    if (
+        not isinstance(target, str)
+        or not target.strip()
+        or any(ord(char) < 0x20 or ord(char) == 0x7F for char in target)
+    ):
         raise AuthorizationError("Destino HTTP/HTTPS inválido o ambiguo.")
     try:
         parsed = urlsplit(target.strip())
@@ -65,8 +69,11 @@ def _canonical_target(target):
             "Por seguridad, esta versión solo admite destinos IP literales; "
             "los dominios requieren transporte con DNS fijado."
         ) from exc
+    if parsed.netloc.endswith(":"):
+        raise AuthorizationError("IP o puerto inválido.")
     try:
-        port = parsed.port or (443 if parsed.scheme == "https" else 80)
+        explicit_port = parsed.port
+        port = (443 if parsed.scheme == "https" else 80) if explicit_port is None else explicit_port
     except ValueError as exc:
         raise AuthorizationError("IP o puerto inválido.") from exc
     if not 1 <= port <= 65535:
@@ -150,10 +157,9 @@ def _load_grants():
             raise AuthorizationError(
                 "El archivo de autorizaciones debe ser regular, estable y de hasta 1 MiB."
             )
-        if opened.st_size and os.name != "nt" and stat.S_IMODE(opened.st_mode) & 0o077:
-            raise AuthorizationError(
-                "El archivo de autorizaciones debe ser privado (permisos 0600)."
-            )
+        insecure_mode = (
+            os.name != "nt" and stat.S_IMODE(opened.st_mode) & 0o077
+        )
         chunks = []
         total = 0
         while True:
@@ -182,6 +188,10 @@ def _load_grants():
         raise AuthorizationError("La política no tiene el esquema esperado.")
     grants = data["authorizations"]
     _validate_grants(grants)
+    if grants and insecure_mode:
+        raise AuthorizationError(
+            "El archivo de autorizaciones debe ser privado (permisos 0600)."
+        )
     return grants
 
 
