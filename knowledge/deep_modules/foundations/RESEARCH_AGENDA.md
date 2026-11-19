@@ -12,63 +12,42 @@ Investigar comparación de modelos, evaluación de controles y gestión de incer
 
 ## Líneas de investigación por tema
 
-Las preguntas siguientes son agendas propuestas. No son resultados ni conclusiones; deben afinarse después de revisar literatura primaria y delimitar una población o sistema experimental.
+Las líneas quedan alineadas exactamente con los siete IDs curriculares y con los protocolos LAB-FND-01A a LAB-FND-07A del desarrollo disciplinar. Las hipótesis son propuestas, no resultados.
 
-### T1. Modelos de seguridad y confianza
+### T1 — `foundations-01`: Modelos de seguridad y confianza
+**Pregunta:** ¿la evaluación centralizada más enforcement local reduce decisiones de autorización obsoletas bajo cambios de atributos y revocación?
+**H1:** versionado de políticas y expiración explícita reduce decisiones obsoletas frente a cachés sin invalidación.
+**Diseño:** simulador con IdP, PDP/PEP, atributos mutables, revocación y fallos de red; medir decisiones erróneas, latencia y disponibilidad.
 
-**Pregunta:** ¿Qué errores de arquitectura aparecen con mayor frecuencia al definir límites de confianza en aplicaciones con varios servicios, identidades y proveedores?
+### T2 — `foundations-02`: Inventario y clasificación de activos
+**Pregunta:** ¿la reconciliación multi-fuente mejora cobertura sin elevar falsos merges?
+**H1:** identificadores fuertes más reconciliación supervisada mejoran F1 frente a hostname como clave única.
+**Diseño:** dataset sintético con duplicados, clones, activos efímeros, huérfanos y cambios de nombre; comparar reglas y baseline de clave única.
 
-**Hipótesis falsable:** un análisis basado en flujos de datos y fronteras de confianza identifica más rutas de acceso no previstas que una revisión de componentes aislados, bajo el mismo tiempo de análisis.
+### T3 — `foundations-03`: Superficie de ataque y modelado de amenazas
+**Pregunta:** ¿DFD más análisis de abuso detecta rutas críticas omitidas por STRIDE sin modelo de flujo?
+**H1:** el enfoque combinado reduce omisiones de rutas del ground truth.
+**Diseño:** arquitecturas sintéticas multi-tier; revisión ciega por dos evaluadores; medir cobertura, falsos positivos, severidad de omisiones y acuerdo interevaluador.
 
-**Diseño:** construir modelos sintéticos equivalentes; asignar evaluadores; comparar rutas descubiertas, falsos positivos, tiempo y acuerdo entre evaluadores. Predefinir criterios de ruta válida.
+### T4 — `foundations-04`: Identidad y control de acceso
+**Pregunta:** ¿credenciales efímeras y permisos mínimos reducen exposición de workloads sin degradar disponibilidad?
+**H1:** reducir duración y alcance de credenciales disminuye ventana de exposición con degradación operacional dentro de umbral predefinido.
+**Diseño:** IdP y workloads simulados; medir permisos efectivos, revocación, fallos legítimos, latencia y recuperación.
 
-### T2. Inventario y clasificación de activos
+### T5 — `foundations-05`: Criptografía y protección de datos
+**Pregunta:** ¿qué política de rotación y recuperación minimiza exposición de claves sin aumentar pérdida de disponibilidad?
+**H1:** rotación automatizada con recuperación ensayada reduce exposición acumulada frente a rotación manual sin ensayo.
+**Diseño:** KMS simulado, claves ficticias, fallos de operador/proveedor; medir tiempo de rotación, fallos de recuperación, disponibilidad y errores.
 
-**Pregunta:** ¿Qué combinación de fuentes pasivas mejora cobertura, atribución y frescura de inventario en entornos híbridos sin introducir escaneo intrusivo?
+### T6 — `foundations-06`: Detección, respuesta y recuperación
+**Pregunta:** ¿qué campos de telemetría permiten reconstrucción robusta bajo pérdida, retraso y duplicación de eventos?
+**H1:** identidad, recurso, acción, timestamp sincronizado, resultado y origen mejoran reconstrucción frente a registros incompletos.
+**Diseño:** trazas sintéticas con ground truth; variar pérdida y desorden; medir secuencias correctas, atribución, FPR/FNR y tiempo de análisis.
 
-**Hipótesis falsable:** la reconciliación de CMDB, cloud inventory, identidad, EDR y DNS reduce activos no atribuidos frente a una única fuente, bajo un alcance y periodo definidos.
-
-**Diseño:** dataset sintético con activos duplicados, efímeros, huérfanos y mal etiquetados; comparar fuentes individuales y combinadas; medir precisión, recall, duplicados y latencia.
-
-### T3. Superficie de ataque y modelado de amenazas
-
-**Pregunta:** ¿Qué combinación de DFD, STRIDE y árboles de ataque produce escenarios más completos y accionables para una arquitectura multi-tier?
-
-**Hipótesis falsable:** combinar DFD y análisis de abuso reduce omisiones de rutas entre componentes frente a STRIDE aplicado sin modelo de flujo.
-
-**Diseño:** casos sintéticos con ground truth elaborado por expertos; evaluación ciega; medir cobertura, falsos positivos, severidad de omisiones y acuerdo interevaluador.
-
-### T4. Identidad, privilegios y autenticación
-
-**Pregunta:** ¿Qué patrones de identidad no humana producen mayor exposición por exceso de privilegios, duración de credenciales y ausencia de propietario?
-
-**Hipótesis falsable:** credenciales efímeras y scopes mínimos reducen la ventana de exposición en escenarios controlados frente a secretos estáticos de larga duración, sin degradar la función prevista fuera de umbral.
-
-**Diseño:** laboratorio con identidades de servicio simuladas; medir duración de credenciales, permisos efectivos, revocación, disponibilidad y fallos de autorización.
-
-### T5. Seguridad de redes y sistemas
-
-**Pregunta:** ¿Qué fallos de segmentación lógica persisten cuando se consideran rutas administrativas, identidades y dependencias además de reglas de firewall?
-
-**Hipótesis falsable:** un modelo de flujos e identidades descubre caminos no contemplados por una revisión exclusiva de reglas de red.
-
-**Diseño:** topología simulada con rutas directas/indirectas, cuentas administrativas y servicios compartidos; comparar revisión de reglas con análisis combinado; medir rutas válidas omitidas.
-
-### T6. Gestión de vulnerabilidades
-
-**Pregunta:** ¿Cómo cambia la priorización cuando CVSS, EPSS, exposición, criticidad del activo y controles compensatorios se analizan conjuntamente?
-
-**Hipótesis falsable:** un modelo contextual produce un orden de remediación más alineado con pérdidas simuladas que el orden por CVSS aislado.
-
-**Diseño:** dataset sintético con etiquetas de impacto y escenarios; comparar ranking CVSS, ranking contextual y revisión experta; medir precision@k, estabilidad y sensibilidad a supuestos. No presentar dataset sintético como evidencia de eficacia real.
-
-### T7. Telemetría, respuesta y recuperación
-
-**Pregunta:** ¿Qué campos de telemetría son mínimos para reconstruir una secuencia de acciones y atribuirla de forma reproducible?
-
-**Hipótesis falsable:** eventos con identidad, recurso, acción, timestamp sincronizado, resultado y origen permiten mayor reconstrucción correcta que logs sin uno o más de esos campos.
-
-**Diseño:** generar trazas sintéticas con pérdida, retraso y alteración de eventos; medir completitud de reconstrucción, atribución correcta, falsos enlaces y tiempo de análisis.
+### T7 — `foundations-07`: Gobierno, riesgo y aseguramiento
+**Pregunta:** ¿la trazabilidad requisito–control–prueba–evidencia detecta controles no operativos mejor que un checklist documental?
+**H1:** pruebas basadas en escenarios detectan más fallos reproducibles que revisión de checklist aislada.
+**Diseño:** caso organizacional sintético con evidencias caducadas/contradictorias; evaluación ciega; medir falsos cierres, cobertura y acuerdo entre revisores.
 
 ## Método transversal
 
