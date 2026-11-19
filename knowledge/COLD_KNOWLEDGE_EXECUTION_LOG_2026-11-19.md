@@ -147,3 +147,12 @@ No conformidades abiertas: lectura integral de fuentes primarias; normas de safe
 - Consultadas las páginas oficiales CSRC de SP 800-160 Vol. 1 Rev. 1 Final (noviembre de 2022) y Vol. 2 Rev. 1 Final (diciembre de 2021).
 - Se verificaron título, revisión, estado final, fecha, DOI y URL oficial de descarga; el registro refleja `official_metadata_reviewed_on` y `publication_status: final`.
 - Esta comprobación confirma versión y procedencia de las publicaciones; no equivale a lectura integral de sus PDF ni cierra NC-FND-01.01-01/06.
+
+
+## Ciclo de remediación de trazabilidad y evaluación — FND-01.01
+
+- Añadido `FND_01_01_PRIMARY_SOURCE_SYNTHESIS_2026-11-19.md`: contraste explícito de NIST SP 800-160 Vol. 1 Rev. 1, Vol. 2 Rev. 1 y NISTIR 8062; se documentan secciones inspeccionadas, consecuencias para el contenido y límites de lectura.
+- Se confirmó en el PDF oficial de Vol. 1 Rev. 1 la cobertura de propiedades emergentes, confianza composicional y assurance cases. Para Vol. 2 Rev. 1 se consultaron abstract, marco, goals/objectives y técnicas seleccionadas. Para NISTIR 8062 se consultaron objetivos de privacidad y modelo de acciones problemáticas de datos.
+- Añadido `topics/FND-01-01_ASSESSOR_GUIDE_V2.md`: anclas de corrección, expectativas por variante, criterios observables para fallas críticas, puntuación y adjudicación. Es material reservado; no es pilotaje ni validación psicométrica.
+- Actualizados el documento principal, la matriz JSON/Markdown y el registro de fuentes. La matriz conserva FND-01.01 en 12 capas y 4 capacidades `in_progress`, T0/O0; no se cambió ninguna celda a `passed`.
+- Persisten las brechas no resolubles por edición documental: lectura integral de fuentes/referencias, determinación de normas sectoriales según alcance concreto, revisión jurídica competente, administración supervisada con dos evaluadores independientes cualificados, pilotaje y revisión disciplinar independiente.
