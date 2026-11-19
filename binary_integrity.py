@@ -74,6 +74,34 @@ def hash_executable(path):
             os.close(descriptor)
 
 
+
+def build_minimal_environment(home, executable_path=None):
+    """Build a subprocess environment that does not inherit application secrets."""
+    isolated_home = Path(home).resolve()
+    env = {
+        key: os.environ[key]
+        for key in ("LANG", "LC_ALL", "TZ", "SYSTEMROOT", "WINDIR", "COMSPEC", "PATHEXT")
+        if os.environ.get(key)
+    }
+    entries = []
+    if executable_path:
+        entries.append(str(Path(executable_path).resolve(strict=True).parent))
+    if os.name == "nt":
+        system_root = os.environ.get("SYSTEMROOT") or os.environ.get("WINDIR")
+        if system_root:
+            entries.append(str(Path(system_root) / "System32"))
+    else:
+        entries.extend(("/usr/local/sbin", "/usr/local/bin", "/usr/sbin", "/usr/bin", "/sbin", "/bin"))
+    env["PATH"] = os.pathsep.join(dict.fromkeys(entries))
+    env["HOME"] = str(isolated_home)
+    env["TMPDIR"] = str(isolated_home)
+    env["TMP"] = str(isolated_home)
+    env["TEMP"] = str(isolated_home)
+    if os.name == "nt":
+        env["USERPROFILE"] = str(isolated_home)
+    return env
+
+
 def require_approved_executable(path, tool_id):
     """Require a matching signed allowlist entry before launching a tool."""
     provenance = hash_executable(path)
@@ -88,6 +116,7 @@ def require_approved_executable(path, tool_id):
 
 __all__ = [
     "BinaryIntegrityError",
+    "build_minimal_environment",
     "hash_executable",
     "require_approved_executable",
 ]
