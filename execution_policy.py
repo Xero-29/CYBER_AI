@@ -172,6 +172,7 @@ def _load_grants():
             or opened.st_size > MAX_POLICY_BYTES
             or stat.S_ISLNK(after.st_mode)
             or getattr(after, "st_file_attributes", 0) & reparse_flag
+            or (before.st_dev, before.st_ino) != (opened.st_dev, opened.st_ino)
             or (opened.st_dev, opened.st_ino) != (after.st_dev, after.st_ino)
         ):
             raise AuthorizationError(
@@ -194,11 +195,18 @@ def _load_grants():
             b"".join(chunks).decode("utf-8"),
             object_pairs_hook=_unique_object,
         )
+        opened_after_read = os.fstat(descriptor)
+        if (
+            (opened.st_dev, opened.st_ino) != (opened_after_read.st_dev, opened_after_read.st_ino)
+            or opened.st_size != opened_after_read.st_size
+            or opened.st_mtime_ns != opened_after_read.st_mtime_ns
+        ):
+            raise AuthorizationError("La política cambió mientras se leía.")
     except AuthorizationError:
         raise
     except FileNotFoundError as exc:
         raise AuthorizationError("No existe el archivo local de autorizaciones.") from exc
-    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError, RecursionError) as exc:
         raise AuthorizationError("No se pudo leer la política de autorizaciones.") from exc
     finally:
         if descriptor is not None:
