@@ -19,6 +19,12 @@ MAX_POLICY_BYTES = 1024 * 1024
 MAX_GRANTS = 500
 IDENTIFIER = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,127}\Z")
 ACTION = re.compile(r"[a-z][a-z0-9_-]{0,63}\Z")
+ALLOWED_PRIVATE_RANGES = (
+    ipaddress.ip_network("10.0.0.0/8"),
+    ipaddress.ip_network("172.16.0.0/12"),
+    ipaddress.ip_network("192.168.0.0/16"),
+    ipaddress.ip_network("fc00::/7"),
+)
 
 
 class AuthorizationError(ValueError):
@@ -32,6 +38,20 @@ def _unique_object(pairs):
             raise AuthorizationError("La política contiene claves JSON duplicadas.")
         result[key] = value
     return result
+
+
+
+def _address_is_allowed(address):
+    """Allow global, RFC1918, ULA and loopback IPs; reject special-purpose ranges."""
+    if (
+        address.is_multicast
+        or address.is_unspecified
+        or address.is_link_local
+        or address.is_reserved
+    ):
+        return False
+    approved_private = any(address in network for network in ALLOWED_PRIVATE_RANGES)
+    return address.is_global or approved_private or address.is_loopback
 
 
 def _canonical_target(target):
@@ -128,8 +148,8 @@ def _validate_grants(grants):
             raise AuthorizationError("La autorización tiene una expiración inválida.") from exc
 
         _, address = _canonical_target(grant["target"])
-        if not address.is_global:
-            raise AuthorizationError("La política contiene un destino que no es una IP pública global.")
+        if not _address_is_allowed(address):
+            raise AuthorizationError("La política contiene una IP reservada o fuera del alcance permitido.")
 
 
 def _load_grants():
@@ -202,8 +222,8 @@ def authorize_target(target, action, authorization_id):
     if not isinstance(authorization_id, str) or not IDENTIFIER.fullmatch(authorization_id):
         raise AuthorizationError("Se requiere un identificador de autorización válido.")
     canonical, address = _canonical_target(target)
-    if not address.is_global:
-        raise AuthorizationError("El destino no es una IP pública global.")
+    if not _address_is_allowed(address):
+        raise AuthorizationError("La dirección IP es reservada, multicast, no especificada o link-local, o está fuera del alcance permitido.")
 
     grants = _load_grants()
     now = datetime.now(timezone.utc)
