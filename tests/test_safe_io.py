@@ -88,6 +88,27 @@ class SafeIoTests(unittest.TestCase):
             if os.name == "posix":
                 self.assertEqual(stat.S_IMODE(directory.stat().st_mode), 0o700)
 
+    @unittest.skipIf(os.name == "nt", "La propiedad POSIX no se valida en Windows.")
+    def test_private_directory_must_belong_to_effective_user(self):
+        with tempfile.TemporaryDirectory() as temp:
+            directory = Path(temp) / "private"
+            directory.mkdir(mode=0o700)
+            other_uid = os.geteuid() + 1
+            with unittest.mock.patch("safe_io.os.geteuid", return_value=other_uid):
+                with self.assertRaisesRegex(SafeWriteError, "usuario efectivo"):
+                    ensure_private_directory(directory)
+
+    @unittest.skipIf(os.name == "nt", "Los permisos POSIX no representan ACL de Windows.")
+    def test_private_directory_rejects_group_writable_parent(self):
+        with tempfile.TemporaryDirectory() as temp:
+            parent = Path(temp) / "group-writable"
+            parent.mkdir(mode=0o770)
+            parent.chmod(0o770)
+            directory = parent / "private"
+            directory.mkdir(mode=0o700)
+            with self.assertRaisesRegex(SafeWriteError, "directorio padre"):
+                ensure_private_directory(directory)
+
     def test_private_directory_rejects_symlink(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)

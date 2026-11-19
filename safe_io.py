@@ -69,8 +69,21 @@ def ensure_private_directory(path, *, create=True):
         raise SafeWriteError("El destino debe ser un directorio existente.")
     if os.name == "posix":
         try:
+            effective_uid = os.geteuid()
+            parent_info = destination.parent.stat()
+            directory_info = destination.stat(follow_symlinks=False)
+            if parent_info.st_uid not in {0, effective_uid} or stat.S_IMODE(parent_info.st_mode) & 0o022:
+                raise SafeWriteError(
+                    "El directorio padre debe pertenecer a root o al usuario efectivo y no ser escribible por grupo u otros."
+                )
+            if directory_info.st_uid != effective_uid:
+                raise SafeWriteError(
+                    "El directorio privado debe pertenecer al usuario efectivo del proceso."
+                )
             os.chmod(destination, 0o700, follow_symlinks=False)
             mode = stat.S_IMODE(destination.stat(follow_symlinks=False).st_mode)
+        except SafeWriteError:
+            raise
         except (OSError, NotImplementedError) as error:
             raise SafeWriteError("No se pudieron restringir los permisos del directorio.") from error
         if mode & 0o077:
