@@ -211,3 +211,15 @@ Se añadió un índice de investigaciones, un registro de 24 fuentes primarias e
 - No se ejecutaron los laboratorios descritos ni se validaron implementaciones en redes, OT, proveedores de IA o producción.
 - No marcar fuentes como lectura integral ni módulos como M4/M5 hasta completar revisión de texto completo, metodología, resultados medidos, reproducción y revisión independiente.
 - La investigación debe continuar con los 40 dominios restantes y ampliar subtemas dentro de cada dominio, no limitarse a los títulos actuales del currículo.
+
+
+### Segunda tanda — ocho dominios adicionales
+
+Se añadieron estudios de campo para Fundamentos, AppSec, APIs, Linux/Unix, Windows/Active Directory, Cloud, Contenedores/Kubernetes y Seguridad móvil. La primera y segunda tanda suman **16 de los 48 dominios** del manifiesto con documentos RESEARCH_STUDY enlazados.
+
+- El registro específico de la entrega contiene 36 referencias; 12 se añadieron en esta tanda.
+- El registro central pasó de 88 a 98 fuentes únicas; se incorporaron 10 referencias nuevas y se preservaron entradas existentes con IDs coincidentes.
+- Se amplió la prueba estructural para exigir los 16 estudios, enlaces, URLs HTTPS e IDs de fuente registrados.
+- Se fijaron estados/versiones: OWASP ASVS 5.0.0 estable; WSTG 4.2 estable y 5.0 en desarrollo; API Top 10 2023; baseline Windows Server 2025; referencias cloud, Kubernetes y móvil.
+
+**Pendiente:** CI del HEAD actualizado, revisión editorial de cada estudio, lectura integral de estándares y documentos de proveedor, laboratorios reproducibles, revisión independiente y desarrollo de los 32 dominios restantes. No declarar estas áreas validadas solo por existir el documento.
