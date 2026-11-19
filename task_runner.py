@@ -413,7 +413,7 @@ def main():
         try:
             atomic_write_text(
                 report_file,
-                json.dumps(report, indent=2, ensure_ascii=False) + "\\n",
+                json.dumps(report, indent=2, ensure_ascii=False) + "\n",
             )
         except (SafeWriteError, OSError, ValueError):
             report["report_persisted"] = False
