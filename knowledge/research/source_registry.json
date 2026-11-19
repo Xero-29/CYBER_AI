@@ -1500,6 +1500,173 @@
       ],
       "verification_status": "official_documentation_reference_registered",
       "review_note": "Review current platform release and hardware generation before mapping controls."
+    },
+    {
+      "id": "NIST-SP800-63-4",
+      "title": "Digital Identity Guidelines",
+      "publisher": "NIST",
+      "version": "SP 800-63-4",
+      "published": "2025-07-31",
+      "url": "https://doi.org/10.6028/NIST.SP.800-63-4",
+      "domains": [
+        "identity",
+        "governance"
+      ],
+      "verification_status": "official_final_publication_page_reviewed",
+      "review_note": "Supersedes SP 800-63-3; use A/B/C companion volumes and implementation hub."
+    },
+    {
+      "id": "NIST-SP800-63B-4",
+      "title": "Digital Identity Guidelines: Authentication and Authenticator Management",
+      "publisher": "NIST",
+      "version": "SP 800-63B-4",
+      "published": "2025-07-31",
+      "url": "https://doi.org/10.6028/NIST.SP.800-63b-4",
+      "domains": [
+        "identity"
+      ],
+      "verification_status": "official_final_publication_page_reviewed",
+      "review_note": "Authenticator assurance and lifecycle requirements; map to local risk and regulatory context."
+    },
+    {
+      "id": "NIST-SP800-83R1",
+      "title": "Guide to Malware Incident Prevention and Handling for Desktops and Laptops",
+      "publisher": "NIST",
+      "version": "SP 800-83 Rev. 1",
+      "published": "2013-07-22",
+      "url": "https://doi.org/10.6028/NIST.SP.800-83r1",
+      "domains": [
+        "malware",
+        "incident_response",
+        "edr_xdr"
+      ],
+      "verification_status": "official_final_metadata_and_abstract_reviewed",
+      "review_note": "Older guide; complement with current platform advisories and modern malware analysis practices."
+    },
+    {
+      "id": "NIST-SP800-86",
+      "title": "Guide to Integrating Forensic Techniques into Incident Response",
+      "publisher": "NIST",
+      "version": "SP 800-86",
+      "published": "2006-09-01",
+      "url": "https://doi.org/10.6028/NIST.SP.800-86",
+      "domains": [
+        "forensics",
+        "incident_response",
+        "cloud_forensics"
+      ],
+      "verification_status": "official_final_metadata_and_abstract_reviewed",
+      "review_note": "Older foundational guidance, not an all-inclusive forensic manual or legal advice."
+    },
+    {
+      "id": "NIST-SP800-101R1",
+      "title": "Guidelines on Mobile Device Forensics",
+      "publisher": "NIST",
+      "version": "SP 800-101 Rev. 1",
+      "published": "2014-05",
+      "url": "https://doi.org/10.6028/NIST.SP.800-101r1",
+      "domains": [
+        "forensics",
+        "mobile"
+      ],
+      "verification_status": "official_publication_reference_registered",
+      "review_note": "Review platform changes and legal constraints before applying to current devices."
+    },
+    {
+      "id": "NISTIR-8259A",
+      "title": "IoT Device Cybersecurity Capability Core Baseline",
+      "publisher": "NIST",
+      "version": "NISTIR 8259A",
+      "published": "2020-05-29",
+      "url": "https://doi.org/10.6028/NIST.IR.8259A",
+      "domains": [
+        "iot_hardware",
+        "hardware_security"
+      ],
+      "verification_status": "official_final_metadata_and_abstract_reviewed",
+      "review_note": "Seven core device capabilities; complement with manufacturer lifecycle and supporting capabilities."
+    },
+    {
+      "id": "NISTIR-8259B",
+      "title": "IoT Non-Technical Supporting Capability Core Baseline",
+      "publisher": "NIST",
+      "version": "NISTIR 8259B",
+      "published": "2021-08-25",
+      "url": "https://doi.org/10.6028/NIST.IR.8259B",
+      "domains": [
+        "iot_hardware",
+        "hardware_security",
+        "governance"
+      ],
+      "verification_status": "official_final_reference_registered",
+      "review_note": "Manufacturer/third-party supporting capabilities, not only device-side controls."
+    },
+    {
+      "id": "NISTIR-8259-R1",
+      "title": "Foundational Activities for IoT Product Manufacturers",
+      "publisher": "NIST",
+      "version": "NISTIR 8259 Rev. 1",
+      "published": "2026-04-09",
+      "url": "https://www.nist.gov/itl/applied-cybersecurity/nist-cybersecurity-iot-program/nistir-8259-series",
+      "domains": [
+        "iot_hardware",
+        "hardware_security"
+      ],
+      "verification_status": "official_series_page_reviewed",
+      "review_note": "2026 revision; obtain and review full publication before deriving requirements."
+    },
+    {
+      "id": "NIST-SP800-193",
+      "title": "Platform Firmware Resiliency Guidelines",
+      "publisher": "NIST",
+      "version": "SP 800-193",
+      "published": "2018-05-04",
+      "url": "https://doi.org/10.6028/NIST.SP.800-193",
+      "domains": [
+        "hardware_security",
+        "iot_hardware"
+      ],
+      "verification_status": "official_final_metadata_and_abstract_reviewed",
+      "review_note": "Protect/detect/recover model for platform firmware; apply to hardware generation and OEM design."
+    },
+    {
+      "id": "NIST-PRIVACY-FRAMEWORK",
+      "title": "NIST Privacy Framework",
+      "publisher": "NIST",
+      "version": "1.0",
+      "url": "https://www.nist.gov/privacy-framework",
+      "domains": [
+        "privacy_engineering",
+        "data_security",
+        "governance"
+      ],
+      "verification_status": "official_framework_reference_registered",
+      "review_note": "Risk management framework; confirm current resources and jurisdictional applicability."
+    },
+    {
+      "id": "NISTIR-8259-CATALOG",
+      "title": "IoT Device Cybersecurity Capabilities Catalog",
+      "publisher": "NIST",
+      "version": "Current catalog",
+      "url": "https://pages.nist.gov/IoT-Device-Cybersecurity-Requirement-Catalogs/",
+      "domains": [
+        "iot_hardware",
+        "hardware_security"
+      ],
+      "verification_status": "official_catalog_page_reviewed",
+      "review_note": "Detailed capability statements refine NISTIR 8259A/B; snapshot version for reproducible mappings."
+    },
+    {
+      "id": "NIST-63-4-IMPLEMENTATION",
+      "title": "Implementation Resources for SP 800-63 Revision 4",
+      "publisher": "NIST",
+      "version": "Current implementation hub",
+      "url": "https://pages.nist.gov/800-63-4-Implementation-Resources/",
+      "domains": [
+        "identity"
+      ],
+      "verification_status": "official_implementation_hub_reviewed",
+      "review_note": "Includes implementation resources, conformance criteria and reference architectures."
     }
   ],
   "last_updated": "2026-11-17"
