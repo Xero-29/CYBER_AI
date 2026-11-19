@@ -6,7 +6,7 @@
 - Comprobaciones subunidad×capa: 1224
 - Comprobaciones de capacidad: 408
 - Celdas aprobadas: 0
-- FND-01.01: 12 capas y 4 capacidades en `in_progress`; 11.?? comprobaciones de capas y 404 capacidades continúan `not_assessed`.
+- FND-01.01: 12 capas y 4 capacidades en `in_progress`; 1.212 comprobaciones de capas y 404 capacidades continúan `not_assessed`.
 - Interpretación: `not_assessed` indica que la evidencia todavía no se ha vinculado y evaluado; no significa ausencia de contenido.
 
 La matriz histórica de siete temas se conserva. Esta matriz añade granularidad y no reemplaza los IDs históricos.
