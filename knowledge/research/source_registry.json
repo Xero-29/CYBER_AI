@@ -1603,14 +1603,18 @@
       "publisher": "NIST",
       "type": "primary_or_authoritative_reference",
       "url": "https://www.nist.gov/privacy-framework",
-      "version": "Consultar edición vigente en el emisor",
-      "published": "Ver registro del emisor",
-      "verification_status": "official_reference_catalogued_not_content_reviewed",
-      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "version": "Version 1.0",
+      "published": "2020-01-16",
+      "verification_status": "selected_sections_reviewed",
+      "verified_scope": "Texto oficial consultado por fragmentos; objetivos de ingeniería de privacidad, ciclo de vida de acciones de datos y riesgo de privacidad. Lectura integral pendiente.",
       "domains": [
         "privacy_engineering"
       ],
-      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+      "review_note": "El PDF oficial y fragmentos de secciones sobre predictability, manageability, disassociability, data actions y privacy risk fueron consultados el 2026-11-19. No se declara lectura integral ni aplicabilidad legal fuera de su contexto federal estadounidense.",
+      "sections_reviewed": [
+        "NIST Privacy Framework Version 1.0: definiciones de Data Action/Data Processing, Predictability, Manageability y Disassociability; objetivos de privacidad; Privacy Risk y Privacy Risk Assessment (consulta parcial del texto oficial)."
+      ],
+      "review_date": "2026-11-19"
     },
     {
       "id": "RESEARCH-RED-TEAM",
@@ -2008,6 +2012,26 @@
       ],
       "review_date": "2026-11-19",
       "review_note": "Abstract y metadatos consultados; artículo completo, metodología, dataset y resultados deben revisarse antes de reutilizar cifras."
+    },
+    {
+      "id": "NIST-CSRC-GLOSSARY-2026-11-03",
+      "title": "NIST CSRC Glossary",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_terminology_aggregation",
+      "url": "https://csrc.nist.gov/glossary",
+      "version": "Actualización del glosario indicada: 2026-11-03",
+      "published": "Continuously maintained; glossary terms last updated 2026-11-03",
+      "verification_status": "selected_terms_reviewed",
+      "verified_scope": "Consultadas las entradas security y system privacy requirement; el glosario advierte que cada término debe interpretarse en el contexto de su documento fuente y no es una definición universal.",
+      "domains": [
+        "foundations"
+      ],
+      "review_note": "Consulta de las entradas oficiales security y system privacy requirement el 2026-11-19. El glosario es una agregación contextual, no sustituye las publicaciones fuente.",
+      "sections_reviewed": [
+        "https://csrc.nist.gov/glossary/term/security",
+        "https://csrc.nist.gov/glossary/term/system_privacy_requirement"
+      ],
+      "review_date": "2026-11-19"
     }
   ],
   "last_updated": "2026-11-19"
