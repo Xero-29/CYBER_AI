@@ -46,3 +46,6 @@ ISO 22301, NIST SP 800-34, NIST SP 800-184, FFIEC business continuity y CISA res
 
 ## Instrucciones para agentes IA
 No apagues servicios ni restaures producción. Los ejercicios usan copias y entornos aislados; la activación de DR requiere autoridad humana.
+
+## Arquitectura
+La continuidad integra servicios de negocio, procesos, personas, instalaciones, proveedores, telecomunicaciones, identidad, energía, datos, aplicaciones y dependencias compartidas. Mapear cadena de servicio de extremo a extremo, puntos únicos de fallo, dependencias upstream/downstream y modos degradados. Vincular BIA, RTO/RPO, estrategias de recuperación, runbooks, comunicación y gobierno de crisis. Separar respaldos, planos de administración y credenciales de recuperación del dominio operativo que podría estar comprometido.

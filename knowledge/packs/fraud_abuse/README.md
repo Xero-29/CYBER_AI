@@ -49,3 +49,6 @@ NIST AI RMF, OWASP Automated Threats, FATF guidance cuando aplique, PCI DSS y li
 
 ## Instrucciones para agentes IA
 No etiquetes personas como fraudulentas por una sola señal. Expón incertidumbre y evita inferir atributos sensibles. Las acciones sobre cuentas o pagos requieren autoridad humana.
+
+## Arquitectura
+El sistema antifraude integra canales de originación, identidad y autenticación, señales de dispositivo/red, motor de reglas y modelos, análisis de riesgo, decisión, revisión humana, pagos/transacciones, gestión de casos y reporting. Trazar señales y datos personales desde su origen hasta cada decisión, con finalidad, retención y control de acceso. Separar scoring de ejecución transaccional; definir umbrales, fallback ante indisponibilidad, revisión de falsos positivos y mecanismos de apelación. Los actores internos, cuentas comprometidas, comercios, intermediarios y proveedores forman parte del modelo de amenaza.
