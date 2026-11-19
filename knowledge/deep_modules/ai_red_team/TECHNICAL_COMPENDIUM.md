@@ -1,3 +1,5 @@
+> **Actualización de navegación (2026-11-19):** el desarrollo teórico disciplinar ampliado de los siete temas está en [AI_RED_TEAM_THEORETICAL_DEVELOPMENT_V1.md](AI_RED_TEAM_THEORETICAL_DEVELOPMENT_V1.md). Este compendio conserva el material anterior como línea base; sus secciones genéricas no sustituyen el nuevo dossier ni se consideran prueba de completitud.
+
 # Compendio técnico: Red teaming de IA y agentes
 
 ID: `ai_red_team` · Versión 0.1.0 · Cuaderno de desarrollo, no validación experta.
