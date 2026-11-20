@@ -1,7 +1,176 @@
 {
   "schema_version": "1.0.0",
-  "policy": "Los registros verificados se limitarán a documentos oficiales inspeccionados en la revisión editorial. Los candidatos requieren comprobación documental antes de usarse como evidencia.",
+  "policy": "Los registros verificados se limitarán a documentos oficiales inspeccionados en la revisión editorial. Los candidatos requieren comprobación documental antes de usarse como evidencia. Los estados de revisión son específicos al alcance y fecha registrados; metadatos/changelog no equivalen a lectura integral ni validación de implementación. Los avisos de errata de FIPS 203 y FIPS 204 se registran por separado y con fecha del emisor; no inferir que FIPS 205 tenga el mismo aviso.",
   "sources": [
+    {
+      "id": "3GPP-TS-33.501-R19",
+      "title": "Security architecture and procedures for 5G System",
+      "publisher": "3GPP/ETSI",
+      "version": "TS 33.501 Release 19 v19.7.0",
+      "published": "2026-08-21",
+      "url": "https://portal.etsi.org/webapp/WorkProgram/Frame_WorkItemList.asp?SearchPage=TRUE+++&qTITLE=TS+33.501",
+      "domains": [
+        "telecom_5g"
+      ],
+      "verification_status": "official_work_program_publication_status_reviewed",
+      "review_note": "Pin exact release/version; standard text is extensive and may be subject to access terms."
+    },
+    {
+      "id": "ANDROID-SECURITY",
+      "title": "Android Security documentation",
+      "publisher": "Google/Android Open Source Project",
+      "version": "Current documentation",
+      "url": "https://source.android.com/docs/security",
+      "domains": [
+        "mobile",
+        "iot_hardware"
+      ],
+      "verification_status": "official_documentation_reference_registered",
+      "review_note": "Version and device implementation specific; test OEM/platform variants."
+    },
+    {
+      "id": "APPLE-PLATFORM-SECURITY",
+      "title": "Apple Platform Security",
+      "publisher": "Apple",
+      "version": "Current guide",
+      "url": "https://support.apple.com/guide/security/welcome/web",
+      "domains": [
+        "mobile",
+        "hardware_security"
+      ],
+      "verification_status": "official_documentation_reference_registered",
+      "review_note": "Review current platform release and hardware generation before mapping controls."
+    },
+    {
+      "id": "AWS-WELLARCH-SECURITY-PILLAR",
+      "title": "AWS Well-Architected Framework — Security Pillar",
+      "publisher": "Amazon Web Services",
+      "type": "official_vendor_architecture_guidance",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/",
+      "version": "Continuously maintained online guidance",
+      "verification_status": "official_documentation_page_reviewed",
+      "verified_scope": "Gobierno, identidad, protección de datos, infraestructura y operaciones de seguridad cloud en AWS.",
+      "domains": [
+        "cloud",
+        "cloud_forensics",
+        "data_security",
+        "governance"
+      ],
+      "review_note": "Página oficial inspeccionada; recomendaciones específicas deben contrastarse con arquitectura, región y servicios usados."
+    },
+    {
+      "id": "BIGDIA-PROMPT-INJECTION-SOK-2026",
+      "title": "A Systematic Survey of Prompt Injection Attacks and Defenses in LLM-Integrated Applications and Agentic Systems",
+      "publisher": "IEEE BigDIA",
+      "type": "peer_reviewed_conference_survey",
+      "url": "https://doi.org/10.1109/BigDIA71496.2026.11684636",
+      "version": "BigDIA 2026",
+      "published": "2026-08",
+      "verification_status": "metadata_and_abstract_reviewed",
+      "verified_scope": "SoK sobre procedencia, flujo de información, ataques de prompt injection y evaluación en aplicaciones/agents según abstract.",
+      "domains": [
+        "ai_red_team",
+        "ai_security"
+      ],
+      "review_date": "2026-11-19",
+      "review_note": "Abstract y metadatos consultados; texto completo pendiente."
+    },
+    {
+      "id": "BLUETOOTH-CORE-SPEC",
+      "title": "Bluetooth Core Specification",
+      "publisher": "Bluetooth SIG",
+      "version": "Current specification family",
+      "url": "https://www.bluetooth.com/specifications/specs/",
+      "domains": [
+        "wireless_security",
+        "mobile",
+        "iot_hardware"
+      ],
+      "verification_status": "official_specification_portal_registered",
+      "review_note": "Pin exact Core version and feature set for security analysis."
+    },
+    {
+      "id": "CAPEC-3.9",
+      "title": "Common Attack Pattern Enumeration and Classification",
+      "publisher": "MITRE",
+      "version": "3.9",
+      "url": "https://capec.mitre.org/data/",
+      "domains": [
+        "red_team",
+        "appsec",
+        "vulnerability_research",
+        "threat_intel",
+        "fraud_abuse"
+      ],
+      "verification_status": "official_catalog_version_page_reviewed",
+      "review_note": "Catalog of attack patterns; fix version and map carefully to CWE/ATT&CK/OWASP."
+    },
+    {
+      "id": "CCSDS-311.0-M-2",
+      "title": "Reference Architecture for Space Data Systems",
+      "publisher": "CCSDS",
+      "version": "311.0-M-2",
+      "published": "2024-12",
+      "url": "https://ccsds.org/Pubs/311x0m2.pdf",
+      "domains": [
+        "satellite_security"
+      ],
+      "verification_status": "official_publication_pdf_registered",
+      "review_note": "Architecture reference; pair with mission-specific security standards and threat model."
+    },
+    {
+      "id": "CIS-BENCHMARKS",
+      "title": "CIS Benchmarks",
+      "publisher": "Center for Internet Security",
+      "version": "Continuously updated per platform",
+      "url": "https://www.cisecurity.org/cis-benchmarks",
+      "domains": [
+        "linux",
+        "containers",
+        "database_security",
+        "cloud"
+      ],
+      "verification_status": "official_catalog_page_reviewed",
+      "review_note": "Platform/version-specific configuration guidance; test compatibility and impact."
+    },
+    {
+      "id": "CIS-CONTROLS-8.1",
+      "title": "CIS Critical Security Controls",
+      "publisher": "CIS",
+      "version": "8.1",
+      "published": "2024-06-24",
+      "url": "https://www.cisecurity.org/controls/v8-1",
+      "domains": [
+        "foundations",
+        "governance",
+        "secure_arch",
+        "devsecops",
+        "linux",
+        "containers",
+        "database_security"
+      ],
+      "verification_status": "official_version_page_reviewed",
+      "review_note": "Revisar el documento completo, edición, erratas, licencia y alcance antes de usar como evidencia específica."
+    },
+    {
+      "id": "CIS-CONTROLS-v8.1",
+      "title": "CIS Critical Security Controls Version 8.1",
+      "publisher": "Center for Internet Security",
+      "type": "official_prioritized_safeguards",
+      "url": "https://www.cisecurity.org/controls/v8-1",
+      "version": "8.1",
+      "published": "2024-06-24",
+      "verification_status": "official_project_page_reviewed",
+      "verified_scope": "Salvaguardas priorizadas y actualizaciones de alineación con NIST CSF 2.0, clases de activos y cadena de suministro.",
+      "domains": [
+        "foundations",
+        "governance",
+        "secure_arch",
+        "network",
+        "devsecops"
+      ],
+      "review_note": "Página oficial CIS inspeccionada el 2026-11-19. Descarga, términos de uso, licencia y lectura del documento completo pendientes."
+    },
     {
       "id": "CISA-KEV",
       "title": "Known Exploited Vulnerabilities Catalog",
@@ -17,6 +186,166 @@
         "incident_response"
       ],
       "review_note": "Referencia oficial registrada; la versión de catálogo debe capturarse por fecha para cualquier experimento."
+    },
+    {
+      "id": "CISA-MALWARE-RESOURCES",
+      "title": "CISA Malware Analysis and Incident Response resources",
+      "publisher": "CISA",
+      "version": "Current resource portal",
+      "url": "https://www.cisa.gov/",
+      "domains": [
+        "malware"
+      ],
+      "verification_status": "official_resource_portal_registered",
+      "review_note": "Cite specific advisories/publications with dates; portal alone is not claim-level evidence."
+    },
+    {
+      "id": "CISA-SECURE-BY-DEMAND-OT",
+      "title": "Secure by Demand: Priority Considerations for OT Owners and Operators",
+      "publisher": "CISA and international partners",
+      "type": "official_joint_guidance",
+      "url": "https://www.cisa.gov/sites/default/files/2025-01/joint-guide-secure-by-demand-priority-considerations-for-ot-owners-and-operators-508c.pdf",
+      "version": "2025-01-13",
+      "published": "2025-01-13",
+      "verification_status": "official_document_summary_reviewed",
+      "verified_scope": "Criterios de adquisición de productos OT con atributos secure-by-design, logging, autenticación y defaults seguros.",
+      "domains": [
+        "ot_ics",
+        "iot_hardware",
+        "automotive_security"
+      ],
+      "review_note": "Resumen oficial localizado; documento íntegro y aplicabilidad sectorial pendientes."
+    },
+    {
+      "id": "CO-DECREE-1575-2007",
+      "title": "Decreto 1575 de 2007 — sistema para la protección y control de la calidad del agua para consumo humano",
+      "publisher": "Presidencia de la República de Colombia; Normograma oficial de Cancillería",
+      "type": "official_colombian_decree",
+      "url": "https://cancilleria.gov.co/normograma/compilacion/docs/decreto_1575_2007.htm",
+      "version": "Decreto 1575 de 2007; texto consultado en compilación oficial",
+      "published": "2007-05-09",
+      "verification_status": "selected_articles_reviewed",
+      "verified_scope": "Consulta de artículos 1–2: objeto, campo de aplicación y definiciones relevantes para prestadores de agua para consumo humano.",
+      "domains": [
+        "foundations",
+        "ot_security",
+        "safety"
+      ],
+      "review_date": "2026-11-19",
+      "sections_reviewed": [
+        "Artículo 1: objeto y campo de aplicación",
+        "Artículo 2: definiciones, agua para consumo humano, análisis de vulnerabilidad y calidad del agua"
+      ],
+      "review_note": "Aplicación condicionada al ámbito de suministro/distribución de agua para consumo humano; se excluye agua envasada del objeto del decreto. No se hizo análisis integral de modificaciones ni concepto jurídico."
+    },
+    {
+      "id": "CO-LEY-1581-2012",
+      "title": "Ley Estatutaria 1581 de 2012 — protección de datos personales",
+      "publisher": "Congreso de Colombia; Normograma oficial de Cancillería",
+      "type": "official_colombian_statute",
+      "url": "https://cancilleria.gov.co/normograma/compilacion/docs/ley_1581_2012.htm",
+      "version": "Ley Estatutaria 1581 de 2012; texto consultado en compilación oficial",
+      "published": "2012-10-17",
+      "verification_status": "selected_articles_reviewed",
+      "verified_scope": "Consulta de artículos 1–4, 6 y 8–10: objeto, ámbito, definiciones, principios, datos sensibles, derechos, autorización y excepciones.",
+      "domains": [
+        "foundations",
+        "privacy_engineering",
+        "governance"
+      ],
+      "review_date": "2026-11-19",
+      "sections_reviewed": [
+        "Artículos 1–3: objeto, ámbito y definiciones",
+        "Artículo 4: principios rectores",
+        "Artículo 6: tratamiento de datos sensibles",
+        "Artículos 8–10: derechos, autorización y excepciones"
+      ],
+      "review_note": "Consulta del texto oficial en Normograma de Cancillería; no constituye análisis jurisprudencial ni concepto jurídico. Aplicabilidad depende de tratamiento de datos personales, actores y ámbito."
+    },
+    {
+      "id": "CO-RES-2115-2007",
+      "title": "Resolución 2115 de 2007 — características, instrumentos básicos y frecuencias del sistema de control y vigilancia de calidad del agua",
+      "publisher": "Ministerios de la Protección Social y de Ambiente, Vivienda y Desarrollo Territorial; Normograma oficial de Cancillería",
+      "type": "official_colombian_resolution",
+      "url": "https://cancilleria.gov.co/sites/default/files/Normograma/docs/resolucion_minproteccion_2115_2007.htm",
+      "version": "Resolución 2115 de 2007; texto consultado en compilación oficial",
+      "published": "2007-06-22",
+      "verification_status": "selected_articles_reviewed",
+      "verified_scope": "Consulta de artículos 1–5 y tablas iniciales sobre análisis básicos/complementarios, definiciones y características físicas/químicas.",
+      "domains": [
+        "foundations",
+        "ot_security",
+        "safety"
+      ],
+      "review_date": "2026-11-19",
+      "sections_reviewed": [
+        "Artículo 1: definiciones de análisis microbiológico/básico/complementario",
+        "Artículos 2–5: características físicas, conductividad, pH y sustancias químicas"
+      ],
+      "review_note": "Aplicación condicionada al agua para consumo humano y al ámbito sectorial. No es norma general de seguridad funcional OT; vigencia, modificaciones y obligaciones concretas deben verificarse para el caso."
+    },
+    {
+      "id": "DUARTE-PROMPT-INJECTION-REVIEW-2026",
+      "title": "A Systematic Review of Prompt Injection Attacks on Large Language Models: Trends, Taxonomy, Evaluation, Defenses, and Opportunities",
+      "publisher": "IEEE Access",
+      "type": "peer_reviewed_systematic_review",
+      "url": "https://doi.org/10.1109/ACCESS.2026.3656849",
+      "version": "Volume 14, pages 12875–12899",
+      "published": "2026-01-21",
+      "verification_status": "metadata_and_abstract_reviewed",
+      "verified_scope": "Revisión de técnicas, contextos, benchmarks y mitigaciones de prompt injection según abstract y metadatos IEEE.",
+      "domains": [
+        "ai_red_team",
+        "ai_security"
+      ],
+      "review_date": "2026-11-19",
+      "review_note": "Abstract y metadatos consultados; texto completo, protocolo y calidad de síntesis pendientes."
+    },
+    {
+      "id": "ENISA-TECH-GUIDANCE-2025",
+      "title": "Technical Implementation Guidance on Cybersecurity Risk Management Measures",
+      "publisher": "European Union Agency for Cybersecurity",
+      "type": "official_technical_guidance",
+      "url": "https://www.enisa.europa.eu/sites/default/files/2025-06/ENISA_Technical_implementation_guidance_on_cybersecurity_risk_management_measures_version_1.0.pdf",
+      "version": "1.0",
+      "published": "2025-06",
+      "verification_status": "official_document_metadata_and_excerpt_reviewed",
+      "verified_scope": "Guía técnica de medidas de gestión de riesgo, incluyendo segmentación de redes y evidencia de implementación.",
+      "domains": [
+        "network",
+        "governance",
+        "ot_ics"
+      ],
+      "review_note": "Metadatos y extracto de segmentación inspeccionados; documento completo y aplicabilidad jurisdiccional pendientes."
+    },
+    {
+      "id": "FIRST-CVSS-4",
+      "title": "CVSS v4.0 Specification",
+      "publisher": "FIRST",
+      "version": "4.0",
+      "published": null,
+      "url": "https://www.first.org/cvss/specification-document",
+      "domains": [
+        "vuln_management",
+        "vulnerability_research"
+      ],
+      "verification_status": "official_specification_reviewed",
+      "review_note": "Revisar el documento completo, edición, erratas, licencia y alcance antes de usar como evidencia específica."
+    },
+    {
+      "id": "FIRST-EPSS",
+      "title": "Exploit Prediction Scoring System",
+      "publisher": "FIRST",
+      "version": "Current model; snapshot required",
+      "published": null,
+      "url": "https://www.first.org/epss/",
+      "domains": [
+        "vuln_management",
+        "threat_intel",
+        "machine_learning"
+      ],
+      "verification_status": "official_model_reference_registered",
+      "review_note": "Revisar el documento completo, edición, erratas, licencia y alcance antes de usar como evidencia específica."
     },
     {
       "id": "FIRST-EPSS-FAQ",
@@ -50,6 +379,277 @@
       "review_note": "Página metodológica revisada; reproducir evaluación requiere datasets/versiones y análisis de calibración."
     },
     {
+      "id": "GENG-PROMPT-INJECTION-SURVEY-2026",
+      "title": "Prompt Injection Attacks on Large Language Models: A Survey of Attack Methods, Root Causes, and Defense Strategies",
+      "publisher": "Computers, Materials & Continua",
+      "type": "peer_reviewed_systematic_review",
+      "url": "https://doi.org/10.32604/cmc.2025.074081",
+      "version": "87(1), Article 4",
+      "published": "2026-02-10",
+      "verification_status": "metadata_and_abstract_reviewed",
+      "verified_scope": "Revisión sistemática de literatura sobre prompt injection; abstract declara 128 estudios de 2022–2025 y método basado en Kitchenham.",
+      "domains": [
+        "ai_red_team",
+        "ai_security"
+      ],
+      "review_date": "2026-11-19",
+      "review_note": "Abstract/metadatos consultados. Método, corpus, criterios, evaluación de calidad y cifras deben verificarse en texto completo."
+    },
+    {
+      "id": "GHIDRA-DOCS",
+      "title": "Ghidra Documentation",
+      "publisher": "NSA",
+      "version": "Current release",
+      "url": "https://ghidra-sre.org/",
+      "domains": [
+        "reverse"
+      ],
+      "verification_status": "official_project_documentation_registered",
+      "review_note": "Record exact release, extensions and processor language packs."
+    },
+    {
+      "id": "GRPC-AUTH-GUIDE",
+      "title": "gRPC Authentication",
+      "publisher": "gRPC Authors / Cloud Native Computing Foundation",
+      "type": "official_technical_documentation",
+      "url": "https://grpc.io/docs/guides/auth/",
+      "version": "Current online documentation",
+      "verification_status": "official_project_page_reviewed",
+      "verified_scope": "Documentación oficial sobre credenciales, TLS y mecanismos de autenticación para canales y llamadas gRPC.",
+      "domains": [
+        "api",
+        "network",
+        "identity"
+      ],
+      "review_note": "Página oficial de autenticación inspeccionada el 2026-11-19; validar API y opciones por lenguaje/versión antes de implementación."
+    },
+    {
+      "id": "IEEE-80211-WG",
+      "title": "IEEE 802.11 Wireless LAN Working Group",
+      "publisher": "IEEE",
+      "version": "Current standards family",
+      "url": "https://www.ieee802.org/11/",
+      "domains": [
+        "wireless_security",
+        "network"
+      ],
+      "verification_status": "official_working_group_reference_registered",
+      "review_note": "Full standards may require access; cite exact amendment/edition for normative claims."
+    },
+    {
+      "id": "IETF-RFC-9700",
+      "title": "Best Current Practice for OAuth 2.0 Security",
+      "publisher": "Internet Engineering Task Force",
+      "type": "best_current_practice",
+      "url": "https://www.rfc-editor.org/rfc/rfc9700.html",
+      "version": "RFC 9700 / BCP 240",
+      "published": "2025-01",
+      "verification_status": "selected_sections_reviewed",
+      "sections_reviewed": [
+        "Sections 2.1-2.6; attacker model; Sections 4.1-4.17 attacks and mitigations, including PKCE, token replay, sender constraint and refresh token protection"
+      ],
+      "review_date": "2026-11-19",
+      "domains": [
+        "foundations",
+        "identity",
+        "api"
+      ],
+      "review_note": "Full RFC text opened; security recommendations and attack/mitigation sections inspected. Not an implementation test."
+    },
+    {
+      "id": "IETF-RFC9700",
+      "title": "Best Current Practice for OAuth 2.0 Security",
+      "publisher": "Internet Engineering Task Force",
+      "type": "internet_best_current_practice",
+      "url": "https://www.rfc-editor.org/rfc/rfc9700.html",
+      "version": "RFC 9700 / BCP 240",
+      "published": "2025-01",
+      "verification_status": "official_standard_metadata_reviewed",
+      "verified_scope": "OAuth 2.0 threat model and best current security practices; includes exact redirect matching, PKCE, CSRF/mix-up mitigations and sender-constrained tokens.",
+      "domains": [
+        "api",
+        "identity",
+        "appsec"
+      ],
+      "review_note": "RFC oficial y abstract/partes de recomendaciones inspeccionados el 2026-11-19; lectura integral, análisis de errata y evaluación de implementación pendientes."
+    },
+    {
+      "id": "ISO-SAE-21434-2021",
+      "title": "Road vehicles — Cybersecurity engineering",
+      "publisher": "ISO/SAE",
+      "version": "ISO/SAE 21434:2021",
+      "published": "2021-08",
+      "url": "https://www.iso.org/standard/70918.html",
+      "domains": [
+        "automotive_security"
+      ],
+      "verification_status": "official_standard_page_reviewed",
+      "review_note": "Edition 1 final; standard full text may require purchase."
+    },
+    {
+      "id": "ISO-SAE-21434-ED2-AWI",
+      "title": "Road vehicles — Cybersecurity engineering Edition 2 work item",
+      "publisher": "ISO/SAE",
+      "version": "AWI 21434 Edition 2",
+      "url": "https://www.iso.org/es/contents/data/standard/09/54/95437.html",
+      "domains": [
+        "automotive_security"
+      ],
+      "verification_status": "official_work_item_page_reviewed_not_final",
+      "review_note": "Approved work item in development; must not be treated as a published standard."
+    },
+    {
+      "id": "K8S-POD-SECURITY-ADMISSION",
+      "title": "Pod Security Admission",
+      "publisher": "Kubernetes Documentation",
+      "type": "official_project_documentation",
+      "url": "https://kubernetes.io/docs/concepts/security/pod-security-admission/",
+      "version": "Kubernetes documentation v1.37",
+      "verification_status": "official_documentation_page_reviewed",
+      "verified_scope": "Aplicación de Pod Security Standards con modos enforce, audit y warn.",
+      "domains": [
+        "containers",
+        "cloud",
+        "devsecops"
+      ],
+      "review_note": "Página oficial inspeccionada; validar comportamiento contra la versión del cluster objetivo."
+    },
+    {
+      "id": "K8S-SECURITY-CHECKLIST",
+      "title": "Kubernetes Security Checklist",
+      "publisher": "Kubernetes project",
+      "version": "Current documentation",
+      "url": "https://kubernetes.io/docs/concepts/security/security-checklist/",
+      "domains": [
+        "containers"
+      ],
+      "verification_status": "official_project_documentation_reviewed",
+      "review_note": "Version-sensitive checklist; pin Kubernetes release and verify feature maturity."
+    },
+    {
+      "id": "LLVM-DOCS",
+      "title": "LLVM Documentation",
+      "publisher": "LLVM Project",
+      "version": "Current docs",
+      "url": "https://llvm.org/docs/",
+      "domains": [
+        "reverse"
+      ],
+      "verification_status": "official_project_documentation_registered",
+      "review_note": "Version toolchain and target architecture for reproducible reverse engineering."
+    },
+    {
+      "id": "MITRE-ATLAS-LIVE-2026-11-19",
+      "title": "MITRE ATLAS",
+      "publisher": "MITRE",
+      "type": "living_adversary_knowledge_base",
+      "url": "https://atlas.mitre.org/",
+      "version": "Snapshot web consultado 2026-11-19; dataset STIX versionado pendiente",
+      "verification_status": "official_live_knowledge_base_page_reviewed",
+      "verified_scope": "Taxonomía viva de tácticas y técnicas contra sistemas predictivos, generativos y agénticos; incluye mitigaciones y casos.",
+      "domains": [
+        "ai_red_team",
+        "ai_security"
+      ],
+      "review_date": "2026-11-19",
+      "review_note": "Página oficial inspeccionada. No se ha descargado ni revisado cada objeto STIX; congelar versión/hash antes de análisis reproducible."
+    },
+    {
+      "id": "MITRE-ATTACK-20.1",
+      "title": "MITRE ATT&CK version history and v20.1 release",
+      "publisher": "MITRE",
+      "type": "official_version_reference",
+      "url": "https://attack.mitre.org/resources/versions/",
+      "version": "20.1",
+      "published": "2026-10-13",
+      "verification_status": "official_version_history_reviewed",
+      "verified_scope": "La página de versiones identifica v20.1 como versión vigente desde 13-oct-2026 al corte de esta ampliación.",
+      "domains": [
+        "threat_intel",
+        "soc_siem",
+        "threat_hunting",
+        "red_team",
+        "ot_ics",
+        "malware"
+      ],
+      "review_note": "Importación STIX, changelog y análisis de cambios pendientes."
+    },
+    {
+      "id": "MITRE-ATTACK-DATASOURCES",
+      "title": "ATT&CK Data Sources deprecation notice",
+      "publisher": "MITRE",
+      "version": "ATT&CK v18 / 2025-10",
+      "published": "2025-10",
+      "url": "https://attack.mitre.org/datasources/",
+      "domains": [
+        "threat_intel",
+        "soc_siem"
+      ],
+      "verification_status": "official_deprecation_notice_reviewed",
+      "review_note": "Revisar el documento completo, edición, erratas, licencia y alcance antes de usar como evidencia específica."
+    },
+    {
+      "id": "MITRE-ATTACK-ENTERPRISE",
+      "title": "ATT&CK Enterprise Matrix",
+      "publisher": "MITRE",
+      "version": "Live/versioned",
+      "published": null,
+      "url": "https://attack.mitre.org/matrices/enterprise/",
+      "domains": [
+        "threat_intel",
+        "network",
+        "windows_ad",
+        "linux",
+        "soc_siem",
+        "threat_hunting",
+        "malware",
+        "reverse"
+      ],
+      "verification_status": "official_matrix_page_reviewed",
+      "review_note": "Revisar el documento completo, edición, erratas, licencia y alcance antes de usar como evidencia específica."
+    },
+    {
+      "id": "MITRE-ATTACK-KB",
+      "title": "MITRE ATT&CK Knowledge Base",
+      "publisher": "MITRE",
+      "type": "official_knowledge_base",
+      "url": "https://attack.mitre.org/",
+      "version": "Continuously versioned",
+      "verification_status": "official_framework_page_reviewed",
+      "verified_scope": "Tácticas y técnicas adversarias basadas en observaciones del mundo real.",
+      "domains": [
+        "threat_intel",
+        "threat_hunting",
+        "red_team",
+        "ai_red_team",
+        "soc_siem",
+        "edr_xdr"
+      ],
+      "review_note": "Página oficial y estructura general inspeccionadas; los datos STIX deben versionarse para análisis reproducible."
+    },
+    {
+      "id": "MITRE-ATTACK-OCT-2026-v20",
+      "title": "MITRE ATT&CK October 2026 release notes",
+      "publisher": "MITRE",
+      "type": "official_release_notes",
+      "url": "https://attack.mitre.org/resources/updates/updates-october-2026/",
+      "version": "v20 / v20.1",
+      "published": "2026-10-13",
+      "verification_status": "official_release_notes_reviewed",
+      "verified_scope": "Cambios de octubre 2026 para Enterprise, Mobile e ICS; nuevas técnicas, estrategias de detección y campañas.",
+      "domains": [
+        "threat_intel",
+        "soc_siem",
+        "ics_security",
+        "ai_red_team"
+      ],
+      "sections_reviewed": [
+        "Official October 2026 release page and current version history"
+      ],
+      "review_date": "2026-11-19",
+      "review_note": "Release notes y resumen del changelog revisados; no se ha revisado cada objeto STIX ni se presume que todas las técnicas apliquen a Foundations."
+    },
+    {
       "id": "MITRE-ATTACK-STIX-DATA",
       "title": "ATT&CK STIX Data",
       "publisher": "MITRE",
@@ -81,6 +681,26 @@
       "review_note": "Metadatos y resumen/versión oficial revisados; lectura integral y verificación de contenido técnico pendientes."
     },
     {
+      "id": "MITRE-ATTACK-v20.1",
+      "title": "MITRE ATT&CK Version History and October 2026 Update",
+      "publisher": "MITRE",
+      "type": "living_knowledge_base_release_record",
+      "url": "https://attack.mitre.org/resources/versions/",
+      "version": "v20.1",
+      "published": "2026-10-13",
+      "verification_status": "version_and_changelog_reviewed",
+      "sections_reviewed": [
+        "Version history and October 2026 changelog"
+      ],
+      "review_date": "2026-11-19",
+      "domains": [
+        "foundations",
+        "threat_intel",
+        "threat_hunting"
+      ],
+      "review_note": "Official MITRE version history and October 2026 changelog reviewed. ATT&CK v20.1 is current at this review date. Catalog object-level content and technique applicability still require scoped review."
+    },
+    {
       "id": "MITRE-ATTACK-VERSION-HISTORY",
       "title": "MITRE ATT&CK Version History",
       "publisher": "MITRE",
@@ -94,6 +714,175 @@
         "threat_intel"
       ],
       "review_note": "Metadatos y resumen/versión oficial revisados; lectura integral y verificación de contenido técnico pendientes."
+    },
+    {
+      "id": "MITRE-CAPEC",
+      "title": "Common Attack Pattern Enumeration and Classification",
+      "publisher": "MITRE",
+      "type": "official_attack_pattern_knowledge_base",
+      "url": "https://capec.mitre.org/",
+      "version": "Continuously maintained",
+      "verification_status": "official_framework_page_reviewed",
+      "verified_scope": "Patrones de ataque y relaciones con CWE/ATT&CK.",
+      "domains": [
+        "appsec",
+        "vulnerability_research",
+        "bug_bounty",
+        "software_engineering"
+      ],
+      "review_note": "Página oficial de comparación y propósito inspeccionada; cada patrón requiere contexto y lectura de su definición."
+    },
+    {
+      "id": "MITRE-CWE-TOP25-2025",
+      "title": "2025 CWE Top 25 Most Dangerous Software Weaknesses",
+      "publisher": "MITRE",
+      "type": "official_weakness_prioritization_list",
+      "url": "https://cwe.mitre.org/top25/archive/2025/2025_cwe_top25",
+      "version": "2025",
+      "published": "2025-12-11",
+      "verification_status": "official_specification_pages_reviewed",
+      "verified_scope": "Lista 2025 y metodología pública basadas en 39,080 registros CVE; destaca debilidades como XSS, SQLi, CSRF, autorización ausente, path traversal y SSRF.",
+      "domains": [
+        "appsec",
+        "api",
+        "vulnerability_research",
+        "vuln_management"
+      ],
+      "review_note": "Página oficial de lista y tabla de ranking inspeccionadas el 2026-11-19; no equivale a análisis de todos los CWE ni a prevalencia universal."
+    },
+    {
+      "id": "MITRE-D3FEND",
+      "title": "D3FEND Defensive Countermeasure Knowledge Graph",
+      "publisher": "MITRE",
+      "version": "Current knowledge graph",
+      "url": "https://d3fend.mitre.org/",
+      "domains": [
+        "soc_siem",
+        "edr_xdr",
+        "threat_hunting",
+        "secure_arch"
+      ],
+      "verification_status": "official_faq_scope_reviewed",
+      "review_note": "Knowledge graph vocabulary of defensive techniques; does not prescribe, prioritize or rate effectiveness."
+    },
+    {
+      "id": "MS-AD-DS-DOCS",
+      "title": "Active Directory Domain Services documentation",
+      "publisher": "Microsoft",
+      "version": "Continuously updated",
+      "url": "https://learn.microsoft.com/windows-server/identity/ad-ds/",
+      "domains": [
+        "windows_ad",
+        "identity"
+      ],
+      "verification_status": "official_documentation_reference_registered",
+      "review_note": "Documentation portal; individual technical procedures need exact versioned pages."
+    },
+    {
+      "id": "MS-WINDOWS-SERVER-2025-BASELINE",
+      "title": "Configure Security Baselines for Windows Server 2025",
+      "publisher": "Microsoft",
+      "version": "Windows Server 2025",
+      "url": "https://learn.microsoft.com/windows-server/security/osconfig/osconfig-how-to-configure-security-baselines",
+      "domains": [
+        "windows_ad"
+      ],
+      "verification_status": "official_documentation_page_reviewed",
+      "review_note": "Apply by server role and supported OS; validate baseline impact before production rollout."
+    },
+    {
+      "id": "NFC-FORUM-SPECS",
+      "title": "NFC Forum Specifications",
+      "publisher": "NFC Forum",
+      "version": "Current specification family",
+      "url": "https://nfc-forum.org/build/specifications/",
+      "domains": [
+        "wireless_security",
+        "mobile",
+        "iot_hardware"
+      ],
+      "verification_status": "official_specification_portal_registered",
+      "review_note": "Review exact specification and licensing/access requirements."
+    },
+    {
+      "id": "NIST-63-4-IMPLEMENTATION",
+      "title": "Implementation Resources for SP 800-63 Revision 4",
+      "publisher": "NIST",
+      "version": "Current implementation hub",
+      "url": "https://pages.nist.gov/800-63-4-Implementation-Resources/",
+      "domains": [
+        "identity"
+      ],
+      "verification_status": "official_implementation_hub_reviewed",
+      "review_note": "Includes implementation resources, conformance criteria and reference architectures."
+    },
+    {
+      "id": "NIST-AI-100-2-E2025",
+      "title": "Adversarial Machine Learning: A Taxonomy and Terminology of Attacks and Mitigations",
+      "publisher": "NIST",
+      "version": "AI 100-2 E2025",
+      "published": "2025-03-24",
+      "url": "https://doi.org/10.6028/NIST.AI.100-2e2025",
+      "domains": [
+        "machine_learning",
+        "ai_security",
+        "ai_red_team",
+        "mathematics"
+      ],
+      "verification_status": "official_final_publication_metadata_and_abstract_reviewed",
+      "review_note": "Supersedes E2023 as newer taxonomy; includes predictive and generative AI attacks and mitigations."
+    },
+    {
+      "id": "NIST-AI-600-1",
+      "title": "Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_risk_management_profile",
+      "url": "https://doi.org/10.6028/NIST.AI.600-1",
+      "version": "NIST AI 600-1",
+      "published": "2024-07-26",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verified_scope": "Perfil transversal del AI RMF para riesgos de IA generativa a lo largo del ciclo de vida.",
+      "domains": [
+        "ai_red_team",
+        "ai_security"
+      ],
+      "review_date": "2026-11-19",
+      "review_note": "Página oficial NIST, abstract y metadatos inspeccionados. PDF completo pendiente de lectura; no implica evaluación de eficacia de controles."
+    },
+    {
+      "id": "NIST-AI-RMF",
+      "title": "AI Risk Management Framework",
+      "publisher": "NIST",
+      "version": "1.0",
+      "published": "2023-01-26",
+      "url": "https://doi.org/10.6028/NIST.AI.100-1",
+      "domains": [
+        "ai_security",
+        "machine_learning",
+        "governance",
+        "fraud_abuse"
+      ],
+      "verification_status": "official_publication_reference_registered",
+      "review_note": "Revisar el documento completo, edición, erratas, licencia y alcance antes de usar como evidencia específica."
+    },
+    {
+      "id": "NIST-CSF-2.0",
+      "title": "NIST Cybersecurity Framework 2.0",
+      "publisher": "NIST",
+      "version": "2.0",
+      "published": "2024-02-26",
+      "url": "https://doi.org/10.6028/NIST.CSWP.29",
+      "domains": [
+        "foundations",
+        "governance",
+        "secure_arch",
+        "incident_response",
+        "satellite_security",
+        "telecom_5g",
+        "data_security"
+      ],
+      "verification_status": "official_scope_reviewed",
+      "review_note": "Revisar el documento completo, edición, erratas, licencia y alcance antes de usar como evidencia específica."
     },
     {
       "id": "NIST-CSF-REFERENCE-TOOL",
@@ -113,6 +902,26 @@
       "review_note": "Descripción oficial revisada; descargar dataset/versionar snapshot antes de usarlo como evidencia reproducible."
     },
     {
+      "id": "NIST-CSRC-GLOSSARY-2026-11-03",
+      "title": "NIST CSRC Glossary",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_terminology_aggregation",
+      "url": "https://csrc.nist.gov/glossary",
+      "version": "Actualización del glosario indicada: 2026-11-03",
+      "published": "Continuously maintained; glossary terms last updated 2026-11-03",
+      "verification_status": "selected_terms_reviewed",
+      "verified_scope": "Consultadas las entradas security y system privacy requirement; el glosario advierte que cada término debe interpretarse en el contexto de su documento fuente y no es una definición universal.",
+      "domains": [
+        "foundations"
+      ],
+      "review_note": "Consulta de las entradas oficiales security y system privacy requirement el 2026-11-19. El glosario es una agregación contextual, no sustituye las publicaciones fuente.",
+      "sections_reviewed": [
+        "https://csrc.nist.gov/glossary/term/security",
+        "https://csrc.nist.gov/glossary/term/system_privacy_requirement"
+      ],
+      "review_date": "2026-11-19"
+    },
+    {
       "id": "NIST-CSWP-29-CSF-2.0",
       "title": "The NIST Cybersecurity Framework (CSF) 2.0",
       "publisher": "National Institute of Standards and Technology",
@@ -120,7 +929,7 @@
       "url": "https://doi.org/10.6028/NIST.CSWP.29",
       "version": "2.0",
       "published": "2024-02-26",
-      "verification_status": "official_metadata_verified",
+      "verification_status": "selected_sections_reviewed",
       "verified_scope": "Marco de resultados de gestión del riesgo; no prescribe por sí solo procedimientos técnicos.",
       "domains": [
         "foundations",
@@ -129,7 +938,12 @@
         "incident_response",
         "business_continuity"
       ],
-      "review_note": "Metadatos y alcance revisados en el registro oficial NIST; descargar y revisar texto completo antes de citar secciones concretas."
+      "review_note": "Metadatos y alcance revisados en el registro oficial NIST; descargar y revisar texto completo antes de citar secciones concretas. Selected official sections inspected and mapped in knowledge/deep_modules/foundations/SOURCE_REVIEW_AND_CLAIM_EVIDENCE_2026-11-19.md; this is not a claim of full linear reading.",
+      "sections_reviewed": [
+        "purpose, CSF Core, Profiles and Tiers",
+        "Selected sections of the official PDF inspected; not linearly read in full."
+      ],
+      "review_date": "2026-11-19"
     },
     {
       "id": "NIST-DEVSECOPS-IPD-2026",
@@ -149,6 +963,36 @@
       "review_note": "Se mantiene marcado como borrador; no tratar como estándar final."
     },
     {
+      "id": "NIST-FIPS-140-3",
+      "title": "Security Requirements for Cryptographic Modules",
+      "publisher": "NIST",
+      "version": "FIPS 140-3",
+      "published": "2019-03-22",
+      "url": "https://doi.org/10.6028/NIST.FIPS.140-3",
+      "domains": [
+        "pki_hsm",
+        "crypto",
+        "hardware_security"
+      ],
+      "verification_status": "official_final_standard_page_reviewed",
+      "review_note": "Validation applies to exact module/version/operating environment and certificate scope."
+    },
+    {
+      "id": "NIST-FIPS-197",
+      "title": "Advanced Encryption Standard (AES)",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "federal_information_processing_standard",
+      "url": "https://doi.org/10.6028/NIST.FIPS.197",
+      "version": "Updated 2023-05-09",
+      "published": "2001-11-26; editorial update 2023-05-09",
+      "verification_status": "official_metadata_reviewed",
+      "verified_scope": "Especificación AES; actualización editorial 2023 sin cambios técnicos declarados por NIST.",
+      "domains": [
+        "crypto"
+      ],
+      "review_note": "Metadatos y nota oficial de actualización revisados; vectores e implementación concreta requieren verificación independiente."
+    },
+    {
       "id": "NIST-FIPS-203",
       "title": "Module-Lattice-Based Key-Encapsulation Mechanism Standard",
       "publisher": "National Institute of Standards and Technology",
@@ -156,14 +1000,18 @@
       "url": "https://doi.org/10.6028/NIST.FIPS.203",
       "version": "Final",
       "published": "2024-08-13",
-      "verification_status": "official_standard_metadata_reviewed",
+      "verification_status": "official_metadata_and_errata_notice_reviewed",
       "verified_scope": "Estándar ML-KEM para establecimiento de secreto compartido.",
       "domains": [
         "crypto",
         "secure_arch",
         "identity"
       ],
-      "review_note": "Metadatos y descripción oficial revisados; lectura integral y pruebas de implementación pendientes."
+      "review_note": "NIST planning note dated 2025-11-17 states an issue was identified for correction in a future update/revision and links an Errata (potential updates) spreadsheet. Treat as versioned standard with unresolved errata notice; inspect spreadsheet and monitor official revision before implementation claims. Full algorithm text not reviewed.",
+      "sections_reviewed": [
+        "Official publication abstract and planning note/errata notice"
+      ],
+      "review_date": "2026-11-19"
     },
     {
       "id": "NIST-FIPS-204",
@@ -173,14 +1021,18 @@
       "url": "https://doi.org/10.6028/NIST.FIPS.204",
       "version": "Final",
       "published": "2024-08-13",
-      "verification_status": "official_standard_metadata_reviewed",
+      "verification_status": "official_metadata_and_errata_notice_reviewed",
       "verified_scope": "Estándar ML-DSA para firmas digitales.",
       "domains": [
         "crypto",
         "secure_arch",
         "identity"
       ],
-      "review_note": "Metadatos y descripción oficial revisados; lectura integral y pruebas de implementación pendientes."
+      "review_note": "NIST planning note dated 2026-07-31 links an Errata (potential updates) spreadsheet listing several minor issues intended for future update/revision. Metadata/notice reviewed; spreadsheet and full algorithm text/conformance not reviewed.",
+      "sections_reviewed": [
+        "Cover, abstract, announcement, applicability and signature-use sections"
+      ],
+      "review_date": "2026-11-19"
     },
     {
       "id": "NIST-FIPS-205",
@@ -190,14 +1042,18 @@
       "url": "https://doi.org/10.6028/NIST.FIPS.205",
       "version": "Final",
       "published": "2024-08-13",
-      "verification_status": "official_standard_metadata_reviewed",
+      "verification_status": "selected_sections_reviewed",
       "verified_scope": "Estándar SLH-DSA para firmas digitales basadas en hashes y sin estado.",
       "domains": [
         "crypto",
         "secure_arch",
         "identity"
       ],
-      "review_note": "Metadatos y descripción oficial revisados; lectura integral y pruebas de implementación pendientes."
+      "review_note": "SLH-DSA is a stateless hash-based digital signature scheme, not a KEM. Full algorithm review and conformance testing pending.",
+      "sections_reviewed": [
+        "Cover, abstract, announcement, applicability and signature-use sections"
+      ],
+      "review_date": "2026-11-19"
     },
     {
       "id": "NIST-IR-8176",
@@ -215,6 +1071,24 @@
       "review_note": "Metadatos y resumen/versión oficial revisados; lectura integral y verificación de contenido técnico pendientes."
     },
     {
+      "id": "NIST-IR-8547",
+      "title": "Transition to Post-Quantum Cryptography Standards",
+      "publisher": "NIST",
+      "type": "official_primary_reference",
+      "url": "https://doi.org/10.6028/NIST.IR.8547",
+      "version": "NIST IR 8547 Final",
+      "published": "2026-10-27",
+      "verification_status": "official_final_publication_page_reviewed",
+      "verified_scope": "Ficha oficial y resumen: hoja de ruta para transición de algoritmos vulnerables a estándares PQC.",
+      "domains": [
+        "post_quantum_crypto",
+        "crypto",
+        "pki_hsm",
+        "governance"
+      ],
+      "review_note": "Lectura integral, extracción de hitos y análisis de aplicabilidad pendientes."
+    },
+    {
       "id": "NIST-LOG-MANAGEMENT-PROJECT",
       "title": "NIST Log Management Project",
       "publisher": "National Institute of Standards and Technology",
@@ -228,6 +1102,56 @@
         "soc_siem"
       ],
       "review_note": "Metadatos y resumen/versión oficial revisados; lectura integral y verificación de contenido técnico pendientes."
+    },
+    {
+      "id": "NIST-NICE-2.2",
+      "title": "NICE Framework Components v2.2.0",
+      "publisher": "NIST",
+      "version": "2.2.0",
+      "published": "2026-04-28",
+      "url": "https://www.nist.gov/news-events/news/2026/04/nice-releases-nice-framework-components-v220",
+      "domains": [
+        "foundations",
+        "software_engineering",
+        "devsecops"
+      ],
+      "verification_status": "official_release_announcement_reviewed",
+      "review_note": "Revisar el documento completo, edición, erratas, licencia y alcance antes de usar como evidencia específica."
+    },
+    {
+      "id": "NIST-PRIVACY-FRAMEWORK",
+      "title": "NIST Privacy Framework",
+      "publisher": "NIST",
+      "version": "1.0",
+      "url": "https://www.nist.gov/privacy-framework",
+      "domains": [
+        "privacy_engineering",
+        "data_security",
+        "governance"
+      ],
+      "verification_status": "official_framework_reference_registered",
+      "review_note": "Risk management framework; confirm current resources and jurisdictional applicability."
+    },
+    {
+      "id": "NIST-PRIVACY-FRAMEWORK-1.1-IPD",
+      "title": "NIST Privacy Framework 1.1 — Initial Public Draft (CSWP 40 IPD)",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_initial_public_draft",
+      "url": "https://doi.org/10.6028/NIST.CSWP.40.ipd",
+      "version": "CSWP 40 IPD",
+      "published": "2025-04-14",
+      "verification_status": "selected_sections_reviewed",
+      "verified_scope": "PDF oficial de 51 páginas; consulta dirigida de Executive Summary, secciones 1.2.1 Cybersecurity and Privacy Risk Management, 1.2.2 AI and Privacy Risk Management, 1.2.3 Privacy Risk Assessment, Core y Appendix D. No lectura integral de todas las secciones.",
+      "domains": [
+        "foundations",
+        "privacy_engineering",
+        "ai_security"
+      ],
+      "review_date": "2026-11-19",
+      "sections_reviewed": [
+        "Páginas 1–2: propósito y estado IPD; páginas 5–8: relación riesgo cibernético/privacidad, privacidad e IA y evaluación de riesgo; Appendix A: Core; Appendix D: prácticas de gestión de riesgo."
+      ],
+      "review_note": "La propia página NIST presenta PF 1.1 como IPD; no tratar como versión final ni como norma legal. El texto indica que el riesgo de privacidad puede surgir sin incidentes de ciberseguridad y describe problemas para individuos por acciones de datos a lo largo del ciclo de vida. La lectura fue dirigida, no integral."
     },
     {
       "id": "NIST-SP-1308",
@@ -261,6 +1185,76 @@
         "secure_arch"
       ],
       "review_note": "Metadatos y resumen oficial revisados; requiere lectura del documento completo para afirmaciones detalladas."
+    },
+    {
+      "id": "NIST-SP-800-160v1r1",
+      "title": "Engineering Trustworthy Secure Systems",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_systems_security_engineering_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.800-160v1r1",
+      "version": "Volume 1 Revision 1 Final",
+      "published": "2022-11-16",
+      "verification_status": "selected_sections_reviewed",
+      "verified_scope": "Inspección dirigida del PDF oficial completo (195 páginas) en secciones de ingeniería de seguridad como propiedad emergente, framework de contextos, assurance cases, confianza composicional, protección continua y evidencia; no lectura lineal integral.",
+      "domains": [
+        "foundations",
+        "secure_arch",
+        "governance"
+      ],
+      "review_note": "Inspección dirigida por secciones del PDF oficial el 2026-11-19. No marcar full_text_reviewed: no se realizó lectura lineal de las 195 páginas ni revisión de todas las referencias. La página oficial CSRC de la publicación final también fue inspeccionada el 2026-11-19; se verificaron título, revisión, fecha final, DOI y enlace de descarga. Esto verifica metadatos de versión, no equivale a lectura integral del PDF.",
+      "sections_reviewed": [
+        "PDF oficial, páginas impresas 31–32: actividades de ingeniería de seguridad y seguridad como propiedad emergente (sección Systems Security Engineering Framework).",
+        "PDF oficial, páginas impresas 35–36: contexto de trustworthiness y assurance case (claims, argumentos, evidencia y supuestos).",
+        "PDF oficial, páginas impresas 87–88: rigor proporcional, confianza composicional y protección continua (Appendix E).",
+        "PDF oficial, páginas impresas 102–103: assurance, confianza y evidencia objetiva; requisitos verificables (Appendix F)."
+      ],
+      "review_date": "2026-11-19",
+      "official_metadata_reviewed_on": "2026-11-19",
+      "official_publication_page": "https://csrc.nist.gov/pubs/sp/800/160/v1/r1/final",
+      "publication_status": "final",
+      "publication_page_verified_fields": [
+        "official title",
+        "revision",
+        "publication month/year",
+        "superseded predecessor",
+        "DOI",
+        "official download URL",
+        "publication history"
+      ]
+    },
+    {
+      "id": "NIST-SP-800-160v2r1",
+      "title": "Developing Cyber-Resilient Systems: A Systems Security Engineering Approach",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_cyber_resiliency_engineering_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.800-160v2r1",
+      "version": "Volume 2 Revision 1 Final",
+      "published": "2021-12-09",
+      "verification_status": "selected_sections_reviewed",
+      "verified_scope": "Inspección dirigida del PDF oficial de 310 páginas: marco de ingeniería de resiliencia cibernética, objetivos, relación con objetivos CIA y ciclo de vida; no lectura lineal integral.",
+      "domains": [
+        "foundations",
+        "cyber_resilience",
+        "secure_arch"
+      ],
+      "review_date": "2026-11-19",
+      "sections_reviewed": [
+        "PDF oficial, páginas impresas 8–10: framework, goals, objectives, techniques, implementation approaches and design principles (Chapter 2, §§2.1–2.1.1).",
+        "PDF oficial, páginas impresas 136–137: aplicación de constructs y complementariedad de anticipar/resistir/recuperar/adaptar con CIA (Appendix D, §D.7)."
+      ],
+      "review_note": "Inspección dirigida por secciones del PDF oficial el 2026-11-19. No marcar full_text_reviewed: no se realizó lectura lineal de las 310 páginas ni revisión completa de las referencias. La página oficial CSRC de la publicación final también fue inspeccionada el 2026-11-19; se verificaron título, revisión, fecha final, DOI y enlace de descarga. Esto verifica metadatos de versión, no equivale a lectura integral del PDF.",
+      "official_metadata_reviewed_on": "2026-11-19",
+      "official_publication_page": "https://csrc.nist.gov/pubs/sp/800/160/v2/r1/final",
+      "publication_status": "final",
+      "publication_page_verified_fields": [
+        "official title",
+        "revision",
+        "publication month/year",
+        "superseded predecessor",
+        "DOI",
+        "official download URL",
+        "publication history"
+      ]
     },
     {
       "id": "NIST-SP-800-190",
@@ -318,6 +1312,186 @@
       "review_note": "Metadatos y alcance revisados en página oficial NIST; comprobar perfiles complementarios y versión vigente antes de aplicación concreta."
     },
     {
+      "id": "NIST-SP-800-218-SSDF-1.1",
+      "title": "Secure Software Development Framework (SSDF) Version 1.1",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_secure_development_framework",
+      "url": "https://csrc.nist.gov/pubs/sp/800/218/final",
+      "version": "1.1",
+      "published": "2022-02-03",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verified_scope": "Metadatos y abstract oficiales confirman prácticas de desarrollo seguro integrables en distintos SDLC para reducir vulnerabilidades y abordar causas raíz.",
+      "domains": [
+        "appsec",
+        "devsecops",
+        "software_engineering"
+      ],
+      "review_note": "Página oficial NIST y abstract inspeccionados el 2026-11-19; texto íntegro y tablas de prácticas pendientes."
+    },
+    {
+      "id": "NIST-SP-800-30r1",
+      "title": "Guide for Conducting Risk Assessments",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.800-30r1",
+      "version": "Revision 1",
+      "published": "2012-09-17",
+      "verification_status": "selected_sections_reviewed",
+      "verified_scope": "Guía para preparar, conducir y mantener evaluaciones de riesgo en sistemas y organizaciones; la aplicación requiere contexto y supuestos documentados.",
+      "domains": [
+        "foundations",
+        "governance",
+        "vuln_management"
+      ],
+      "review_note": "Página oficial NIST y abstract inspeccionados el 2026-11-19. Texto completo, extracción por sección y contraste independiente pendientes. Selected official sections inspected and mapped in knowledge/deep_modules/foundations/SOURCE_REVIEW_AND_CLAIM_EVIDENCE_2026-11-19.md; this is not a claim of full linear reading.",
+      "sections_reviewed": [
+        "Risk framing/model; threat sources/events; vulnerabilities/predisposing conditions; likelihood initiation/occurrence and impact; impact/risk determination; uncertainty and assumptions (Chapter 2, Chapter 3 and relevant appendices)."
+      ],
+      "review_date": "2026-11-19"
+    },
+    {
+      "id": "NIST-SP-800-37r2",
+      "title": "Risk Management Framework for Information Systems and Organizations: A System Life Cycle Approach for Security and Privacy",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_risk_management_framework",
+      "url": "https://doi.org/10.6028/NIST.SP.800-37r2",
+      "version": "Revision 2 Final",
+      "published": "2018-12-20",
+      "verification_status": "selected_sections_reviewed",
+      "verified_scope": "Proceso RMF que conecta categorización, selección, implementación, evaluación, autorización y monitoreo continuo con el ciclo de vida.",
+      "domains": [
+        "foundations",
+        "governance",
+        "secure_arch"
+      ],
+      "review_note": "Página oficial NIST y abstract inspeccionados el 2026-11-19. Texto completo, lectura por sección y análisis de aplicabilidad local pendientes. Selected official sections inspected and mapped in knowledge/deep_modules/foundations/SOURCE_REVIEW_AND_CLAIM_EVIDENCE_2026-11-19.md; this is not a claim of full linear reading.",
+      "sections_reviewed": [
+        "Prepare organization/system levels including P-14 risk assessment and P-15 requirements definition; Categorize; Select; Implement; Assess; Authorize; Monitor; privacy/life-cycle/supply-chain integration."
+      ],
+      "review_date": "2026-11-19"
+    },
+    {
+      "id": "NIST-SP-800-53r5",
+      "title": "Security and Privacy Controls for Information Systems and Organizations",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_control_catalog",
+      "url": "https://doi.org/10.6028/NIST.SP.800-53r5",
+      "version": "Revision 5",
+      "published": "2020-09-23",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verified_scope": "Catálogo adaptable de controles de seguridad y privacidad; la selección de controles no demuestra implementación ni eficacia.",
+      "domains": [
+        "foundations",
+        "governance",
+        "secure_arch",
+        "identity",
+        "data_security"
+      ],
+      "review_note": "Página oficial NIST y abstract inspeccionados el 2026-11-19. Revisar erratas, SP 800-53A/53B y versión vigente antes de uso normativo."
+    },
+    {
+      "id": "NIST-SP-800-53r5-2.0",
+      "title": "Security and Privacy Controls for Information Systems and Organizations",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_security_privacy_control_catalog",
+      "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/final",
+      "version": "Release 5.2.0",
+      "published": "2025-08-27",
+      "verification_status": "official_release_notice_and_change_summary_reviewed",
+      "verified_scope": "Release 5.2.0 incorpora cambios sobre resiliencia, pruebas de desarrollo, despliegue/gestión de actualizaciones e integridad de software; SP 800-53A 5.2.0 se actualiza en correspondencia.",
+      "domains": [
+        "foundations",
+        "governance",
+        "secure_arch",
+        "identity",
+        "data_security"
+      ],
+      "review_note": "Release 5.2.0 published 2025-08-27; adds SA-24 Design for Cyber Resiliency and SA-15(13) Logging Syntax, SI-02(07) Root Cause Analysis; revises SI-07(12). This is a targeted change-summary review, not full catalog review.",
+      "sections_reviewed": [
+        "NIST official Release 5.2.0 announcement (2025-08-27)",
+        "Official change summary: SA-15(13), SA-24, SI-02(07), SI-07(12) and discussion changes"
+      ],
+      "review_date": "2026-11-19"
+    },
+    {
+      "id": "NIST-SP-800-56A-r3",
+      "title": "Recommendation for Pair-Wise Key-Establishment Schemes Using Discrete Logarithm Cryptography",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.800-56Ar3",
+      "version": "Revision 3",
+      "published": "2018-04",
+      "verification_status": "official_metadata_reviewed_update_announced",
+      "verified_scope": "Esquemas de establecimiento de claves basados en logaritmo discreto, incluyendo DH y curvas elípticas.",
+      "domains": [
+        "crypto"
+      ],
+      "review_note": "Metadatos y alcance oficial revisados; NIST anunció el 2026-01-06 que la publicación será actualizada. Comprobar estado vigente antes de adoptar."
+    },
+    {
+      "id": "NIST-SP-800-57p1r5",
+      "title": "Recommendation for Key Management: Part 1 – General",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.800-57pt1r5",
+      "version": "Revision 5",
+      "published": "2020-05",
+      "verification_status": "official_metadata_reviewed",
+      "verified_scope": "Orientación general para gestión, protección, uso y ciclo de vida de material criptográfico.",
+      "domains": [
+        "crypto",
+        "pki_hsm"
+      ],
+      "review_note": "Metadatos y alcance oficial revisados; verificar suplementos y estado vigente antes de definir políticas."
+    },
+    {
+      "id": "NIST-SP-800-57pt1r5",
+      "title": "Recommendation for Key Management: Part 1 – General",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_key_management_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.800-57pt1r5",
+      "version": "Part 1 Revision 5",
+      "published": "2020-05-04",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "sections_reviewed": [
+        "Official publication record and abstract"
+      ],
+      "review_date": "2026-11-19",
+      "domains": [
+        "foundations",
+        "crypto",
+        "identity"
+      ],
+      "review_note": "PDF retrieval timed out; do not claim full-text reading. Detailed key-management claims must be checked against the PDF before M3."
+    },
+    {
+      "id": "NIST-SP-800-57pt1r6-IPD",
+      "title": "Recommendation for Key Management: Part 1 – General (Initial Public Draft)",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_initial_public_draft",
+      "url": "https://csrc.nist.gov/pubs/sp/800/57/pt1/r6/ipd",
+      "version": "Revision 6 Initial Public Draft",
+      "published": "2025-12-05",
+      "verification_status": "selected_sections_reviewed",
+      "verified_scope": "Borrador de revisión de gestión de claves que incorpora Ascon y algoritmos post-cuánticos FIPS 203/204/205; distingue claves de establecimiento y almacenamiento.",
+      "domains": [
+        "crypto",
+        "secure_arch",
+        "identity"
+      ],
+      "sections_reviewed": [
+        "PDF title/authority/abstract and reviewer notes (pp. i–iii)",
+        "Section 4.3.6 cryptoperiod recommendations (pp. 27–39)",
+        "Section 5.2.3 key metadata (pp. 87–89)",
+        "Section 6 key states/transitions (pp. 89–96)",
+        "Section 7 key-management phases/functions (pp. 97–126)",
+        "Section 7.2.3 key change/re-keying vs key update (pp. 119–120)",
+        "Section 8.2 key inventory management (pp. 129–130)"
+      ],
+      "review_date": "2026-11-19",
+      "review_note": "Selected sections of the 201-page IPD PDF inspected, not linear full reading. It describes four lifecycle phases; key-state transitions should be recorded in audit logs/metadata; long-term key inventory uses references/pointers, not secret/private key values (unless inventory also serves backup/archive); key change distinguishes independent re-keying from dependent key update. Draft only; Rev. 5 remains final."
+    },
+    {
       "id": "NIST-SP-800-61r3",
       "title": "Incident Response Recommendations and Considerations for Cybersecurity Risk Management: A CSF 2.0 Community Profile",
       "publisher": "National Institute of Standards and Technology",
@@ -325,7 +1499,7 @@
       "url": "https://doi.org/10.6028/NIST.SP.800-61r3",
       "version": "Revision 3",
       "published": "2025-04-03",
-      "verification_status": "official_pdf_sections_inspected",
+      "verification_status": "selected_sections_reviewed",
       "verified_scope": "Integra recomendaciones de respuesta a incidentes en actividades de gestión del riesgo alineadas con CSF 2.0; sustituye SP 800-61 Rev. 2.",
       "domains": [
         "incident_response",
@@ -334,7 +1508,12 @@
         "business_continuity",
         "forensics"
       ],
-      "review_note": "Se inspeccionaron portada, Executive Summary, modelo de ciclo de vida en páginas impresas 4–6 y fragmentos de contención/respuesta en páginas 31–32 del PDF oficial. No se declara lectura exhaustiva de todo el documento."
+      "review_note": "Se inspeccionaron portada, Executive Summary, modelo de ciclo de vida en páginas impresas 4–6 y fragmentos de contención/respuesta en páginas 31–32 del PDF oficial. No se declara lectura exhaustiva de todo el documento. Selected official sections inspected and mapped in knowledge/deep_modules/foundations/SOURCE_REVIEW_AND_CLAIM_EVIDENCE_2026-11-19.md; this is not a claim of full linear reading.",
+      "sections_reviewed": [
+        "Section 2 life-cycle model, CSF 2.0 Functions, roles/responsibilities and continuous improvement",
+        "Section 2 and selected profile material inspected; not linearly read in full."
+      ],
+      "review_date": "2026-11-19"
     },
     {
       "id": "NIST-SP-800-63-4",
@@ -449,6 +1628,72 @@
       "review_note": "Metadatos y resumen/versión oficial revisados; lectura integral y verificación de contenido técnico pendientes."
     },
     {
+      "id": "NIST-SP-800-88r2",
+      "title": "Guidelines for Media Sanitization",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.800-88r2",
+      "version": "Revision 2 Final",
+      "published": "2025-09-26",
+      "verification_status": "selected_sections_reviewed",
+      "sections_reviewed": [
+        "Executive Summary and scope; sanitization methods; cryptography and cryptographic erase (Section 3.2); general sanitization program and sanitization validation (Section 4.5.2)."
+      ],
+      "review_date": "2026-11-19",
+      "domains": [
+        "foundations",
+        "asset_management",
+        "data_security",
+        "hardware"
+      ],
+      "review_note": "PDF and official publication record inspected; replaces Rev. 1. Selected sections only, not a full linear reading."
+    },
+    {
+      "id": "NIST-SP-800-90A-r1",
+      "title": "Recommendation for Random Number Generation Using Deterministic Random Bit Generators",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.800-90Ar1",
+      "version": "Revision 1",
+      "published": "2015-06-24",
+      "verification_status": "official_metadata_reviewed",
+      "verified_scope": "Mecanismos DRBG basados en hash y cifrado; consultar el estado del borrador de revisión antes de seleccionar perfil.",
+      "domains": [
+        "crypto"
+      ],
+      "review_note": "Registro y metadatos oficiales revisados; lectura integral y validación de implementación pendientes."
+    },
+    {
+      "id": "NIST-SP-800-90B",
+      "title": "Recommendation for the Entropy Sources Used for Random Bit Generation",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.800-90B",
+      "version": "Final",
+      "published": "2018-01-10",
+      "verification_status": "official_metadata_reviewed",
+      "verified_scope": "Diseño, evaluación y validación de fuentes de entropía para generación de bits aleatorios.",
+      "domains": [
+        "crypto"
+      ],
+      "review_note": "Metadatos y alcance del catálogo oficial revisados; lectura integral y evaluación de una fuente concreta pendientes."
+    },
+    {
+      "id": "NIST-SP-800-90C",
+      "title": "Recommendation for Random Bit Generator (RBG) Constructions",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_guidance",
+      "url": "https://doi.org/10.6028/NIST.SP.800-90C",
+      "version": "Final",
+      "published": "2025-09-25",
+      "verification_status": "official_metadata_reviewed",
+      "verified_scope": "Construcciones RBG que integran DRBG y fuentes de entropía conforme a la serie SP 800-90.",
+      "domains": [
+        "crypto"
+      ],
+      "review_note": "Publicación final y metadatos oficiales revisados; lectura integral y evaluación de una construcción concreta pendientes."
+    },
+    {
       "id": "NIST-SP-800-92",
       "title": "Guide to Computer Security Log Management",
       "publisher": "National Institute of Standards and Technology",
@@ -479,6 +1724,604 @@
         "forensics"
       ],
       "review_note": "Registro y resumen oficial revisados; conservar estado de borrador y no usar como norma final."
+    },
+    {
+      "id": "NIST-SP800-101R1",
+      "title": "Guidelines on Mobile Device Forensics",
+      "publisher": "NIST",
+      "version": "SP 800-101 Rev. 1",
+      "published": "2014-05",
+      "url": "https://doi.org/10.6028/NIST.SP.800-101r1",
+      "domains": [
+        "forensics",
+        "mobile"
+      ],
+      "verification_status": "official_publication_reference_registered",
+      "review_note": "Review platform changes and legal constraints before applying to current devices."
+    },
+    {
+      "id": "NIST-SP800-115",
+      "title": "Technical Guide to Information Security Testing and Assessment",
+      "publisher": "NIST",
+      "version": "SP 800-115",
+      "published": "2008-09-30",
+      "url": "https://doi.org/10.6028/NIST.SP.800-115",
+      "domains": [
+        "red_team",
+        "vulnerability_research",
+        "appsec"
+      ],
+      "verification_status": "official_final_metadata_and_abstract_reviewed",
+      "review_note": "Older overview of test planning and techniques; not a comprehensive modern assessment program."
+    },
+    {
+      "id": "NIST-SP800-131A-R2",
+      "title": "Transitioning the Use of Cryptographic Algorithms and Key Lengths",
+      "publisher": "NIST",
+      "version": "SP 800-131A Rev. 2",
+      "published": "2019-03-21",
+      "url": "https://doi.org/10.6028/NIST.SP.800-131Ar2",
+      "domains": [
+        "post_quantum_crypto",
+        "crypto",
+        "pki_hsm"
+      ],
+      "verification_status": "official_final_page_reviewed_with_newer_draft_note",
+      "review_note": "Rev. 3 IPD appeared in 2024; verify whether a final revision supersedes this before policy use."
+    },
+    {
+      "id": "NIST-SP800-137",
+      "title": "Information Security Continuous Monitoring",
+      "publisher": "NIST",
+      "version": "SP 800-137",
+      "published": "2011-09-30",
+      "url": "https://doi.org/10.6028/NIST.SP.800-137",
+      "domains": [
+        "soc_siem",
+        "threat_hunting",
+        "governance"
+      ],
+      "verification_status": "official_final_metadata_and_abstract_reviewed",
+      "review_note": "Foundational continuous monitoring guidance; supplement with current architecture and telemetry practice."
+    },
+    {
+      "id": "NIST-SP800-144",
+      "title": "Guidelines on Security and Privacy in Public Cloud Computing",
+      "publisher": "NIST",
+      "version": "SP 800-144",
+      "published": "2011-12",
+      "url": "https://doi.org/10.6028/NIST.SP.800-144",
+      "domains": [
+        "cloud",
+        "secure_arch"
+      ],
+      "verification_status": "official_publication_reference_registered",
+      "review_note": "Foundational guidance; dated publication, complement with current provider-specific shared responsibility and controls."
+    },
+    {
+      "id": "NIST-SP800-147",
+      "title": "BIOS Protection Guidelines",
+      "publisher": "NIST",
+      "version": "SP 800-147",
+      "url": "https://csrc.nist.gov/pubs/sp/800/147/final",
+      "domains": [
+        "hardware_security"
+      ],
+      "verification_status": "official_publication_reference_registered",
+      "review_note": "Legacy BIOS-era guidance; complement with UEFI/platform-specific current vendor guidance."
+    },
+    {
+      "id": "NIST-SP800-184",
+      "title": "Guide for Cybersecurity Event Recovery",
+      "publisher": "NIST",
+      "version": "SP 800-184",
+      "published": "2016-12-22",
+      "url": "https://doi.org/10.6028/NIST.SP.800-184",
+      "domains": [
+        "business_continuity",
+        "incident_response"
+      ],
+      "verification_status": "official_final_metadata_and_abstract_reviewed",
+      "review_note": "Recovery planning/playbooks; complement with current cloud and ransomware practice."
+    },
+    {
+      "id": "NIST-SP800-190",
+      "title": "Application Container Security Guide",
+      "publisher": "NIST",
+      "version": "SP 800-190",
+      "published": "2017-09",
+      "url": "https://doi.org/10.6028/NIST.SP.800-190",
+      "domains": [
+        "containers",
+        "cloud",
+        "devsecops"
+      ],
+      "verification_status": "official_publication_reference_registered",
+      "review_note": "Foundational container guide; supplement with current Kubernetes/runtime guidance."
+    },
+    {
+      "id": "NIST-SP800-193",
+      "title": "Platform Firmware Resiliency Guidelines",
+      "publisher": "NIST",
+      "version": "SP 800-193",
+      "published": "2018-05-04",
+      "url": "https://doi.org/10.6028/NIST.SP.800-193",
+      "domains": [
+        "hardware_security",
+        "iot_hardware",
+        "satellite_security"
+      ],
+      "verification_status": "official_final_metadata_and_abstract_reviewed",
+      "review_note": "Protect/detect/recover model for platform firmware; apply to hardware generation and OEM design."
+    },
+    {
+      "id": "NIST-SP800-201",
+      "title": "NIST Cloud Computing Forensic Reference Architecture",
+      "publisher": "NIST",
+      "version": "SP 800-201",
+      "published": "2024-07-30",
+      "url": "https://doi.org/10.6028/NIST.SP.800-201",
+      "domains": [
+        "cloud_forensics",
+        "forensics"
+      ],
+      "verification_status": "official_final_metadata_and_abstract_reviewed",
+      "review_note": "Final architecture for forensic readiness; customize to provider/service and jurisdiction."
+    },
+    {
+      "id": "NIST-SP800-207",
+      "title": "Zero Trust Architecture",
+      "publisher": "NIST",
+      "version": "SP 800-207",
+      "published": "2020-08",
+      "url": "https://doi.org/10.6028/NIST.SP.800-207",
+      "domains": [
+        "network",
+        "identity",
+        "secure_arch",
+        "cloud"
+      ],
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "review_note": "Revisar el documento completo, edición, erratas, licencia y alcance antes de usar como evidencia específica."
+    },
+    {
+      "id": "NIST-SP800-207A",
+      "title": "A Zero Trust Architecture Model for Access Control in Cloud-Native Applications in Multi-Cloud Environments",
+      "publisher": "NIST",
+      "type": "official_primary_reference",
+      "url": "https://doi.org/10.6028/NIST.SP.800-207A",
+      "version": "SP 800-207A Final",
+      "published": "2023-09-13",
+      "verification_status": "official_final_metadata_and_abstract_reviewed",
+      "verified_scope": "Identidad de aplicación/servicio, gateways, sidecars, service mesh y políticas de acceso cloud-native multi-cloud.",
+      "domains": [
+        "cloud",
+        "containers",
+        "api",
+        "identity",
+        "secure_arch"
+      ],
+      "review_note": "Lectura integral y pruebas de arquitectura en laboratorio pendientes."
+    },
+    {
+      "id": "NIST-SP800-213",
+      "title": "IoT Device Cybersecurity Guidance for the Federal Government",
+      "publisher": "NIST",
+      "version": "SP 800-213",
+      "published": "2021-11-29",
+      "url": "https://doi.org/10.6028/NIST.SP.800-213",
+      "domains": [
+        "iot_hardware",
+        "hardware_security"
+      ],
+      "verification_status": "official_final_metadata_and_abstract_reviewed",
+      "review_note": "A Rev. 1 initial public draft was published June 2026; do not label the draft final."
+    },
+    {
+      "id": "NIST-SP800-213R1-IPD",
+      "title": "IoT Product Cybersecurity Guidelines Rev. 1 Initial Public Draft",
+      "publisher": "NIST",
+      "version": "SP 800-213 Rev. 1 IPD",
+      "published": "2026-06-24",
+      "url": "https://csrc.nist.gov/pubs/sp/800/213/r1/ipd",
+      "domains": [
+        "iot_hardware",
+        "hardware_security"
+      ],
+      "verification_status": "official_initial_public_draft_reviewed",
+      "review_note": "Comment period closed Aug 24 2026; not a final publication."
+    },
+    {
+      "id": "NIST-SP800-218",
+      "title": "Secure Software Development Framework",
+      "publisher": "NIST",
+      "version": "SP 800-218 v1.1",
+      "published": "2022-02",
+      "url": "https://doi.org/10.6028/NIST.SP.800-218",
+      "domains": [
+        "devsecops",
+        "software_engineering"
+      ],
+      "verification_status": "official_final_metadata_and_abstract_reviewed",
+      "review_note": "Revisar el documento completo, edición, erratas, licencia y alcance antes de usar como evidencia específica."
+    },
+    {
+      "id": "NIST-SP800-218A",
+      "title": "SSDF Community Profile for Generative AI and Foundation Models",
+      "publisher": "NIST",
+      "version": "SP 800-218A",
+      "published": null,
+      "url": "https://csrc.nist.gov/Projects/ssdf",
+      "domains": [
+        "devsecops",
+        "ai_security",
+        "machine_learning"
+      ],
+      "verification_status": "official_project_page_reviewed",
+      "review_note": "Revisar el documento completo, edición, erratas, licencia y alcance antes de usar como evidencia específica."
+    },
+    {
+      "id": "NIST-SP800-227",
+      "title": "Recommendations for Key-Encapsulation Mechanisms",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_final_publication",
+      "url": "https://csrc.nist.gov/pubs/sp/800/227/final",
+      "version": "SP 800-227",
+      "published": "2025-09-18",
+      "verification_status": "official_catalog_metadata_reviewed",
+      "verified_scope": "Recomendaciones para uso seguro de mecanismos de encapsulación de claves.",
+      "domains": [
+        "crypto",
+        "post_quantum_crypto",
+        "pki_hsm"
+      ],
+      "review_note": "Entrada del catálogo oficial NIST localizada; texto completo pendiente."
+    },
+    {
+      "id": "NIST-SP800-34R1",
+      "title": "Contingency Planning Guide for Federal Information Systems",
+      "publisher": "NIST",
+      "version": "SP 800-34 Rev. 1",
+      "published": "2010-11-11",
+      "url": "https://doi.org/10.6028/NIST.SP.800-34r1",
+      "domains": [
+        "business_continuity"
+      ],
+      "verification_status": "official_final_metadata_reviewed",
+      "review_note": "Foundational but old; supplement with current resilience requirements."
+    },
+    {
+      "id": "NIST-SP800-41R1",
+      "title": "Guidelines on Firewalls and Firewall Policy",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_primary_reference",
+      "url": "https://csrc.nist.gov/pubs/sp/800/41/r1/final",
+      "version": "SP 800-41 Rev. 1",
+      "published": "2009-09-28",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verified_scope": "Guía histórica de tecnologías, políticas, selección, configuración, pruebas, despliegue y gestión de firewalls.",
+      "domains": [
+        "network"
+      ],
+      "review_note": "Metadatos y abstract oficial inspeccionados; documento completo pendiente. Tratar como referencia fundacional de 2009, no como cobertura de arquitecturas modernas."
+    },
+    {
+      "id": "NIST-SP800-53R5",
+      "title": "Security and Privacy Controls for Information Systems and Organizations",
+      "publisher": "NIST",
+      "version": "SP 800-53 Rev. 5",
+      "published": "2020-09-23",
+      "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final",
+      "domains": [
+        "linux",
+        "data_security",
+        "secure_arch",
+        "governance",
+        "database_security",
+        "physical_security"
+      ],
+      "verification_status": "official_final_publication_page_reviewed",
+      "review_note": "Control catalog; tailor to system risk rather than checklist-only compliance."
+    },
+    {
+      "id": "NIST-SP800-57P1R5",
+      "title": "Recommendation for Key Management Part 1",
+      "publisher": "NIST",
+      "version": "SP 800-57 Part 1 Rev. 5",
+      "published": "2020-05",
+      "url": "https://doi.org/10.6028/NIST.SP.800-57pt1r5",
+      "domains": [
+        "crypto",
+        "pki_hsm",
+        "identity"
+      ],
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "review_note": "Revisar el documento completo, edición, erratas, licencia y alcance antes de usar como evidencia específica."
+    },
+    {
+      "id": "NIST-SP800-61R3",
+      "title": "Incident Response Recommendations and Considerations for Cybersecurity Risk Management: A CSF 2.0 Community Profile",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_final_publication",
+      "url": "https://csrc.nist.gov/pubs/sp/800/61/r3/final",
+      "version": "SP 800-61 Rev. 3",
+      "published": "2025-04-03",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verified_scope": "Integración de preparación, detección, respuesta y recuperación en la gestión de riesgo CSF 2.0.",
+      "domains": [
+        "incident_response",
+        "forensics",
+        "soc_siem",
+        "threat_intel",
+        "business_continuity"
+      ],
+      "review_note": "Metadatos y abstract oficiales inspeccionados; texto completo pendiente de lectura y extracción."
+    },
+    {
+      "id": "NIST-SP800-63-4",
+      "title": "Digital Identity Guidelines",
+      "publisher": "NIST",
+      "version": "SP 800-63-4",
+      "published": "2025-07-31",
+      "url": "https://doi.org/10.6028/NIST.SP.800-63-4",
+      "domains": [
+        "identity",
+        "governance"
+      ],
+      "verification_status": "official_final_publication_page_reviewed",
+      "review_note": "Supersedes SP 800-63-3; use A/B/C companion volumes and implementation hub."
+    },
+    {
+      "id": "NIST-SP800-63B-4",
+      "title": "Digital Identity Guidelines: Authentication and Authenticator Management",
+      "publisher": "NIST",
+      "version": "SP 800-63B-4",
+      "published": "2025-07-31",
+      "url": "https://doi.org/10.6028/NIST.SP.800-63b-4",
+      "domains": [
+        "identity"
+      ],
+      "verification_status": "official_final_publication_page_reviewed",
+      "review_note": "Authenticator assurance and lifecycle requirements; map to local risk and regulatory context."
+    },
+    {
+      "id": "NIST-SP800-82R3",
+      "title": "Guide to Operational Technology (OT) Security",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_final_publication",
+      "url": "https://csrc.nist.gov/pubs/sp/800/82/r3/final",
+      "version": "SP 800-82 Rev. 3",
+      "published": "2023-09",
+      "verification_status": "official_document_metadata_and_excerpt_reviewed",
+      "verified_scope": "Seguridad de OT/ICS, arquitectura, riesgos, controles, monitorización y respuesta.",
+      "domains": [
+        "ot_ics",
+        "automotive_security",
+        "telecom_5g",
+        "satellite_security"
+      ],
+      "review_note": "Metadatos y extracto oficial inspeccionados; lectura integral y validación por sector pendientes."
+    },
+    {
+      "id": "NIST-SP800-82R4-IPD",
+      "title": "Guide to OT Security Initial Public Draft",
+      "publisher": "NIST",
+      "version": "SP 800-82 Rev. 4 IPD",
+      "published": "2026-09-21",
+      "url": "https://csrc.nist.gov/pubs/sp/800/82/r4/ipd",
+      "domains": [
+        "ot_ics",
+        "iot_hardware",
+        "physical_security"
+      ],
+      "verification_status": "official_draft_reviewed_not_final",
+      "review_note": "Revisar el documento completo, edición, erratas, licencia y alcance antes de usar como evidencia específica."
+    },
+    {
+      "id": "NIST-SP800-83R1",
+      "title": "Guide to Malware Incident Prevention and Handling for Desktops and Laptops",
+      "publisher": "NIST",
+      "version": "SP 800-83 Rev. 1",
+      "published": "2013-07-22",
+      "url": "https://doi.org/10.6028/NIST.SP.800-83r1",
+      "domains": [
+        "malware",
+        "incident_response",
+        "edr_xdr"
+      ],
+      "verification_status": "official_final_metadata_and_abstract_reviewed",
+      "review_note": "Older guide; complement with current platform advisories and modern malware analysis practices."
+    },
+    {
+      "id": "NIST-SP800-86",
+      "title": "Guide to Integrating Forensic Techniques into Incident Response",
+      "publisher": "NIST",
+      "version": "SP 800-86",
+      "published": "2006-09-01",
+      "url": "https://doi.org/10.6028/NIST.SP.800-86",
+      "domains": [
+        "forensics",
+        "incident_response",
+        "cloud_forensics",
+        "reverse"
+      ],
+      "verification_status": "official_final_metadata_and_abstract_reviewed",
+      "review_note": "Older foundational guidance, not an all-inclusive forensic manual or legal advice."
+    },
+    {
+      "id": "NIST-SP800-94",
+      "title": "Guide to Intrusion Detection and Prevention Systems (IDPS)",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_primary_reference",
+      "url": "https://csrc.nist.gov/pubs/sp/800/94/final",
+      "version": "SP 800-94",
+      "published": "2007-02-20",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verified_scope": "Guía histórica para diseño, implementación, configuración, operación y mantenimiento de IDPS de red, inalámbricos, host y análisis de comportamiento.",
+      "domains": [
+        "network",
+        "soc_siem",
+        "edr_xdr"
+      ],
+      "review_note": "Metadatos y abstract oficial inspeccionados; documento completo pendiente. NIST señala que el borrador Rev. 1 de 2012 fue retirado y nunca finalizado."
+    },
+    {
+      "id": "NISTIR-8062",
+      "title": "An Introduction to Privacy Engineering and Risk Management in Federal Systems",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "official_interagency_internal_report",
+      "url": "https://doi.org/10.6028/NIST.IR.8062",
+      "version": "NISTIR 8062",
+      "published": "2017-01",
+      "verification_status": "selected_sections_reviewed",
+      "verified_scope": "PDF oficial de 49 páginas; inspección dirigida del abstract, Executive Summary, §2.1, §3.1 (objetivos predictability/manageability/disassociability), §3.2 y §3.2.2 (acciones de datos, PII y contexto). No lectura integral de todas las secciones ni revisión completa de referencias.",
+      "domains": [
+        "foundations",
+        "privacy_engineering",
+        "data_security"
+      ],
+      "review_date": "2026-11-19",
+      "sections_reviewed": [
+        "Executive Summary: diferencia seguridad de la información/privacidad y riesgos para individuos más allá del acceso no autorizado",
+        "§2.1: relación y distinción entre seguridad y privacidad",
+        "§3.1.1: objetivos de ingeniería de privacidad",
+        "§3.2 y §3.2.2: acciones problemáticas de datos, factores de riesgo y contexto"
+      ],
+      "review_note": "El informe aporta un modelo técnico-conceptual de privacidad para sistemas federales de EE. UU.; no es norma legal colombiana. Revisión selectiva de texto primario, no lectura integral."
+    },
+    {
+      "id": "NISTIR-8259-CATALOG",
+      "title": "IoT Device Cybersecurity Capabilities Catalog",
+      "publisher": "NIST",
+      "version": "Current catalog",
+      "url": "https://pages.nist.gov/IoT-Device-Cybersecurity-Requirement-Catalogs/",
+      "domains": [
+        "iot_hardware",
+        "hardware_security"
+      ],
+      "verification_status": "official_catalog_page_reviewed",
+      "review_note": "Detailed capability statements refine NISTIR 8259A/B; snapshot version for reproducible mappings."
+    },
+    {
+      "id": "NISTIR-8259-R1",
+      "title": "Foundational Activities for IoT Product Manufacturers",
+      "publisher": "NIST",
+      "version": "NISTIR 8259 Rev. 1",
+      "published": "2026-04-09",
+      "url": "https://www.nist.gov/itl/applied-cybersecurity/nist-cybersecurity-iot-program/nistir-8259-series",
+      "domains": [
+        "iot_hardware",
+        "hardware_security"
+      ],
+      "verification_status": "official_series_page_reviewed",
+      "review_note": "2026 revision; obtain and review full publication before deriving requirements."
+    },
+    {
+      "id": "NISTIR-8259A",
+      "title": "IoT Device Cybersecurity Capability Core Baseline",
+      "publisher": "NIST",
+      "version": "NISTIR 8259A",
+      "published": "2020-05-29",
+      "url": "https://doi.org/10.6028/NIST.IR.8259A",
+      "domains": [
+        "iot_hardware",
+        "hardware_security"
+      ],
+      "verification_status": "official_final_metadata_and_abstract_reviewed",
+      "review_note": "Seven core device capabilities; complement with manufacturer lifecycle and supporting capabilities."
+    },
+    {
+      "id": "NISTIR-8259B",
+      "title": "IoT Non-Technical Supporting Capability Core Baseline",
+      "publisher": "NIST",
+      "version": "NISTIR 8259B",
+      "published": "2021-08-25",
+      "url": "https://doi.org/10.6028/NIST.IR.8259B",
+      "domains": [
+        "iot_hardware",
+        "hardware_security",
+        "governance"
+      ],
+      "verification_status": "official_final_reference_registered",
+      "review_note": "Manufacturer/third-party supporting capabilities, not only device-side controls."
+    },
+    {
+      "id": "NSA-CISA-K8S-HARDENING",
+      "title": "Kubernetes Hardening Guidance",
+      "publisher": "NSA/CISA",
+      "version": "Current guidance",
+      "url": "https://www.cisa.gov/resources-tools/resources/kubernetes-hardening-guidance",
+      "domains": [
+        "containers",
+        "cloud"
+      ],
+      "verification_status": "official_guidance_reference_registered",
+      "review_note": "Validate revision date and cluster version applicability before operational use."
+    },
+    {
+      "id": "NSA-ZT-NETWORK-2024",
+      "title": "Advancing Zero Trust Maturity Throughout the Network and Environment Pillar",
+      "publisher": "National Security Agency",
+      "type": "official_cybersecurity_information_sheet",
+      "url": "https://media.defense.gov/2024/Mar/05/2003405462/-1/-1/0/CSI-ZERO-TRUST-NETWORK-ENVIRONMENT-PILLAR.PDF",
+      "version": "1.0",
+      "published": "2024-03-05",
+      "verification_status": "official_document_metadata_and_summary_reviewed",
+      "verified_scope": "Madurez Zero Trust de red/entorno, segmentación, aislamiento, mapeo de flujos y contención de movimiento lateral.",
+      "domains": [
+        "network",
+        "secure_arch",
+        "identity"
+      ],
+      "review_note": "Resumen y metadatos oficiales inspeccionados; lectura completa y aplicación experimental pendientes."
+    },
+    {
+      "id": "OPENAPI-OAS-3.2.1",
+      "title": "OpenAPI Specification",
+      "publisher": "OpenAPI Initiative",
+      "type": "open_api_contract_specification",
+      "url": "https://spec.openapis.org/oas/v3.2.1.html",
+      "version": "3.2.1",
+      "published": "2026-11",
+      "verification_status": "official_specification_pages_reviewed",
+      "verified_scope": "Especificación oficial OpenAPI; catálogo oficial lista versiones 3.2.1/3.2.0 y advierte que los esquemas no capturan necesariamente todas las violaciones del texto normativo.",
+      "domains": [
+        "api",
+        "appsec",
+        "devsecops"
+      ],
+      "review_note": "Índice oficial de versiones inspeccionado el 2026-11-19; no se declara lectura integral de la especificación 3.2.1."
+    },
+    {
+      "id": "OWASP-AGENTIC-TOP10-2026",
+      "title": "OWASP Top 10 for Agentic Applications 2026",
+      "publisher": "OWASP GenAI Security Project",
+      "type": "community_agentic_security_guidance",
+      "url": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+      "version": "2026",
+      "published": "2025-12-09",
+      "verification_status": "official_resource_page_reviewed",
+      "verified_scope": "Riesgos de sistemas autónomos/agénticos y guía práctica para identificar y reducirlos.",
+      "domains": [
+        "ai_red_team",
+        "ai_security"
+      ],
+      "review_date": "2026-11-19",
+      "review_note": "Página oficial y propósito inspeccionados. Requiere revisar entradas, amenazas, mitigaciones y referencias de la publicación."
+    },
+    {
+      "id": "OWASP-API-TOP10",
+      "title": "OWASP API Security Top 10",
+      "publisher": "OWASP",
+      "version": "Current project",
+      "published": null,
+      "url": "https://api-security.owasp.org/",
+      "domains": [
+        "api",
+        "appsec"
+      ],
+      "verification_status": "official_project_scope_reviewed",
+      "review_note": "Revisar el documento completo, edición, erratas, licencia y alcance antes de usar como evidencia específica."
     },
     {
       "id": "OWASP-API-TOP10-2023",
@@ -519,13 +2362,166 @@
       "url": "https://asvs.owasp.org/",
       "version": "5.0.0",
       "published": "2025-05-30",
-      "verification_status": "official_project_page_reviewed",
+      "verification_status": "official_version_metadata_reviewed",
       "verified_scope": "Objetivos, versión estable y forma de uso del estándar de verificación de aplicaciones web.",
       "domains": [
         "appsec",
         "api"
       ],
-      "review_note": "Página oficial de proyecto y metadatos de release revisados; no se declara lectura integral del estándar."
+      "review_note": "Official ASVS overview confirms stable release 5.0.0 published 2025-05-30 and downloadable PDF/DOCX/CSV. This verifies release metadata and intended scope, not complete requirement-by-requirement review.",
+      "sections_reviewed": [
+        "Official overview, stable version and downloads page"
+      ],
+      "review_date": "2026-11-19"
+    },
+    {
+      "id": "OWASP-AUTOMATED-THREATS",
+      "title": "Automated Threats to Web Applications",
+      "publisher": "OWASP",
+      "version": "Current project handbook",
+      "url": "https://owasp.org/www-project-automated-threats-to-web-applications/",
+      "domains": [
+        "fraud_abuse",
+        "api",
+        "appsec"
+      ],
+      "verification_status": "official_project_taxonomy_reviewed",
+      "review_note": "Covers misuse of valid functionality and automated abuse, not only software vulnerabilities."
+    },
+    {
+      "id": "OWASP-DATABASE-CHEAT",
+      "title": "Database Security Cheat Sheet",
+      "publisher": "OWASP",
+      "version": "Current project guidance",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Database_Security_Cheat_Sheet.html",
+      "domains": [
+        "database_security"
+      ],
+      "verification_status": "official_cheat_sheet_reviewed",
+      "review_note": "Relational database security guidance; supplement with engine-specific docs and NoSQL controls."
+    },
+    {
+      "id": "OWASP-GENAI-LLM-TOP10-2026",
+      "title": "OWASP GenAI LLM Top 10 2026",
+      "publisher": "OWASP GenAI Security Project",
+      "type": "community_security_risk_guidance",
+      "url": "https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/",
+      "version": "2026",
+      "published": "2026-08-03",
+      "verification_status": "official_publication_page_reviewed",
+      "verified_scope": "Guía comunitaria de riesgos críticos de aplicaciones LLM; mapea a NIST, MITRE ATLAS, CWE y riesgos de agentes.",
+      "domains": [
+        "ai_red_team",
+        "ai_security",
+        "appsec"
+      ],
+      "review_date": "2026-11-19",
+      "review_note": "Página oficial de publicación revisada. Las diez entradas canónicas, referencias y mappings requieren lectura individual; no es certificación ni benchmark."
+    },
+    {
+      "id": "OWASP-LLM-TOP10",
+      "title": "OWASP Top 10 for LLM Applications",
+      "publisher": "OWASP",
+      "version": "2025 project material",
+      "published": "2025",
+      "url": "https://owasp.org/projects/top-10-for-large-language-model-applications",
+      "domains": [
+        "ai_security",
+        "ai_red_team",
+        "machine_learning"
+      ],
+      "verification_status": "official_risk_descriptions_reviewed",
+      "review_note": "Revisar el documento completo, edición, erratas, licencia y alcance antes de usar como evidencia específica."
+    },
+    {
+      "id": "OWASP-MAS",
+      "title": "OWASP Mobile Application Security (MAS)",
+      "publisher": "OWASP",
+      "version": "Current project",
+      "url": "https://owasp.org/projects/mobile-application-security/",
+      "domains": [
+        "mobile",
+        "api",
+        "privacy_engineering"
+      ],
+      "verification_status": "official_project_scope_reviewed",
+      "review_note": "Project includes MASVS, MASWE and MASTG; pin release versions for tests."
+    },
+    {
+      "id": "OWASP-SQLI-PREVENTION",
+      "title": "SQL Injection Prevention Cheat Sheet",
+      "publisher": "OWASP Foundation",
+      "type": "secure_coding_guidance",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html",
+      "version": "Current online series",
+      "verification_status": "official_project_page_reviewed",
+      "verified_scope": "Guía recomienda consultas parametrizadas, allowlists para identificadores estructurales y privilegio mínimo; explica límites de escaping manual.",
+      "domains": [
+        "appsec",
+        "api",
+        "database_security"
+      ],
+      "review_note": "Página oficial y recomendaciones primarias inspeccionadas el 2026-11-19; validar ejemplos por lenguaje/driver y no asumir equivalencia entre motores."
+    },
+    {
+      "id": "OWASP-THREAT-MODELING",
+      "title": "OWASP Threat Modeling Project",
+      "publisher": "OWASP",
+      "version": "Current project",
+      "url": "https://owasp.org/www-project-threat-modeling/",
+      "domains": [
+        "secure_arch",
+        "vulnerability_research"
+      ],
+      "verification_status": "official_project_page_reviewed",
+      "review_note": "Methodology resource; choose techniques for the specific system."
+    },
+    {
+      "id": "OWASP-VULN-DISCLOSURE",
+      "title": "Vulnerability Disclosure Cheat Sheet",
+      "publisher": "OWASP",
+      "version": "Current project guidance",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Vulnerability_Disclosure_Cheat_Sheet.html",
+      "domains": [
+        "bug_bounty",
+        "vulnerability_research"
+      ],
+      "verification_status": "official_cheat_sheet_reviewed",
+      "review_note": "Guidance for researchers and organizations; legal safe harbor requires local counsel."
+    },
+    {
+      "id": "OWASP-WSTG-4.2",
+      "title": "Web Security Testing Guide",
+      "publisher": "OWASP Foundation",
+      "type": "web_application_security_testing_guide",
+      "url": "https://owasp.org/www-project-web-security-testing-guide/v42/",
+      "version": "4.2",
+      "published": "2020-12-03",
+      "verification_status": "official_specification_pages_reviewed",
+      "verified_scope": "La guía oficial identifica WSTG 4.2 como release versionado y documenta categorías y escenarios de pruebas; WSTG 5.0 aparece en desarrollo.",
+      "domains": [
+        "appsec",
+        "api"
+      ],
+      "review_note": "Página oficial del proyecto y estado de versiones inspeccionados el 2026-11-19; no se declara lectura integral de todos los escenarios."
+    },
+    {
+      "id": "PROMPT-TO-API-CALL-INJECTION-2026",
+      "title": "Prompt-to-API-Call injection: Systematic attack generation and semantic defense in LLM agents",
+      "publisher": "Journal of Systems and Software / Elsevier",
+      "type": "peer_reviewed_journal_preprint_online",
+      "url": "https://doi.org/10.1016/j.jss.2026.113164",
+      "version": "Article 113164",
+      "published": "2026-10-27",
+      "verification_status": "metadata_and_abstract_reviewed",
+      "verified_scope": "Estudio sobre inyección hacia llamadas API, confused deputy, RBAC y generación sistemática de vectores según abstract.",
+      "domains": [
+        "ai_red_team",
+        "ai_security",
+        "api"
+      ],
+      "review_date": "2026-11-19",
+      "review_note": "Abstract y metadatos consultados; artículo completo, metodología, dataset y resultados deben revisarse antes de reutilizar cifras."
     },
     {
       "id": "RESEARCH-AI-RED-TEAM",
@@ -908,14 +2904,19 @@
       "publisher": "NIST",
       "type": "primary_or_authoritative_reference",
       "url": "https://www.nist.gov/privacy-framework",
-      "version": "Consultar edición vigente en el emisor",
-      "published": "Ver registro del emisor",
-      "verification_status": "official_reference_catalogued_not_content_reviewed",
-      "verified_scope": "Referencia y URL localizadas en el sitio del emisor; texto íntegro pendiente de revisión.",
+      "version": "Version 1.0",
+      "published": "2020-01-16",
+      "verification_status": "selected_sections_reviewed",
+      "verified_scope": "PF 1.0: consulta parcial de definiciones y objetivos de ingeniería. Para estado de desarrollo actual consultar también CSWP 40 IPD; no declarar lectura integral.",
       "domains": [
+        "foundations",
         "privacy_engineering"
       ],
-      "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
+      "review_note": "NIST Privacy Framework 1.0 (2020) es la versión final de referencia existente; NIST publicó después el CSWP 40 Privacy Framework 1.1 Initial Public Draft el 2025-04-14. La IPD no es final. La revisión 1.0 fue parcial; la 1.1 IPD se registra separadamente.",
+      "sections_reviewed": [
+        "NIST Privacy Framework Version 1.0: definiciones de Data Action/Data Processing, Predictability, Manageability y Disassociability; objetivos de privacidad; Privacy Risk y Privacy Risk Assessment (consulta parcial del texto oficial)."
+      ],
+      "review_date": "2026-11-19"
     },
     {
       "id": "RESEARCH-RED-TEAM",
@@ -1053,6 +3054,203 @@
       "review_note": "Referencia institucional localizada; no se declara lectura integral, vigencia exhaustiva ni verificación de cada requisito."
     },
     {
+      "id": "RFC-5869",
+      "title": "HMAC-based Extract-and-Expand Key Derivation Function (HKDF)",
+      "publisher": "Internet Engineering Task Force",
+      "type": "standards_track_rfc",
+      "url": "https://www.rfc-editor.org/rfc/rfc5869",
+      "version": "RFC 5869",
+      "published": "2010-05",
+      "verification_status": "official_rfc_metadata_reviewed",
+      "verified_scope": "KDF basada en HMAC con etapas Extract y Expand.",
+      "domains": [
+        "crypto"
+      ],
+      "review_note": "Metadatos oficiales del RFC revisados; lectura integral y pruebas de interoperabilidad pendientes."
+    },
+    {
+      "id": "RFC-6376",
+      "title": "DomainKeys Identified Mail (DKIM) Signatures",
+      "publisher": "IETF/RFC Editor",
+      "version": "RFC 6376",
+      "published": "2011-09",
+      "url": "https://www.rfc-editor.org/rfc/rfc6376.html",
+      "domains": [
+        "email_dns_security"
+      ],
+      "verification_status": "official_rfc_and_updates_reviewed",
+      "review_note": "Updated by RFC 8301, 8463, 8553 and 8616."
+    },
+    {
+      "id": "RFC-7208",
+      "title": "Sender Policy Framework (SPF)",
+      "publisher": "IETF/RFC Editor",
+      "version": "RFC 7208",
+      "published": "2014-04",
+      "url": "https://www.rfc-editor.org/rfc/rfc7208.html",
+      "domains": [
+        "email_dns_security"
+      ],
+      "verification_status": "official_rfc_and_updates_reviewed",
+      "review_note": "Review RFC 7372/8553/8616 updates and current deployment guidance."
+    },
+    {
+      "id": "RFC-8032",
+      "title": "Edwards-Curve Digital Signature Algorithm (EdDSA)",
+      "publisher": "Internet Engineering Task Force",
+      "type": "standards_track_rfc",
+      "url": "https://www.rfc-editor.org/rfc/rfc8032",
+      "version": "RFC 8032",
+      "published": "2017-01",
+      "verification_status": "official_rfc_metadata_reviewed",
+      "verified_scope": "EdDSA sobre curvas Edwards, incluyendo Ed25519 y Ed448.",
+      "domains": [
+        "crypto"
+      ],
+      "review_note": "Metadatos oficiales del RFC revisados; perfiles, validación de puntos y side channels requieren revisión de implementación."
+    },
+    {
+      "id": "RFC-8439",
+      "title": "ChaCha20 and Poly1305 for IETF Protocols",
+      "publisher": "Internet Engineering Task Force",
+      "type": "standards_track_rfc",
+      "url": "https://www.rfc-editor.org/rfc/rfc8439",
+      "version": "RFC 8439",
+      "published": "2018-06",
+      "verification_status": "official_rfc_metadata_reviewed",
+      "verified_scope": "Cifrado de flujo ChaCha20 y autenticador Poly1305 para construcción AEAD.",
+      "domains": [
+        "crypto"
+      ],
+      "review_note": "Metadatos oficiales del RFC revisados; lectura integral y verificación de vectores pendientes."
+    },
+    {
+      "id": "RFC-8446",
+      "title": "The Transport Layer Security (TLS) Protocol Version 1.3",
+      "publisher": "Internet Engineering Task Force",
+      "type": "standards_track_rfc",
+      "url": "https://www.rfc-editor.org/rfc/rfc8446",
+      "version": "RFC 8446",
+      "published": "2018-08",
+      "verification_status": "official_rfc_metadata_reviewed",
+      "verified_scope": "Protocolo TLS 1.3, handshake, autenticación y derivación de secretos.",
+      "domains": [
+        "crypto",
+        "network"
+      ],
+      "review_note": "Metadatos oficiales del RFC revisados; lectura integral, erratas y perfil de implementación pendientes."
+    },
+    {
+      "id": "RFC-9106",
+      "title": "Argon2 Memory-Hard Function for Password Hashing and Proof-of-Work Applications",
+      "publisher": "Internet Engineering Task Force",
+      "type": "informational_rfc",
+      "url": "https://www.rfc-editor.org/rfc/rfc9106",
+      "version": "RFC 9106",
+      "published": "2021-09",
+      "verification_status": "official_rfc_metadata_reviewed",
+      "verified_scope": "Función de derivación de contraseñas Argon2 y perfiles de parametrización.",
+      "domains": [
+        "crypto",
+        "identity"
+      ],
+      "review_note": "Metadatos oficiales del RFC revisados; parametrización debe medirse en el hardware y amenaza objetivo."
+    },
+    {
+      "id": "RFC-9180",
+      "title": "Hybrid Public Key Encryption",
+      "publisher": "Internet Engineering Task Force",
+      "type": "standards_track_rfc",
+      "url": "https://www.rfc-editor.org/rfc/rfc9180",
+      "version": "RFC 9180",
+      "published": "2022-02",
+      "verification_status": "official_rfc_metadata_reviewed",
+      "verified_scope": "Composición HPKE de KEM, KDF y AEAD con modos definidos.",
+      "domains": [
+        "crypto"
+      ],
+      "review_note": "Metadatos oficiales del RFC revisados; lectura integral y análisis de uso/protocolo pendientes."
+    },
+    {
+      "id": "RFC-9293",
+      "title": "Transmission Control Protocol",
+      "publisher": "IETF",
+      "version": "RFC 9293 / STD 7",
+      "published": "2022-08",
+      "url": "https://www.rfc-editor.org/rfc/rfc9293.html",
+      "domains": [
+        "network"
+      ],
+      "verification_status": "official_standards_track_document_reviewed",
+      "review_note": "Revisar el documento completo, edición, erratas, licencia y alcance antes de usar como evidencia específica."
+    },
+    {
+      "id": "RFC-9846",
+      "title": "The TLS Protocol Version 1.3",
+      "publisher": "IETF",
+      "version": "RFC 9846",
+      "published": "2026-07",
+      "url": "https://www.rfc-editor.org/rfc/rfc9846.html",
+      "domains": [
+        "network",
+        "crypto",
+        "identity",
+        "secure_arch"
+      ],
+      "verification_status": "official_standards_track_document_reviewed",
+      "review_note": "Revisar el documento completo, edición, erratas, licencia y alcance antes de usar como evidencia específica."
+    },
+    {
+      "id": "RFC-9989",
+      "title": "Domain-Based Message Authentication, Reporting, and Conformance (DMARC)",
+      "publisher": "IETF/RFC Editor",
+      "version": "RFC 9989",
+      "url": "https://www.rfc-editor.org/rfc/rfc9989.html",
+      "domains": [
+        "email_dns_security"
+      ],
+      "verification_status": "official_rfc_editor_status_reviewed",
+      "review_note": "New DMARC specification; RFC 7489 is obsolete."
+    },
+    {
+      "id": "RFC-9990",
+      "title": "DMARC Aggregate Reporting",
+      "publisher": "IETF/RFC Editor",
+      "version": "RFC 9990",
+      "url": "https://www.rfc-editor.org/rfc/rfc9990.html",
+      "domains": [
+        "email_dns_security"
+      ],
+      "verification_status": "official_rfc_editor_status_reviewed",
+      "review_note": "DMARC aggregate reporting specification; coordinate with RFC 9989."
+    },
+    {
+      "id": "RFC-9991",
+      "title": "DMARC Failure Reporting",
+      "publisher": "IETF/RFC Editor",
+      "version": "RFC 9991",
+      "url": "https://www.rfc-editor.org/rfc/rfc9991.html",
+      "domains": [
+        "email_dns_security"
+      ],
+      "verification_status": "official_rfc_editor_status_reviewed",
+      "review_note": "DMARC failure reporting specification; coordinate with RFC 9989."
+    },
+    {
+      "id": "SIGMA-SPEC",
+      "title": "Sigma Rule Specification",
+      "publisher": "SigmaHQ",
+      "version": "Current specification",
+      "url": "https://sigmahq.io/",
+      "domains": [
+        "soc_siem",
+        "threat_hunting",
+        "edr_xdr"
+      ],
+      "verification_status": "official_project_reference_registered",
+      "review_note": "Portable detection rule format; backend conversion and semantic equivalence require tests."
+    },
+    {
       "id": "SLSA-v1.1",
       "title": "Supply-chain Levels for Software Artifacts specification",
       "publisher": "OpenSSF",
@@ -1067,7 +3265,77 @@
         "software_engineering"
       ],
       "review_note": "Se revisaron páginas oficiales de especificación y provenance; no se afirma auditoría de un builder concreto."
+    },
+    {
+      "id": "SURICATA-DOCS",
+      "title": "Suricata User Guide",
+      "publisher": "OISF",
+      "version": "Current docs",
+      "url": "https://docs.suricata.io/",
+      "domains": [
+        "network",
+        "soc_siem",
+        "edr_xdr"
+      ],
+      "verification_status": "official_project_reference_registered",
+      "review_note": "IDS/IPS/NSM engine; test rule performance, false positives and version-specific features."
+    },
+    {
+      "id": "TANG-LLM-AGENT-SECURITY-SURVEY-2026",
+      "title": "Security of LLM-based agents regarding attacks, defenses, and applications: A comprehensive survey",
+      "publisher": "Information Fusion / Elsevier",
+      "type": "peer_reviewed_survey",
+      "url": "https://www.sciencedirect.com/science/article/pii/S1566253525010036",
+      "version": "Volume 127, Part C, Article 103941",
+      "published": "2026-03",
+      "verification_status": "metadata_and_abstract_reviewed",
+      "verified_scope": "Taxonomía de ataques/defensas de agentes LLM y criterios de evaluación según abstract editorial.",
+      "domains": [
+        "ai_red_team",
+        "ai_security"
+      ],
+      "review_date": "2026-11-19",
+      "review_note": "Metadatos y abstract consultados; el acceso al texto completo falló en esta revisión. No declarar full_text_reviewed."
+    },
+    {
+      "id": "UNECE-R155",
+      "title": "UN Regulation No. 155 — Cyber security and cybersecurity management systems",
+      "publisher": "UNECE/UN Treaty Collection",
+      "version": "UN R155",
+      "published": "2021-01-22",
+      "url": "https://treaties.un.org/Pages/ViewDetails.aspx?chapter=11&clang=_en&mtdsg_no=XI-B-16-155&src=TREATY",
+      "domains": [
+        "automotive_security"
+      ],
+      "verification_status": "official_treaty_status_page_reviewed",
+      "review_note": "Review current amendments, contracting parties and vehicle type approval requirements."
+    },
+    {
+      "id": "YARA-DOCS",
+      "title": "YARA Documentation",
+      "publisher": "VirusTotal",
+      "version": "Current documentation",
+      "url": "https://yara.readthedocs.io/",
+      "domains": [
+        "malware"
+      ],
+      "verification_status": "official_project_documentation_registered",
+      "review_note": "Pin version and test rules against benign and malicious corpora."
+    },
+    {
+      "id": "ZEEK-DOCS",
+      "title": "Zeek Documentation",
+      "publisher": "Zeek Project",
+      "version": "Current docs",
+      "url": "https://docs.zeek.org/",
+      "domains": [
+        "network",
+        "soc_siem",
+        "threat_hunting"
+      ],
+      "verification_status": "official_project_reference_registered",
+      "review_note": "Network security monitoring platform; record version, scripts and data model."
     }
   ],
-  "last_updated": "2026-11-17"
+  "last_updated": "2026-11-19"
 }
