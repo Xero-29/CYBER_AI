@@ -169,3 +169,27 @@ No se declaran fuentes verificadas por la mera inclusión de nombres o enlaces. 
 ## Madurez
 
 `draft_structured_not_expert_validated` — este documento organiza el trabajo de profundización; no acredita dominio experto, exactitud de todos los procedimientos ni validación operacional.
+
+
+## Actualización de desarrollo — 2026-11-20
+
+### Subtemas iniciales ampliados
+- FND-01.01: crosswalk de seguridad, safety, privacidad, confiabilidad, disponibilidad y resiliencia; modelos de riesgo, métricas, interacciones, límites de estándares y aplicabilidad colombiana condicionada.
+- FND-01.02: modelo CIA y propiedades extendidas; autenticidad, autorización, accountability, non-repudiation, provenance, freshness, privacy, safety, reliability y resilience.
+- Instrumentos en frío: FND-01.01 V2 y FND-01.02 V1 preparados, ninguno administrado.
+
+### Laboratorios sintéticos
+El runner contiene 12 laboratorios sintéticos. LAB-FND-08A a LAB-FND-12A amplían la cobertura:
+- LAB-FND-08A: conflicto fail-safe/fail-secure y salida de emergencia.
+- LAB-FND-09A: cifrado y control de acceso no equivalen a privacidad.
+- LAB-FND-10A: recuperar servicio no equivale a recuperar confianza.
+- LAB-FND-11A: dependencia común puede anular redundancia nominal.
+- LAB-FND-12A: firma/hash válidos no prueban verdad ni calibración.
+
+Los modelos se ejecutan en CI con datos sintéticos. No son pruebas físicas, certificación de safety ni validación operacional de un sistema real.
+
+### Skills candidatas
+Dos especificaciones se indexan desde knowledge/skills/candidates. No están activas ni registradas en skillbook. Requieren evidencia de ledger, ejecuciones repetidas y revisión independiente para promoción.
+
+### Madurez
+Solo dos de 102 subtemas tienen esta ampliación documental. L1–L12 continúan in_progress; 0 capas/capacidades aprobadas; T0/O0. La matriz de doce capas y el log de remediación identifican lo que sigue pendiente.

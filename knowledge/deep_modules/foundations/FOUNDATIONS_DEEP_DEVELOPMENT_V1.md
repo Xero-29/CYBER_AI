@@ -792,3 +792,48 @@ Los protocolos siguientes son diseños reproducibles para ejecución posterior. 
 ## Rúbrica transversal de salida por tema
 
 Puntuar cada criterio 0–2: 0 ausente/incorrecto; 1 parcial o no reproducible; 2 completo y respaldado. Criterios: (a) definiciones y alcance; (b) modelo y supuestos; (c) arquitectura/flujo; (d) estándares y versión; (e) procedimiento reproducible; (f) fallos y límites; (g) controles y riesgo residual; (h) hipótesis y validez; (i) dataset/ground truth; (j) métricas y baselines; (k) Skill con permisos/parada/rollback; (l) trazabilidad. Un puntaje documental no aprueba G5/G7/G8: esas puertas requieren ejecución, reproducción y revisión real. Un cero en seguridad, procedencia o trazabilidad bloquea la promoción del tema.
+
+
+## Laboratorios sintéticos adicionales — 2026-11-20
+
+### LAB-FND-08A — Conflicto safety/security
+
+- **Escenario:** controlador de acceso con fallo de energía durante una emergencia. El control electrónico mantiene ingress bloqueado (fail-secure), mientras un mecanismo mecánico independiente permite egress.
+- **Pregunta:** ¿se pueden satisfacer simultáneamente la protección frente a entrada no autorizada y la evacuación segura?
+- **Modelo:** estados de emergencia, bloqueo electrónico, salida mecánica independiente y condiciones de autorización.
+- **Aserción:** safety_egress_preserved y security_ingress_denied deben ser verdaderos. Un único estado fail-secure no es suficiente si impide salida.
+- **Límite:** modelo lógico sintético; no sustituye HAZOP/STPA, diseño de puertas ni certificación física.
+
+### LAB-FND-09A — Privacidad no es confidencialidad
+
+- **Escenario:** telemetría cifrada y con acceso restringido se reutiliza para una finalidad incompatible.
+- **Pregunta:** ¿puede fallar privacidad mientras confidencialidad permanece protegida?
+- **Modelo:** cifrado, control de acceso, finalidad, minimización, retención y compatibilidad de uso.
+- **Aserción:** confidentiality_protected y privacy_risk_detected pueden ser verdaderos al mismo tiempo; la mitigación exige finalidad compatible, minimización y retención limitada.
+- **Límite:** no determina base legal ni derechos; requiere análisis jurídico contextual.
+
+### LAB-FND-10A — Recuperación de confianza
+
+- **Escenario:** el servicio se restaura desde backup, pero credenciales del atacante siguen válidas.
+- **Pregunta:** ¿se recuperó disponibilidad, confianza o ambas?
+- **Modelo:** restauración, compromiso de credenciales, rotación, reconstrucción de identidad y procedencia del backup.
+- **Aserción:** service_available_after_restore puede ser verdadero mientras trust_restored_before_controls es falso.
+- **Límite:** no prueba recuperación real; exige restore test, rotación de secretos y verificación de estado en ambiente aislado.
+
+### LAB-FND-11A — Redundancia y causa común
+
+- **Escenario:** dos nodos independientes comparten el mismo proveedor de identidad.
+- **Pregunta:** ¿la redundancia nominal mantiene la misión cuando falla la dependencia común?
+- **Modelo:** nodos, dependencia compartida, fallo común y ruta independiente de recuperación.
+- **Aserción:** common_cause_detected debe ser verdadero; una ruta de recuperación independiente puede sostener servicio degradado.
+- **Límite:** la independencia real requiere análisis de proveedores, energía, red, identidad, DNS, administración y ubicación.
+
+### LAB-FND-12A — Integridad, autenticidad y verdad
+
+- **Escenario:** una lectura de sensor está firmada y su hash coincide, pero el sensor tiene calibración vencida.
+- **Pregunta:** ¿qué demuestra la firma y qué no demuestra?
+- **Modelo:** firma, hash, calibración, contraste con sensor independiente y validez semántica.
+- **Aserción:** integrity_and_authenticity puede ser verdadero mientras semantic_validity_before_review es falso.
+- **Límite:** la validez física exige calibración, metrología y evidencia del proceso de medición.
+
+Los cinco laboratorios se ejecutan como modelos deterministas en CI. Los resultados sintéticos no acreditan O1 de un sistema real, ni sustituyen ensayos físicos, evaluación de safety o revisión independiente.
