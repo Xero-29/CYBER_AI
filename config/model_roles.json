@@ -288,6 +288,47 @@
         "buscar experiencias",
         "recuerdo de investigaciones"
       ]
+    },
+    "INVESTIGADOR": {
+      "id": "investigador",
+      "model": "qwen3.5:0.8b",
+      "type": "research",
+      "description": "Investigador autónomo ligero para cerrar brechas de conocimiento de la IA principal",
+      "capabilities": [
+        "gap_focused_research",
+        "prerequisite_analysis",
+        "source_assessment",
+        "technical_explanation",
+        "research_synthesis"
+      ],
+      "instructions": "Investiga únicamente las brechas recibidas. Ordena el trabajo por prerrequisitos. Distingue hechos, inferencias e hipótesis. No inventes fuentes, DOI, URLs, citas ni resultados. Si no tienes acceso a búsqueda externa o una fuente no puede verificarse, declara la limitación y no simules haberla consultado. Prioriza fuentes primarias, estándares y documentación oficial. Devuelve un informe trazable con fundamentos, explicación técnica, metodología, ejemplos, límites, contradicciones y preguntas abiertas.",
+      "parameters": {
+        "num_ctx": 4096,
+        "num_predict": 1400,
+        "temperature": 0.2
+      },
+      "memory": {
+        "enabled": true,
+        "namespace": "investigador"
+      },
+      "permissions": {
+        "tools": [
+          "memory_search",
+          "read_reports"
+        ],
+        "require_confirmation": [
+          "file_changes",
+          "code_execution",
+          "security_testing"
+        ]
+      },
+      "enabled": true,
+      "think": false,
+      "routing_keywords": [
+        "investigación autónoma",
+        "brecha de conocimiento",
+        "investigador"
+      ]
     }
   },
   "default_provider": "ollama",
@@ -324,5 +365,12 @@
       "embedding_model": "",
       "models": {}
     }
+  },
+  "metacognition": {
+    "enabled": true,
+    "researcher_agent": "INVESTIGADOR",
+    "verifier_agent": "VERITAS",
+    "max_rounds": 2,
+    "policy": "research_then_independent_verification"
   }
 }
