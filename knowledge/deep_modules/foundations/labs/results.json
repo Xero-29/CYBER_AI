@@ -12,7 +12,12 @@
     "timeline_ordered": true,
     "audit_chain_tamper_detected": true,
     "audit_chain_reordering_detected": true,
-    "assurance_stale_evidence_rejected": true
+    "assurance_stale_evidence_rejected": true,
+    "safety_security_tradeoff_preserved": true,
+    "privacy_not_confidentiality": true,
+    "recovery_requires_trust_rebuild": true,
+    "common_cause_redundancy_detected": true,
+    "integrity_not_truth": true
   },
   "all_checks_passed": true,
   "labs": {
@@ -113,6 +118,38 @@
         "C1"
       ],
       "as_of": "2026-11-19"
+    },
+    "LAB-FND-08A": {
+      "emergency": true,
+      "safety_egress_preserved": true,
+      "security_ingress_denied": true,
+      "joint_requirement_met": true,
+      "warning": "A synthetic state model is not a hazard analysis, certification or physical test."
+    },
+    "LAB-FND-09A": {
+      "confidentiality_protected": true,
+      "privacy_risk_detected": true,
+      "privacy_risk_mitigated_after_design_change": true,
+      "warning": "The model is illustrative; legal basis and individual rights require context-specific review."
+    },
+    "LAB-FND-10A": {
+      "service_available_after_restore": true,
+      "trust_restored_before_controls": false,
+      "trust_restored_after_controls": true,
+      "warning": "A synthetic decision model does not prove recovery of a real environment."
+    },
+    "LAB-FND-11A": {
+      "redundant_nodes": 2,
+      "common_cause_detected": true,
+      "independent_recovery_path": true,
+      "degraded_service_available": true,
+      "warning": "Independence must be evidenced; naming two nodes does not establish redundancy."
+    },
+    "LAB-FND-12A": {
+      "integrity_and_authenticity": true,
+      "semantic_validity_before_review": false,
+      "semantic_validity_after_calibration_and_crosscheck": true,
+      "warning": "Cryptographic integrity does not establish truth, calibration or physical correctness."
     }
   }
 }

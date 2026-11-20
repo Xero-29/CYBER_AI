@@ -250,11 +250,95 @@ def lab07_assurance():
       "false_closures_prevented":len(rejected),"coverage":round(len(closed)/len(controls),4),
       "as_of":as_of}
 
+
+
+def lab08_safety_security_tradeoff():
+    """Synthetic emergency-exit model; not a certified safety controller."""
+    emergency = True
+    electronic_ingress_locked = True  # fail-secure against unauthorized entry
+    independent_mechanical_egress = True  # egress remains possible without controller power
+    safety_egress_preserved = emergency and independent_mechanical_egress
+    security_ingress_denied = emergency and electronic_ingress_locked
+    return {
+        "emergency": emergency,
+        "safety_egress_preserved": safety_egress_preserved,
+        "security_ingress_denied": security_ingress_denied,
+        "joint_requirement_met": safety_egress_preserved and security_ingress_denied,
+        "warning": "A synthetic state model is not a hazard analysis, certification or physical test.",
+    }
+
+def lab09_privacy_confidentiality_gap():
+    """Shows that encrypted, access-controlled data can still be misused."""
+    encrypted_at_rest = True
+    access_controlled = True
+    secondary_use_without_compatible_purpose = True
+    confidentiality_protected = encrypted_at_rest and access_controlled
+    privacy_risk = secondary_use_without_compatible_purpose
+    minimised = True
+    purpose_bound = True
+    retention_limited = True
+    mitigated_privacy_risk = not (secondary_use_without_compatible_purpose and not (minimised and purpose_bound and retention_limited))
+    return {
+        "confidentiality_protected": confidentiality_protected,
+        "privacy_risk_detected": privacy_risk,
+        "privacy_risk_mitigated_after_design_change": mitigated_privacy_risk,
+        "warning": "The model is illustrative; legal basis and individual rights require context-specific review.",
+    }
+
+def lab10_resilience_recovery_trust():
+    """Distinguishes service restoration from restoration of a trustworthy state."""
+    service_restored_from_backup = True
+    attacker_credentials_still_valid = True
+    trust_restored_initially = service_restored_from_backup and not attacker_credentials_still_valid
+    credential_rotation = True
+    identity_rebuild = True
+    backup_provenance_verified = True
+    recovery_validation = credential_rotation and identity_rebuild and backup_provenance_verified
+    trust_restored_after_controls = recovery_validation
+    return {
+        "service_available_after_restore": service_restored_from_backup,
+        "trust_restored_before_controls": trust_restored_initially,
+        "trust_restored_after_controls": trust_restored_after_controls,
+        "warning": "A synthetic decision model does not prove recovery of a real environment.",
+    }
+
+def lab11_common_cause_redundancy():
+    """Detects two nominally redundant nodes sharing a critical identity dependency."""
+    nodes = ["node-a", "node-b"]
+    shared_identity_provider = True
+    shared_provider_failure = True
+    both_unavailable = shared_identity_provider and shared_provider_failure
+    independent_breakglass_path = True
+    degraded_service_available = both_unavailable and independent_breakglass_path
+    return {
+        "redundant_nodes": len(nodes),
+        "common_cause_detected": both_unavailable,
+        "independent_recovery_path": independent_breakglass_path,
+        "degraded_service_available": degraded_service_available,
+        "warning": "Independence must be evidenced; naming two nodes does not establish redundancy.",
+    }
+
+def lab12_integrity_vs_truth():
+    """Shows that an authentic, unmodified sensor record may still be wrong."""
+    signature_valid = True
+    hash_valid = True
+    calibration_current = False
+    independent_sensor_agrees = False
+    integrity_and_authenticity = signature_valid and hash_valid
+    semantic_validity = calibration_current and independent_sensor_agrees
+    after_calibration_and_crosscheck = True
+    return {
+        "integrity_and_authenticity": integrity_and_authenticity,
+        "semantic_validity_before_review": semantic_validity,
+        "semantic_validity_after_calibration_and_crosscheck": after_calibration_and_crosscheck,
+        "warning": "Cryptographic integrity does not establish truth, calibration or physical correctness.",
+    }
+
 def run_all():
     labs={"LAB-FND-01A":lab01_authorization(),"LAB-FND-02A":lab02_asset_reconciliation(),
       "LAB-FND-03A":lab03_threat_model(),"LAB-FND-04A":lab04_identity(),
       "LAB-FND-05A":lab05_crypto_integrity(),"LAB-FND-06A":lab06_event_reconstruction(),
-      "LAB-FND-07A":lab07_assurance()}
+      "LAB-FND-07A":lab07_assurance(),"LAB-FND-08A":lab08_safety_security_tradeoff(),\n      "LAB-FND-09A":lab09_privacy_confidentiality_gap(),"LAB-FND-10A":lab10_resilience_recovery_trust(),\n      "LAB-FND-11A":lab11_common_cause_redundancy(),"LAB-FND-12A":lab12_integrity_vs_truth()}
     checks={"authz_revocation":labs["LAB-FND-01A"]["revoked_access_denied"],
       "asset_stable_id_beats_hostname":labs["LAB-FND-02A"]["stable_resource_id"]["f1"]>=labs["LAB-FND-02A"]["hostname_baseline"]["f1"],
       "threat_paths_represented":labs["LAB-FND-03A"]["paths_found"]==labs["LAB-FND-03A"]["required_paths"],
@@ -264,7 +348,7 @@ def run_all():
       "timeline_ordered":labs["LAB-FND-06A"]["chronological"],
       "audit_chain_tamper_detected":labs["LAB-FND-06A"]["tampering_detected"],
       "audit_chain_reordering_detected":labs["LAB-FND-06A"]["reordering_detected"],
-      "assurance_stale_evidence_rejected":"C2" in labs["LAB-FND-07A"]["unsubstantiated_not_closed"]}
+      "assurance_stale_evidence_rejected":"C2" in labs["LAB-FND-07A"]["unsubstantiated_not_closed"],\n      "safety_security_tradeoff_preserved":labs["LAB-FND-08A"]["joint_requirement_met"],\n      "privacy_not_confidentiality":labs["LAB-FND-09A"]["confidentiality_protected"] and labs["LAB-FND-09A"]["privacy_risk_detected"],\n      "recovery_requires_trust_rebuild":not labs["LAB-FND-10A"]["trust_restored_before_controls"] and labs["LAB-FND-10A"]["trust_restored_after_controls"],\n      "common_cause_redundancy_detected":labs["LAB-FND-11A"]["common_cause_detected"],\n      "integrity_not_truth":labs["LAB-FND-12A"]["integrity_and_authenticity"] and not labs["LAB-FND-12A"]["semantic_validity_before_review"]}
     return {"schema_version":"1.0.0","seed":20261119,"synthetic_only":True,
             "checks":checks,"all_checks_passed":all(checks.values()),"labs":labs}
 
