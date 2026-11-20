@@ -220,6 +220,48 @@ class KnowledgeBootstrapTests(unittest.TestCase):
             self.assertEqual(by_kind["skill_candidate"]["topic_id"], "skills")
             self.assertEqual(by_kind["skill_candidate"]["area_id"], "x")
 
+    def test_loads_compendia_agendas_literature_and_supplemental_documents(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            _, manifest = self._setup(root)
+            data = json.loads(manifest.read_text(encoding="utf-8"))
+            for field, name in [
+                ("technical_compendium_path", "TECHNICAL_COMPENDIUM.md"),
+                ("research_agenda_path", "RESEARCH_AGENDA.md"),
+                ("literature_review_path", "LITERATURE_REVIEW.md"),
+            ]:
+                path = root / "knowledge/deep_modules/x" / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text("# " + name, encoding="utf-8")
+                data["areas"][0][field] = path.relative_to(root).as_posix()
+            supplemental = root / "knowledge/research/EXTRA.md"
+            supplemental.parent.mkdir(parents=True, exist_ok=True)
+            supplemental.write_text("# Extra", encoding="utf-8")
+            data["supplemental_documents"] = [{
+                "id": "EXTRA-1", "area_id": "x", "name": "Extra",
+                "path": supplemental.relative_to(root).as_posix(),
+                "topic_id": "research", "subtopic_id": "extra",
+            }]
+            manifest.write_text(json.dumps(data), encoding="utf-8")
+            with patch.object(bootstrap, "PROJECT", root), patch.object(bootstrap, "MANIFEST", manifest):
+                result = bootstrap.bootstrap(dry_run=True)
+            self.assertEqual(result["selected"], 5)
+            kinds = {item["document_kind"] for item in result["items"]}
+            self.assertEqual(kinds, {"pack", "technical_compendium", "research_agenda", "literature_review", "supplemental_document"})
+
+    def test_rejects_unsafe_supplemental_document_path(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            _, manifest = self._setup(root)
+            data = json.loads(manifest.read_text(encoding="utf-8"))
+            data["supplemental_documents"] = [{
+                "id": "EXTRA-1", "area_id": "x", "path": "../outside.md"
+            }]
+            manifest.write_text(json.dumps(data), encoding="utf-8")
+            with patch.object(bootstrap, "PROJECT", root), patch.object(bootstrap, "MANIFEST", manifest):
+                with self.assertRaisesRegex(ValueError, "Ruta no permitida"):
+                    bootstrap.load_packs()
+
     def test_rejects_unsafe_deep_sections_path(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)

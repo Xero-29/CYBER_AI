@@ -83,6 +83,9 @@ def load_packs(area_id=None):
         area_name = item.get("name", item["id"])
         candidates = [
             ("pack", item.get("path"), area_name, "baseline", "methodology"),
+            ("technical_compendium", item.get("technical_compendium_path"), f"{area_name} — compendio técnico", "technical", "compendium"),
+            ("research_agenda", item.get("research_agenda_path"), f"{area_name} — agenda de investigación", "research", "agenda"),
+            ("literature_review", item.get("literature_review_path"), f"{area_name} — revisión bibliográfica", "research", "literature_review"),
             ("deep_sections", item.get("deep_sections_path"),
              f"{area_name} — desarrollo profundo", "research", "deep_sections"),
             ("research_study", item.get("research_study_path"),
@@ -118,6 +121,30 @@ def load_packs(area_id=None):
             "relative": skill.get("path"), "title": skill.get("name", skill_id),
             "topic_id": skill.get("topic_id", "skills"),
             "subtopic_id": skill.get("subtopic_id", "candidate_spec"),
+        })
+
+    supplemental_documents = data.get("supplemental_documents", [])
+    if not isinstance(supplemental_documents, list):
+        raise ValueError("supplemental_documents debe ser una lista.")
+    supplemental_ids = set()
+    for document in supplemental_documents:
+        if not isinstance(document, dict):
+            raise ValueError("Cada documento suplementario debe ser un objeto.")
+        document_id = document.get("id")
+        document_area = document.get("area_id", "foundations")
+        if not isinstance(document_id, str) or not document_id.strip() or document_id in supplemental_ids:
+            raise ValueError("ID de documento suplementario inválido o duplicado.")
+        supplemental_ids.add(document_id)
+        if document_area not in ids:
+            raise ValueError(f"Área inválida para documento suplementario: {document_area}")
+        if area_id and document_area != area_id:
+            continue
+        documents.append({
+            "id": document_id, "area_id": document_area,
+            "kind": "supplemental_document", "relative": document.get("path"),
+            "title": document.get("name", document_id),
+            "topic_id": document.get("topic_id", "supplemental"),
+            "subtopic_id": document.get("subtopic_id", "reference"),
         })
 
     packs = []
@@ -159,6 +186,10 @@ def _bootstrap_locked(packs, dry_run=False):
         "pack": "knowledge_pack",
         "deep_sections": "knowledge_deep_sections",
         "research_study": "knowledge_research_study",
+        "technical_compendium": "knowledge_technical_compendium",
+        "research_agenda": "knowledge_research_agenda",
+        "literature_review": "knowledge_literature_review",
+        "supplemental_document": "knowledge_supplemental_document",
         "skill_candidate": "knowledge_skill_candidate",
     }
     ingested, skipped, failed = [], [], []

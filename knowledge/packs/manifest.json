@@ -30,7 +30,10 @@
       "validation_status": "not_expert_validated",
       "maturity_note": "Foundations tiene dossier técnico y evaluación de FND-01.01/FND-01.02 en borrador. La matriz granular cubre 102 subtemas y 1.224 capas; solo 24 capas están en progreso, 1.200 no evaluadas, cero aprobadas y todos los subtemas T0/O0. No equivale a cierre experto.",
       "research_study_path": "knowledge/deep_modules/foundations/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/foundations/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/foundations/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/foundations/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/foundations/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/foundations/LITERATURE_REVIEW.md"
     },
     {
       "id": "appsec",
@@ -58,7 +61,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/appsec/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/appsec/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/appsec/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/appsec/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/appsec/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/appsec/LITERATURE_REVIEW.md"
     },
     {
       "id": "api",
@@ -86,7 +92,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/api/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/api/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/api/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/api/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/api/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/api/LITERATURE_REVIEW.md"
     },
     {
       "id": "network",
@@ -114,7 +123,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/network/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/network/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/network/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/network/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/network/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/network/LITERATURE_REVIEW.md"
     },
     {
       "id": "linux",
@@ -142,7 +154,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/linux/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/linux/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/linux/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/linux/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/linux/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/linux/LITERATURE_REVIEW.md"
     },
     {
       "id": "windows_ad",
@@ -170,7 +185,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/windows_ad/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/windows_ad/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/windows_ad/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/windows_ad/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/windows_ad/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/windows_ad/LITERATURE_REVIEW.md"
     },
     {
       "id": "cloud",
@@ -198,7 +216,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/cloud/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/cloud/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/cloud/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/cloud/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/cloud/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/cloud/LITERATURE_REVIEW.md"
     },
     {
       "id": "containers",
@@ -226,7 +247,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/containers/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/containers/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/containers/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/containers/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/containers/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/containers/LITERATURE_REVIEW.md"
     },
     {
       "id": "mobile",
@@ -254,7 +278,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/mobile/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/mobile/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/mobile/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/mobile/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/mobile/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/mobile/LITERATURE_REVIEW.md"
     },
     {
       "id": "crypto",
@@ -282,7 +309,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/crypto/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/crypto/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/crypto/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/crypto/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/crypto/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/crypto/LITERATURE_REVIEW.md"
     },
     {
       "id": "identity",
@@ -310,7 +340,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/identity/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/identity/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/identity/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/identity/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/identity/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/identity/LITERATURE_REVIEW.md"
     },
     {
       "id": "malware",
@@ -338,7 +371,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/malware/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/malware/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/malware/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/malware/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/malware/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/malware/LITERATURE_REVIEW.md"
     },
     {
       "id": "forensics",
@@ -366,7 +402,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/forensics/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/forensics/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/forensics/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/forensics/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/forensics/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/forensics/LITERATURE_REVIEW.md"
     },
     {
       "id": "incident_response",
@@ -394,7 +433,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/incident_response/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/incident_response/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/incident_response/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/incident_response/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/incident_response/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/incident_response/LITERATURE_REVIEW.md"
     },
     {
       "id": "threat_intel",
@@ -422,7 +464,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/threat_intel/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/threat_intel/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/threat_intel/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/threat_intel/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/threat_intel/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/threat_intel/LITERATURE_REVIEW.md"
     },
     {
       "id": "reverse",
@@ -450,7 +495,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/reverse/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/reverse/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/reverse/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/reverse/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/reverse/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/reverse/LITERATURE_REVIEW.md"
     },
     {
       "id": "iot_hardware",
@@ -478,7 +526,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/iot_hardware/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/iot_hardware/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/iot_hardware/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/iot_hardware/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/iot_hardware/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/iot_hardware/LITERATURE_REVIEW.md"
     },
     {
       "id": "devsecops",
@@ -506,7 +557,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/devsecops/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/devsecops/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/devsecops/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/devsecops/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/devsecops/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/devsecops/LITERATURE_REVIEW.md"
     },
     {
       "id": "ai_security",
@@ -534,7 +588,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/ai_security/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/ai_security/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/ai_security/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/ai_security/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/ai_security/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/ai_security/LITERATURE_REVIEW.md"
     },
     {
       "id": "governance",
@@ -562,7 +619,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/governance/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/governance/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/governance/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/governance/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/governance/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/governance/LITERATURE_REVIEW.md"
     },
     {
       "id": "vuln_management",
@@ -590,7 +650,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/vuln_management/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/vuln_management/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/vuln_management/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/vuln_management/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/vuln_management/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/vuln_management/LITERATURE_REVIEW.md"
     },
     {
       "id": "bug_bounty",
@@ -618,7 +681,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/bug_bounty/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/bug_bounty/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/bug_bounty/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/bug_bounty/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/bug_bounty/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/bug_bounty/LITERATURE_REVIEW.md"
     },
     {
       "id": "secure_arch",
@@ -646,7 +712,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/secure_arch/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/secure_arch/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/secure_arch/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/secure_arch/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/secure_arch/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/secure_arch/LITERATURE_REVIEW.md"
     },
     {
       "id": "data_security",
@@ -674,7 +743,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/data_security/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/data_security/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/data_security/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/data_security/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/data_security/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/data_security/LITERATURE_REVIEW.md"
     },
     {
       "id": "software_engineering",
@@ -702,7 +774,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/software_engineering/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/software_engineering/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/software_engineering/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/software_engineering/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/software_engineering/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/software_engineering/LITERATURE_REVIEW.md"
     },
     {
       "id": "machine_learning",
@@ -730,7 +805,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/machine_learning/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/machine_learning/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/machine_learning/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/machine_learning/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/machine_learning/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/machine_learning/LITERATURE_REVIEW.md"
     },
     {
       "id": "hardware_security",
@@ -758,7 +836,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/hardware_security/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/hardware_security/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/hardware_security/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/hardware_security/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/hardware_security/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/hardware_security/LITERATURE_REVIEW.md"
     },
     {
       "id": "mathematics",
@@ -786,7 +867,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/mathematics/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/mathematics/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/mathematics/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/mathematics/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/mathematics/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/mathematics/LITERATURE_REVIEW.md"
     },
     {
       "id": "soc_siem",
@@ -814,7 +898,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/soc_siem/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/soc_siem/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/soc_siem/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/soc_siem/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/soc_siem/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/soc_siem/LITERATURE_REVIEW.md"
     },
     {
       "id": "edr_xdr",
@@ -842,7 +929,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/edr_xdr/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/edr_xdr/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/edr_xdr/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/edr_xdr/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/edr_xdr/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/edr_xdr/LITERATURE_REVIEW.md"
     },
     {
       "id": "threat_hunting",
@@ -870,7 +960,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/threat_hunting/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/threat_hunting/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/threat_hunting/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/threat_hunting/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/threat_hunting/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/threat_hunting/LITERATURE_REVIEW.md"
     },
     {
       "id": "red_team",
@@ -898,7 +991,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/red_team/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/red_team/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/red_team/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/red_team/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/red_team/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/red_team/LITERATURE_REVIEW.md"
     },
     {
       "id": "wireless_security",
@@ -926,7 +1022,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/wireless_security/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/wireless_security/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/wireless_security/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/wireless_security/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/wireless_security/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/wireless_security/LITERATURE_REVIEW.md"
     },
     {
       "id": "ot_ics",
@@ -954,7 +1053,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/ot_ics/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/ot_ics/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/ot_ics/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/ot_ics/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/ot_ics/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/ot_ics/LITERATURE_REVIEW.md"
     },
     {
       "id": "telecom_5g",
@@ -982,7 +1084,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/telecom_5g/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/telecom_5g/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/telecom_5g/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/telecom_5g/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/telecom_5g/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/telecom_5g/LITERATURE_REVIEW.md"
     },
     {
       "id": "automotive_security",
@@ -1010,7 +1115,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/automotive_security/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/automotive_security/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/automotive_security/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/automotive_security/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/automotive_security/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/automotive_security/LITERATURE_REVIEW.md"
     },
     {
       "id": "satellite_security",
@@ -1038,7 +1146,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/satellite_security/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/satellite_security/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/satellite_security/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/satellite_security/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/satellite_security/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/satellite_security/LITERATURE_REVIEW.md"
     },
     {
       "id": "physical_security",
@@ -1066,7 +1177,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/physical_security/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/physical_security/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/physical_security/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/physical_security/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/physical_security/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/physical_security/LITERATURE_REVIEW.md"
     },
     {
       "id": "email_dns_security",
@@ -1094,7 +1208,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/email_dns_security/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/email_dns_security/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/email_dns_security/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/email_dns_security/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/email_dns_security/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/email_dns_security/LITERATURE_REVIEW.md"
     },
     {
       "id": "fraud_abuse",
@@ -1122,7 +1239,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/fraud_abuse/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/fraud_abuse/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/fraud_abuse/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/fraud_abuse/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/fraud_abuse/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/fraud_abuse/LITERATURE_REVIEW.md"
     },
     {
       "id": "privacy_engineering",
@@ -1150,7 +1270,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/privacy_engineering/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/privacy_engineering/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/privacy_engineering/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/privacy_engineering/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/privacy_engineering/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/privacy_engineering/LITERATURE_REVIEW.md"
     },
     {
       "id": "cloud_forensics",
@@ -1178,7 +1301,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/cloud_forensics/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/cloud_forensics/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/cloud_forensics/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/cloud_forensics/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/cloud_forensics/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/cloud_forensics/LITERATURE_REVIEW.md"
     },
     {
       "id": "ai_red_team",
@@ -1206,7 +1332,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/ai_red_team/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/ai_red_team/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/ai_red_team/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/ai_red_team/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/ai_red_team/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/ai_red_team/LITERATURE_REVIEW.md"
     },
     {
       "id": "pki_hsm",
@@ -1234,7 +1363,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/pki_hsm/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/pki_hsm/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/pki_hsm/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/pki_hsm/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/pki_hsm/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/pki_hsm/LITERATURE_REVIEW.md"
     },
     {
       "id": "post_quantum_crypto",
@@ -1262,7 +1394,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/post_quantum_crypto/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/post_quantum_crypto/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/post_quantum_crypto/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/post_quantum_crypto/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/post_quantum_crypto/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/post_quantum_crypto/LITERATURE_REVIEW.md"
     },
     {
       "id": "business_continuity",
@@ -1290,7 +1425,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/business_continuity/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/business_continuity/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/business_continuity/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/business_continuity/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/business_continuity/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/business_continuity/LITERATURE_REVIEW.md"
     },
     {
       "id": "database_security",
@@ -1318,7 +1456,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/database_security/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/database_security/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/database_security/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/database_security/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/database_security/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/database_security/LITERATURE_REVIEW.md"
     },
     {
       "id": "vulnerability_research",
@@ -1346,7 +1487,10 @@
       "laboratory_status": "designed_not_executed",
       "validation_status": "not_expert_validated",
       "research_study_path": "knowledge/deep_modules/vulnerability_research/RESEARCH_STUDY.md",
-      "deep_sections_path": "knowledge/deep_modules/vulnerability_research/DEEP_SECTIONS.md"
+      "deep_sections_path": "knowledge/deep_modules/vulnerability_research/DEEP_SECTIONS.md",
+      "technical_compendium_path": "knowledge/deep_modules/vulnerability_research/TECHNICAL_COMPENDIUM.md",
+      "research_agenda_path": "knowledge/deep_modules/vulnerability_research/RESEARCH_AGENDA.md",
+      "literature_review_path": "knowledge/deep_modules/vulnerability_research/LITERATURE_REVIEW.md"
     }
   ],
   "skill_candidates": [
@@ -1365,6 +1509,312 @@
       "path": "knowledge/skills/candidates/FND-01-02_CIA_PROPERTY_ASSESSMENT.md",
       "topic_id": "skills",
       "subtopic_id": "candidate_spec"
+    }
+  ],
+  "supplemental_documents": [
+    {
+      "id": "EXPERT_RESEARCH_STANDARD",
+      "area_id": "foundations",
+      "name": "Estándar experto de investigación",
+      "path": "knowledge/EXPERT_RESEARCH_STANDARD.md",
+      "topic_id": "meta",
+      "subtopic_id": "expert_standard"
+    },
+    {
+      "id": "COLD_KNOWLEDGE_EXECUTION_PROTOCOL",
+      "area_id": "foundations",
+      "name": "Protocolo de ejecución en frío",
+      "path": "knowledge/COLD_KNOWLEDGE_EXECUTION_PROTOCOL.md",
+      "topic_id": "meta",
+      "subtopic_id": "cold_protocol"
+    },
+    {
+      "id": "THEORETICAL_LIBRARY_COMPLETION_PROGRAM_48",
+      "area_id": "governance",
+      "name": "Programa de cierre teórico de 48 áreas",
+      "path": "knowledge/THEORETICAL_LIBRARY_COMPLETION_PROGRAM_48.md",
+      "topic_id": "meta",
+      "subtopic_id": "completion_program"
+    },
+    {
+      "id": "EXPERT_LIBRARY_COMPLETION_TRACKER",
+      "area_id": "governance",
+      "name": "Tracker de cierre de biblioteca experta",
+      "path": "knowledge/EXPERT_LIBRARY_COMPLETION_TRACKER.md",
+      "topic_id": "meta",
+      "subtopic_id": "completion_tracker"
+    },
+    {
+      "id": "COLD_KNOWLEDGE_EXECUTION_LOG",
+      "area_id": "governance",
+      "name": "Registro de ejecución de conocimiento en frío",
+      "path": "knowledge/COLD_KNOWLEDGE_EXECUTION_LOG_2026-11-19.md",
+      "topic_id": "meta",
+      "subtopic_id": "execution_log"
+    },
+    {
+      "id": "RESEARCH_PROTOCOL",
+      "area_id": "governance",
+      "name": "Protocolo de investigación",
+      "path": "knowledge/research/RESEARCH_PROTOCOL.md",
+      "topic_id": "research",
+      "subtopic_id": "protocol"
+    },
+    {
+      "id": "VALIDATION_SYSTEM",
+      "area_id": "governance",
+      "name": "Sistema de validación de investigación",
+      "path": "knowledge/research/VALIDATION_SYSTEM.md",
+      "topic_id": "research",
+      "subtopic_id": "validation_system"
+    },
+    {
+      "id": "SOURCE_REGISTRY",
+      "area_id": "governance",
+      "name": "Registro de fuentes",
+      "path": "knowledge/research/source_registry.json",
+      "topic_id": "research",
+      "subtopic_id": "source_registry"
+    },
+    {
+      "id": "ADVANCED_GAP_DEVELOPMENT",
+      "area_id": "governance",
+      "name": "Desarrollo de 192 brechas avanzadas",
+      "path": "knowledge/research/ADVANCED_GAP_DEVELOPMENT.md",
+      "topic_id": "research",
+      "subtopic_id": "advanced_gaps"
+    },
+    {
+      "id": "ADVANCED_GAP_REGISTER",
+      "area_id": "governance",
+      "name": "Registro de brechas avanzadas",
+      "path": "knowledge/research/ADVANCED_GAP_REGISTER.json",
+      "topic_id": "research",
+      "subtopic_id": "gap_register"
+    },
+    {
+      "id": "CLAIM_EVIDENCE_REGISTER",
+      "area_id": "governance",
+      "name": "Registro de afirmaciones y evidencias",
+      "path": "knowledge/research/CLAIM_EVIDENCE_REGISTER.json",
+      "topic_id": "research",
+      "subtopic_id": "claim_evidence"
+    },
+    {
+      "id": "VALIDATION_WORKLIST_192",
+      "area_id": "governance",
+      "name": "Worklist de validación de 192 brechas",
+      "path": "knowledge/research/VALIDATION_WORKLIST_192.json",
+      "topic_id": "research",
+      "subtopic_id": "validation_worklist"
+    },
+    {
+      "id": "DOMAIN_LAYER_AUDIT_48",
+      "area_id": "governance",
+      "name": "Auditoría de capas de 48 dominios",
+      "path": "knowledge/research/DOMAIN_LAYER_AUDIT_48.md",
+      "topic_id": "research",
+      "subtopic_id": "domain_layer_audit"
+    },
+    {
+      "id": "GLOBAL_COVERAGE_AUDIT",
+      "area_id": "governance",
+      "name": "Auditoría de cobertura global",
+      "path": "knowledge/research/GLOBAL_COVERAGE_AUDIT.md",
+      "topic_id": "research",
+      "subtopic_id": "global_coverage"
+    },
+    {
+      "id": "GLOBAL_COVERAGE_MATRIX",
+      "area_id": "governance",
+      "name": "Matriz global de cobertura",
+      "path": "knowledge/research/global_coverage_matrix.json",
+      "topic_id": "research",
+      "subtopic_id": "coverage_matrix"
+    },
+    {
+      "id": "FIELD_STUDIES_README",
+      "area_id": "governance",
+      "name": "Guía de estudios de campo",
+      "path": "knowledge/research/field_studies/README.md",
+      "topic_id": "research",
+      "subtopic_id": "field_studies"
+    },
+    {
+      "id": "FIELD_STUDIES_SOURCE_REGISTER",
+      "area_id": "governance",
+      "name": "Registro de fuentes candidatas de estudios de campo",
+      "path": "knowledge/research/field_studies/SOURCE_REGISTER_2026-11-18.json",
+      "topic_id": "research",
+      "subtopic_id": "field_source_register"
+    },
+    {
+      "id": "FIELD_STUDIES_DOMAIN_SOURCE_MAP",
+      "area_id": "governance",
+      "name": "Mapa dominio-fuente de estudios de campo",
+      "path": "knowledge/research/field_studies/DOMAIN_SOURCE_MAP.json",
+      "topic_id": "research",
+      "subtopic_id": "domain_source_map"
+    },
+    {
+      "id": "KNOWLEDGE_DEPTH_AUDIT",
+      "area_id": "governance",
+      "name": "Auditoría de profundidad y reutilización de brechas",
+      "path": "knowledge/research/KNOWLEDGE_DEPTH_AUDIT_2026-11-20.md",
+      "topic_id": "research",
+      "subtopic_id": "depth_audit"
+    },
+    {
+      "id": "FOUNDATIONS_SUBTOPIC_AUDIT",
+      "area_id": "foundations",
+      "name": "Auditoría granular de subtemas Foundations",
+      "path": "knowledge/deep_modules/foundations/FOUNDATIONS_SUBTOPIC_AUDIT_V2.json",
+      "topic_id": "FND-01",
+      "subtopic_id": "subtopic_audit"
+    },
+    {
+      "id": "FOUNDATIONS_AUDIT_VERDICT",
+      "area_id": "foundations",
+      "name": "Dictamen de auditoría Foundations",
+      "path": "knowledge/deep_modules/foundations/FOUNDATIONS_AUDIT_VERDICT_2026-11-19.md",
+      "topic_id": "FND-01",
+      "subtopic_id": "audit_verdict"
+    },
+    {
+      "id": "FOUNDATIONS_LAYER_COVERAGE_MAP",
+      "area_id": "foundations",
+      "name": "Mapa de cobertura de doce capas Foundations",
+      "path": "knowledge/deep_modules/foundations/FOUNDATIONS_LAYER_COVERAGE_MAP_2026-11-20.md",
+      "topic_id": "FND-01",
+      "subtopic_id": "layer_coverage"
+    },
+    {
+      "id": "FOUNDATIONS_REMEDIATION_UPDATE",
+      "area_id": "foundations",
+      "name": "Registro de remediación Foundations",
+      "path": "knowledge/deep_modules/foundations/FOUNDATIONS_REMEDIATION_UPDATE_2026-11-20.md",
+      "topic_id": "FND-01",
+      "subtopic_id": "remediation"
+    },
+    {
+      "id": "FOUNDATIONS_FND01_TWELVE_LAYER_EXPANSION",
+      "area_id": "foundations",
+      "name": "Desarrollo de doce capas FND-01",
+      "path": "knowledge/deep_modules/foundations/FOUNDATIONS_FND01_TWELVE_LAYER_EXPANSION_2026-11-20.md",
+      "topic_id": "FND-01",
+      "subtopic_id": "twelve_layer_expansion"
+    },
+    {
+      "id": "FND_01_01_CROSSWALK",
+      "area_id": "foundations",
+      "name": "Crosswalk FND-01.01",
+      "path": "knowledge/deep_modules/foundations/FND_01_01_SAFETY_SECURITY_PRIVACY_RELIABILITY_RESILIENCE_CROSSWALK_2026-11-20.md",
+      "topic_id": "FND-01",
+      "subtopic_id": "FND-01.01"
+    },
+    {
+      "id": "FND_01_02_SYNTHESIS",
+      "area_id": "foundations",
+      "name": "Síntesis FND-01.02",
+      "path": "knowledge/deep_modules/foundations/FND_01_02_PRIMARY_SOURCE_SYNTHESIS_2026-11-20.md",
+      "topic_id": "FND-01",
+      "subtopic_id": "FND-01.02"
+    },
+    {
+      "id": "FND_01_02_ASSESSMENT",
+      "area_id": "foundations",
+      "name": "Evaluación en frío FND-01.02",
+      "path": "knowledge/deep_modules/foundations/FND_01_02_COLD_ASSESSMENT_V1.md",
+      "topic_id": "FND-01",
+      "subtopic_id": "FND-01.02"
+    },
+    {
+      "id": "FOUNDATIONS_CURRICULUM_MAP",
+      "area_id": "foundations",
+      "name": "Mapa curricular Foundations",
+      "path": "knowledge/deep_modules/foundations/FOUNDATIONS_CURRICULUM_MAP_V2.md",
+      "topic_id": "FND-01",
+      "subtopic_id": "curriculum"
+    },
+    {
+      "id": "FOUNDATIONS_DEEP_DEVELOPMENT",
+      "area_id": "foundations",
+      "name": "Desarrollo profundo Foundations",
+      "path": "knowledge/deep_modules/foundations/FOUNDATIONS_DEEP_DEVELOPMENT_V1.md",
+      "topic_id": "FND-01",
+      "subtopic_id": "deep_development"
+    },
+    {
+      "id": "FOUNDATIONS_LAB_RUNNER",
+      "area_id": "foundations",
+      "name": "Runner de laboratorios sintéticos Foundations",
+      "path": "knowledge/deep_modules/foundations/labs/runner.py",
+      "topic_id": "FND-01",
+      "subtopic_id": "labs"
+    },
+    {
+      "id": "FOUNDATIONS_LAB_RESULTS",
+      "area_id": "foundations",
+      "name": "Resultados de laboratorios sintéticos Foundations",
+      "path": "knowledge/deep_modules/foundations/labs/results.json",
+      "topic_id": "FND-01",
+      "subtopic_id": "lab_results"
+    },
+    {
+      "id": "FOUNDATIONS_TOPIC_01_01",
+      "area_id": "foundations",
+      "name": "Subtema FND-01.01",
+      "path": "knowledge/deep_modules/foundations/topics/FND-01-01_SECURITY_SAFETY_PRIVACY_RELIABILITY_RESILIENCE.md",
+      "topic_id": "FND-01",
+      "subtopic_id": "FND-01.01"
+    },
+    {
+      "id": "FOUNDATIONS_TOPIC_01_02",
+      "area_id": "foundations",
+      "name": "Subtema FND-01.02",
+      "path": "knowledge/deep_modules/foundations/topics/FND-01-02_SECURITY_PROPERTIES_CIA_EXTENDED.md",
+      "topic_id": "FND-01",
+      "subtopic_id": "FND-01.02"
+    },
+    {
+      "id": "FOUNDATIONS_COLD_ASSESSMENT_01_01",
+      "area_id": "foundations",
+      "name": "Evaluación en frío FND-01.01",
+      "path": "knowledge/deep_modules/foundations/topics/FND-01-01_COLD_ASSESSMENT_V2.md",
+      "topic_id": "FND-01",
+      "subtopic_id": "FND-01.01"
+    },
+    {
+      "id": "FOUNDATIONS_ASSESSOR_GUIDE_01_01",
+      "area_id": "foundations",
+      "name": "Guía del evaluador FND-01.01",
+      "path": "knowledge/deep_modules/foundations/topics/FND-01-01_ASSESSOR_GUIDE_V2.md",
+      "topic_id": "FND-01",
+      "subtopic_id": "FND-01.01"
+    },
+    {
+      "id": "FOUNDATIONS_ASSESSOR_PROTOCOL_01_01",
+      "area_id": "foundations",
+      "name": "Protocolo de evaluador independiente FND-01.01",
+      "path": "knowledge/deep_modules/foundations/topics/FND-01-01_INDEPENDENT_ASSESSOR_PROTOCOL_V1.md",
+      "topic_id": "FND-01",
+      "subtopic_id": "FND-01.01"
+    },
+    {
+      "id": "FOUNDATIONS_WORKED_SOLUTIONS_01_01",
+      "area_id": "foundations",
+      "name": "Soluciones trabajadas FND-01.01",
+      "path": "knowledge/deep_modules/foundations/topics/FND-01-01_CAPABILITY_WORKED_SOLUTIONS_V1.md",
+      "topic_id": "FND-01",
+      "subtopic_id": "FND-01.01"
+    },
+    {
+      "id": "AI_RED_TEAM_THEORETICAL_DEVELOPMENT",
+      "area_id": "ai_red_team",
+      "name": "Desarrollo teórico AI Red Team",
+      "path": "knowledge/deep_modules/ai_red_team/AI_RED_TEAM_THEORETICAL_DEVELOPMENT_V1.md",
+      "topic_id": "AI-RT",
+      "subtopic_id": "theoretical_dossier"
     }
   ]
 }
