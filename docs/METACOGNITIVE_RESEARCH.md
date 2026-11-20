@@ -37,7 +37,8 @@ El contrato `ModelBackend(name, model, generate)` acepta cualquier función que 
 - La verificación de VERITAS sigue siendo una revisión basada en modelo; no sustituye comprobaciones externas de URLs, DOI, publicaciones ni experimentos.
 - El informe aprobado se intenta indexar en la biblioteca como categoría `research_provisional`, con etiquetas de provisionalidad. Si ECO o la base no están disponibles, se conserva en el registro y se entrega directamente al principal para la reevaluación; el mapa indica `library_indexed=false`.
 - El ciclo se limita a dos rondas por defecto para evitar bucles y costes sin control.
-- La adquisición de fuentes usa `web_research.py`, que consulta dominios de `config/trusted_sources.json`, y `review_web_report.py`, que aplica revisión por NEXO, FILTRO y VERITAS. Si la búsqueda no devuelve páginas registradas consultables, el sistema registra la limitación y no simula investigación.\n- El informe aceptado se intenta indexar mediante ECO y `knowledge_library.store_chunks` como `research_provisional`. Si la indexación falla, DIRECTOR bloquea la ejecución original para no perder el contexto aprendido.
+- La adquisición de fuentes usa `web_research.py`, que consulta dominios de `config/trusted_sources.json`, y `review_web_report.py`, que aplica revisión por NEXO, FILTRO y VERITAS. Si la búsqueda no devuelve páginas registradas consultables, el sistema registra la limitación y no simula investigación.
+- El informe aceptado se intenta indexar mediante ECO y `knowledge_library.store_chunks` como `research_provisional`. Si la indexación falla, DIRECTOR bloquea la ejecución original para no perder el contexto aprendido.
 
 ## Pruebas
 
