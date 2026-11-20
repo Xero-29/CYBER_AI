@@ -1,3 +1,4 @@
+import json
 import unittest
 
 from secret_redaction import redact_sensitive_data, redact_text
@@ -14,6 +15,13 @@ class SecretRedactionTests(unittest.TestCase):
             self.assertNotIn(secret, cleaned)
         self.assertIn('"api_key":"[REDACTED]"', cleaned)
         self.assertIn('"safe":"ok"', cleaned)
+
+    def test_redaction_preserves_json_when_secret_assignment_is_inside_a_string(self):
+        raw = json.dumps({"message": "password=embedded-secret", "safe": "ok"})
+        cleaned = redact_text(raw)
+        parsed = json.loads(cleaned)
+        self.assertEqual(parsed["message"], "password=[REDACTED]")
+        self.assertEqual(parsed["safe"], "ok")
 
     def test_redacts_common_provider_token_formats(self):
         tokens = (

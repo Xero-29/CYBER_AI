@@ -10,7 +10,7 @@ SECRET_FIELD = re.compile(
 SECRET_ASSIGNMENT = re.compile(
     r'''(?i)(["']?(?:api[_-]?key|access[_-]?token|refresh[_-]?token|token|password|'''
     r'''passwd|secret|client[_-]?secret|authorization|credential|private[_-]?key)'''
-    r'''["']?\s*[:=]\s*)("[^"]*"|'[^']*'|[^\s,;}\]]+)'''
+    r'''["']?\s*[:=]\s*)("[^"]*"|'[^']*'|[^\s,;}\]"\x27]+)'''
 )
 PRIVATE_KEY = re.compile(
     r"-----BEGIN [^-]*PRIVATE KEY-----.*?-----END [^-]*PRIVATE KEY-----",
