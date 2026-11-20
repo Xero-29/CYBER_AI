@@ -50,7 +50,7 @@ class KnowledgeQualityTests(unittest.TestCase):
                 self.assertGreaterEqual(area["research_study_references"], 2)
 
 
-    def test_all_192_advanced_gaps_have_substantive_development(self):
+    def test_all_192_advanced_gaps_have_structured_initial_drafts(self):
         root = Path(__file__).resolve().parents[1]
         register = json.loads((root / "knowledge/research/ADVANCED_GAP_REGISTER.json").read_text(encoding="utf-8"))
         manifest = json.loads((root / "knowledge/packs/manifest.json").read_text(encoding="utf-8"))

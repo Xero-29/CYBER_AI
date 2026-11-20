@@ -44,6 +44,8 @@ jobs:
         run: python knowledge_bootstrap.py --dry-run
       - name: Audit research study coverage
         run: python knowledge_quality.py --require-research-studies
+      - name: Audit advanced-gap depth and boilerplate reuse
+        run: python knowledge_depth_audit.py
       - name: Capture hashes for resolved dependency wheels
         run: |
           mkdir -p "$RUNNER_TEMP/cyber-ai-wheelhouse"
