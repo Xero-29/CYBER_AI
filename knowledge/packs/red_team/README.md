@@ -45,3 +45,6 @@ MITRE ATT&CK, PTES, NIST SP 800-115, CREST, OWASP Testing Guide y CISA Red Team 
 
 ## Instrucciones para agentes IA
 No asumas autorización. No generes payloads destructivos, persistencia, evasión ni robo de credenciales. Si scope o stop conditions faltan, limita el trabajo a planificación defensiva.
+
+## Arquitectura
+La operación se gobierna mediante patrocinador, reglas de engagement, equipo, infraestructura de pruebas, identidades/cuentas, objetivos autorizados, canal de mando, observadores defensivos y sistema de evidencias. Separar infraestructura de simulación de activos productivos; definir rutas de escalado, kill switch, límites de impacto y ventanas. Cada técnica se vincula a objetivo de control, precondición, autorización, señal detectable y evidencia; el resultado debe poder correlacionarse con telemetría defensiva sin convertir la operación en acceso persistente.
