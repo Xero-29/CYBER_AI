@@ -3,11 +3,14 @@
 
 import argparse
 import json
+import os
 import time
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.request import urlopen
+from llm_providers import request as provider_request
+from safe_io import SafeWriteError, open_private_file
+from secret_redaction import redact_sensitive_data
 
 PROJECT = Path(__file__).resolve().parent
 CONFIG_FILE = PROJECT / "config" / "model_roles.json"
@@ -17,6 +20,8 @@ BLOB_ROOT = MODEL_ROOT / "blobs"
 HISTORY = PROJECT / "data" / "model_usage.jsonl"
 OLLAMA_API = "http://127.0.0.1:11434"
 CHUNK_SIZE = 8 * 1024 * 1024
+MAX_HISTORY_BYTES = 16 * 1024 * 1024
+MAX_HISTORY_EVENTS = 100_000
 
 
 def load_config():
@@ -47,9 +52,13 @@ def load_config():
 
 
 def api_get(endpoint):
-    """Consulta la API local de Ollama, sin acceder a Internet."""
-    with urlopen(f"{OLLAMA_API}/{endpoint}", timeout=5) as response:
-        return json.load(response)
+    """Consulta Ollama por el transporte común con límite de respuesta y sin redirects."""
+    provider = {
+        "name": "ollama",
+        "protocol": "ollama",
+        "base_url": OLLAMA_API,
+    }
+    return provider_request(provider, endpoint, timeout=5)
 
 
 def available_ram():
@@ -65,17 +74,25 @@ def model_name(item):
 
 
 def read_history():
-    """Lee también los registros antiguos que no tenían nombre de agente."""
-    if not HISTORY.is_file():
-        return []
+    """Lee historial privado con límites y sanea también registros heredados."""
     events = []
-    for line in HISTORY.read_text(encoding="utf-8").splitlines():
-        try:
-            item = json.loads(line)
-            if isinstance(item, dict):
-                events.append(item)
-        except json.JSONDecodeError:
-            continue
+    try:
+        with open_private_file(HISTORY, "r") as stream:
+            if os.fstat(stream.fileno()).st_size > MAX_HISTORY_BYTES:
+                raise ValueError("El historial de modelos supera 16 MiB.")
+            for line in stream:
+                try:
+                    item = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if isinstance(item, dict):
+                    events.append(redact_sensitive_data(item))
+                    if len(events) > MAX_HISTORY_EVENTS:
+                        raise ValueError("El historial de modelos supera 100.000 eventos.")
+    except SafeWriteError:
+        if not HISTORY.exists() and not HISTORY.is_symlink():
+            return []
+        raise ValueError("El historial de modelos no es un archivo privado seguro.") from None
     return events
 
 
@@ -183,14 +200,21 @@ def record(target, task, *, model=None, provider=None):
         "task": task,
     }
 
-    HISTORY.parent.mkdir(parents=True, exist_ok=True)
-    with HISTORY.open("a", encoding="utf-8") as file:
-        file.write(json.dumps(event, ensure_ascii=False) + "\n")
+    safe_event = redact_sensitive_data(event)
+    rendered = json.dumps(safe_event, ensure_ascii=False, allow_nan=False) + "\n"
+    encoded_size = len(rendered.encode("utf-8"))
+    if encoded_size > MAX_HISTORY_BYTES:
+        raise ValueError("El evento de historial supera 16 MiB.")
+    with open_private_file(HISTORY, "a") as file:
+        current_size = os.fstat(file.fileno()).st_size
+        if current_size + encoded_size > MAX_HISTORY_BYTES:
+            raise ValueError("El historial de modelos alcanzó el límite de 16 MiB.")
+        file.write(rendered)
 
     print(f"Agente registrado: {agent}")
     print(f"Proveedor: {provider}")
     print(f"Modelo: {model}")
-    print(f"Tarea: {task}")
+    print(f"Tarea: {safe_event['task']}")
     print(f"Agente anterior: {previous_agent or 'ninguno'}")
 
 
