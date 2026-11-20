@@ -59,8 +59,8 @@ class TestSharedSessionHistory(unittest.TestCase):
                         "task_id": "task-nexo",
                         "session_id": "linux-session",
                         "agent": "NEXO",
-                        "task": "Investigar permisos de Linux.",
-                        "response": "NEXO recomienda revisar permisos con stat.",
+                        "task": "Investigar permisos de Linux password=legacy-task-secret.",
+                        "response": "NEXO recomienda revisar permisos con stat; token=legacy-response-secret.",
                     },
                     {
                         "task_id": "task-other",
