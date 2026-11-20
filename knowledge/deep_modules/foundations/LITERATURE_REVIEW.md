@@ -60,3 +60,18 @@ Cobertura activos; enlaces verificables; inconsistencias; riesgos sin dueño; ev
 ## Identificadores del registro de fuentes
 
 - `RESEARCH-FOUNDATIONS`
+
+
+## Addendum de fuentes primarias — 2026-11-20
+
+IDs añadidos al registro y utilizados en la ampliación FND-01.01/FND-01.02:
+
+- `NIST-FIPS-199` — definición y categorización CIA para sistemas federales de EE. UU.
+- `NASA-SP-2014-612` — metadatos oficiales del handbook de system safety; contenido íntegro pendiente.
+- `ISO-22316-2017` y `ISO-FDIS-22316-2027` — edición publicada y borrador FDIS en aprobación, respectivamente.
+- `ISO-26262-1-2018` y `ISO-DIS-26262-1-2026` — edición publicada y borrador en enquiry, respectivamente.
+- `IEC-61508-1-2010` y `IEC-61508-1-2026-PRV` — edición publicada y pre-release FDIS no final, respectivamente.
+- `IEC-TR-63069-2019` — coordinación safety/security.
+- `IEC-62443-2-1-2024` y `IEC-62443-3-3-2013` — programa y requisitos técnicos de ciberseguridad IACS.
+
+El estado de revisión de cada fuente está registrado individualmente. Los metadatos o abstracts no se contabilizan como lectura integral. Las normas ISO/IEC de pago no se han copiado ni ingerido.

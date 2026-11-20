@@ -153,3 +153,17 @@ La evaluación debe exigir un modelo de propiedades, un escenario integrado, una
 ## 10. Límites de revisión
 
 FIPS 199 y páginas oficiales NIST/IEC/ISO se revisaron en las secciones y metadatos relevantes indicados en el registro. No se ha completado lectura lineal de todos los estándares ni se han adquirido los textos ISO/IEC protegidos. No hay prueba supervisada ni revisión independiente. El estado teórico continúa como borrador ampliado, no aprobado.
+
+
+## IDs del registro de fuentes utilizados
+
+- `NIST-FIPS-199`
+- `NIST-CSWP-29-CSF-2.0`
+- `NIST-SP-800-160v1r1`
+- `NIST-SP-800-160v2r1`
+- `NIST-SP-800-53r5`
+- `NISTIR-8062`
+- `IEC-62443-2-1-2024`
+- `IEC-62443-3-3-2013`
+- `IEC-61508-1-2010`
+- `IEC-TR-63069-2019`

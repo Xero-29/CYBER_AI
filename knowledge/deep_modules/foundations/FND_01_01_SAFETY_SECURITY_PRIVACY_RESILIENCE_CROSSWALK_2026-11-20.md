@@ -244,3 +244,23 @@ El estudiante debe poder:
 **Estado de fuentes:** revisión dirigida de secciones y metadatos oficiales. No se ha realizado lectura lineal integral de todos los documentos. Las normas ISO/IEC de pago no se han ingerido ni resumido más allá de metadatos/alcance oficiales. No se han ejecutado laboratorios ni pruebas físicas. No se ha obtenido revisión jurídica o disciplinar independiente.
 
 **Dictamen:** esta ampliación fortalece el contenido teórico y corrige equivalencias conceptuales. No cierra las no conformidades de lectura integral, evaluación supervisada ni revisión independiente; no promueve T0/O0.
+
+
+## IDs del registro de fuentes utilizados
+
+- `NIST-SP-800-160v1r1`
+- `NIST-SP-800-160v2r1`
+- `NIST-CSWP-29-CSF-2.0`
+- `NISTIR-8062`
+- `NIST-SP-800-30r1`
+- `NIST-FIPS-199`
+- `NASA-SP-2014-612`
+- `IEC-61508-1-2010`
+- `IEC-61508-1-2026-PRV`
+- `IEC-TR-63069-2019`
+- `IEC-62443-2-1-2024`
+- `IEC-62443-3-3-2013`
+- `ISO-22316-2017`
+- `ISO-FDIS-22316-2027`
+- `ISO-26262-1-2018`
+- `ISO-DIS-26262-1-2026`

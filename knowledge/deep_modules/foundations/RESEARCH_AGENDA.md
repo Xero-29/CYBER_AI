@@ -127,3 +127,8 @@ Autorización escrita para toda evaluación activa; alcance, exclusiones, límit
 ## Estado editorial
 
 `research_agenda_defined` — preguntas y diseño inicial propuestos. No equivale a estado del arte terminado, paper reproducido ni resultado validado. Para avanzar a M4 se requiere literatura revisada, experimento ejecutado y análisis; M5 requiere revisión y reproducción externa.
+
+
+## Actualización de fuentes y alcance — 2026-11-20
+
+FND-01.01 y FND-01.02 incorporan un crosswalk de safety/security/privacy/reliability/resilience y un modelo CIA extendido. La revisión dirigida añade FIPS 199, NASA/SP-2014-612, IEC 61508, IEC 62443, IEC TR 63069, ISO 22316 e ISO 26262. Ver estados, fechas y límites de acceso en `knowledge/research/source_registry.json`. No promover madurez por metadatos o abstracts; la lectura integral y la revisión independiente siguen pendientes.

@@ -169,7 +169,10 @@ def audit_research_library(root: Path = ROOT) -> dict:
         "official_methodology_page_reviewed", "official_standard_metadata_reviewed",
     }
     source_reviewed_count = sum(s.get("verification_status") in reviewed_statuses for s in sources)
-    source_metadata_only_count = sum(s.get("verification_status") == "official_metadata_verified" for s in sources)
+    source_metadata_only_count = sum(
+        s.get("verification_status") in {"official_metadata_verified", "official_metadata_only_content_not_accessed"}
+        for s in sources
+    )
     source_catalog_only_count = sum(
         "catalog" in s.get("verification_status", "") or "registered" in s.get("verification_status", "")
         for s in sources
