@@ -117,6 +117,7 @@ def main():
                 "--principal", name,
                 "--researcher", researcher,
                 "--verifier", verifier,
+                "--max-rounds", str(meta_config.get("max_rounds", 2)),
                 "--task-text", task,
             ]
             if args.no_knowledge:
