@@ -338,7 +338,9 @@ def run_all():
     labs={"LAB-FND-01A":lab01_authorization(),"LAB-FND-02A":lab02_asset_reconciliation(),
       "LAB-FND-03A":lab03_threat_model(),"LAB-FND-04A":lab04_identity(),
       "LAB-FND-05A":lab05_crypto_integrity(),"LAB-FND-06A":lab06_event_reconstruction(),
-      "LAB-FND-07A":lab07_assurance(),"LAB-FND-08A":lab08_safety_security_tradeoff(),\n      "LAB-FND-09A":lab09_privacy_confidentiality_gap(),"LAB-FND-10A":lab10_resilience_recovery_trust(),\n      "LAB-FND-11A":lab11_common_cause_redundancy(),"LAB-FND-12A":lab12_integrity_vs_truth()}
+      "LAB-FND-07A":lab07_assurance(),"LAB-FND-08A":lab08_safety_security_tradeoff(),
+      "LAB-FND-09A":lab09_privacy_confidentiality_gap(),"LAB-FND-10A":lab10_resilience_recovery_trust(),
+      "LAB-FND-11A":lab11_common_cause_redundancy(),"LAB-FND-12A":lab12_integrity_vs_truth()}
     checks={"authz_revocation":labs["LAB-FND-01A"]["revoked_access_denied"],
       "asset_stable_id_beats_hostname":labs["LAB-FND-02A"]["stable_resource_id"]["f1"]>=labs["LAB-FND-02A"]["hostname_baseline"]["f1"],
       "threat_paths_represented":labs["LAB-FND-03A"]["paths_found"]==labs["LAB-FND-03A"]["required_paths"],
@@ -348,7 +350,12 @@ def run_all():
       "timeline_ordered":labs["LAB-FND-06A"]["chronological"],
       "audit_chain_tamper_detected":labs["LAB-FND-06A"]["tampering_detected"],
       "audit_chain_reordering_detected":labs["LAB-FND-06A"]["reordering_detected"],
-      "assurance_stale_evidence_rejected":"C2" in labs["LAB-FND-07A"]["unsubstantiated_not_closed"],\n      "safety_security_tradeoff_preserved":labs["LAB-FND-08A"]["joint_requirement_met"],\n      "privacy_not_confidentiality":labs["LAB-FND-09A"]["confidentiality_protected"] and labs["LAB-FND-09A"]["privacy_risk_detected"],\n      "recovery_requires_trust_rebuild":not labs["LAB-FND-10A"]["trust_restored_before_controls"] and labs["LAB-FND-10A"]["trust_restored_after_controls"],\n      "common_cause_redundancy_detected":labs["LAB-FND-11A"]["common_cause_detected"],\n      "integrity_not_truth":labs["LAB-FND-12A"]["integrity_and_authenticity"] and not labs["LAB-FND-12A"]["semantic_validity_before_review"]}
+      "assurance_stale_evidence_rejected":"C2" in labs["LAB-FND-07A"]["unsubstantiated_not_closed"],
+      "safety_security_tradeoff_preserved":labs["LAB-FND-08A"]["joint_requirement_met"],
+      "privacy_not_confidentiality":labs["LAB-FND-09A"]["confidentiality_protected"] and labs["LAB-FND-09A"]["privacy_risk_detected"],
+      "recovery_requires_trust_rebuild":not labs["LAB-FND-10A"]["trust_restored_before_controls"] and labs["LAB-FND-10A"]["trust_restored_after_controls"],
+      "common_cause_redundancy_detected":labs["LAB-FND-11A"]["common_cause_detected"],
+      "integrity_not_truth":labs["LAB-FND-12A"]["integrity_and_authenticity"] and not labs["LAB-FND-12A"]["semantic_validity_before_review"]}
     return {"schema_version":"1.0.0","seed":20261119,"synthetic_only":True,
             "checks":checks,"all_checks_passed":all(checks.values()),"labs":labs}
 
