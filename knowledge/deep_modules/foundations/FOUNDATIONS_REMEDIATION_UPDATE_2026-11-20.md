@@ -13,9 +13,9 @@
 - Lectura integral, evaluación supervisada, revisión independiente y aplicabilidad sectorial siguen pendientes.
 
 ## Estado global
-- 2 de 102 subtemas tienen desarrollo documental ampliado.
-- 24 de 1.224 capas están en progreso; 1.200 no evaluadas.
-- 8 de 408 capacidades están en progreso; 400 no evaluadas.
+- 3 de 102 subtemas tienen desarrollo documental ampliado.
+- 36 de 1.224 capas están en progreso; 1.188 no evaluadas.
+- 12 de 408 capacidades están en progreso; 396 no evaluadas.
 - 0 capas o capacidades aprobadas.
 - 102 subtemas permanecen T0/O0.
 - Ninguna no conformidad se cierra por añadir texto o registrar metadatos.
@@ -24,7 +24,7 @@
 ## Actualización de integración — 2026-11-20
 
 - Se añadieron cinco laboratorios sintéticos LAB-FND-08A a LAB-FND-12A. El runner y sus pruebas se ejecutan en CI; los modelos no certifican safety ni validan un entorno físico.
-- El bootstrap indexa 328 documentos: 328 documentos: 48 paquetes, 48 dossiers DEEP_SECTIONS, 48 estudios RESEARCH_STUDY, 48 compendios técnicos, 48 agendas, 48 revisiones bibliográficas, 38 documentos suplementarios y 2 Skills candidatas.
+- El bootstrap indexa 332 documentos: 328 documentos: 48 paquetes, 48 dossiers DEEP_SECTIONS, 48 estudios RESEARCH_STUDY, 48 compendios técnicos, 48 agendas, 48 revisiones bibliográficas, 41 documentos suplementarios y 3 Skills candidatas.
 - Las dos Skills candidatas describen metodologías; no están activas ni registradas en skillbook. No se promueven sin ledger, dos ejecuciones exitosas, evidencia y revisión independiente.
 - CI HEAD c7555318: 683 pruebas unitarias y cinco jobs aprobados.
 - La madurez de ambos subtemas no cambia: 12 capas in_progress, 0 passed, T0/O0.

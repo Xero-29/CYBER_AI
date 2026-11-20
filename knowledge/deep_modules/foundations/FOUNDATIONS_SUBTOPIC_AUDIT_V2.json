@@ -209,7 +209,7 @@
         "topics/FND-01-03_COLD_ASSESSMENT_V1.md",
         "labs/runner.py",
         "labs/results.json",
-        "../../../research/source_registry.json",
+        "../../research/source_registry.json",
         "../../skills/candidates/FND-01-03_ASSET_MISSION_INVENTORY.md"
       ],
       "nonconformities": [],

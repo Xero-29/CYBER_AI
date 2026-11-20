@@ -1,7 +1,7 @@
 # Foundations — Mapa de cobertura por las doce capas obligatorias
 
 **Corte:** 2026-11-20  
-**Alcance:** FND-01.01 y FND-01.02, primeros dos subtemas del currículo.  
+**Alcance:** FND-01.01, FND-01.02 y FND-01.03, primeros tres subtemas del currículo.  
 **Regla:** la presencia de un documento no equivale a que una capa esté aprobada. Los estados se mantienen en progreso y T0/O0 hasta cumplir la evidencia exigida.
 
 ## 1. Mapeo de capas

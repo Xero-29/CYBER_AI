@@ -179,6 +179,11 @@ La estructura de PR #13 y PR #14 es útil y sus CI exactos están verdes. La bib
 
 ## 6. Actualización de Foundations — 2026-11-20
 
-FND-01.01 incorpora un crosswalk disciplinar de safety/security/privacy/reliability/availability/resilience y 11 fuentes oficiales adicionales con estados de revisión diferenciados. FND-01.02 incorpora una síntesis CIA y propiedades extendidas, contraejemplos y un instrumento en frío V1 no administrado. El bootstrap ahora valida e indexa 328 documentos: 328 documentos: 48 paquetes, 48 dossiers DEEP_SECTIONS, 48 estudios RESEARCH_STUDY, 48 compendios técnicos, 48 agendas, 48 revisiones bibliográficas, 38 documentos suplementarios y 2 Skills candidatas. Se añadieron cinco laboratorios sintéticos (LAB-FND-08A a LAB-FND-12A); se ejecutan en CI, pero no son pruebas físicas ni validación operacional.
+FND-01.01 incorpora un crosswalk disciplinar de safety/security/privacy/reliability/availability/resilience y 11 fuentes oficiales adicionales con estados de revisión diferenciados. FND-01.02 incorpora una síntesis CIA y propiedades extendidas, contraejemplos y un instrumento en frío V1 no administrado. El bootstrap ahora valida e indexa 332 documentos: 328 documentos: 48 paquetes, 48 dossiers DEEP_SECTIONS, 48 estudios RESEARCH_STUDY, 48 compendios técnicos, 48 agendas, 48 revisiones bibliográficas, 41 documentos suplementarios y 3 Skills candidatas. Se añadieron cinco laboratorios sintéticos (LAB-FND-08A a LAB-FND-12A); se ejecutan en CI, pero no son pruebas físicas ni validación operacional.
 
 Los dos subtemas siguen con sus 12 capas en progreso, 0 aprobadas y madurez T0/O0. El mapa de cobertura por doce capas registra explícitamente los faltantes. Las Skills candidatas se indexan como conocimiento provisional; no se registran en skillbook ni se activan.
+
+
+## FND-01.03 — Tercer subtema de Foundations
+
+Se incorporó el desarrollo de activo/sujeto/objeto/recurso/dato/proceso/servicio/misión/stakeholder, el instrumento en frío V1, la Skill candidata no activa y LAB-FND-13A. El registro de subtemas refleja 12 capas y 4 capacidades en progreso, sin aprobación. El bootstrap pasa a 332 documentos.
