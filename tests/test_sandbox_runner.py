@@ -56,11 +56,21 @@ class SandboxRunnerTests(unittest.TestCase):
                     sandbox_runner.build_docker_command(tool, "sample.py", evidence)
 
     def test_allowlist_matches_tools_installed_in_image(self):
-        dockerfile = Path(sandbox_runner.__file__).parent / "sandbox" / "Dockerfile"
-        content = dockerfile.read_text(encoding="utf-8")
-        self.assertIn('ruff==0.14.5', content)
-        self.assertIn('bandit==1.8.6', content)
-        self.assertIn('python:3.12-slim-bookworm@sha256:0f086103b026048cc50cb5da25ec435c023c5241a83fc44daea593377abc61c4', content)
+        sandbox_dir = Path(sandbox_runner.__file__).parent / "sandbox"
+        dockerfile = sandbox_dir / "Dockerfile"
+        lockfile = sandbox_dir / "requirements.lock"
+        docker_content = dockerfile.read_text(encoding="utf-8")
+        lock_content = lockfile.read_text(encoding="utf-8")
+
+        self.assertIn("COPY sandbox/requirements.lock", docker_content)
+        self.assertIn("--require-hashes", docker_content)
+        self.assertIn("ruff==0.14.5", lock_content)
+        self.assertIn("bandit==1.8.6", lock_content)
+        self.assertIn(
+            "python:3.12-slim-bookworm@sha256:"
+            "0f086103b026048cc50cb5da25ec435c023c5241a83fc44daea593377abc61c4",
+            docker_content,
+        )
         self.assertEqual(SANDBOX_TOOLS, frozenset({"ruff", "bandit"}))
 
     def test_host_timeout_bounds_docker_process(self):
