@@ -110,6 +110,33 @@ class SafeIoTests(unittest.TestCase):
             with self.assertRaisesRegex(SafeWriteError, "directorio padre"):
                 ensure_private_directory(directory)
 
+    @unittest.skipIf(os.name == "nt", "Los permisos POSIX no representan ACL de Windows.")
+    def test_private_directory_accepts_root_owned_sticky_parent(self):
+        parent = Path(tempfile.gettempdir())
+        parent_info = parent.stat()
+        if (
+            parent_info.st_uid != 0
+            or not (parent_info.st_mode & stat.S_ISVTX)
+        ):
+            self.skipTest("el directorio temporal no es root-owned sticky")
+        with tempfile.TemporaryDirectory(dir=parent) as temp:
+            directory = Path(temp)
+            self.assertEqual(
+                ensure_private_directory(directory, create=False), directory
+            )
+            self.assertEqual(stat.S_IMODE(directory.stat().st_mode), 0o700)
+
+    @unittest.skipIf(os.name == "nt", "Los permisos POSIX no representan ACL de Windows.")
+    def test_private_directory_rejects_world_writable_parent_without_sticky_bit(self):
+        with tempfile.TemporaryDirectory() as temp:
+            parent = Path(temp) / "world-writable"
+            parent.mkdir(mode=0o700)
+            parent.chmod(0o777)
+            directory = parent / "private"
+            directory.mkdir(mode=0o700)
+            with self.assertRaisesRegex(SafeWriteError, "directorio padre"):
+                ensure_private_directory(directory)
+
     def test_open_private_file_appends_and_reads_with_private_permissions(self):
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp) / "data" / "events.jsonl"

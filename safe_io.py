@@ -77,9 +77,19 @@ def ensure_private_directory(path, *, create=True):
                 raise SafeWriteError(
                     "El directorio privado debe pertenecer al usuario efectivo del proceso."
                 )
-            if parent_info.st_uid not in {0, effective_uid} or stat.S_IMODE(parent_info.st_mode) & 0o022:
+            parent_mode = stat.S_IMODE(parent_info.st_mode)
+            parent_is_trusted = parent_info.st_uid in {0, effective_uid}
+            parent_is_root_sticky = (
+                parent_info.st_uid == 0
+                and bool(parent_info.st_mode & stat.S_ISVTX)
+            )
+            if (
+                not parent_is_trusted
+                or (parent_mode & 0o022 and not parent_is_root_sticky)
+            ):
                 raise SafeWriteError(
-                    "El directorio padre debe pertenecer a root o al usuario efectivo y no ser escribible por grupo u otros."
+                    "El directorio padre debe pertenecer a root o al usuario efectivo y "
+                    "no ser escribible por grupo u otros, salvo un padre sticky propiedad de root."
                 )
             os.chmod(destination, 0o700, follow_symlinks=False)
             mode = stat.S_IMODE(destination.stat(follow_symlinks=False).st_mode)
