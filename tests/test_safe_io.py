@@ -148,6 +148,16 @@ class SafeIoTests(unittest.TestCase):
                 self.assertEqual(stat.S_IMODE(path.stat().st_mode), 0o600)
                 self.assertEqual(stat.S_IMODE(path.parent.stat().st_mode), 0o700)
 
+    @unittest.skipUnless(hasattr(os, "mkfifo"), "FIFO solo disponible en POSIX.")
+    def test_open_private_file_rejects_fifo_before_open(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "data" / "stream.fifo"
+            path.parent.mkdir(mode=0o700)
+            os.mkfifo(path, 0o600)
+            with self.assertRaisesRegex(SafeWriteError, "archivo privado debe ser regular"):
+                with open_private_file(path, "r"):
+                    pass
+
     def test_open_private_file_rejects_symlink_and_hard_link(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)

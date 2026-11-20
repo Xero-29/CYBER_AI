@@ -205,9 +205,17 @@ def _load_grants():
         if (
             stat.S_ISLNK(before.st_mode)
             or getattr(before, "st_file_attributes", 0) & reparse_flag
+            or not stat.S_ISREG(before.st_mode)
         ):
-            raise AuthorizationError("El archivo de autorizaciones no puede ser un enlace.")
-        flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_CLOEXEC", 0)
+            raise AuthorizationError(
+                "El archivo de autorizaciones debe ser regular y no puede ser un enlace."
+            )
+        flags = (
+            os.O_RDONLY
+            | getattr(os, "O_NOFOLLOW", 0)
+            | getattr(os, "O_CLOEXEC", 0)
+            | getattr(os, "O_NONBLOCK", 0)
+        )
         descriptor = os.open(path, flags)
         opened = os.fstat(descriptor)
         after = path.lstat()

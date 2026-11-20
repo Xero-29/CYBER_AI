@@ -113,13 +113,23 @@ def open_private_file(path, mode="r", *, encoding="utf-8"):
     before = None
     try:
         before = destination.lstat()
-        if stat.S_ISLNK(before.st_mode) or _is_reparse_point(before):
-            raise SafeWriteError("No se permiten enlaces en archivos privados.")
+        if (
+            stat.S_ISLNK(before.st_mode)
+            or _is_reparse_point(before)
+            or not stat.S_ISREG(before.st_mode)
+        ):
+            raise SafeWriteError(
+                "El archivo privado debe ser regular y no puede ser un enlace."
+            )
     except FileNotFoundError:
         if not mode.startswith("a"):
             raise SafeWriteError("El archivo privado no existe.")
 
-    flags = getattr(os, "O_CLOEXEC", 0) | getattr(os, "O_NOFOLLOW", 0)
+    flags = (
+        getattr(os, "O_CLOEXEC", 0)
+        | getattr(os, "O_NOFOLLOW", 0)
+        | getattr(os, "O_NONBLOCK", 0)
+    )
     if mode in {"r", "rb"}:
         flags |= os.O_RDONLY
     elif mode == "a":

@@ -225,6 +225,13 @@ class ExecutionPolicyTests(unittest.TestCase):
             with self.assertRaises(AuthorizationError):
                 authorize_target("https://8.8.8.8", "nuclei_scan", "grant-001")
 
+    @unittest.skipUnless(hasattr(os, "mkfifo"), "FIFO solo disponible en POSIX.")
+    def test_fifo_policy_is_rejected_before_open(self):
+        self.policy.unlink()
+        os.mkfifo(self.policy, 0o600)
+        with self.assertRaisesRegex(AuthorizationError, "archivo.*regular"):
+            authorize_target("https://8.8.8.8", "nuclei_scan", "grant-001")
+
     def test_oversized_policy_is_rejected(self):
         self.policy.write_bytes(b" " * (1024 * 1024 + 1))
         self.policy.chmod(0o600)

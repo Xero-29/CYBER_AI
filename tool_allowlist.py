@@ -47,6 +47,50 @@ def sign_tool_allowlist(tools, key):
     return document
 
 
+def _validate_parent_chain(candidate):
+    """Reject untrusted parent directories and return their stable identities."""
+    chain = []
+    reparse_flag = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
+    for parent in reversed(candidate.parents):
+        parent_info = parent.lstat()
+        if (
+            stat.S_ISLNK(parent_info.st_mode)
+            or getattr(parent_info, "st_file_attributes", 0) & reparse_flag
+            or not stat.S_ISDIR(parent_info.st_mode)
+        ):
+            raise ToolAllowlistError(
+                "La ruta de la allowlist contiene un padre enlazado o no-directorio."
+            )
+        if os.name != "nt":
+            parent_mode = stat.S_IMODE(parent_info.st_mode)
+            parent_is_trusted = parent_info.st_uid in {0, os.geteuid()}
+            parent_is_root_sticky = (
+                parent_info.st_uid == 0
+                and bool(parent_info.st_mode & stat.S_ISVTX)
+            )
+            if (
+                not parent_is_trusted
+                or (parent_mode & 0o022 and not parent_is_root_sticky)
+            ):
+                raise ToolAllowlistError(
+                    "Los directorios padre de la allowlist no tienen permisos seguros."
+                )
+        chain.append((parent, parent_info))
+    return chain
+
+
+def _same_parent_chain(before, after):
+    return (
+        len(before) == len(after)
+        and all(
+            old_path == new_path
+            and (old_info.st_dev, old_info.st_ino)
+            == (new_info.st_dev, new_info.st_ino)
+            for (old_path, old_info), (new_path, new_info) in zip(before, after)
+        )
+    )
+
+
 def load_signed_tool_allowlist(path, key):
     if not isinstance(key, bytes) or len(key) < 32:
         raise ToolAllowlistError("La clave HMAC debe tener al menos 32 bytes.")
@@ -54,37 +98,16 @@ def load_signed_tool_allowlist(path, key):
     reparse_flag = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
     descriptor = None
     try:
-        for parent in reversed(candidate.parents):
-            parent_info = parent.lstat()
-            if (
-                stat.S_ISLNK(parent_info.st_mode)
-                or getattr(parent_info, "st_file_attributes", 0) & reparse_flag
-                or not stat.S_ISDIR(parent_info.st_mode)
-            ):
-                raise ToolAllowlistError(
-                    "La ruta de la allowlist contiene un padre enlazado o no-directorio."
-                )
-            if os.name != "nt":
-                parent_mode = stat.S_IMODE(parent_info.st_mode)
-                parent_is_trusted = parent_info.st_uid in {0, os.geteuid()}
-                parent_is_root_sticky = (
-                    parent_info.st_uid == 0
-                    and bool(parent_info.st_mode & stat.S_ISVTX)
-                )
-                if (
-                    not parent_is_trusted
-                    or (parent_mode & 0o022 and not parent_is_root_sticky)
-                ):
-                    raise ToolAllowlistError(
-                        "Los directorios padre de la allowlist no tienen permisos seguros."
-                    )
-
+        parent_chain_before = _validate_parent_chain(candidate)
         path_info = candidate.lstat()
         if (
             stat.S_ISLNK(path_info.st_mode)
             or getattr(path_info, "st_file_attributes", 0) & reparse_flag
+            or not stat.S_ISREG(path_info.st_mode)
         ):
-            raise ToolAllowlistError("La allowlist no puede ser un enlace o punto de reanálisis.")
+            raise ToolAllowlistError(
+                "La allowlist debe ser un archivo regular, no un enlace o punto de reanálisis."
+            )
         if os.name != "nt" and (
             path_info.st_uid != os.geteuid()
             or stat.S_IMODE(path_info.st_mode) & 0o077
@@ -93,19 +116,27 @@ def load_signed_tool_allowlist(path, key):
             raise ToolAllowlistError(
                 "La allowlist debe pertenecer al usuario, ser privada (0600) y no tener hardlinks."
             )
-        flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_CLOEXEC", 0)
+        flags = (
+            os.O_RDONLY
+            | getattr(os, "O_NOFOLLOW", 0)
+            | getattr(os, "O_CLOEXEC", 0)
+            | getattr(os, "O_NONBLOCK", 0)
+        )
         descriptor = os.open(candidate, flags)
         info = os.fstat(descriptor)
         path_after = candidate.lstat()
+        parent_chain_after_open = _validate_parent_chain(candidate)
         if (
             not stat.S_ISREG(info.st_mode)
             or info.st_size > 65536
             or stat.S_ISLNK(path_after.st_mode)
             or getattr(path_after, "st_file_attributes", 0) & reparse_flag
+            or not stat.S_ISREG(path_after.st_mode)
             or (info.st_dev, info.st_ino) != (path_after.st_dev, path_after.st_ino)
             or (info.st_uid, info.st_mode, info.st_nlink) != (
                 path_info.st_uid, path_info.st_mode, path_info.st_nlink
             )
+            or not _same_parent_chain(parent_chain_before, parent_chain_after_open)
         ):
             raise ToolAllowlistError(
                 "La allowlist debe ser un archivo regular estable de hasta 64 KiB."
@@ -122,19 +153,26 @@ def load_signed_tool_allowlist(path, key):
             chunks.append(chunk)
         after = os.fstat(descriptor)
         path_final = candidate.lstat()
+        parent_chain_after_read = _validate_parent_chain(candidate)
         if (
             (after.st_dev, after.st_ino) != (info.st_dev, info.st_ino)
             or (path_final.st_dev, path_final.st_ino) != (info.st_dev, info.st_ino)
+            or stat.S_ISLNK(path_final.st_mode)
+            or getattr(path_final, "st_file_attributes", 0) & reparse_flag
+            or not stat.S_ISREG(path_final.st_mode)
+            or (after.st_uid, after.st_mode, after.st_nlink)
+            != (info.st_uid, info.st_mode, info.st_nlink)
             or after.st_size != info.st_size
             or after.st_mtime_ns != info.st_mtime_ns
             or getattr(after, "st_ctime_ns", 0) != getattr(info, "st_ctime_ns", 0)
             or total != after.st_size
+            or not _same_parent_chain(parent_chain_before, parent_chain_after_read)
         ):
             raise ToolAllowlistError("La allowlist cambió mientras se leía.")
         document = json.loads(b"".join(chunks).decode("utf-8"), object_pairs_hook=_unique_object)
     except ToolAllowlistError:
         raise
-    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError, RecursionError) as exc:
         raise ToolAllowlistError("No se pudo leer la allowlist firmada.") from exc
     finally:
         if descriptor is not None:

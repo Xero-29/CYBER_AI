@@ -18,7 +18,9 @@ class ToolAllowlistTests(unittest.TestCase):
         self.key = b"test-only-key-material-32-bytes!!"
         self.digest = "a" * 64
         self.temp = tempfile.TemporaryDirectory()
-        self.path = Path(self.temp.name) / "tools.json"
+        self.directory = Path(self.temp.name) / "config"
+        self.directory.mkdir()
+        self.path = self.directory / "tools.json"
         self.document = sign_tool_allowlist({"ruff": {"sha256": self.digest}}, self.key)
         self.path.write_text(json.dumps(self.document), encoding="utf-8")
         if os.name != "nt":
@@ -63,6 +65,18 @@ class ToolAllowlistTests(unittest.TestCase):
         with self.assertRaises(ToolAllowlistError):
             load_signed_tool_allowlist(directory, self.key)
 
+    @unittest.skipUnless(hasattr(os, "mkfifo"), "FIFO solo disponible en POSIX.")
+    def test_fifo_manifest_is_rejected_before_open(self):
+        fifo = self.directory / "manifest.fifo"
+        os.mkfifo(fifo, 0o600)
+        with self.assertRaisesRegex(ToolAllowlistError, "archivo regular"):
+            load_signed_tool_allowlist(fifo, self.key)
+
+    def test_excessive_json_nesting_is_reported_as_allowlist_error(self):
+        self.path.write_text("[" * 2000 + "0" + "]" * 2000, encoding="utf-8")
+        with self.assertRaises(ToolAllowlistError):
+            load_signed_tool_allowlist(self.path, self.key)
+
     def test_verifier_rejects_invalid_tool_id_and_binary_digest(self):
         with self.assertRaises(ToolAllowlistError):
             verify_tool_allowed("../ruff", self.digest)
@@ -81,6 +95,29 @@ class ToolAllowlistTests(unittest.TestCase):
             self.skipTest("symlinks unavailable")
         with self.assertRaises(ToolAllowlistError):
             load_signed_tool_allowlist(link, self.key)
+
+    def test_parent_replacement_during_open_is_rejected(self):
+        if os.name != "posix":
+            self.skipTest("La sustitución de directorio se prueba en POSIX.")
+        original_parent = self.path.parent
+        moved_parent = original_parent.with_name("config-moved")
+        real_open = os.open
+
+        def replace_parent_after_open(path, flags):
+            descriptor = real_open(path, flags)
+            original_parent.rename(moved_parent)
+            original_parent.symlink_to(moved_parent, target_is_directory=True)
+            return descriptor
+
+        try:
+            with patch("tool_allowlist.os.open", side_effect=replace_parent_after_open):
+                with self.assertRaises(ToolAllowlistError):
+                    load_signed_tool_allowlist(self.path, self.key)
+        finally:
+            if original_parent.is_symlink():
+                original_parent.unlink()
+            if moved_parent.exists():
+                moved_parent.rename(original_parent)
 
     def test_path_replacement_between_open_and_read_is_rejected(self):
         if os.name != "posix":
