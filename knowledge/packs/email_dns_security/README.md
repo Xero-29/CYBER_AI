@@ -46,3 +46,6 @@ RFC 7208, RFC 6376, RFC 7489, RFC 8461, RFC 8460, RFC 4033-4035 y NIST email sec
 
 ## Instrucciones para agentes IA
 No modifiques DNS ni envíes correos sin aprobación. No uses dominios de terceros para pruebas de spoofing; limita el ejercicio a zonas propias.
+
+## Arquitectura
+El ecosistema incluye registrador, DNS autoritativo, DNS recursivo, MX, MTA de entrada/salida, filtros, gateways, buzones, identidad, SPF, DKIM, DMARC, MTA-STS/TLS-RPT y clientes. Trazar dominios, subdominios, delegaciones, rutas de correo, selectores DKIM, políticas y reportes. Separar dominios de envío transaccional y corporativo cuando proceda; contemplar forwarding, listas, terceros y subdominios olvidados. Los cambios DNS tienen TTL, cachés y ventanas de propagación que afectan validación y rollback.
