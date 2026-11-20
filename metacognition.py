@@ -300,6 +300,7 @@ def run_cycle(
 
     task_id = uuid.uuid4().hex
     accepted_reports = []
+    all_reports_indexed = True
     for round_number in range(1, max_rounds + 1):
         if not assessment["gaps"]:
             break
@@ -340,6 +341,7 @@ def run_cycle(
                 "indexed": False,
                 "error": type(publish_error).__name__ + ": " + str(publish_error)[:500],
             }
+        all_reports_indexed = all_reports_indexed and bool(publication.get("indexed"))
         # "known" significa informe revisado; no significa dominio. El estado
         # registra por separado si el informe quedó indexado para recuperación.
         for gap in assessment["gaps"]:
@@ -362,6 +364,13 @@ def run_cycle(
             model_call(principal, build_assessment_prompt(task, knowledge_context, state))
         ))
         if assessment["knowledge_sufficient"]:
+            if not all_reports_indexed:
+                return {
+                    "status": "knowledge_acquired_not_indexed",
+                    "task_id": task_id, "assessment": assessment,
+                    "accepted_reports": len(accepted_reports), "research_rounds": round_number,
+                    "note": "El conocimiento fue revisado, pero no quedó indexado; se bloquea la ejecución para no perder el contexto adquirido.",
+                }
             return {
                 "status": "knowledge_acquired_needs_task_execution",
                 "task_id": task_id, "assessment": assessment,
@@ -397,7 +406,7 @@ def main() -> int:
             knowledge_context="", max_rounds=args.max_rounds,
         )
         print(json.dumps(result, ensure_ascii=False, indent=2))
-        if result["status"] in {"verification_failed", "insufficient_after_research"}:
+        if result["status"] in {"verification_failed", "insufficient_after_research", "knowledge_acquired_not_indexed"}:
             return 2
         return 0
     except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as exc:
