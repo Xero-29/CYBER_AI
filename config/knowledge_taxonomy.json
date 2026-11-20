@@ -1,0 +1,71 @@
+{
+  "taxonomy_version":"1.0.0",
+  "title":"Taxonomía institucional de conocimiento de ciberseguridad",
+  "language":"es",
+  "classification_policy":{"multi_label":true,"require_source_provenance":true,"require_version_or_access_date":true,"unclassified_state":"pending","confidence_scale":["low","medium","high"],"never_infer_validation_from_taxonomy_match":true},
+  "areas":[
+    {"id":"governance-risk-compliance","name":"Gobierno, riesgo y cumplimiento","domains":[
+      {"id":"security-governance","topics":["estrategia y políticas","roles y responsabilidades","comités y supervisión","gestión de excepciones","métricas y madurez"]},
+      {"id":"risk-management","topics":["identificación y análisis de riesgos","apetito y tolerancia","tratamiento y aceptación","riesgo residual","registro y comunicación"]},
+      {"id":"standards-regulations","topics":["ISO 27001 e ISO 27002","NIST CSF y SP 800","CIS Controls","SOC 2","PCI DSS","privacidad y protección de datos","regulación sectorial"]},
+      {"id":"audit-assurance","topics":["auditoría interna","evidencia y trazabilidad","controles y pruebas","hallazgos y remediación","terceras partes"]}]},
+    {"id":"asset-management","name":"Activos, inventario y superficie de ataque","domains":[
+      {"id":"asset-discovery","topics":["inventario hardware y software","descubrimiento de red","servicios y puertos","activos cloud","shadow IT","criticidad y propietarios"]},
+      {"id":"attack-surface","topics":["superficie externa e interna","dominios y DNS","certificados y TLS","exposición de servicios","gestión de cambios"]}]},
+    {"id":"network-security","name":"Seguridad de redes y comunicaciones","domains":[
+      {"id":"network-architecture","topics":["segmentación y microsegmentación","firewalls y ACL","VPN y acceso remoto","Zero Trust","SDN y redes híbridas"]},
+      {"id":"protocols","topics":["TCP/IP y UDP","HTTP y HTTP/2/3","DNS y DHCP","SMTP","SSH","TLS y PKI","protocolos industriales OT"]},
+      {"id":"network-defense","topics":["IDS e IPS","NDR","análisis de tráfico","detección de anomalías","hardening","DDoS y resiliencia"]}]},
+    {"id":"application-security","name":"Seguridad de aplicaciones y APIs","domains":[
+      {"id":"secure-development","topics":["SSDLC y DevSecOps","modelado de amenazas","revisión de código","SAST y DAST","IAST y RASP","SBOM y dependencias"]},
+      {"id":"web-vulnerabilities","topics":["inyección SQL y NoSQL","XSS","CSRF","SSRF","XXE","path traversal","deserialización insegura","control de acceso roto","subida de archivos","request smuggling"]},
+      {"id":"api-security","topics":["REST y GraphQL","autenticación y autorización","BOLA y BFLA","rate limiting","validación de esquemas","versionado y exposición de datos"]},
+      {"id":"software-supply-chain","topics":["paquetes y repositorios","firmado y procedencia","dependencias transitivas","typosquatting","CI/CD y runners","secretos en código"]}]},
+    {"id":"identity-access","name":"Identidad, autenticación y control de acceso","domains":[
+      {"id":"identity-lifecycle","topics":["IAM e IGA","altas bajas y cambios","MFA y passkeys","SSO y federación","OAuth 2.0 y OIDC","SAML","Kerberos","gestión de sesiones"]},
+      {"id":"authorization","topics":["RBAC ABAC ReBAC","mínimo privilegio","PAM","segregación de funciones","revisión de privilegios","cuentas de servicio"]}]},
+    {"id":"endpoint-security","name":"Seguridad de endpoints y sistemas operativos","domains":[
+      {"id":"windows-security","topics":["Active Directory","GPO","PowerShell","Defender","LSASS y credenciales","event logging"]},
+      {"id":"linux-unix-security","topics":["permisos y capacidades","sudo y PAM","systemd","SSH","kernel","SELinux y AppArmor","auditd"]},
+      {"id":"endpoint-defense","topics":["EDR y XDR","antimalware","control de aplicaciones","hardening CIS","gestión de parches","forense de endpoints"]}]},
+    {"id":"cloud-container","name":"Cloud, virtualización y contenedores","domains":[
+      {"id":"cloud-platforms","topics":["AWS","Microsoft Azure","Google Cloud","IAM cloud","redes cloud","storage y cifrado","CSPM"]},
+      {"id":"containers","topics":["Docker y OCI","Kubernetes","runtime security","secrets y RBAC","admission control","service mesh"]},
+      {"id":"infrastructure-as-code","topics":["Terraform","Ansible","plantillas declarativas","drift detection","políticas como código","seguridad de pipelines"]}]},
+    {"id":"data-cryptography","name":"Protección de datos y criptografía","domains":[
+      {"id":"data-security","topics":["clasificación y etiquetado","DLP","cifrado en reposo y tránsito","tokenización","retención y borrado","residencia y soberanía"]},
+      {"id":"cryptography","topics":["criptografía simétrica y asimétrica","hash y MAC","KMS y HSM","PKI y certificados","agilidad criptográfica","computación poscuántica"]}]},
+    {"id":"vulnerability-management","name":"Gestión y análisis de vulnerabilidades","domains":[
+      {"id":"vulnerability-intelligence","topics":["CVE y CNA","CWE","CVSS","EPSS","CPE","CISA KEV","avisos de fabricantes","NVD y CERT"]},
+      {"id":"assessment","topics":["escaneo autenticado y no autenticado","falsos positivos y negativos","validación reproducible","priorización por riesgo","exposición y explotabilidad"]},
+      {"id":"remediation","topics":["parches y mitigaciones","controles compensatorios","excepciones","verificación posterior","rollback y ventanas"]}]},
+    {"id":"offensive-security","name":"Evaluación ofensiva autorizada","domains":[
+      {"id":"methodologies","topics":["PTES","OWASP Testing Guide","OSSTMM","MITRE ATT&CK","MITRE ATLAS","reglas de compromiso"]},
+      {"id":"penetration-testing","topics":["reconocimiento autorizado","enumeración","validación controlada","pruebas de autenticación","pruebas de autorización","reporte y retest"]},
+      {"id":"red-purple-team","topics":["emulación de adversarios","purple teaming","detección y cobertura","tabletop","simulación segura"]}]},
+    {"id":"defensive-operations","name":"Operaciones defensivas y detección","domains":[
+      {"id":"soc-siem","topics":["SOC y SIEM","correlación y reglas","detección conductual","gestión de alertas","SOAR","MITRE ATT&CK mapping"]},
+      {"id":"threat-hunting","topics":["hipótesis de hunting","telemetría","consultas y pivotes","detección de persistencia","validación"]},
+      {"id":"incident-response","topics":["preparación","triage","contención","erradicación y recuperación","cadena de custodia","lecciones aprendidas"]}]},
+    {"id":"digital-forensics","name":"Informática forense","domains":[{"id":"forensics","topics":["adquisición forense","imágenes y hashes","memoria volátil","discos y sistemas de archivos","logs y timeline","forense de red","preservación de evidencia"]}]},
+    {"id":"threat-intelligence","name":"Inteligencia de amenazas","domains":[
+      {"id":"threat-actors","topics":["actores y motivaciones","TTPs","campañas","infraestructura maliciosa","atribución y confianza"]},
+      {"id":"ioc-intelligence","topics":["IOC","STIX y TAXII","MISP","enriquecimiento","caducidad y reputación","contextualización"]}]},
+    {"id":"resilience-continuity","name":"Resiliencia y continuidad","domains":[
+      {"id":"business-continuity","topics":["BIA","RTO y RPO","BCP y DRP","backup inmutable","recuperación ante ransomware","pruebas de restauración"]},
+      {"id":"reliability-testing","topics":["pruebas de carga controladas","capacity planning","chaos engineering","fault injection en laboratorio","límites y guardrails","observabilidad"]}]},
+    {"id":"ai-security","name":"Seguridad de IA y sistemas autónomos","domains":[
+      {"id":"ml-security","topics":["seguridad de datos de entrenamiento","model poisoning","model extraction","privacidad de inferencia","robustez y evaluación"]},
+      {"id":"llm-security","topics":["prompt injection","jailbreaks","RAG y envenenamiento","fuga de datos","tool abuse","evaluación de agentes","MCP y conectores"]},
+      {"id":"agent-governance","topics":["identidad de agentes","permisos por capacidad","sandboxing","aprobación humana","trazabilidad","kill switch","red teaming de agentes"]}]},
+    {"id":"security-architecture","name":"Arquitectura y diseño seguro","domains":[
+      {"id":"architecture-patterns","topics":["Zero Trust","defense in depth","secure by design","STRIDE","trust boundaries","riesgo residual"]},
+      {"id":"engineering","topics":["sistemas distribuidos","observabilidad","resiliencia","configuración","secret management","seguridad por defecto"]}]},
+    {"id":"human-security","name":"Factor humano y seguridad organizacional","domains":[
+      {"id":"awareness","topics":["concienciación","ingeniería social","simulación autorizada de phishing","cultura de reporte","formación por rol"]},
+      {"id":"insider-risk","topics":["amenaza interna","privacidad del monitoreo","controles proporcionales","debido proceso"]}]},
+    {"id":"research-methods","name":"Investigación y calidad científica","domains":[
+      {"id":"evidence-method","topics":["hipótesis falsables","reproducibilidad","control de sesgos","calidad de fuentes","contradicción","revisión por pares"]},
+      {"id":"metrics","topics":["precisión y recall","falsos positivos","cobertura","MTTD y MTTR","calidad de evidencia","benchmarking"]}]}
+  ]
+}
