@@ -163,7 +163,12 @@ No copiar un workflow completo sobre otro. Construir uno solo y probar cada job 
 6. Después de Foundations y AI Red Team, desarrollar las otras 46 especialidades.
 7. Validar individualmente las afirmaciones de las 192 brechas; no autoaprobar.
 
-## 7. Estado final de esta auditoría
+
+## 8. Material de evaluación reservado
+
+No se copia `FOUNDATIONS_ASSESSOR_KEY_V1.md` al paquete público de conocimiento. El archivo se identifica explícitamente como clave de corrección para evaluadores y advierte que no debe entregarse antes de la prueba. Exponerlo junto al material de estudio permitiría memorizar respuestas y contaminar la evaluación. Debe mantenerse en un repositorio/área de evaluadores con control de acceso, o entregarse solo después de la evaluación. La guía de evaluación y el protocolo pueden permanecer públicos; la clave de respuestas no.
+
+## 9. Estado final de esta auditoría
 
 La estructura de PR #13 y PR #14 es útil y sus CI exactos están verdes. La biblioteca aún no alcanza aceptación experta. Se recomienda integración selectiva y encadenada sobre la rama de reconciliación de PR #17, manteniendo ambos PR originales en draft hasta que el contenido, manifiestos, fuentes y workflow hayan sido reconciliados y auditados.
 
