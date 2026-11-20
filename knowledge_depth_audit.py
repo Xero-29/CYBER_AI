@@ -242,7 +242,8 @@ def audit_depth(root: Path = ROOT) -> dict:
         "experimental_not_assessed_count": experiments_not_assessed,
         "independent_review_not_started_count": independent_not_started,
         "full_text_review_pending_count": full_text_pending,
-        "expert_eligible_count": expert_eligible,\n        "expert_eligible_domains": sorted(expert_eligible_domains),
+        "expert_eligible_count": expert_eligible,
+        "expert_eligible_domains": sorted(expert_eligible_domains),
         "policy": (
             "Structural presence and word count are not expert evidence. "
             "Promotion requires claim-to-source traceability, full-text review, "
