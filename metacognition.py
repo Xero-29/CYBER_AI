@@ -101,6 +101,8 @@ def validate_assessment(value: dict) -> dict:
             "priority": priority,
         })
     # Si declara suficiencia, no puede ocultar brechas críticas en la misma respuesta.
+    if sufficient and confidence < 0.75:
+        sufficient = False
     if sufficient and any(item["priority"] >= 4 for item in clean_gaps):
         sufficient = False
     return {
@@ -185,6 +187,27 @@ def _runner_call(agent: str, prompt: str, *, knowledge: bool = True, timeout: in
     return answer
 
 
+def publish_research_report(report: str, task_id: str) -> dict:
+    """Indexa el informe aprobado como conocimiento provisional, nunca como dominio."""
+    from knowledge_embeddings import generate_embedding
+    from knowledge_library import store_chunks
+
+    vector = generate_embedding(report, agent_name="ECO")
+    embedding_model = vector.get("embedding_space") or vector.get("model")
+    stored = store_chunks([{
+        "title": "Investigación metacognitiva " + task_id,
+        "source": "metacognition://" + task_id,
+        "license": "UNSPECIFIED",
+        "category": "research_provisional",
+        "tags": ["metacognition", "ai-research", "provisional", "independently-reviewed"],
+        "visibility": "shared",
+        "content": report,
+        "embedding": vector["embedding"],
+        "embedding_model": embedding_model,
+    }])
+    return {"indexed": True, "document": stored[0]}
+
+
 def run_cycle(
     task: str,
     *,
@@ -192,6 +215,7 @@ def run_cycle(
     researcher: str,
     verifier: str,
     model_call: Callable[[str, str], str] = _runner_call,
+    publisher: Callable[[str, str], dict] = publish_research_report,
     knowledge_context: str = "",
     state_path: Path = STATE_FILE,
     log_path: Path = RESEARCH_LOG,
@@ -246,8 +270,15 @@ def run_cycle(
                 "research_rounds": round_number,
             }
         accepted_reports.append(event)
-        # Actualizar solo como "known", nunca "mastered": dominar requiere una
-        # evaluación práctica separada del informe de investigación.
+        try:
+            publication = publisher(research, task_id)
+        except Exception as publish_error:
+            publication = {
+                "indexed": False,
+                "error": type(publish_error).__name__ + ": " + str(publish_error)[:500],
+            }
+        # "known" significa informe revisado; no significa dominio. El estado
+        # registra por separado si el informe quedó indexado para recuperación.
         for gap in assessment["gaps"]:
             key = gap["topic"].casefold()
             state["competencies"][key] = {
@@ -255,8 +286,15 @@ def run_cycle(
                 "source_task_id": task_id, "verification_score": score,
                 "verified_at": _now(), "prerequisites": gap["prerequisites"],
                 "evidence_log": str(log_path),
+                "library_indexed": bool(publication.get("indexed")),
+                "library_document": publication.get("document", {}).get("document_id"),
             }
         save_competency_map(state, state_path)
+        # Entregar también el informe aceptado directamente al principal para
+        # reevaluación, aunque la indexación semántica esté temporalmente caída.
+        knowledge_context = (
+            knowledge_context + "\\n\\nINFORME REVISADO PROVISIONALMENTE:\\n" + research
+        )[-30000:]
         assessment = validate_assessment(extract_json_object(
             model_call(principal, build_assessment_prompt(task, knowledge_context, state))
         ))
