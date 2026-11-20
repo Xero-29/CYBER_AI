@@ -170,10 +170,57 @@ def audit_depth(root: Path = ROOT) -> dict:
     if len(tasks) != 192:
         errors.append(f"expected 192 validation tasks, found {len(tasks)}")
 
-    # A gap is not expert-eligible merely because it has headings or word count.
-    # Promotion requires validated claims, reviewed sources, assessed experiments,
-    # and independent review; none can be inferred from the draft register.
-    expert_eligible = 0
+    # Expert eligibility is computed from explicit evidence states, never from
+    # word count. Core sections must also be domain-specific rather than copied.
+    core_headings = {
+        "Arquitectura y modelo de amenazas",
+        "Desarrollo técnico y controles",
+        "Procedimiento reproducible",
+        "Laboratorio y evaluación",
+        "Evidencia y limitaciones",
+    }
+    domains_by_section_text: dict[tuple[str, str], set[str]] = defaultdict(set)
+    for record in topic_records:
+        for heading in core_headings:
+            text = record["sections"].get(heading, "")
+            normalised = _normalise(text)
+            if normalised:
+                domains_by_section_text[(heading, normalised)].add(record["domain_id"])
+    for record in topic_records:
+        record["core_sections_unique"] = all(
+            len(domains_by_section_text.get((heading, _normalise(record["sections"].get(heading, ""))), set())) == 1
+            for heading in core_headings
+        )
+
+    tasks_by_domain: dict[str, list[dict]] = defaultdict(list)
+    for task in tasks:
+        tasks_by_domain[task.get("domain_id", "")].append(task)
+    claims_by_task: dict[str, list[dict]] = defaultdict(list)
+    for claim in supported_claims:
+        claims_by_task[claim.get("task_id", "")].append(claim)
+
+    accepted_states = {"expert_validated", "passed"}
+    expert_eligible_domains = []
+    register_by_domain = {
+        item.get("domain_id"): item for item in register.get("domains", [])
+    }
+    for domain_id, domain_record in register_by_domain.items():
+        domain_topics = [item for item in topic_records if item["domain_id"] == domain_id]
+        domain_tasks = tasks_by_domain.get(domain_id, [])
+        registered_topics = domain_record.get("developed_topics", [])
+        if (
+            domain_record.get("status") in accepted_states
+            and len(domain_topics) == 4
+            and len(domain_tasks) == 4
+            and all(item.get("status") in accepted_states for item in registered_topics)
+            and all(item.get("core_sections_unique") for item in domain_topics)
+            and all(task.get("source_review_status") == "full_text_reviewed" for task in domain_tasks)
+            and all(task.get("experimental_status") == "validated" for task in domain_tasks)
+            and all(task.get("independent_review_status") in {"approved", "passed"} for task in domain_tasks)
+            and all(claims_by_task.get(task.get("task_id", "")) for task in domain_tasks)
+        ):
+            expert_eligible_domains.append(domain_id)
+    expert_eligible = len(expert_eligible_domains)
     return {
         "ok": not errors,
         "errors": errors,
@@ -195,7 +242,7 @@ def audit_depth(root: Path = ROOT) -> dict:
         "experimental_not_assessed_count": experiments_not_assessed,
         "independent_review_not_started_count": independent_not_started,
         "full_text_review_pending_count": full_text_pending,
-        "expert_eligible_count": expert_eligible,
+        "expert_eligible_count": expert_eligible,\n        "expert_eligible_domains": sorted(expert_eligible_domains),
         "policy": (
             "Structural presence and word count are not expert evidence. "
             "Promotion requires claim-to-source traceability, full-text review, "
