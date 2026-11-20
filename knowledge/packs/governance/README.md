@@ -50,3 +50,6 @@ ISO/IEC 27001/27002, NIST CSF 2.0, CIS Controls, COBIT, NIST Privacy Framework, 
 
 ## Instrucciones para agentes IA
 No declares cumplimiento o certificación. Cita versión y alcance del marco. Diferencia evidencia, autoevaluación y auditoría independiente. No inventes obligaciones legales ni fechas regulatorias.
+
+## Arquitectura
+El modelo de gobierno conecta órgano de dirección, propietario del riesgo, CISO, responsables de sistemas/datos, compras, privacidad, auditoría y operación. Los flujos de decisión cubren estrategia, apetito de riesgo, políticas, excepciones, inversión, métricas y escalado. Mantener separación entre quien define controles, quien los opera y quien verifica; integrar terceros y filiales en el alcance. Cada obligación debe trazarse a entidad, activo, proceso, control, evidencia, responsable, frecuencia y mecanismo de remediación.

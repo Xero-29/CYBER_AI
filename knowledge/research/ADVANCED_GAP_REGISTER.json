@@ -1,0 +1,2707 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-11-19",
+  "purpose": "Registro de 192 módulos desarrollados como borradores técnicos estructurados; no implica validación experimental ni revisión experta.",
+  "status_policy": {
+    "initial_status": "identified_not_yet_assessed",
+    "developed_status": "developed_initial_draft",
+    "validated_requires": [
+      "fuentes primarias leídas y trazadas por afirmación",
+      "procedimiento reproducible",
+      "laboratorio y resultados cuando aplique",
+      "pruebas negativas y métricas",
+      "revisión independiente"
+    ],
+    "maturity_warning": "El desarrollo documental no eleva automáticamente madurez M3/M4/M5."
+  },
+  "domains": [
+    {
+      "domain_id": "foundations",
+      "missing_advanced_topics": [
+        "cuantificación de riesgo y análisis de incertidumbre",
+        "arquitectura de confianza y resiliencia sistémica",
+        "economía de seguridad y priorización basada en impacto",
+        "gestión de exposición externa y attack surface management"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "cuantificación de riesgo y análisis de incertidumbre",
+          "anchor": "foundations#1",
+          "status": "developed_initial_draft",
+          "word_count": 420,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "arquitectura de confianza y resiliencia sistémica",
+          "anchor": "foundations#2",
+          "status": "developed_initial_draft",
+          "word_count": 414,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "economía de seguridad y priorización basada en impacto",
+          "anchor": "foundations#3",
+          "status": "developed_initial_draft",
+          "word_count": 421,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "gestión de exposición externa y attack surface management",
+          "anchor": "foundations#4",
+          "status": "developed_initial_draft",
+          "word_count": 420,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "appsec",
+      "missing_advanced_topics": [
+        "seguridad de lógica de negocio y flujos transaccionales",
+        "seguridad de navegador, extensiones y aislamiento de origen",
+        "seguridad de componentes frontend y cadena de dependencias",
+        "pruebas de autorización y propiedades de seguridad por flujo"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "seguridad de lógica de negocio y flujos transaccionales",
+          "anchor": "appsec#1",
+          "status": "developed_initial_draft",
+          "word_count": 422,
+          "source_urls": [
+            "https://owasp.org/www-project-top-ten/",
+            "https://owasp.org/www-project-application-security-verification-standard/"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "seguridad de navegador, extensiones y aislamiento de origen",
+          "anchor": "appsec#2",
+          "status": "developed_initial_draft",
+          "word_count": 419,
+          "source_urls": [
+            "https://owasp.org/www-project-top-ten/",
+            "https://owasp.org/www-project-application-security-verification-standard/"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "seguridad de componentes frontend y cadena de dependencias",
+          "anchor": "appsec#3",
+          "status": "developed_initial_draft",
+          "word_count": 422,
+          "source_urls": [
+            "https://owasp.org/www-project-top-ten/",
+            "https://owasp.org/www-project-application-security-verification-standard/"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "pruebas de autorización y propiedades de seguridad por flujo",
+          "anchor": "appsec#4",
+          "status": "developed_initial_draft",
+          "word_count": 419,
+          "source_urls": [
+            "https://owasp.org/www-project-top-ten/",
+            "https://owasp.org/www-project-application-security-verification-standard/"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "api",
+      "missing_advanced_topics": [
+        "GraphQL federation, introspection y autorización por resolver",
+        "gRPC, protobuf y seguridad de canales",
+        "API inventory, shadow APIs y contratos versionados",
+        "abuso de negocio, replay y límites distribuidos"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "GraphQL federation, introspection y autorización por resolver",
+          "anchor": "api#1",
+          "status": "developed_initial_draft",
+          "word_count": 424,
+          "source_urls": [
+            "https://owasp.org/www-project-api-security/",
+            "https://doi.org/10.6028/NIST.SP.800-207A"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "gRPC, protobuf y seguridad de canales",
+          "anchor": "api#2",
+          "status": "developed_initial_draft",
+          "word_count": 423,
+          "source_urls": [
+            "https://owasp.org/www-project-api-security/",
+            "https://doi.org/10.6028/NIST.SP.800-207A"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "API inventory, shadow APIs y contratos versionados",
+          "anchor": "api#3",
+          "status": "developed_initial_draft",
+          "word_count": 424,
+          "source_urls": [
+            "https://owasp.org/www-project-api-security/",
+            "https://doi.org/10.6028/NIST.SP.800-207A"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "abuso de negocio, replay y límites distribuidos",
+          "anchor": "api#4",
+          "status": "developed_initial_draft",
+          "word_count": 424,
+          "source_urls": [
+            "https://owasp.org/www-project-api-security/",
+            "https://doi.org/10.6028/NIST.SP.800-207A"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "network",
+      "missing_advanced_topics": [
+        "BGP, RPKI y validación de origen de rutas",
+        "IPv6, RA guard y superficies dual-stack",
+        "DNS moderno, DoH/DoT y seguridad de resolvers",
+        "SASE, SD-WAN, ZTNA y seguridad de borde"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "BGP, RPKI y validación de origen de rutas",
+          "anchor": "network#1",
+          "status": "developed_initial_draft",
+          "word_count": 417,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "IPv6, RA guard y superficies dual-stack",
+          "anchor": "network#2",
+          "status": "developed_initial_draft",
+          "word_count": 418,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "DNS moderno, DoH/DoT y seguridad de resolvers",
+          "anchor": "network#3",
+          "status": "developed_initial_draft",
+          "word_count": 420,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "SASE, SD-WAN, ZTNA y seguridad de borde",
+          "anchor": "network#4",
+          "status": "developed_initial_draft",
+          "word_count": 415,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "linux",
+      "missing_advanced_topics": [
+        "eBPF y observabilidad/seguridad del kernel",
+        "Linux namespaces, cgroups y escape de contenedores",
+        "PAM, sudo, systemd y hardening por distribución",
+        "firmware, boot chain y respuesta a compromisos"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "eBPF y observabilidad/seguridad del kernel",
+          "anchor": "linux#1",
+          "status": "developed_initial_draft",
+          "word_count": 415,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "Linux namespaces, cgroups y escape de contenedores",
+          "anchor": "linux#2",
+          "status": "developed_initial_draft",
+          "word_count": 416,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "PAM, sudo, systemd y hardening por distribución",
+          "anchor": "linux#3",
+          "status": "developed_initial_draft",
+          "word_count": 416,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "firmware, boot chain y respuesta a compromisos",
+          "anchor": "linux#4",
+          "status": "developed_initial_draft",
+          "word_count": 418,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "windows_ad",
+      "missing_advanced_topics": [
+        "AD CS, certificados y abuso de PKI empresarial",
+        "Entra ID/híbrido, OAuth y workload identities",
+        "Kerberos delegation, trusts y tiering avanzado",
+        "detección de identidad y recuperación forest-level"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "AD CS, certificados y abuso de PKI empresarial",
+          "anchor": "windows_ad#1",
+          "status": "developed_initial_draft",
+          "word_count": 411,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "Entra ID/híbrido, OAuth y workload identities",
+          "anchor": "windows_ad#2",
+          "status": "developed_initial_draft",
+          "word_count": 410,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "Kerberos delegation, trusts y tiering avanzado",
+          "anchor": "windows_ad#3",
+          "status": "developed_initial_draft",
+          "word_count": 409,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "detección de identidad y recuperación forest-level",
+          "anchor": "windows_ad#4",
+          "status": "developed_initial_draft",
+          "word_count": 409,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "cloud",
+      "missing_advanced_topics": [
+        "SaaS security posture y control plane de identidades",
+        "serverless, event-driven y permisos por función",
+        "CNAPP, CSPM, CIEM y correlación de exposición",
+        "cloud-native zero trust y workload identity"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "SaaS security posture y control plane de identidades",
+          "anchor": "cloud#1",
+          "status": "developed_initial_draft",
+          "word_count": 420,
+          "source_urls": [
+            "https://doi.org/10.6028/NIST.SP.800-207A",
+            "https://csrc.nist.gov/pubs/ir/8587/final"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "serverless, event-driven y permisos por función",
+          "anchor": "cloud#2",
+          "status": "developed_initial_draft",
+          "word_count": 419,
+          "source_urls": [
+            "https://doi.org/10.6028/NIST.SP.800-207A",
+            "https://csrc.nist.gov/pubs/ir/8587/final"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "CNAPP, CSPM, CIEM y correlación de exposición",
+          "anchor": "cloud#3",
+          "status": "developed_initial_draft",
+          "word_count": 418,
+          "source_urls": [
+            "https://doi.org/10.6028/NIST.SP.800-207A",
+            "https://csrc.nist.gov/pubs/ir/8587/final"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "cloud-native zero trust y workload identity",
+          "anchor": "cloud#4",
+          "status": "developed_initial_draft",
+          "word_count": 418,
+          "source_urls": [
+            "https://doi.org/10.6028/NIST.SP.800-207A",
+            "https://csrc.nist.gov/pubs/ir/8587/final"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "containers",
+      "missing_advanced_topics": [
+        "Kubernetes supply chain y verificación de imágenes",
+        "runtime security, eBPF y detección de comportamiento",
+        "service mesh, SPIFFE/SPIRE y políticas de servicio",
+        "admission control, secrets y recuperación de control plane"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "Kubernetes supply chain y verificación de imágenes",
+          "anchor": "containers#1",
+          "status": "developed_initial_draft",
+          "word_count": 417,
+          "source_urls": [
+            "https://doi.org/10.6028/NIST.SP.800-190",
+            "https://slsa.dev/spec/v1.0/"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "runtime security, eBPF y detección de comportamiento",
+          "anchor": "containers#2",
+          "status": "developed_initial_draft",
+          "word_count": 415,
+          "source_urls": [
+            "https://doi.org/10.6028/NIST.SP.800-190",
+            "https://slsa.dev/spec/v1.0/"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "service mesh, SPIFFE/SPIRE y políticas de servicio",
+          "anchor": "containers#3",
+          "status": "developed_initial_draft",
+          "word_count": 418,
+          "source_urls": [
+            "https://doi.org/10.6028/NIST.SP.800-190",
+            "https://slsa.dev/spec/v1.0/"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "admission control, secrets y recuperación de control plane",
+          "anchor": "containers#4",
+          "status": "developed_initial_draft",
+          "word_count": 416,
+          "source_urls": [
+            "https://doi.org/10.6028/NIST.SP.800-190",
+            "https://slsa.dev/spec/v1.0/"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "mobile",
+      "missing_advanced_topics": [
+        "mobile app supply chain y firma de releases",
+        "runtime application self-protection y anti-tampering",
+        "baseband, eSIM y superficie de radio",
+        "privacidad, SDKs de terceros y telemetría móvil"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "mobile app supply chain y firma de releases",
+          "anchor": "mobile#1",
+          "status": "developed_initial_draft",
+          "word_count": 416,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "runtime application self-protection y anti-tampering",
+          "anchor": "mobile#2",
+          "status": "developed_initial_draft",
+          "word_count": 416,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "baseband, eSIM y superficie de radio",
+          "anchor": "mobile#3",
+          "status": "developed_initial_draft",
+          "word_count": 417,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "privacidad, SDKs de terceros y telemetría móvil",
+          "anchor": "mobile#4",
+          "status": "developed_initial_draft",
+          "word_count": 418,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "crypto",
+      "missing_advanced_topics": [
+        "cripto-agilidad e inventario criptográfico empresarial",
+        "side-channel y fault attacks en implementaciones",
+        "protocolos híbridos y negociación segura",
+        "validación de bibliotecas, vectores y erratas"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "cripto-agilidad e inventario criptográfico empresarial",
+          "anchor": "crypto#1",
+          "status": "developed_initial_draft",
+          "word_count": 420,
+          "source_urls": [
+            "https://doi.org/10.6028/NIST.FIPS.203",
+            "https://doi.org/10.6028/NIST.FIPS.204"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "side-channel y fault attacks en implementaciones",
+          "anchor": "crypto#2",
+          "status": "developed_initial_draft",
+          "word_count": 422,
+          "source_urls": [
+            "https://doi.org/10.6028/NIST.FIPS.203",
+            "https://doi.org/10.6028/NIST.FIPS.204"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "protocolos híbridos y negociación segura",
+          "anchor": "crypto#3",
+          "status": "developed_initial_draft",
+          "word_count": 424,
+          "source_urls": [
+            "https://doi.org/10.6028/NIST.FIPS.203",
+            "https://doi.org/10.6028/NIST.FIPS.204"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "validación de bibliotecas, vectores y erratas",
+          "anchor": "crypto#4",
+          "status": "developed_initial_draft",
+          "word_count": 423,
+          "source_urls": [
+            "https://doi.org/10.6028/NIST.FIPS.203",
+            "https://doi.org/10.6028/NIST.FIPS.204"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "identity",
+      "missing_advanced_topics": [
+        "passkeys/WebAuthn y autenticación resistente a phishing",
+        "identidades no humanas y ciclo de vida de credenciales",
+        "CIEM y permisos efectivos multi-cloud",
+        "detección de ataques a identidad y recuperación segura"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "passkeys/WebAuthn y autenticación resistente a phishing",
+          "anchor": "identity#1",
+          "status": "developed_initial_draft",
+          "word_count": 418,
+          "source_urls": [
+            "https://csrc.nist.gov/pubs/ir/8587/final",
+            "https://doi.org/10.6028/NIST.SP.800-63-4"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "identidades no humanas y ciclo de vida de credenciales",
+          "anchor": "identity#2",
+          "status": "developed_initial_draft",
+          "word_count": 420,
+          "source_urls": [
+            "https://csrc.nist.gov/pubs/ir/8587/final",
+            "https://doi.org/10.6028/NIST.SP.800-63-4"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "CIEM y permisos efectivos multi-cloud",
+          "anchor": "identity#3",
+          "status": "developed_initial_draft",
+          "word_count": 417,
+          "source_urls": [
+            "https://csrc.nist.gov/pubs/ir/8587/final",
+            "https://doi.org/10.6028/NIST.SP.800-63-4"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "detección de ataques a identidad y recuperación segura",
+          "anchor": "identity#4",
+          "status": "developed_initial_draft",
+          "word_count": 419,
+          "source_urls": [
+            "https://csrc.nist.gov/pubs/ir/8587/final",
+            "https://doi.org/10.6028/NIST.SP.800-63-4"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "malware",
+      "missing_advanced_topics": [
+        "malware fileless y abuso de herramientas legítimas",
+        "firmware/UEFI y bootkits",
+        "análisis de memoria y artefactos multiplataforma",
+        "ransomware, exfiltración y recuperación coordinada"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "malware fileless y abuso de herramientas legítimas",
+          "anchor": "malware#1",
+          "status": "developed_initial_draft",
+          "word_count": 415,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "firmware/UEFI y bootkits",
+          "anchor": "malware#2",
+          "status": "developed_initial_draft",
+          "word_count": 410,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "análisis de memoria y artefactos multiplataforma",
+          "anchor": "malware#3",
+          "status": "developed_initial_draft",
+          "word_count": 414,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "ransomware, exfiltración y recuperación coordinada",
+          "anchor": "malware#4",
+          "status": "developed_initial_draft",
+          "word_count": 413,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "forensics",
+      "missing_advanced_topics": [
+        "forense de memoria multiplataforma",
+        "forense SaaS/cloud con APIs y retención distribuida",
+        "adquisición móvil moderna y cifrado",
+        "reproducibilidad, validación de herramientas y error forense"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "forense de memoria multiplataforma",
+          "anchor": "forensics#1",
+          "status": "developed_initial_draft",
+          "word_count": 416,
+          "source_urls": [
+            "https://www.nist.gov/digital-evidence",
+            "https://doi.org/10.6028/NIST.SP.800-86"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "forense SaaS/cloud con APIs y retención distribuida",
+          "anchor": "forensics#2",
+          "status": "developed_initial_draft",
+          "word_count": 418,
+          "source_urls": [
+            "https://www.nist.gov/digital-evidence",
+            "https://doi.org/10.6028/NIST.SP.800-86"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "adquisición móvil moderna y cifrado",
+          "anchor": "forensics#3",
+          "status": "developed_initial_draft",
+          "word_count": 414,
+          "source_urls": [
+            "https://www.nist.gov/digital-evidence",
+            "https://doi.org/10.6028/NIST.SP.800-86"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "reproducibilidad, validación de herramientas y error forense",
+          "anchor": "forensics#4",
+          "status": "developed_initial_draft",
+          "word_count": 419,
+          "source_urls": [
+            "https://www.nist.gov/digital-evidence",
+            "https://doi.org/10.6028/NIST.SP.800-86"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "incident_response",
+      "missing_advanced_topics": [
+        "respuesta a ransomware y extorsión múltiple",
+        "respuesta cloud, SaaS e identidad comprometida",
+        "notificación regulatoria y coordinación sectorial",
+        "recuperación segura, validación de backups y crisis"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "respuesta a ransomware y extorsión múltiple",
+          "anchor": "incident_response#1",
+          "status": "developed_initial_draft",
+          "word_count": 419,
+          "source_urls": [
+            "https://doi.org/10.6028/NIST.SP.800-61r3",
+            "https://www.cisa.gov/stopransomware"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "respuesta cloud, SaaS e identidad comprometida",
+          "anchor": "incident_response#2",
+          "status": "developed_initial_draft",
+          "word_count": 416,
+          "source_urls": [
+            "https://doi.org/10.6028/NIST.SP.800-61r3",
+            "https://www.cisa.gov/stopransomware"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "notificación regulatoria y coordinación sectorial",
+          "anchor": "incident_response#3",
+          "status": "developed_initial_draft",
+          "word_count": 418,
+          "source_urls": [
+            "https://doi.org/10.6028/NIST.SP.800-61r3",
+            "https://www.cisa.gov/stopransomware"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "recuperación segura, validación de backups y crisis",
+          "anchor": "incident_response#4",
+          "status": "developed_initial_draft",
+          "word_count": 416,
+          "source_urls": [
+            "https://doi.org/10.6028/NIST.SP.800-61r3",
+            "https://www.cisa.gov/stopransomware"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "threat_intel",
+      "missing_advanced_topics": [
+        "ATT&CK versionado, STIX y procedencia de objetos",
+        "calidad de inteligencia y evaluación de hipótesis",
+        "detección estratégica basada en cadenas de comportamiento",
+        "automatización de CTI con control de poisoning"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "ATT&CK versionado, STIX y procedencia de objetos",
+          "anchor": "threat_intel#1",
+          "status": "developed_initial_draft",
+          "word_count": 419,
+          "source_urls": [
+            "https://attack.mitre.org/",
+            "https://oasis-open.github.io/cti-documentation/"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "calidad de inteligencia y evaluación de hipótesis",
+          "anchor": "threat_intel#2",
+          "status": "developed_initial_draft",
+          "word_count": 418,
+          "source_urls": [
+            "https://attack.mitre.org/",
+            "https://oasis-open.github.io/cti-documentation/"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "detección estratégica basada en cadenas de comportamiento",
+          "anchor": "threat_intel#3",
+          "status": "developed_initial_draft",
+          "word_count": 414,
+          "source_urls": [
+            "https://attack.mitre.org/",
+            "https://oasis-open.github.io/cti-documentation/"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "automatización de CTI con control de poisoning",
+          "anchor": "threat_intel#4",
+          "status": "developed_initial_draft",
+          "word_count": 414,
+          "source_urls": [
+            "https://attack.mitre.org/",
+            "https://oasis-open.github.io/cti-documentation/"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "reverse",
+      "missing_advanced_topics": [
+        "WebAssembly, bytecode y runtimes modernos",
+        "firmware, bootloaders y análisis de dispositivos",
+        "análisis de vulnerabilidades de memoria y compiladores",
+        "reproducibilidad de builds y artefactos"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "WebAssembly, bytecode y runtimes modernos",
+          "anchor": "reverse#1",
+          "status": "developed_initial_draft",
+          "word_count": 416,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "firmware, bootloaders y análisis de dispositivos",
+          "anchor": "reverse#2",
+          "status": "developed_initial_draft",
+          "word_count": 415,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "análisis de vulnerabilidades de memoria y compiladores",
+          "anchor": "reverse#3",
+          "status": "developed_initial_draft",
+          "word_count": 418,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "reproducibilidad de builds y artefactos",
+          "anchor": "reverse#4",
+          "status": "developed_initial_draft",
+          "word_count": 412,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "iot_hardware",
+      "missing_advanced_topics": [
+        "device identity y provisioning de confianza",
+        "SBOM/firmware BOM y vulnerabilidades de componentes",
+        "actualizaciones OTA, rollback y recuperación",
+        "seguridad de radios, gateways y protocolos industriales"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "device identity y provisioning de confianza",
+          "anchor": "iot_hardware#1",
+          "status": "developed_initial_draft",
+          "word_count": 413,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "SBOM/firmware BOM y vulnerabilidades de componentes",
+          "anchor": "iot_hardware#2",
+          "status": "developed_initial_draft",
+          "word_count": 415,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "actualizaciones OTA, rollback y recuperación",
+          "anchor": "iot_hardware#3",
+          "status": "developed_initial_draft",
+          "word_count": 413,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "seguridad de radios, gateways y protocolos industriales",
+          "anchor": "iot_hardware#4",
+          "status": "developed_initial_draft",
+          "word_count": 417,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "devsecops",
+      "missing_advanced_topics": [
+        "provenance verificable, SLSA y attestations",
+        "OIDC, runners efímeros y permisos por job",
+        "seguridad de modelos/datasets en pipelines ML",
+        "verificación de artefactos y políticas de despliegue"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "provenance verificable, SLSA y attestations",
+          "anchor": "devsecops#1",
+          "status": "developed_initial_draft",
+          "word_count": 417,
+          "source_urls": [
+            "https://csrc.nist.gov/Projects/ssdf",
+            "https://slsa.dev/spec/v1.0/"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "OIDC, runners efímeros y permisos por job",
+          "anchor": "devsecops#2",
+          "status": "developed_initial_draft",
+          "word_count": 419,
+          "source_urls": [
+            "https://csrc.nist.gov/Projects/ssdf",
+            "https://slsa.dev/spec/v1.0/"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "seguridad de modelos/datasets en pipelines ML",
+          "anchor": "devsecops#3",
+          "status": "developed_initial_draft",
+          "word_count": 419,
+          "source_urls": [
+            "https://csrc.nist.gov/Projects/ssdf",
+            "https://slsa.dev/spec/v1.0/"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "verificación de artefactos y políticas de despliegue",
+          "anchor": "devsecops#4",
+          "status": "developed_initial_draft",
+          "word_count": 417,
+          "source_urls": [
+            "https://csrc.nist.gov/Projects/ssdf",
+            "https://slsa.dev/spec/v1.0/"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "ai_security",
+      "missing_advanced_topics": [
+        "model supply chain y model BOM",
+        "seguridad de agentes, tools y delegación de autoridad",
+        "aislamiento multi-tenant de RAG, memoria y vectores",
+        "evaluación continua de modelos y datasets contaminados"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "model supply chain y model BOM",
+          "anchor": "ai_security#1",
+          "status": "developed_initial_draft",
+          "word_count": 416,
+          "source_urls": [
+            "https://www.nist.gov/itl/ai-risk-management-framework",
+            "https://owasp.org/www-project-top-10-for-large-language-model-applications/"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "seguridad de agentes, tools y delegación de autoridad",
+          "anchor": "ai_security#2",
+          "status": "developed_initial_draft",
+          "word_count": 417,
+          "source_urls": [
+            "https://www.nist.gov/itl/ai-risk-management-framework",
+            "https://owasp.org/www-project-top-10-for-large-language-model-applications/"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "aislamiento multi-tenant de RAG, memoria y vectores",
+          "anchor": "ai_security#3",
+          "status": "developed_initial_draft",
+          "word_count": 419,
+          "source_urls": [
+            "https://www.nist.gov/itl/ai-risk-management-framework",
+            "https://owasp.org/www-project-top-10-for-large-language-model-applications/"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "evaluación continua de modelos y datasets contaminados",
+          "anchor": "ai_security#4",
+          "status": "developed_initial_draft",
+          "word_count": 416,
+          "source_urls": [
+            "https://www.nist.gov/itl/ai-risk-management-framework",
+            "https://owasp.org/www-project-top-10-for-large-language-model-applications/"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "governance",
+      "missing_advanced_topics": [
+        "regulación colombiana y sectorial aplicable",
+        "riesgo de terceros, concentración y cadena de suministro",
+        "métricas cuantitativas, apetito y riesgo residual",
+        "gobierno de IA, privacidad y uso responsable"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "regulación colombiana y sectorial aplicable",
+          "anchor": "governance#1",
+          "status": "developed_initial_draft",
+          "word_count": 410,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "riesgo de terceros, concentración y cadena de suministro",
+          "anchor": "governance#2",
+          "status": "developed_initial_draft",
+          "word_count": 418,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "métricas cuantitativas, apetito y riesgo residual",
+          "anchor": "governance#3",
+          "status": "developed_initial_draft",
+          "word_count": 416,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "gobierno de IA, privacidad y uso responsable",
+          "anchor": "governance#4",
+          "status": "developed_initial_draft",
+          "word_count": 412,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "vuln_management",
+      "missing_advanced_topics": [
+        "exposure management y attack surface externo",
+        "correlación KEV, EPSS, CVSS y contexto de activo",
+        "priorización por ruta de ataque y explotabilidad",
+        "gestión de excepciones, deuda y remediación verificable"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "exposure management y attack surface externo",
+          "anchor": "vuln_management#1",
+          "status": "developed_initial_draft",
+          "word_count": 415,
+          "source_urls": [
+            "https://www.cisa.gov/known-exploited-vulnerabilities-catalog",
+            "https://www.first.org/epss/"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "correlación KEV, EPSS, CVSS y contexto de activo",
+          "anchor": "vuln_management#2",
+          "status": "developed_initial_draft",
+          "word_count": 413,
+          "source_urls": [
+            "https://www.cisa.gov/known-exploited-vulnerabilities-catalog",
+            "https://www.first.org/epss/"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "priorización por ruta de ataque y explotabilidad",
+          "anchor": "vuln_management#3",
+          "status": "developed_initial_draft",
+          "word_count": 414,
+          "source_urls": [
+            "https://www.cisa.gov/known-exploited-vulnerabilities-catalog",
+            "https://www.first.org/epss/"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "gestión de excepciones, deuda y remediación verificable",
+          "anchor": "vuln_management#4",
+          "status": "developed_initial_draft",
+          "word_count": 412,
+          "source_urls": [
+            "https://www.cisa.gov/known-exploited-vulnerabilities-catalog",
+            "https://www.first.org/epss/"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "bug_bounty",
+      "missing_advanced_topics": [
+        "VDP, safe harbor y coordinación legal",
+        "triage reproducible y deduplicación de hallazgos",
+        "pruebas seguras de impacto sin exfiltración",
+        "métricas de programa y divulgación coordinada"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "VDP, safe harbor y coordinación legal",
+          "anchor": "bug_bounty#1",
+          "status": "developed_initial_draft",
+          "word_count": 412,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "triage reproducible y deduplicación de hallazgos",
+          "anchor": "bug_bounty#2",
+          "status": "developed_initial_draft",
+          "word_count": 411,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "pruebas seguras de impacto sin exfiltración",
+          "anchor": "bug_bounty#3",
+          "status": "developed_initial_draft",
+          "word_count": 416,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "métricas de programa y divulgación coordinada",
+          "anchor": "bug_bounty#4",
+          "status": "developed_initial_draft",
+          "word_count": 416,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "secure_arch",
+      "missing_advanced_topics": [
+        "arquitectura cloud-native Zero Trust",
+        "resiliencia, degradación segura y blast-radius control",
+        "arquitectura multi-tenant y separación de datos",
+        "seguridad de APIs internas, service mesh y supply chain"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "arquitectura cloud-native Zero Trust",
+          "anchor": "secure_arch#1",
+          "status": "developed_initial_draft",
+          "word_count": 413,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "resiliencia, degradación segura y blast-radius control",
+          "anchor": "secure_arch#2",
+          "status": "developed_initial_draft",
+          "word_count": 413,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "arquitectura multi-tenant y separación de datos",
+          "anchor": "secure_arch#3",
+          "status": "developed_initial_draft",
+          "word_count": 414,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "seguridad de APIs internas, service mesh y supply chain",
+          "anchor": "secure_arch#4",
+          "status": "developed_initial_draft",
+          "word_count": 418,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "data_security",
+      "missing_advanced_topics": [
+        "DSPM, clasificación automatizada y data lineage",
+        "confidential computing y protección de datos en uso",
+        "privacidad-preserving analytics y aprendizaje",
+        "borrado verificable, retención y gobernanza de backups"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "DSPM, clasificación automatizada y data lineage",
+          "anchor": "data_security#1",
+          "status": "developed_initial_draft",
+          "word_count": 412,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "confidential computing y protección de datos en uso",
+          "anchor": "data_security#2",
+          "status": "developed_initial_draft",
+          "word_count": 414,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "privacidad-preserving analytics y aprendizaje",
+          "anchor": "data_security#3",
+          "status": "developed_initial_draft",
+          "word_count": 413,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "borrado verificable, retención y gobernanza de backups",
+          "anchor": "data_security#4",
+          "status": "developed_initial_draft",
+          "word_count": 412,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "software_engineering",
+      "missing_advanced_topics": [
+        "memory safety y lenguajes seguros",
+        "concurrencia, race conditions y seguridad de runtime",
+        "reproducible builds y provenance de dependencias",
+        "fuzzing, property-based testing y verificación"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "memory safety y lenguajes seguros",
+          "anchor": "software_engineering#1",
+          "status": "developed_initial_draft",
+          "word_count": 409,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "concurrencia, race conditions y seguridad de runtime",
+          "anchor": "software_engineering#2",
+          "status": "developed_initial_draft",
+          "word_count": 410,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "reproducible builds y provenance de dependencias",
+          "anchor": "software_engineering#3",
+          "status": "developed_initial_draft",
+          "word_count": 411,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "fuzzing, property-based testing y verificación",
+          "anchor": "software_engineering#4",
+          "status": "developed_initial_draft",
+          "word_count": 408,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "machine_learning",
+      "missing_advanced_topics": [
+        "adversarial ML, poisoning y backdoors",
+        "privacy leakage, membership inference y extracción",
+        "model evaluation, calibration y uncertainty",
+        "MLOps, model registry y procedencia de datasets"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "adversarial ML, poisoning y backdoors",
+          "anchor": "machine_learning#1",
+          "status": "developed_initial_draft",
+          "word_count": 410,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "privacy leakage, membership inference y extracción",
+          "anchor": "machine_learning#2",
+          "status": "developed_initial_draft",
+          "word_count": 412,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "model evaluation, calibration y uncertainty",
+          "anchor": "machine_learning#3",
+          "status": "developed_initial_draft",
+          "word_count": 415,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "MLOps, model registry y procedencia de datasets",
+          "anchor": "machine_learning#4",
+          "status": "developed_initial_draft",
+          "word_count": 413,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "hardware_security",
+      "missing_advanced_topics": [
+        "silicon assurance y cadena de fabricación",
+        "fault injection y side-channel avanzado",
+        "attestation, TEE y confidential computing",
+        "firmware lifecycle y recuperación de root of trust"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "silicon assurance y cadena de fabricación",
+          "anchor": "hardware_security#1",
+          "status": "developed_initial_draft",
+          "word_count": 409,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "fault injection y side-channel avanzado",
+          "anchor": "hardware_security#2",
+          "status": "developed_initial_draft",
+          "word_count": 409,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "attestation, TEE y confidential computing",
+          "anchor": "hardware_security#3",
+          "status": "developed_initial_draft",
+          "word_count": 409,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "firmware lifecycle y recuperación de root of trust",
+          "anchor": "hardware_security#4",
+          "status": "developed_initial_draft",
+          "word_count": 413,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "mathematics",
+      "missing_advanced_topics": [
+        "estadística bayesiana y calibración de confianza",
+        "optimización robusta y detección de anomalías",
+        "teoría de información aplicada a privacidad",
+        "métodos formales y pruebas criptográficas"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "estadística bayesiana y calibración de confianza",
+          "anchor": "mathematics#1",
+          "status": "developed_initial_draft",
+          "word_count": 414,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "optimización robusta y detección de anomalías",
+          "anchor": "mathematics#2",
+          "status": "developed_initial_draft",
+          "word_count": 409,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "teoría de información aplicada a privacidad",
+          "anchor": "mathematics#3",
+          "status": "developed_initial_draft",
+          "word_count": 409,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "métodos formales y pruebas criptográficas",
+          "anchor": "mathematics#4",
+          "status": "developed_initial_draft",
+          "word_count": 408,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "soc_siem",
+      "missing_advanced_topics": [
+        "ATT&CK Detection Strategies y Analytics versionados",
+        "detección de secuencias y causalidad temporal",
+        "calidad, cobertura y drift de telemetría",
+        "evaluación estadística de reglas y playbooks"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "ATT&CK Detection Strategies y Analytics versionados",
+          "anchor": "soc_siem#1",
+          "status": "developed_initial_draft",
+          "word_count": 417,
+          "source_urls": [
+            "https://attack.mitre.org/",
+            "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "detección de secuencias y causalidad temporal",
+          "anchor": "soc_siem#2",
+          "status": "developed_initial_draft",
+          "word_count": 412,
+          "source_urls": [
+            "https://attack.mitre.org/",
+            "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "calidad, cobertura y drift de telemetría",
+          "anchor": "soc_siem#3",
+          "status": "developed_initial_draft",
+          "word_count": 416,
+          "source_urls": [
+            "https://attack.mitre.org/",
+            "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "evaluación estadística de reglas y playbooks",
+          "anchor": "soc_siem#4",
+          "status": "developed_initial_draft",
+          "word_count": 417,
+          "source_urls": [
+            "https://attack.mitre.org/",
+            "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "edr_xdr",
+      "missing_advanced_topics": [
+        "telemetría kernel y eBPF multiplataforma",
+        "detección de identidad, SaaS y cloud workloads",
+        "resistencia a tampering y gaps de sensor",
+        "aislamiento reversible y recuperación del endpoint"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "telemetría kernel y eBPF multiplataforma",
+          "anchor": "edr_xdr#1",
+          "status": "developed_initial_draft",
+          "word_count": 412,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "detección de identidad, SaaS y cloud workloads",
+          "anchor": "edr_xdr#2",
+          "status": "developed_initial_draft",
+          "word_count": 411,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "resistencia a tampering y gaps de sensor",
+          "anchor": "edr_xdr#3",
+          "status": "developed_initial_draft",
+          "word_count": 410,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "aislamiento reversible y recuperación del endpoint",
+          "anchor": "edr_xdr#4",
+          "status": "developed_initial_draft",
+          "word_count": 410,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "threat_hunting",
+      "missing_advanced_topics": [
+        "hipótesis falsables y análisis de base rates",
+        "detección por comportamiento y cadenas de eventos",
+        "ATT&CK analytics y data components actuales",
+        "reproducibilidad y medición de valor del hunt"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "hipótesis falsables y análisis de base rates",
+          "anchor": "threat_hunting#1",
+          "status": "developed_initial_draft",
+          "word_count": 412,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "detección por comportamiento y cadenas de eventos",
+          "anchor": "threat_hunting#2",
+          "status": "developed_initial_draft",
+          "word_count": 412,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "ATT&CK analytics y data components actuales",
+          "anchor": "threat_hunting#3",
+          "status": "developed_initial_draft",
+          "word_count": 416,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "reproducibilidad y medición de valor del hunt",
+          "anchor": "threat_hunting#4",
+          "status": "developed_initial_draft",
+          "word_count": 412,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "red_team",
+      "missing_advanced_topics": [
+        "adversary emulation con ATT&CK versionado",
+        "cloud, SaaS e identidad como superficies prioritarias",
+        "purple teaming y validación de detecciones",
+        "seguridad operacional, deconfliction y límites"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "adversary emulation con ATT&CK versionado",
+          "anchor": "red_team#1",
+          "status": "developed_initial_draft",
+          "word_count": 410,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "cloud, SaaS e identidad como superficies prioritarias",
+          "anchor": "red_team#2",
+          "status": "developed_initial_draft",
+          "word_count": 412,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "purple teaming y validación de detecciones",
+          "anchor": "red_team#3",
+          "status": "developed_initial_draft",
+          "word_count": 410,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "seguridad operacional, deconfliction y límites",
+          "anchor": "red_team#4",
+          "status": "developed_initial_draft",
+          "word_count": 409,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "wireless_security",
+      "missing_advanced_topics": [
+        "WPA3 Enterprise, 802.1X y roaming seguro",
+        "Bluetooth LE privacy y seguridad GATT",
+        "SDR, espectro y pruebas de radio autorizadas",
+        "Wi-Fi 6E/7 y segmentación de IoT"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "WPA3 Enterprise, 802.1X y roaming seguro",
+          "anchor": "wireless_security#1",
+          "status": "developed_initial_draft",
+          "word_count": 410,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "Bluetooth LE privacy y seguridad GATT",
+          "anchor": "wireless_security#2",
+          "status": "developed_initial_draft",
+          "word_count": 413,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "SDR, espectro y pruebas de radio autorizadas",
+          "anchor": "wireless_security#3",
+          "status": "developed_initial_draft",
+          "word_count": 414,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "Wi-Fi 6E/7 y segmentación de IoT",
+          "anchor": "wireless_security#4",
+          "status": "developed_initial_draft",
+          "word_count": 412,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "ot_ics",
+      "missing_advanced_topics": [
+        "IEC 62443 ciclo de vida y zonas/conduits",
+        "safety-security co-engineering y análisis de consecuencias",
+        "remote access, vendor access y control de cambios",
+        "detección pasiva y recuperación de lógica/firmware"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "IEC 62443 ciclo de vida y zonas/conduits",
+          "anchor": "ot_ics#1",
+          "status": "developed_initial_draft",
+          "word_count": 419,
+          "source_urls": [
+            "https://www.cisa.gov/resources-tools/resources/ics-recommended-practices",
+            "https://www.nist.gov/publications/guide-industrial-control-systems-ics-security"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "safety-security co-engineering y análisis de consecuencias",
+          "anchor": "ot_ics#2",
+          "status": "developed_initial_draft",
+          "word_count": 417,
+          "source_urls": [
+            "https://www.cisa.gov/resources-tools/resources/ics-recommended-practices",
+            "https://www.nist.gov/publications/guide-industrial-control-systems-ics-security"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "remote access, vendor access y control de cambios",
+          "anchor": "ot_ics#3",
+          "status": "developed_initial_draft",
+          "word_count": 423,
+          "source_urls": [
+            "https://www.cisa.gov/resources-tools/resources/ics-recommended-practices",
+            "https://www.nist.gov/publications/guide-industrial-control-systems-ics-security"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "detección pasiva y recuperación de lógica/firmware",
+          "anchor": "ot_ics#4",
+          "status": "developed_initial_draft",
+          "word_count": 420,
+          "source_urls": [
+            "https://www.cisa.gov/resources-tools/resources/ics-recommended-practices",
+            "https://www.nist.gov/publications/guide-industrial-control-systems-ics-security"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "telecom_5g",
+      "missing_advanced_topics": [
+        "Open RAN y seguridad de interfaces",
+        "5G SBA, APIs y service-based identity",
+        "slicing, roaming y aislamiento entre tenants",
+        "eSIM, supply chain y edge/MEC"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "Open RAN y seguridad de interfaces",
+          "anchor": "telecom_5g#1",
+          "status": "developed_initial_draft",
+          "word_count": 409,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "5G SBA, APIs y service-based identity",
+          "anchor": "telecom_5g#2",
+          "status": "developed_initial_draft",
+          "word_count": 410,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "slicing, roaming y aislamiento entre tenants",
+          "anchor": "telecom_5g#3",
+          "status": "developed_initial_draft",
+          "word_count": 410,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "eSIM, supply chain y edge/MEC",
+          "anchor": "telecom_5g#4",
+          "status": "developed_initial_draft",
+          "word_count": 411,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "automotive_security",
+      "missing_advanced_topics": [
+        "UNECE R155/R156 y CSMS/SUMS",
+        "CAN-FD, Automotive Ethernet y gateways zonales",
+        "V2X, telemática y backend cloud",
+        "OTA, HIL/SIL y análisis de seguridad funcional"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "UNECE R155/R156 y CSMS/SUMS",
+          "anchor": "automotive_security#1",
+          "status": "developed_initial_draft",
+          "word_count": 413,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "CAN-FD, Automotive Ethernet y gateways zonales",
+          "anchor": "automotive_security#2",
+          "status": "developed_initial_draft",
+          "word_count": 417,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "V2X, telemática y backend cloud",
+          "anchor": "automotive_security#3",
+          "status": "developed_initial_draft",
+          "word_count": 414,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "OTA, HIL/SIL y análisis de seguridad funcional",
+          "anchor": "automotive_security#4",
+          "status": "developed_initial_draft",
+          "word_count": 417,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "satellite_security",
+      "missing_advanced_topics": [
+        "ground segment, TT&C y cadena de mando",
+        "GNSS spoofing/jamming y resiliencia de navegación",
+        "RF links, key management y anti-replay",
+        "supply chain y operaciones de constelaciones"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "ground segment, TT&C y cadena de mando",
+          "anchor": "satellite_security#1",
+          "status": "developed_initial_draft",
+          "word_count": 413,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "GNSS spoofing/jamming y resiliencia de navegación",
+          "anchor": "satellite_security#2",
+          "status": "developed_initial_draft",
+          "word_count": 412,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "RF links, key management y anti-replay",
+          "anchor": "satellite_security#3",
+          "status": "developed_initial_draft",
+          "word_count": 415,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "supply chain y operaciones de constelaciones",
+          "anchor": "satellite_security#4",
+          "status": "developed_initial_draft",
+          "word_count": 413,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "physical_security",
+      "missing_advanced_topics": [
+        "convergencia de identidad física y lógica",
+        "controladores de acceso, firmware y redes de edificios",
+        "CCTV/IoT, privacidad y retención de evidencia",
+        "amenazas internas y respuesta ciberfísica"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "convergencia de identidad física y lógica",
+          "anchor": "physical_security#1",
+          "status": "developed_initial_draft",
+          "word_count": 411,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "controladores de acceso, firmware y redes de edificios",
+          "anchor": "physical_security#2",
+          "status": "developed_initial_draft",
+          "word_count": 414,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "CCTV/IoT, privacidad y retención de evidencia",
+          "anchor": "physical_security#3",
+          "status": "developed_initial_draft",
+          "word_count": 413,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "amenazas internas y respuesta ciberfísica",
+          "anchor": "physical_security#4",
+          "status": "developed_initial_draft",
+          "word_count": 413,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "email_dns_security",
+      "missing_advanced_topics": [
+        "DMARC alignment, reporting y operación de políticas",
+        "MTA-STS, DANE, TLS-RPT y downgrade",
+        "BIMI, ARC y ecosistema de autenticación de correo",
+        "DNS registrar security, DNSSEC y account takeover"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "DMARC alignment, reporting y operación de políticas",
+          "anchor": "email_dns_security#1",
+          "status": "developed_initial_draft",
+          "word_count": 410,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "MTA-STS, DANE, TLS-RPT y downgrade",
+          "anchor": "email_dns_security#2",
+          "status": "developed_initial_draft",
+          "word_count": 407,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "BIMI, ARC y ecosistema de autenticación de correo",
+          "anchor": "email_dns_security#3",
+          "status": "developed_initial_draft",
+          "word_count": 410,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "DNS registrar security, DNSSEC y account takeover",
+          "anchor": "email_dns_security#4",
+          "status": "developed_initial_draft",
+          "word_count": 413,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "fraud_abuse",
+      "missing_advanced_topics": [
+        "identidad sintética y señales de dispositivo",
+        "detección de bots y fricción adaptativa",
+        "grafos de fraude y análisis temporal",
+        "apelación, fairness y medición de falsos positivos"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "identidad sintética y señales de dispositivo",
+          "anchor": "fraud_abuse#1",
+          "status": "developed_initial_draft",
+          "word_count": 413,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "detección de bots y fricción adaptativa",
+          "anchor": "fraud_abuse#2",
+          "status": "developed_initial_draft",
+          "word_count": 416,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "grafos de fraude y análisis temporal",
+          "anchor": "fraud_abuse#3",
+          "status": "developed_initial_draft",
+          "word_count": 413,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "apelación, fairness y medición de falsos positivos",
+          "anchor": "fraud_abuse#4",
+          "status": "developed_initial_draft",
+          "word_count": 418,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "privacy_engineering",
+      "missing_advanced_topics": [
+        "DPIA/PIA y evaluación de riesgo de reidentificación",
+        "PETs: differential privacy, MPC y federated learning",
+        "gobierno de SDKs, telemetría y terceros",
+        "retención, derechos y borrado verificable"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "DPIA/PIA y evaluación de riesgo de reidentificación",
+          "anchor": "privacy_engineering#1",
+          "status": "developed_initial_draft",
+          "word_count": 416,
+          "source_urls": [
+            "https://www.nist.gov/privacy-framework",
+            "https://www.edpb.europa.eu/"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "PETs: differential privacy, MPC y federated learning",
+          "anchor": "privacy_engineering#2",
+          "status": "developed_initial_draft",
+          "word_count": 411,
+          "source_urls": [
+            "https://www.nist.gov/privacy-framework",
+            "https://www.edpb.europa.eu/"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "gobierno de SDKs, telemetría y terceros",
+          "anchor": "privacy_engineering#3",
+          "status": "developed_initial_draft",
+          "word_count": 413,
+          "source_urls": [
+            "https://www.nist.gov/privacy-framework",
+            "https://www.edpb.europa.eu/"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "retención, derechos y borrado verificable",
+          "anchor": "privacy_engineering#4",
+          "status": "developed_initial_draft",
+          "word_count": 408,
+          "source_urls": [
+            "https://www.nist.gov/privacy-framework",
+            "https://www.edpb.europa.eu/"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "cloud_forensics",
+      "missing_advanced_topics": [
+        "evidencia de control plane y auditoría cloud",
+        "serverless, containers y evidencia efímera",
+        "snapshots, object lock y cadena de custodia",
+        "correlación multi-cloud, SaaS e identidad"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "evidencia de control plane y auditoría cloud",
+          "anchor": "cloud_forensics#1",
+          "status": "developed_initial_draft",
+          "word_count": 417,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "serverless, containers y evidencia efímera",
+          "anchor": "cloud_forensics#2",
+          "status": "developed_initial_draft",
+          "word_count": 415,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "snapshots, object lock y cadena de custodia",
+          "anchor": "cloud_forensics#3",
+          "status": "developed_initial_draft",
+          "word_count": 419,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "correlación multi-cloud, SaaS e identidad",
+          "anchor": "cloud_forensics#4",
+          "status": "developed_initial_draft",
+          "word_count": 414,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "ai_red_team",
+      "missing_advanced_topics": [
+        "ataques multimodales y prompt injection indirecta",
+        "tool abuse, excessive agency y autorización",
+        "RAG poisoning, memory poisoning y cross-tenant",
+        "evaluación de agentes, costes y recuperación"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "ataques multimodales y prompt injection indirecta",
+          "anchor": "ai_red_team#1",
+          "status": "developed_initial_draft",
+          "word_count": 412,
+          "source_urls": [
+            "https://www.nist.gov/itl/ai-risk-management-framework",
+            "https://owasp.org/www-project-top-10-for-large-language-model-applications/"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "tool abuse, excessive agency y autorización",
+          "anchor": "ai_red_team#2",
+          "status": "developed_initial_draft",
+          "word_count": 412,
+          "source_urls": [
+            "https://www.nist.gov/itl/ai-risk-management-framework",
+            "https://owasp.org/www-project-top-10-for-large-language-model-applications/"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "RAG poisoning, memory poisoning y cross-tenant",
+          "anchor": "ai_red_team#3",
+          "status": "developed_initial_draft",
+          "word_count": 412,
+          "source_urls": [
+            "https://www.nist.gov/itl/ai-risk-management-framework",
+            "https://owasp.org/www-project-top-10-for-large-language-model-applications/"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "evaluación de agentes, costes y recuperación",
+          "anchor": "ai_red_team#4",
+          "status": "developed_initial_draft",
+          "word_count": 412,
+          "source_urls": [
+            "https://www.nist.gov/itl/ai-risk-management-framework",
+            "https://owasp.org/www-project-top-10-for-large-language-model-applications/"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "pki_hsm",
+      "missing_advanced_topics": [
+        "ACME, CT logs y automatización de certificados",
+        "ceremonias de claves, quorum y recuperación HSM",
+        "CA compromise, revocation y trust store governance",
+        "PQC certificates y crypto-agility"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "ACME, CT logs y automatización de certificados",
+          "anchor": "pki_hsm#1",
+          "status": "developed_initial_draft",
+          "word_count": 413,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "ceremonias de claves, quorum y recuperación HSM",
+          "anchor": "pki_hsm#2",
+          "status": "developed_initial_draft",
+          "word_count": 413,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "CA compromise, revocation y trust store governance",
+          "anchor": "pki_hsm#3",
+          "status": "developed_initial_draft",
+          "word_count": 413,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "PQC certificates y crypto-agility",
+          "anchor": "pki_hsm#4",
+          "status": "developed_initial_draft",
+          "word_count": 410,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "post_quantum_crypto",
+      "missing_advanced_topics": [
+        "NIST IR 8547 y hoja de ruta de transición",
+        "inventario criptográfico y clasificación HNDL",
+        "interoperabilidad híbrida, rendimiento y fallback",
+        "gobierno de algoritmos heredados y fechas de retiro"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "NIST IR 8547 y hoja de ruta de transición",
+          "anchor": "post_quantum_crypto#1",
+          "status": "developed_initial_draft",
+          "word_count": 417,
+          "source_urls": [
+            "https://doi.org/10.6028/NIST.IR.8547",
+            "https://doi.org/10.6028/NIST.FIPS.203"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "inventario criptográfico y clasificación HNDL",
+          "anchor": "post_quantum_crypto#2",
+          "status": "developed_initial_draft",
+          "word_count": 413,
+          "source_urls": [
+            "https://doi.org/10.6028/NIST.IR.8547",
+            "https://doi.org/10.6028/NIST.FIPS.203"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "interoperabilidad híbrida, rendimiento y fallback",
+          "anchor": "post_quantum_crypto#3",
+          "status": "developed_initial_draft",
+          "word_count": 413,
+          "source_urls": [
+            "https://doi.org/10.6028/NIST.IR.8547",
+            "https://doi.org/10.6028/NIST.FIPS.203"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "gobierno de algoritmos heredados y fechas de retiro",
+          "anchor": "post_quantum_crypto#4",
+          "status": "developed_initial_draft",
+          "word_count": 416,
+          "source_urls": [
+            "https://doi.org/10.6028/NIST.IR.8547",
+            "https://doi.org/10.6028/NIST.FIPS.203"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "business_continuity",
+      "missing_advanced_topics": [
+        "ransomware recovery y clean-room restoration",
+        "validación de backups inmutables y credenciales",
+        "dependencia de proveedores y continuidad SaaS",
+        "crisis exercises y recuperación de procesos"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "ransomware recovery y clean-room restoration",
+          "anchor": "business_continuity#1",
+          "status": "developed_initial_draft",
+          "word_count": 419,
+          "source_urls": [
+            "https://www.cisa.gov/stopransomware",
+            "https://doi.org/10.6028/NIST.SP.800-34r1"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "validación de backups inmutables y credenciales",
+          "anchor": "business_continuity#2",
+          "status": "developed_initial_draft",
+          "word_count": 416,
+          "source_urls": [
+            "https://www.cisa.gov/stopransomware",
+            "https://doi.org/10.6028/NIST.SP.800-34r1"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "dependencia de proveedores y continuidad SaaS",
+          "anchor": "business_continuity#3",
+          "status": "developed_initial_draft",
+          "word_count": 418,
+          "source_urls": [
+            "https://www.cisa.gov/stopransomware",
+            "https://doi.org/10.6028/NIST.SP.800-34r1"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "crisis exercises y recuperación de procesos",
+          "anchor": "business_continuity#4",
+          "status": "developed_initial_draft",
+          "word_count": 416,
+          "source_urls": [
+            "https://www.cisa.gov/stopransomware",
+            "https://doi.org/10.6028/NIST.SP.800-34r1"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "database_security",
+      "missing_advanced_topics": [
+        "vector databases y controles de acceso por fila/tenant",
+        "cloud-managed databases y control plane",
+        "auditoría, query abuse y detección de exfiltración",
+        "backup encryption, restore testing y secretos"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "vector databases y controles de acceso por fila/tenant",
+          "anchor": "database_security#1",
+          "status": "developed_initial_draft",
+          "word_count": 416,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "cloud-managed databases y control plane",
+          "anchor": "database_security#2",
+          "status": "developed_initial_draft",
+          "word_count": 413,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "auditoría, query abuse y detección de exfiltración",
+          "anchor": "database_security#3",
+          "status": "developed_initial_draft",
+          "word_count": 414,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "backup encryption, restore testing y secretos",
+          "anchor": "database_security#4",
+          "status": "developed_initial_draft",
+          "word_count": 412,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    },
+    {
+      "domain_id": "vulnerability_research",
+      "missing_advanced_topics": [
+        "fuzzing coverage-guided y corpus minimization",
+        "memory corruption, sanitizers y exploitability",
+        "coordinated disclosure y gestión de CVE",
+        "supply-chain vulnerabilities y análisis de dependencias"
+      ],
+      "status": "developed_initial_draft",
+      "developed_topics": [
+        {
+          "topic": "fuzzing coverage-guided y corpus minimization",
+          "anchor": "vulnerability_research#1",
+          "status": "developed_initial_draft",
+          "word_count": 409,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "memory corruption, sanitizers y exploitability",
+          "anchor": "vulnerability_research#2",
+          "status": "developed_initial_draft",
+          "word_count": 409,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "coordinated disclosure y gestión de CVE",
+          "anchor": "vulnerability_research#3",
+          "status": "developed_initial_draft",
+          "word_count": 409,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        },
+        {
+          "topic": "supply-chain vulnerabilities y análisis de dependencias",
+          "anchor": "vulnerability_research#4",
+          "status": "developed_initial_draft",
+          "word_count": 411,
+          "source_urls": [
+            "https://www.nist.gov/cyberframework",
+            "https://www.cisa.gov/resources-tools"
+          ],
+          "validation": "not_experimentally_validated"
+        }
+      ]
+    }
+  ]
+}

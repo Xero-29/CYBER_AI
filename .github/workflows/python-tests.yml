@@ -40,6 +40,12 @@ jobs:
           fi
       - name: Run complete local verification
         run: bash verify.sh
+      - name: Validate knowledge corpus paths and hashes
+        run: python knowledge_bootstrap.py --dry-run
+      - name: Audit research study coverage
+        run: python knowledge_quality.py --require-research-studies
+      - name: Audit advanced-gap depth and boilerplate reuse
+        run: python knowledge_depth_audit.py
       - name: Capture hashes for resolved dependency wheels
         run: |
           mkdir -p "$RUNNER_TEMP/cyber-ai-wheelhouse"
@@ -127,3 +133,34 @@ jobs:
           python-version: "3.12"
       - name: Test signed executable allowlist on Windows
         run: python -m unittest discover -s tests -p test_tool_allowlist.py -v
+
+  foundations-reproducibility:
+    name: Foundations reproducibility (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: "${{ matrix.python-version }}"
+      - name: Run isolated Foundations tests
+        run: python -m unittest discover -s tests -p test_foundations_labs.py -v
+      - name: Verify deterministic result artifact
+        run: |
+          python - <<'PY'
+          import json
+          from knowledge.deep_modules.foundations.labs.runner import run_all
+          with open("knowledge/deep_modules/foundations/labs/results.json", encoding="utf-8") as handle:
+              expected = json.load(handle)
+          actual = run_all()
+          if actual != expected:
+              raise SystemExit("Foundations runner output differs from committed results.json")
+          print("Foundations result artifact matches the runner output")
+          PY

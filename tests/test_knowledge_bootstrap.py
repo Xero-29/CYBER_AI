@@ -173,5 +173,161 @@ class KnowledgeBootstrapTests(unittest.TestCase):
                 "new-provider::embed-v2",
             )
 
+
+    def test_loads_research_study_as_separate_indexable_document(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            pack, manifest = self._setup(root)
+            study = root / "knowledge/deep_modules/x/RESEARCH_STUDY.md"
+            study.parent.mkdir(parents=True, exist_ok=True)
+            study.write_text("# Investigación técnica\\nEstudio profundo", encoding="utf-8")
+            data = json.loads(manifest.read_text(encoding="utf-8"))
+            data["areas"][0]["research_study_path"] = "knowledge/deep_modules/x/RESEARCH_STUDY.md"
+            manifest.write_text(json.dumps(data), encoding="utf-8")
+            with patch.object(bootstrap, "PROJECT", root), patch.object(bootstrap, "MANIFEST", manifest):
+                result = bootstrap.bootstrap(dry_run=True)
+            self.assertEqual(result["selected"], 2)
+            by_kind = {item["document_kind"]: item for item in result["items"]}
+            self.assertEqual(set(by_kind), {"pack", "research_study"})
+            self.assertNotEqual(by_kind["pack"]["document_id"], by_kind["research_study"]["document_id"])
+            self.assertEqual(by_kind["research_study"]["topic_id"], "research")
+            self.assertEqual(by_kind["research_study"]["subtopic_id"], "field_study")
+
+    def test_loads_deep_sections_and_skill_candidates_as_separate_documents(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            _, manifest = self._setup(root)
+            deep = root / "knowledge/deep_modules/x/DEEP_SECTIONS.md"
+            deep.parent.mkdir(parents=True, exist_ok=True)
+            deep.write_text("# Deep\nDraft", encoding="utf-8")
+            skill = root / "knowledge/skills/candidates/SKILL-X.md"
+            skill.parent.mkdir(parents=True, exist_ok=True)
+            skill.write_text("# Candidate\nNot active", encoding="utf-8")
+            data = json.loads(manifest.read_text(encoding="utf-8"))
+            data["areas"][0]["deep_sections_path"] = "knowledge/deep_modules/x/DEEP_SECTIONS.md"
+            data["skill_candidates"] = [{
+                "id": "SKILL-X", "area_id": "x", "name": "Candidate X",
+                "path": "knowledge/skills/candidates/SKILL-X.md",
+                "topic_id": "skills", "subtopic_id": "candidate_spec",
+            }]
+            manifest.write_text(json.dumps(data), encoding="utf-8")
+            with patch.object(bootstrap, "PROJECT", root), patch.object(bootstrap, "MANIFEST", manifest):
+                result = bootstrap.bootstrap(dry_run=True)
+            self.assertEqual(result["selected"], 3)
+            by_kind = {item["document_kind"]: item for item in result["items"]}
+            self.assertEqual(set(by_kind), {"pack", "deep_sections", "skill_candidate"})
+            self.assertEqual(by_kind["deep_sections"]["topic_id"], "research")
+            self.assertEqual(by_kind["skill_candidate"]["topic_id"], "skills")
+            self.assertEqual(by_kind["skill_candidate"]["area_id"], "x")
+
+    def test_loads_compendia_agendas_literature_and_supplemental_documents(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            _, manifest = self._setup(root)
+            data = json.loads(manifest.read_text(encoding="utf-8"))
+            for field, name in [
+                ("technical_compendium_path", "TECHNICAL_COMPENDIUM.md"),
+                ("research_agenda_path", "RESEARCH_AGENDA.md"),
+                ("literature_review_path", "LITERATURE_REVIEW.md"),
+            ]:
+                path = root / "knowledge/deep_modules/x" / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text("# " + name, encoding="utf-8")
+                data["areas"][0][field] = path.relative_to(root).as_posix()
+            supplemental = root / "knowledge/research/EXTRA.md"
+            supplemental.parent.mkdir(parents=True, exist_ok=True)
+            supplemental.write_text("# Extra", encoding="utf-8")
+            data["supplemental_documents"] = [{
+                "id": "EXTRA-1", "area_id": "x", "name": "Extra",
+                "path": supplemental.relative_to(root).as_posix(),
+                "topic_id": "research", "subtopic_id": "extra",
+            }]
+            manifest.write_text(json.dumps(data), encoding="utf-8")
+            with patch.object(bootstrap, "PROJECT", root), patch.object(bootstrap, "MANIFEST", manifest):
+                result = bootstrap.bootstrap(dry_run=True)
+            self.assertEqual(result["selected"], 5)
+            kinds = {item["document_kind"] for item in result["items"]}
+            self.assertEqual(kinds, {"pack", "technical_compendium", "research_agenda", "literature_review", "supplemental_document"})
+
+    def test_rejects_unsafe_supplemental_document_path(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            _, manifest = self._setup(root)
+            data = json.loads(manifest.read_text(encoding="utf-8"))
+            data["supplemental_documents"] = [{
+                "id": "EXTRA-1", "area_id": "x", "path": "../outside.md"
+            }]
+            manifest.write_text(json.dumps(data), encoding="utf-8")
+            with patch.object(bootstrap, "PROJECT", root), patch.object(bootstrap, "MANIFEST", manifest):
+                with self.assertRaisesRegex(ValueError, "Ruta no permitida"):
+                    bootstrap.load_packs()
+
+    def test_rejects_unsafe_deep_sections_path(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            _, manifest = self._setup(root)
+            data = json.loads(manifest.read_text(encoding="utf-8"))
+            data["areas"][0]["deep_sections_path"] = "../outside.md"
+            manifest.write_text(json.dumps(data), encoding="utf-8")
+            with patch.object(bootstrap, "PROJECT", root), patch.object(bootstrap, "MANIFEST", manifest):
+                with self.assertRaisesRegex(ValueError, "Ruta no permitida"):
+                    bootstrap.load_packs()
+
+    def test_rejects_unsafe_skill_candidate_path(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            _, manifest = self._setup(root)
+            data = json.loads(manifest.read_text(encoding="utf-8"))
+            data["skill_candidates"] = [{
+                "id": "SKILL-X", "area_id": "x", "path": "../outside.md"
+            }]
+            manifest.write_text(json.dumps(data), encoding="utf-8")
+            with patch.object(bootstrap, "PROJECT", root), patch.object(bootstrap, "MANIFEST", manifest):
+                with self.assertRaisesRegex(ValueError, "Ruta no permitida"):
+                    bootstrap.load_packs()
+
+    def test_rejects_unsafe_research_study_path(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            _, manifest = self._setup(root)
+            data = json.loads(manifest.read_text(encoding="utf-8"))
+            data["areas"][0]["research_study_path"] = "../outside.md"
+            manifest.write_text(json.dumps(data), encoding="utf-8")
+            with patch.object(bootstrap, "PROJECT", root), patch.object(bootstrap, "MANIFEST", manifest):
+                with self.assertRaisesRegex(ValueError, "Ruta no permitida"):
+                    bootstrap.load_packs()
+
+    def test_bootstrap_ingests_pack_and_research_study_with_separate_metadata(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            _, manifest = self._setup(root)
+            study = root / "knowledge/deep_modules/x/RESEARCH_STUDY.md"
+            study.parent.mkdir(parents=True, exist_ok=True)
+            study.write_text("# Investigación técnica\\nContenido", encoding="utf-8")
+            data = json.loads(manifest.read_text(encoding="utf-8"))
+            data["areas"][0]["research_study_path"] = "knowledge/deep_modules/x/RESEARCH_STUDY.md"
+            manifest.write_text(json.dumps(data), encoding="utf-8")
+            with (
+                patch.object(bootstrap, "PROJECT", root),
+                patch.object(bootstrap, "MANIFEST", manifest),
+                patch("knowledge_embeddings.expected_embedding_space", return_value="provider::embed-v1"),
+                patch("knowledge_registry.resource_inventory", return_value=[]),
+                patch("knowledge_registry.register_resource", side_effect=[{"resource_id": "pack"}, {"resource_id": "study"}]),
+                patch("knowledge_registry.update_resource_classification") as classify,
+                patch("knowledge_registry.update_resource_processing_status"),
+                patch("knowledge_library.document_chunk_count", return_value=1),
+                patch("knowledge_ingest.ingest_document", side_effect=[
+                    {"document_id": "pack-doc", "chunks": 1},
+                    {"document_id": "study-doc", "chunks": 1},
+                ]) as ingest,
+            ):
+                result = bootstrap.bootstrap()
+            self.assertEqual(result["ingested_count"], 2)
+            self.assertEqual([item["kind"] for item in result["ingested"]], ["pack", "research_study"])
+            self.assertEqual(ingest.call_count, 2)
+            self.assertIn("research_study", ingest.call_args_list[1].kwargs["tags"])
+            self.assertEqual(classify.call_args_list[1].kwargs["topic_id"], "research")
+            self.assertEqual(classify.call_args_list[1].kwargs["subtopic_id"], "field_study")
+
 if __name__ == "__main__":
     unittest.main()

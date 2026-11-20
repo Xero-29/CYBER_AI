@@ -1,117 +1,109 @@
-# Agenda de investigación: Identidad y acceso
+# Agenda de investigación: identity
 
-**Dominio:** `identity` · **Objetivo:** L4 · **Estado:** agenda de investigación propuesta.
+**Dominio:** identity · **Corte:** 2026-11-19 · **Madurez:** M2 editorial; no M3/M4/M5 · **Estado:** `research_agenda_defined`, protocolo propuesto; no ejecutado.
+**Objetivo de diseño:** L4; la madurez efectiva permanece M2 editorial hasta disponer de fuentes leídas y resultados.  
+**Hipótesis central:** ¿Qué combinación de ciclo de vida, autenticación resistente a phishing, federación y autorización reduce accesos indebidos sin crear fallos inaceptables de disponibilidad o usabilidad?
 
 ## Pregunta central
 
-¿Cómo medir y comparar la seguridad, robustez, privacidad y operabilidad de federated identity, assurance levels, authorization semantics and lifecycle governance en Identidad y acceso, bajo modelos de amenaza y restricciones documentadas?
+¿Qué combinación de ciclo de vida, autenticación resistente a phishing, federación y autorización reduce accesos indebidos sin crear fallos inaceptables de disponibilidad o usabilidad?
 
-## Preguntas de investigación por tema
+## Alcance, exclusiones y ética
 
-### R1 — IAM, IGA, PAM y ciclo de vida
+Los estudios se limitan a datos sintéticos, datasets con licencia y activos propios o expresamente autorizados. No se ejecutarán acciones contra terceros, no se usarán credenciales ni datos personales reales y no se desplegarán muestras/payloads operativos fuera de entornos controlados. Cada experimento debe declarar responsable, autorización, límites de recursos, regla de parada y procedimiento de rollback.
 
-**Pregunta:** ¿Qué propiedades de seguridad de IAM, IGA, PAM y ciclo de vida se mantienen bajo cambios de configuración, carga, versiones y condiciones adversas? ¿Qué fallos residuales permanecen?
+## Protocolos específicos
 
-**Hipótesis falsable inicial:** el control o diseño evaluado reduce una tasa de fallo/abuso definida frente a una baseline, sin exceder el presupuesto de coste/latencia/usabilidad predefinido.
+### R1 — IAM/IGA/PAM y lifecycle
 
-**Diseño:** especificar amenaza y alcance; fijar versiones; preparar baseline y comparador; aislar variables; generar casos normales, límite y adversos; repetir con semillas registradas; medir resultados y conservar artefactos.
+Unidad: identidad sintética y evento joiner/mover/leaver. Variables: tipo de identidad, latencia de sincronización, dependencias SaaS y sesión activa. Baseline: baja manual documentada. Intervención: workflow automatizado idempotente. Casos: cambio de rol, baja, cuenta huérfana, grupo anidado y proveedor desconectado. Métricas: tiempo de revocación, permisos residuales, errores y trazabilidad.
 
-**Métricas:** cobertura y eficacia, error de detección, falsos positivos/negativos, rendimiento, coste, robustez y tasa de reproducción. Definir fórmula y unidad antes de medir.
+**Hipótesis falsable:** la intervención definida mejora la métrica primaria respecto de la baseline sin superar el umbral de daño/coste predefinido. **H0:** no existe diferencia bajo el protocolo y la muestra definidos.  
+**Análisis:** informar tamaño muestral, distribución, intervalos de confianza y casos excluidos; no generalizar fuera del corpus.
 
-**Entregable:** protocolo, matriz de evidencia, datos sintéticos o autorizados, análisis estadístico, incertidumbre, limitaciones, scripts y hashes.
+### R2 — MFA y recuperación
 
-### R2 — MFA resistente a phishing
+Unidad: ceremonia de autenticación y recuperación en IdP demo. Variables: origin, challenge, dispositivo, método de recuperación y expiración. Controles: passkey/WebAuthn, OTP de laboratorio y recovery débil simulado. Métricas: aceptación indebida, falsos rechazos, abandono y tiempo de revocación.
 
-**Pregunta:** ¿Qué propiedades de seguridad de MFA resistente a phishing se mantienen bajo cambios de configuración, carga, versiones y condiciones adversas? ¿Qué fallos residuales permanecen?
+**Hipótesis falsable:** la intervención definida mejora la métrica primaria respecto de la baseline sin superar el umbral de daño/coste predefinido. **H0:** no existe diferencia bajo el protocolo y la muestra definidos.  
+**Análisis:** informar tamaño muestral, distribución, intervalos de confianza y casos excluidos; no generalizar fuera del corpus.
 
-**Hipótesis falsable inicial:** el control o diseño evaluado reduce una tasa de fallo/abuso definida frente a una baseline, sin exceder el presupuesto de coste/latencia/usabilidad predefinido.
+### R3 — OAuth/OIDC/SAML/Kerberos
 
-**Diseño:** especificar amenaza y alcance; fijar versiones; preparar baseline y comparador; aislar variables; generar casos normales, límite y adversos; repetir con semillas registradas; medir resultados y conservar artefactos.
+Unidad: transacción de federación. Variar issuer, audience, nonce/state, PKCE, redirect URI, firma, reloj, replay y rotación JWKS. Comparador: configuración de referencia fijada. Métricas: negativos rechazados, interoperabilidad y fallos de validación.
 
-**Métricas:** cobertura y eficacia, error de detección, falsos positivos/negativos, rendimiento, coste, robustez y tasa de reproducción. Definir fórmula y unidad antes de medir.
+**Hipótesis falsable:** la intervención definida mejora la métrica primaria respecto de la baseline sin superar el umbral de daño/coste predefinido. **H0:** no existe diferencia bajo el protocolo y la muestra definidos.  
+**Análisis:** informar tamaño muestral, distribución, intervalos de confianza y casos excluidos; no generalizar fuera del corpus.
 
-**Entregable:** protocolo, matriz de evidencia, datos sintéticos o autorizados, análisis estadístico, incertidumbre, limitaciones, scripts y hashes.
+### R4 — RBAC/ABAC/ReBAC
 
-### R3 — OAuth/OIDC, SAML y Kerberos
+Unidad: decisión sujeto-acción-recurso-contexto. Dataset sintético con roles, atributos faltantes, herencia, tenant y relaciones. Comparar política esperada con decisión observada. Métricas: autorización incorrecta, explicabilidad y coste de evaluación.
 
-**Pregunta:** ¿Qué propiedades de seguridad de OAuth/OIDC, SAML y Kerberos se mantienen bajo cambios de configuración, carga, versiones y condiciones adversas? ¿Qué fallos residuales permanecen?
+**Hipótesis falsable:** la intervención definida mejora la métrica primaria respecto de la baseline sin superar el umbral de daño/coste predefinido. **H0:** no existe diferencia bajo el protocolo y la muestra definidos.  
+**Análisis:** informar tamaño muestral, distribución, intervalos de confianza y casos excluidos; no generalizar fuera del corpus.
 
-**Hipótesis falsable inicial:** el control o diseño evaluado reduce una tasa de fallo/abuso definida frente a una baseline, sin exceder el presupuesto de coste/latencia/usabilidad predefinido.
+### R5 — Workload identity/secretos
 
-**Diseño:** especificar amenaza y alcance; fijar versiones; preparar baseline y comparador; aislar variables; generar casos normales, límite y adversos; repetir con semillas registradas; medir resultados y conservar artefactos.
+Unidad: identidad de servicio y ciclo de credencial efímera. Variar attestation, expiración, rotación, revocación y trust bundle. Métricas: tiempo de revocación, credenciales residuales y disponibilidad tras rotación.
 
-**Métricas:** cobertura y eficacia, error de detección, falsos positivos/negativos, rendimiento, coste, robustez y tasa de reproducción. Definir fórmula y unidad antes de medir.
+**Hipótesis falsable:** la intervención definida mejora la métrica primaria respecto de la baseline sin superar el umbral de daño/coste predefinido. **H0:** no existe diferencia bajo el protocolo y la muestra definidos.  
+**Análisis:** informar tamaño muestral, distribución, intervalos de confianza y casos excluidos; no generalizar fuera del corpus.
 
-**Entregable:** protocolo, matriz de evidencia, datos sintéticos o autorizados, análisis estadístico, incertidumbre, limitaciones, scripts y hashes.
+### R6 — SoD/recertificación/abuso
 
-### R4 — RBAC, ABAC y mínimo privilegio
+Unidad: usuario sintético, combinación de permisos y sesión. Inyectar conflictos, privilegios sin uso, anomalías y recuperación. Medir detección, falsos positivos, cierre de excepciones y tiempo de respuesta.
 
-**Pregunta:** ¿Qué propiedades de seguridad de RBAC, ABAC y mínimo privilegio se mantienen bajo cambios de configuración, carga, versiones y condiciones adversas? ¿Qué fallos residuales permanecen?
+**Hipótesis falsable:** la intervención definida mejora la métrica primaria respecto de la baseline sin superar el umbral de daño/coste predefinido. **H0:** no existe diferencia bajo el protocolo y la muestra definidos.  
+**Análisis:** informar tamaño muestral, distribución, intervalos de confianza y casos excluidos; no generalizar fuera del corpus.
 
-**Hipótesis falsable inicial:** el control o diseño evaluado reduce una tasa de fallo/abuso definida frente a una baseline, sin exceder el presupuesto de coste/latencia/usabilidad predefinido.
+## Método
 
-**Diseño:** especificar amenaza y alcance; fijar versiones; preparar baseline y comparador; aislar variables; generar casos normales, límite y adversos; repetir con semillas registradas; medir resultados y conservar artefactos.
+Diseño experimental controlado, con hipótesis falsable, unidad de análisis, variables, baseline, controles, corpus versionado y criterios de exclusión definidos antes de ejecutar.
 
-**Métricas:** cobertura y eficacia, error de detección, falsos positivos/negativos, rendimiento, coste, robustez y tasa de reproducción. Definir fórmula y unidad antes de medir.
+## Protocolo común de ejecución
 
-**Entregable:** protocolo, matriz de evidencia, datos sintéticos o autorizados, análisis estadístico, incertidumbre, limitaciones, scripts y hashes.
+1. Congelar pregunta, hipótesis, unidad de análisis, métrica primaria y criterio de exclusión antes de ejecutar.
+2. Registrar versiones de OS, herramientas, librerías, datasets, configuración y hardware.
+3. Fijar corpus y su procedencia, licencia, etiquetas, hash y particiones; evitar fuga entre train/test o entre versiones.
+4. Construir baseline reproducible y controles positivos/negativos.
+5. Aislar entorno, registrar reloj y verificar salvaguardas antes de introducir casos.
+6. Ejecutar piloto para comprobar instrumentación; no mezclar resultados del piloto con la muestra confirmatoria sin declararlo.
+7. Ejecutar repeticiones predefinidas y conservar salidas brutas, logs saneados y errores.
+8. Analizar incertidumbre, sesgo de selección, variables de confusión y resultados negativos.
+9. Reproducir desde entorno limpio y registrar diferencias.
 
-### R5 — workload identity y secretos
+## Métricas y análisis
 
-**Pregunta:** ¿Qué propiedades de seguridad de workload identity y secretos se mantienen bajo cambios de configuración, carga, versiones y condiciones adversas? ¿Qué fallos residuales permanecen?
+Cada protocolo define su métrica primaria. Cuando se evalúe clasificación, reportar matriz de confusión, precision, recall, F1 cuando sea pertinente y prevalencia; no usar accuracy aislada con clases desbalanceadas. Para tiempos, informar mediana, p50/p95, tamaño muestral y condiciones. Para reproducibilidad, declarar qué constituye una repetición válida. Los resultados deben incluir falsos positivos, falsos negativos, intervalos y casos no concluyentes.
 
-**Hipótesis falsable inicial:** el control o diseño evaluado reduce una tasa de fallo/abuso definida frente a una baseline, sin exceder el presupuesto de coste/latencia/usabilidad predefinido.
+## Amenazas a la validez
 
-**Diseño:** especificar amenaza y alcance; fijar versiones; preparar baseline y comparador; aislar variables; generar casos normales, límite y adversos; repetir con semillas registradas; medir resultados y conservar artefactos.
+- **Interna:** versiones, reloj, instrumentación, operador, orden de pruebas y variables no controladas.
+- **Externa:** muestras sintéticas o un proveedor no representan todos los entornos.
+- **Constructo:** cobertura, alerta o puntuación no equivalen automáticamente a seguridad.
+- **Selección:** corpus sesgado, duplicados y contaminación entre particiones.
+- **Reproducibilidad:** cambios de herramienta, firmware, dependencias o datos.
+- **Ética/legal:** autorización, privacidad, licencias, divulgación y retención.
 
-**Métricas:** cobertura y eficacia, error de detección, falsos positivos/negativos, rendimiento, coste, robustez y tasa de reproducción. Definir fórmula y unidad antes de medir.
+## Reproducibilidad
 
-**Entregable:** protocolo, matriz de evidencia, datos sintéticos o autorizados, análisis estadístico, incertidumbre, limitaciones, scripts y hashes.
+Conservar scripts, datos, hashes, versiones, configuración, logs y pasos de ejecución para permitir repetición independiente.
 
-### R6 — recertificación y separación de funciones
+## Entregables
 
-**Pregunta:** ¿Qué propiedades de seguridad de recertificación y separación de funciones se mantienen bajo cambios de configuración, carga, versiones y condiciones adversas? ¿Qué fallos residuales permanecen?
+- Protocolo preregistrado y baseline.
+- Dataset/corpus con procedencia, licencia, hash y ground truth.
+- Scripts, configuración y versiones fijadas.
+- Resultados brutos, métricas y análisis estadístico.
+- Registro de falsos positivos/negativos y casos no concluyentes.
+- Limitaciones, amenazas a validez y plan de reproducción.
+- Revisión independiente.
 
-**Hipótesis falsable inicial:** el control o diseño evaluado reduce una tasa de fallo/abuso definida frente a una baseline, sin exceder el presupuesto de coste/latencia/usabilidad predefinido.
+## Puertas de madurez
 
-**Diseño:** especificar amenaza y alcance; fijar versiones; preparar baseline y comparador; aislar variables; generar casos normales, límite y adversos; repetir con semillas registradas; medir resultados y conservar artefactos.
+- **M2:** contenido específico y protocolo reproducible diseñado.
+- **M3:** fuentes primarias leídas con extracción de requisitos y síntesis crítica.
+- **M4:** experimentos ejecutados, resultados conservados y reproducción interna.
+- **M5:** revisión independiente y reproducción por un segundo operador.
 
-**Métricas:** cobertura y eficacia, error de detección, falsos positivos/negativos, rendimiento, coste, robustez y tasa de reproducción. Definir fórmula y unidad antes de medir.
-
-**Entregable:** protocolo, matriz de evidencia, datos sintéticos o autorizados, análisis estadístico, incertidumbre, limitaciones, scripts y hashes.
-
-### R7 — abuso y recuperación de cuentas
-
-**Pregunta:** ¿Qué propiedades de seguridad de abuso y recuperación de cuentas se mantienen bajo cambios de configuración, carga, versiones y condiciones adversas? ¿Qué fallos residuales permanecen?
-
-**Hipótesis falsable inicial:** el control o diseño evaluado reduce una tasa de fallo/abuso definida frente a una baseline, sin exceder el presupuesto de coste/latencia/usabilidad predefinido.
-
-**Diseño:** especificar amenaza y alcance; fijar versiones; preparar baseline y comparador; aislar variables; generar casos normales, límite y adversos; repetir con semillas registradas; medir resultados y conservar artefactos.
-
-**Métricas:** cobertura y eficacia, error de detección, falsos positivos/negativos, rendimiento, coste, robustez y tasa de reproducción. Definir fórmula y unidad antes de medir.
-
-**Entregable:** protocolo, matriz de evidencia, datos sintéticos o autorizados, análisis estadístico, incertidumbre, limitaciones, scripts y hashes.
-
-## Revisión de literatura y estado del arte
-
-Buscar estándares, especificaciones, artículos revisados por pares, tesis, advisories y documentación primaria. Registrar bases, consultas exactas, fecha, filtros, criterios de inclusión/exclusión y duplicados. Clasificar calidad metodológica, actualidad, sesgo, reproducibilidad y aplicabilidad. Sintetizar enfoques, resultados en conflicto y vacíos; no extrapolar resultados fuera de su contexto.
-
-## Protocolo experimental
-
-1. Definir población/sistemas, pregunta, hipótesis nula/alternativa y criterios de refutación.
-2. Definir variables independientes/dependientes, confusores, muestras y comparadores.
-3. Predefinir métricas, método estadístico, intervalos de confianza y tratamiento de datos faltantes.
-4. Registrar entorno, hardware, software, versiones, configuración, semillas y dependencias.
-5. Ejecutar pruebas aisladas, autorizadas y de bajo impacto; registrar desviaciones.
-6. Repetir, analizar resultados y evaluar validez interna, externa, de constructo y conclusión.
-7. Publicar datos permitidos, código, configuración, SBOM, hashes y procedimiento de reproducción.
-
-## Requisitos éticos y de seguridad
-
-Autorización escrita, alcance, exclusiones, límites de impacto y parada. No evaluar sistemas de terceros ni producción crítica sin permiso explícito y plan de seguridad. Minimizar datos, anonimizar y proteger evidencia. Aplicar divulgación coordinada cuando corresponda.
-
-## Criterios M4/M5
-
-M4 requiere revisión bibliográfica documentada, experimento ejecutado, análisis y limitaciones. M5 requiere revisión técnica independiente y reproducción por otro operador. La agenda por sí sola no satisface ninguno de esos niveles.
-
-**Madurez actual:** `research_agenda_defined`.
+**Estado actual:** agenda M2 propuesta. No se declaran experimentos ejecutados ni validación científica.

@@ -47,3 +47,6 @@ MITRE ATT&CK, Sigma, Kusto Query Language, Splunk SPL, Elastic EQL, NIST SP 800-
 
 ## Instrucciones para agentes IA
 No concluyas compromiso solo por anomalía. Indica qué datos faltan y limita consultas a la autorización y ventana indicadas.
+
+## Arquitectura
+El hunting se apoya en hipótesis derivadas de inteligencia y amenazas, fuentes de telemetría (endpoint, identidad, DNS, proxy, cloud, red), normalización, consultas, enriquecimiento, validación, escalado a incidente y feedback a detecciones. Registrar cobertura, calidad, latencia y retención de cada fuente; una ausencia de eventos no demuestra ausencia de actividad si la sensorística no cubre el activo o periodo. Separar exploración analítica de acciones de contención y mantener consultas reproducibles con ventanas temporales y filtros documentados.

@@ -1,3 +1,55 @@
+# Estado canónico de CYBER_AI — 2026-11-20
+
+**Repositorio:** https://github.com/Xero-29/CYBER_AI  
+**Rama principal:** `main` — sin modificar durante esta secuencia.  
+**HEAD de main auditado:** `387104756d0f8307c39a46a1ea2df07671bd81c9`.
+
+## Integración encadenada
+
+| PR | Rama | Estado | Función |
+|---|---|---|---|
+| #16 | `codex/cold-phase-baseline-2026-11-20` | Draft | Línea base; corregida la granularidad de Foundations |
+| #17 | `codex/reconcile-pr11-pr12-2026-11-20` | Draft | Locks SHA-256, SBOM, safe I/O, wheelhouse y pruebas |
+| #18 | `codex/reconcile-knowledge-pr13-pr14-2026-11-20` | Draft | Currículo, biblioteca, trazabilidad y gates de profundidad |
+| #19 | — | Cerrado sin fusionar | Intento de integrar PR #14 completo; se detectó conflicto, se pasó a integración selectiva |
+
+PR #18 tiene como base la rama de PR #17. No se debe fusionar #18 antes de integrar #17. Los PR originales #11–#14 siguen separados; no se fusionaron en bloque.
+
+## Evidencia de software
+
+- PR #17: [Python Tests](https://github.com/Xero-29/CYBER_AI/actions/runs/44795901916) y [Docker Sandbox](https://github.com/Xero-29/CYBER_AI/actions/runs/44795901820) terminaron en éxito sobre el HEAD de esa rama.
+- PR #18, HEAD actual de integración: [CI 44801690723](https://github.com/Xero-29/CYBER_AI/actions/runs/44801690723) — 683 pruebas unitarias, allowlist Windows y laboratorios Foundations en Python 3.11/3.12/3.13, todos en éxito.
+- El gate `knowledge_depth_audit.py` se ejecuta en CI y detecta reutilización de boilerplate; no concede aceptación experta.
+
+## Estado real de la biblioteca
+
+- 48/48 paquetes con estructura base; 48 estudios `RESEARCH_STUDY.md`; 48 `DEEP_SECTIONS.md`.
+- 20.588 palabras en estudios y 218 referencias HTTPS. Son borradores con umbral editorial mínimo; no implican lectura integral ni verificación de afirmaciones.
+- 48/48 agendas estructuralmente completas; 223 IDs de fuente registrados (16 añadidos en FND-01.01/01.02/01.03); 0 fuentes con lectura integral registrada en la worklist; 192 tareas siguen con fuentes candidatas, no claims verificados.
+- Registro de claims: 0 claims aprobados.
+- Las 192 brechas tienen 1.344 bloques de sección, 77 variantes únicas y reutilización de boilerplate. La auditoría encontró 84.015 pares de duplicación exacta, 82.208 entre dominios; cero brechas elegibles como expertas.
+- Foundations: 102 subtemas; 1.224 comprobaciones de capa (36 en progreso, 1.188 no evaluadas); 408 comprobaciones de capacidad (12 en progreso, 396 no evaluadas); 0 aprobadas; todos los subtemas T0/O0.
+- AI Red Team: siete temas base, 84 celdas en progreso, 0 aprobadas; G5/G7 sin iniciar y G8 bloqueada.
+- Seis reescrituras disciplinares importadas como borradores: identity, malware, forensics, incident_response, threat_intel y reverse. Otras 40 áreas tienen expansión específica pendiente.
+- El bootstrap offline valida e indexa 332 documentos: 48 paquetes, 48 dossiers DEEP_SECTIONS, 48 estudios RESEARCH_STUDY, 48 compendios técnicos, 48 agendas, 48 revisiones bibliográficas, 41 documentos suplementarios y 3 Skills candidatas. Las candidatas no son Skills activas.
+- FND-01.01, FND-01.02 y FND-01.03 tienen ampliaciones teóricas, instrumentos de evaluación en frío preparados y seis laboratorios sintéticos nuevos; ningún instrumento se ha administrado.
+- Los laboratorios sintéticos incluyen conflictos safety/security, privacidad vs confidencialidad, recuperación confiable, causa común y autenticidad/integridad vs verdad. CI no equivale a prueba física u operacional.
+- Los gates de estructura no son gates de aceptación experta. La madurez editorial M2 no equivale a T4/T5 ni a O4/O5.
+
+## Siguiente orden obligatorio
+
+1. Cerrar revisión de PR #17 y después PR #18, sin saltarse gates.
+2. Foundations: cerrar sus 102 subtemas y no conformidades, uno por uno.
+3. AI Red Team: currículo granular, evidencia, validación y revisión independiente.
+4. Las otras 46 especialidades, en secuencia y con el mismo estándar.
+5. Validación caliente y pruebas operativas reales después de completar la fase en frío.
+
+## Historial anterior
+
+El contenido histórico que sigue registra estados de 2026-11-18 y commits anteriores. Se conserva por trazabilidad, pero no reemplaza este estado canónico ni debe interpretarse como estado actual de `main`.
+
+---
+
 # Estado de integración — 2026-11-18
 
 **Rama de integración:** `codex/integration-hash-locks-2026-11-17-v2`  

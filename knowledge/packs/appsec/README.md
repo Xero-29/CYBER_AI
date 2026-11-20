@@ -1,6 +1,6 @@
 # Seguridad de aplicaciones — Guía de dominio
 
-**ID:** `appsec` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio incluido offline.
+**ID:** `appsec` · **Versión:** 2.1.0 · **Idioma:** español · **Distribución:** contenido editorial propio incluido offline.
 
 ## Propósito y límites
 Asegura el ciclo de vida de aplicaciones web y servicios, desde requisitos y diseño hasta despliegue y operación. Cubre errores de lógica, validación, sesiones, autorización, dependencias, configuración y exposición de datos. Las pruebas dinámicas deben ejecutarse en entornos autorizados, con datos sintéticos y límites de carga.
@@ -48,3 +48,34 @@ OWASP Top 10, OWASP ASVS, OWASP Testing Guide, CWE, Semgrep, Bandit, Ruff, ZAP y
 
 ## Instrucciones para agentes IA
 Prioriza revisión de código y pruebas locales. No propongas explotación destructiva, persistencia, evasión ni extracción de datos. Para cada hallazgo incluye precondición, componente, impacto, evidencia mínima, mitigación y test de regresión.
+
+---
+
+## Marco obligatorio de desarrollo experto e investigación
+
+Este paquete se desarrolla conforme al [Estándar experto e investigación](../../EXPERT_RESEARCH_STANDARD.md). El estándar aplica a esta especialidad, no solo al currículo global.
+
+**Estado del perfil:** estructura y mapa de evidencias definidos; el contenido técnico ampliado, la revisión integral de fuentes, los laboratorios ejecutados y la validación independiente se registran por separado. No se declara K4/K5 por la existencia de este marco.
+
+Cada tema de esta especialidad debe desarrollarse como unidad independiente y cubrir: teoría, formalización pertinente, arquitectura, estándares versionados, implementación, análisis avanzado, seguridad adaptada al dominio, investigación, laboratorio/dataset, evaluación, Skills verificadas y trazabilidad. La matriz detallada de capas, evidencias, enfoque matemático y restricciones de laboratorio está en `knowledge/curricula/domain_curriculum.json`, dentro del perfil `appsec`.
+
+**Madurez:** K1–K5 se asigna por tema y evidencia. Las ocho puertas G1–G8 deben mostrar estado explícito; lo no ejecutado o no revisado permanece pendiente. Las referencias descubiertas no cuentan como lectura completa y los laboratorios diseñados no cuentan como ejecutados.
+
+
+## Mapa técnico ampliado (v2.1.0)
+
+El compendio técnico desarrolla: modelo de seguridad de aplicaciones; modelado de amenazas; identidad, autenticación, sesión y recuperación; autorización por sujeto/acción/objeto/tenant; inyección y codificación contextual; XSS, CSRF, SSRF, deserialización, uploads y traversal; APIs y lógica de negocio; criptografía aplicada y secretos; SDLC y cadena de suministro; SAST/DAST/IAST/SCA/fuzzing; métricas y validación.
+
+La agenda de investigación contiene seis líneas con preguntas, hipótesis nula/alternativa, diseños, variables, controles, métricas y amenazas a validez. Cinco laboratorios fríos están diseñados, pero no ejecutados.
+
+## Estado de madurez
+
+- Contenido técnico específico ampliado: disponible en `knowledge/deep_modules/appsec/TECHNICAL_COMPENDIUM.md`.
+- Fuentes primarias identificadas e inspección de páginas oficiales: documentada en `LITERATURE_REVIEW.md` y en `knowledge/research/source_registry.json`.
+- Lectura integral de ASVS/WSTG/SSDF: pendiente.
+- Revisión sistemática académica: pendiente.
+- Laboratorios ejecutados, benchmark y resultados: pendientes.
+- Revisión independiente y reproducción: pendientes.
+- Skills AppSec verificadas: no promovidas en este cambio.
+
+**Límite empírico: no M3/M4/M5.** El contenido ampliado no se presenta como validación experta ni como investigación concluida. El estado K1–K5 se asigna por tema y evidencia conforme a `knowledge/EXPERT_RESEARCH_STANDARD.md`.

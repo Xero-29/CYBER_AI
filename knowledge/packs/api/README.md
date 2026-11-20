@@ -1,6 +1,6 @@
 # Seguridad de API — Guía de dominio
 
-**ID:** `api` · **Versión:** 2.0.0 · **Idioma:** español · **Distribución:** contenido editorial propio incluido offline.
+**ID:** `api` · **Versión:** 2.1.0 · **Idioma:** español · **Distribución:** contenido editorial propio incluido offline.
 
 ## Propósito y límites
 Define controles para APIs REST, GraphQL, gRPC y eventos. El riesgo dominante suele estar en autorización por objeto/función, identidad máquina-a-máquina, exposición excesiva de datos, abuso de recursos y confianza incorrecta entre servicios. Las pruebas activas solo se ejecutan sobre APIs propias o autorizadas.
@@ -49,3 +49,37 @@ OWASP API Security Top 10, OAuth 2.1, OpenID Connect, RFC 9700, OpenAPI, GraphQL
 
 ## Instrucciones para agentes IA
 No generes tokens reales ni envíes solicitudes a servicios productivos. Usa fixtures locales. No marques una API como segura por tener gateway o JWT: verifica autorización por objeto, tenant y operación.
+
+---
+
+## Arquitectura
+Modelar el recorrido cliente → DNS/TLS/CDN o gateway → autenticación/autorización → servicio API → colas y servicios internos → almacenes de datos y terceros. Separar plano de control (registro, versionado, políticas y secretos) del plano de datos. Identificar límites entre tenants, servicios y zonas de confianza; registrar scopes, claims, identidad de workload, contratos, esquemas, límites de tamaño y operaciones con efectos laterales. Los callbacks/webhooks, resolvers GraphQL, endpoints administrativos y rutas internas son superficies distintas y requieren controles propios.
+
+## Marco obligatorio de desarrollo experto e investigación
+
+Este paquete se desarrolla conforme al [Estándar experto e investigación](../../EXPERT_RESEARCH_STANDARD.md). El estándar aplica a esta especialidad, no solo al currículo global.
+
+**Estado del perfil:** estructura y mapa de evidencias definidos; el contenido técnico ampliado, la revisión integral de fuentes, los laboratorios ejecutados y la validación independiente se registran por separado. No se declara K4/K5 por la existencia de este marco.
+
+Cada tema de esta especialidad debe desarrollarse como unidad independiente y cubrir: teoría, formalización pertinente, arquitectura, estándares versionados, implementación, análisis avanzado, seguridad adaptada al dominio, investigación, laboratorio/dataset, evaluación, Skills verificadas y trazabilidad. La matriz detallada de capas, evidencias, enfoque matemático y restricciones de laboratorio está en `knowledge/curricula/domain_curriculum.json`, dentro del perfil `api`.
+
+**Madurez:** K1–K5 se asigna por tema y evidencia. Las ocho puertas G1–G8 deben mostrar estado explícito; lo no ejecutado o no revisado permanece pendiente. Las referencias descubiertas no cuentan como lectura completa y los laboratorios diseñados no cuentan como ejecutados.
+
+
+## Mapa técnico ampliado (v2.1.0)
+
+El compendio cubre arquitectura y límites de confianza, REST/HTTP, OpenAPI, GraphQL, gRPC, OAuth 2.0/OIDC, RFC 9700, JWT, autorización multi-tenant, rate limiting, abuso de negocio, webhooks, mTLS, gateway/service mesh, telemetría y métricas.
+
+La agenda define seis líneas de investigación con hipótesis falsables y diseños experimentales. Cinco laboratorios fríos están diseñados; no se han ejecutado.
+
+## Estado de madurez
+
+- Contenido técnico específico ampliado: `knowledge/deep_modules/api/TECHNICAL_COMPENDIUM.md`.
+- Fuentes oficiales y límites de revisión: `LITERATURE_REVIEW.md` y `knowledge/research/source_registry.json`.
+- Lectura integral de RFC 9700, OpenAPI y documentación gRPC: pendiente.
+- Revisión sistemática académica: pendiente.
+- Laboratorios, benchmarks y resultados propios: pendientes.
+- Revisión independiente y reproducción: pendientes.
+- Skills verificadas: no promovidas en este cambio.
+
+**Límite empírico: no M3/M4/M5.** El contenido ampliado no equivale a validación experta ni investigación concluida. K1–K5 se asigna por tema y evidencia conforme a `knowledge/EXPERT_RESEARCH_STANDARD.md`.

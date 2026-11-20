@@ -60,3 +60,28 @@ Cobertura activos; enlaces verificables; inconsistencias; riesgos sin dueño; ev
 ## Identificadores del registro de fuentes
 
 - `RESEARCH-FOUNDATIONS`
+
+
+## Addendum de fuentes primarias — 2026-11-20
+
+IDs añadidos al registro y utilizados en la ampliación FND-01.01/FND-01.02:
+
+- `NIST-FIPS-199` — definición y categorización CIA para sistemas federales de EE. UU.
+- `NASA-SP-2014-612` — metadatos oficiales del handbook de system safety; contenido íntegro pendiente.
+- `ISO-22316-2017` y `ISO-FDIS-22316-2027` — edición publicada y borrador FDIS en aprobación, respectivamente.
+- `ISO-26262-1-2018` y `ISO-DIS-26262-1-2026` — edición publicada y borrador en enquiry, respectivamente.
+- `IEC-61508-1-2010` y `IEC-61508-1-2026-PRV` — edición publicada y pre-release FDIS no final, respectivamente.
+- `IEC-TR-63069-2019` — coordinación safety/security.
+- `IEC-62443-2-1-2024` y `IEC-62443-3-3-2013` — programa y requisitos técnicos de ciberseguridad IACS.
+
+El estado de revisión de cada fuente está registrado individualmente. Los metadatos o abstracts no se contabilizan como lectura integral. Las normas ISO/IEC de pago no se han copiado ni ingerido.
+
+
+## Addendum FND-01.03 — Inventario y ontología de activos (2026-11-20)
+
+- `NISTIR-8286A-r1` — versión vigente 2025; sustituye la edición 2021 retirada.
+- `CISA-OT-ASSET-INVENTORY-2025` — guía conjunta OT, alcance y campos prioritarios revisados.
+- `ISO-IEC-IEEE-15288-2023` — procesos del ciclo de vida de sistemas y stakeholders; metadatos/abstract.
+- `ISO-IEC-27001-2022` — ISMS, edición 2022 y Amd 1:2024; metadatos/abstract.
+- `NIST-SP-800-128` — gestión de configuración centrada en seguridad; metadatos/abstract.
+- `NIST-SP-800-53r5` — revisión selectiva de CM-8, PM-5, CM-12 y CM-13; aplicar Release 5.2.0.

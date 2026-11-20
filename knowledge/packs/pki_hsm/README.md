@@ -49,3 +49,6 @@ NIST SP 800-57, RFC 5280, RFC 6960, CA/Browser Forum Baseline Requirements, FIPS
 
 ## Instrucciones para agentes IA
 No pidas claves privadas ni PIN de HSM. No generes ni firmes certificados productivos. Toda ceremonia requiere operador humano, quorum y evidencia independiente.
+
+## Arquitectura
+La PKI se compone de raíz y CA subordinadas, políticas/prácticas, RA, módulos HSM, repositorios de certificados, OCSP/CRL, clientes, inventario, automatización de emisión y operadores. Definir jerarquía, trust stores, perfiles, algoritmos, separación de funciones, ceremonia de claves y recuperación ante pérdida/compromiso. En HSM, documentar particiones, quorum, roles, backup cifrado, firmware, auditoría y dependencia del fabricante. Las claves privadas no deben exportarse salvo procedimiento explícito y controlado.

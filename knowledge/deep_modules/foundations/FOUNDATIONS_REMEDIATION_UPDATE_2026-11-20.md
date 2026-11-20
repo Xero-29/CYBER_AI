@@ -1,0 +1,38 @@
+# Foundations — Registro de remediación en frío 2026-11-20
+
+## FND-01.01
+- Añadido crosswalk disciplinar de seguridad, safety, privacidad, confiabilidad, disponibilidad y resiliencia.
+- Añadidos modelos de riesgo y métricas, trade-offs, casos de ingeniería integrada y límites de estándares.
+- Registradas fuentes oficiales NIST, NASA, IEC e ISO con estado de revisión por fuente.
+- No conformidades de lectura integral, aplicabilidad legal independiente, evaluación supervisada y revisión experta siguen abiertas.
+
+## FND-01.02
+- Añadida síntesis del modelo CIA y propiedades relacionadas: autenticidad, autorización, accountability, non-repudiation, provenance, freshness, privacy, safety, reliability y resilience.
+- Añadidos contraejemplos, matriz de controles/evidencia y criterios de rechazo.
+- Preparado instrumento de evaluación en frío V1; no administrado.
+- Lectura integral, evaluación supervisada, revisión independiente y aplicabilidad sectorial siguen pendientes.
+
+## Estado global
+- 3 de 102 subtemas tienen desarrollo documental ampliado.
+- 36 de 1.224 capas están en progreso; 1.188 no evaluadas.
+- 12 de 408 capacidades están en progreso; 396 no evaluadas.
+- 0 capas o capacidades aprobadas.
+- 102 subtemas permanecen T0/O0.
+- Ninguna no conformidad se cierra por añadir texto o registrar metadatos.
+
+
+## Actualización de integración — 2026-11-20
+
+- Se añadieron seis laboratorios sintéticos LAB-FND-08A a LAB-FND-13A. El runner y sus pruebas se ejecutan en CI; los modelos no certifican safety ni validan un entorno físico.
+- El bootstrap indexa 332 documentos: 48 paquetes, 48 dossiers DEEP_SECTIONS, 48 estudios RESEARCH_STUDY, 48 compendios técnicos, 48 agendas, 48 revisiones bibliográficas, 41 documentos suplementarios y 3 Skills candidatas.
+- Las tres Skills candidatas describen metodologías; no están activas ni registradas en skillbook. No se promueven sin ledger, dos ejecuciones exitosas, evidencia y revisión independiente.
+- CI previo al subtema FND-01.03: 683 pruebas unitarias y cinco jobs aprobados; el nuevo HEAD está pendiente de CI.
+- La madurez de los tres subtemas no cambia: 12 capas in_progress por subtema, 0 passed, T0/O0.
+
+
+## FND-01.03 — 2026-11-20
+
+- Desarrollado el tercer subtema en sus doce capas como borrador: ontología, grafo formal, criticidad, arquitectura, estándares, implementación, análisis, threat model, investigación, laboratorio, evaluación, Skill y trazabilidad.
+- Añadidas cinco fuentes al registro (NISTIR 8286A Rev. 1, CISA OT Asset Inventory 2025, ISO/IEC/IEEE 15288:2023, ISO/IEC 27001:2022 Amd 1:2024 y NIST SP 800-128); revisión selectiva de CM-8/PM-5/CM-12/CM-13 en SP 800-53.
+- LAB-FND-13A y evaluación V1 preparados; CI ejecuta el laboratorio sintético, no una inspección real.
+- FND-01.03: 12/12 capas in_progress; 4/4 capacidades in_progress; T0/O0; no aprobado.

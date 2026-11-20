@@ -47,3 +47,9 @@ NIST SP 800-160, NIST CSF 2.0, ISO/IEC 27001/27002, SABSA, OWASP ASVS, C4 Model 
 
 ## Instrucciones para agentes IA
 No declares segura una arquitectura por cumplir un patrón. Expón supuestos, fallos de diseño, compensaciones y pruebas necesarias. No conviertas diagramas en evidencia de despliegue.
+
+## Arquitectura
+Descomponer la solución en contextos de confianza, planos de control/datos/administración, identidad, servicios, datos, secretos, red, dependencias y observabilidad. Para cada componente documentar responsabilidad, interfaces, entradas, salidas, privilegios, invariantes, modos de fallo y dependencias. Evaluar patrones de aislamiento, segmentación, mediación completa, fail-safe defaults y separación de deberes; revisar tanto arquitectura lógica como despliegue físico y cadena de suministro.
+
+## Controles
+Exigir threat modeling por cambio significativo, revisión de límites de confianza, autenticación de servicio a servicio, autorización por objeto/acción, mínimo privilegio, validación de entradas, secretos fuera del código, cifrado y rotación, segmentación/egress, hardening reproducible, logging de seguridad y pruebas negativas. Cada patrón debe incluir contexto de aplicabilidad, riesgos residuales, alternativa compensatoria y test automatizado que evite regresiones.
