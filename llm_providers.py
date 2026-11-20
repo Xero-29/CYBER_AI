@@ -23,6 +23,7 @@ class _NoRedirect(HTTPRedirectHandler):
 
 
 _HTTP_OPENER = build_opener(_NoRedirect)
+MAX_PROVIDER_RESPONSE_BYTES = 16 * 1024 * 1024
 
 
 @lru_cache(maxsize=32)
@@ -178,12 +179,26 @@ def _http_json(url, payload=None, headers=None, timeout=600):
                       method="GET" if payload is None else "POST")
     try:
         with _HTTP_OPENER.open(request, timeout=timeout) as response:
-            return json.load(response)
+            raw = response.read(MAX_PROVIDER_RESPONSE_BYTES + 1)
+        if len(raw) > MAX_PROVIDER_RESPONSE_BYTES:
+            raise RuntimeError(
+                "La respuesta del proveedor IA supera el límite de 16 MiB."
+            )
+        try:
+            return json.loads(raw.decode("utf-8"))
+        except (UnicodeDecodeError, json.JSONDecodeError) as error:
+            raise RuntimeError(
+                "El proveedor IA devolvió una respuesta que no es JSON UTF-8 válido."
+            ) from error
     except HTTPError as exc:
-        detail = exc.read().decode("utf-8", errors="replace")[:2000]
-        raise RuntimeError(f"Proveedor IA respondió HTTP {exc.code}: {detail}") from exc
+        # Never echo untrusted provider bodies: they may contain credentials or
+        # sensitive prompt fragments reflected by an upstream gateway.
+        raise RuntimeError(f"Proveedor IA respondió HTTP {exc.code}.") from None
     except URLError as exc:
-        raise RuntimeError(f"No se pudo conectar con el proveedor IA: {exc}") from exc
+        reason_type = type(exc.reason).__name__
+        raise RuntimeError(
+            f"No se pudo conectar con el proveedor IA ({reason_type})."
+        ) from None
 
 
 def _credentials(provider):

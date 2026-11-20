@@ -1,5 +1,8 @@
 import unittest
-from unittest.mock import patch
+from io import BytesIO
+from unittest.mock import MagicMock, patch
+from urllib.error import HTTPError, URLError
+
 import llm_providers
 
 class ProviderTests(unittest.TestCase):
@@ -333,6 +336,40 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
         with patch.object(llm_providers, "_http_json", return_value={"message": {"content": "ok"}}) as call:
             llm_providers.request(provider, "api/chat", {}, timeout=12.5)
         self.assertEqual(call.call_args.kwargs["timeout"], 12.5)
+
+    def test_http_json_rejects_oversized_provider_response(self):
+        response = MagicMock()
+        response.__enter__.return_value = response
+        response.read.return_value = b"x" * (
+            llm_providers.MAX_PROVIDER_RESPONSE_BYTES + 1
+        )
+        with patch.object(llm_providers._HTTP_OPENER, "open", return_value=response):
+            with self.assertRaisesRegex(RuntimeError, "16 MiB"):
+                llm_providers._http_json("https://provider.example/v1/models")
+
+    def test_http_error_body_is_not_echoed_to_logs(self):
+        secret = "provider-secret-value"
+        error = HTTPError(
+            "https://provider.example/v1/chat/completions",
+            401,
+            "Unauthorized",
+            {},
+            BytesIO(json_bytes := ('{"api_key":"' + secret + '"}').encode("utf-8")),
+        )
+        with patch.object(llm_providers._HTTP_OPENER, "open", side_effect=error):
+            with self.assertRaisesRegex(RuntimeError, "HTTP 401") as caught:
+                llm_providers._http_json("https://provider.example/v1/chat/completions")
+        self.assertNotIn(secret, str(caught.exception))
+        self.assertNotIn(json_bytes.decode("utf-8"), str(caught.exception))
+
+    def test_url_error_does_not_echo_provider_url_or_reason(self):
+        with patch.object(
+            llm_providers._HTTP_OPENER, "open",
+            side_effect=URLError("sensitive-upstream-detail"),
+        ):
+            with self.assertRaisesRegex(RuntimeError, "No se pudo conectar") as caught:
+                llm_providers._http_json("https://provider.example/v1/models")
+        self.assertNotIn("sensitive-upstream-detail", str(caught.exception))
 
     def test_builtin_embedding_response_must_match_input_count(self):
         provider = {"name": "cloud", "protocol": "openai",
