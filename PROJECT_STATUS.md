@@ -1,16 +1,42 @@
-# Estado canónico vigente — 2026-11-17
+# Estado de integración — 2026-11-18
+
+**Rama de integración:** `codex/integration-hash-locks-2026-11-17-v2`  
+**PR existente:** [#11](https://github.com/Xero-29/CYBER_AI/pull/11), abierto en draft; no se creó un PR duplicado.  
+**HEAD previo:** `ba4c8e61319a1f2320c0d0dcf9f72149aec594f2`. **main:** `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`.  
+**Divergencia previa:** 39 commits propios y 477 commits de main desde el merge-base `c9c794c984b3fff5ff2032d0831f7f161205afc0`. Se detectó solapamiento en los dos workflows, README y PROJECT_STATUS. La nueva revisión conserva main como base del árbol e incorpora los cambios de integración; main no se modifica.
+
+**Rama fuente de auditoría:** `codex/security-integrity-audit`, HEAD `3f83ed5bcf42f1ae3e1b1c38fc48a8a4c1f94781`; 35 commits adelante y 573 detrás de main desde el merge-base `cae816d6037b56f017c2fbdb3e98ef00df58c1d`. El commit histórico `7b5ed033f1f6461b5780a10ac4ada67a444b93e5` es ancestro común y está preservado.
+
+## Cambios de integración
+
+- Se conservan las capacidades recientes de main: sandbox YARA/TShark, contratos de ejecución, Nuclei, orquestación y biblioteca ampliada.
+- Se mantienen locks SHA-256 para runtime, Ruff/Bandit y extractores documentales; CI verifica wheels, instala extractores y genera SBOM separados con provenance.
+- Se portan del branch de auditoría los límites/Unicode en datasets, entorno host efímero para adaptadores, límites de manifiesto/archivos de backup y límite de 2 MiB para METADATA de wheels.
+- El smoke de repositorio exige el entrypoint canónico `preflight.py` y `verify.sh`, no el antiguo `verifier.py` eliminado de main.
+
+## Evidencia y validación
+
+- main HEAD `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`: Python Tests **success, 605 pruebas** ([run 44198470095](https://github.com/Xero-29/CYBER_AI/actions/runs/44198470095)); Docker Sandbox **success, 605 pruebas y Ruff** ([run 44198470143](https://github.com/Xero-29/CYBER_AI/actions/runs/44198470143)).
+- Rama de auditoría HEAD `3f83ed5bcf42f1ae3e1b1c38fc48a8a4c1f94781`: Python Tests **success, 481 pruebas** ([run 44327499508](https://github.com/Xero-29/CYBER_AI/actions/runs/44327499508)); Docker Sandbox **success** ([run 44327500029](https://github.com/Xero-29/CYBER_AI/actions/runs/44327500029)).
+- PR #11 HEAD anterior falló en evento `pull_request` porque una prueba exigía `verifier.py`, eliminado en main. Se actualizó para comprobar `preflight.py` y `verify.sh`.
+- El nuevo merge commit requiere checks de push y pull_request sobre el SHA exacto. No se extrapola CI de los padres.
+- PR #11 permanece en draft; no se fusiona automáticamente.
+
+---
+
+# Estado canónico vigente — 2026-11-18
 
 **Rama:** `main`  
-**Último commit verificado en CI:** `0767cd68d418f7bfbb69bbe336106a9e869de563` (plan maestro).  
-**CI Python:** [run 44181807943](https://github.com/Xero-29/CYBER_AI/actions/runs/44181807943) — **594 pruebas aprobadas, 1 omitida**.  
-**CI Docker sandbox:** [run 44181807961](https://github.com/Xero-29/CYBER_AI/actions/runs/44181807961) — **success**.  
+**Último commit verificado en CI:** `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`.  
+**CI Python:** [run 44198470095](https://github.com/Xero-29/CYBER_AI/actions/runs/44198470095) — **605 pruebas aprobadas**.  
+**CI Docker sandbox:** [run 44198470143](https://github.com/Xero-29/CYBER_AI/actions/runs/44198470143) — **success, 605 pruebas y Ruff en sandbox**.  
 **Plan de cierre:** [docs/PROJECT_COMPLETION_PLAN.md](docs/PROJECT_COMPLETION_PLAN.md).  
 **Matriz vigente:** [docs/IMPLEMENTATION_MATRIX.md](docs/IMPLEMENTATION_MATRIX.md).  
 **Respaldo:** `backup/main-before-cyber-ai-2026-11-17`, sin modificar.
 
 ## Estado real resumido
 
-- El último cambio funcional de memoria, Skills y adaptadores sigue siendo `6fa5da29c23f2d39c79ea93adb3a1fbb1018a0bf`; el commit `0767cd68` añadió el plan maestro. La suite Python del commit del plan ejecutó 594 pruebas, con 1 omitida; Docker sandbox terminó correctamente.
+- El HEAD `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea` pasó 605 pruebas en Python Tests y 605 en Docker Sandbox; los workflows exactos están enlazados en el encabezado de este estado. El resultado valida ese SHA, no cambios posteriores.
 - Herramientas: 21 declaradas, 20 IDs `TOOL_SPECS`, 17 adaptadores host (16 local/offline y Nmap scoped), pip-audit bloqueado, YARA/TShark en Docker y Nuclei con runner separado. El catálogo no garantiza instalación.
 - Conocimiento: 48 paquetes, perfiles, agendas y dossiers exploratorios; profundidad aún no validada. El preflight registró 138 fuentes de investigación, 0 revisadas y 276 verificaciones pendientes en el commit probado.
 - Agentes y proveedores están implementados, pero falta evaluar calidad semántica, robustez y coste con proveedores reales.
