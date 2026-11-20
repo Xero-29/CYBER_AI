@@ -171,6 +171,34 @@ class DataBackupTests(unittest.TestCase):
             verify_backup(snapshot)
 
 
+    def test_restore_rejects_manifest_symlink_swap_after_verification(self):
+        snapshot = self.root / "backup"
+        create_backup(self.data, snapshot)
+        manifest_path = snapshot / "manifest.json"
+        outside = self.root / "outside-manifest.json"
+        outside.write_text("not a backup manifest", encoding="utf-8")
+        real_open = os.open
+        manifest_opens = {"count": 0}
+
+        def swap_on_restore(path, flags, *args, **kwargs):
+            if Path(path) == manifest_path:
+                manifest_opens["count"] += 1
+                if manifest_opens["count"] == 2:
+                    manifest_path.unlink()
+                    manifest_path.symlink_to(outside)
+            return real_open(path, flags, *args, **kwargs)
+
+        with patch("data_backup.os.open", side_effect=swap_on_restore):
+            with self.assertRaises(BackupError):
+                restore_backup(
+                    snapshot, self.data, confirm_quiesced=True, confirm_replace=True
+                )
+        self.assertEqual(
+            (self.data / "events.jsonl").read_text(encoding="utf-8"),
+            '{"event":"test"}\n',
+        )
+        self.assertEqual(outside.read_text(encoding="utf-8"), "not a backup manifest")
+
     def test_restore_creates_missing_parent_and_rejects_overlap(self):
         snapshot = self.root / "backup"
         create_backup(self.data, snapshot)

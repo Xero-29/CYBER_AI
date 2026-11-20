@@ -477,10 +477,15 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
     staging.mkdir(mode=0o700)
     previous = None
     try:
-        manifest_bytes = (snapshot / "manifest.json").read_bytes()
+        manifest_path = snapshot / "manifest.json"
+        manifest_bytes = _read_regular_file(
+            manifest_path, max_bytes=MAX_MANIFEST_BYTES
+        )
         if hashlib.sha256(manifest_bytes).hexdigest() != report["manifest_sha256"]:
             raise BackupError("El manifiesto cambió después de su verificación.")
-        manifest = json.loads(manifest_bytes.decode("utf-8"))
+        manifest_text = manifest_bytes.decode("utf-8")
+        _enforce_manifest_json_depth(manifest_text)
+        manifest = json.loads(manifest_text, object_pairs_hook=_unique_object)
         for item in manifest["files"]:
             relative = _safe_relative(item["path"])
             source = snapshot.joinpath(*relative.parts)
