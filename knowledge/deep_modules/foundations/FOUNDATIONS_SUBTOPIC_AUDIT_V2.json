@@ -72,7 +72,12 @@
         "FND_01_01_PRIMARY_SOURCE_SYNTHESIS_2026-11-19.md",
         "topics/FND-01-01_ASSESSOR_GUIDE_V2.md",
         "FND_01_01_SAFETY_SECURITY_PRIVACY_RESILIENCE_CROSSWALK_2026-11-20.md",
-        "../../research/source_registry.json"
+        "../../research/source_registry.json",
+        "labs/runner.py",
+        "labs/results.json",
+        "../../../../tests/test_foundations_labs.py",
+        "../../../skills/candidates/README.md",
+        "../../../skills/candidates/FND-01-01_INTEGRATED_PROPERTY_ANALYSIS.md"
       ],
       "nonconformities": [
         "NC-FND-01.01-01: revisión integral de fuentes primarias y referencias críticas pendiente, incluidas las publicaciones NIST 800-160; las revisiones dirigidas no equivalen a lectura integral.",
@@ -87,14 +92,16 @@
         "completed": [
           "Formal distinction and crosswalk for security, safety, privacy, reliability, availability, resilience and assurance",
           "Official metadata/version-state review for NIST, NASA, IEC and ISO references",
-          "Explicit limits for U.S. federal and sector-specific standards and conditional Colombia applicability"
+          "Explicit limits for U.S. federal and sector-specific standards and conditional Colombia applicability",
+          "Five synthetic property-interaction labs added and CI-tested; candidate skill specification indexed but not active"
         ],
         "pending": [
           "Linear full-text review of NIST SP 800-160 Vol. 1 Rev. 1 and Vol. 2 Rev. 1 and critical references",
           "Independent Colombian legal and sectoral applicability review",
           "Supervised assessment, two qualified evaluators, original scoring sheets and adjudication",
           "Independent disciplinary review",
-          "Full comparative validation of reliability and functional-safety models"
+          "Full comparative validation of reliability and functional-safety models",
+          "Physical/safety validation and independent specialist review"
         ],
         "no_maturity_promotion": true
       },
@@ -132,7 +139,12 @@
         "FND_01_01_SAFETY_SECURITY_PRIVACY_RESILIENCE_CROSSWALK_2026-11-20.md",
         "../../research/source_registry.json",
         "FND_01_02_PRIMARY_SOURCE_SYNTHESIS_2026-11-20.md",
-        "FND_01_02_COLD_ASSESSMENT_V1.md"
+        "FND_01_02_COLD_ASSESSMENT_V1.md",
+        "labs/runner.py",
+        "labs/results.json",
+        "../../../../tests/test_foundations_labs.py",
+        "../../../skills/candidates/README.md",
+        "../../../skills/candidates/FND-01-02_CIA_PROPERTY_ASSESSMENT.md"
       ],
       "nonconformities": [
         "NC-FND-01.02-01: lectura integral de estándares y fuentes primarias pendiente",
@@ -146,13 +158,15 @@
         "completed": [
           "CIA scope and limits anchored to FIPS 199",
           "Distinctions among authenticity, authorization, accountability, non-repudiation, provenance, privacy, safety, reliability and resilience",
-          "Cold assessment instrument and fail conditions prepared"
+          "Cold assessment instrument and fail conditions prepared",
+          "Synthetic privacy/confidentiality and integrity/truth cases executed in CI; candidate skill specification indexed but not active"
         ],
         "pending": [
           "Full-text review of primary standards",
           "Administer cold assessment and preserve original responses",
           "Independent second scoring and adjudication",
-          "Sectoral and Colombian applicability review"
+          "Sectoral and Colombian applicability review",
+          "Administer the cold assessment and preserve original responses; independent scoring"
         ],
         "no_maturity_promotion": true
       },

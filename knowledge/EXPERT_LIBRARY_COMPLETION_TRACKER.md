@@ -169,3 +169,19 @@ Norma y secuencia completas: [THEORETICAL_LIBRARY_COMPLETION_PROGRAM_48.md](THEO
 - Se enlazó el dossier desde el README y el compendio técnico previo.
 - **Estado:** avance documental sustancial, todavía incompleto. El inventario de siete temas debe ampliarse, la lectura integral de fuentes sigue pendiente, no se ha completado la auditoría adversarial de las 84 celdas y no hay revisión independiente ni laboratorios nuevos ejecutados.
 - **Madurez:** M2 editorial; no declarar T4, G1–G8 aprobadas ni madurez operativa. La salida del módulo permanece bloqueada hasta cerrar su completitud teórica.
+
+
+## Actualización de Foundations — 2026-11-20
+
+### FND-01.01
+- Crosswalk disciplinar añadido: safety/security/privacy/reliability/availability/resilience, modelos de riesgo, interacciones, métricas, métodos y límites de estándares.
+- 11 fuentes oficiales adicionales registradas con estados distintos: lectura de secciones, abstract/metadatos y borradores no finales. Ninguna se declara leída íntegramente por inferencia.
+- Laboratorios sintéticos LAB-FND-08A a LAB-FND-12A cubren trade-off safety/security, privacidad/confidencialidad, recuperación confiable, causa común e integridad vs verdad. CI ejecuta el modelo sintético; no valida hardware ni operación real.
+- Skill candidata de análisis integrado indexada, no activa.
+
+### FND-01.02
+- Síntesis CIA y propiedades extendidas añadida; instrumento de evaluación en frío V1 preparado, no administrado.
+- Labs 09 y 12 aportan escenarios sintéticos de privacidad e integridad/verdad.
+- Skill candidata de evaluación CIA indexada, no activa.
+
+**Estado común:** L1–L12 siguen in_progress; cero capas/capacidades aprobadas; T0/O0; evaluación no administrada; revisión independiente pendiente. Ver FOUNDATIONS_LAYER_COVERAGE_MAP_2026-11-20.md y FOUNDATIONS_REMEDIATION_UPDATE_2026-11-20.md.

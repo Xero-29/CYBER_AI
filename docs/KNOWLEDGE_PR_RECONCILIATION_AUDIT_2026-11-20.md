@@ -175,3 +175,10 @@ No se copia `FOUNDATIONS_ASSESSOR_KEY_V1.md` al paquete público de conocimiento
 La estructura de PR #13 y PR #14 es útil y sus CI exactos están verdes. La biblioteca aún no alcanza aceptación experta. Se recomienda integración selectiva y encadenada sobre la rama de reconciliación de PR #17, manteniendo ambos PR originales en draft hasta que el contenido, manifiestos, fuentes y workflow hayan sido reconciliados y auditados.
 
 **No se fusiona PR #13 ni PR #14 en bloque. No se cambia ningún estado de madurez a partir de volumen, encabezados, referencias o CI solamente.**
+
+
+## 6. Actualización de Foundations — 2026-11-20
+
+FND-01.01 incorpora un crosswalk disciplinar de safety/security/privacy/reliability/availability/resilience y 11 fuentes oficiales adicionales con estados de revisión diferenciados. FND-01.02 incorpora una síntesis CIA y propiedades extendidas, contraejemplos y un instrumento en frío V1 no administrado. El bootstrap ahora valida e indexa 146 documentos: 48 paquetes, 48 dossiers DEEP_SECTIONS, 48 estudios RESEARCH_STUDY y 2 especificaciones de Skills candidatas. Se añadieron cinco laboratorios sintéticos (LAB-FND-08A a LAB-FND-12A); se ejecutan en CI, pero no son pruebas físicas ni validación operacional.
+
+Los dos subtemas siguen con sus 12 capas en progreso, 0 aprobadas y madurez T0/O0. El mapa de cobertura por doce capas registra explícitamente los faltantes. Las Skills candidatas se indexan como conocimiento provisional; no se registran en skillbook ni se activan.
