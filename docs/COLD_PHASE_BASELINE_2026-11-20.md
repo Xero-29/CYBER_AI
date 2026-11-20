@@ -60,7 +60,7 @@ La existencia de 48 carpetas, compendios, agendas y revisiones bibliográficas n
 
 El compendio técnico ampliado tiene contenido sustantivo, modelos de seguridad, terminología y convenciones epistemológicas. El PR #14 también contiene dossiers, evaluaciones, soluciones, guías de evaluador y laboratorios sintéticos.
 
-El dictamen interno de Foundations se declara **cerrado — no aprobado para promoción**, con madurez editorial M2. Registra 84/84 celdas en progreso y límites explícitos de los laboratorios sintéticos. Por tanto, el módulo no se considera terminado. La siguiente iteración debe cerrar no conformidades concretas, ampliar temas/subtemas según el currículo reconciliado y aportar evidencia para cada puerta sin promover estados por inferencia.
+El dictamen interno de Foundations se declara **cerrado — no aprobado para promoción**, con madurez editorial M2. El dictamen coarse-grained registra 84/84 celdas en progreso para siete temas × doce capas. Sin embargo, la matriz granular V2 amplía el currículo a 102 subtemas y 1.224 comprobaciones de capa: solo 24 están en `in_progress` (FND-01.01 y FND-01.02), 1.200 están `not_assessed`, las 408 comprobaciones de capacidad tienen 8 `in_progress` y 400 `not_assessed`, y los 102 subtemas permanecen T0/O0. Ninguna comprobación está aprobada. Los denominadores describen dos niveles de granularidad distintos y no deben mezclarse. Por tanto, el módulo no se considera terminado. La siguiente iteración debe cerrar no conformidades concretas y completar la evaluación granular sin promover estados por inferencia.
 
 ### 4.3 AI Red Team
 
@@ -73,6 +73,10 @@ Su propia declaración lo clasifica como borrador profundo, no T4 ni validación
 El PR #13 contiene `ADVANCED_GAP_DEVELOPMENT.md` (aprox. 618 KB) y una cola de 192 tareas. El registro de evidencia está vacío: no hay afirmaciones aprobadas como `supported`. La cola contiene 92 fuentes candidatas y declara expresamente que la asociación temática no constituye evidencia.
 
 La inspección de una muestra confirma bloques metodológicos repetidos entre brechas distintas. Por tanto, el recuento 192/192 solo significa que hay 192 borradores estructurados. No significa 192 investigaciones específicas, fuentes leídas, afirmaciones demostradas ni módulos aceptados. La integración deberá exigir contenido propio por brecha y trazabilidad claim-to-source.
+
+## 4.5 Precisión de la matriz granular de Foundations
+
+La revisión posterior del archivo `FOUNDATIONS_SUBTOPIC_AUDIT_V2.json` del HEAD de PR #14 detectó una diferencia de granularidad que debe preservarse en todos los informes: el dictamen de 84 celdas corresponde a siete temas base × doce capas; la matriz V2 contiene 102 subtemas × doce capas (1.224 checks). En esa matriz solo FND-01.01 y FND-01.02 están en progreso (24/1.224 capas y 8/408 capacidades); los otros 100 subtemas no han sido evaluados. Los 102 subtemas siguen T0/O0 y el contador de aprobados es cero. Esta precisión sustituye cualquier lectura de “84/84” como si cubriera el currículo granular completo.
 
 ## 5. Reglas de reconciliación
 
