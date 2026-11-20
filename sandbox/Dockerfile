@@ -5,9 +5,10 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
-RUN python -m pip install --no-cache-dir \
-      ruff==0.14.5 \
-      bandit==1.8.6 \
+COPY sandbox/requirements.lock /tmp/sandbox-requirements.lock
+
+RUN python -m pip install --no-cache-dir --require-hashes -r /tmp/sandbox-requirements.lock \
+    && rm -f /tmp/sandbox-requirements.lock \
     && groupadd --gid 65532 cyberai \
     && useradd --uid 65532 --gid 65532 --no-create-home --shell /usr/sbin/nologin cyberai
 
