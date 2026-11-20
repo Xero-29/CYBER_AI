@@ -35,7 +35,7 @@ El contrato `ModelBackend(name, model, generate)` acepta cualquier función que 
 
 - La confianza declarada por el modelo no se trata como probabilidad calibrada ni como prueba.
 - La verificación de VERITAS sigue siendo una revisión basada en modelo; no sustituye comprobaciones externas de URLs, DOI, publicaciones ni experimentos.
-- El informe aprobado se conserva en el registro de investigación; la promoción automática al índice de la biblioteca requiere una etapa de ingestión y validación documental adicional.
+- El informe aprobado se intenta indexar en la biblioteca como categoría `research_provisional`, con etiquetas de provisionalidad. Si ECO o la base no están disponibles, se conserva en el registro y se entrega directamente al principal para la reevaluación; el mapa indica `library_indexed=false`.
 - El ciclo se limita a dos rondas por defecto para evitar bucles y costes sin control.
 - La investigación autónoma requiere herramientas de búsqueda y acceso a fuentes habilitadas; el agente no debe afirmar que consultó fuentes si no tuvo acceso a ellas.
 
