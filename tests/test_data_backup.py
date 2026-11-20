@@ -70,6 +70,17 @@ class DataBackupTests(unittest.TestCase):
         with self.assertRaisesRegex(BackupError, "profundidad JSON"):
             verify_backup(snapshot)
 
+    def test_manifest_depth_scanner_ignores_delimiters_inside_strings(self):
+        snapshot = self.root / "backup"
+        create_backup(self.data, snapshot)
+        manifest_path = snapshot / "manifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["description"] = '[]{}"\\\\' * 256
+        manifest_path.write_text(
+            json.dumps(manifest, ensure_ascii=False), encoding="utf-8"
+        )
+        self.assertTrue(verify_backup(snapshot)["valid"])
+
     def test_backup_and_verifier_enforce_file_count_limit(self):
         snapshot = self.root / "backup"
         with patch("data_backup.MAX_BACKUP_FILES", 1):

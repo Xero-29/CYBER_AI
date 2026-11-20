@@ -20,6 +20,7 @@ LOCK_SUFFIXES = {".lock", ".pid", ".sock", "-wal", "-shm"}
 SCHEMA = "cyber-ai-data-backup-v1"
 MAX_BACKUP_FILES = 50_000
 MAX_MANIFEST_BYTES = 16 * 1024 * 1024
+MAX_MANIFEST_DEPTH = 64
 
 
 class BackupError(ValueError):
@@ -33,6 +34,30 @@ def _unique_object(pairs):
             raise BackupError("El manifiesto contiene claves JSON duplicadas.")
         result[key] = value
     return result
+
+
+def _enforce_manifest_json_depth(text):
+    """Reject excessive JSON nesting before the recursive stdlib decoder runs."""
+    depth = 0
+    in_string = False
+    escaped = False
+    for character in text:
+        if in_string:
+            if escaped:
+                escaped = False
+            elif character == "\\":
+                escaped = True
+            elif character == '"':
+                in_string = False
+            continue
+        if character == '"':
+            in_string = True
+        elif character in "[{":
+            depth += 1
+            if depth > MAX_MANIFEST_DEPTH:
+                raise BackupError("El manifiesto supera la profundidad JSON permitida.")
+        elif character in "]}":
+            depth -= 1
 
 
 def _sha256(path):
@@ -293,9 +318,9 @@ def verify_backup(snapshot, *, require_signature=False):
         manifest_bytes = manifest_path.read_bytes()
         if len(manifest_bytes) > MAX_MANIFEST_BYTES:
             raise BackupError("El manifiesto del backup supera 16 MiB.")
-        manifest = json.loads(
-            manifest_bytes.decode("utf-8"), object_pairs_hook=_unique_object
-        )
+        manifest_text = manifest_bytes.decode("utf-8")
+        _enforce_manifest_json_depth(manifest_text)
+        manifest = json.loads(manifest_text, object_pairs_hook=_unique_object)
     except RecursionError as error:
         raise BackupError("El manifiesto supera la profundidad JSON permitida.") from error
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
