@@ -31,6 +31,8 @@ Los dos PR tienen CI verde en sus HEADs exactos, pero ese CI demuestra que los t
 
 La propia declaración del archivo lo clasifica como borrador técnico estructurado, sin afirmar lectura integral, experimentos ejecutados ni revisión independiente.
 
+La nueva auditoría automatizada de reutilización cuantifica el problema: 1.344 bloques de sección distribuidos en 192 brechas, solo 77 variantes únicas y 84.015 pares de duplicación exacta (82.208 pares entre dominios). En “Arquitectura y modelo de amenazas”, “Procedimiento reproducible”, “Laboratorio y evaluación” y “Evidencia y limitaciones” existe una sola variante reutilizada en los 192 temas. “Desarrollo técnico y controles” tiene siete variantes (máxima reutilización 55); “Fuentes de partida”, 18 variantes (máxima 120); “Propósito y alcance”, 48 variantes (máxima 4). La herramienta `knowledge_depth_audit.py` bloquea la promoción: 0 claims respaldados, 192 experimentos sin evaluar, 192 revisiones independientes sin iniciar y 0 brechas elegibles como expertas.
+
 El registro `VALIDATION_WORKLIST_192.json` confirma:
 - 48 dominios, 192 tareas y 92 fuentes candidatas.
 - 192/192 tareas con fuentes candidatas mapeadas, no con claims verificados.

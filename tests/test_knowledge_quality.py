@@ -24,7 +24,7 @@ class KnowledgeQualityTests(unittest.TestCase):
         self.assertEqual(report["base_complete"],48, report["areas"])
         self.assertEqual(report["area_count"],48)
 
-    def test_all_48_domains_have_substantive_deep_sections(self):
+    def test_all_48_domains_have_structured_initial_deep_sections(self):
         report=audit_library()
         self.assertEqual(report["deep_complete"],48, report["areas"])
         self.assertEqual(report["deep_section_checks"],240)
