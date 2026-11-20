@@ -50,3 +50,6 @@ NIST SP 800-57, SP 800-56A/B, SP 800-132, FIPS 140-3, RFC 8446, OWASP Cryptograp
 
 ## Instrucciones para agentes IA
 No inventes recomendaciones de algoritmos sin contexto de compatibilidad. No generes criptografía casera. Nunca imprimas, copies ni guardes claves, tokens o material secreto.
+
+## Arquitectura
+La arquitectura criptográfica comprende identidades y raíces de confianza, PKI, emisión/validación de certificados, negociación de protocolos, bibliotecas y módulos criptográficos, almacenamiento/uso de claves, rotación, revocación y destrucción. Trazar dónde se generan, transportan, derivan, almacenan y consumen claves; separar claves de datos y de envoltura; delimitar HSM/KMS, procesos consumidores y operadores. Definir inventario de algoritmos y protocolos, dependencias, modos de fallo y estrategia de agilidad criptográfica, incluida transición poscuántica cuando el horizonte de confidencialidad lo requiera.
