@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Valida e indexa de forma reanudable los paquetes offline de CYBER_AI."""
+"""Valida e indexa de forma reanudable los paquetes, estudios, dossiers y Skills candidatas."""
 import argparse
 import hashlib
 import json
@@ -38,6 +38,25 @@ def exclusive_file_lock(lock, *, windows=None, windows_api=None):
             fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
 
 
+def _resolve_document(relative, root):
+    if not isinstance(relative, str) or not relative.strip():
+        raise ValueError("Ruta de documento inválida.")
+    rel = Path(relative)
+    if rel.is_absolute() or ".." in rel.parts:
+        raise ValueError(f"Ruta no permitida: {relative}")
+    current = PROJECT
+    for part in rel.parts:
+        if part in {"", "."}:
+            continue
+        current = current / part
+        if current.is_symlink():
+            raise ValueError(f"No se permiten symlinks: {relative}")
+    path = (PROJECT / rel).resolve()
+    if root not in path.parents or not path.is_file():
+        raise ValueError(f"Ruta fuera del proyecto o inexistente: {relative}")
+    return path
+
+
 def load_packs(area_id=None):
     data = json.loads(MANIFEST.read_text(encoding="utf-8"))
     areas = data.get("areas")
@@ -57,52 +76,68 @@ def load_packs(area_id=None):
         raise ValueError(f"Área desconocida: {area_id}")
 
     root = PROJECT.resolve()
-    packs = []
+    documents = []
     for item in areas:
         if area_id and item["id"] != area_id:
             continue
         area_name = item.get("name", item["id"])
-        documents = [
+        candidates = [
             ("pack", item.get("path"), area_name, "baseline", "methodology"),
+            ("deep_sections", item.get("deep_sections_path"),
+             f"{area_name} — desarrollo profundo", "research", "deep_sections"),
+            ("research_study", item.get("research_study_path"),
+             f"{area_name} — investigación técnica", "research", "field_study"),
         ]
-        research_path = item.get("research_study_path")
-        if research_path is not None:
-            documents.append((
-                "research_study", research_path,
-                f"{area_name} — investigación técnica",
-                "research", "field_study",
-            ))
-
-        for document_kind, relative, document_name, topic_id, subtopic_id in documents:
-            if not isinstance(relative, str) or not relative.strip():
-                raise ValueError(f"Ruta inválida: {item['id']}")
-            rel = Path(relative)
-            if rel.is_absolute() or ".." in rel.parts:
-                raise ValueError(f"Ruta no permitida: {relative}")
-            current = PROJECT
-            for part in rel.parts:
-                if part in {"", "."}:
-                    continue
-                current = current / part
-                if current.is_symlink():
-                    raise ValueError(f"No se permiten symlinks: {relative}")
-            path = (PROJECT / rel).resolve()
-            if root not in path.parents or not path.is_file():
-                raise ValueError(f"Ruta fuera del proyecto o inexistente: {relative}")
-            raw = path.read_bytes()
-            digest = hashlib.sha256(raw).hexdigest()
-            stable_id = "offline-" + hashlib.sha256(
-                (rel.as_posix() + ":" + digest).encode("utf-8")
-            ).hexdigest()
-            packs.append({
-                "id": item["id"], "name": document_name,
-                "document_kind": document_kind, "topic_id": topic_id,
-                "subtopic_id": subtopic_id, "path": path,
-                "relative": path.relative_to(root).as_posix(),
-                "sha256": digest, "document_id": stable_id, "size": len(raw),
-                "visibility": "shared", "tenant_id": None,
+        for kind, relative, title, topic_id, subtopic_id in candidates:
+            if relative is None:
+                continue
+            documents.append({
+                "id": item["id"], "area_id": item["id"], "kind": kind,
+                "relative": relative, "title": title,
+                "topic_id": topic_id, "subtopic_id": subtopic_id,
             })
+
+    skill_candidates = data.get("skill_candidates", [])
+    if not isinstance(skill_candidates, list):
+        raise ValueError("skill_candidates debe ser una lista.")
+    skill_ids = set()
+    for skill in skill_candidates:
+        if not isinstance(skill, dict):
+            raise ValueError("Cada Skill candidata debe ser un objeto.")
+        skill_id = skill.get("id")
+        skill_area = skill.get("area_id", "foundations")
+        if not isinstance(skill_id, str) or not skill_id.strip() or skill_id in skill_ids:
+            raise ValueError("ID de Skill candidata inválido o duplicado.")
+        skill_ids.add(skill_id)
+        if skill_area not in ids:
+            raise ValueError(f"Área inválida para Skill candidata: {skill_area}")
+        if area_id and skill_area != area_id:
+            continue
+        documents.append({
+            "id": skill_id, "area_id": skill_area, "kind": "skill_candidate",
+            "relative": skill.get("path"), "title": skill.get("name", skill_id),
+            "topic_id": skill.get("topic_id", "skills"),
+            "subtopic_id": skill.get("subtopic_id", "candidate_spec"),
+        })
+
+    packs = []
+    for item in documents:
+        path = _resolve_document(item["relative"], root)
+        raw = path.read_bytes()
+        digest = hashlib.sha256(raw).hexdigest()
+        stable_id = "offline-" + hashlib.sha256(
+            (Path(item["relative"]).as_posix() + ":" + digest).encode("utf-8")
+        ).hexdigest()
+        packs.append({
+            "id": item["id"], "area_id": item["area_id"], "name": item["title"],
+            "document_kind": item["kind"], "topic_id": item["topic_id"],
+            "subtopic_id": item["subtopic_id"], "path": path,
+            "relative": path.relative_to(root).as_posix(),
+            "sha256": digest, "document_id": stable_id, "size": len(raw),
+            "visibility": "shared", "tenant_id": None,
+        })
     return packs
+
 
 def _bootstrap_locked(packs, dry_run=False):
     if dry_run:
@@ -120,6 +155,12 @@ def _bootstrap_locked(packs, dry_run=False):
         str(Path(row["source_path"]).resolve()): row
         for row in resource_inventory()
     }
+    resource_types = {
+        "pack": "knowledge_pack",
+        "deep_sections": "knowledge_deep_sections",
+        "research_study": "knowledge_research_study",
+        "skill_candidate": "knowledge_skill_candidate",
+    }
     ingested, skipped, failed = [], [], []
     for pack in packs:
         resource_id = None
@@ -131,26 +172,35 @@ def _bootstrap_locked(packs, dry_run=False):
                 pack["document_id"], embedding_model,
                 visibility=pack["visibility"], tenant_id=pack["tenant_id"],
             ) > 0):
-                skipped.append(pack["id"] if pack.get("document_kind") == "pack" else f"{pack['id']}:research_study")
+                skipped.append(
+                    pack["id"] if pack["document_kind"] == "pack"
+                    else f"{pack['id']}:{pack['document_kind']}"
+                )
                 continue
             registered = register_resource(
                 pack["path"], sha256=pack["sha256"], file_size=pack["size"],
-                resource_type=("knowledge_research_study" if pack.get("document_kind") == "research_study" else "knowledge_pack"), title=pack["name"],
-                publisher="CYBER_AI", canonical_uri=f"repo://{pack['relative']}",
+                resource_type=resource_types[pack["document_kind"]],
+                title=pack["name"], publisher="CYBER_AI",
+                canonical_uri=f"repo://{pack['relative']}",
             )
             resource_id = registered["resource_id"]
             update_resource_classification(
-                resource_id, area_id=pack["id"], domain_id=pack["id"],
-                topic_id=pack.get("topic_id", "baseline"), subtopic_id=pack.get("subtopic_id", "methodology"),
+                resource_id, area_id=pack["area_id"], domain_id=pack["area_id"],
+                topic_id=pack.get("topic_id", "baseline"),
+                subtopic_id=pack.get("subtopic_id", "methodology"),
                 classification_status="provisional",
-                reason=("Estudio de investigación versionado del repositorio indexado para recuperación." if pack.get("document_kind") == "research_study" else "Paquete propio offline indexado desde el manifiesto versionado."),
+                reason=(
+                    "Especificación candidata de Skill indexada como conocimiento no activo."
+                    if pack["document_kind"] == "skill_candidate"
+                    else "Documento propio offline indexado desde el manifiesto versionado."
+                ),
             )
             update_resource_processing_status(resource_id, "processing")
+            tags = ["cyber_ai", "offline_knowledge", pack["area_id"], pack["document_kind"]]
             result = ingest_document(
                 pack["path"], title=pack["name"],
-                category=f"cybersecurity:{pack['id']}", source=pack["relative"],
-                license="UNSPECIFIED", visibility="shared",
-                tags=["cyber_ai", "offline_pack", pack["id"]] + (["research_study"] if pack.get("document_kind") == "research_study" else []),
+                category=f"cybersecurity:{pack['area_id']}", source=pack["relative"],
+                license="UNSPECIFIED", visibility="shared", tags=tags,
                 document_id=pack["document_id"],
                 expected_embedding_model=embedding_model,
             )
@@ -161,8 +211,9 @@ def _bootstrap_locked(packs, dry_run=False):
                 raise RuntimeError("La ingestión no publicó fragmentos verificables.")
             update_resource_processing_status(resource_id, "completed")
             ingested.append({
-                "area": pack["id"], "kind": pack.get("document_kind", "pack"), "document_id": result["document_id"],
-                "chunks": result["chunks"], "sha256": pack["sha256"],
+                "area": pack["area_id"], "kind": pack.get("document_kind", "pack"),
+                "document_id": result["document_id"], "chunks": result["chunks"],
+                "sha256": pack["sha256"],
                 "already_present": bool(result.get("already_present", False)),
             })
         except Exception as error:
@@ -171,7 +222,7 @@ def _bootstrap_locked(packs, dry_run=False):
                     update_resource_processing_status(resource_id, "failed")
                 except Exception:
                     pass
-            failed.append({"area": pack["id"], "error": str(error)[:500]})
+            failed.append({"area": pack["area_id"], "kind": pack.get("document_kind"), "error": str(error)[:500]})
     return {
         "dry_run": False, "selected": len(packs), "ingested": ingested,
         "skipped": skipped, "failed": failed,
@@ -200,21 +251,19 @@ def main():
                         help="Reconstruir el índice FTS5 sin generar embeddings.")
     args = parser.parse_args()
     if args.rebuild_text_index:
-        from knowledge_library import rebuild_text_index
-        result = rebuild_text_index()
-        print(f"Índice textual disponible: {result['available']}; fragmentos: {result['indexed']}.")
-        return
-    result = bootstrap(args.area, args.dry_run)
-    if args.dry_run:
-        print(f"Validación: {result['selected']} paquetes; sin IA ni escrituras.")
-        for item in result["items"]:
-            print(f"{item['id']}: {item['size']} bytes SHA-256 {item['sha256']}")
-    else:
-        print(f"Indexados: {result['ingested_count']}; sin cambios: "
-              f"{result['skipped_count']}; fallidos: {result['failed_count']}.")
-        for item in result["failed"]:
-            print(f"ERROR {item['area']}: {item['error']}")
+        from knowledge_library import rebuild_fts_index
+        print(json.dumps(rebuild_fts_index(), ensure_ascii=False, indent=2))
+        return 0
+    result = bootstrap(area_id=args.area, dry_run=args.dry_run)
+    print(json.dumps({
+        "dry_run": result["dry_run"], "selected": result["selected"],
+        "ingested": result.get("ingested_count", len(result["ingested"])),
+        "skipped": result.get("skipped_count", len(result["skipped"])),
+        "failed": result.get("failed_count", len(result["failed"])),
+        "errors": result["failed"],
+    }, ensure_ascii=False, indent=2))
+    return 1 if result["failed"] else 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
