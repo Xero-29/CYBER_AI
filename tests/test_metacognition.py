@@ -34,7 +34,7 @@ class MetacognitionTests(unittest.TestCase):
             })
         with tempfile.TemporaryDirectory() as tmp:
             result = run_cycle("Explicar TCP", principal="MAIN", researcher="R", verifier="V",
-                               model_call=model, publisher=lambda report, task_id: {"indexed": True}, state_path=Path(tmp) / "state.json",
+                               model_call=model, publisher=lambda report, task_id: {"indexed": True}, source_researcher=lambda task, assessment: "test evidence", state_path=Path(tmp) / "state.json",
                                log_path=Path(tmp) / "events.jsonl")
         self.assertEqual(result["status"], "sufficient")
         self.assertEqual(calls, ["MAIN"])
@@ -58,6 +58,7 @@ class MetacognitionTests(unittest.TestCase):
             result = run_cycle("Explicar control de congestión", principal="MAIN",
                 researcher="RESEARCHER", verifier="VERIFIER", model_call=model,
                 publisher=lambda report, task_id: {"indexed": True},
+                source_researcher=lambda task, assessment: "test evidence",
                 state_path=state_path, log_path=log_path)
             state = load_competency_map(state_path)
         self.assertEqual(result["status"], "knowledge_acquired_needs_task_execution")
