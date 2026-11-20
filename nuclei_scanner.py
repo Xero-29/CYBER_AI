@@ -25,12 +25,18 @@ from binary_integrity import (
     hash_executable,
     require_approved_executable,
 )
-from safe_io import SafeWriteError, ensure_private_directory
+from safe_io import SafeWriteError, ensure_private_directory, open_private_file
 from template_integrity import (
     TemplateIntegrityError,
     hash_selected_templates,
     resolve_template_path,
 )
+
+
+MAX_SCAN_OUTPUT_BYTES = 20 * 1024 * 1024
+MAX_SCAN_LINE_BYTES = 1024 * 1024
+MAX_FINDINGS = 10_000
+MAX_SCANNER_CONSOLE_LINES = 2_000
 
 
 def validate_target(target):
@@ -84,6 +90,26 @@ def _iter_output_chunks(stream, max_chars=2001):
             yield chunk
     else:
         yield from stream
+
+
+def _inspect_output_file(path):
+    """Classify scanner output without following symlinks or accepting special files."""
+    try:
+        info = Path(path).lstat()
+    except FileNotFoundError:
+        return "missing"
+    except OSError:
+        return "invalid"
+    reparse_flag = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
+    if (
+        stat.S_ISLNK(info.st_mode)
+        or not stat.S_ISREG(info.st_mode)
+        or getattr(info, "st_file_attributes", 0) & reparse_flag
+    ):
+        return "invalid"
+    if info.st_size > MAX_SCAN_OUTPUT_BYTES:
+        return "over_limit"
+    return "ok"
 
 
 def _close_process_output(process, reader, join_timeout=3):
@@ -292,6 +318,9 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
     print("[2/4] Iniciando Nuclei. La salida aparecerá debajo.", flush=True)
 
     messages = deque(maxlen=100)
+    console_line_count = {"value": 0}
+    output_limit_exceeded = False
+    evidence_invalid = False
     isolated_home = None
     process = None
     reader = None
@@ -325,7 +354,11 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
                     if line:
                         safe_line = redact_text(line[:2000])
                         messages.append(safe_line)
-                        print(f"[Nuclei] {safe_line}", flush=True)
+                        if console_line_count["value"] < MAX_SCANNER_CONSOLE_LINES:
+                            print(f"[Nuclei] {safe_line}", flush=True)
+                        elif console_line_count["value"] == MAX_SCANNER_CONSOLE_LINES:
+                            print("[Nuclei] salida de consola truncada por límite.", flush=True)
+                        console_line_count["value"] += 1
             except (OSError, ValueError):
                 return
 
@@ -333,6 +366,18 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
         reader.start()
 
         while process.poll() is None:
+            output_state = _inspect_output_file(output_file)
+            if output_state == "over_limit":
+                output_limit_exceeded = True
+                _terminate_process_tree(process)
+                print("\n[Salida excedida] Se detuvo el escaneo.", flush=True)
+                break
+            if output_state == "invalid":
+                evidence_invalid = True
+                _terminate_process_tree(process)
+                print("\n[Evidencia inválida] Se detuvo el escaneo.", flush=True)
+                break
+
             elapsed = int(time.monotonic() - started)
             print(
                 f"\r[En curso] Tiempo transcurrido: {elapsed}s",
@@ -380,7 +425,8 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
             time.sleep(1)
 
         elapsed = round(time.monotonic() - started, 1)
-        print(f"\n[3/4] Escaneo terminado en {elapsed} segundos.", flush=True)
+        if not output_limit_exceeded and not evidence_invalid:
+            print(f"\n[3/4] Escaneo terminado en {elapsed} segundos.", flush=True)
 
     except Exception as error:
         io_error = isinstance(error, OSError)
@@ -434,27 +480,21 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
         templates_modified = True
 
     findings = []
-    output_limit_exceeded = False
-    evidence_invalid = False
-    if output_file.exists() or output_file.is_symlink():
-        try:
-            output_info = output_file.lstat()
-            if stat.S_ISLNK(output_info.st_mode) or not stat.S_ISREG(output_info.st_mode):
-                evidence_invalid = True
-            elif output_info.st_size > 20 * 1024 * 1024:
-                output_limit_exceeded = True
-            else:
-                try:
-                    os.chmod(output_file, 0o600, follow_symlinks=False)
-                except NotImplementedError:
-                    os.chmod(output_file, 0o600)
-                with output_file.open("r", encoding="utf-8") as stream:
+    if not output_limit_exceeded and not evidence_invalid:
+        output_state = _inspect_output_file(output_file)
+        if output_state == "over_limit":
+            output_limit_exceeded = True
+        elif output_state == "invalid":
+            evidence_invalid = True
+        elif output_state == "ok":
+            try:
+                with open_private_file(output_file, "r") as stream:
                     for line in stream:
-                        if len(line.encode("utf-8")) > 1024 * 1024:
+                        if len(line.encode("utf-8")) > MAX_SCAN_LINE_BYTES:
                             evidence_invalid = True
                             findings = []
                             break
-                        if len(findings) >= 10000:
+                        if len(findings) >= MAX_FINDINGS:
                             output_limit_exceeded = True
                             findings = []
                             break
@@ -466,10 +506,15 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
                             evidence_invalid = True
                             findings = []
                             break
-        except OSError:
-            evidence_invalid = True
+            except (OSError, SafeWriteError, UnicodeError):
+                evidence_invalid = True
 
-    status = "completed" if process.returncode == 0 else "scanner_error"
+    status = (
+        "output_limit_exceeded" if output_limit_exceeded
+        else "evidence_invalid" if evidence_invalid
+        else "completed" if process.returncode == 0
+        else "scanner_error"
+    )
     if output_limit_exceeded:
         status = "output_limit_exceeded"
         findings = []

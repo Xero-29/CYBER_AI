@@ -12,8 +12,10 @@ from nuclei_scanner import (
     scan_target,
     validate_target,
     _close_process_output,
+    _inspect_output_file,
     _iter_output_chunks,
     _terminate_process_tree,
+    MAX_SCAN_OUTPUT_BYTES,
 )
 from execution_ledger import ExecutionLedger
 from binary_integrity import BinaryIntegrityError
@@ -193,6 +195,27 @@ class NucleiScannerTests(unittest.TestCase):
         with patch("nuclei_scanner.os.name", "nt"):
             _terminate_process_tree(process)
         self.assertEqual(process.returncode, -9)
+
+    def test_output_file_monitor_enforces_size_and_regular_file_limits(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / "nuclei.jsonl"
+            output.write_bytes(b"x" * (MAX_SCAN_OUTPUT_BYTES + 1))
+            self.assertEqual(_inspect_output_file(output), "over_limit")
+            output.unlink()
+            output.mkdir()
+            self.assertEqual(_inspect_output_file(output), "invalid")
+
+    def test_output_file_monitor_rejects_symlinks(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            outside = root / "outside.jsonl"
+            outside.write_text("{}", encoding="utf-8")
+            link = root / "nuclei.jsonl"
+            try:
+                link.symlink_to(outside)
+            except (OSError, NotImplementedError):
+                self.skipTest("symlinks unavailable")
+            self.assertEqual(_inspect_output_file(link), "invalid")
 
     def test_output_chunks_are_bounded(self):
         stream = io.StringIO("x" * 5000 + "\n")
