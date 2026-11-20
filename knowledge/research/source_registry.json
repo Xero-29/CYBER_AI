@@ -424,6 +424,88 @@
       "review_note": "Página oficial de autenticación inspeccionada el 2026-11-19; validar API y opciones por lenguaje/versión antes de implementación."
     },
     {
+      "id": "IEC-61508-1-2010",
+      "title": "Functional safety of electrical/electronic/programmable electronic safety-related systems — Part 1: General requirements",
+      "publisher": "International Electrotechnical Commission",
+      "type": "functional_safety_standard_metadata",
+      "url": "https://webstore.iec.ch/en/publication/5515",
+      "version": "IEC 61508-1:2010 Edition 2",
+      "published": "2010-04-30",
+      "verification_status": "official_metadata_and_scope_reviewed",
+      "domains": [
+        "foundations",
+        "ot_ics"
+      ],
+      "review_date": "2026-11-20",
+      "publication_status": "edition_2_valid_current_at_review_date",
+      "review_note": "IEC catalog lists 2010 edition as valid; Edition 3 pre-release/FDIS exists with forecast publication 2027-01-22. IEC 61508 addresses functional safety of E/E/PE systems, not complete cybersecurity requirements."
+    },
+    {
+      "id": "IEC-61508-1-2026-PRV",
+      "title": "Functional safety of electrical/electronic/programmable electronic safety-related systems — Part 1: General requirements",
+      "publisher": "International Electrotechnical Commission",
+      "type": "pre_release_final_draft_standard_metadata",
+      "url": "https://webstore.iec.ch/en/publication/117296",
+      "version": "IEC 61508-1:2026 PRV Edition 3",
+      "published": "2026-10-02 pre-release",
+      "verification_status": "official_metadata_and_scope_summary_reviewed",
+      "domains": [
+        "foundations",
+        "ot_ics"
+      ],
+      "review_date": "2026-11-20",
+      "publication_status": "pre_release_FDIS_not_final_published_forecast_2027_01_22",
+      "review_note": "IEC catalog describes a pre-release FDIS, voting period 2026-10-02 to 2026-11-13, forecast final publication 2027-01-22. It explicitly states IEC 61508 does not itself provide normative requirements for malicious action except within hazard/risk analysis and points to IEC 62443/ISO/IEC 27000 and IEC TR 63069 for coordination. Do not cite as final published edition."
+    },
+    {
+      "id": "IEC-62443-2-1-2024",
+      "title": "Security for industrial automation and control systems — Part 2-1: Security program requirements for IACS asset owners",
+      "publisher": "International Electrotechnical Commission",
+      "type": "industrial_control_system_security_standard_metadata",
+      "url": "https://webstore.iec.ch/en/publication/62883",
+      "version": "IEC 62443-2-1:2024 Edition 2",
+      "published": "2024-08-07",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "domains": [
+        "foundations",
+        "ot_ics"
+      ],
+      "review_date": "2026-11-20",
+      "review_note": "Official abstract covers asset-owner/operator security program policy and procedures and legacy-system compensating measures. Full standard not accessed."
+    },
+    {
+      "id": "IEC-62443-3-3-2013",
+      "title": "Industrial communication networks — Network and system security — Part 3-3: System security requirements and security levels",
+      "publisher": "International Electrotechnical Commission",
+      "type": "industrial_control_system_security_standard_metadata",
+      "url": "https://webstore.iec.ch/en/publication/7033",
+      "version": "IEC 62443-3-3:2013 Edition 1",
+      "published": "2013-08-07",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "domains": [
+        "foundations",
+        "ot_ics"
+      ],
+      "review_date": "2026-11-20",
+      "review_note": "Official abstract describes system requirements associated with seven foundational requirements and security levels for IACS. Full standard not accessed."
+    },
+    {
+      "id": "IEC-TR-63069-2019",
+      "title": "Industrial-process measurement, control and automation — Framework for functional safety and security",
+      "publisher": "International Electrotechnical Commission",
+      "type": "technical_report_metadata",
+      "url": "https://webstore.iec.ch/en/publication/31421",
+      "version": "IEC TR 63069:2019 Edition 1",
+      "published": "2019-05-20",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "domains": [
+        "foundations",
+        "ot_ics"
+      ],
+      "review_date": "2026-11-20",
+      "review_note": "Official abstract states it explains common application of IEC 61508 and IEC 62443 in industrial-process measurement, control and automation. Full report not accessed."
+    },
+    {
       "id": "IEEE-80211-WG",
       "title": "IEEE 802.11 Wireless LAN Working Group",
       "publisher": "IEEE",
@@ -472,6 +554,74 @@
         "appsec"
       ],
       "review_note": "RFC oficial y abstract/partes de recomendaciones inspeccionados el 2026-11-19; lectura integral, análisis de errata y evaluación de implementación pendientes."
+    },
+    {
+      "id": "ISO-22316-2017",
+      "title": "Security and resilience — Organizational resilience — Principles and attributes",
+      "publisher": "International Organization for Standardization",
+      "type": "international_standard_metadata",
+      "url": "https://www.iso.org/standard/50053.html",
+      "version": "ISO 22316:2017 Edition 1",
+      "published": "2017-03",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "domains": [
+        "foundations",
+        "business_continuity"
+      ],
+      "review_date": "2026-11-20",
+      "publication_status": "published_2017_to_be_replaced_by_ISO_FDIS_22316",
+      "review_note": "Only official catalog metadata and abstract reviewed. Full copyrighted standard not accessed. ISO/FDIS 22316 Edition 2 is in approval phase with forecast publication 2027-01; do not treat FDIS as published."
+    },
+    {
+      "id": "ISO-26262-1-2018",
+      "title": "Road vehicles — Functional safety — Part 1: Vocabulary",
+      "publisher": "International Organization for Standardization",
+      "type": "sector_specific_functional_safety_standard_metadata",
+      "url": "https://www.iso.org/standard/68383.html",
+      "version": "ISO 26262-1:2018 Edition 2",
+      "published": "2018-12",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "domains": [
+        "foundations",
+        "automotive_security"
+      ],
+      "review_date": "2026-11-20",
+      "publication_status": "published_2018_under_revision",
+      "review_note": "Official catalog scope reviewed: safety-related E/E systems installed in series-production road vehicles, with stated exclusions. ISO/DIS 26262-1 Edition 3 is in enquiry; do not treat draft as final."
+    },
+    {
+      "id": "ISO-DIS-26262-1-2026",
+      "title": "Road vehicles — Functional safety — Part 1: Vocabulary",
+      "publisher": "International Organization for Standardization",
+      "type": "draft_international_standard_metadata",
+      "url": "https://www.iso.org/standard/90020.html",
+      "version": "ISO/DIS 26262-1 Edition 3",
+      "published": "under development 2026",
+      "verification_status": "official_metadata_only_content_not_accessed",
+      "domains": [
+        "foundations",
+        "automotive_security"
+      ],
+      "review_date": "2026-11-20",
+      "publication_status": "draft_enquiry_stage_40_20_not_published",
+      "review_note": "Official catalog indicates enquiry ballot stage 40.20. This is a draft, not a published standard."
+    },
+    {
+      "id": "ISO-FDIS-22316-2027",
+      "title": "Security and resilience — Organizational resilience — Guidelines",
+      "publisher": "International Organization for Standardization",
+      "type": "final_draft_international_standard_metadata",
+      "url": "https://www.iso.org/standard/86493.html",
+      "version": "ISO/FDIS 22316 Edition 2",
+      "published": "forecast 2027-01",
+      "verification_status": "official_metadata_only_content_not_accessed",
+      "domains": [
+        "foundations",
+        "business_continuity"
+      ],
+      "review_date": "2026-11-20",
+      "publication_status": "under_approval_stage_50_00_not_published",
+      "review_note": "Official catalog states final draft under approval and intended to replace ISO 22316:2017. Forecast publication is not a guarantee; use only as draft status metadata."
     },
     {
       "id": "ISO-SAE-21434-2021",
@@ -791,6 +941,22 @@
       "review_note": "Apply by server role and supported OS; validate baseline impact before production rollout."
     },
     {
+      "id": "NASA-SP-2014-612",
+      "title": "NASA System Safety Handbook, Volume 2: System Safety Concepts, Guidelines, and Implementation Examples",
+      "publisher": "National Aeronautics and Space Administration",
+      "type": "official_system_safety_handbook",
+      "url": "https://ntrs.nasa.gov/citations/20150015500",
+      "version": "NASA/SP-2014-612 Version 1.0",
+      "published": "2014-11",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "domains": [
+        "foundations",
+        "secure_arch"
+      ],
+      "review_date": "2026-11-20",
+      "review_note": "Official NASA NTRS record, title, publication date, public-use status and summary inspected. PDF content not read in full; do not mark full_text_reviewed."
+    },
+    {
       "id": "NFC-FORUM-SPECS",
       "title": "NFC Forum Specifications",
       "publisher": "NFC Forum",
@@ -991,6 +1157,27 @@
         "crypto"
       ],
       "review_note": "Metadatos y nota oficial de actualización revisados; vectores e implementación concreta requieren verificación independiente."
+    },
+    {
+      "id": "NIST-FIPS-199",
+      "title": "Standards for Security Categorization of Federal Information and Information Systems",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "federal_information_processing_standard",
+      "url": "https://doi.org/10.6028/NIST.FIPS.199",
+      "version": "FIPS PUB 199",
+      "published": "2004-02",
+      "verification_status": "selected_sections_reviewed",
+      "verified_scope": "Definitions and impact categorization for confidentiality, integrity and availability in U.S. federal information and systems.",
+      "domains": [
+        "foundations",
+        "governance"
+      ],
+      "review_date": "2026-11-20",
+      "sections_reviewed": [
+        "§2: confidentiality, integrity and availability definitions",
+        "§3: potential impact levels and categorization"
+      ],
+      "review_note": "Selected sections inspected from official NIST PDF. The standard is scoped to federal information and information systems; do not present it as a complete universal taxonomy of safety, privacy or resilience."
     },
     {
       "id": "NIST-FIPS-203",

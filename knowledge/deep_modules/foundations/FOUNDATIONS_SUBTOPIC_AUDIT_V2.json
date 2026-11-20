@@ -70,7 +70,9 @@
         "topics/FND-01-01_COLD_ASSESSMENT_V2.md",
         "topics/FND-01-01_INDEPENDENT_ASSESSOR_PROTOCOL_V1.md",
         "FND_01_01_PRIMARY_SOURCE_SYNTHESIS_2026-11-19.md",
-        "topics/FND-01-01_ASSESSOR_GUIDE_V2.md"
+        "topics/FND-01-01_ASSESSOR_GUIDE_V2.md",
+        "FND_01_01_SAFETY_SECURITY_PRIVACY_RESILIENCE_CROSSWALK_2026-11-20.md",
+        "../../research/source_registry.json"
       ],
       "nonconformities": [
         "NC-FND-01.01-01: revisión integral de fuentes primarias y referencias críticas pendiente, incluidas las publicaciones NIST 800-160; las revisiones dirigidas no equivalen a lectura integral.",
@@ -79,7 +81,23 @@
         "NC-FND-01.01-04: revisión disciplinar independiente pendiente",
         "NC-FND-01.01-05: contraste integral de modelos de confiabilidad/safety y revisión primaria pendiente; anexo técnico no cierra madurez."
       ],
-      "review": "internal_draft_not_assessed"
+      "review": "internal_draft_not_assessed",
+      "cold_remediation_2026_11_20": {
+        "status": "partial_documentary_remediation",
+        "completed": [
+          "Formal distinction and crosswalk for security, safety, privacy, reliability, availability, resilience and assurance",
+          "Official metadata/version-state review for NIST, NASA, IEC and ISO references",
+          "Explicit limits for U.S. federal and sector-specific standards and conditional Colombia applicability"
+        ],
+        "pending": [
+          "Linear full-text review of NIST SP 800-160 Vol. 1 Rev. 1 and Vol. 2 Rev. 1 and critical references",
+          "Independent Colombian legal and sectoral applicability review",
+          "Supervised assessment, two qualified evaluators, original scoring sheets and adjudication",
+          "Independent disciplinary review",
+          "Full comparative validation of reliability and functional-safety models"
+        ],
+        "no_maturity_promotion": true
+      }
     },
     {
       "id": "FND-01.02",
@@ -108,6 +126,8 @@
       "operational_maturity": "O0",
       "evidence": [
         "topics/FND-01-02_SECURITY_PROPERTIES_CIA_EXTENDED.md",
+        "../../research/source_registry.json",
+        "FND_01_01_SAFETY_SECURITY_PRIVACY_RESILIENCE_CROSSWALK_2026-11-20.md",
         "../../research/source_registry.json"
       ],
       "nonconformities": [
@@ -116,7 +136,21 @@
         "NC-FND-01.02-03: revisión disciplinar independiente pendiente",
         "NC-FND-01.02-04: normas de aplicación sectorial/colombiana pendientes"
       ],
-      "review": "internal_draft_not_assessed"
+      "review": "internal_draft_not_assessed",
+      "cold_remediation_2026_11_20": {
+        "status": "source_and_conceptual_crosswalk_added_assessment_pending",
+        "completed": [
+          "CIA scope anchored to FIPS 199 and NIST CSF 2.0",
+          "Distinctions among authenticity, accountability, non-repudiation, privacy, safety, reliability and resilience documented"
+        ],
+        "pending": [
+          "Full-text review of primary standards",
+          "Cold assessment administration",
+          "Independent disciplinary review",
+          "Sectoral and Colombian applicability review"
+        ],
+        "no_maturity_promotion": true
+      }
     },
     {
       "id": "FND-01.03",

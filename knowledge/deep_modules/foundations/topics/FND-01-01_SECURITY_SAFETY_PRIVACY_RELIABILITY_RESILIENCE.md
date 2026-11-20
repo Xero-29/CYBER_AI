@@ -291,3 +291,8 @@ La V1 de evaluación en frío queda supersedida: sus ponderaciones sumaban 110 p
 La revisión dirigida ampliada de NIST SP 800-160 Vol. 1 Rev. 1, Vol. 2 Rev. 1 y NISTIR 8062 se documenta en [FND_01_01_PRIMARY_SOURCE_SYNTHESIS_2026-11-19.md](../FND_01_01_PRIMARY_SOURCE_SYNTHESIS_2026-11-19.md). Se inspeccionaron secciones sobre propiedades emergentes, confianza composicional, assurance, resiliencia y riesgo de privacidad. Esta revisión mejora el soporte de las afirmaciones, pero no es lectura lineal integral ni revisión de todas las referencias.
 
 La guía reservada de corrección [FND-01-01_ASSESSOR_GUIDE_V2.md](FND-01-01_ASSESSOR_GUIDE_V2.md) complementa el instrumento V2 con anclas por bloque, respuestas mínimas esperadas por variante, criterios de fallas críticas, hoja de puntuación y adjudicación. No debe entregarse al candidato. No es una validación psicométrica ni reemplaza el pilotaje y la doble evaluación independiente.
+
+
+## Ampliación disciplinar y crosswalk — 2026-11-20
+
+La distinción formal entre security, safety, privacy, reliability, availability y resilience, la matriz de propiedades, los modelos y el crosswalk normativo se desarrollan en [FND_01_01_SAFETY_SECURITY_PRIVACY_RESILIENCE_CROSSWALK_2026-11-20.md](../FND_01_01_SAFETY_SECURITY_PRIVACY_RESILIENCE_CROSSWALK_2026-11-20.md). La ampliación incorpora fuentes NIST, NASA, IEC e ISO con estado de lectura explícito. Las fuentes ISO/IEC de pago se registran solo por metadatos y alcance oficial cuando no se accedió al texto completo.
