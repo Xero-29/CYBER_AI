@@ -29,7 +29,7 @@ class PreflightTests(unittest.TestCase):
                 python_version=(3, 12, 0),
                 module_lookup=lambda name: object() if name in preflight.REQUIRED_MODULES else None,
                 executable_lookup=lambda name: None,
-                environ={},
+                environ={"CYBER_AI_TOOL_ALLOWLIST_REQUIRED": "0"},
             )
         self.assertEqual(report["status"], "ready")
         self.assertGreater(report["warnings"], 0)
