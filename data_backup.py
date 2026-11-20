@@ -60,12 +60,135 @@ def _enforce_manifest_json_depth(text):
             depth -= 1
 
 
+def _is_regular_file_info(info):
+    reparse_flag = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
+    return (
+        stat.S_ISREG(info.st_mode)
+        and not (getattr(info, "st_file_attributes", 0) & reparse_flag)
+    )
+
+
+def _file_state(info):
+    return (
+        info.st_dev,
+        info.st_ino,
+        info.st_size,
+        info.st_mtime_ns,
+        getattr(info, "st_ctime_ns", 0),
+        info.st_mode,
+        info.st_nlink,
+    )
+
+
+def _open_regular_file(path):
+    """Open one regular file without following its final symlink or hard links."""
+    path = Path(path)
+    descriptor = None
+    try:
+        before = path.lstat()
+        if not _is_regular_file_info(before):
+            raise BackupError("El archivo del backup debe ser regular y no puede ser un enlace.")
+        flags = (
+            os.O_RDONLY
+            | getattr(os, "O_NOFOLLOW", 0)
+            | getattr(os, "O_CLOEXEC", 0)
+            | getattr(os, "O_NONBLOCK", 0)
+        )
+        descriptor = os.open(path, flags)
+        opened = os.fstat(descriptor)
+        after = path.lstat()
+        if (
+            not _is_regular_file_info(opened)
+            or not _is_regular_file_info(after)
+            or (before.st_dev, before.st_ino) != (opened.st_dev, opened.st_ino)
+            or (opened.st_dev, opened.st_ino) != (after.st_dev, after.st_ino)
+        ):
+            raise BackupError("El archivo cambió durante su apertura o no es regular.")
+        if os.name == "posix" and opened.st_nlink != 1:
+            raise BackupError("No se permiten enlaces duros en archivos del backup.")
+        stream = os.fdopen(descriptor, "rb")
+        descriptor = None
+        return stream
+    except BackupError:
+        raise
+    except OSError as error:
+        raise BackupError("No se pudo abrir un archivo regular del backup.") from error
+    finally:
+        if descriptor is not None:
+            os.close(descriptor)
+
+
+def _assert_open_file_stable(path, stream, initial):
+    try:
+        final = os.fstat(stream.fileno())
+        current = Path(path).lstat()
+    except OSError as error:
+        raise BackupError("El archivo desapareció durante su lectura.") from error
+    if (
+        not _is_regular_file_info(final)
+        or not _is_regular_file_info(current)
+        or _file_state(initial) != _file_state(final)
+        or (final.st_dev, final.st_ino) != (current.st_dev, current.st_ino)
+    ):
+        raise BackupError("El archivo cambió durante su lectura.")
+
+
+def _read_regular_file(path, *, max_bytes):
+    with _open_regular_file(path) as stream:
+        initial = os.fstat(stream.fileno())
+        if initial.st_size > max_bytes:
+            raise BackupError("El manifiesto del backup supera 16 MiB.")
+        chunks = []
+        total = 0
+        while True:
+            chunk = stream.read(min(8192, max_bytes + 1 - total))
+            if not chunk:
+                break
+            total += len(chunk)
+            if total > max_bytes:
+                raise BackupError("El manifiesto del backup supera 16 MiB.")
+            chunks.append(chunk)
+        _assert_open_file_stable(path, stream, initial)
+        if total != initial.st_size:
+            raise BackupError("El archivo cambió de tamaño durante su lectura.")
+        return b"".join(chunks)
+
+
 def _sha256(path):
     digest = hashlib.sha256()
-    with Path(path).open("rb") as stream:
+    with _open_regular_file(path) as stream:
+        initial = os.fstat(stream.fileno())
         for block in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(block)
+        _assert_open_file_stable(path, stream, initial)
     return digest.hexdigest()
+
+
+def _copy_regular_file(source, destination):
+    """Copy a regular source without following its final symlink or overwriting."""
+    with _open_regular_file(source) as src:
+        initial = os.fstat(src.fileno())
+        flags = (
+            os.O_WRONLY
+            | os.O_CREAT
+            | os.O_EXCL
+            | getattr(os, "O_NOFOLLOW", 0)
+            | getattr(os, "O_CLOEXEC", 0)
+        )
+        descriptor = None
+        try:
+            descriptor = os.open(destination, flags, 0o600)
+            with os.fdopen(descriptor, "wb") as dst:
+                descriptor = None
+                shutil.copyfileobj(src, dst, length=1024 * 1024)
+                dst.flush()
+                os.fsync(dst.fileno())
+        except OSError as error:
+            raise BackupError("No se pudo copiar un archivo regular del backup.") from error
+        finally:
+            if descriptor is not None:
+                os.close(descriptor)
+        _assert_open_file_stable(source, src, initial)
 
 
 def _backup_signing_key():
@@ -258,7 +381,7 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None):
                     _sqlite_snapshot(source, target)
                     kind = "sqlite_snapshot"
                 else:
-                    shutil.copy2(source, target)
+                    _copy_regular_file(source, target)
                     kind = "file_copy_quiesced"
                 try:
                     os.chmod(target, 0o600)
@@ -310,14 +433,10 @@ def verify_backup(snapshot, *, require_signature=False):
     if not snapshot.is_dir():
         raise BackupError("El backup debe ser un directorio existente.")
     manifest_path = snapshot / "manifest.json"
-    if manifest_path.is_symlink() or not manifest_path.is_file():
-        raise BackupError("Falta manifest.json válido.")
     try:
-        if manifest_path.stat().st_size > MAX_MANIFEST_BYTES:
-            raise BackupError("El manifiesto del backup supera 16 MiB.")
-        manifest_bytes = manifest_path.read_bytes()
-        if len(manifest_bytes) > MAX_MANIFEST_BYTES:
-            raise BackupError("El manifiesto del backup supera 16 MiB.")
+        manifest_bytes = _read_regular_file(
+            manifest_path, max_bytes=MAX_MANIFEST_BYTES
+        )
         manifest_text = manifest_bytes.decode("utf-8")
         _enforce_manifest_json_depth(manifest_text)
         manifest = json.loads(manifest_text, object_pairs_hook=_unique_object)
@@ -367,7 +486,7 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
             source = snapshot.joinpath(*relative.parts)
             target = staging.joinpath(*relative.parts)
             target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
-            shutil.copy2(source, target)
+            _copy_regular_file(source, target)
             if target.stat().st_size != item["size"] or _sha256(target) != item["sha256"]:
                 raise BackupError(f"El archivo cambió durante la restauración: {relative.as_posix()}")
             if target.suffix.lower() in {".sqlite", ".sqlite3", ".db"}:

@@ -214,14 +214,14 @@ class DataBackupTests(unittest.TestCase):
     def test_restore_detects_source_changes_after_verification(self):
         snapshot = self.root / "backup"
         create_backup(self.data, snapshot)
-        original_copy = shutil.copy2
+        original_copy = __import__("data_backup")._copy_regular_file
 
         def mutate_before_copy(source, target):
             if Path(source) == snapshot / "events.jsonl":
                 Path(source).write_text("tampered", encoding="utf-8")
             return original_copy(source, target)
 
-        with patch("data_backup.shutil.copy2", side_effect=mutate_before_copy):
+        with patch("data_backup._copy_regular_file", side_effect=mutate_before_copy):
             with self.assertRaisesRegex(BackupError, "cambió durante la restauración"):
                 restore_backup(
                     snapshot, self.data, confirm_quiesced=True, confirm_replace=True
@@ -231,6 +231,36 @@ class DataBackupTests(unittest.TestCase):
             '{"event":"test"}\n',
         )
 
+
+    @unittest.skipUnless(os.name == "posix", "Los enlaces duros se validan en POSIX.")
+    def test_rejects_hard_link_file_inside_backup(self):
+        snapshot = self.root / "backup"
+        create_backup(self.data, snapshot)
+        target = snapshot / "events.jsonl"
+        os.link(target, self.root / "outside-hard-link")
+        with self.assertRaisesRegex(BackupError, "enlaces duros"):
+            verify_backup(snapshot)
+
+    def test_rejects_symlink_swap_between_inspection_and_open(self):
+        snapshot = self.root / "backup"
+        create_backup(self.data, snapshot)
+        target = snapshot / "events.jsonl"
+        outside = self.root / "outside.txt"
+        outside.write_text("outside", encoding="utf-8")
+        real_open = os.open
+        swapped = {"value": False}
+
+        def swap_then_open(path, flags, *args, **kwargs):
+            if Path(path) == target and not swapped["value"]:
+                swapped["value"] = True
+                target.unlink()
+                target.symlink_to(outside)
+            return real_open(path, flags, *args, **kwargs)
+
+        with patch("data_backup.os.open", side_effect=swap_then_open):
+            with self.assertRaises(BackupError):
+                verify_backup(snapshot)
+        self.assertEqual(outside.read_text(encoding="utf-8"), "outside")
 
     def test_rejects_symlink_file_inside_backup(self):
         snapshot = self.root / "backup"
