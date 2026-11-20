@@ -34,7 +34,7 @@ class MetacognitionTests(unittest.TestCase):
             })
         with tempfile.TemporaryDirectory() as tmp:
             result = run_cycle("Explicar TCP", principal="MAIN", researcher="R", verifier="V",
-                               model_call=model, state_path=Path(tmp) / "state.json",
+                               model_call=model, publisher=lambda report, task_id: {"indexed": True}, state_path=Path(tmp) / "state.json",
                                log_path=Path(tmp) / "events.jsonl")
         self.assertEqual(result["status"], "sufficient")
         self.assertEqual(calls, ["MAIN"])
