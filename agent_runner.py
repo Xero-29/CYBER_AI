@@ -3,6 +3,7 @@
 
 from collections import deque
 import argparse
+import hashlib
 import fcntl
 import json
 import os
@@ -15,7 +16,7 @@ from pathlib import Path
 from model_memory_manager import load_config, resolve_agent, record
 from execution_ledger import ExecutionLedger
 from safe_io import SafeWriteError, open_private_file
-from secret_redaction import redact_sensitive_data
+from secret_redaction import redact_sensitive_data, redact_text
 
 
 def _ledger_required(environ=None):
@@ -188,6 +189,15 @@ def unload_other_models(target_model):
 def save_jsonl(path, event):
     """Añade evidencia saneada a un archivo privado, acotado y append-only."""
     safe_event = redact_sensitive_data(event)
+    if (
+        isinstance(event, dict)
+        and isinstance(event.get("session_id"), str)
+        and event["session_id"]
+    ):
+        # Keep session isolation without persisting the raw session identifier.
+        safe_event["session_fingerprint"] = hashlib.sha256(
+            event["session_id"].encode("utf-8")
+        ).hexdigest()
     rendered = json.dumps(
         safe_event, ensure_ascii=False, allow_nan=False
     ) + "\n"
@@ -321,9 +331,16 @@ def build_task_prompt(
                         continue
 
                     allowed_task_ids = set(context_task_ids or [])
+                    expected_fingerprint = hashlib.sha256(
+                        session_id.encode("utf-8")
+                    ).hexdigest()
+                    session_matches = (
+                        item.get("session_id") == session_id
+                        or item.get("session_fingerprint") == expected_fingerprint
+                    ) if isinstance(item, dict) else False
                     if (
                         isinstance(item, dict)
-                        and item.get("session_id") == session_id
+                        and session_matches
                         and (
                             item.get("task_id") == task_id
                             or item.get("task_id") in allowed_task_ids
@@ -357,8 +374,15 @@ def build_task_prompt(
     for item in records:
         # La sesión es la frontera de aislamiento del historial.
         if isolate_history:
-            if session_id and item.get("session_id") != session_id:
-                continue
+            if session_id:
+                expected_fingerprint = hashlib.sha256(
+                    session_id.encode("utf-8")
+                ).hexdigest()
+                if (
+                    item.get("session_id") != session_id
+                    and item.get("session_fingerprint") != expected_fingerprint
+                ):
+                    continue
             allowed_task_ids = set(context_task_ids or [])
             if (
                 item.get("task_id") != task_id
@@ -366,18 +390,15 @@ def build_task_prompt(
             ):
                 continue
 
-        # Filter session identifiers before redaction; they are sensitive but still
-        # required for isolation decisions.
-        item = redact_sensitive_data(item)
         fields = [f"Especialista: {item.get('agent', 'desconocido')}"]
 
         if settings.get("include_task", True):
-            task = str(item.get("task", ""))[:max_chars]
+            task = redact_text(str(item.get("task", "")))[:max_chars]
             if task:
                 fields.append("Tarea: " + task)
 
         if settings.get("include_response", True):
-            response = str(item.get("response", ""))[:max_chars]
+            response = redact_text(str(item.get("response", "")))[:max_chars]
             if response:
                 fields.append("Respuesta registrada: " + response)
 
