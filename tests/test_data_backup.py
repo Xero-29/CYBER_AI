@@ -65,7 +65,7 @@ class DataBackupTests(unittest.TestCase):
         snapshot = self.root / "backup"
         create_backup(self.data, snapshot)
         (snapshot / "manifest.json").write_text(
-            "[" * 2000 + "0" + "]" * 2000, encoding="utf-8"
+            '{"a":' * 2000 + "0" + "}" * 2000, encoding="utf-8"
         )
         with self.assertRaisesRegex(BackupError, "profundidad JSON"):
             verify_backup(snapshot)
