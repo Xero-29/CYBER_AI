@@ -1,3 +1,4 @@
+import json
 import os
 import stat
 import subprocess
@@ -9,6 +10,7 @@ from unittest.mock import patch
 import sandbox_runner
 import tool_adapters
 from tool_adapters import ToolExecutionError
+from tool_allowlist import sign_tool_allowlist
 from sandbox_runner import SANDBOX_TOOLS
 
 
@@ -21,8 +23,27 @@ class SandboxRunnerTests(unittest.TestCase):
         self.root_patch.start()
         self.adapter_root_patch = patch.object(tool_adapters, "PROJECT_ROOT", self.root)
         self.adapter_root_patch.start()
+        self.allowlist_temp = tempfile.TemporaryDirectory()
+        self.allowlist_path = Path(self.allowlist_temp.name) / "tools.json"
+        self.allowlist_key = "unit-test-hmac-key-" + "x" * 48
+        manifest = sign_tool_allowlist(
+            {"ruff": {"sha256": "a" * 64}},
+            self.allowlist_key.encode("utf-8"),
+        )
+        self.allowlist_path.write_text(
+            json.dumps(manifest, sort_keys=True), encoding="utf-8"
+        )
+        if os.name == "posix":
+            self.allowlist_path.chmod(0o600)
+        self.allowlist_env_patch = patch.dict(os.environ, {
+            "CYBER_AI_TOOL_ALLOWLIST_PATH": str(self.allowlist_path),
+            "CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY": self.allowlist_key,
+        })
+        self.allowlist_env_patch.start()
 
     def tearDown(self):
+        self.allowlist_env_patch.stop()
+        self.allowlist_temp.cleanup()
         self.adapter_root_patch.stop()
         self.root_patch.stop()
         self.temp.cleanup()
@@ -52,6 +73,58 @@ class SandboxRunnerTests(unittest.TestCase):
         self.assertIn("--require-ledger", command)
         self.assertNotIn("--privileged", command)
         self.assertNotIn("/var/run/docker.sock", joined)
+
+    def test_signed_allowlist_is_read_only_mounted_and_key_is_not_in_argv(self):
+        evidence = self.root.parent / (self.root.name + "-signed-evidence")
+        command = sandbox_runner.build_docker_command(
+            "ruff", "sample.py", evidence, image="sandbox:test"
+        )
+        allowlist_mount = (
+            f"type=bind,src={self.allowlist_path.resolve()},"
+            "dst=/run/cyber-ai-tool-allowlist.json,readonly"
+        )
+        self.assertIn(allowlist_mount, command)
+        self.assertIn(
+            "CYBER_AI_TOOL_ALLOWLIST_PATH=/run/cyber-ai-tool-allowlist.json",
+            command,
+        )
+        self.assertIn("CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY", command)
+        self.assertIn("CYBER_AI_TOOL_ALLOWLIST_REQUIRED=1", command)
+        self.assertNotIn(self.allowlist_key, command)
+
+    def test_missing_signed_allowlist_blocks_sandbox_command(self):
+        evidence = self.root.parent / (self.root.name + "-missing-allowlist")
+        with patch.dict(os.environ, {
+            "CYBER_AI_TOOL_ALLOWLIST_PATH": "",
+            "CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY": "",
+        }):
+            with self.assertRaisesRegex(ToolExecutionError, "allowlist HMAC"):
+                sandbox_runner.build_docker_command("ruff", "sample.py", evidence)
+
+    def test_invalid_signature_blocks_sandbox_command(self):
+        evidence = self.root.parent / (self.root.name + "-invalid-allowlist")
+        self.allowlist_path.write_text('{"schema_version":1}', encoding="utf-8")
+        if os.name == "posix":
+            self.allowlist_path.chmod(0o600)
+        with self.assertRaisesRegex(ToolExecutionError, "allowlist HMAC"):
+            sandbox_runner.build_docker_command("ruff", "sample.py", evidence)
+
+    def test_allowlist_cannot_authorize_extra_tools(self):
+        evidence = self.root.parent / (self.root.name + "-extra-tool-allowlist")
+        manifest = sign_tool_allowlist(
+            {
+                "ruff": {"sha256": "a" * 64},
+                "bandit": {"sha256": "b" * 64},
+            },
+            self.allowlist_key.encode("utf-8"),
+        )
+        self.allowlist_path.write_text(
+            json.dumps(manifest, sort_keys=True), encoding="utf-8"
+        )
+        if os.name == "posix":
+            self.allowlist_path.chmod(0o600)
+        with self.assertRaisesRegex(ToolExecutionError, "exclusivamente"):
+            sandbox_runner.build_docker_command("ruff", "sample.py", evidence)
 
     @unittest.skipIf(os.name == "nt", "El UID de host solo existe en POSIX.")
     def test_root_host_is_rejected_instead_of_running_container_as_root(self):

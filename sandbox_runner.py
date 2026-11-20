@@ -11,6 +11,7 @@ import uuid
 from pathlib import Path
 
 from tool_adapters import TOOL_SPECS, ToolExecutionError, _confined_path, PROJECT_ROOT
+from tool_allowlist import ToolAllowlistError, load_signed_tool_allowlist
 
 
 DEFAULT_IMAGE = "cyber-ai-tool-sandbox:local"
@@ -32,6 +33,58 @@ def _docker_user_args(platform_name=None):
         )
     return [f"--user={host_uid}:{os.getgid()}"]
 
+
+
+def _signed_allowlist_mount_args(tool_id):
+    """Validate and mount a one-tool HMAC allowlist read-only into the sandbox."""
+    path_value = os.environ.get("CYBER_AI_TOOL_ALLOWLIST_PATH", "").strip()
+    key_value = os.environ.get("CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY", "")
+    if not path_value and not key_value:
+        raise ToolExecutionError(
+            "La sandbox exige una allowlist HMAC firmada para el ejecutable."
+        )
+    if not path_value or not key_value:
+        raise ToolExecutionError(
+            "La ruta y la clave HMAC de la allowlist deben configurarse juntas."
+        )
+    key = key_value.encode("utf-8")
+    if len(key) < 32:
+        raise ToolExecutionError(
+            "La clave HMAC de la allowlist debe tener al menos 32 bytes."
+        )
+
+    candidate = Path(os.path.abspath(path_value))
+    if any(character in str(candidate) for character in (",", "\n", "\r")):
+        raise ToolExecutionError(
+            "La ruta de la allowlist contiene caracteres no permitidos para Docker --mount."
+        )
+    try:
+        candidate.relative_to(PROJECT_ROOT.resolve())
+    except ValueError:
+        pass
+    else:
+        raise ToolExecutionError("La allowlist debe almacenarse fuera del repositorio.")
+
+    try:
+        approved = load_signed_tool_allowlist(candidate, key)
+    except ToolAllowlistError as exc:
+        raise ToolExecutionError(
+            "La allowlist HMAC no es válida o no cumple la política de archivos."
+        ) from exc
+    if set(approved) != {tool_id}:
+        raise ToolExecutionError(
+            "La allowlist debe autorizar exclusivamente la herramienta solicitada."
+        )
+    return [
+        "--mount",
+        f"type=bind,src={candidate.resolve(strict=True)},dst=/run/cyber-ai-tool-allowlist.json,readonly",
+        "--env",
+        "CYBER_AI_TOOL_ALLOWLIST_PATH=/run/cyber-ai-tool-allowlist.json",
+        "--env",
+        "CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY",
+        "--env",
+        "CYBER_AI_TOOL_ALLOWLIST_REQUIRED=1",
+    ]
 
 
 def build_docker_command(tool_id, target, evidence_dir, image=DEFAULT_IMAGE, timeout=None, config=None):
@@ -66,6 +119,7 @@ def build_docker_command(tool_id, target, evidence_dir, image=DEFAULT_IMAGE, tim
         raise ToolExecutionError("La carpeta de evidencias debe estar fuera del repositorio.")
 
     user_args = _docker_user_args()
+    allowlist_args = _signed_allowlist_mount_args(tool_id)
 
     command = [
         "docker", "run", "--rm", "--pull=never",
@@ -81,6 +135,7 @@ def build_docker_command(tool_id, target, evidence_dir, image=DEFAULT_IMAGE, tim
         "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=64m",
         "--mount", f"type=bind,src={PROJECT_ROOT.resolve()},dst=/workspace,readonly",
         "--mount", f"type=bind,src={evidence},dst=/evidence",
+        *allowlist_args,
         "--workdir=/workspace",
         "--env", "CYBER_AI_EVIDENCE_DIR=/evidence",
         "--env", "CYBER_AI_LEDGER_PATH=/evidence/execution_ledger.sqlite3",

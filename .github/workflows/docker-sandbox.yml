@@ -9,9 +9,6 @@ on:
       - main
   workflow_dispatch:
 
-env:
-  CYBER_AI_TOOL_ALLOWLIST_REQUIRED: "0"
-
 permissions:
   contents: read
 
@@ -44,6 +41,49 @@ jobs:
             --tag cyber-ai-tool-sandbox:ci \
             --file sandbox/Dockerfile .
 
+      - name: Prepare ephemeral signed allowlist for the sandbox
+        run: |
+          set -euo pipefail
+          allowlist_dir="$RUNNER_TEMP/cyber-ai-tool-allowlist"
+          mkdir -m 700 "$allowlist_dir"
+          ruff_sha256="$(docker run --rm --network=none --entrypoint python cyber-ai-tool-sandbox:ci -c 'import hashlib, pathlib, shutil; path=shutil.which("ruff"); assert path; print(hashlib.sha256(pathlib.Path(path).read_bytes()).hexdigest())')"
+          python3 - "$allowlist_dir/tools.json" "$ruff_sha256" <<'PY'
+          import json
+          import os
+          import re
+          import secrets
+          import sys
+          from pathlib import Path
+
+          from tool_allowlist import sign_tool_allowlist
+
+          destination = Path(sys.argv[1])
+          digest = sys.argv[2]
+          if not re.fullmatch(r"[0-9a-f]{64}", digest):
+              raise SystemExit("El hash del ejecutable Ruff no es válido.")
+          key = secrets.token_urlsafe(48)
+          document = sign_tool_allowlist(
+              {"ruff": {"sha256": digest}},
+              key.encode("utf-8"),
+          )
+          payload = (json.dumps(
+              document, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+          ) + "\n").encode("utf-8")
+          descriptor = os.open(
+              destination,
+              os.O_WRONLY | os.O_CREAT | os.O_EXCL,
+              0o600,
+          )
+          with os.fdopen(descriptor, "wb") as stream:
+              stream.write(payload)
+              stream.flush()
+              os.fsync(stream.fileno())
+          os.chmod(destination, 0o600)
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
+              env_file.write(f"CYBER_AI_TOOL_ALLOWLIST_PATH={destination}\n")
+              env_file.write(f"CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY={key}\n")
+          PY
+
       - name: Protect checked-out runtime data directories
         run: |
           if [[ -d data && ! -L data ]]; then
@@ -51,10 +91,14 @@ jobs:
           fi
 
       - name: Run complete local verification
+        env:
+          CYBER_AI_TOOL_ALLOWLIST_REQUIRED: "0"
         run: bash verify.sh
 
       - name: Run Ruff inside hardened sandbox
         run: |
+          set -euo pipefail
+          trap 'rm -rf "$RUNNER_TEMP/cyber-ai-tool-allowlist"' EXIT
           python3 sandbox_runner.py \
             --tool ruff \
             --target tests/fixtures/sandbox_sample.py \
