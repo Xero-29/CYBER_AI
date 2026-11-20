@@ -6,7 +6,7 @@ Sistema modular de investigación técnica y ciberseguridad con agentes LLM, bib
 
 ## Requisitos
 
-- Linux recomendado (Ubuntu), Python 3.12 o superior.
+- Instalación con lock SHA-256 soportada actualmente: CPython 3.12.x, Linux x86_64 y glibc >= 2.26. Otras plataformas requieren locks específicos verificados.
 - Git.
 - Para agentes locales: Ollama instalado y ejecutándose.
 - Para el sandbox: Docker Engine/CLI.
@@ -26,7 +26,7 @@ cd CYBER_AI
 ```bash
 python3.12 -m venv .venv
 source .venv/bin/activate
-python -m pip install -r requirements.lock
+python -m pip install --require-hashes -r requirements.lock
 ```
 
 También puedes usar el instalador incluido:
@@ -36,7 +36,7 @@ bash setup.sh
 source .venv/bin/activate
 ```
 
-El instalador crea el entorno virtual e instala dependencias Python. No instala Ollama, Docker, modelos ni herramientas de seguridad.
+El instalador valida CPython 3.12.x, Linux x86_64 y glibc >= 2.26 antes de instalar con `--require-hashes`. Fuera de esa plataforma falla de forma cerrada; no reutilices hashes de otra arquitectura. No instala Ollama, Docker, modelos ni herramientas de seguridad.
 
 ## Comprobaciones iniciales
 
@@ -84,6 +84,8 @@ python cyber_ai.py --team "Revisa la calidad y seguridad del código" --execute-
 ```
 
 Solo se consideran adaptadores locales registrados; los que requieren red o aislamiento especial siguen bloqueados. El objetivo debe estar dentro del repositorio. La ejecución no se activa por defecto. La validación automática verifica integridad de hashes, allowlist, código de salida y ausencia de modificación del objetivo/binario; no demuestra por sí sola que cada hallazgo sea verdadero. Los resultados se entregan a los agentes como datos no confiables y quedan enlazados al informe y al ledger.
+
+Los adaptadores host usan `HOME`/temporales efímeros y un entorno mínimo que no hereda las variables secretas del proceso invocador. Aun así comparten el UID y el acceso al sistema de archivos del usuario; no equivalen a un sandbox ni imponen aislamiento de red. Para objetivos no confiables utiliza el runner Docker y recuerda que Docker comparte el kernel.
 
 ## Ejecutar agentes LLM locales
 
@@ -191,7 +193,7 @@ python data_backup.py verify --snapshot /ruta/segura/cyber-ai-backup --require-s
 python data_backup.py restore --snapshot /ruta/segura/cyber-ai-backup --confirm-quiesced --confirm-replace --require-signature
 ```
 
-La verificación de un backup firmado requiere la misma clave. HMAC autentica el manifiesto frente a quien no controla la clave, pero **no cifra** los datos ni proporciona identidad individual, KMS/HSM o almacenamiento WORM. Sin clave configurada, el backup sigue siendo compatible con el modo anterior sin firma. Protege también el acceso al directorio de backups y conserva la clave fuera del host de origen.
+La verificación de un backup firmado requiere la misma clave. HMAC autentica el manifiesto frente a quien no controla la clave, pero **no cifra** los datos ni proporciona identidad individual, KMS/HSM o almacenamiento WORM. Sin clave configurada, el backup sigue siendo compatible con el modo anterior sin firma. Protege también el acceso al directorio de backups y conserva la clave fuera del host de origen. El formato limita cada snapshot a 50.000 archivos y un manifiesto de 16 MiB para acotar el coste de verificación; planifica un mecanismo de archivo separado para volúmenes mayores.
 
 Genera un SBOM CycloneDX determinista a partir de las dependencias fijadas:
 
@@ -199,7 +201,7 @@ Genera un SBOM CycloneDX determinista a partir de las dependencias fijadas:
 python sbom_generator.py --output reports/cyber-ai-sbom.cdx.json
 ```
 
-El SBOM distingue dependencias directas y transitivas y registra el hash del lock. El lock actual no contiene hashes de artefactos ni un grafo transitivo completo; el SBOM no afirma verificar esos elementos.
+El SBOM distingue dependencias directas y transitivas, registra el hash del lock y, en CI, incorpora SHA-256 de los wheels descargados y verificados contra el lock. Se generan SBOM separados para runtime, sandbox (Ruff/Bandit) y extractores documentales opcionales. Esto fija los artefactos usados para la plataforma del runner, pero no demuestra la procedencia upstream del publicador ni equivale a una firma upstream. Los generadores de locks/manifiestos rechazan metadatos `METADATA` de wheel superiores a 2 MiB para limitar la descompresión de entradas no confiables.
 
 Para medir la recuperación por especialidad después de indexar, ejecuta el benchmark por defecto de 48 consultas (una por área). El conjunto de 12 consultas anteriores queda disponible como smoke test rápido:
 
@@ -228,7 +230,7 @@ Cada línea del dataset debe ser un objeto JSON con exactamente `id`, `query` y 
 
 ## Conocimiento y Skills
 
-- Ingesta TXT, Markdown, HTML, CSV, JSON/JSONL y código: disponible con las dependencias base. PDF, DOCX, XLSX y PPTX requieren `pip install -r requirements-documents.txt`. Los PDF escaneados necesitan OCR externo; el importador no ejecuta OCR.
+- Ingesta TXT, Markdown, HTML, CSV, JSON/JSONL y código: disponible con las dependencias base. PDF, DOCX, XLSX y PPTX requieren `python -m pip install --require-hashes -r requirements-documents.lock`. `requirements-documents.in` contiene las versiones directas; el lock documental está verificado para CPython 3.12.x/Linux x86_64/glibc >= 2.26. Otras plataformas requieren locks propios. Los PDF escaneados necesitan OCR externo; el importador no ejecuta OCR.
 - Recuperación e indexación: revisa `knowledge_library.py`, `knowledge_embeddings.py` y `knowledge_reindex.py`.
 - Fuentes externas: el catálogo requiere revisión de licencia y verificación antes de habilitar descargas.
 - Skills: `propose_skill_from_ledger` crea candidatas no ejecutables; solo la promoción firmada por VERITAS las hace recuperables. El CLI `skillbook_cli.py` permite proponer desde un manifiesto ligado a dos ejecuciones, exportar el payload canónico para firma independiente, promover con firma y generar/aplicar rollback. El historial de versiones es append-only. Una coincidencia recuperada no concede permisos de ejecución.

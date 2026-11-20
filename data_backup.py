@@ -17,6 +17,8 @@ PROJECT = Path(__file__).resolve().parent
 DEFAULT_DATA = PROJECT / "data"
 LOCK_SUFFIXES = {".lock", ".pid", ".sock", "-wal", "-shm"}
 SCHEMA = "cyber-ai-data-backup-v1"
+MAX_BACKUP_FILES = 50_000
+MAX_MANIFEST_BYTES = 16 * 1024 * 1024
 
 
 class BackupError(ValueError):
@@ -71,6 +73,8 @@ def _validate_manifest(snapshot, manifest, *, require_signature=False):
     files = manifest.get("files")
     if not isinstance(files, list):
         raise BackupError("Lista de archivos del manifiesto inválida.")
+    if len(files) > MAX_BACKUP_FILES:
+        raise BackupError("El manifiesto supera el límite de archivos del backup.")
     if manifest.get("encrypted") is not False:
         raise BackupError("Metadato de cifrado inválido o no compatible.")
     if manifest.get("requires_quiesced_writers") is not True:
@@ -202,6 +206,8 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None):
                     raise BackupError(f"No se permiten symlinks: {source.relative_to(data_dir)}")
                 if source.suffix in LOCK_SUFFIXES or source.name.endswith(("-wal", "-shm")):
                     continue
+                if len(entries) >= MAX_BACKUP_FILES:
+                    raise BackupError("El directorio de datos supera el límite de archivos del backup.")
                 relative = source.relative_to(data_dir).as_posix()
                 if relative == "manifest.json":
                     raise BackupError("data/manifest.json está reservado para el manifiesto del backup.")
@@ -235,10 +241,12 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None):
                 "value": _manifest_signature(manifest, signing_key),
             }
         manifest_path = staging / "manifest.json"
-        manifest_path.write_text(
-            json.dumps(manifest, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
-            encoding="utf-8",
+        rendered_manifest = (
+            json.dumps(manifest, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
         )
+        if len(rendered_manifest.encode("utf-8")) > MAX_MANIFEST_BYTES:
+            raise BackupError("El manifiesto del backup supera 16 MiB.")
+        manifest_path.write_text(rendered_manifest, encoding="utf-8")
         try:
             os.chmod(manifest_path, 0o600)
             os.chmod(staging, 0o700)
@@ -264,7 +272,11 @@ def verify_backup(snapshot, *, require_signature=False):
     if manifest_path.is_symlink() or not manifest_path.is_file():
         raise BackupError("Falta manifest.json válido.")
     try:
+        if manifest_path.stat().st_size > MAX_MANIFEST_BYTES:
+            raise BackupError("El manifiesto del backup supera 16 MiB.")
         manifest_bytes = manifest_path.read_bytes()
+        if len(manifest_bytes) > MAX_MANIFEST_BYTES:
+            raise BackupError("El manifiesto del backup supera 16 MiB.")
         manifest = json.loads(manifest_bytes.decode("utf-8"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
         raise BackupError("El manifiesto no es JSON UTF-8 válido.") from error
