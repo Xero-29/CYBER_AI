@@ -3,13 +3,16 @@ import re
 
 
 SECRET_FIELD = re.compile(
-    r"(?:api[_-]?key|access[_-]?token|refresh[_-]?token|token|authorization|"
-    r"password|passwd|secret|credential|private[_-]?key)",
+    r"(?:api[_-]?key|access[_-]?key|access[_-]?token|refresh[_-]?token|token|"
+    r"authorization|password|passwd|secret|credential|private[_-]?key|cookie|"
+    r"set[_-]?cookie|session[_-]?(?:id|token|key)|hmac[_-]?key|"
+    r"signing[_-]?key|encryption[_-]?key)",
     re.IGNORECASE,
 )
 SECRET_ASSIGNMENT = re.compile(
-    r'''(?i)(["']?(?:api[_-]?key|access[_-]?token|refresh[_-]?token|token|password|'''
-    r'''passwd|secret|client[_-]?secret|authorization|credential|private[_-]?key)'''
+    r'''(?i)(["']?(?:api[_-]?key|access[_-]?key|access[_-]?token|refresh[_-]?token|token|password|'''
+    r'''passwd|secret|client[_-]?secret|authorization|credential|private[_-]?key|cookie|'''
+    r'''set[_-]?cookie|session[_-]?(?:id|token|key)|hmac[_-]?key|signing[_-]?key|encryption[_-]?key)'''
     r'''["']?\s*[:=]\s*)("[^"]*"|'[^']*'|[^\s,;}\]"\x27]+)'''
 )
 PRIVATE_KEY = re.compile(

@@ -85,6 +85,40 @@ class ExecutionLedgerTests(unittest.TestCase):
             self.assertNotIn(secret, value)
         self.assertIn("[REDACTED]", value)
 
+    def test_redacts_private_keys_cookies_and_bytes_from_stored_metadata(self):
+        self.append(
+            metadata={
+                "private_key": "private-material",
+                "hmac_key": "hmac-material",
+                "cookie": "cookie-material",
+                "payload": b"Bearer byte-token-material",
+            },
+            validator_results=[{"session_id": "session-material"}],
+        )
+        with sqlite3.connect(self.ledger.path) as db:
+            row = db.execute(
+                "SELECT metadata, validator_results FROM execution_events"
+            ).fetchone()
+        stored = " ".join(row)
+        for secret in (
+            "private-material", "hmac-material", "cookie-material",
+            "byte-token-material", "session-material",
+        ):
+            self.assertNotIn(secret, stored)
+        self.assertIn("[REDACTED]", stored)
+
+    def test_ledger_sanitization_limits_nested_metadata_depth(self):
+        nested = "safe"
+        for _ in range(100):
+            nested = {"child": nested}
+        self.append(metadata=nested)
+        with sqlite3.connect(self.ledger.path) as db:
+            stored = db.execute(
+                "SELECT metadata FROM execution_events"
+            ).fetchone()[0]
+        self.assertIn("nesting limit", stored)
+        self.assertTrue(self.ledger.verify()["valid"])
+
     def test_validation(self):
         with self.assertRaises(LedgerError):
             self.append(status="success")

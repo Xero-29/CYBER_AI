@@ -15,7 +15,13 @@ DEFAULT_DB = PROJECT / "data" / "execution_ledger.sqlite3"
 GENESIS = "0" * 64
 MAX_FIELD = 16384
 MAX_SQLITE_INTEGER = (1 << 63) - 1
-SECRET_KEY = re.compile(r"(?:api[_-]?key|authorization|password|secret|token|credential)", re.I)
+SECRET_KEY = re.compile(
+    r"(?:api[_-]?key|access[_-]?key|authorization|password|passwd|secret|token|"
+    r"credential|private[_-]?key|cookie|set[_-]?cookie|"
+    r"session[_-]?(?:id|token|key)|hmac[_-]?key|signing[_-]?key|encryption[_-]?key)",
+    re.I,
+)
+MAX_NESTING_DEPTH = 64
 from secret_redaction import redact_text as _redact_text
 
 
@@ -27,18 +33,27 @@ def _canonical(value):
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False)
 
 
-def _clean(value, key=""):
+def _clean(value, key="", _depth=0):
     if SECRET_KEY.search(key):
         return "[REDACTED]"
+    if _depth > MAX_NESTING_DEPTH:
+        return "[REDACTED: nesting limit]"
     if value is None or isinstance(value, (bool, int, float)):
         return value
+    if isinstance(value, bytes):
+        return _redact_text(value.decode("utf-8", errors="replace")[:MAX_FIELD])
     if isinstance(value, str):
         return _redact_text(value[:MAX_FIELD])
     if isinstance(value, list):
-        return [_clean(item) for item in value[:500]]
+        return [
+            _clean(item, _depth=_depth + 1) for item in value[:500]
+        ]
     if isinstance(value, dict):
-        return {str(k)[:128]: _clean(v, str(k)) for k, v in list(value.items())[:500]}
-    return str(value)[:MAX_FIELD]
+        return {
+            str(k)[:128]: _clean(v, str(k), _depth + 1)
+            for k, v in list(value.items())[:500]
+        }
+    return _redact_text(str(value)[:MAX_FIELD])
 
 
 def _digest(previous, payload):

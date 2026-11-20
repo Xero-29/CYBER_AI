@@ -62,6 +62,24 @@ class SecretRedactionTests(unittest.TestCase):
         self.assertNotIn("alice:password", cleaned)
         self.assertNotIn("private-material", cleaned)
 
+    def test_redacts_private_signing_session_and_cookie_fields(self):
+        value = {
+            "private_key": "private-material",
+            "hmac_key": "hmac-material",
+            "signing_key": "signing-material",
+            "cookie": "cookie-material",
+            "session_id": "session-material",
+        }
+        cleaned = redact_sensitive_data(value)
+        for field in value:
+            self.assertEqual(cleaned[field], "[REDACTED]")
+        text = redact_text(
+            "hmac_key=inline-hmac cookie=inline-cookie "
+            "session_id=inline-session"
+        )
+        for secret in ("inline-hmac", "inline-cookie", "inline-session"):
+            self.assertNotIn(secret, text)
+
     def test_limits_recursive_depth(self):
         value = "safe"
         for _ in range(70):
