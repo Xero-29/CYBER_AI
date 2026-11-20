@@ -296,3 +296,8 @@ La guía reservada de corrección [FND-01-01_ASSESSOR_GUIDE_V2.md](FND-01-01_ASS
 ## Ampliación disciplinar y crosswalk — 2026-11-20
 
 La distinción formal entre security, safety, privacy, reliability, availability y resilience, la matriz de propiedades, los modelos y el crosswalk normativo se desarrollan en [FND_01_01_SAFETY_SECURITY_PRIVACY_RESILIENCE_CROSSWALK_2026-11-20.md](../FND_01_01_SAFETY_SECURITY_PRIVACY_RESILIENCE_CROSSWALK_2026-11-20.md). La ampliación incorpora fuentes NIST, NASA, IEC e ISO con estado de lectura explícito. Las fuentes ISO/IEC de pago se registran solo por metadatos y alcance oficial cuando no se accedió al texto completo.
+
+
+## Desarrollo integrado por doce capas
+
+Consultar [FOUNDATIONS_FND01_TWELVE_LAYER_EXPANSION_2026-11-20.md](../FOUNDATIONS_FND01_TWELVE_LAYER_EXPANSION_2026-11-20.md).

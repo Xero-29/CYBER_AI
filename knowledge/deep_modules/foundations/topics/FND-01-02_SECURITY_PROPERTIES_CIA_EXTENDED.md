@@ -183,3 +183,8 @@ Pendiente: lectura integral de SP 800-160/800-53 y normas sectoriales; legislaci
 ## Ampliación 2026-11-20
 
 La síntesis primaria, el modelo ampliado de propiedades y los contraejemplos se encuentran en [FND_01_02_PRIMARY_SOURCE_SYNTHESIS_2026-11-20.md](../FND_01_02_PRIMARY_SOURCE_SYNTHESIS_2026-11-20.md). El instrumento en frío está en [FND_01_02_COLD_ASSESSMENT_V1.md](../FND_01_02_COLD_ASSESSMENT_V1.md); está preparado, no administrado.
+
+
+## Desarrollo integrado por doce capas
+
+Consultar [FOUNDATIONS_FND01_TWELVE_LAYER_EXPANSION_2026-11-20.md](../FOUNDATIONS_FND01_TWELVE_LAYER_EXPANSION_2026-11-20.md).
