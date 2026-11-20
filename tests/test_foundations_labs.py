@@ -3,7 +3,7 @@ from knowledge.deep_modules.foundations.labs.runner import (
     lab01_authorization, lab02_asset_reconciliation, lab03_threat_model,
     lab04_identity, lab05_crypto_integrity, lab06_event_reconstruction,
     lab07_assurance, lab08_safety_security_tradeoff, lab09_privacy_confidentiality_gap,
-    lab10_resilience_recovery_trust, lab11_common_cause_redundancy, lab12_integrity_vs_truth,
+    lab10_resilience_recovery_trust, lab11_common_cause_redundancy, lab12_integrity_vs_truth, lab13_asset_mission_inventory,
     run_all, encode_hs256_jwt, validate_hs256_jwt,
 )
 
@@ -55,6 +55,11 @@ class FoundationsLabTests(unittest.TestCase):
         r=lab12_integrity_vs_truth(); self.assertTrue(r["integrity_and_authenticity"])
         self.assertFalse(r["semantic_validity_before_review"])
         self.assertTrue(r["semantic_validity_after_calibration_and_crosscheck"])
+    def test_15_asset_inventory_detects_quality_gaps(self):
+        r=lab13_asset_mission_inventory()
+        self.assertTrue(r["asset_quality_findings_detected"])
+        self.assertIn("HMI-01",r["missing_owner"]); self.assertIn("DATA-01",r["unclassified_data_assets"])
+        self.assertIn("HMI-01",r["stale_records"]); self.assertIn("SaaS-01",r["unknown_support_status"])
     def test_08_full_suite(self):
         r=run_all(); self.assertTrue(r["synthetic_only"]); self.assertTrue(r["all_checks_passed"])
     def test_09_jwt_rejects_duplicate_json_members(self):

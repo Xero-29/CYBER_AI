@@ -1509,6 +1509,14 @@
       "path": "knowledge/skills/candidates/FND-01-02_CIA_PROPERTY_ASSESSMENT.md",
       "topic_id": "skills",
       "subtopic_id": "candidate_spec"
+    },
+    {
+      "id": "SKILL-FND-01-03-ASSET-MISSION-INVENTORY",
+      "area_id": "foundations",
+      "name": "Inventario de activos orientado a misión",
+      "path": "knowledge/skills/candidates/FND-01-03_ASSET_MISSION_INVENTORY.md",
+      "topic_id": "skills",
+      "subtopic_id": "candidate_spec"
     }
   ],
   "supplemental_documents": [
@@ -1815,6 +1823,30 @@
       "path": "knowledge/deep_modules/ai_red_team/AI_RED_TEAM_THEORETICAL_DEVELOPMENT_V1.md",
       "topic_id": "AI-RT",
       "subtopic_id": "theoretical_dossier"
+    },
+    {
+      "id": "FOUNDATIONS_TOPIC_01_03",
+      "area_id": "foundations",
+      "name": "Subtema FND-01.03",
+      "path": "knowledge/deep_modules/foundations/topics/FND-01-03_ASSET_SUBJECT_OBJECT_RESOURCE_DATA_PROCESS_SERVICE_MISSION_STAKEHOLDER.md",
+      "topic_id": "FND-01",
+      "subtopic_id": "FND-01.03"
+    },
+    {
+      "id": "FOUNDATIONS_COLD_ASSESSMENT_01_03",
+      "area_id": "foundations",
+      "name": "Evaluación en frío FND-01.03",
+      "path": "knowledge/deep_modules/foundations/topics/FND-01-03_COLD_ASSESSMENT_V1.md",
+      "topic_id": "FND-01",
+      "subtopic_id": "FND-01.03"
+    },
+    {
+      "id": "FOUNDATIONS_SKILL_CANDIDATE_01_03",
+      "area_id": "foundations",
+      "name": "Skill candidata FND-01.03",
+      "path": "knowledge/skills/candidates/FND-01-03_ASSET_MISSION_INVENTORY.md",
+      "topic_id": "skills",
+      "subtopic_id": "candidate_spec"
     }
   ]
 }

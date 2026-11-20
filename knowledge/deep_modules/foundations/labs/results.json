@@ -17,7 +17,8 @@
     "privacy_not_confidentiality": true,
     "recovery_requires_trust_rebuild": true,
     "common_cause_redundancy_detected": true,
-    "integrity_not_truth": true
+    "integrity_not_truth": true,
+    "asset_inventory_quality_findings_detected": true
   },
   "all_checks_passed": true,
   "labs": {
@@ -151,6 +152,33 @@
       "semantic_validity_before_review": false,
       "semantic_validity_after_calibration_and_crosscheck": true,
       "warning": "Cryptographic integrity does not establish truth, calibration or physical correctness."
+    },
+    "LAB-FND-13A": {
+      "asset_count": 11,
+      "missing_owner": [
+        "DATA-01",
+        "HMI-01",
+        "SENSOR-01"
+      ],
+      "stale_records": [
+        "HMI-01",
+        "SENSOR-01"
+      ],
+      "unclassified_data_assets": [
+        "DATA-01"
+      ],
+      "high_criticality_without_logging": [
+        "HMI-01",
+        "SaaS-01",
+        "SENSOR-01"
+      ],
+      "unknown_support_status": [
+        "DATA-01",
+        "SaaS-01",
+        "SENSOR-01"
+      ],
+      "asset_quality_findings_detected": true,
+      "warning": "Synthetic inventory only; discovery coverage, owner truth and OT safety require field validation."
     }
   }
 }

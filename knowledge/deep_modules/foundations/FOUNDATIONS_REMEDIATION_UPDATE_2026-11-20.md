@@ -28,3 +28,11 @@
 - Las dos Skills candidatas describen metodologías; no están activas ni registradas en skillbook. No se promueven sin ledger, dos ejecuciones exitosas, evidencia y revisión independiente.
 - CI HEAD c7555318: 683 pruebas unitarias y cinco jobs aprobados.
 - La madurez de ambos subtemas no cambia: 12 capas in_progress, 0 passed, T0/O0.
+
+
+## FND-01.03 — 2026-11-20
+
+- Desarrollado el tercer subtema en sus doce capas como borrador: ontología, grafo formal, criticidad, arquitectura, estándares, implementación, análisis, threat model, investigación, laboratorio, evaluación, Skill y trazabilidad.
+- Añadidas cinco fuentes al registro (NISTIR 8286A Rev. 1, CISA OT Asset Inventory 2025, ISO/IEC/IEEE 15288:2023, ISO/IEC 27001:2022 Amd 1:2024 y NIST SP 800-128); revisión selectiva de CM-8/PM-5/CM-12/CM-13 en SP 800-53.
+- LAB-FND-13A y evaluación V1 preparados; CI ejecuta el laboratorio sintético, no una inspección real.
+- FND-01.03: 12/12 capas in_progress; 4/4 capacidades in_progress; T0/O0; no aprobado.

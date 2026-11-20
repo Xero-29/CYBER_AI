@@ -183,30 +183,57 @@
       "id": "FND-01.03",
       "name": "Activo, sujeto, objeto, recurso, dato, proceso, servicio, misión y stakeholder.",
       "layers": {
-        "L1": "not_assessed",
-        "L2": "not_assessed",
-        "L3": "not_assessed",
-        "L4": "not_assessed",
-        "L5": "not_assessed",
-        "L6": "not_assessed",
-        "L7": "not_assessed",
-        "L8": "not_assessed",
-        "L9": "not_assessed",
-        "L10": "not_assessed",
-        "L11": "not_assessed",
-        "L12": "not_assessed"
+        "L1": "in_progress",
+        "L2": "in_progress",
+        "L3": "in_progress",
+        "L4": "in_progress",
+        "L5": "in_progress",
+        "L6": "in_progress",
+        "L7": "in_progress",
+        "L8": "in_progress",
+        "L9": "in_progress",
+        "L10": "in_progress",
+        "L11": "in_progress",
+        "L12": "in_progress"
       },
       "capabilities": {
-        "teach": "not_assessed",
-        "explain": "not_assessed",
-        "analyze": "not_assessed",
-        "design": "not_assessed"
+        "teach": "in_progress",
+        "explain": "in_progress",
+        "analyze": "in_progress",
+        "design": "in_progress"
       },
       "theoretical_maturity": "T0",
       "operational_maturity": "O0",
-      "evidence": [],
+      "evidence": [
+        "topics/FND-01-03_ASSET_SUBJECT_OBJECT_RESOURCE_DATA_PROCESS_SERVICE_MISSION_STAKEHOLDER.md",
+        "topics/FND-01-03_COLD_ASSESSMENT_V1.md",
+        "labs/runner.py",
+        "labs/results.json",
+        "../../../research/source_registry.json",
+        "../../skills/candidates/FND-01-03_ASSET_MISSION_INVENTORY.md"
+      ],
       "nonconformities": [],
-      "review": "pending"
+      "review": "pending",
+      "cold_content_status": "all_12_layers_documented_in_draft_pending_audit_and_evaluation",
+      "cold_remediation_2026_11_20": {
+        "status": "draft_development_all_12_layers_in_progress",
+        "completed": [
+          "Asset/resource/subject/object/data/process/service/mission/stakeholder ontology",
+          "Typed graph model and multidimensional criticality",
+          "Inventory schema, lifecycle, discovery and reconciliation process",
+          "Current standards and version-state crosswalk",
+          "Synthetic asset inventory lab and cold assessment instrument",
+          "Candidate skill specification indexed but not active"
+        ],
+        "pending": [
+          "Full-text review of primary sources",
+          "Field validation with authorized asset owners/operators",
+          "Administer cold assessment and preserve responses",
+          "Independent scoring and disciplinary review",
+          "Sector-specific and Colombian legal applicability review"
+        ],
+        "no_maturity_promotion": true
+      }
     },
     {
       "id": "FND-01.04",

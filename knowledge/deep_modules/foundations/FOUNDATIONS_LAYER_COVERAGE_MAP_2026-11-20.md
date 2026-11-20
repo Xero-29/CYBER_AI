@@ -50,3 +50,13 @@
 1. Terminar remediación documental de FND-01.01 y FND-01.02 sin cerrar artificialmente las no conformidades externas.
 2. Desarrollar FND-01.03 y siguientes en el orden del currículo, aplicando desde el inicio las doce capas.
 3. No abrir AI Red Team hasta que Foundations tenga sus 102 subtemas desarrollados en frío o una excepción explícita y justificada.
+
+
+### FND-01.03 — Activo y misión
+
+- L1–L12: contenido de borrador presente en `topics/FND-01-03_ASSET_SUBJECT_OBJECT_RESOURCE_DATA_PROCESS_SERVICE_MISSION_STAKEHOLDER.md`.
+- L9: LAB-FND-13A detecta ownership ausente, registros obsoletos, datos sin clasificar, criticidad alta sin logging y soporte desconocido; ejecutado en CI como simulación sintética.
+- L10: instrumento en frío V1 preparado, no administrado.
+- L11: Skill candidata de inventario orientado a misión indexada, no activa.
+- L12: fuentes, estados de revisión, evidencia y hashes registrados.
+- Todas las capas permanecen in_progress; 0 aprobadas; T0/O0.

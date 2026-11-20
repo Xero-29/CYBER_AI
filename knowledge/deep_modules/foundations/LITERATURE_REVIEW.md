@@ -75,3 +75,13 @@ IDs añadidos al registro y utilizados en la ampliación FND-01.01/FND-01.02:
 - `IEC-62443-2-1-2024` y `IEC-62443-3-3-2013` — programa y requisitos técnicos de ciberseguridad IACS.
 
 El estado de revisión de cada fuente está registrado individualmente. Los metadatos o abstracts no se contabilizan como lectura integral. Las normas ISO/IEC de pago no se han copiado ni ingerido.
+
+
+## Addendum FND-01.03 — Inventario y ontología de activos (2026-11-20)
+
+- `NISTIR-8286A-r1` — versión vigente 2025; sustituye la edición 2021 retirada.
+- `CISA-OT-ASSET-INVENTORY-2025` — guía conjunta OT, alcance y campos prioritarios revisados.
+- `ISO-IEC-IEEE-15288-2023` — procesos del ciclo de vida de sistemas y stakeholders; metadatos/abstract.
+- `ISO-IEC-27001-2022` — ISMS, edición 2022 y Amd 1:2024; metadatos/abstract.
+- `NIST-SP-800-128` — gestión de configuración centrada en seguridad; metadatos/abstract.
+- `NIST-SP-800-53r5` — revisión selectiva de CM-8, PM-5, CM-12 y CM-13; aplicar Release 5.2.0.

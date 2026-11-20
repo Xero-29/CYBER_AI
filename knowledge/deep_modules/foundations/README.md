@@ -193,3 +193,8 @@ Dos especificaciones se indexan desde knowledge/skills/candidates. No están act
 
 ### Madurez
 Solo dos de 102 subtemas tienen esta ampliación documental. L1–L12 continúan in_progress; 0 capas/capacidades aprobadas; T0/O0. La matriz de doce capas y el log de remediación identifican lo que sigue pendiente.
+
+
+### FND-01.03 — Ontología e inventario de activos
+
+Se añadió el tercer subtema del orden curricular: ontología activo/recurso/sujeto/objeto/dato/proceso/servicio/misión/stakeholder, grafo de dependencias, esquema de inventario, fuentes NIST/CISA/ISO, evaluación en frío V1 y laboratorio sintético LAB-FND-13A. Sigue en progreso y T0/O0.

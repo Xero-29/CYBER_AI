@@ -200,6 +200,29 @@
       "review_note": "Cite specific advisories/publications with dates; portal alone is not claim-level evidence."
     },
     {
+      "id": "CISA-OT-ASSET-INVENTORY-2025",
+      "title": "Foundations for OT Cybersecurity: Asset Inventory Guidance for Owners and Operators",
+      "publisher": "CISA, EPA, NSA, FBI, ASD ACSC, Canadian Centre for Cyber Security, BSI, NCSC-NL and NCSC-NZ",
+      "type": "joint_ot_asset_inventory_guidance",
+      "url": "https://www.cisa.gov/sites/default/files/2025-08/joint-guide-foundations-for-OT-cybersecurity-asset-inventory-guidance_508c.pdf",
+      "version": "2025-08-13 TLP:CLEAR",
+      "published": "2025-08-13",
+      "verification_status": "selected_sections_reviewed",
+      "domains": [
+        "foundations",
+        "ot_ics",
+        "asset_management"
+      ],
+      "review_date": "2026-11-20",
+      "sections_reviewed": [
+        "Executive summary and scope",
+        "Five-step process: define scope, identify assets/attributes, taxonomy, manage data, lifecycle",
+        "Appendix A high-priority asset inventory fields",
+        "Post-inventory risk management and lifecycle guidance"
+      ],
+      "review_note": "Selected sections of the official public guide reviewed. The guide explicitly supplements rather than comprehensively enumerates all possible OT assets; its example sector taxonomies are conceptual. It does not replace safety engineering."
+    },
+    {
       "id": "CISA-SECURE-BY-DEMAND-OT",
       "title": "Secure by Demand: Priority Considerations for OT Owners and Operators",
       "publisher": "CISA and international partners",
@@ -622,6 +645,39 @@
       "review_date": "2026-11-20",
       "publication_status": "under_approval_stage_50_00_not_published",
       "review_note": "Official catalog states final draft under approval and intended to replace ISO 22316:2017. Forecast publication is not a guarantee; use only as draft status metadata."
+    },
+    {
+      "id": "ISO-IEC-27001-2022",
+      "title": "Information security, cybersecurity and privacy protection — Information security management systems — Requirements",
+      "publisher": "ISO/IEC",
+      "type": "international_information_security_management_standard_metadata",
+      "url": "https://www.iso.org/standard/27001",
+      "version": "ISO/IEC 27001:2022 Edition 3 + Amd 1:2024",
+      "published": "2022-10; amendment 2024",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "domains": [
+        "foundations",
+        "governance"
+      ],
+      "review_date": "2026-11-20",
+      "review_note": "Official ISO catalog states published Edition 3 (2022) with Amendment 1:2024. Abstract and scope reviewed; full copyrighted text not accessed. Do not infer certification or clause-level conformity from metadata."
+    },
+    {
+      "id": "ISO-IEC-IEEE-15288-2023",
+      "title": "Systems and software engineering — System life cycle processes",
+      "publisher": "ISO/IEC/IEEE",
+      "type": "international_systems_engineering_standard_metadata",
+      "url": "https://www.iso.org/standard/81702.html",
+      "version": "ISO/IEC/IEEE 15288:2023 Edition 2",
+      "published": "2023-05",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "domains": [
+        "foundations",
+        "secure_arch",
+        "governance"
+      ],
+      "review_date": "2026-11-20",
+      "review_note": "Official catalog abstract reviewed: common framework of life-cycle process descriptions, stakeholders, acquisition/supply, conception through retirement; it does not prescribe a single model or method. Full copyrighted text not accessed."
     },
     {
       "id": "ISO-SAE-21434-2021",
@@ -1374,6 +1430,23 @@
       "review_note": "Metadatos y resumen oficial revisados; requiere lectura del documento completo para afirmaciones detalladas."
     },
     {
+      "id": "NIST-SP-800-128",
+      "title": "Guide for Security-Focused Configuration Management of Information Systems",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "special_publication",
+      "url": "https://doi.org/10.6028/NIST.SP.800-128",
+      "version": "NIST SP 800-128",
+      "published": "2011-08",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "domains": [
+        "foundations",
+        "devsecops",
+        "asset_management"
+      ],
+      "review_date": "2026-11-20",
+      "review_note": "Official NIST publication metadata and scope registered for configuration management and baseline control; full-text section review pending."
+    },
+    {
       "id": "NIST-SP-800-160v1r1",
       "title": "Engineering Trustworthy Secure Systems",
       "publisher": "National Institute of Standards and Technology",
@@ -1565,7 +1638,7 @@
       "url": "https://doi.org/10.6028/NIST.SP.800-53r5",
       "version": "Revision 5",
       "published": "2020-09-23",
-      "verification_status": "official_metadata_and_abstract_reviewed",
+      "verification_status": "selected_sections_reviewed",
       "verified_scope": "Catálogo adaptable de controles de seguridad y privacidad; la selección de controles no demuestra implementación ni eficacia.",
       "domains": [
         "foundations",
@@ -1574,7 +1647,14 @@
         "identity",
         "data_security"
       ],
-      "review_note": "Página oficial NIST y abstract inspeccionados el 2026-11-19. Revisar erratas, SP 800-53A/53B y versión vigente antes de uso normativo."
+      "review_note": "Selected control text reviewed from official NIST SP 800-53 Rev. 5 PDF. Apply Release 5.2.0 (2025-08-27) for current control catalog; this is not full-catalog review.",
+      "review_date": "2026-11-20",
+      "sections_reviewed": [
+        "CM-8 System Component Inventory",
+        "PM-5 System Inventory",
+        "CM-12 Information Location",
+        "CM-13 Data Action Mapping"
+      ]
     },
     {
       "id": "NIST-SP-800-53r5-2.0",
@@ -2431,6 +2511,22 @@
       ],
       "verification_status": "official_final_reference_registered",
       "review_note": "Manufacturer/third-party supporting capabilities, not only device-side controls."
+    },
+    {
+      "id": "NISTIR-8286A-r1",
+      "title": "Identifying and Estimating Cybersecurity Risk for Enterprise Risk Management",
+      "publisher": "National Institute of Standards and Technology",
+      "type": "interagency_report",
+      "url": "https://csrc.nist.gov/pubs/ir/8286/a/r1/final",
+      "version": "NIST IR 8286A Rev. 1",
+      "published": "2025-12",
+      "verification_status": "official_metadata_and_abstract_reviewed",
+      "domains": [
+        "foundations",
+        "governance"
+      ],
+      "review_date": "2026-11-20",
+      "review_note": "Rev. 1 published 2025-12 and supersedes/withdraws the 2021 IR 8286A on 2025-12-18. Abstract and risk-register scope reviewed. Use Rev. 1; do not cite the withdrawn 2021 edition as current."
     },
     {
       "id": "NSA-CISA-K8S-HARDENING",

@@ -185,3 +185,11 @@ Norma y secuencia completas: [THEORETICAL_LIBRARY_COMPLETION_PROGRAM_48.md](THEO
 - Skill candidata de evaluación CIA indexada, no activa.
 
 **Estado común:** L1–L12 siguen in_progress; cero capas/capacidades aprobadas; T0/O0; evaluación no administrada; revisión independiente pendiente. Ver FOUNDATIONS_LAYER_COVERAGE_MAP_2026-11-20.md y FOUNDATIONS_REMEDIATION_UPDATE_2026-11-20.md.
+
+
+### FND-01.03 — Activo, sujeto, objeto, recurso, dato, proceso, servicio, misión y stakeholder
+- Doce capas desarrolladas en borrador; 12/12 in_progress, 0 aprobadas.
+- Cuatro capacidades teach/explain/analyze/design en progreso.
+- LAB-FND-13A detecta gaps de ownership, frescura, clasificación, logging y soporte en inventario sintético.
+- Instrumento en frío V1 preparado, no administrado; Skill candidata indexada, no activa.
+- Fuentes añadidas: NISTIR 8286A Rev.1, CISA OT Asset Inventory 2025, ISO/IEC/IEEE 15288:2023, ISO/IEC 27001:2022 Amd 1:2024, NIST SP 800-128.

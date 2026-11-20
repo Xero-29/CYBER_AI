@@ -132,3 +132,12 @@ Autorización escrita para toda evaluación activa; alcance, exclusiones, límit
 ## Actualización de fuentes y alcance — 2026-11-20
 
 FND-01.01 y FND-01.02 incorporan un crosswalk de safety/security/privacy/reliability/resilience y un modelo CIA extendido. La revisión dirigida añade FIPS 199, NASA/SP-2014-612, IEC 61508, IEC 62443, IEC TR 63069, ISO 22316 e ISO 26262. Ver estados, fechas y límites de acceso en `knowledge/research/source_registry.json`. No promover madurez por metadatos o abstracts; la lectura integral y la revisión independiente siguen pendientes.
+
+
+## FND-01.03 — Activo, sujeto, objeto, recurso, dato, proceso, servicio, misión y stakeholder
+
+**Pregunta central:** ¿qué ontología y combinación de fuentes permiten mantener un inventario completo, actual, atribuible y conectado a misión en entornos IT/OT/cloud?
+
+**Líneas:** (1) resolución de identidad de activos efímeros; (2) grafo de dependencias y propagación de impacto; (3) calidad de inventario y cobertura con denominador incierto; (4) reconciliación multi-fuente y procedencia; (5) inventario de datos y riesgos de privacidad; (6) descubrimiento OT seguro y métodos pasivos.
+
+**Fuentes iniciales:** NIST CSF 2.0 ID.AM; SP 800-53 Rev. 5 Release 5.2.0; SP 800-37 Rev. 2; NISTIR 8286A Rev. 1; CISA OT Asset Inventory Guidance 2025; ISO/IEC/IEEE 15288:2023; ISO/IEC 27001:2022 Amd 1:2024. No tratar taxonomías CISA como inventario exhaustivo ni estándares ISO como legislación colombiana automática.

@@ -334,13 +334,45 @@ def lab12_integrity_vs_truth():
         "warning": "Cryptographic integrity does not establish truth, calibration or physical correctness.",
     }
 
+
+
+def lab13_asset_mission_inventory():
+    """Synthetic asset graph checks ownership, freshness, classification and dependencies."""
+    assets = [
+        {"id":"PLC-01","type":"controller","criticality":"high","owner":"OT-Operations","last_seen":"2026-11-19","logging":True,"support_status":"supported","dependencies":["HMI-01","NET-OT-01"]},
+        {"id":"HMI-01","type":"workstation","criticality":"high","owner":"","last_seen":"2026-01-01","logging":False,"support_status":"unsupported","dependencies":["PLC-01","IDP-01"]},
+        {"id":"HIST-01","type":"historian","criticality":"medium","owner":"DataOps","last_seen":"2026-11-10","logging":True,"support_status":"supported","dependencies":["PLC-01"]},
+        {"id":"VPN-01","type":"remote_access","criticality":"high","owner":"IT-Sec","last_seen":"2026-11-18","logging":True,"support_status":"supported","dependencies":["IDP-01","FIREWALL-01"]},
+        {"id":"IDP-01","type":"identity_provider","criticality":"high","owner":"IAM","last_seen":"2026-11-19","logging":True,"support_status":"supported","dependencies":[]},
+        {"id":"SaaS-01","type":"third_party_service","criticality":"high","owner":"Procurement","last_seen":"2026-11-19","logging":False,"support_status":"unknown","dependencies":["IDP-01"]},
+        {"id":"SENSOR-01","type":"sensor","criticality":"high","owner":"","last_seen":"2026-10-01","logging":False,"support_status":"unknown","dependencies":["PLC-01"]},
+        {"id":"DATA-01","type":"data_asset","criticality":"high","owner":"","last_seen":"2026-11-19","logging":True,"support_status":"unknown","data_classification":"","purpose":"","dependencies":["HIST-01"]},
+        {"id":"BACKUP-01","type":"backup","criticality":"high","owner":"BackupOps","last_seen":"2026-11-18","logging":True,"support_status":"supported","dependencies":["IDP-01"]},
+        {"id":"NET-OT-01","type":"network","criticality":"high","owner":"NetworkOps","last_seen":"2026-11-19","logging":True,"support_status":"supported","dependencies":[]},
+        {"id":"FIREWALL-01","type":"firewall","criticality":"high","owner":"NetSec","last_seen":"2026-11-19","logging":True,"support_status":"supported","dependencies":["NET-OT-01"]},
+    ]
+    from datetime import date
+    cutoff = date(2026, 10, 21)
+    missing_owner = sorted(a["id"] for a in assets if not a.get("owner"))
+    stale = sorted(a["id"] for a in assets if date.fromisoformat(a["last_seen"]) < cutoff)
+    unclassified_data = sorted(a["id"] for a in assets if a["type"] == "data_asset" and not a.get("data_classification"))
+    high_without_logging = sorted(a["id"] for a in assets if a["criticality"] == "high" and not a.get("logging"))
+    unknown_support = sorted(a["id"] for a in assets if a.get("support_status") == "unknown")
+    return {
+        "asset_count": len(assets), "missing_owner": missing_owner, "stale_records": stale,
+        "unclassified_data_assets": unclassified_data, "high_criticality_without_logging": high_without_logging,
+        "unknown_support_status": unknown_support,
+        "asset_quality_findings_detected": bool(missing_owner and stale and unclassified_data and high_without_logging and unknown_support),
+        "warning": "Synthetic inventory only; discovery coverage, owner truth and OT safety require field validation.",
+    }
+
 def run_all():
     labs={"LAB-FND-01A":lab01_authorization(),"LAB-FND-02A":lab02_asset_reconciliation(),
       "LAB-FND-03A":lab03_threat_model(),"LAB-FND-04A":lab04_identity(),
       "LAB-FND-05A":lab05_crypto_integrity(),"LAB-FND-06A":lab06_event_reconstruction(),
       "LAB-FND-07A":lab07_assurance(),"LAB-FND-08A":lab08_safety_security_tradeoff(),
       "LAB-FND-09A":lab09_privacy_confidentiality_gap(),"LAB-FND-10A":lab10_resilience_recovery_trust(),
-      "LAB-FND-11A":lab11_common_cause_redundancy(),"LAB-FND-12A":lab12_integrity_vs_truth()}
+      "LAB-FND-11A":lab11_common_cause_redundancy(),"LAB-FND-12A":lab12_integrity_vs_truth(),"LAB-FND-13A":lab13_asset_mission_inventory()}
     checks={"authz_revocation":labs["LAB-FND-01A"]["revoked_access_denied"],
       "asset_stable_id_beats_hostname":labs["LAB-FND-02A"]["stable_resource_id"]["f1"]>=labs["LAB-FND-02A"]["hostname_baseline"]["f1"],
       "threat_paths_represented":labs["LAB-FND-03A"]["paths_found"]==labs["LAB-FND-03A"]["required_paths"],
@@ -355,7 +387,8 @@ def run_all():
       "privacy_not_confidentiality":labs["LAB-FND-09A"]["confidentiality_protected"] and labs["LAB-FND-09A"]["privacy_risk_detected"],
       "recovery_requires_trust_rebuild":not labs["LAB-FND-10A"]["trust_restored_before_controls"] and labs["LAB-FND-10A"]["trust_restored_after_controls"],
       "common_cause_redundancy_detected":labs["LAB-FND-11A"]["common_cause_detected"],
-      "integrity_not_truth":labs["LAB-FND-12A"]["integrity_and_authenticity"] and not labs["LAB-FND-12A"]["semantic_validity_before_review"]}
+      "integrity_not_truth":labs["LAB-FND-12A"]["integrity_and_authenticity"] and not labs["LAB-FND-12A"]["semantic_validity_before_review"],
+      "asset_inventory_quality_findings_detected":labs["LAB-FND-13A"]["asset_quality_findings_detected"]}
     return {"schema_version":"1.0.0","seed":20261119,"synthetic_only":True,
             "checks":checks,"all_checks_passed":all(checks.values()),"labs":labs}
 

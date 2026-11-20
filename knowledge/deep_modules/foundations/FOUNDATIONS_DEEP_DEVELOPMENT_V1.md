@@ -837,3 +837,8 @@ Puntuar cada criterio 0–2: 0 ausente/incorrecto; 1 parcial o no reproducible; 
 - **Límite:** la validez física exige calibración, metrología y evidencia del proceso de medición.
 
 Los cinco laboratorios se ejecutan como modelos deterministas en CI. Los resultados sintéticos no acreditan O1 de un sistema real, ni sustituyen ensayos físicos, evaluación de safety o revisión independiente.
+
+
+## FND-01.03 — Ontología e inventario orientado a misión
+
+El desarrollo del tercer subtema está en `topics/FND-01-03_ASSET_SUBJECT_OBJECT_RESOURCE_DATA_PROCESS_SERVICE_MISSION_STAKEHOLDER.md`. Incluye ontología tipada, grafo de dependencias, criticidad multidimensional, inventario y ciclo de vida, marcos NIST/CISA/ISO, threat model, investigación y evaluación. LAB-FND-13A es sintético; no valida descubrimiento real ni safety OT.
