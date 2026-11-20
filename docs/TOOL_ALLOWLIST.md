@@ -1,6 +1,6 @@
 # Allowlist firmada de ejecutables
 
-Los adaptadores locales pueden exigir que el SHA-256 del ejecutable coincida con una política HMAC-SHA256 antes de iniciar el proceso. La verificación ocurre después de resolver el binario y antes de ejecutar la herramienta.
+Los adaptadores locales exigen por defecto que el SHA-256 del ejecutable coincida con una política HMAC-SHA256 antes de iniciar el proceso. La verificación ocurre después de resolver el binario y antes de ejecutar la herramienta. Sin política válida, la ejecución se bloquea.
 
 ## Configuración
 
@@ -8,9 +8,9 @@ Define estas variables en el entorno del proceso:
 
 - `CYBER_AI_TOOL_ALLOWLIST_PATH`: ruta al manifiesto firmado.
 - `CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY`: clave HMAC de al menos 32 bytes.
-- `CYBER_AI_TOOL_ALLOWLIST_REQUIRED=1`: bloquea la ejecución si falta cualquiera de los dos valores o si la firma/hash no coincide.
+- `CYBER_AI_TOOL_ALLOWLIST_REQUIRED`: está activado por defecto. Solo define `0` para un entorno de desarrollo/pruebas que acepte explícitamente el modo de compatibilidad.
 
-Si solo se configura una de las dos primeras variables, la ejecución se deniega. Si no se configura ninguna y el modo obligatorio no está activo, el sistema permanece en modo de compatibilidad y la evidencia marca `not_configured`; ese modo no equivale a una allowlist aprobada.
+Si solo se configura una de las dos primeras variables, la ejecución se deniega. Si no se configura ninguna, el comportamiento predeterminado es fail-closed. El opt-out explícito `CYBER_AI_TOOL_ALLOWLIST_REQUIRED=0` permite compatibilidad y la evidencia marca `not_configured`; nunca equivale a una allowlist aprobada.
 
 El manifiesto contiene el identificador de cada herramienta y el SHA-256 exacto del binario enrolado. Ejemplo de estructura sin firmar:
 
@@ -40,9 +40,10 @@ Path("tools.signed.json").write_text(
     json.dumps(document, sort_keys=True, separators=(",", ":")) + "\n",
     encoding="utf-8",
 )
+os.chmod("tools.signed.json", 0o600)
 ```
 
-Protege la clave y el manifiesto por separado. No guardes la clave en Git, no la imprimas y no la incluyas en reportes. El archivo se limita a 64 KiB; se rechazan symlinks, archivos no regulares, claves JSON duplicadas, campos inválidos, firmas no válidas y hashes no aprobados.
+Protege la clave y el manifiesto por separado. No guardes la clave en Git, no la imprimas y no la incluyas en reportes. El archivo se limita a 64 KiB; en POSIX debe pertenecer al usuario efectivo, tener permisos privados (0600), no tener hardlinks y residir bajo directorios padre confiables. Se rechazan symlinks, puntos de reanálisis, archivos no regulares, claves JSON duplicadas, campos inválidos, firmas no válidas y hashes no aprobados.
 
 ## Integración y verificación
 

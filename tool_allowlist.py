@@ -50,17 +50,50 @@ def sign_tool_allowlist(tools, key):
 def load_signed_tool_allowlist(path, key):
     if not isinstance(key, bytes) or len(key) < 32:
         raise ToolAllowlistError("La clave HMAC debe tener al menos 32 bytes.")
-    candidate = Path(path)
+    candidate = Path(os.path.abspath(os.fspath(path)))
     reparse_flag = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
     descriptor = None
     try:
+        for parent in reversed(candidate.parents):
+            parent_info = parent.lstat()
+            if (
+                stat.S_ISLNK(parent_info.st_mode)
+                or getattr(parent_info, "st_file_attributes", 0) & reparse_flag
+                or not stat.S_ISDIR(parent_info.st_mode)
+            ):
+                raise ToolAllowlistError(
+                    "La ruta de la allowlist contiene un padre enlazado o no-directorio."
+                )
+            if os.name != "nt":
+                parent_mode = stat.S_IMODE(parent_info.st_mode)
+                parent_is_trusted = parent_info.st_uid in {0, os.geteuid()}
+                parent_is_root_sticky = (
+                    parent_info.st_uid == 0
+                    and bool(parent_info.st_mode & stat.S_ISVTX)
+                )
+                if (
+                    not parent_is_trusted
+                    or (parent_mode & 0o022 and not parent_is_root_sticky)
+                ):
+                    raise ToolAllowlistError(
+                        "Los directorios padre de la allowlist no tienen permisos seguros."
+                    )
+
         path_info = candidate.lstat()
         if (
             stat.S_ISLNK(path_info.st_mode)
             or getattr(path_info, "st_file_attributes", 0) & reparse_flag
         ):
             raise ToolAllowlistError("La allowlist no puede ser un enlace o punto de reanálisis.")
-        flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+        if os.name != "nt" and (
+            path_info.st_uid != os.geteuid()
+            or stat.S_IMODE(path_info.st_mode) & 0o077
+            or path_info.st_nlink != 1
+        ):
+            raise ToolAllowlistError(
+                "La allowlist debe pertenecer al usuario, ser privada (0600) y no tener hardlinks."
+            )
+        flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_CLOEXEC", 0)
         descriptor = os.open(candidate, flags)
         info = os.fstat(descriptor)
         path_after = candidate.lstat()
@@ -70,6 +103,9 @@ def load_signed_tool_allowlist(path, key):
             or stat.S_ISLNK(path_after.st_mode)
             or getattr(path_after, "st_file_attributes", 0) & reparse_flag
             or (info.st_dev, info.st_ino) != (path_after.st_dev, path_after.st_ino)
+            or (info.st_uid, info.st_mode, info.st_nlink) != (
+                path_info.st_uid, path_info.st_mode, path_info.st_nlink
+            )
         ):
             raise ToolAllowlistError(
                 "La allowlist debe ser un archivo regular estable de hasta 64 KiB."
@@ -84,6 +120,17 @@ def load_signed_tool_allowlist(path, key):
             if total > 65536:
                 raise ToolAllowlistError("La allowlist supera el límite de 64 KiB.")
             chunks.append(chunk)
+        after = os.fstat(descriptor)
+        path_final = candidate.lstat()
+        if (
+            (after.st_dev, after.st_ino) != (info.st_dev, info.st_ino)
+            or (path_final.st_dev, path_final.st_ino) != (info.st_dev, info.st_ino)
+            or after.st_size != info.st_size
+            or after.st_mtime_ns != info.st_mtime_ns
+            or getattr(after, "st_ctime_ns", 0) != getattr(info, "st_ctime_ns", 0)
+            or total != after.st_size
+        ):
+            raise ToolAllowlistError("La allowlist cambió mientras se leía.")
         document = json.loads(b"".join(chunks).decode("utf-8"), object_pairs_hook=_unique_object)
     except ToolAllowlistError:
         raise
@@ -113,7 +160,11 @@ def verify_tool_allowed(tool_id, binary_sha256):
         raise ToolAllowlistError("SHA-256 de ejecutable inválido.")
     path = os.environ.get("CYBER_AI_TOOL_ALLOWLIST_PATH")
     key_text = os.environ.get("CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY")
-    required = os.environ.get("CYBER_AI_TOOL_ALLOWLIST_REQUIRED", "").strip().lower() in {"1", "true", "yes"}
+    required_value = os.environ.get("CYBER_AI_TOOL_ALLOWLIST_REQUIRED")
+    required = (
+        required_value is None
+        or required_value.strip().lower() not in {"0", "false", "no", "off"}
+    )
     if not path and not key_text:
         if required:
             raise ToolAllowlistError("La política exige allowlist, pero no está configurada.")

@@ -1,4 +1,5 @@
 import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -19,12 +20,21 @@ class PreflightToolAllowlistTests(unittest.TestCase):
     def tool_allowlist_check(self, report):
         return next(item for item in report["checks"] if item["name"] == "tool_allowlist")
 
-    def test_missing_optional_allowlist_is_reported_as_warning(self):
+    def test_missing_allowlist_blocks_preflight_by_default(self):
         with tempfile.TemporaryDirectory() as temp:
             report = self.collect(Path(temp), {})
         check = self.tool_allowlist_check(report)
+        self.assertEqual(check["status"], "error")
+        self.assertEqual(report["status"], "blocked")
+
+    def test_explicit_compatibility_mode_is_reported_as_warning(self):
+        with tempfile.TemporaryDirectory() as temp:
+            report = self.collect(
+                Path(temp), {"CYBER_AI_TOOL_ALLOWLIST_REQUIRED": "0"}
+            )
+        check = self.tool_allowlist_check(report)
         self.assertEqual(check["status"], "warning")
-        self.assertIn("compatibilidad", check["detail"])
+        self.assertIn("opt-out explícito", check["detail"])
 
     def test_missing_required_allowlist_blocks_preflight(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -44,6 +54,8 @@ class PreflightToolAllowlistTests(unittest.TestCase):
             )
             path = root / "tools.json"
             path.write_text(json.dumps(manifest), encoding="utf-8")
+            if os.name != "nt":
+                path.chmod(0o600)
             report = self.collect(root, {
                 "CYBER_AI_TOOL_ALLOWLIST_REQUIRED": "true",
                 "CYBER_AI_TOOL_ALLOWLIST_PATH": str(path),

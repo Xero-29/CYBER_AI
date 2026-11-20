@@ -21,6 +21,8 @@ class ToolAllowlistTests(unittest.TestCase):
         self.path = Path(self.temp.name) / "tools.json"
         self.document = sign_tool_allowlist({"ruff": {"sha256": self.digest}}, self.key)
         self.path.write_text(json.dumps(self.document), encoding="utf-8")
+        if os.name != "nt":
+            self.path.chmod(0o600)
 
     def tearDown(self):
         self.temp.cleanup()
@@ -89,6 +91,8 @@ class ToolAllowlistTests(unittest.TestCase):
             descriptor = real_open(path, flags)
             self.path.unlink()
             self.path.write_text(json.dumps(self.document), encoding="utf-8")
+            if os.name != "nt":
+                self.path.chmod(0o600)
             return descriptor
 
         with patch("tool_allowlist.os.open", side_effect=replace_after_open):
@@ -103,6 +107,31 @@ class ToolAllowlistTests(unittest.TestCase):
         }, clear=False):
             with self.assertRaises(ToolAllowlistError):
                 verify_tool_allowed("ruff", self.digest)
+
+    def test_missing_policy_fails_closed_by_default(self):
+        with patch.dict(os.environ, {
+            "CYBER_AI_TOOL_ALLOWLIST_REQUIRED": "",
+            "CYBER_AI_TOOL_ALLOWLIST_PATH": "",
+            "CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY": "",
+        }, clear=False):
+            with self.assertRaises(ToolAllowlistError):
+                verify_tool_allowed("ruff", self.digest)
+
+    def test_explicit_compatibility_override_is_not_reported_as_approved(self):
+        with patch.dict(os.environ, {
+            "CYBER_AI_TOOL_ALLOWLIST_REQUIRED": "0",
+            "CYBER_AI_TOOL_ALLOWLIST_PATH": "",
+            "CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY": "",
+        }, clear=False):
+            result = verify_tool_allowed("ruff", self.digest)
+        self.assertEqual(result, {"enforced": False, "status": "not_configured"})
+
+    def test_group_readable_manifest_is_rejected(self):
+        if os.name != "posix":
+            self.skipTest("Los permisos POSIX no representan ACL de Windows.")
+        self.path.chmod(0o640)
+        with self.assertRaises(ToolAllowlistError):
+            load_signed_tool_allowlist(self.path, self.key)
 
     def test_matching_tool_is_approved(self):
         with patch.dict(os.environ, {

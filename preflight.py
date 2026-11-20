@@ -408,16 +408,19 @@ def collect_checks(root=PROJECT, python_version=None, module_lookup=None,
 
     allowlist_path = str(environ.get("CYBER_AI_TOOL_ALLOWLIST_PATH", "")).strip()
     allowlist_key = environ.get("CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY", "")
-    allowlist_required = str(
-        environ.get("CYBER_AI_TOOL_ALLOWLIST_REQUIRED", "")
-    ).strip().lower() in {"1", "true", "yes"}
+    allowlist_required_value = environ.get("CYBER_AI_TOOL_ALLOWLIST_REQUIRED")
+    allowlist_required = (
+        allowlist_required_value is None
+        or str(allowlist_required_value).strip().lower()
+        not in {"0", "false", "no", "off"}
+    )
     if not allowlist_path and not allowlist_key:
         add(
             "tool_allowlist",
             "error" if allowlist_required else "warning",
             "La ejecución exige una allowlist firmada, pero no está configurada."
             if allowlist_required else
-            "Sin allowlist firmada; los adaptadores conservan el modo de compatibilidad.",
+            "Sin allowlist firmada; solo se permite compatibilidad por opt-out explícito.",
         )
     elif not allowlist_path or not allowlist_key:
         add(
