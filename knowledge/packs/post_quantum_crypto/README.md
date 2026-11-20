@@ -46,3 +46,6 @@ NIST FIPS 203, FIPS 204, FIPS 205, NIST IR 8547, RFC PQC relevantes y NIST SP 80
 
 ## Instrucciones para agentes IA
 Verifica estado normativo y soporte de librería antes de recomendar despliegue. Distingue borrador, estándar final y experimento. No inventes compatibilidad.
+
+## Arquitectura
+La transición poscuántica requiere inventario criptográfico de protocolos, certificados, bibliotecas, firmware, appliances, formatos y proveedores; clasificar uso (intercambio de claves, firma, cifrado almacenado) y vida útil de datos. Diseñar cripto-agilidad con negociación, interoperabilidad, tamaños de claves/firmas, rendimiento y compatibilidad. Evaluar esquemas híbridos durante transición, gestión de certificados y actualización de endpoints. Mantener separación entre algoritmos estandarizados, borradores y propuestas experimentales; no desplegar algoritmos no estandarizados como sustitución improvisada.
