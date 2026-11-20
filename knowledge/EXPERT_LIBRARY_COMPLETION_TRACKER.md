@@ -7,12 +7,12 @@
 **Estado global:** M2 editorial; auditoría estructural aplicada, pero cobertura por capa todavía no demostrada. Investigación documental, experimentación y validación independiente pendientes.
 
 ## Alcance aplicado
-Los seis módulos P0 (identity, malware, forensics, incident_response, threat_intel y reverse) fueron reescritos para sustituir bloques genéricos por mecanismos, casos límite, pruebas negativas, métricas y laboratorios específicos. Cada uno dispone ahora de agenda experimental y revisión exploratoria de literatura. Esto es avance editorial M2, no validación disciplinar. Las otras 41 áreas, aparte de Foundations, conservan el estado editorial previo y requieren ampliación disciplinar tema por tema. Foundations ya recibió auditoría documental individual de sus siete temas contra doce capas por tema (84/84 en progreso, ninguna aprobada). La corrección se registra en `knowledge/deep_modules/foundations/FOUNDATIONS_DEEP_DEVELOPMENT_V1.md`, la agenda se alinea a esos siete IDs y las matrices Markdown/JSON registran los estados. Falta ampliar lectura integral de fuentes, ejecutar laboratorios con implementaciones reales aisladas, réplica independiente y revisión externa.
+Los seis módulos P0 (identity, malware, forensics, incident_response, threat_intel y reverse) fueron reescritos para sustituir bloques genéricos por mecanismos, casos límite, pruebas negativas, métricas y laboratorios específicos. Cada uno dispone ahora de agenda experimental y revisión exploratoria de literatura. Esto es avance editorial M2, no validación disciplinar. Las otras 41 áreas, aparte de Foundations, conservan el estado editorial previo y requieren ampliación disciplinar tema por tema. Foundations ya recibió auditoría documental de siete temas base contra doce capas (84/84 en progreso, ninguna aprobada). La matriz granular V2 amplía a 102 subtemas × 12 capas = 1.224 checks: solo 24 están en progreso (FND-01.01 y FND-01.02), 1.200 no evaluados; 8/408 capacidades en progreso, 400 no evaluadas; los 102 subtemas siguen T0/O0. La corrección se registra en `knowledge/deep_modules/foundations/FOUNDATIONS_DEEP_DEVELOPMENT_V1.md`, la agenda se alinea a esos siete IDs y las matrices Markdown/JSON registran los estados. Falta ampliar lectura integral de fuentes, ejecutar laboratorios con implementaciones reales aisladas, réplica independiente y revisión externa.
 
 ## Matriz de áreas
 | ID | Área | Compendio | Agenda específica | Fuentes integrales | Laboratorio ejecutado | Revisión independiente |
 |---|---|---|---|---|---|---|
-| `foundations` | Fundamentos | Siete temas auditados documentalmente contra 12 capas; 84/84 en progreso; M2 | Agenda alineada a los siete temas; siete protocolos específicos | Secciones primarias pertinentes revisadas y trazadas; lectura lineal completa pendiente | 7 labs sintéticos ejecutados localmente; 8 tests pasan; réplica y revisión independiente pendientes | Pendiente |
+| `foundations` | Fundamentos | Siete temas coarse auditados; 84/84 en progreso. Matriz V2: 102 subtemas, 24/1.224 capas en progreso, 1.200 no evaluadas; M2 | Agenda alineada a los siete temas; siete protocolos específicos | Secciones primarias pertinentes revisadas y trazadas; lectura lineal completa pendiente | 7 labs sintéticos ejecutados localmente; 8 tests pasan; réplica y revisión independiente pendientes | Pendiente |
 | `appsec` | Seguridad de aplicaciones | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
 | `api` | Seguridad de API | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
 | `network` | Seguridad de redes | Ampliado, borrador | Definida en matriz común | Pendiente | Pendiente | Pendiente |
@@ -100,7 +100,7 @@ Se inspeccionaron los 48 compendios técnicos y se creó una línea base legible
 - `knowledge/research/DOMAIN_LAYER_AUDIT_48.md`
 - `knowledge/research/DOMAIN_LAYER_AUDIT_48.json`
 
-La matriz contiene 48 especialidades, 7 unidades temáticas iniciales por especialidad, 12 capas por tema (4.032 estados) y ocho puertas G1–G8 por especialidad. Los estados restantes se mantienen `not_assessed` cuando no hay comprobación trazable; Foundations es la excepción actual, con sus 84 celdas `in_progress` por desarrollo documental mapeado, sin aprobación.
+La matriz contiene 48 especialidades, 7 unidades temáticas iniciales por especialidad, 12 capas por tema (4.032 estados) y ocho puertas G1–G8 por especialidad. Los estados restantes se mantienen `not_assessed` cuando no hay comprobación trazable; Foundations es la excepción coarse actual, con 84 celdas `in_progress` en siete temas base, sin aprobación. La matriz granular V2 registra solo 24/1.224 capas en progreso para dos subtemas; 1.200 están `not_assessed`.
 
 ### Hallazgo de la inspección
 - Seis módulos (identity, malware, forensics, incident_response, threat_intel y reverse) tienen reescritura disciplinar inicial. Foundations tiene siete dossiers tema×capa documentados; los seis módulos P0 y Foundations aún requieren evidencia de lectura, experimentación y revisión independiente.
@@ -129,9 +129,9 @@ La matriz contiene 48 especialidades, 7 unidades temáticas iniciales por especi
 ## Cierre de auditoría documental de Foundations — 2026-11-19
 
 - Siete temas identificados por sus IDs `foundations-01` a `foundations-07`.
-- Doce capas desarrolladas explícitamente por tema en `FOUNDATIONS_DEEP_DEVELOPMENT_V1.md`.
+- Doce capas desarrolladas documentalmente para los siete temas base en `FOUNDATIONS_DEEP_DEVELOPMENT_V1.md`; no equivale a completar los 102 subtemas granulares.
 - Agenda de investigación alineada uno a uno con los siete temas.
-- Matriz JSON: 84/84 celdas `in_progress`; ninguna `passed`.
+- Matriz coarse: 84/84 celdas `in_progress`; ninguna `passed`. Matriz granular V2: 24/1.224 capas `in_progress`, 1.200 `not_assessed`; 8/408 capacidades `in_progress`, 400 `not_assessed`; 0 aprobadas.
 - G1–G7 `in_progress`; G8 `blocked` por revisión independiente pendiente.
 - Se registraron y revisaron por secciones NIST SP 800-160 Vol. 1 Rev. 1, SP 800-30 Rev. 1, SP 800-37 Rev. 2, SP 800-61 Rev. 3, SP 800-88 Rev. 2, CSF 2.0, RFC 9700, FIPS 204/205, ATT&CK v20.1 y OWASP ASVS 5.0.0. Lectura integral de algunas fuentes y revisión de FIPS 203/SP 800-57/800-53 5.2.0 siguen pendientes.
 - Siete laboratorios sintéticos ejecutados localmente; 8 pruebas unitarias pasan. Réplica independiente y pruebas de implementación real pendientes. Las siete Skills siguen candidatas, no validadas.
