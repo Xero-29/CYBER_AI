@@ -193,3 +193,11 @@ Norma y secuencia completas: [THEORETICAL_LIBRARY_COMPLETION_PROGRAM_48.md](THEO
 - LAB-FND-13A detecta gaps de ownership, frescura, clasificación, logging y soporte en inventario sintético.
 - Instrumento en frío V1 preparado, no administrado; Skill candidata indexada, no activa.
 - Fuentes añadidas: NISTIR 8286A Rev.1, CISA OT Asset Inventory 2025, ISO/IEC/IEEE 15288:2023, ISO/IEC 27001:2022 Amd 1:2024, NIST SP 800-128.
+
+
+## Índice y cobertura al 2026-11-20
+
+- 223 fuentes registradas; 16 añadidas en los tres primeros subtemas Foundations. Estados de metadatos, abstract y secciones permanecen diferenciados.
+- Bootstrap: 332 documentos indexables (48 packs, 48 dossiers profundos, 48 estudios, 48 compendios, 48 agendas, 48 revisiones bibliográficas, 41 suplementarios y 3 Skills candidatas).
+- Foundations: tres subtemas con desarrollo en borrador; 36/1.224 capas en progreso, 12/408 capacidades en progreso, 0 aprobadas; T0/O0.
+- Runner: 13 laboratorios sintéticos; LAB-FND-13A cubre inventario de activos orientado a misión. CI no acredita descubrimiento de activos reales ni seguridad OT.

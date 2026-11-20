@@ -179,12 +179,13 @@ No se declaran fuentes verificadas por la mera inclusión de nombres o enlaces. 
 - Instrumentos en frío: FND-01.01 V2 y FND-01.02 V1 preparados, ninguno administrado.
 
 ### Laboratorios sintéticos
-El runner contiene 12 laboratorios sintéticos. LAB-FND-08A a LAB-FND-12A amplían la cobertura:
+El runner contiene 13 laboratorios sintéticos. LAB-FND-08A a LAB-FND-12A amplían la cobertura:
 - LAB-FND-08A: conflicto fail-safe/fail-secure y salida de emergencia.
 - LAB-FND-09A: cifrado y control de acceso no equivalen a privacidad.
 - LAB-FND-10A: recuperar servicio no equivale a recuperar confianza.
 - LAB-FND-11A: dependencia común puede anular redundancia nominal.
 - LAB-FND-12A: firma/hash válidos no prueban verdad ni calibración.
+- LAB-FND-13A: inventario orientado a misión detecta ownership ausente, registros obsoletos, datos sin clasificar, logging insuficiente y soporte desconocido.
 
 Los modelos se ejecutan en CI con datos sintéticos. No son pruebas físicas, certificación de safety ni validación operacional de un sistema real.
 
