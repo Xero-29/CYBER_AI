@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import subprocess
 import sys
@@ -358,7 +357,7 @@ def run_cycle(
         # Entregar también el informe aceptado directamente al principal para
         # reevaluación, aunque la indexación semántica esté temporalmente caída.
         knowledge_context = (
-            knowledge_context + "\\n\\nINFORME REVISADO PROVISIONALMENTE:\\n" + research
+            knowledge_context + "\n\nINFORME REVISADO PROVISIONALMENTE:\n" + research
         )[-30000:]
         assessment = validate_assessment(extract_json_object(
             model_call(principal, build_assessment_prompt(task, knowledge_context, state))
