@@ -57,6 +57,7 @@ class MetacognitionTests(unittest.TestCase):
             state_path, log_path = Path(tmp) / "state.json", Path(tmp) / "events.jsonl"
             result = run_cycle("Explicar control de congestión", principal="MAIN",
                 researcher="RESEARCHER", verifier="VERIFIER", model_call=model,
+                publisher=lambda report, task_id: {"indexed": True},
                 state_path=state_path, log_path=log_path)
             state = load_competency_map(state_path)
         self.assertEqual(result["status"], "knowledge_acquired_needs_task_execution")
