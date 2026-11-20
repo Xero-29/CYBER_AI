@@ -26,7 +26,8 @@ class ProcessIsolationTests(unittest.TestCase):
         self.assertLessEqual(len(result["stderr"].encode()), 512)
         self.assertTrue(result["output_truncated"])
         self.assertFalse(result["timed_out"])
-        self.assertTrue(result["process_tree_isolation_enforced"])
+        self.assertTrue(result["process_group_isolation_enforced"])
+        self.assertFalse(result["process_tree_isolation_enforced"])
 
     def test_timeout_terminates_the_process_group(self):
         with tempfile.TemporaryDirectory() as cwd:
@@ -39,7 +40,8 @@ class ProcessIsolationTests(unittest.TestCase):
             )
         self.assertTrue(result["timed_out"])
         self.assertNotEqual(result["returncode"], 0)
-        self.assertTrue(result["process_tree_isolation_enforced"])
+        self.assertTrue(result["process_group_isolation_enforced"])
+        self.assertFalse(result["process_tree_isolation_enforced"])
 
     def test_invalid_limits_are_rejected_before_process_start(self):
         invalid_timeouts = (

@@ -89,5 +89,6 @@ La confirmación del operador es una barrera adicional; no sustituye al permiso 
 - `approved_by` y `ticket` son metadatos declarativos en un archivo local. Esta versión no autentica criptográficamente la identidad del aprobador ni verifica el ticket contra un sistema externo.
 - La seguridad del permiso depende de la protección del archivo y del sistema operativo. Para un despliegue institucional debe integrarse un servicio de autorización con identidad corporativa, aprobación firmada, revocación, auditoría inmutable y separación entre quien solicita y quien aprueba.
 - Se bloquean nombres DNS hasta implementar resolución y conexión con IP fijada, validación de cada redirección y protección contra DNS rebinding.
-- La autorización actual no es un sandbox. Los procesos Nuclei siguen necesitando aislamiento del sistema operativo, límites de recursos y políticas de egreso de red.
+- La autorización actual no es un sandbox. El runner POSIX crea y termina un grupo de procesos, pero un descendiente puede escapar si crea otra sesión/grupo (setsid/setpgid); por tanto, no equivale a contención completa del árbol. Los trabajos hostiles requieren cgroups/namespace o contenedor reforzado; para Windows siguen pendientes Job Objects.
+- El runner de procesos no impone aislamiento de red. Los adaptadores host pueden alcanzar la red salvo que una política externa de egress lo impida.
 - No se deben habilitar escaneos externos hasta que la organización configure y revise su archivo de permisos.

@@ -130,7 +130,10 @@ def run_bounded_process(
         "stderr": captured["stderr"].decode("utf-8", errors="replace"),
         "timed_out": timed_out,
         "output_truncated": truncated["value"],
-        "process_tree_isolation_enforced": True,
+        # POSIX process groups do not contain descendants that deliberately call
+        # setsid()/setpgid(); stronger containment requires cgroups or a container.
+        "process_group_isolation_enforced": True,
+        "process_tree_isolation_enforced": False,
     }
 
 
