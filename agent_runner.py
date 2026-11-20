@@ -349,7 +349,7 @@ def build_task_prompt(
         try:
             item = json.loads(line)
             if isinstance(item, dict):
-                records.append(redact_sensitive_data(item))
+                records.append(item)
         except json.JSONDecodeError:
             continue
 
@@ -366,6 +366,9 @@ def build_task_prompt(
             ):
                 continue
 
+        # Filter session identifiers before redaction; they are sensitive but still
+        # required for isolation decisions.
+        item = redact_sensitive_data(item)
         fields = [f"Especialista: {item.get('agent', 'desconocido')}"]
 
         if settings.get("include_task", True):

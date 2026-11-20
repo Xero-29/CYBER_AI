@@ -66,6 +66,10 @@ class TestSharedSessionHistory(unittest.TestCase):
 
                 self.assertIn("NEXO recomienda revisar permisos", prompt)
                 self.assertNotIn("DATO QUE NO DEBE APARECER", prompt)
+                self.assertNotIn("legacy-task-secret", prompt)
+                self.assertNotIn("legacy-response-secret", prompt)
+                self.assertIn("password=[REDACTED]", prompt)
+                self.assertIn("token=[REDACTED]", prompt)
         finally:
             runner.TASK_LOG = previous_log
 
