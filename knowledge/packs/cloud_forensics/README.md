@@ -49,3 +49,6 @@ NIST SP 800-86, NIST SP 800-201, CSA Cloud Forensics, AWS/Azure/GCP audit loggin
 
 ## Instrucciones para agentes IA
 No borres, detengas ni restaures recursos. Preserva primero y coordina con dueño de cuenta y legal. No afirmes atribución a partir de IP o user-agent aislado.
+
+## Arquitectura
+La evidencia cloud se distribuye entre plano de control, plano de datos, identidad, APIs de administración, logs del proveedor, snapshots, almacenamiento de objetos, red virtual, workloads y servicios gestionados. Preservar IDs de cuenta/tenant, región, timestamps, actor, request ID, configuración de retención y metadatos de adquisición. Capturar primero fuentes volátiles cuando sea legal y técnicamente viable; exportar a repositorio inmutable con hashes y control de acceso. Documentar límites de visibilidad impuestos por el proveedor y sincronización de relojes.

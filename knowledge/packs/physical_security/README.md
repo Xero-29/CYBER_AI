@@ -46,3 +46,6 @@ ISO/IEC 27001 controles físicos, ISO 22301, NIST SP 800-53 PE, NFPA y ASIS Phys
 
 ## Instrucciones para agentes IA
 No sugieras entrar en instalaciones ni manipular sensores. Limita el análisis a documentación, planos ficticios y walkthroughs autorizados.
+
+## Arquitectura
+Modelar perímetros, zonas de seguridad, accesos, recepción, visitantes, salas técnicas, racks, energía, climatización, cableado, almacenamiento y destrucción de medios. Trazar el movimiento de personas, activos y soportes entre zonas; integrar credenciales físicas, CCTV, alarmas, sensores, guardias y respuesta a incidentes. Identificar dependencias de terceros, accesos de emergencia, puntos ciegos y escenarios de fallo simultáneo (energía, comunicaciones, incendio, inundación o intrusión).

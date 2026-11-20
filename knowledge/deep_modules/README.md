@@ -135,3 +135,75 @@ Se añadieron cuadernos técnicos para las 48 áreas. Son planes técnicos estru
 - [Continuidad y recuperación](./business_continuity/TECHNICAL_COMPENDIUM.md) — `business_continuity`
 - [Seguridad de bases de datos](./database_security/TECHNICAL_COMPENDIUM.md) — `database_security`
 - [Investigación de vulnerabilidades](./vulnerability_research/TECHNICAL_COMPENDIUM.md) — `vulnerability_research`
+
+
+## Estudios de investigación profunda (primera entrega, 2026-11-18)
+
+Estos estudios amplían los compendios estructurados con síntesis técnicas, amenazas, controles, evaluación, laboratorios y fuentes. Su madurez y limitaciones están declaradas en cada documento; no deben confundirse con validación experta.
+
+- [Investigaciones técnicas profundas](../research/field_studies/README.md)
+- [Registro de fuentes de esta entrega](../research/field_studies/SOURCE_REGISTER_2026-11-18.json)
+- [Redes](./network/RESEARCH_STUDY.md)
+- [Criptografía](./crypto/RESEARCH_STUDY.md)
+- [Seguridad de IA](./ai_security/RESEARCH_STUDY.md)
+- [OT/ICS/SCADA](./ot_ics/RESEARCH_STUDY.md)
+- [Respuesta a incidentes](./incident_response/RESEARCH_STUDY.md)
+- [Gestión de vulnerabilidades](./vuln_management/RESEARCH_STUDY.md)
+- [DevSecOps](./devsecops/RESEARCH_STUDY.md)
+- [Arquitectura segura](./secure_arch/RESEARCH_STUDY.md)
+
+
+## Segunda tanda de estudios profundos (2026-11-18)
+
+- [Fundamentos](./foundations/RESEARCH_STUDY.md)
+- [Seguridad web y aplicaciones](./appsec/RESEARCH_STUDY.md)
+- [Seguridad de API](./api/RESEARCH_STUDY.md)
+- [Linux y Unix](./linux/RESEARCH_STUDY.md)
+- [Windows y Active Directory](./windows_ad/RESEARCH_STUDY.md)
+- [Seguridad cloud](./cloud/RESEARCH_STUDY.md)
+- [Contenedores y Kubernetes](./containers/RESEARCH_STUDY.md)
+- [Seguridad móvil](./mobile/RESEARCH_STUDY.md)
+
+
+## Tercera tanda de estudios profundos (2026-11-18)
+
+- [Identidad y acceso](./identity/RESEARCH_STUDY.md)
+- [Análisis de malware](./malware/RESEARCH_STUDY.md)
+- [Forense digital](./forensics/RESEARCH_STUDY.md)
+- [Inteligencia de amenazas](./threat_intel/RESEARCH_STUDY.md)
+- [Ingeniería inversa](./reverse/RESEARCH_STUDY.md)
+- [IoT y hardware](./iot_hardware/RESEARCH_STUDY.md)
+- [Gobernanza](./governance/RESEARCH_STUDY.md)
+- [Seguridad de datos](./data_security/RESEARCH_STUDY.md)
+
+
+## Cuarta tanda de estudios profundos (2026-11-18)
+
+- [Aprendizaje automático](./machine_learning/RESEARCH_STUDY.md)
+- [Matemáticas](./mathematics/RESEARCH_STUDY.md)
+- [Ingeniería de software](./software_engineering/RESEARCH_STUDY.md)
+- [SOC, SIEM y SOAR](./soc_siem/RESEARCH_STUDY.md)
+- [EDR/XDR](./edr_xdr/RESEARCH_STUDY.md)
+- [Threat hunting](./threat_hunting/RESEARCH_STUDY.md)
+- [Red Team](./red_team/RESEARCH_STUDY.md)
+- [Wireless/Bluetooth/NFC](./wireless_security/RESEARCH_STUDY.md)
+
+
+## Quinta tanda de estudios profundos (2026-11-18)
+
+- [Bug bounty](./bug_bounty/RESEARCH_STUDY.md)
+- [Seguridad satelital](./satellite_security/RESEARCH_STUDY.md)
+- [Seguridad física](./physical_security/RESEARCH_STUDY.md)
+- [Correo y DNS](./email_dns_security/RESEARCH_STUDY.md)
+- [Fraude y abuso](./fraud_abuse/RESEARCH_STUDY.md)
+- [Ingeniería de privacidad](./privacy_engineering/RESEARCH_STUDY.md)
+- [Forense cloud](./cloud_forensics/RESEARCH_STUDY.md)
+- [Red Team de IA](./ai_red_team/RESEARCH_STUDY.md)
+- [PKI/HSM](./pki_hsm/RESEARCH_STUDY.md)
+- [Criptografía poscuántica](./post_quantum_crypto/RESEARCH_STUDY.md)
+- [Continuidad de negocio](./business_continuity/RESEARCH_STUDY.md)
+- [Seguridad de bases de datos](./database_security/RESEARCH_STUDY.md)
+- [Investigación de vulnerabilidades](./vulnerability_research/RESEARCH_STUDY.md)
+- [Telecom/5G](./telecom_5g/RESEARCH_STUDY.md)
+- [Seguridad automotriz](./automotive_security/RESEARCH_STUDY.md)
+- [Seguridad de hardware](./hardware_security/RESEARCH_STUDY.md)

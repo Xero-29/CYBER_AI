@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "Registro de afirmaciones verificadas individualmente. Vacío hasta que un revisor registre afirmaciones y evidencia exacta; no rellenar con texto generado automáticamente.",
+  "allowed_statuses": [
+    "candidate",
+    "needs_review",
+    "supported",
+    "contradicted",
+    "inconclusive"
+  ],
+  "claims": []
+}

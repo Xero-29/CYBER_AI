@@ -46,3 +46,6 @@ MITRE ATT&CK, NIST SP 800-61, CIS Controls, vendor EDR/XDR hardening guides y Si
 
 ## Instrucciones para agentes IA
 No aísles endpoints ni mates procesos. Recomienda acciones y su impacto; el operador autorizado decide.
+
+## Arquitectura
+EDR/XDR conecta sensores de endpoint, identidad, correo, red y cloud con colectores, normalización, correlación, motor de detección, consola de analista y acciones de respuesta. Identificar agentes, privilegios, canales de actualización, políticas, telemetría, retención y dependencias del proveedor. Separar plano de gestión del plano de datos; restringir quién puede aislar equipos, matar procesos o poner archivos en cuarentena. Definir degradación ante pérdida de conectividad, protección contra manipulación y exportación verificable de evidencias.
