@@ -2,33 +2,33 @@
 
 **Repositorio:** Xero-29/CYBER_AI  
 **Rama de trabajo:** codex/security-integrity-audit  
-**HEAD previo a esta remediación:** 693aaf6215a0e6819f61a1cb2ee996c5d930b232  
+**HEAD previo a este ajuste de alcance CI:** 54f6a11f3741f227776e9dcb180a0d960ae4653a  
 **main:** 9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea  
 **Ancestro común verificado:** cae816d6037b56f017c2fbdbb3e98ef00df58c1d
 
 ## Divergencia e integración
 
-- La comparación de tres puntos confirma **573 commits exclusivos de main y 183 exclusivos de la rama de auditoría** desde el ancestro común. No existe ahora una divergencia de un único commit; ambas líneas contienen cambios extensos y distintos.
+- La comparación de tres puntos confirma **573 commits exclusivos de main y 184 exclusivos de la rama de auditoría** desde el ancestro común. No existe ahora una divergencia de un único commit; ambas líneas contienen cambios extensos y distintos.
 - PR #2 está **cerrado y fusionado**. Su merge commit es 478c6ddc676221e4c07b8c5780f127bc5a9e749e; el HEAD de PR #2 era cae816d6037b56f017c2fbdbb3e98ef00df58c1d. La rama actual continúa desde ese ancestro y no contiene el merge commit.
 - El HEAD de main es 9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea; su línea contiene, entre otros cambios, las pruebas de preflight de OSV-Scanner/Grype. Se preserva el HEAD completo de main y no se ejecutó merge, rebase, cherry-pick, force-push ni escritura en esa rama.
 - PR #11 (locks/SBOM), #12 (reconciliación selectiva), #13 (investigación de 192 brechas) y #14 (currículo/Foundations) permanecen abiertos en draft y apuntan a ramas distintas. PR #12 está basado en el HEAD actual de main; no se reutiliza ni se duplica.
 - No existe PR abierto que apunte a la rama actual codex/security-integrity-audit. PR #2 no se reabre ni se duplica. No se crea un PR adicional mientras la divergencia y el alcance de integración no estén resueltos.
 - La reconciliación sigue separada y requiere revisión por archivo y pruebas de tres vías. No se copiarán árboles completos ni se descartarán cambios de ninguna línea.
 
-## Incidencia CI identificada en el HEAD previo
+## Incidencia CI del commit 54f6a11
 
-- HEAD: 693aaf6215a0e6819f61a1cb2ee996c5d930b232.
-- Python Tests: **success** — [run 44758054958](https://github.com/Xero-29/CYBER_AI/actions/runs/44758054958).
-- Docker Sandbox: **failure** — [run 44758054968](https://github.com/Xero-29/CYBER_AI/actions/runs/44758054968). La construcción de imagen y verify.sh pasaron; Ruff fue denegado porque el contenedor no recibió la allowlist HMAC firmada. El override de compatibilidad estaba definido en el host y no se propagaba al contenedor. El resultado fue fail-closed, no una ejecución sin autorización.
-- Por tanto, **el HEAD previo no tenía CI completamente verde**.
+- Python Tests: **success** — [run 44760591710](https://github.com/Xero-29/CYBER_AI/actions/runs/44760591710).
+- Docker Sandbox: **failure** — [run 44760591699](https://github.com/Xero-29/CYBER_AI/actions/runs/44760591699). La allowlist HMAC de Ruff se exportó mediante GITHUB_ENV antes de la verificación del host; por eso la suite heredó un manifiesto que autorizaba solo Ruff y fallaron seis pruebas de adaptadores que necesitan sus propias políticas simuladas. El preflight reconoció la firma; la ejecución no se saltó la autorización.
+- Resultado exacto de la suite en ese run: 624 tests, 1 failure, 5 errors y 4 skipped. No se declara CI verde para este commit.
 
-## Remediación implementada en esta iteración
+## Corrección de alcance aplicada en esta iteración
 
-- sandbox_runner.py exige una allowlist HMAC válida, privada y firmada para una sola herramienta. La monta como archivo de solo lectura en el contenedor; pasa la clave por herencia de entorno Docker y no como argumento visible del proceso. No hay fallback unsigned en el sandbox.
-- .github/workflows/docker-sandbox.yml obtiene SHA-256 del ejecutable Ruff desde la imagen fijada y crea para cada ejecución una allowlist HMAC efímera. La clave se mantiene en el entorno temporal de Actions, no se registra en logs ni se almacena en el repositorio; el directorio temporal se elimina al terminar.
-- El override CYBER_AI_TOOL_ALLOWLIST_REQUIRED=0 queda limitado al paso de verificación local, que no ejecuta herramientas externas. No se transmite al contenedor.
-- tests/test_sandbox_runner.py añade regresiones para allowlist ausente, firma inválida, alcance de una sola herramienta, montaje de solo lectura y ausencia de la clave HMAC en los argumentos Docker.
-- La validación de Actions del nuevo HEAD debe terminar antes de declarar CI verde. No se reutiliza el resultado del SHA previo.
+- La creación del manifiesto HMAC y de su clave efímera se mueve al mismo paso que ejecuta Ruff en Docker. La clave solo existe en ese paso y en sus procesos hijos; no se escribe en GITHUB_ENV ni se expone a la verificación del host o al paso de publicación de artefactos.
+- El manifiesto contiene únicamente el SHA-256 del ejecutable Ruff extraído de la imagen fijada; se crea con permisos 0600 dentro de un directorio 0700 y se elimina al terminar el paso.
+- El workflow Python limita el override de compatibilidad a sus dos pasos de verify.sh. El workflow Docker lo limita al paso de verify.sh. El contenedor no recibe el override y exige la allowlist firmada.
+- sandbox_runner.py mantiene la validación HMAC fail-closed, el alcance de una sola herramienta, el montaje de solo lectura y el paso de la clave por variable de entorno heredada, nunca como argumento.
+- Las regresiones cubren ausencia/firma inválida, exceso de alcance, montaje de solo lectura y ausencia de la clave en argv.
+- Los nuevos checks de Actions deben terminar en el HEAD resultante antes de afirmar CI verde.
 
 ## Capacidades y límites que siguen siendo reales
 

@@ -12,9 +12,6 @@ on:
     branches:
       - main
 
-env:
-  CYBER_AI_TOOL_ALLOWLIST_REQUIRED: "0"
-
 permissions:
   contents: read
 
@@ -42,6 +39,8 @@ jobs:
             find data -type d -exec chmod 700 {} +
           fi
       - name: Run complete local verification
+        env:
+          CYBER_AI_TOOL_ALLOWLIST_REQUIRED: "0"
         run: bash verify.sh
       - name: Capture hashes for resolved dependency wheels
         run: |
@@ -70,6 +69,8 @@ jobs:
       - name: Install optional document dependencies
         run: python -m pip install --require-hashes -r requirements-documents.lock
       - name: Verify full suite with document extractors enabled
+        env:
+          CYBER_AI_TOOL_ALLOWLIST_REQUIRED: "0"
         run: bash verify.sh
       - name: Generate CycloneDX SBOM
         run: |
