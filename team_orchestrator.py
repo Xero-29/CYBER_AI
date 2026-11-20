@@ -13,6 +13,7 @@ from pathlib import Path
 
 from execution_ledger import ExecutionLedger
 from safe_io import atomic_write_text, ensure_private_directory, open_private_file
+from secret_redaction import redact_sensitive_data
 
 from model_memory_manager import load_config
 import experiment_engine
@@ -22,6 +23,7 @@ PROJECT = Path(__file__).resolve().parent
 WORKFLOW_FILE = PROJECT / "config" / "workflows.json"
 TASK_LOG = PROJECT / "data" / "agent_tasks.jsonl"
 REPORT_DIR = PROJECT / "reports" / "team_runs"
+MAX_REPORT_BYTES = 16 * 1024 * 1024
 
 
 def load_workflow(name):
@@ -149,12 +151,16 @@ def validate_step_output(response, step):
 
 
 def save_report(path, report):
-    """Guarda el progreso, incluso si una etapa falla."""
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        json.dumps(report, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    """Guarda progreso saneado mediante escritura privada y atómica."""
+    path = Path(path)
+    ensure_private_directory(path.parent, create=True)
+    safe_report = redact_sensitive_data(report)
+    rendered = json.dumps(
+        safe_report, ensure_ascii=False, indent=2, allow_nan=False
+    ) + "\n"
+    if len(rendered.encode("utf-8")) > MAX_REPORT_BYTES:
+        raise ValueError("El informe del flujo supera el límite de 16 MiB.")
+    atomic_write_text(path, rendered)
 
 
 
