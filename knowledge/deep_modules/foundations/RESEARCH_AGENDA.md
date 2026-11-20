@@ -12,89 +12,42 @@ Investigar comparación de modelos, evaluación de controles y gestión de incer
 
 ## Líneas de investigación por tema
 
-### T1. modelos de seguridad y confianza
+Las líneas quedan alineadas exactamente con los siete IDs curriculares y con los protocolos LAB-FND-01A a LAB-FND-07A del desarrollo disciplinar. Las hipótesis son propuestas, no resultados.
 
-**Pregunta de investigación:** ¿Qué propiedades de seguridad, fiabilidad y observabilidad de *modelos de seguridad y confianza* dependen de la arquitectura y configuración, y cómo se pueden medir de forma reproducible?
+### T1 — `foundations-01`: Modelos de seguridad y confianza
+**Pregunta:** ¿la evaluación centralizada más enforcement local reduce decisiones de autorización obsoletas bajo cambios de atributos y revocación?
+**H1:** versionado de políticas y expiración explícita reduce decisiones obsoletas frente a cachés sin invalidación.
+**Diseño:** simulador con IdP, PDP/PEP, atributos mutables, revocación y fallos de red; medir decisiones erróneas, latencia y disponibilidad.
 
-**Hipótesis de trabajo:** un diseño/configuración con controles explícitos y verificables mejora la métrica de seguridad definida frente a una línea base sin dichos controles, con un coste medible en rendimiento, complejidad o usabilidad. La hipótesis debe ser reformulada y falsable tras revisar literatura específica.
+### T2 — `foundations-02`: Inventario y clasificación de activos
+**Pregunta:** ¿la reconciliación multi-fuente mejora cobertura sin elevar falsos merges?
+**H1:** identificadores fuertes más reconciliación supervisada mejoran F1 frente a hostname como clave única.
+**Diseño:** dataset sintético con duplicados, clones, activos efímeros, huérfanos y cambios de nombre; comparar reglas y baseline de clave única.
 
-**Diseño propuesto:** definir sistema/población y versión; documentar baseline; variar una dimensión por experimento; mantener constantes factores de confusión; usar casos positivos, negativos y límite; repetir pruebas; registrar logs y artefactos con hashes; aplicar análisis estadístico apropiado.
+### T3 — `foundations-03`: Superficie de ataque y modelado de amenazas
+**Pregunta:** ¿DFD más análisis de abuso detecta rutas críticas omitidas por STRIDE sin modelo de flujo?
+**H1:** el enfoque combinado reduce omisiones de rutas del ground truth.
+**Diseño:** arquitecturas sintéticas multi-tier; revisión ciega por dos evaluadores; medir cobertura, falsos positivos, severidad de omisiones y acuerdo interevaluador.
 
-**Métricas candidatas:** eficacia del control, cobertura, tasa de error/falsos positivos, latencia/coste, reproducibilidad y degradación ante cambios. Elegir solo métricas pertinentes y justificar la operacionalización.
+### T4 — `foundations-04`: Identidad y control de acceso
+**Pregunta:** ¿credenciales efímeras y permisos mínimos reducen exposición de workloads sin degradar disponibilidad?
+**H1:** reducir duración y alcance de credenciales disminuye ventana de exposición con degradación operacional dentro de umbral predefinido.
+**Diseño:** IdP y workloads simulados; medir permisos efectivos, revocación, fallos legítimos, latencia y recuperación.
 
-**Resultado exigido:** mapa de literatura, taxonomía, protocolo, datos sintéticos/autorizados, resultados, intervalos de incertidumbre, amenazas a validez, limitaciones y artefactos para replicación.
+### T5 — `foundations-05`: Criptografía y protección de datos
+**Pregunta:** ¿qué política de rotación y recuperación minimiza exposición de claves sin aumentar pérdida de disponibilidad?
+**H1:** rotación automatizada con recuperación ensayada reduce exposición acumulada frente a rotación manual sin ensayo.
+**Diseño:** KMS simulado, claves ficticias, fallos de operador/proveedor; medir tiempo de rotación, fallos de recuperación, disponibilidad y errores.
 
-### T2. inventario y clasificación de activos
+### T6 — `foundations-06`: Detección, respuesta y recuperación
+**Pregunta:** ¿qué campos de telemetría permiten reconstrucción robusta bajo pérdida, retraso y duplicación de eventos?
+**H1:** identidad, recurso, acción, timestamp sincronizado, resultado y origen mejoran reconstrucción frente a registros incompletos.
+**Diseño:** trazas sintéticas con ground truth; variar pérdida y desorden; medir secuencias correctas, atribución, FPR/FNR y tiempo de análisis.
 
-**Pregunta de investigación:** ¿Qué propiedades de seguridad, fiabilidad y observabilidad de *inventario y clasificación de activos* dependen de la arquitectura y configuración, y cómo se pueden medir de forma reproducible?
-
-**Hipótesis de trabajo:** un diseño/configuración con controles explícitos y verificables mejora la métrica de seguridad definida frente a una línea base sin dichos controles, con un coste medible en rendimiento, complejidad o usabilidad. La hipótesis debe ser reformulada y falsable tras revisar literatura específica.
-
-**Diseño propuesto:** definir sistema/población y versión; documentar baseline; variar una dimensión por experimento; mantener constantes factores de confusión; usar casos positivos, negativos y límite; repetir pruebas; registrar logs y artefactos con hashes; aplicar análisis estadístico apropiado.
-
-**Métricas candidatas:** eficacia del control, cobertura, tasa de error/falsos positivos, latencia/coste, reproducibilidad y degradación ante cambios. Elegir solo métricas pertinentes y justificar la operacionalización.
-
-**Resultado exigido:** mapa de literatura, taxonomía, protocolo, datos sintéticos/autorizados, resultados, intervalos de incertidumbre, amenazas a validez, limitaciones y artefactos para replicación.
-
-### T3. superficie de ataque y modelado de amenazas
-
-**Pregunta de investigación:** ¿Qué propiedades de seguridad, fiabilidad y observabilidad de *superficie de ataque y modelado de amenazas* dependen de la arquitectura y configuración, y cómo se pueden medir de forma reproducible?
-
-**Hipótesis de trabajo:** un diseño/configuración con controles explícitos y verificables mejora la métrica de seguridad definida frente a una línea base sin dichos controles, con un coste medible en rendimiento, complejidad o usabilidad. La hipótesis debe ser reformulada y falsable tras revisar literatura específica.
-
-**Diseño propuesto:** definir sistema/población y versión; documentar baseline; variar una dimensión por experimento; mantener constantes factores de confusión; usar casos positivos, negativos y límite; repetir pruebas; registrar logs y artefactos con hashes; aplicar análisis estadístico apropiado.
-
-**Métricas candidatas:** eficacia del control, cobertura, tasa de error/falsos positivos, latencia/coste, reproducibilidad y degradación ante cambios. Elegir solo métricas pertinentes y justificar la operacionalización.
-
-**Resultado exigido:** mapa de literatura, taxonomía, protocolo, datos sintéticos/autorizados, resultados, intervalos de incertidumbre, amenazas a validez, limitaciones y artefactos para replicación.
-
-### T4. identidad, privilegios y autenticación
-
-**Pregunta de investigación:** ¿Qué propiedades de seguridad, fiabilidad y observabilidad de *identidad, privilegios y autenticación* dependen de la arquitectura y configuración, y cómo se pueden medir de forma reproducible?
-
-**Hipótesis de trabajo:** un diseño/configuración con controles explícitos y verificables mejora la métrica de seguridad definida frente a una línea base sin dichos controles, con un coste medible en rendimiento, complejidad o usabilidad. La hipótesis debe ser reformulada y falsable tras revisar literatura específica.
-
-**Diseño propuesto:** definir sistema/población y versión; documentar baseline; variar una dimensión por experimento; mantener constantes factores de confusión; usar casos positivos, negativos y límite; repetir pruebas; registrar logs y artefactos con hashes; aplicar análisis estadístico apropiado.
-
-**Métricas candidatas:** eficacia del control, cobertura, tasa de error/falsos positivos, latencia/coste, reproducibilidad y degradación ante cambios. Elegir solo métricas pertinentes y justificar la operacionalización.
-
-**Resultado exigido:** mapa de literatura, taxonomía, protocolo, datos sintéticos/autorizados, resultados, intervalos de incertidumbre, amenazas a validez, limitaciones y artefactos para replicación.
-
-### T5. seguridad de redes y sistemas
-
-**Pregunta de investigación:** ¿Qué propiedades de seguridad, fiabilidad y observabilidad de *seguridad de redes y sistemas* dependen de la arquitectura y configuración, y cómo se pueden medir de forma reproducible?
-
-**Hipótesis de trabajo:** un diseño/configuración con controles explícitos y verificables mejora la métrica de seguridad definida frente a una línea base sin dichos controles, con un coste medible en rendimiento, complejidad o usabilidad. La hipótesis debe ser reformulada y falsable tras revisar literatura específica.
-
-**Diseño propuesto:** definir sistema/población y versión; documentar baseline; variar una dimensión por experimento; mantener constantes factores de confusión; usar casos positivos, negativos y límite; repetir pruebas; registrar logs y artefactos con hashes; aplicar análisis estadístico apropiado.
-
-**Métricas candidatas:** eficacia del control, cobertura, tasa de error/falsos positivos, latencia/coste, reproducibilidad y degradación ante cambios. Elegir solo métricas pertinentes y justificar la operacionalización.
-
-**Resultado exigido:** mapa de literatura, taxonomía, protocolo, datos sintéticos/autorizados, resultados, intervalos de incertidumbre, amenazas a validez, limitaciones y artefactos para replicación.
-
-### T6. gestión de vulnerabilidades
-
-**Pregunta de investigación:** ¿Qué propiedades de seguridad, fiabilidad y observabilidad de *gestión de vulnerabilidades* dependen de la arquitectura y configuración, y cómo se pueden medir de forma reproducible?
-
-**Hipótesis de trabajo:** un diseño/configuración con controles explícitos y verificables mejora la métrica de seguridad definida frente a una línea base sin dichos controles, con un coste medible en rendimiento, complejidad o usabilidad. La hipótesis debe ser reformulada y falsable tras revisar literatura específica.
-
-**Diseño propuesto:** definir sistema/población y versión; documentar baseline; variar una dimensión por experimento; mantener constantes factores de confusión; usar casos positivos, negativos y límite; repetir pruebas; registrar logs y artefactos con hashes; aplicar análisis estadístico apropiado.
-
-**Métricas candidatas:** eficacia del control, cobertura, tasa de error/falsos positivos, latencia/coste, reproducibilidad y degradación ante cambios. Elegir solo métricas pertinentes y justificar la operacionalización.
-
-**Resultado exigido:** mapa de literatura, taxonomía, protocolo, datos sintéticos/autorizados, resultados, intervalos de incertidumbre, amenazas a validez, limitaciones y artefactos para replicación.
-
-### T7. telemetría, respuesta y recuperación
-
-**Pregunta de investigación:** ¿Qué propiedades de seguridad, fiabilidad y observabilidad de *telemetría, respuesta y recuperación* dependen de la arquitectura y configuración, y cómo se pueden medir de forma reproducible?
-
-**Hipótesis de trabajo:** un diseño/configuración con controles explícitos y verificables mejora la métrica de seguridad definida frente a una línea base sin dichos controles, con un coste medible en rendimiento, complejidad o usabilidad. La hipótesis debe ser reformulada y falsable tras revisar literatura específica.
-
-**Diseño propuesto:** definir sistema/población y versión; documentar baseline; variar una dimensión por experimento; mantener constantes factores de confusión; usar casos positivos, negativos y límite; repetir pruebas; registrar logs y artefactos con hashes; aplicar análisis estadístico apropiado.
-
-**Métricas candidatas:** eficacia del control, cobertura, tasa de error/falsos positivos, latencia/coste, reproducibilidad y degradación ante cambios. Elegir solo métricas pertinentes y justificar la operacionalización.
-
-**Resultado exigido:** mapa de literatura, taxonomía, protocolo, datos sintéticos/autorizados, resultados, intervalos de incertidumbre, amenazas a validez, limitaciones y artefactos para replicación.
+### T7 — `foundations-07`: Gobierno, riesgo y aseguramiento
+**Pregunta:** ¿la trazabilidad requisito–control–prueba–evidencia detecta controles no operativos mejor que un checklist documental?
+**H1:** pruebas basadas en escenarios detectan más fallos reproducibles que revisión de checklist aislada.
+**Diseño:** caso organizacional sintético con evidencias caducadas/contradictorias; evaluación ciega; medir falsos cierres, cobertura y acuerdo entre revisores.
 
 ## Método transversal
 

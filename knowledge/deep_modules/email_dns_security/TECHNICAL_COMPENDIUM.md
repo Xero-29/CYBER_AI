@@ -122,3 +122,24 @@ Cada estudio debe definir H0/H1, variables, muestra, comparadores, refutación, 
 
 ## Madurez
 M0/M1 estructural. No prueba profundidad ni madurez M3/M4/M5. Avanzar exige lectura crítica, artefactos específicos, experimentos ejecutados y evidencia auditable.
+
+
+## Profundización técnica específica: Seguridad de correo y DNS
+
+### Correo: arquitectura y autenticación
+Modelar MTA, MDA, MUA, gateways, relay, SPF, DKIM, DMARC, ARC, TLS, MTA-STS y DANE según soporte. SPF autoriza hosts emisores, DKIM firma contenido/headers y DMARC alinea dominio visible con SPF/DKIM; ninguno elimina phishing ni abuso de cuentas válidas. Revisar subdominios, forwarding, mailing services y reportes agregados/forenses.
+
+### Protección de identidad y contenido
+Implementar MFA resistente a phishing, OAuth para acceso, bloqueo de autenticación legacy, protección de sesión, mailbox audit y alertas de reglas/forwarding. Revisar BEC, display-name spoofing, homoglyphs, QR phishing, adjuntos, URLs, macros y HTML remoto. Safe links/attachments requieren análisis de falsos positivos y bypass.
+
+### DNS como plano de confianza
+Revisar registrar, DNS provider, delegación, glue, DNSSEC, CAA, MX, SPF, DKIM selectors, DMARC, subdomain takeover y cambios no autorizados. Proteger cuentas de registrador con MFA, lock y separación de roles. DNSSEC autentica respuestas, no valida contenido de aplicación ni elimina compromiso de registrador.
+
+### Telemetría y respuesta
+Correlacionar message trace, headers, auth logs, DNS, URL click, endpoint, identity sign-ins y mailbox audit. Preservar headers completos, IDs, timestamps y hashes de adjuntos. Responder revocando sesiones, reglas maliciosas, forwarding, credenciales y tokens; buscar mensajes similares y destinatarios.
+
+### Laboratorios
+Dominios sintéticos con SPF/DKIM/DMARC; mensajes de phishing benignos controlados; detección de forwarding/reglas y simulación de BEC. Medir delivery, alignment, spoof detection, false positives y tiempo de contención.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.

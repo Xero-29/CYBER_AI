@@ -122,3 +122,27 @@ Definir H0/H1, variables, población, comparadores, criterio de refutación, an�
 
 ## Madurez
 M0/M1 estructural. No acredita profundidad ni M3/M4/M5. Para avanzar: revisar fuentes completas, elaborar artefactos específicos, ejecutar casos y registrar evidencia auditable.
+
+
+## Profundización técnica específica: Matemáticas para ciberseguridad
+
+### Matemática discreta y teoría de números
+Dominar lógica proposicional, predicados, conjuntos, relaciones, grafos, combinatoria, congruencias, aritmética modular, grupos, anillos y campos finitos. Aplicaciones: protocolos, criptografía, control de acceso, análisis de dependencias y modelado de ataques. Documentar supuestos y pruebas, no solo resultados numéricos.
+
+### Probabilidad e inferencia
+Variables aleatorias, distribuciones, Bayes, independencia, entropía, información mutua, estimación, intervalos y pruebas de hipótesis. En detección, prior probability afecta valor predictivo: una alerta de alta precisión aparente puede producir muchos falsos positivos si prevalencia es baja. Calibrar scores y reportar incertidumbre.
+
+### Estadística y experimentación
+Diseño de experimentos, muestreo, tamaño muestral, potencia, sesgo, confusión, regresión, bootstrap y análisis no paramétrico. Separar significancia estadística de importancia operacional. Evitar p-hacking y leakage. Pre-registrar hipótesis, outcomes y exclusiones.
+
+### Álgebra lineal y optimización
+Vectores, matrices, eigenvalues, SVD, normas, gradientes, convexidad, regularización y optimización. Aplicaciones a ML, detección de anomalías, embeddings, reducción de dimensionalidad y análisis de señales. Interpretar condiciones numéricas, escalado, estabilidad y coste computacional.
+
+### Teoría de la información y grafos
+Entropía de Shannon, codificación, compresión, canales ruidosos y mutual information para modelar filtración. Grafos y redes para attack paths, identidad, fraude, dependencias y propagación. Definir nodos/aristas, dirección, pesos, centralidad y límites de inferencia.
+
+### Validación y laboratorios
+Problemas reproducibles con soluciones verificadas, tests unitarios, notebooks versionados y seeds. Comparar predicción con baseline, análisis de sensibilidad y límites numéricos. No aceptar cálculos sin unidades, supuestos y verificación independiente.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.

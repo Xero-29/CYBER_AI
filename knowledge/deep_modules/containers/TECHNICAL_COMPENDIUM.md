@@ -125,3 +125,35 @@ Para cada estudio definir H0/H1, variables, muestra, comparadores, criterio de r
 
 ## Madurez
 Estado actual: M0/M1 estructural. Este compendio no demuestra profundidad cubierta ni madurez M3/M4/M5. La siguiente puerta es leer y evaluar fuentes completas, producir artefactos específicos, ejecutar los laboratorios y registrar evidencia revisable.
+
+
+## Profundización técnica específica: Contenedores y Kubernetes
+
+### Modelo de aislamiento y runtime
+Distinguir contenedor de VM: procesos comparten kernel host y el aislamiento depende de namespaces, cgroups, capabilities, seccomp, LSM, mounts y runtime. Revisar user namespaces, rootless mode, dispositivos, sockets del runtime, hostPath, privileged, hostPID/hostNetwork, proc mounts y capabilities añadidas. El socket Docker/containerd es una interfaz altamente privilegiada. Evaluar escape como riesgo de frontera host-kernel, no como vulnerabilidad abstracta del contenedor.
+
+### Imágenes, registries y supply chain
+Construir imágenes reproducibles, minimizar capas y paquetes, fijar digest, verificar firma/procedencia y escanear dependencias. Dockerfile debe evitar secretos en layers, usar multi-stage, usuario no root y base soportada. SBOM (SPDX/CycloneDX) necesita vinculación al digest exacto y a la build. Revisar registry ACL, retención, tag mutability, provenance, build isolation, cache poisoning y dependencias externas. Escaneo de CVE requiere priorización por explotabilidad, reachability, exposición y compensating controls.
+
+### Kubernetes control plane
+Analizar API server, etcd, scheduler, controller manager, kubelet, kube-proxy/CNI, admission chain y certificados. RBAC debe limitar verbs, resources, namespaces y subject; evitar cluster-admin generalizado y bindings heredados. Proteger etcd con cifrado, acceso restringido, backups probados y rotación de certificados. Revisar audit policy, autenticación OIDC, service accounts y automount de tokens.
+
+### Pods, admission y runtime
+Aplicar Pod Security Standards con perfiles restricted/baseline según compatibilidad; configurar runAsNonRoot, seccomp RuntimeDefault, readOnlyRootFilesystem, allowPrivilegeEscalation=false, capabilities drop y límites de recursos. Admission controllers/policies deben validar imágenes, firmas, registries, host namespaces, mounts y privilegios. La política debe tener fases audit/warn antes de enforce y versionado. Runtime detection observa exec, file writes, syscalls y conexiones, pero requiere baseline y control de ruido.
+
+### Red, secretos y persistencia
+NetworkPolicy depende del CNI y su semántica; validar ingress y egress, DNS, namespaces, IPv6 y tráfico host. Service mesh mTLS aporta identidad/cifrado pero no reemplaza RBAC ni autorización de aplicación. Kubernetes Secrets suelen ser objetos API codificados, no automáticamente cifrados en reposo; configurar encryption at rest, KMS provider y acceso mínimo. Proteger ConfigMaps sensibles, CSI drivers, volumes, snapshots, admission webhooks y operadores.
+
+### Respuesta y recuperación
+En incidentes preservar pod spec, eventos, audit logs, imágenes por digest, node metadata, runtime telemetry y volúmenes. Evitar borrar pods antes de capturar evidencia; aislar workload y node con procedimiento probado. Reconstruir desde manifiestos declarativos verificados, rotar identidades/tokens y validar integridad de cluster. Backups de etcd no sustituyen backup de datos persistentes ni plan de recuperación regional.
+
+### Laboratorios específicos
+- Cluster local efímero: probar RBAC con matriz de permisos y negativas.
+- Admission policy que rechaza privileged, root y tags mutables.
+- NetworkPolicy deny-by-default y pruebas de conectividad permitida/denegada.
+- Escaneo de imágenes, SBOM y verificación de firma por digest.
+- Simulación de token expuesto con identidad ficticia y trazabilidad de uso.
+Registrar Kubernetes, runtime, CNI, CSI, admission versions, manifiestos, outputs, hashes y teardown.
+
+## Estado de validación de la ampliación
+Contenido técnico editorial añadido para orientar revisión disciplinar; no implica lectura integral de fuentes, revisión externa ni ejecución de laboratorio. Mantener madurez M1/M2 hasta completar puertas G1–G8 con evidencias.

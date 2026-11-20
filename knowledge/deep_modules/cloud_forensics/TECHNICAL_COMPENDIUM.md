@@ -122,3 +122,24 @@ Definir H0/H1, variables, población, comparadores, criterio de refutación, an�
 
 ## Madurez
 M0/M1 estructural. No acredita profundidad ni M3/M4/M5. Para avanzar: leer fuentes completas, producir artefactos específicos, ejecutar laboratorios y registrar evidencia auditable.
+
+
+## Profundización técnica específica: Forense cloud
+
+### Modelo de evidencia distribuida
+La evidencia se distribuye entre control plane, data plane, identidad, servicios gestionados, red, storage, snapshots, APIs y proveedor. Identificar tenant, cuenta/proyecto, región, resource ID, principal, request ID, timestamp, retention y jurisdicción. Los logs pueden estar deshabilitados, incompletos o bajo retención limitada; preparar antes del incidente.
+
+### Preservación
+Capturar audit trails, IAM changes, network flow, DNS, object access, snapshots, VM disks, container images, serverless versions, KMS events y metadata. Documentar quién inició captura, API, parámetros, hora, resultado, hash, ubicación y custodia. Evitar modificar recursos al contener; usar snapshots consistentes y métodos soportados.
+
+### Identidad y timeline
+Correlacionar federated identities, role assumption, tokens, service principals, workload identities, MFA, source IP, user agent, session IDs y API calls. Tener en cuenta reloj, latencia, servicios regionales y retrasos de ingestión. No atribuir acciones solo por IP compartida o nombre de usuario.
+
+### Multi-cloud y SaaS
+Normalizar schemas y conservar vendor-native raw logs. Documentar límites de API, export, eDiscovery, soporte legal, data residency y dependencia de licencias. SaaS puede no exponer host telemetry; combinar audit logs, exports, IdP y endpoint evidence.
+
+### Laboratorios
+Incidente sintético con cambios IAM, bucket público y snapshot; reconstruir timeline, preservar evidencia y verificar hashes. Medir completitud, tiempo, lag, gaps y reproducibilidad. No acceder a tenants ajenos.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.

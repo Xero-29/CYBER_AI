@@ -122,3 +122,27 @@ Todo estudio debe definir H0/H1, variables, muestra, comparadores, criterio de r
 
 ## Madurez
 M0/M1 estructural. Este documento no prueba profundidad cubierta ni madurez M3/M4/M5. Siguiente puerta: lectura crítica de fuentes completas, artefactos específicos, ejecución de laboratorio y evidencia verificable.
+
+
+## Profundización técnica específica: Gobierno, riesgo y cumplimiento
+
+### Gobierno y contexto
+Definir apetito/tolerancia al riesgo, objetivos de negocio, obligaciones legales, sector, jurisdicción, terceros y criticidad. Establecer órganos de decisión, roles, independencia, presupuesto, autoridad de excepción y rendición de cuentas. Políticas deben tener propietario, alcance, versión, aprobación, vigencia, métricas y evidencia de cumplimiento. Evitar confundir existencia documental con implementación efectiva.
+
+### Gestión de riesgos
+Identificar escenarios, activos, amenazas, vulnerabilidades, impactos, likelihood, incertidumbre y controles. Separar riesgo inherente, residual y aceptado. Registrar método, supuestos, escalas, fuentes y límites de cuantificación. FAIR u otros métodos cuantitativos requieren datos y calibración; matrices cualitativas no son probabilidades. Riesgo debe vincularse a decisiones y presupuesto.
+
+### Marcos y controles
+NIST CSF 2.0 organiza resultados de gobernar, identificar, proteger, detectar, responder y recuperar; ISO 27001/27002, CIS Controls y regulación aportan requisitos distintos. Mapear controles a objetivos, evidencia, responsable, frecuencia, población y excepción. Evitar mapeos automáticos como prueba de conformidad. Mantener crosswalk versionado y explicar no aplicabilidad.
+
+### Terceros y supply chain
+Inventariar proveedores, subprocesadores, software, servicios cloud y dependencias críticas. Evaluar acceso, datos, ubicación, continuidad, incidentes, vulnerabilidades, SBOM, auditorías, subcontratación, salida y destrucción de datos. Evidencia de certificación no sustituye evaluación de alcance y excepciones. Contratos deben incluir notificación, preservación, cooperación y derecho de auditoría.
+
+### Auditoría y aseguramiento
+Diseñar pruebas de diseño y efectividad operativa; seleccionar muestra representativa y conservar evidencia. Separar primera, segunda y tercera línea; gestionar conflictos de interés. Hallazgos requieren criterio, condición, causa, efecto, recomendación, dueño y fecha. Remediación se cierra con retest y evidencia, no declaración del responsable.
+
+### Métricas y laboratorio
+Medir cobertura de activos, controles probados, excepciones vencidas, riesgo residual, tiempos de remediación, proveedores críticos evaluados y ejercicios de continuidad. Laboratorio: mapa de riesgos de organización sintética, crosswalk CSF/ISO/CIS, muestreo de controles y evaluación de proveedor ficticio.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.

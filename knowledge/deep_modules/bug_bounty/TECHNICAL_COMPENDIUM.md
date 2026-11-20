@@ -122,3 +122,24 @@ Todo estudio debe definir H0/H1, variables, muestra, comparadores, criterio de r
 
 ## Madurez
 M0/M1 estructural. Este documento no prueba profundidad cubierta ni madurez M3/M4/M5. Siguiente puerta: lectura crítica de fuentes completas, artefactos específicos, ejecución de laboratorio y evidencia verificable.
+
+
+## Profundización técnica específica: Bug bounty y divulgación coordinada
+
+### Programa y alcance
+Leer política vigente, assets in-scope/out-of-scope, safe harbor, límites de rate, cuentas de prueba, datos, métodos prohibidos y requisitos de reporte. Autorización de programa no cubre activos no listados ni acciones destructivas. Registrar versión y fecha de política.
+
+### Metodología de investigación
+Priorizar superficies por criticidad, cambios, exposición y lógica de negocio. Construir inventario y mapa de endpoints; usar pruebas no destructivas, validación manual y PoCs mínimos. Revisar autenticación, autorización, multi-tenant, SSRF, inyección, lógica, archivos, deserialización y dependencias según alcance. No automatizar sin límites.
+
+### Evidencia y reporte
+Incluir título, resumen, asset, versión, precondiciones, pasos mínimos reproducibles, impacto demostrado, evidencia redactada, CWE/CVSS justificado y mitigación. No incluir datos personales ni secretos completos. Diferenciar impacto potencial de impacto observado y evitar afirmaciones especulativas.
+
+### Coordinación y calidad
+Respetar triage, duplicados, embargo, comunicación y retest. Mantener notas seguras y eliminar datos sensibles. Analizar feedback para mejorar hipótesis y reducir falsos positivos, no presionar por severidad/recompensa. El aprendizaje se convierte en Skill solo si el procedimiento fue legal, reproducible y revisado.
+
+### Laboratorios
+Aplicación deliberadamente vulnerable local, scope ficticio, reporte reproducible, retest tras parche y evaluación de calidad.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.

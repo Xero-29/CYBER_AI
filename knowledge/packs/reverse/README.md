@@ -50,3 +50,12 @@ Ghidra, radare2, Binary Ninja, Capstone, QEMU, Binwalk, LLVM docs y formatos PE/
 
 ## Instrucciones para agentes IA
 No ejecutes binarios desconocidos. No generes instrucciones de explotación de dispositivos ajenos. Usa muestras sintéticas o código abierto y explica límites de la decompilación.
+
+## Biblioteca técnica e agenda de investigación
+
+- [Compendio técnico específico](../../deep_modules/reverse/TECHNICAL_COMPENDIUM.md)
+- [Agenda de investigación y protocolos](../../deep_modules/reverse/RESEARCH_AGENDA.md)
+- [Revisión exploratoria de literatura](../../deep_modules/reverse/LITERATURE_REVIEW.md)
+- [Seguimiento global de madurez y evidencia](../../EXPERT_LIBRARY_COMPLETION_TRACKER.md)
+
+**Estado:** desarrollo editorial M2; las fuentes integrales, laboratorios ejecutados y revisión independiente siguen pendientes. No interpretar laboratorios diseñados como pruebas ejecutadas.

@@ -122,3 +122,24 @@ Cada estudio debe definir H0/H1, variables, muestra, comparadores, refutación, 
 
 ## Madurez
 M0/M1 estructural. No prueba profundidad ni madurez M3/M4/M5. Avanzar exige lectura crítica, artefactos específicos, experimentos ejecutados y evidencia auditable.
+
+
+## Profundización técnica específica: Telecomunicaciones y 5G
+
+### Arquitectura 5G
+Modelar UE, gNB, AMF, SMF, UPF, AUSF, UDM, PCF, NRF, NEF, NSSF, SEPP, slicing, MEC, OSS/BSS y transporte. Analizar SBA, service-based interfaces, control/user plane separation y dependencias cloud-native. Identificar trust boundaries entre operador, roaming, vendors, edge y terceros.
+
+### Identidad y autenticación
+Evaluar SIM/eSIM, SUPI/SUCI, 5G-AKA/EAP-AKA', key hierarchy, subscriber privacy, roaming y provisioning. Proteger claves de suscriptor, lifecycle y APIs de gestión. Revisar downgrade/legacy interworking, signaling abuse y exposición de metadata.
+
+### Slicing, edge y virtualización
+Network slicing no equivale a aislamiento físico; validar políticas, recursos compartidos, orchestration, SDN/NFV, containers, hypervisor y management plane. MEC añade proximidad y superficie local. Revisar multitenancy, east-west traffic, images, APIs y supply chain.
+
+### Señalización y disponibilidad
+Evaluar HTTP/2 service-based interfaces, TLS/mTLS, Diameter/SS7 interworking, GTP, PFCP, DNS y routing. Proteger contra signaling storms, resource exhaustion, rogue base stations y misconfiguration con controles específicos y pruebas en simulador. No generar interferencia radioeléctrica ni pruebas disruptivas en red pública.
+
+### Laboratorios
+Simulador 5G core aislado, pruebas de identidad sintética, segmentación slice, API security y telemetría. Medir aislamiento, latency, availability, detección y fallos de configuración.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.

@@ -122,3 +122,24 @@ Definir H0/H1, variables, población, comparadores, criterio de refutación, an�
 
 ## Madurez
 M0/M1 estructural. No acredita profundidad ni M3/M4/M5. Para avanzar: revisar fuentes completas, elaborar artefactos específicos, ejecutar casos y registrar evidencia auditable.
+
+
+## Profundización técnica específica: Threat hunting
+
+### Hipótesis y alcance
+Hunting es búsqueda proactiva guiada por hipótesis, no exploración ilimitada. Formular hipótesis desde ATT&CK, inteligencia, gaps de detección, cambios de arquitectura y anomalías. Definir población, ventana, fuentes, precondiciones, señal esperada, alternativa benigna y criterio de refutación. Limitar a telemetría autorizada.
+
+### Datos y cobertura
+Inventariar EDR, Sysmon, auditd, DNS, proxy, firewall, cloud audit, identity, email y network flows. Evaluar cobertura, retención, normalización, reloj, gaps, permisos y calidad. Ausencia de evento no prueba ausencia de actividad. Registrar query, parser, schema, version y limitaciones.
+
+### Análisis y pivote
+Usar entidades, procesos, usuarios, sesiones, hashes, dominios, certificados, conexiones y secuencias temporales. Diferenciar correlación de causalidad. Pivotes deben mantener contexto y ventana temporal. Enriquecer con inteligencia sin atribución automática. Registrar hipótesis alternativas y evidencia contradictoria.
+
+### Detección y transferencia
+Un hallazgo de hunting puede producir regla, caso de uso, respuesta, hardening o nueva hipótesis. Probar regla sobre histórico y corpus benigno; medir precision/recall, volumen, latencia y coste. Añadir tests para evitar regresión y owner para mantenimiento.
+
+### Laboratorios
+Dataset sintético con ground truth, consultas de hunting y pivotes; medir tiempo de descubrimiento, cobertura, falsos positivos y reproducibilidad. Documentar búsquedas negativas y sesgos.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.

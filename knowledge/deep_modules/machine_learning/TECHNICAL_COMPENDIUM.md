@@ -122,3 +122,31 @@ Definir H0/H1, variables, población, comparadores, criterio de refutación, an�
 
 ## Madurez
 M0/M1 estructural. No acredita profundidad ni M3/M4/M5. Para avanzar: revisar fuentes completas, elaborar artefactos específicos, ejecutar casos y registrar evidencia auditable.
+
+
+## Profundización técnica específica: Seguridad de Machine Learning
+
+### Pipeline y amenazas
+Modelar adquisición, etiquetado, preprocessing, feature store, entrenamiento, validación, registry, despliegue, inferencia, feedback y retirada. Amenazas: poisoning, backdoor, evasion, extraction, inversion, membership inference, model stealing, supply chain y drift. Definir atacante, conocimiento, acceso, objetivo y coste antes de evaluar robustez.
+
+### Datos y evaluación
+Mantener lineage, licencias, consentimiento, hashes, splits temporales/por entidad, deduplicación y control de leakage. Proteger labels y feature pipelines; medir representatividad, missingness, imbalance y sesgos. Los resultados deben incluir baseline, partición, semilla, métricas, intervalos, calibración y validación externa. Accuracy aislada es insuficiente para clases desbalanceadas.
+
+### Robustez y ataques
+Evaluar perturbaciones, adversarial examples, evasion y poisoning en datasets sintéticos o autorizados. Separar amenaza digital/física, white/grey/black-box y acceso a gradientes. Definir presupuesto de perturbación y restricciones realistas. Robust accuracy depende del conjunto de ataques; no afirmar robustez universal. Para LLM/GenAI, complementar con prompt injection y abuso de herramientas.
+
+### Privacidad y federación
+Membership inference, model inversion y memorization deben evaluarse con threat model y canaries. Differential privacy exige parámetros epsilon/delta, composición, clipping y utilidad; no basta con añadir ruido. Federated learning conserva datos localmente pero expone gradientes/model updates y requiere secure aggregation, autenticación y defensa frente a clientes maliciosos.
+
+### Despliegue y MLOps
+Firmar artefactos, controlar registry, reproducir build, escanear dependencias, aislar inferencia, rate limit, validar input/output y controlar acceso. Monitorear drift, data quality, calibration, anomalías y cambios de distribución. Rollback de modelo debe preservar trazabilidad y compatibilidad de features. Separar entrenamiento y serving credentials.
+
+### Laboratorios
+- Poisoning controlado de dataset sintético con medición de impacto.
+- Evaluación de extracción/inversión con canaries no sensibles.
+- Comparación de robustez bajo presupuestos adversariales definidos.
+- Pipeline ML reproducible con SBOM, firma y lineage.
+Reportar métricas, costes, supuestos, incertidumbre y limitaciones.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.

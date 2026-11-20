@@ -122,3 +122,24 @@ Cada estudio debe definir H0/H1, variables, muestra, comparadores, refutación, 
 
 ## Madurez
 M0/M1 estructural. No prueba profundidad ni madurez M3/M4/M5. Avanzar exige lectura crítica, artefactos específicos, experimentos ejecutados y evidencia auditable.
+
+
+## Profundización técnica específica: Fraude y abuso digital
+
+### Modelo de amenaza y tipologías
+Definir abuso de cuenta, pago, promoción, identidad sintética, bot, chargeback, marketplace, insider, abuso de API y collusion. Modelar actores, incentivos, pérdidas, víctimas, rutas, señales y falsos positivos. Distinguir fraude confirmado, sospecha, anomalía y error legítimo.
+
+### Señales y features
+Combinar dispositivo, sesión, velocidad, geolocalización aproximada, reputación, grafo de relaciones, comportamiento, transacciones, identidad y señales de riesgo. Evitar features que filtren datos sensibles o creen proxies discriminatorios. Controlar data leakage temporal y etiquetas tardías. Minimizar datos y definir retención.
+
+### Detección y decisión
+Reglas, scoring, grafos y ML deben calibrarse con clases desbalanceadas y costes asimétricos. Medir precision, recall, PR-AUC, calibration, false decline, loss prevented y customer friction. Umbrales deben ser explicables y monitorizados por segmento. Revisión humana necesita contexto y consistencia.
+
+### Respuesta y adversarial adaptation
+Controles escalonados: step-up, rate limit, hold, review, block, recovery. Proteger APIs contra automatización y abuso sin bloquear accesibilidad. Monitorear drift, ataques de evasión, adversarial adaptation y feedback loops. No permitir que el sistema aprenda etiquetas sesgadas sin revisión.
+
+### Laboratorios
+Dataset sintético temporal con fraude/no fraude, evaluación por coste y fairness, grafo de cuentas ficticias y pruebas de rate limiting. Medir falsos positivos por cohortes y efectos sobre usuarios legítimos.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.

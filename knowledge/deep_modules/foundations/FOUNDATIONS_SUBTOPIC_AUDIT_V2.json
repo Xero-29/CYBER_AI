@@ -1,0 +1,3022 @@
+{
+  "schema_version": "2.0.0",
+  "specialty": "foundations",
+  "generated_at": "2026-11-19",
+  "source": "FOUNDATIONS_CURRICULUM_MAP_V2.md",
+  "standard": "../../EXPERT_RESEARCH_STANDARD.md",
+  "protocol": "../../COLD_KNOWLEDGE_EXECUTION_PROTOCOL.md",
+  "interpretation": "Subtopic-level baseline. not_assessed means evidence has not yet been mapped and evaluated; it does not mean the subject has no content. No approval is inferred from document presence, headings, length or references.",
+  "summary": {
+    "subtopics": 102,
+    "layer_checks": 1224,
+    "capability_checks": 408,
+    "approved": 0
+  },
+  "layers": {
+    "L1": "Fundamentos teóricos",
+    "L2": "Fundamentos matemáticos y formales",
+    "L3": "Arquitectura y funcionamiento interno",
+    "L4": "Estándares y metodologías",
+    "L5": "Implementación técnica",
+    "L6": "Análisis avanzado",
+    "L7": "Perspectiva de seguridad",
+    "L8": "Investigación científica",
+    "L9": "Laboratorios y datasets",
+    "L10": "Evaluación y benchmarks",
+    "L11": "Conocimiento operativo y Skills",
+    "L12": "Trazabilidad y mantenimiento"
+  },
+  "capabilities": {
+    "teach": "Enseñar",
+    "explain": "Explicar",
+    "analyze": "Analizar",
+    "design": "Diseñar"
+  },
+  "subtopics": [
+    {
+      "id": "FND-01.01",
+      "name": "Seguridad, safety, privacidad, confiabilidad, disponibilidad y resiliencia: definiciones, diferencias y conflictos.",
+      "layers": {
+        "L1": "in_progress",
+        "L2": "in_progress",
+        "L3": "in_progress",
+        "L4": "in_progress",
+        "L5": "in_progress",
+        "L6": "in_progress",
+        "L7": "in_progress",
+        "L8": "in_progress",
+        "L9": "in_progress",
+        "L10": "in_progress",
+        "L11": "in_progress",
+        "L12": "in_progress"
+      },
+      "capabilities": {
+        "teach": "in_progress",
+        "explain": "in_progress",
+        "analyze": "in_progress",
+        "design": "in_progress"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [
+        "topics/FND-01-01_SECURITY_SAFETY_PRIVACY_RELIABILITY_RESILIENCE.md",
+        "../../research/source_registry.json",
+        "topics/FND-01-01_COLD_ASSESSMENT_V1.md",
+        "topics/FND-01-01_ASSESSOR_GUIDE_V1.md",
+        "topics/FND-01-01_TECHNICAL_DEEPENING_CASEBOOK_V1.md",
+        "SOURCE_REVIEW_ADDENDUM_NIST_800_160_2026-11-19.md",
+        "COLOMBIA_APPLICABILITY_FND_01_01_2026-11-19.md",
+        "topics/FND-01-01_CAPABILITY_WORKED_SOLUTIONS_V1.md",
+        "topics/FND-01-01_COLD_ASSESSMENT_V2.md",
+        "topics/FND-01-01_INDEPENDENT_ASSESSOR_PROTOCOL_V1.md",
+        "FND_01_01_PRIMARY_SOURCE_SYNTHESIS_2026-11-19.md",
+        "topics/FND-01-01_ASSESSOR_GUIDE_V2.md"
+      ],
+      "nonconformities": [
+        "NC-FND-01.01-01: revisión integral de fuentes primarias y referencias críticas pendiente, incluidas las publicaciones NIST 800-160; las revisiones dirigidas no equivalen a lectura integral.",
+        "NC-FND-01.01-02: mapa colombiano parcial para Ley 1581/2012 y agua de consumo humano; normas de safety funcional/sectoriales y validación jurídica independiente pendientes.",
+        "NC-FND-01.01-03: instrumento V2 corregido y protocolo de doble calificación preparados; faltan administración supervisada, dos evaluadores independientes cualificados, hojas originales y adjudicación.",
+        "NC-FND-01.01-04: revisión disciplinar independiente pendiente",
+        "NC-FND-01.01-05: contraste integral de modelos de confiabilidad/safety y revisión primaria pendiente; anexo técnico no cierra madurez."
+      ],
+      "review": "internal_draft_not_assessed"
+    },
+    {
+      "id": "FND-01.02",
+      "name": "CIA y propiedades ampliadas: autenticidad, responsabilidad, trazabilidad, no repudio, integridad de origen y seguridad funcional.",
+      "layers": {
+        "L1": "in_progress",
+        "L2": "in_progress",
+        "L3": "in_progress",
+        "L4": "in_progress",
+        "L5": "in_progress",
+        "L6": "in_progress",
+        "L7": "in_progress",
+        "L8": "in_progress",
+        "L9": "in_progress",
+        "L10": "in_progress",
+        "L11": "in_progress",
+        "L12": "in_progress"
+      },
+      "capabilities": {
+        "teach": "in_progress",
+        "explain": "in_progress",
+        "analyze": "in_progress",
+        "design": "in_progress"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [
+        "topics/FND-01-02_SECURITY_PROPERTIES_CIA_EXTENDED.md",
+        "../../research/source_registry.json"
+      ],
+      "nonconformities": [
+        "NC-FND-01.02-01: lectura integral de estándares y fuentes primarias pendiente",
+        "NC-FND-01.02-02: evaluación en frío no administrada",
+        "NC-FND-01.02-03: revisión disciplinar independiente pendiente",
+        "NC-FND-01.02-04: normas de aplicación sectorial/colombiana pendientes"
+      ],
+      "review": "internal_draft_not_assessed"
+    },
+    {
+      "id": "FND-01.03",
+      "name": "Activo, sujeto, objeto, recurso, dato, proceso, servicio, misión y stakeholder.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-01.04",
+      "name": "Política, mecanismo, control, salvaguarda, requisito, garantía, evidencia y riesgo residual.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-01.05",
+      "name": "Modelos de control de acceso: DAC, MAC, RBAC, ABAC; modelo de referencia, límites y composición.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-01.06",
+      "name": "Modelos de confianza: perímetro, Zero Trust, confianza explícita, delegación y confianza transitoria.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-01.07",
+      "name": "Modelos de seguridad clásicos y formales: Bell-LaPadula, Biba, Clark-Wilson, Brewer-Nash; aplicabilidad y límites.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-01.08",
+      "name": "Principios de diseño: mínimo privilegio, mediación completa, fail-safe defaults, separación de funciones, economía de mecanismo, open design y defense in depth.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-01.09",
+      "name": "Propiedades emergentes, fallos comunes, dependencias y límites del razonamiento por componentes.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-01.10",
+      "name": "Ontología común, vocabulario controlado y errores conceptuales recurrentes.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-02.01",
+      "name": "Sistema de interés, contexto operacional, misión, objetivos y fronteras de análisis.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-02.02",
+      "name": "Inventario de hardware, software, firmware, identidades, datos, servicios, procesos y terceros.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-02.03",
+      "name": "Clasificación de activos y datos por sensibilidad, criticidad, impacto y obligaciones.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-02.04",
+      "name": "Propietario, custodio, operador, consumidor, proveedor y responsabilidad compartida.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-02.05",
+      "name": "Descubrimiento, reconciliación, resolución de entidades, procedencia y confianza de inventario.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-02.06",
+      "name": "Dependencias técnicas, organizativas, físicas, cloud y supply chain; concentración y puntos únicos de fallo.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-02.07",
+      "name": "Activos efímeros, shadow IT, BYOD, SaaS, serverless, recursos desconectados y activos no observables.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-02.08",
+      "name": "Gestión de configuración, baseline, drift, cambios y deuda técnica.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-02.09",
+      "name": "Adquisición, desarrollo, despliegue, operación, mantenimiento, transferencia, retiro y sanitización.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-02.10",
+      "name": "Inventario como grafo dinámico; cobertura, frescura, sesgo de observación y calidad de datos.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-03.01",
+      "name": "Descomposición de sistemas, arquitectura lógica/física y vistas de stakeholder.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-03.02",
+      "name": "Flujos de datos, flujos de autoridad, interfaces, estados y protocolos.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-03.03",
+      "name": "Límites de confianza, dominios administrativos, zonas, planos de control y datos.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-03.04",
+      "name": "Requisitos de seguridad derivados de misión, pérdidas temidas y escenarios.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-03.05",
+      "name": "Ingeniería de requisitos: trazabilidad, verificabilidad, completitud, consistencia y priorización.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-03.06",
+      "name": "Secure Systems Engineering, ciclo de vida, iteración, recursividad y assurance.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-03.07",
+      "name": "Arquitectura de referencia, patrones, separación, aislamiento y defensa en profundidad.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-03.08",
+      "name": "Verificación, validación, revisión, análisis, pruebas y evidencia: diferencias y relación.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-03.09",
+      "name": "Trade studies, análisis multicriterio, restricciones, coste, rendimiento y riesgo.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-03.10",
+      "name": "Modos degradados, resiliencia arquitectónica, recuperación y eliminación segura.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-04.01",
+      "name": "Amenaza, actor, capacidad, intención, oportunidad, evento, vulnerabilidad, exposición, impacto y riesgo.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-04.02",
+      "name": "Adversarios intencionales, error humano, accidente, fallo técnico, desastre y dependencia.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-04.03",
+      "name": "Superficie de ataque técnica, humana, física, organizativa y de terceros.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-04.04",
+      "name": "STRIDE, misuse/abuse cases, árboles de ataque, DFD y modelado de amenazas.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-04.05",
+      "name": "Grafos de ataque, precondiciones, transiciones, rutas AND/OR y alcanzabilidad.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-04.06",
+      "name": "FMEA/FMECA, fault trees, bow-tie, análisis causal y causa raíz.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-04.07",
+      "name": "Riesgo contextual: horizonte, escenarios, probabilidad condicionada, impacto y decisión.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-04.08",
+      "name": "Incertidumbre aleatoria/epistémica, calidad de evidencia, sesgos y desacuerdo experto.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-04.09",
+      "name": "Sensibilidad, escenarios extremos plausibles, colas, dependencia y riesgo sistémico.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-04.10",
+      "name": "Priorización, tratamiento, aceptación, transferencia, evitación y riesgo residual.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-04.11",
+      "name": "Límites de CVSS, matrices ordinales, taxonomías y scores; no confundir puntuación con riesgo contextual.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-04.12",
+      "name": "Actualización del modelo ante cambios, incidentes, amenazas y nuevas dependencias.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-05.01",
+      "name": "Identidades humanas, máquinas, servicios, workloads, dispositivos y agentes.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-05.02",
+      "name": "Identificación, autenticación, autorización, accounting y auditoría: separación conceptual.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-05.03",
+      "name": "Factores de autenticación, MFA, phishing resistance, passkeys y recuperación de cuenta.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-05.04",
+      "name": "Sesiones, tokens, claims, scopes, audiencia, expiración, replay y revocación.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-05.05",
+      "name": "Autorización centralizada/local, PDP/PEP, atributos, políticas y enforcement.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-05.06",
+      "name": "RBAC/ABAC/ReBAC/capability-based access: modelos, composición y trade-offs.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-05.07",
+      "name": "Federación, delegación, impersonation, confused deputy y cadena de confianza.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-05.08",
+      "name": "Identidades privilegiadas, separación de funciones y acceso de emergencia.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-05.09",
+      "name": "Ciclo de vida de identidades, alta/cambio/baja, cuentas huérfanas y permisos residuales.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-05.10",
+      "name": "Consistencia, caché, TOCTOU, revocación y fail-open/fail-closed.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-05.11",
+      "name": "Evidencia de identidad y auditoría con minimización de datos.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-05.12",
+      "name": "Límites del fundamento: protocolos e implementaciones detalladas se desarrollan en Identity.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-06.01",
+      "name": "Objetivos criptográficos: confidencialidad, integridad, autenticación, firma y establecimiento de claves.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-06.02",
+      "name": "Entropía, aleatoriedad, nonces, IV, semillas, generadores y errores de uso.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-06.03",
+      "name": "Cifrado simétrico, modos, AEAD y requisitos de nonce.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-06.04",
+      "name": "Criptografía asimétrica, firmas, KEM, intercambio de claves y PKI.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-06.05",
+      "name": "Hash, MAC, KDF, derivación, salting y compromisos.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-06.06",
+      "name": "Gestión de claves: generación, distribución, almacenamiento, uso, rotación, recuperación y destrucción.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-06.07",
+      "name": "Secretos, certificados, trust stores, HSM/KMS y separación de funciones.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-06.08",
+      "name": "Datos en reposo, tránsito y uso; cifrado, tokenización, seudonimización y minimización.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-06.09",
+      "name": "Criptoanálisis y fallos de implementación: side channels, downgrade, replay, nonce reuse y RNG.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-06.10",
+      "name": "Agilidad criptográfica, migración post-cuántica, inventario y dependencias.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-06.11",
+      "name": "Validación, estándares, módulos criptográficos y límites de claims de cumplimiento.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-06.12",
+      "name": "Límites del fundamento: pruebas de seguridad y protocolos avanzados se desarrollan en Crypto.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-07.01",
+      "name": "Control preventivo, detectivo, correctivo, disuasivo, compensatorio y recuperación.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-07.02",
+      "name": "Diseño de controles, objetivos, owner, alcance, frecuencia, excepción y evidencia.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-07.03",
+      "name": "Observabilidad, telemetría, logs, eventos, métricas, trazas y procedencia.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-07.04",
+      "name": "Integridad, sincronización temporal, retención, privacidad y cadena de custodia.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-07.05",
+      "name": "Detección, hipótesis, correlación, tasa base, falsos positivos/negativos y triage.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-07.06",
+      "name": "Gestión de incidentes, severidad, escalamiento, comunicación y coordinación.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-07.07",
+      "name": "Contención, erradicación, recuperación, validación y prevención de recurrencia.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-07.08",
+      "name": "Continuidad, análisis de impacto, funciones críticas, RTO/RPO y dependencias.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-07.09",
+      "name": "Backup, restauración, identidad, claves, configuración y recuperación de proveedores.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-07.10",
+      "name": "Métricas operativas, MTTD/MTTA/MTTR, cobertura, completitud y límites interpretativos.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-07.11",
+      "name": "Control assurance: diseño, implementación, operación, eficacia y riesgo residual.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-07.12",
+      "name": "Automatización, supervisión humana, criterios de parada y rollback.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-08.01",
+      "name": "Gobierno, gestión, estrategia, apetito, tolerancia y autoridad de decisión.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-08.02",
+      "name": "Roles, accountability, tres líneas, independencia y conflictos de interés.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-08.03",
+      "name": "Políticas, estándares internos, procedimientos, excepciones y gestión de cambios.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-08.04",
+      "name": "Obligaciones legales, contractuales, regulatorias y sectoriales; jurisdicción y vigencia.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-08.05",
+      "name": "Privacidad: finalidad, minimización, proporcionalidad, derechos y ciclo de vida de datos.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-08.06",
+      "name": "Safety y análisis de peligros cuando exista impacto físico/ambiental.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-08.07",
+      "name": "Terceros, subprocesadores, cadena de suministro, concentración, continuidad y salida.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-08.08",
+      "name": "Gestión de riesgo empresarial y tecnológico, tratamiento y aceptación formal.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-08.09",
+      "name": "NIST CSF/RMF/800-53, ISO, CIS y otros marcos: alcance y no equivalencia.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-08.10",
+      "name": "Assurance cases: claims, argumentos, evidencia, supuestos y derrotadores.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-08.11",
+      "name": "Auditoría, evaluación independiente, certificación y límites de atestación.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-08.12",
+      "name": "Comunicación ejecutiva, reporte de riesgo, excepciones y mejora continua.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-09.01",
+      "name": "Lógica, conjuntos, relaciones, predicados, invariantes y lógica temporal.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-09.02",
+      "name": "Grafos, árboles, redes, alcanzabilidad y análisis de dependencias.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-09.03",
+      "name": "Probabilidad, Bayes, dependencia, tasas base y calibración.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-09.04",
+      "name": "Estadística descriptiva/inferencial, muestreo, intervalos y tamaños de efecto.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-09.05",
+      "name": "Incertidumbre, sensibilidad, análisis de escenarios y valor de información.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-09.06",
+      "name": "Métricas, denominadores, prevalencia, sesgo, validez y comparabilidad.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-09.07",
+      "name": "Diseño experimental, variables, controles, baselines y amenazas a validez.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-09.08",
+      "name": "Benchmarks, ground truth, etiquetado, acuerdo interevaluador y contaminación.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-09.09",
+      "name": "Revisión sistemática, estrategia de búsqueda, inclusión/exclusión y síntesis crítica.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-09.10",
+      "name": "Hipótesis falsables, reproducibilidad, resultados negativos y límites de generalización.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-09.11",
+      "name": "Investigación aplicada: pregunta, método, datos, análisis, incertidumbre y conclusión.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    },
+    {
+      "id": "FND-09.12",
+      "name": "Comunicación técnica y visualización sin falsa precisión.",
+      "layers": {
+        "L1": "not_assessed",
+        "L2": "not_assessed",
+        "L3": "not_assessed",
+        "L4": "not_assessed",
+        "L5": "not_assessed",
+        "L6": "not_assessed",
+        "L7": "not_assessed",
+        "L8": "not_assessed",
+        "L9": "not_assessed",
+        "L10": "not_assessed",
+        "L11": "not_assessed",
+        "L12": "not_assessed"
+      },
+      "capabilities": {
+        "teach": "not_assessed",
+        "explain": "not_assessed",
+        "analyze": "not_assessed",
+        "design": "not_assessed"
+      },
+      "theoretical_maturity": "T0",
+      "operational_maturity": "O0",
+      "evidence": [],
+      "nonconformities": [],
+      "review": "pending"
+    }
+  ]
+}

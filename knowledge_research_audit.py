@@ -162,6 +162,8 @@ def audit_research_library(root: Path = ROOT) -> dict:
     reviewed_statuses = {
         "official_project_page_reviewed", "official_risk_page_reviewed",
         "official_metadata_and_abstract_reviewed", "official_pdf_sections_inspected",
+        "selected_sections_reviewed", "version_and_changelog_reviewed",
+        "official_version_metadata_reviewed", "official_metadata_and_errata_notice_reviewed",
         "official_draft_metadata_reviewed", "official_draft_metadata_and_announcement_reviewed",
         "official_specification_pages_reviewed",
         "official_data_repository_reviewed", "official_release_notes_reviewed",

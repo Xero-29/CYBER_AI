@@ -122,3 +122,24 @@ Definir H0/H1, variables, población, comparadores, criterio de refutación, an�
 
 ## Madurez
 M0/M1 estructural. No acredita profundidad ni M3/M4/M5. Para avanzar: leer fuentes completas, producir artefactos específicos, ejecutar laboratorios y registrar evidencia auditable.
+
+
+## Profundización técnica específica: PKI y HSM
+
+### Arquitectura PKI
+Modelar raíz offline, CAs intermedias, RA, repositorios, OCSP/CRL, CT, políticas, perfiles, relying parties y automatización ACME. Definir CP/CPS, identidad, validación, emisión, renovación, revocación, expiración y trust anchors. Separar emisión de autorización de uso.
+
+### Certificados y validación
+Revisar SAN, EKU, key usage, basic constraints, path building, name constraints, policy OIDs, algoritmos, validity periods, revocation checking y hostname. Un certificado válido no implica identidad autorizada. Controlar certificados wildcard, misissuance, subCA, certificados huérfanos y private key reuse.
+
+### HSM y custodia
+Evaluar FIPS level/validation scope, tamper resistance, partitions, roles, quorum, audit logs, backup, HA, firmware, remote admin y key export policy. Certificación aplica a módulo/configuración/operación definidos, no a todo el sistema. Definir ceremonias de claves, dual control, split knowledge y recuperación.
+
+### Automatización y ciclo de vida
+Inventariar certificados, owners, SAN, issuer, key type, expiry, usage, environment y rotation. Automatizar emisión/renovación sin exponer private keys. Alertar expiración, CA compromise, anomalías de emisión y uso. Diseñar revocación efectiva en clientes y servicios.
+
+### Laboratorios
+Construir CA de laboratorio, emitir/revocar certificados, probar path validation, expiración, hostname mismatch y rotación de HSM simulado. Medir tiempo de propagación, cobertura y fallos de cliente. No usar claves privadas reales.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.

@@ -122,3 +122,28 @@ Definir H0/H1, variables, población, comparadores, criterio de refutación, an�
 
 ## Madurez
 M0/M1 estructural. No acredita profundidad ni M3/M4/M5. Para avanzar: revisar fuentes completas, elaborar artefactos específicos, ejecutar casos y registrar evidencia auditable.
+
+
+## Profundización técnica específica: EDR y XDR
+
+### Arquitectura de sensores y telemetría
+Modelar agentes endpoint, kernel/user sensors, cloud connectors, identity telemetry, network sensors, data lake, analytics, console, APIs y response actions. Evaluar cobertura por OS/versión, salud de sensor, pérdida de eventos, buffering offline, latencia, integridad y privacidad. Un agente instalado no implica telemetría completa ni protección activa.
+
+### Detección y correlación
+Combinar proceso, command line, parent-child, módulos, archivos, registry, autenticación, DNS, conexiones, cloud audit y comportamiento. Reglas deben tener hipótesis, ATT&CK mapping, prerequisites, expected telemetry, tuning y expiración. XDR correlaciona dominios, pero errores de identidad, reloj o deduplicación generan historias falsas.
+
+### Prevención y respuesta
+Evaluar bloqueo, quarantine, isolate host, kill process, rollback, containment y remote shell con control de permisos. Definir aprobaciones, impacto, rollback, auditoría y break-glass. Evitar acciones automáticas irreversibles sin umbrales y contexto. En OT/servidores críticos, aislar puede causar daño operacional.
+
+### Ingeniería de detección
+Crear datasets sintéticos y emulación controlada; versionar reglas, parsers, watchlists y exclusions. Medir precision, recall, FPR/FNR, alert volume, MTTD, triage time y performance overhead. Pruebas ATT&CK deben ser seguras y autorizadas; una técnica detectada en una plataforma no generaliza a todos los endpoints.
+
+### Laboratorios
+- Replay de eventos sintéticos multi-host.
+- Validación de regla de proceso y red con ground truth.
+- Simulación de sensor offline y medición de gaps.
+- Prueba de aislamiento con rollback en VM desechable.
+Registrar agente, policy, tenant, versión, OS, reglas, datos y resultados.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.

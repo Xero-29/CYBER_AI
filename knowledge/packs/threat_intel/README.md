@@ -50,3 +50,12 @@ MITRE ATT&CK, D3FEND, STIX 2.1, TAXII 2.1, FIRST EPSS, CISA KEV, MISP y OpenCTI.
 
 ## Instrucciones para agentes IA
 No atribuyas campañas por similitud superficial. Marca fecha y confianza. No copies fuentes restringidas a la biblioteca compartida ni conviertas IOCs sin contexto en reglas de bloqueo.
+
+## Biblioteca técnica e agenda de investigación
+
+- [Compendio técnico específico](../../deep_modules/threat_intel/TECHNICAL_COMPENDIUM.md)
+- [Agenda de investigación y protocolos](../../deep_modules/threat_intel/RESEARCH_AGENDA.md)
+- [Revisión exploratoria de literatura](../../deep_modules/threat_intel/LITERATURE_REVIEW.md)
+- [Seguimiento global de madurez y evidencia](../../EXPERT_LIBRARY_COMPLETION_TRACKER.md)
+
+**Estado:** desarrollo editorial M2; las fuentes integrales, laboratorios ejecutados y revisión independiente siguen pendientes. No interpretar laboratorios diseñados como pruebas ejecutadas.

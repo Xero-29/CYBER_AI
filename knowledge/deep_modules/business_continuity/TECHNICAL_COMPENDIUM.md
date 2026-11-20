@@ -122,3 +122,24 @@ Definir H0/H1, variables, población, comparadores, criterio de refutación, an�
 
 ## Madurez
 M0/M1 estructural. No acredita profundidad ni M3/M4/M5. Para avanzar: leer fuentes completas, producir artefactos específicos, ejecutar laboratorios y registrar evidencia auditable.
+
+
+## Profundización técnica específica: Continuidad de negocio y resiliencia
+
+### BIA y dependencias
+Identificar productos/servicios críticos, procesos, personas, proveedores, tecnología, instalaciones, datos y dependencias. Definir MTPD, RTO, RPO, MBCO y tolerancia a degradación con dueños de negocio. RTO/RPO deben derivarse de impacto y probarse; no asignarse por plantilla. Mapear dependencias compartidas y concentración cloud/MSP.
+
+### Estrategia de continuidad
+Definir alternativas de personal, ubicación, comunicaciones, proveedores, operación manual, redundancia, failover y capacidad degradada. Analizar riesgos de diseño activo-activo/activo-pasivo, split-brain, replicación de corrupción, dependencia de identidad/DNS y pérdida regional. Redundancia sin independencia real puede replicar fallo.
+
+### Recuperación cibernética
+Backups inmutables/aislados, credenciales separadas, protección de catálogo, clean room, golden images, restauración por capas y validación de integridad. Ransomware puede comprometer backups y credenciales. Definir secuencia de recuperación de identidad, red, seguridad, datos y aplicaciones. No reconectar antes de erradicar causa raíz.
+
+### Crisis y comunicación
+Establecer comité, autoridad, sucesión, canales alternos, mensajes, criterios de activación y relación con reguladores/terceros. Simular pérdida de correo/IdP/telefonía y coordinar decisiones de negocio. Documentar decisiones y supuestos.
+
+### Pruebas y métricas
+Ejercicios tabletop, walk-through, failover técnico, restore y simulación de crisis. Medir RTO/RPO observado, pérdida de datos, dependencia no identificada, errores humanos, disponibilidad de proveedores y tiempo de decisión. Reportar límites del ejercicio y acciones con dueño/plazo.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.

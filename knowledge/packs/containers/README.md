@@ -51,3 +51,15 @@ CIS Kubernetes Benchmark, NSA/CISA Kubernetes Hardening Guidance, Kubernetes Pod
 
 ## Instrucciones para agentes IA
 No afirmes que Docker aísla malware. No sugieras montar socket Docker o host filesystem para resolver tareas. Usa manifiestos sintéticos y bloquea cualquier prueba de escape fuera de VM desechable.
+
+---
+
+## Marco obligatorio de desarrollo experto e investigación
+
+Este paquete se desarrolla conforme al [Estándar experto e investigación](../../EXPERT_RESEARCH_STANDARD.md). El estándar aplica a esta especialidad, no solo al currículo global.
+
+**Estado del perfil:** estructura y mapa de evidencias definidos; el contenido técnico ampliado, la revisión integral de fuentes, los laboratorios ejecutados y la validación independiente se registran por separado. No se declara K4/K5 por la existencia de este marco.
+
+Cada tema de esta especialidad debe desarrollarse como unidad independiente y cubrir: teoría, formalización pertinente, arquitectura, estándares versionados, implementación, análisis avanzado, seguridad adaptada al dominio, investigación, laboratorio/dataset, evaluación, Skills verificadas y trazabilidad. La matriz detallada de capas, evidencias, enfoque matemático y restricciones de laboratorio está en `knowledge/curricula/domain_curriculum.json`, dentro del perfil `containers`.
+
+**Madurez:** K1–K5 se asigna por tema y evidencia. Las ocho puertas G1–G8 deben mostrar estado explícito; lo no ejecutado o no revisado permanece pendiente. Las referencias descubiertas no cuentan como lectura completa y los laboratorios diseñados no cuentan como ejecutados.
