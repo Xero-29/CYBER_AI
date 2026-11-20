@@ -178,3 +178,8 @@ Umbral interno: mínimo 3 en cada dimensión; 4 y revisión independiente para s
 5. NIST CSRC Glossary: entradas seleccionadas; interpretar cada definición en contexto de su publicación fuente.
 
 Pendiente: lectura integral de SP 800-160/800-53 y normas sectoriales; legislación colombiana; evaluación administrada; revisión independiente. Sin evidencia experimental u operacional.
+
+
+## Ampliación 2026-11-20
+
+La síntesis primaria, el modelo ampliado de propiedades y los contraejemplos se encuentran en [FND_01_02_PRIMARY_SOURCE_SYNTHESIS_2026-11-20.md](../FND_01_02_PRIMARY_SOURCE_SYNTHESIS_2026-11-20.md). El instrumento en frío está en [FND_01_02_COLD_ASSESSMENT_V1.md](../FND_01_02_COLD_ASSESSMENT_V1.md); está preparado, no administrado.

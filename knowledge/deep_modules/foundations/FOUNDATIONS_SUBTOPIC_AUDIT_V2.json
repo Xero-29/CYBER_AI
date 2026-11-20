@@ -128,7 +128,9 @@
         "topics/FND-01-02_SECURITY_PROPERTIES_CIA_EXTENDED.md",
         "../../research/source_registry.json",
         "FND_01_01_SAFETY_SECURITY_PRIVACY_RESILIENCE_CROSSWALK_2026-11-20.md",
-        "../../research/source_registry.json"
+        "../../research/source_registry.json",
+        "FND_01_02_PRIMARY_SOURCE_SYNTHESIS_2026-11-20.md",
+        "FND_01_02_COLD_ASSESSMENT_V1.md"
       ],
       "nonconformities": [
         "NC-FND-01.02-01: lectura integral de estándares y fuentes primarias pendiente",
@@ -138,15 +140,16 @@
       ],
       "review": "internal_draft_not_assessed",
       "cold_remediation_2026_11_20": {
-        "status": "source_and_conceptual_crosswalk_added_assessment_pending",
+        "status": "documentary_synthesis_and_assessment_instrument_prepared_not_administered",
         "completed": [
-          "CIA scope anchored to FIPS 199 and NIST CSF 2.0",
-          "Distinctions among authenticity, accountability, non-repudiation, privacy, safety, reliability and resilience documented"
+          "CIA scope and limits anchored to FIPS 199",
+          "Distinctions among authenticity, authorization, accountability, non-repudiation, provenance, privacy, safety, reliability and resilience",
+          "Cold assessment instrument and fail conditions prepared"
         ],
         "pending": [
           "Full-text review of primary standards",
-          "Cold assessment administration",
-          "Independent disciplinary review",
+          "Administer cold assessment and preserve original responses",
+          "Independent second scoring and adjudication",
           "Sectoral and Colombian applicability review"
         ],
         "no_maturity_promotion": true
