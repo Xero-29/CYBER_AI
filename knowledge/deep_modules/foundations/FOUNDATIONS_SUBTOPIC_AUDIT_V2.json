@@ -75,9 +75,9 @@
         "../../research/source_registry.json",
         "labs/runner.py",
         "labs/results.json",
-        "../../../../tests/test_foundations_labs.py",
-        "../../../skills/candidates/README.md",
-        "../../../skills/candidates/FND-01-01_INTEGRATED_PROPERTY_ANALYSIS.md"
+        "../../../tests/test_foundations_labs.py",
+        "../../skills/candidates/skills/candidates/README.md",
+        "../../skills/candidates/skills/candidates/FND-01-01_INTEGRATED_PROPERTY_ANALYSIS.md"
       ],
       "nonconformities": [
         "NC-FND-01.01-01: revisión integral de fuentes primarias y referencias críticas pendiente, incluidas las publicaciones NIST 800-160; las revisiones dirigidas no equivalen a lectura integral.",
@@ -142,9 +142,9 @@
         "FND_01_02_COLD_ASSESSMENT_V1.md",
         "labs/runner.py",
         "labs/results.json",
-        "../../../../tests/test_foundations_labs.py",
-        "../../../skills/candidates/README.md",
-        "../../../skills/candidates/FND-01-02_CIA_PROPERTY_ASSESSMENT.md"
+        "../../../tests/test_foundations_labs.py",
+        "../../skills/candidates/skills/candidates/README.md",
+        "../../skills/candidates/skills/candidates/FND-01-02_CIA_PROPERTY_ASSESSMENT.md"
       ],
       "nonconformities": [
         "NC-FND-01.02-01: lectura integral de estándares y fuentes primarias pendiente",
