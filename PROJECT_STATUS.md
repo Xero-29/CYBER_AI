@@ -1,52 +1,54 @@
 # Estado de ingeniería y auditoría — 2026-11-20
 
-**Repositorio:** Xero-29/CYBER_AI  
-**Rama de trabajo:** codex/security-integrity-audit  
-**HEAD previo a esta corrección de regresiones:** 324318803abe7c2cceb8dfce28ed987b1b134ca2  
-**main:** 9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea  
-**Ancestro común:** cae816d6037b56f017c2fbdbb3e98ef00df58c1d
+**Repositorio:** `Xero-29/CYBER_AI`  
+**Rama de trabajo:** `codex/security-integrity-audit`  
+**HEAD de código/documentación:** `4a19e2ffa04522de1aee03ad741d182f1478948d`  
+**main:** `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`  
+**Ancestro común:** `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`
 
-## Divergencia e integración
+## Estado de ramas e integración
 
-- Comparación de tres puntos: **573 commits exclusivos de main y 186 exclusivos de la rama de auditoría**. No es una divergencia de un único commit.
-- PR #2 está cerrado y fusionado (merge commit 478c6ddc676221e4c07b8c5780f127bc5a9e749e). PR #11, #12, #13 y #14 siguen abiertos en draft sobre ramas distintas. No existe PR abierto para la rama actual.
-- main permanece intacto. No se ejecutó merge, rebase, cherry-pick ni force-push. La reconciliación sigue reservada para una rama separada y una revisión de tres vías.
+- Comparación actual `main...codex/security-integrity-audit`: **194 commits exclusivos de la rama y 573 exclusivos de main**. El grafo ya no corresponde a la hipótesis histórica de un único commit exclusivo de main.
+- El HEAD de `main` inspeccionado, `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`, añade dos regresiones en `tests/test_tool_adapters.py`: OSV con base de datos ausente y Grype con base obsoleta deben bloquear el inicio del proceso. Se conserva ese commit y toda la historia exclusiva de `main`.
+- PR #2 está **cerrado y fusionado** desde el 2026-11-17; merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. Ese PR no representa el HEAD actual de la rama.
+- No hay PR abierto asociado a la rama actual. PR #11, #12, #13 y #14 continúan abiertos en draft, en ramas separadas. #11 trata locks/SBOM; #12 porta activos seleccionados sobre main; #13 y #14 tratan investigación y biblioteca de conocimiento. No se creó un PR duplicado.
+- No se ejecutó merge, rebase, cherry-pick, force-push ni escritura en `main`. No se integrará la divergencia sin una reconciliación de tres vías separada, inventario de conflictos y validación completa.
 
-## Validación previa
+## Corrección implementada en este corte
 
-- HEAD abae3977ed147e79b2612b0dad4ddf3598b7b1d9: Python Tests **success** (624 pruebas, 4 skipped), [run 44761016119](https://github.com/Xero-29/CYBER_AI/actions/runs/44761016119); Docker Sandbox **success** (624 pruebas, 4 skipped y Ruff aislado), [run 44761016049](https://github.com/Xero-29/CYBER_AI/actions/runs/44761016049).
-- SBOM CycloneDX de aplicación, sandbox y extractores, más manifiestos de artefactos/procedencia: [artefacto SBOM](https://github.com/Xero-29/CYBER_AI/actions/runs/44761016119/artifacts/14641340924). Evidencia Docker: [artefacto](https://github.com/Xero-29/CYBER_AI/actions/runs/44761016049/artifacts/14641940096).
-- En el HEAD 324318803abe7c2cceb8dfce28ed987b1b134ca2, Python Tests falló solo por dos aserciones de texto que esperaban el mensaje singular “directorio padre”; 627 pruebas, 2 failures y 4 skipped. Docker Sandbox seguía en curso al registrar este estado; no se declara verde ese SHA.
+- `data_backup.py` ahora limita la profundidad del JSON del manifiesto a 64 niveles **antes** de llamar al decodificador recursivo de la biblioteca estándar.
+- El escáner léxico ignora delimitadores dentro de cadenas JSON, incluidas comillas escapadas y barras inversas; el límite de bytes de 16 MiB y el rechazo de claves duplicadas se mantienen.
+- `tests/test_data_backup.py` conserva la regresión de 2.000 niveles de objetos y añade una prueba que verifica que corchetes/llaves dentro de cadenas no produzcan falsos positivos.
+- La causa del fallo anterior era que `_validate_manifest` rechazaba primero el esquema desconocido y nunca inspeccionaba la estructura profunda; el nuevo control ocurre antes de `json.loads` y antes de validar el esquema.
 
-## Corrección de la política de autorización
+## CI del HEAD exacto
 
-- execution_policy.py ahora inspecciona todos los componentes de la ruta y vuelve a comprobar la identidad de la cadena de directorios durante la lectura. Rechaza enlaces simbólicos/junctions en cualquier ancestro, directorios modificables por grupo/otros y hardlinks del archivo de política.
-- Las autorizaciones activas deben residir fuera del repositorio. La comprobación usa la ruta absoluta ya validada, sin volver a resolverla después de leer el descriptor, evitando una ventana de sustitución al aplicar la regla de ubicación.
-- tests/test_execution_policy.py cubre ancestros enlazados, hardlinks y políticas activas dentro del repositorio.
-- La ejecución CI del siguiente HEAD debe validar estos cambios; no se extrapola el resultado de 624 pruebas del SHA anterior.
+- Python tests — **success, 641 pruebas, 4 skipped**: [run 44766960784](https://github.com/Xero-29/CYBER_AI/actions/runs/44766960784).
+- Docker sandbox — **success, 641 pruebas, 4 skipped y Ruff aislado**: [run 44766960550](https://github.com/Xero-29/CYBER_AI/actions/runs/44766960550).
+- Ambos checks validaron exactamente `4a19e2ffa04522de1aee03ad741d182f1478948d`.
+- El workflow Python instaló dependencias con hashes, validó los locks de runtime/sandbox/documentos, ejecutó la suite también con extractores documentales y generó tres SBOM CycloneDX (aplicación, sandbox y documentos) más provenance. [Artefacto SBOM/provenance](https://github.com/Xero-29/CYBER_AI/actions/runs/44766960784/artifacts/14644233035).
+- El workflow Docker construyó la imagen, ejecutó la suite y Ruff dentro del sandbox; [artefacto de evidencia](https://github.com/Xero-29/CYBER_AI/actions/runs/44766960550/artifacts/14644402908).
+- El entorno de esta ejecución no contiene un checkout local del repositorio; no se afirma una ejecución local independiente. La validación ejecutable disponible es la de GitHub Actions sobre el SHA exacto.
 
-## Capacidades y límites que siguen siendo reales
+## Límites de implementación que siguen abiertos
 
-- El runner de procesos falla cerrado cuando el entorno no garantiza aislamiento de árbol de procesos. Windows aún requiere implementación y pruebas reales de Job Objects para habilitar ejecución allí.
-- El aislamiento de red de las herramientas locales no está impuesto por el proyecto; el estado `network_isolation_enforced=false` no debe interpretarse como aislamiento.
-- El ledger local es tamper-evident, no WORM. KMS/HSM, identidad/RBAC/IdP/MFA y anclaje externo siguen dependiendo de infraestructura.
-- Los backups tienen verificaciones de integridad y restauración, pero faltan cifrado/firmado externo, almacenamiento offsite/WORM y simulacros DR medidos.
-- Docker reduce superficie, pero comparte kernel; no sustituye microVM/VM reforzada para muestras hostiles.
-- Los proveedores y embeddings requieren pruebas contra servicios/modelos reales, con políticas de datos, cuotas, coste, latencia y fallos.
-- La cobertura documental no equivale a validación científica: las fuentes deben leerse íntegramente, enlazarse con afirmaciones concretas, revisarse por especialistas y probarse en laboratorios reproducibles. PR #13 declara sus 192 módulos como borradores iniciales, no como conocimiento ya validado.
+- Windows: la ejecución local falla cerrada porque aún no existe implementación validada de Job Objects. No habilitar ejecución de herramientas en Windows por ahora.
+- POSIX: el grupo de procesos limita terminación ordinaria, pero no contiene descendientes que creen otra sesión; `process_tree_isolation_enforced=false` es el estado correcto. Para código hostil se requiere cgroup/contendor o microVM, no asumir aislamiento completo del host.
+- Docker comparte kernel; no sustituye microVM/VM desechable para muestras hostiles. El aislamiento real de red/egress requiere gateway/firewall configurado y pruebas fuera de CI.
+- El backup local verifica hashes y puede firmar con HMAC configurado, pero no cifra ni equivale a WORM/offsite; custodia de claves, cifrado y recuperación DR dependen de infraestructura externa.
+- Ledger hash-chain local no es anclaje externo. KMS/HSM, RBAC/IdP/MFA, segregación de funciones y almacenamiento WORM siguen sin desplegarse.
+- Proveedores LLM/embeddings requieren pruebas contra servicios reales (política de datos, cuotas, latencia, coste, errores y continuidad).
+- Los 48 dominios y sus documentos no equivalen a validación científica. Las fuentes primarias, licencias, afirmaciones claim-to-source, laboratorios y revisión experta deben completarse; PR #13 declara los 192 módulos como borradores iniciales, no investigaciones independientes aprobadas.
 
-## Pendientes para la siguiente iteración
+## Próxima secuencia de ingeniería
 
-1. Obtener Python Tests y Docker Sandbox exitosos en el HEAD exacto que contiene esta actualización documental; inspeccionar pasos/logs si falla algo.
-2. Seguir auditando las rutas de ejecución, autorización, allowlist, aislamiento, ledger, backups, adaptadores, locks y SBOM; corregir defectos concretos con pruebas de regresión.
-3. Preparar reconciliación separada de la rama con los 573 commits exclusivos de `main`, preservando explícitamente el commit `9bab38f` y el resto de cambios actuales de `main`; no integrar hasta resolver conflictos y ejecutar la suite completa.
-4. Completar la implementación de aislamiento Windows y conectar aislamiento real de red/egress antes de habilitar herramientas locales que lo necesiten.
-5. Ejecutar pruebas operacionales de microVM/escape, concurrencia, carga/soak, disco lleno, fallos de host, backups y recuperación.
-6. Conectar KMS/HSM, RBAC/IdP/MFA, WORM/offsite, cifrado y monitorización/alertas en infraestructura controlada.
-7. Validar proveedores/modelos reales y medir calidad de recuperación por dominio con benchmarks revisados por especialistas.
-8. Completar lectura de fuentes primarias, trazabilidad claim-to-source, revisión experta, licencias y laboratorios reproducibles de la biblioteca.
+1. Continuar auditoría estática de backups/restauración, almacenamiento, ejecución de herramientas, redacción de secretos y proveedores; corregir defectos reproducibles con pruebas.
+2. Revisar el contenido y los checks de PR #11/#12 antes de cualquier portabilidad; evitar duplicar locks, utilidades o workflows ya propuestos.
+3. Preparar, solo en una rama separada, una reconciliación de tres vías con los 573 commits exclusivos de `main` y los 194 de esta rama; preservar explícitamente `9bab38f` y los cambios de ambos lados.
+4. Repetir CI sobre el HEAD final de esa rama separada antes de proponer integración. No usar el resultado verde de este SHA como evidencia de una rama reconciliada.
+5. Mantener bloqueadas las capacidades que dependen de Job Objects, cgroups/microVM, egress, KMS/HSM, RBAC, WORM y servicios/modelos reales hasta validar esas condiciones.
 
-**Conclusión:** la rama no está lista para la validación final del usuario. Primero deben pasar los checks del HEAD actual y continuar la auditoría técnica. No se ha modificado `main` ni se ha fusionado ningún PR.
+**Conclusión de este corte:** la regresión del parser de manifiestos está corregida y ambos workflows pasan en el HEAD exacto. El proyecto todavía no está listo para la validación final del usuario: la auditoría y la reconciliación de ramas siguen abiertas, además de las pruebas operacionales e infraestructura externas.
 
 ---
 
