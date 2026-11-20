@@ -49,6 +49,27 @@ class DataBackupTests(unittest.TestCase):
             with self.assertRaisesRegex(BackupError, "16 MiB"):
                 verify_backup(snapshot)
 
+    def test_manifest_duplicate_json_keys_are_rejected(self):
+        snapshot = self.root / "backup"
+        create_backup(self.data, snapshot)
+        (snapshot / "manifest.json").write_text(
+            '{"schema":"cyber-ai-data-backup-v1",'
+            '"schema":"cyber-ai-data-backup-v1",'
+            '"files":[],"encrypted":false,"requires_quiesced_writers":true}',
+            encoding="utf-8",
+        )
+        with self.assertRaisesRegex(BackupError, "claves JSON duplicadas"):
+            verify_backup(snapshot)
+
+    def test_excessive_manifest_nesting_is_reported_as_backup_error(self):
+        snapshot = self.root / "backup"
+        create_backup(self.data, snapshot)
+        (snapshot / "manifest.json").write_text(
+            "[" * 2000 + "0" + "]" * 2000, encoding="utf-8"
+        )
+        with self.assertRaisesRegex(BackupError, "profundidad JSON"):
+            verify_backup(snapshot)
+
     def test_backup_and_verifier_enforce_file_count_limit(self):
         snapshot = self.root / "backup"
         with patch("data_backup.MAX_BACKUP_FILES", 1):

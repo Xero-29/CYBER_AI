@@ -26,6 +26,15 @@ class BackupError(ValueError):
     pass
 
 
+def _unique_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise BackupError("El manifiesto contiene claves JSON duplicadas.")
+        result[key] = value
+    return result
+
+
 def _sha256(path):
     digest = hashlib.sha256()
     with Path(path).open("rb") as stream:
@@ -284,7 +293,11 @@ def verify_backup(snapshot, *, require_signature=False):
         manifest_bytes = manifest_path.read_bytes()
         if len(manifest_bytes) > MAX_MANIFEST_BYTES:
             raise BackupError("El manifiesto del backup supera 16 MiB.")
-        manifest = json.loads(manifest_bytes.decode("utf-8"))
+        manifest = json.loads(
+            manifest_bytes.decode("utf-8"), object_pairs_hook=_unique_object
+        )
+    except RecursionError as error:
+        raise BackupError("El manifiesto supera la profundidad JSON permitida.") from error
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
         raise BackupError("El manifiesto no es JSON UTF-8 válido.") from error
     report = _validate_manifest(snapshot, manifest, require_signature=require_signature)
