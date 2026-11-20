@@ -65,6 +65,36 @@ class MetacognitionTests(unittest.TestCase):
         self.assertEqual(state["competencies"]["tcp congestion control"]["status"], "known")
         self.assertNotEqual(state["competencies"]["tcp congestion control"]["status"], "mastered")
 
+    def test_index_failure_blocks_claim_of_ready_knowledge(self):
+        calls = []
+        def model(agent, prompt):
+            calls.append(agent)
+            if agent == "MAIN" and calls.count("MAIN") == 1:
+                return json.dumps({"knowledge_sufficient": False, "confidence": 0.2,
+                    "gaps": [{"topic": "DNSSEC", "why": "missing",
+                              "prerequisites": ["DNS"], "priority": 4}]})
+            if agent == "RESEARCHER":
+                return "Informe con fuentes."
+            if agent == "VERIFIER":
+                return json.dumps({"approved": True, "score": 90, "reasons": []})
+            return json.dumps({"knowledge_sufficient": True, "confidence": 0.9, "gaps": []})
+        with tempfile.TemporaryDirectory() as tmp:
+            result = run_cycle(
+                "Diseñar validación DNSSEC", principal="MAIN",
+                researcher="RESEARCHER", verifier="VERIFIER", model_call=model,
+                publisher=lambda report, task_id: {"indexed": False},
+                source_researcher=lambda task, assessment: "fuentes revisadas",
+                state_path=Path(tmp) / "state.json",
+                log_path=Path(tmp) / "events.jsonl",
+            )
+        self.assertEqual(result["status"], "knowledge_acquired_not_indexed")
+
+    def test_low_confidence_cannot_claim_sufficiency(self):
+        result = validate_assessment({
+            "knowledge_sufficient": True, "confidence": 0.4, "gaps": [],
+        })
+        self.assertFalse(result["knowledge_sufficient"])
+
     def test_researcher_backend_is_replaceable(self):
         seen = []
         backend = ModelBackend("local", "small-model", lambda prompt: seen.append(prompt) or "informe")
