@@ -3,12 +3,12 @@ import re
 
 
 SECRET_FIELD = re.compile(
-    r"(?:api[_-]?key|access[_-]?token|refresh[_-]?token|authorization|"
-    r"password|passwd|secret|credential|private[_-]?key|session[_-]?token)",
+    r"(?:api[_-]?key|access[_-]?token|refresh[_-]?token|token|authorization|"
+    r"password|passwd|secret|credential|private[_-]?key)",
     re.IGNORECASE,
 )
 SECRET_ASSIGNMENT = re.compile(
-    r'''(?i)(["']?(?:api[_-]?key|access[_-]?token|refresh[_-]?token|password|'''
+    r'''(?i)(["']?(?:api[_-]?key|access[_-]?token|refresh[_-]?token|token|password|'''
     r'''passwd|secret|client[_-]?secret|authorization|credential|private[_-]?key)'''
     r'''["']?\s*[:=]\s*)("[^"]*"|'[^']*'|[^\s,;}\]]+)'''
 )

@@ -7,10 +7,10 @@ class SecretRedactionTests(unittest.TestCase):
     def test_redacts_json_fields_assignments_and_bearer_tokens(self):
         raw = (
             '{"api_key":"json-secret","Authorization":"Bearer bearer-secret",'
-            '"safe":"ok"} password=inline-secret'
+            '"safe":"ok"} password=inline-secret token=plain-token-secret'
         )
         cleaned = redact_text(raw)
-        for secret in ("json-secret", "bearer-secret", "inline-secret"):
+        for secret in ("json-secret", "bearer-secret", "inline-secret", "plain-token-secret"):
             self.assertNotIn(secret, cleaned)
         self.assertIn('"api_key":"[REDACTED]"', cleaned)
         self.assertIn('"safe":"ok"', cleaned)

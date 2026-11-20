@@ -94,6 +94,7 @@ class ToolAdapterAllowlistIntegrationTests(unittest.TestCase):
         ):
             self.assertNotIn(secret, serialized)
             self.assertNotIn(secret, stored)
+        self.assertIsNotNone(evidence["parsed_json"], evidence["stdout"])
         self.assertEqual(evidence["parsed_json"]["safe"], "ok")
         self.assertEqual(evidence["parsed_json"]["api_key"], "[REDACTED]")
 
