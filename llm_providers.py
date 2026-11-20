@@ -193,7 +193,12 @@ def _http_json(url, payload=None, headers=None, timeout=600):
     except HTTPError as exc:
         # Never echo untrusted provider bodies: they may contain credentials or
         # sensitive prompt fragments reflected by an upstream gateway.
-        raise RuntimeError(f"Proveedor IA respondió HTTP {exc.code}.") from None
+        status = exc.code
+        try:
+            exc.close()
+        except OSError:
+            pass
+        raise RuntimeError(f"Proveedor IA respondió HTTP {status}.") from None
     except URLError as exc:
         reason_type = type(exc.reason).__name__
         raise RuntimeError(
@@ -357,7 +362,16 @@ def _validate_plugin_response(endpoint, result, protocol):
 
 def request(provider, endpoint, payload=None, timeout=600):
     """Normaliza llamadas y valida respuestas de todos los proveedores."""
-    if isinstance(timeout, bool) or not isinstance(timeout, (int, float)) or not math.isfinite(timeout) or not 0 < timeout <= 600:
+    try:
+        valid_timeout = (
+            not isinstance(timeout, bool)
+            and isinstance(timeout, (int, float))
+            and math.isfinite(timeout)
+            and 0 < timeout <= 600
+        )
+    except OverflowError:
+        valid_timeout = False
+    if not valid_timeout:
         raise ValueError("timeout debe ser un número finito mayor que 0 y máximo 600 segundos.")
     protocol = provider.get("protocol")
     required = {"api/chat": "chat", "api/embed": "embeddings", "api/ps": "model_listing"}.get(endpoint)

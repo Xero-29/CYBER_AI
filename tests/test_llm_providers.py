@@ -326,7 +326,7 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
     def test_timeout_must_be_finite_and_bounded(self):
         provider = {"name": "local", "protocol": "ollama",
                     "base_url": "http://127.0.0.1:11434"}
-        for timeout in (0, -1, 601, float("inf"), float("nan"), True, "5"):
+        for timeout in (0, -1, 601, float("inf"), float("nan"), True, "5", 10 ** 1000):
             with self.subTest(timeout=timeout), self.assertRaises(ValueError):
                 llm_providers.request(provider, "api/chat", {}, timeout=timeout)
 
@@ -361,6 +361,7 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
                 llm_providers._http_json("https://provider.example/v1/chat/completions")
         self.assertNotIn(secret, str(caught.exception))
         self.assertNotIn(json_bytes.decode("utf-8"), str(caught.exception))
+        self.assertTrue(error.fp.closed)
 
     def test_url_error_does_not_echo_provider_url_or_reason(self):
         with patch.object(
