@@ -51,3 +51,9 @@ NIST SP 800-61 Rev. 3, CISA Incident Response Playbooks, FIRST CSIRT Services Fr
 
 ## Instrucciones para agentes IA
 No aísles, apagues, borres ni restaures activos por iniciativa propia. Recomienda opciones con impacto y reversibilidad; la autoridad humana decide. Separa hechos, hipótesis y recomendaciones.
+
+## Arquitectura
+El sistema de respuesta conecta fuentes de señal (endpoint, identidad, red, cloud, aplicaciones y terceros), colectores, SIEM/casos, equipo de guardia, responsables de negocio, asesoría legal/privacidad y capacidades de contención/recuperación. Separar canal de mando fuera de banda del entorno potencialmente comprometido. Definir quién puede aislar endpoints, revocar sesiones, bloquear indicadores, preservar evidencia y restaurar servicios; cada acción debe tener autorización, impacto conocido, reversibilidad y registro. La arquitectura contempla dependencias críticas, comunicaciones degradadas y continuidad durante indisponibilidad del plano principal.
+
+## Controles
+Mantener plan aprobado, roles y suplencias, contactos fuera de banda, inventario de activos críticos, playbooks versionados, sincronización horaria y retención de logs. Preservar evidencia antes de cambios destructivos cuando sea viable; contener proporcionalmente, documentar decisiones y cadena de custodia. Probar backups y restauración, validar integridad antes de reconectar, rotar secretos comprometidos y revisar persistencia. Toda excepción de contención debe tener propietario, justificación, vencimiento y monitoreo compensatorio.

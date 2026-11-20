@@ -50,3 +50,6 @@ MITRE ATT&CK, D3FEND, STIX 2.1, TAXII 2.1, FIRST EPSS, CISA KEV, MISP y OpenCTI.
 
 ## Instrucciones para agentes IA
 No atribuyas campañas por similitud superficial. Marca fecha y confianza. No copies fuentes restringidas a la biblioteca compartida ni conviertas IOCs sin contexto en reglas de bloqueo.
+
+## Arquitectura
+El ciclo de inteligencia integra requisitos de decisión (PIR), fuentes internas y externas, adquisición, normalización, enriquecimiento, análisis, revisión, difusión y feedback. Distinguir datos crudos, observables, indicadores, TTP, hipótesis y juicios analíticos; conservar procedencia, timestamps, confianza, contexto y restricciones de redistribución. Conectar STIX/TAXII u otros formatos con SIEM, EDR, gestión de vulnerabilidades y equipos de respuesta mediante una capa de validación y deduplicación. No permitir que un indicador externo active bloqueo automático sin política, contexto, caducidad y control humano proporcional.
