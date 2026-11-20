@@ -25,7 +25,7 @@ Archivos inspeccionados:
 Hallazgos:
 - El estándar ya separa madurez teórica T0–T5 y operativa O0–O5.
 - La matriz histórica contiene 48 especialidades, 336 temas iniciales y 4.032 celdas tema×capa.
-- Foundations: siete temas base × doce capas = 84 celdas; todas siguen `in_progress`, ninguna aprobada.
+- Foundations: siete temas base × doce capas = 84 celdas coarse; todas `in_progress`, ninguna aprobada. La matriz granular V2 cubre 102 subtemas × 12 capas = 1.224 checks: 24 `in_progress` (FND-01.01/FND-01.02), 1.200 `not_assessed`; 8/408 capacidades en progreso y 400 no evaluadas; 0 aprobadas, 102 subtemas T0/O0. No interpretar 84/84 como cobertura del currículo granular.
 - AI Red Team: siete temas base × doce capas = 84 celdas; todas siguen `in_progress`, ninguna aprobada.
 - El dossier Foundations tiene 795 líneas y el dossier AI Red Team 418 líneas al corte de inspección. Estos tamaños no se usan como métrica de completitud.
 - AI Red Team ya reconoce explícitamente que su currículo ampliado, lectura integral de fuentes y revisión independiente están pendientes.

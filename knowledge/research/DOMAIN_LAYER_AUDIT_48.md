@@ -641,3 +641,8 @@ Se inspeccionaron los 48 compendios técnicos. Todos tienen documentos y rutas d
 8. Actualizar estados K1–K5 y G1–G8 únicamente con evidencia.
 
 **Orden de trabajo recomendado:** completar el inventario tema×capa en los seis módulos ya reescritos y luego desarrollar los 42 compendios restantes en lotes priorizados por criticidad y dependencias. La automatización de búsqueda/descarga se implementará después como herramienta de remediación de brechas; no sustituye lectura crítica ni validación.
+
+
+## Nota de granularidad de Foundations — 2026-11-20
+
+La fila Foundations de esta auditoría usa siete temas base × doce capas (84 celdas coarse). La matriz granular posterior `FOUNDATIONS_SUBTOPIC_AUDIT_V2.json` cubre 102 subtemas × doce capas (1.224 checks): solo 24 en progreso para FND-01.01/FND-01.02, 1.200 no evaluados; 8/408 capacidades en progreso, 400 no evaluadas; cero aprobadas. Los 102 subtemas siguen T0/O0. Ambos niveles deben informarse por separado.
