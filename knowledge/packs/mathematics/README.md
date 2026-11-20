@@ -43,3 +43,9 @@ NIST Statistical Methods, Handbook of Applied Cryptography, Introduction to Algo
 
 ## Instrucciones para agentes IA
 Muestra derivaciones cuando importen. No inventes parámetros ni probabilidades. Distingue demostración matemática, estimación estadística y evidencia empírica.
+
+## Arquitectura
+La evaluación cuantitativa de seguridad debe definir sistema, variables observables, supuestos, distribución de amenazas, datos, modelo y decisión. En criptografía, distinguir problemas matemáticos, parámetros, reducciones, supuestos y modelo de adversario; en riesgo, separar probabilidad, impacto e incertidumbre; en detección, definir población base, tasa de prevalencia, sensibilidad, especificidad y coste de errores. Documentar unidades, dominios, condiciones de borde y límites de validez antes de aplicar una fórmula o interpretar una métrica.
+
+## Controles
+Verificar derivaciones y unidades de forma independiente; usar aritmética de precisión adecuada; fijar semillas y versiones en experimentos; separar datos de entrenamiento/prueba; evitar fuga de información; informar intervalos de confianza y tamaños de muestra; analizar sensibilidad y supuestos; someter primitivas criptográficas a bibliografía y estándares reconocidos, sin diseñar algoritmos propios para producción. Una métrica aislada no sustituye el modelo de amenaza ni la revisión experta.

@@ -46,3 +46,6 @@ NIST SP 800-193, TCG TPM 2.0, UEFI Secure Boot, NIST SP 800-147, IEC 62443 y ven
 
 ## Instrucciones para agentes IA
 No sugieras fault injection, extracción de claves o modificación de firmware de dispositivos ajenos. Prioriza revisión documental y bancos de prueba.
+
+## Arquitectura
+La superficie hardware abarca silicio/SoC, firmware y boot chain, ROM/bootloader, TPM/TEE/secure element, buses y periféricos, interfaces de depuración, cadena de fabricación, aprovisionamiento, actualización y desmantelamiento. Trazar raíces de confianza, medición/atestación, almacenamiento de secretos y fronteras entre firmware, hipervisor y sistema operativo. Incluir amenazas de proveedor, acceso físico, fallos de suministro eléctrico, manipulación, side channels y firmware malicioso; distinguir garantías declaradas de propiedades verificadas.
