@@ -285,10 +285,15 @@ def main() -> int:
     parser.add_argument("--max-rounds", type=int, default=MAX_RESEARCH_ROUNDS)
     args = parser.parse_args()
     try:
+        def selected_backend(agent_name: str, prompt: str) -> str:
+            return _runner_call(
+                agent_name, prompt, knowledge=not args.no_knowledge
+            )
+
         result = run_cycle(
             args.task_text, principal=args.principal, researcher=args.researcher,
-            verifier=args.verifier, knowledge_context="",
-            max_rounds=args.max_rounds,
+            verifier=args.verifier, model_call=selected_backend,
+            knowledge_context="", max_rounds=args.max_rounds,
         )
         print(json.dumps(result, ensure_ascii=False, indent=2))
         if result["status"] in {"verification_failed", "insufficient_after_research"}:
