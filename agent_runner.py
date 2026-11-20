@@ -11,8 +11,6 @@ import sys
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.request import Request, urlopen
-from urllib.error import HTTPError, URLError
 
 from model_memory_manager import load_config, resolve_agent, record
 from execution_ledger import ExecutionLedger
@@ -152,26 +150,14 @@ def contains_repeated_paragraph(
 
 
 def request_json(endpoint, payload=None, timeout=600, provider=None):
-    """Realiza peticiones mediante el proveedor seleccionado."""
-    if provider is not None:
-        return provider_request(provider, endpoint, payload, timeout)
-    data = None if payload is None else json.dumps(payload).encode("utf-8")
-    request = Request(
-        f"{API}/{endpoint}",
-        data=data,
-        headers={"Content-Type": "application/json"},
-        method="GET" if payload is None else "POST",
-    )
-    try:
-        with urlopen(request, timeout=timeout) as response:
-            return json.load(response)
-    except HTTPError as error:
-        detail = error.read().decode("utf-8", errors="replace")
-        raise RuntimeError(f"Ollama respondió HTTP {error.code}: {detail}") from error
-    except URLError as error:
-        raise RuntimeError(
-            f"No se pudo conectar con Ollama en {API}: {error}"
-        ) from error
+    """Realiza peticiones por el transporte común con límites y errores saneados."""
+    if provider is None:
+        provider = {
+            "name": "ollama",
+            "protocol": "ollama",
+            "base_url": API,
+        }
+    return provider_request(provider, endpoint, payload, timeout)
 
 
 def installed_models():
