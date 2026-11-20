@@ -43,3 +43,6 @@ OWASP Web/API Testing Guides, CWE, CVSS, FIRST EPSS, CISA KEV y políticas ofici
 
 ## Instrucciones para agentes IA
 No infieras autorización a partir de un dominio o programa conocido. Si scope o permiso no están claros, limita el trabajo a análisis pasivo. No recomiendes extracción de datos, persistencia ni indisponibilidad.
+
+## Arquitectura
+Un programa de divulgación coordinada define propietario, política pública, alcance por activo, exclusiones, reglas de engagement, canal seguro, triage, severidad, SLA, coordinación con proveedores y publicación. El flujo es reporte → acuse → reproducción mínima → clasificación → asignación → corrección → retest → recompensa/divulgación. Separar activos autorizados de terceros y sistemas compartidos; documentar límites de prueba, ventanas, rate limits, datos prohibidos y canal de escalado para hallazgos críticos.

@@ -50,3 +50,6 @@ FIRST CVSS, EPSS, CISA KEV, NVD, CWE, OSV, OWASP, DefectDojo, Trivy, Grype, pip-
 
 ## Instrucciones para agentes IA
 No uses CVSS como única prioridad. No ejecutes PoC contra producción. Distingue hallazgo confirmado, potencial y falso positivo; documenta la evidencia que falta.
+
+## Arquitectura
+El flujo de gestión de vulnerabilidades une inventario/CMDB y descubrimiento → fuentes de vulnerabilidad y exposición → normalización y deduplicación → enriquecimiento (CVE, CPE, CVSS, EPSS, KEV, exposición y criticidad) → priorización → ticket/propietario/SLA → remediación o excepción → verificación y cierre. Mantener sincronía entre activos, software, nube, endpoints y dependencias; registrar cobertura y activos desconocidos. Separar escaneo autenticado/no autenticado y pruebas activas de la toma de decisiones de riesgo.

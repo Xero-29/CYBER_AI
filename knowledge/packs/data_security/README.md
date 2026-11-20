@@ -47,3 +47,6 @@ NIST Privacy Framework, ISO/IEC 27040, DAMA-DMBOK, OWASP Data Security, NIST SP 
 
 ## Instrucciones para agentes IA
 No incluyas datos personales reales en fixtures. No exportes datasets completos para probar una hipótesis. Diferencia cifrado, anonimización y seudonimización.
+
+## Arquitectura
+Trazar el ciclo de vida del dato desde creación/captura, clasificación, uso, movimiento, almacenamiento, compartición, archivo y eliminación. Identificar productores, consumidores, procesadores, regiones, copias, caches, logs, backups y terceros. Separar plano de gobierno (catálogo, políticas, consentimiento/propósito y retención) del plano de datos (almacenamiento, pipelines, APIs y analítica). Los límites de confianza incluyen exportaciones, replicación, ETL, entornos de desarrollo y herramientas de observabilidad.
