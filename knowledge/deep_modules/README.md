@@ -1,6 +1,10 @@
 # Biblioteca de módulos de profundización
 
-Esta colección transforma los 48 currículos de dominio en módulos editoriales con ruta técnica, procedimiento, laboratorio, evaluación y control de procedencia.
+Esta colección contiene 48 compendios técnicos disciplinares ampliados como borradores, con agenda de investigación transversal específica por área y mapa de procedencia. La ampliación editorial no equivale a revisión experta ni validación experimental.
+
+## Auditoría de profundidad (2026-11-19)
+
+- [Auditoría de profundidad de los 48 compendios](../research/COMPENDIUM_DEPTH_AUDIT_2026-11-19.md): detecta desigualdad de profundidad y bloques plantilla en ocho áreas; define prioridades de remediación. Es un diagnóstico editorial preliminar, no una certificación disciplinar.
 
 ## Investigación nivel L4/L5
 
@@ -9,14 +13,14 @@ Cada especialidad dispone de una agenda de investigación en `./<area>/RESEARCH_
 - Auditoría global de cobertura: [informe](../research/GLOBAL_COVERAGE_AUDIT.md) y [matriz de 61 referencias](../research/global_coverage_matrix.json).
 - Ejecución: `python knowledge_global_coverage_audit.py` o `python knowledge_global_coverage_audit.py --json`.
 - Método obligatorio: `../research/RESEARCH_PROTOCOL.md`.
-- Registro inicial de fuentes oficiales: `../research/source_registry.json`.
+- Registro de fuentes: `../research/source_registry.json` (102 entradas registradas al corte; lectura integral no asumida).\n- Agenda de investigación por 48 áreas: [DOMAIN_RESEARCH_AGENDA_48.md](../research/DOMAIN_RESEARCH_AGENDA_48.md).\n- Mapa de evidencia por especialidad: [DOMAIN_EVIDENCE_MAP_48.md](../research/DOMAIN_EVIDENCE_MAP_48.md).\n- Seguimiento de puertas y brechas: [EXPERT_LIBRARY_COMPLETION_TRACKER.md](../EXPERT_LIBRARY_COMPLETION_TRACKER.md).
 - Auditoría estructural y de trazabilidad: `python knowledge_research_audit.py` o `python knowledge_research_audit.py --json`.
 - Revisiones iniciales: [AppSec/API](./appsec/LITERATURE_REVIEW.md), [respuesta a incidentes](./incident_response/LITERATURE_REVIEW.md), [DevSecOps](./devsecops/LITERATURE_REVIEW.md), [gestión de vulnerabilidades](./vuln_management/LITERATURE_REVIEW.md), [OT/ICS](./ot_ics/LITERATURE_REVIEW.md), [arquitectura segura](./secure_arch/LITERATURE_REVIEW.md) y [criptografía](./crypto/LITERATURE_REVIEW.md).
 
 ## Estado y uso
 
 - Un módulo por cada área declarada en `knowledge/packs/manifest.json`.
-- Los módulos son borradores estructurados para completar con teoría técnica específica, diagramas, casos, fuentes primarias verificadas y laboratorios reproducibles.
+- Los 48 compendios tienen ampliaciones técnicas específicas por disciplina; siguen siendo borradores que requieren contraste tema por tema, fuentes completas, diagramas/casos adicionales, laboratorios reproducibles y revisión independiente.\n- El manifiesto distingue contenido editorial, agenda, revisión bibliográfica, diseño de laboratorio y validación. `verified_external_sources` permanece en cero hasta que exista evidencia documental suficiente.
 - El estado `draft_structured_not_expert_validated` es deliberado: no confundir una guía de desarrollo con conocimiento experto ya validado.
 - No se deben marcar fuentes como verificadas hasta comprobar URL canónica, editor, versión, vigencia, licencia, integridad y correspondencia temática.
 - Las pruebas activas requieren autorización expresa, alcance, límites de impacto y criterio de parada.
@@ -135,3 +139,56 @@ Se añadieron cuadernos técnicos para las 48 áreas. Son planes técnicos estru
 - [Continuidad y recuperación](./business_continuity/TECHNICAL_COMPENDIUM.md) — `business_continuity`
 - [Seguridad de bases de datos](./database_security/TECHNICAL_COMPENDIUM.md) — `database_security`
 - [Investigación de vulnerabilidades](./vulnerability_research/TECHNICAL_COMPENDIUM.md) — `vulnerability_research`
+
+## Estudios técnicos por especialidad — borradores
+
+Los 48 estudios se indexan como borradores de investigación. Su inclusión no implica lectura integral ni validación de afirmaciones.
+
+- [Redes](./network/RESEARCH_STUDY.md)
+- [Criptografía](./crypto/RESEARCH_STUDY.md)
+- [Seguridad de IA](./ai_security/RESEARCH_STUDY.md)
+- [OT/ICS/SCADA](./ot_ics/RESEARCH_STUDY.md)
+- [Respuesta a incidentes](./incident_response/RESEARCH_STUDY.md)
+- [Gestión de vulnerabilidades](./vuln_management/RESEARCH_STUDY.md)
+- [DevSecOps](./devsecops/RESEARCH_STUDY.md)
+- [Arquitectura segura](./secure_arch/RESEARCH_STUDY.md)
+- [Fundamentos](./foundations/RESEARCH_STUDY.md)
+- [Seguridad web y aplicaciones](./appsec/RESEARCH_STUDY.md)
+- [Seguridad de API](./api/RESEARCH_STUDY.md)
+- [Linux y Unix](./linux/RESEARCH_STUDY.md)
+- [Windows y Active Directory](./windows_ad/RESEARCH_STUDY.md)
+- [Seguridad cloud](./cloud/RESEARCH_STUDY.md)
+- [Contenedores y Kubernetes](./containers/RESEARCH_STUDY.md)
+- [Seguridad móvil](./mobile/RESEARCH_STUDY.md)
+- [Identidad y acceso](./identity/RESEARCH_STUDY.md)
+- [Análisis de malware](./malware/RESEARCH_STUDY.md)
+- [Forense digital](./forensics/RESEARCH_STUDY.md)
+- [Inteligencia de amenazas](./threat_intel/RESEARCH_STUDY.md)
+- [Ingeniería inversa](./reverse/RESEARCH_STUDY.md)
+- [IoT y hardware](./iot_hardware/RESEARCH_STUDY.md)
+- [Gobernanza](./governance/RESEARCH_STUDY.md)
+- [Seguridad de datos](./data_security/RESEARCH_STUDY.md)
+- [Aprendizaje automático](./machine_learning/RESEARCH_STUDY.md)
+- [Matemáticas](./mathematics/RESEARCH_STUDY.md)
+- [Ingeniería de software](./software_engineering/RESEARCH_STUDY.md)
+- [SOC, SIEM y SOAR](./soc_siem/RESEARCH_STUDY.md)
+- [EDR/XDR](./edr_xdr/RESEARCH_STUDY.md)
+- [Threat hunting](./threat_hunting/RESEARCH_STUDY.md)
+- [Red Team](./red_team/RESEARCH_STUDY.md)
+- [Wireless/Bluetooth/NFC](./wireless_security/RESEARCH_STUDY.md)
+- [Bug bounty](./bug_bounty/RESEARCH_STUDY.md)
+- [Seguridad satelital](./satellite_security/RESEARCH_STUDY.md)
+- [Seguridad física](./physical_security/RESEARCH_STUDY.md)
+- [Correo y DNS](./email_dns_security/RESEARCH_STUDY.md)
+- [Fraude y abuso](./fraud_abuse/RESEARCH_STUDY.md)
+- [Ingeniería de privacidad](./privacy_engineering/RESEARCH_STUDY.md)
+- [Forense cloud](./cloud_forensics/RESEARCH_STUDY.md)
+- [Red Team de IA](./ai_red_team/RESEARCH_STUDY.md)
+- [PKI/HSM](./pki_hsm/RESEARCH_STUDY.md)
+- [Criptografía poscuántica](./post_quantum_crypto/RESEARCH_STUDY.md)
+- [Continuidad de negocio](./business_continuity/RESEARCH_STUDY.md)
+- [Seguridad de bases de datos](./database_security/RESEARCH_STUDY.md)
+- [Investigación de vulnerabilidades](./vulnerability_research/RESEARCH_STUDY.md)
+- [Telecom/5G](./telecom_5g/RESEARCH_STUDY.md)
+- [Seguridad automotriz](./automotive_security/RESEARCH_STUDY.md)
+- [Seguridad de hardware](./hardware_security/RESEARCH_STUDY.md)
