@@ -16,22 +16,7 @@ GENESIS = "0" * 64
 MAX_FIELD = 16384
 MAX_SQLITE_INTEGER = (1 << 63) - 1
 SECRET_KEY = re.compile(r"(?:api[_-]?key|authorization|password|secret|token|credential)", re.I)
-SECRET_ASSIGNMENT = re.compile(
-    r"""(?i)\b(api[_-]?key|access[_-]?token|refresh[_-]?token|password|passwd|secret|client[_-]?secret)\b\s*([:=])\s*("[^"]*"|'[^']*'|[^\s,;]+)"""
-)
-BEARER_TOKEN = re.compile(r"(?i)\bBearer\s+[A-Za-z0-9._~+/=-]+")
-PRIVATE_KEY = re.compile(
-    r"-----BEGIN [^-]*PRIVATE KEY-----.*?-----END [^-]*PRIVATE KEY-----", re.S
-)
-URL_CREDENTIALS = re.compile(r"(?i)(https?://)[^/@\s:]+:[^/@\s]+@")
-
-
-def _redact_text(value):
-    value = PRIVATE_KEY.sub("[REDACTED PRIVATE KEY]", str(value))
-    value = BEARER_TOKEN.sub("Bearer [REDACTED]", value)
-    value = SECRET_ASSIGNMENT.sub(r"\1\2[REDACTED]", value)
-    return URL_CREDENTIALS.sub(r"\1[REDACTED]@", value)
-
+from secret_redaction import redact_text as _redact_text
 
 
 class LedgerError(ValueError):

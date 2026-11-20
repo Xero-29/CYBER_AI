@@ -16,6 +16,7 @@ from urllib.parse import urlparse
 from capability_selector import select_capabilities
 from execution_policy import AuthorizationError, authorize_target
 from execution_ledger import ExecutionLedger
+from secret_redaction import redact_sensitive_data, redact_text
 from binary_integrity import (
     BinaryIntegrityError,
     build_minimal_environment,
@@ -265,7 +266,9 @@ def main():
                 max_output_bytes=2_000_000,
             )
         elapsed = round(time.monotonic() - started, 2)
-        scanner_output = (process_result["stdout"] + "\n" + process_result["stderr"])[-12000:]
+        scanner_output = redact_text(
+            (process_result["stdout"] + "\n" + process_result["stderr"])[-12000:]
+        )
 
         if process_result["timed_out"]:
             try:
@@ -336,7 +339,7 @@ def main():
                                 findings = []
                                 break
                             try:
-                                findings.append(json.loads(line))
+                                findings.append(redact_sensitive_data(json.loads(line)))
                             except json.JSONDecodeError:
                                 evidence_invalid = True
                                 findings = []

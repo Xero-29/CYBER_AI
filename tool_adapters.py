@@ -19,6 +19,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 from tool_allowlist import ToolAllowlistError, verify_tool_allowed
+from secret_redaction import redact_sensitive_data, redact_text
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent
@@ -179,7 +180,7 @@ def _probe_tool_version(binary, tool_id, env):
         return "unknown"
     if result.returncode != 0 or not result.stdout.strip():
         return "unknown"
-    return result.stdout.strip().splitlines()[0][:256]
+    return redact_text(result.stdout.strip().splitlines()[0][:256])
 
 
 def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
@@ -349,12 +350,14 @@ def _run_local_tool_with_home(
         for reader in readers:
             reader.join(timeout=1)
 
-    out_text = captured["stdout"].decode("utf-8", errors="replace")
-    err_text = captured["stderr"].decode("utf-8", errors="replace")
+    out_text = redact_text(captured["stdout"].decode("utf-8", errors="replace"))
+    err_text = redact_text(captured["stderr"].decode("utf-8", errors="replace"))
     truncated = stream_truncated["value"]
     try:
         parsed = json.loads(out_text) if out_text.strip() else None
-    except json.JSONDecodeError:
+        if parsed is not None:
+            parsed = redact_sensitive_data(parsed)
+    except (json.JSONDecodeError, RecursionError):
         parsed = None
     target_hash_after = _hash_target(path)
     target_modified = target_hash_before != target_hash_after
@@ -387,7 +390,7 @@ def _run_local_tool_with_home(
         "stdout": out_text,
         "stderr": err_text,
         "parsed_json": parsed,
-        "command": command[1:],
+        "command": redact_sensitive_data(command[1:]),
         "network_access": "not_enforced",
         "network_isolation_enforced": False,
         "network_policy": "Los adaptadores que requieren red se deniegan; el egress de procesos locales no está aislado por este ejecutor.",
@@ -424,7 +427,8 @@ def write_evidence(evidence, output_dir="reports/tool_evidence", *, allow_extern
             )
             if directory_mode & 0o077:
                 raise ToolExecutionError("El directorio de evidencias no es privado.")
-        tool = evidence.get("tool") if isinstance(evidence, dict) else None
+        safe_evidence = redact_sensitive_data(evidence)
+        tool = safe_evidence.get("tool") if isinstance(safe_evidence, dict) else None
         if not isinstance(tool, str) or not re.fullmatch(r"[A-Za-z0-9_-]{1,64}", tool):
             raise ToolExecutionError("Identificador de herramienta inválido para el nombre de evidencia.")
 
@@ -439,7 +443,7 @@ def write_evidence(evidence, output_dir="reports/tool_evidence", *, allow_extern
                 os.fchmod(descriptor, 0o600)
             with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
                 descriptor = -1
-                stream.write(json.dumps(evidence, ensure_ascii=False, indent=2) + "\n")
+                stream.write(json.dumps(safe_evidence, ensure_ascii=False, indent=2) + "\n")
                 stream.flush()
                 os.fsync(stream.fileno())
             # Publish only a fully written file; destination directory is private.

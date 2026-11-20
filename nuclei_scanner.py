@@ -18,6 +18,7 @@ from urllib.parse import urlparse
 
 from execution_policy import AuthorizationError, authorize_target
 from execution_ledger import ExecutionLedger
+from secret_redaction import redact_sensitive_data, redact_text
 from binary_integrity import (
     BinaryIntegrityError,
     build_minimal_environment,
@@ -322,7 +323,7 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
                 for line in _iter_output_chunks(process.stdout):
                     line = line.rstrip()
                     if line:
-                        safe_line = line[:2000]
+                        safe_line = redact_text(line[:2000])
                         messages.append(safe_line)
                         print(f"[Nuclei] {safe_line}", flush=True)
             except (OSError, ValueError):
@@ -460,7 +461,7 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
                         if not line.strip():
                             continue
                         try:
-                            findings.append(json.loads(line))
+                            findings.append(redact_sensitive_data(json.loads(line)))
                         except json.JSONDecodeError:
                             evidence_invalid = True
                             findings = []

@@ -116,6 +116,8 @@ class NucleiScannerTests(unittest.TestCase):
             "template-id": "test-template",
             "info": {"name": "Test", "severity": "info"},
             "matched-at": "http://127.0.0.1:8765",
+            "api_key": "nuclei-finding-secret",
+            "extracted-results": ["password=extracted-secret"],
         }
 
         with tempfile.TemporaryDirectory() as tmp:
@@ -123,7 +125,7 @@ class NucleiScannerTests(unittest.TestCase):
             executable = root / "nuclei"
             executable.write_bytes(b"nuclei-test-binary")
             self._create_templates(root)
-            fake_process = FakeProcess(stdout_lines=["Nuclei iniciado\n"])
+            fake_process = FakeProcess(stdout_lines=["Nuclei iniciado token=scanner-message-secret\n"])
 
             def fake_popen(command, **kwargs):
                 output_index = command.index("-o") + 1
@@ -149,6 +151,12 @@ class NucleiScannerTests(unittest.TestCase):
             self.assertEqual(result["status"], "completed")
             self.assertEqual(result["findings_count"], 1)
             self.assertEqual(result["findings"][0]["template-id"], "test-template")
+            self.assertEqual(result["findings"][0]["api_key"], "[REDACTED]")
+            serialized = json.dumps(result, ensure_ascii=False)
+            for secret in (
+                "nuclei-finding-secret", "extracted-secret", "scanner-message-secret"
+            ):
+                self.assertNotIn(secret, serialized)
             events = ExecutionLedger(self.ledger_path).history(namespace="security-scans")
             self.assertEqual(events[0]["status"], "completed")
             self.assertEqual(events[1]["status"], "started")
