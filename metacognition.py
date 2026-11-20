@@ -225,23 +225,23 @@ def collect_web_evidence(task: str, assessment: dict, *, timeout: int = 900) -> 
              "--max-results", "5"],
             cwd=PROJECT, capture_output=True, text=True, timeout=timeout, check=False,
         )
-        output = (search.stdout or "") + "\\n" + (search.stderr or "")
-        match = re.search(r"Datos JSON:\\s*(reports/web_research/[^\\s]+\\.json)", output)
+        output = (search.stdout or "") + "\n" + (search.stderr or "")
+        match = re.search(r"Datos JSON:\s*(reports/web_research/[^\s]+\.json)", output)
         if search.returncode != 0 or not match:
             collected.append(
-                f"BRECHA: {gap['topic']}\\nESTADO: búsqueda fallida o sin informe. "
+                f"BRECHA: {gap['topic']}\nESTADO: búsqueda fallida o sin informe. "
                 f"DETALLE: {output[-1200:]}"
             )
             continue
         relative = Path(match.group(1))
         report_path = (PROJECT / relative).resolve()
         if PROJECT.resolve() not in report_path.parents or not report_path.is_file():
-            collected.append(f"BRECHA: {gap['topic']}\\nESTADO: ruta de informe no válida.")
+            collected.append(f"BRECHA: {gap['topic']}\nESTADO: ruta de informe no válida.")
             continue
         report = _read_json(report_path, {})
         if report.get("search_status") != "ok" or not report.get("results"):
             collected.append(
-                f"BRECHA: {gap['topic']}\\nESTADO: sin resultados confiables. "
+                f"BRECHA: {gap['topic']}\nESTADO: sin resultados confiables. "
                 "No se interpreta la ausencia de resultados como ausencia de conocimiento."
             )
             continue
@@ -249,20 +249,20 @@ def collect_web_evidence(task: str, assessment: dict, *, timeout: int = 900) -> 
             [sys.executable, str(PROJECT / "review_web_report.py"), str(relative)],
             cwd=PROJECT, capture_output=True, text=True, timeout=timeout, check=False,
         )
-        review_output = (review.stdout or "") + "\\n" + (review.stderr or "")
-        draft_match = re.search(r"(reports/web_research/[^\\s]+\\.md)", review_output)
+        review_output = (review.stdout or "") + "\n" + (review.stderr or "")
+        draft_match = re.search(r"(reports/web_research/[^\s]+\.md)", review_output)
         draft_text = ""
         if draft_match:
             draft_path = (PROJECT / draft_match.group(1)).resolve()
             if PROJECT.resolve() in draft_path.parents and draft_path.is_file():
                 draft_text = draft_path.read_text(encoding="utf-8")[:12000]
         collected.append(
-            f"BRECHA: {gap['topic']}\\nESTADO DE BÚSQUEDA: {report.get('search_status')}\\n"
-            f"ESTADO DE REVISIÓN: {'completada' if review.returncode == 0 else 'fallida'}\\n"
-            f"DATOS DE FUENTES:\\n{json.dumps(report, ensure_ascii=False)[:12000]}\\n"
-            f"BORRADOR DE REVISIÓN:\\n{draft_text or review_output[-5000:]}"
+            f"BRECHA: {gap['topic']}\nESTADO DE BÚSQUEDA: {report.get('search_status')}\n"
+            f"ESTADO DE REVISIÓN: {'completada' if review.returncode == 0 else 'fallida'}\n"
+            f"DATOS DE FUENTES:\n{json.dumps(report, ensure_ascii=False)[:12000]}\n"
+            f"BORRADOR DE REVISIÓN:\n{draft_text or review_output[-5000:]}"
         )
-    return "\\n\\n--- SIGUIENTE BRECHA ---\\n\\n".join(collected)[:30000]
+    return "\n\n--- SIGUIENTE BRECHA ---\n\n".join(collected)[:30000]
 
 
 def run_cycle(
@@ -305,7 +305,7 @@ def run_cycle(
             break
         source_evidence = source_researcher(task, assessment)
         research_context = (
-            knowledge_context + "\\n\\nEVIDENCIA DE INVESTIGACIÓN WEB CURADA:\\n"
+            knowledge_context + "\n\nEVIDENCIA DE INVESTIGACIÓN WEB CURADA:\n"
             + source_evidence
         )[-30000:]
         research = model_call(
