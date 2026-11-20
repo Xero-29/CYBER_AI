@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import patch
 
+import execution_policy
 from execution_policy import AuthorizationError, authorize_target
 
 
@@ -160,6 +161,52 @@ class ExecutionPolicyTests(unittest.TestCase):
         with patch.dict("os.environ", {"CYBER_AI_AUTHORIZATIONS_FILE": str(linked_policy)}):
             with self.assertRaisesRegex(AuthorizationError, "directorio padre"):
                 authorize_target("https://8.8.8.8", "nuclei_scan", "grant-001")
+
+    def test_ancestor_symlink_is_rejected(self):
+        real_root = Path(self.temp.name) / "real-root"
+        nested = real_root / "nested"
+        nested.mkdir(parents=True)
+        real_policy = nested / "authorizations.json"
+        real_policy.write_text(
+            json.dumps({"authorizations": [self.grant]}), encoding="utf-8"
+        )
+        real_policy.chmod(0o600)
+        ancestor_link = Path(self.temp.name) / "ancestor-link"
+        try:
+            ancestor_link.symlink_to(real_root, target_is_directory=True)
+        except (OSError, NotImplementedError):
+            self.skipTest("symlinks unavailable")
+        linked_policy = ancestor_link / "nested" / "authorizations.json"
+        with patch.dict(
+            "os.environ", {"CYBER_AI_AUTHORIZATIONS_FILE": str(linked_policy)}
+        ):
+            with self.assertRaisesRegex(AuthorizationError, "directorios padre"):
+                authorize_target("https://8.8.8.8", "nuclei_scan", "grant-001")
+
+    def test_policy_hardlink_is_rejected(self):
+        alias = Path(self.temp.name) / "authorizations-alias.json"
+        try:
+            os.link(self.policy, alias)
+        except (OSError, NotImplementedError):
+            self.skipTest("hard links unavailable")
+        with self.assertRaisesRegex(AuthorizationError, "enlaces duros"):
+            authorize_target("https://8.8.8.8", "nuclei_scan", "grant-001")
+
+    def test_active_authorizations_must_be_outside_repository(self):
+        repository = Path(self.temp.name) / "repository"
+        repository.mkdir()
+        tracked_policy = repository / "authorized_targets.json"
+        tracked_policy.write_text(
+            json.dumps({"authorizations": [self.grant]}), encoding="utf-8"
+        )
+        tracked_policy.chmod(0o600)
+        with patch.object(execution_policy, "PROJECT", repository):
+            with patch.dict(
+                "os.environ",
+                {"CYBER_AI_AUTHORIZATIONS_FILE": str(tracked_policy)},
+            ):
+                with self.assertRaisesRegex(AuthorizationError, "fuera del repositorio"):
+                    authorize_target("https://8.8.8.8", "nuclei_scan", "grant-001")
 
     def test_policy_symlink_is_rejected(self):
         link = Path(self.temp.name) / "policy-link.json"

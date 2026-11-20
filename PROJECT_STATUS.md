@@ -2,33 +2,33 @@
 
 **Repositorio:** Xero-29/CYBER_AI  
 **Rama de trabajo:** codex/security-integrity-audit  
-**HEAD previo a este ajuste de alcance CI:** 54f6a11f3741f227776e9dcb180a0d960ae4653a  
+**HEAD validado antes del endurecimiento de rutas de autorización:** abae3977ed147e79b2612b0dad4ddf3598b7b1d9  
 **main:** 9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea  
-**Ancestro común verificado:** cae816d6037b56f017c2fbdbb3e98ef00df58c1d
+**Ancestro común:** cae816d6037b56f017c2fbdbb3e98ef00df58c1d
 
 ## Divergencia e integración
 
-- La comparación de tres puntos confirma **573 commits exclusivos de main y 184 exclusivos de la rama de auditoría** desde el ancestro común. No existe ahora una divergencia de un único commit; ambas líneas contienen cambios extensos y distintos.
-- PR #2 está **cerrado y fusionado**. Su merge commit es 478c6ddc676221e4c07b8c5780f127bc5a9e749e; el HEAD de PR #2 era cae816d6037b56f017c2fbdbb3e98ef00df58c1d. La rama actual continúa desde ese ancestro y no contiene el merge commit.
-- El HEAD de main es 9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea; su línea contiene, entre otros cambios, las pruebas de preflight de OSV-Scanner/Grype. Se preserva el HEAD completo de main y no se ejecutó merge, rebase, cherry-pick, force-push ni escritura en esa rama.
-- PR #11 (locks/SBOM), #12 (reconciliación selectiva), #13 (investigación de 192 brechas) y #14 (currículo/Foundations) permanecen abiertos en draft y apuntan a ramas distintas. PR #12 está basado en el HEAD actual de main; no se reutiliza ni se duplica.
-- No existe PR abierto que apunte a la rama actual codex/security-integrity-audit. PR #2 no se reabre ni se duplica. No se crea un PR adicional mientras la divergencia y el alcance de integración no estén resueltos.
-- La reconciliación sigue separada y requiere revisión por archivo y pruebas de tres vías. No se copiarán árboles completos ni se descartarán cambios de ninguna línea.
+- La comparación de tres puntos confirma **573 commits exclusivos de main y 185 exclusivos de la rama de auditoría** desde el ancestro común. Ambas líneas contienen cambios extensos y distintos.
+- PR #2 está **cerrado y fusionado** (merge commit 478c6ddc676221e4c07b8c5780f127bc5a9e749e). La rama actual continúa desde el HEAD original de PR #2, no desde el merge commit.
+- Se preserva íntegro main (HEAD 9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea). No hubo merge, rebase, cherry-pick, force-push ni escritura en main.
+- PR #11, #12, #13 y #14 permanecen abiertos en draft y apuntan a ramas distintas; #12 es la rama de reconciliación separada basada en main. No existe PR abierto para la rama actual y no se ha duplicado ninguno.
+- La reconciliación requiere análisis de tres vías por archivo y no se automatiza sobre una divergencia de 573/185 commits.
 
-## Incidencia CI del commit 54f6a11
+## CI del HEAD abae397
 
-- Python Tests: **success** — [run 44760591710](https://github.com/Xero-29/CYBER_AI/actions/runs/44760591710).
-- Docker Sandbox: **failure** — [run 44760591699](https://github.com/Xero-29/CYBER_AI/actions/runs/44760591699). La allowlist HMAC de Ruff se exportó mediante GITHUB_ENV antes de la verificación del host; por eso la suite heredó un manifiesto que autorizaba solo Ruff y fallaron seis pruebas de adaptadores que necesitan sus propias políticas simuladas. El preflight reconoció la firma; la ejecución no se saltó la autorización.
-- Resultado exacto de la suite en ese run: 624 tests, 1 failure, 5 errors y 4 skipped. No se declara CI verde para este commit.
+- Python Tests: **success**, 624 pruebas, 4 skipped — [run 44761016119](https://github.com/Xero-29/CYBER_AI/actions/runs/44761016119).
+- Docker Sandbox: **success**, 624 pruebas, 4 skipped, build endurecido y Ruff ejecutado dentro del contenedor sin red — [run 44761016049](https://github.com/Xero-29/CYBER_AI/actions/runs/44761016049).
+- Se publicaron SBOM CycloneDX para aplicación (9 componentes), sandbox (8) y extractores de documentos (9), con manifiestos de artefactos/procedencia — [artefacto SBOM](https://github.com/Xero-29/CYBER_AI/actions/runs/44761016119/artifacts/14641340924).
+- Evidencia del sandbox publicada — [artefacto de evidencias](https://github.com/Xero-29/CYBER_AI/actions/runs/44761016049/artifacts/14641940096).
+- Estos checks validan exactamente el SHA abae3977ed147e79b2612b0dad4ddf3598b7b1d9. No validan aún los cambios posteriores de autorización.
 
-## Corrección de alcance aplicada en esta iteración
+## Endurecimiento adicional de autorización implementado
 
-- La creación del manifiesto HMAC y de su clave efímera se mueve al mismo paso que ejecuta Ruff en Docker. La clave solo existe en ese paso y en sus procesos hijos; no se escribe en GITHUB_ENV ni se expone a la verificación del host o al paso de publicación de artefactos.
-- El manifiesto contiene únicamente el SHA-256 del ejecutable Ruff extraído de la imagen fijada; se crea con permisos 0600 dentro de un directorio 0700 y se elimina al terminar el paso.
-- El workflow Python limita el override de compatibilidad a sus dos pasos de verify.sh. El workflow Docker lo limita al paso de verify.sh. El contenedor no recibe el override y exige la allowlist firmada.
-- sandbox_runner.py mantiene la validación HMAC fail-closed, el alcance de una sola herramienta, el montaje de solo lectura y el paso de la clave por variable de entorno heredada, nunca como argumento.
-- Las regresiones cubren ausencia/firma inválida, exceso de alcance, montaje de solo lectura y ausencia de la clave en argv.
-- Los nuevos checks de Actions deben terminar en el HEAD resultante antes de afirmar CI verde.
+- execution_policy.py valida ahora toda la cadena de directorios padre, no solo el padre inmediato; rechaza symlinks/junctions en cualquier nivel, directorios modificables por grupo/otros y cambios de identidad de directorios durante la lectura.
+- El archivo de política no puede tener hardlinks; se verifica la identidad y metadatos del archivo antes/después de leer para detectar sustitución o mutación.
+- Las autorizaciones activas deben residir fuera del repositorio. El archivo de configuración por defecto puede seguir vacío y deny-by-default, pero no puede contener grants activos que terminen versionados en Git.
+- tests/test_execution_policy.py añade regresiones para symlink en ancestro, hardlink y política activa dentro del repositorio.
+- Los checks de Actions del nuevo HEAD quedan pendientes; no se extrapola el CI verde del SHA anterior.
 
 ## Capacidades y límites que siguen siendo reales
 

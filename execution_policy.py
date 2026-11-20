@@ -154,22 +154,53 @@ def _validate_grants(grants):
             raise AuthorizationError("La política contiene una IP reservada o fuera del alcance permitido.")
 
 
+def _validate_policy_parent_chain(path):
+    """Reject symlink/reparse ancestors and writable parent directories."""
+    chain = []
+    reparse_flag = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
+    for parent in reversed(path.parents):
+        info = parent.lstat()
+        if (
+            stat.S_ISLNK(info.st_mode)
+            or getattr(info, "st_file_attributes", 0) & reparse_flag
+            or not stat.S_ISDIR(info.st_mode)
+        ):
+            raise AuthorizationError(
+                "Los directorios padre de autorizaciones no pueden ser enlaces ni no-directorios."
+            )
+        if os.name != "nt":
+            parent_is_root_sticky = (
+                info.st_uid == 0 and bool(info.st_mode & stat.S_ISVTX)
+            )
+            if stat.S_IMODE(info.st_mode) & 0o022 and not parent_is_root_sticky:
+                raise AuthorizationError(
+                    "Los directorios padre de autorizaciones no pueden ser modificables por grupo u otros."
+                )
+        chain.append((parent, info))
+    return chain
+
+
+def _same_parent_chain(before, after):
+    return (
+        len(before) == len(after)
+        and all(
+            old_path == new_path
+            and (old_info.st_dev, old_info.st_ino)
+            == (new_info.st_dev, new_info.st_ino)
+            for (old_path, old_info), (new_path, new_info) in zip(before, after)
+        )
+    )
+
+
 def _load_grants():
-    path = Path(os.environ.get("CYBER_AI_AUTHORIZATIONS_FILE", DEFAULT_AUTHORIZATIONS))
+    configured_path = os.environ.get(
+        "CYBER_AI_AUTHORIZATIONS_FILE", DEFAULT_AUTHORIZATIONS
+    )
+    path = Path(os.path.abspath(os.fspath(configured_path)))
     descriptor = None
     reparse_flag = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
     try:
-        parent_before = path.parent.lstat()
-        if (
-            stat.S_ISLNK(parent_before.st_mode)
-            or getattr(parent_before, "st_file_attributes", 0) & reparse_flag
-            or not stat.S_ISDIR(parent_before.st_mode)
-        ):
-            raise AuthorizationError("El directorio padre de autorizaciones no puede ser un enlace.")
-        if os.name != "nt" and stat.S_IMODE(parent_before.st_mode) & 0o022:
-            raise AuthorizationError(
-                "El directorio padre de autorizaciones no puede ser modificable por grupo u otros."
-            )
+        parent_chain_before = _validate_policy_parent_chain(path)
         before = path.lstat()
         if (
             stat.S_ISLNK(before.st_mode)
@@ -180,26 +211,28 @@ def _load_grants():
         descriptor = os.open(path, flags)
         opened = os.fstat(descriptor)
         after = path.lstat()
-        parent_after = path.parent.lstat()
+        parent_chain_after_open = _validate_policy_parent_chain(path)
         if (
             not stat.S_ISREG(opened.st_mode)
             or stat.S_ISLNK(after.st_mode)
             or getattr(after, "st_file_attributes", 0) & reparse_flag
-            or stat.S_ISLNK(parent_after.st_mode)
-            or getattr(parent_after, "st_file_attributes", 0) & reparse_flag
-            or (parent_before.st_dev, parent_before.st_ino) !=
-               (parent_after.st_dev, parent_after.st_ino)
+            or not stat.S_ISREG(after.st_mode)
             or (before.st_dev, before.st_ino) != (opened.st_dev, opened.st_ino)
             or (opened.st_dev, opened.st_ino) != (after.st_dev, after.st_ino)
+            or not _same_parent_chain(parent_chain_before, parent_chain_after_open)
         ):
             raise AuthorizationError(
-                "El archivo de autorizaciones y su directorio deben ser regulares y estables."
+                "El archivo de autorizaciones y sus directorios deben ser regulares y estables."
             )
         if opened.st_size > MAX_POLICY_BYTES:
             raise AuthorizationError("El archivo de autorizaciones supera 1 MiB.")
         if os.name != "nt" and opened.st_uid != os.geteuid():
             raise AuthorizationError(
                 "El archivo de autorizaciones debe pertenecer al usuario efectivo del proceso."
+            )
+        if opened.st_nlink != 1:
+            raise AuthorizationError(
+                "El archivo de autorizaciones no puede tener enlaces duros."
             )
         insecure_mode = (
             os.name != "nt" and stat.S_IMODE(opened.st_mode) & 0o077
@@ -219,10 +252,24 @@ def _load_grants():
             object_pairs_hook=_unique_object,
         )
         opened_after_read = os.fstat(descriptor)
+        path_after_read = path.lstat()
+        parent_chain_after_read = _validate_policy_parent_chain(path)
         if (
-            (opened.st_dev, opened.st_ino) != (opened_after_read.st_dev, opened_after_read.st_ino)
+            (opened.st_dev, opened.st_ino)
+            != (opened_after_read.st_dev, opened_after_read.st_ino)
             or opened.st_size != opened_after_read.st_size
+            or opened.st_size != total
             or opened.st_mtime_ns != opened_after_read.st_mtime_ns
+            or getattr(opened, "st_ctime_ns", 0)
+            != getattr(opened_after_read, "st_ctime_ns", 0)
+            or opened.st_mode != opened_after_read.st_mode
+            or opened.st_nlink != opened_after_read.st_nlink
+            or stat.S_ISLNK(path_after_read.st_mode)
+            or getattr(path_after_read, "st_file_attributes", 0) & reparse_flag
+            or not stat.S_ISREG(path_after_read.st_mode)
+            or (path_after_read.st_dev, path_after_read.st_ino)
+            != (opened_after_read.st_dev, opened_after_read.st_ino)
+            or not _same_parent_chain(parent_chain_before, parent_chain_after_read)
             or (os.name != "nt" and opened_after_read.st_uid != os.geteuid())
         ):
             raise AuthorizationError("La política cambió mientras se leía.")
@@ -244,6 +291,15 @@ def _load_grants():
         raise AuthorizationError(
             "El archivo de autorizaciones debe ser privado (permisos 0600)."
         )
+    if grants:
+        try:
+            path.resolve(strict=True).relative_to(PROJECT.resolve())
+        except ValueError:
+            pass
+        else:
+            raise AuthorizationError(
+                "Las autorizaciones activas deben almacenarse fuera del repositorio."
+            )
     return grants
 
 
