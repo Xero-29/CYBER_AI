@@ -267,7 +267,7 @@ def lab08_safety_security_tradeoff():
         "warning": "A synthetic state model is not a hazard analysis, certification or physical test.",
     }
 
-def lab09_privacy_confidentiality_gap():
+def lab09_privacy_confidentiality_gap(*, purpose_compatible_after_change=True):
     """Shows that encrypted, access-controlled data can still be misused."""
     encrypted_at_rest = True
     access_controlled = True
@@ -275,12 +275,12 @@ def lab09_privacy_confidentiality_gap():
     confidentiality_protected = encrypted_at_rest and access_controlled
     privacy_risk = secondary_use_without_compatible_purpose
     minimised = True
-    purpose_bound = True
     retention_limited = True
-    mitigated_privacy_risk = not (secondary_use_without_compatible_purpose and not (minimised and purpose_bound and retention_limited))
+    mitigated_privacy_risk = purpose_compatible_after_change and minimised and retention_limited
     return {
         "confidentiality_protected": confidentiality_protected,
         "privacy_risk_detected": privacy_risk,
+        "purpose_compatible_after_change": purpose_compatible_after_change,
         "privacy_risk_mitigated_after_design_change": mitigated_privacy_risk,
         "warning": "The model is illustrative; legal basis and individual rights require context-specific review.",
     }

@@ -130,7 +130,8 @@
       "confidentiality_protected": true,
       "privacy_risk_detected": true,
       "privacy_risk_mitigated_after_design_change": true,
-      "warning": "The model is illustrative; legal basis and individual rights require context-specific review."
+      "warning": "The model is illustrative; legal basis and individual rights require context-specific review.",
+      "purpose_compatible_after_change": true
     },
     "LAB-FND-10A": {
       "service_available_after_restore": true,

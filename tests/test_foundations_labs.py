@@ -44,6 +44,7 @@ class FoundationsLabTests(unittest.TestCase):
     def test_11_privacy_is_not_confidentiality(self):
         r=lab09_privacy_confidentiality_gap(); self.assertTrue(r["confidentiality_protected"])
         self.assertTrue(r["privacy_risk_detected"]); self.assertTrue(r["privacy_risk_mitigated_after_design_change"])
+        self.assertFalse(lab09_privacy_confidentiality_gap(purpose_compatible_after_change=False)["privacy_risk_mitigated_after_design_change"])
     def test_12_recovery_must_restore_trust(self):
         r=lab10_resilience_recovery_trust(); self.assertTrue(r["service_available_after_restore"])
         self.assertFalse(r["trust_restored_before_controls"]); self.assertTrue(r["trust_restored_after_controls"])
