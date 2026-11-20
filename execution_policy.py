@@ -166,7 +166,7 @@ def _validate_policy_parent_chain(path):
             or not stat.S_ISDIR(info.st_mode)
         ):
             raise AuthorizationError(
-                "Los directorios padre de autorizaciones no pueden ser enlaces ni no-directorios."
+                "El directorio padre de autorizaciones o uno de sus ancestros no puede ser un enlace ni un no-directorio."
             )
         if os.name != "nt":
             parent_is_root_sticky = (
@@ -174,7 +174,7 @@ def _validate_policy_parent_chain(path):
             )
             if stat.S_IMODE(info.st_mode) & 0o022 and not parent_is_root_sticky:
                 raise AuthorizationError(
-                    "Los directorios padre de autorizaciones no pueden ser modificables por grupo u otros."
+                    "El directorio padre de autorizaciones o uno de sus ancestros no puede ser modificable por grupo u otros."
                 )
         chain.append((parent, info))
     return chain
@@ -293,7 +293,7 @@ def _load_grants():
         )
     if grants:
         try:
-            path.resolve(strict=True).relative_to(PROJECT.resolve())
+            path.relative_to(PROJECT.resolve())
         except ValueError:
             pass
         else:

@@ -180,7 +180,7 @@ class ExecutionPolicyTests(unittest.TestCase):
         with patch.dict(
             "os.environ", {"CYBER_AI_AUTHORIZATIONS_FILE": str(linked_policy)}
         ):
-            with self.assertRaisesRegex(AuthorizationError, "directorios padre"):
+            with self.assertRaisesRegex(AuthorizationError, "directorio padre"):
                 authorize_target("https://8.8.8.8", "nuclei_scan", "grant-001")
 
     def test_policy_hardlink_is_rejected(self):

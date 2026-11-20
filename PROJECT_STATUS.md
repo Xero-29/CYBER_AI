@@ -2,33 +2,28 @@
 
 **Repositorio:** Xero-29/CYBER_AI  
 **Rama de trabajo:** codex/security-integrity-audit  
-**HEAD validado antes del endurecimiento de rutas de autorización:** abae3977ed147e79b2612b0dad4ddf3598b7b1d9  
+**HEAD previo a esta corrección de regresiones:** 324318803abe7c2cceb8dfce28ed987b1b134ca2  
 **main:** 9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea  
 **Ancestro común:** cae816d6037b56f017c2fbdbb3e98ef00df58c1d
 
 ## Divergencia e integración
 
-- La comparación de tres puntos confirma **573 commits exclusivos de main y 185 exclusivos de la rama de auditoría** desde el ancestro común. Ambas líneas contienen cambios extensos y distintos.
-- PR #2 está **cerrado y fusionado** (merge commit 478c6ddc676221e4c07b8c5780f127bc5a9e749e). La rama actual continúa desde el HEAD original de PR #2, no desde el merge commit.
-- Se preserva íntegro main (HEAD 9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea). No hubo merge, rebase, cherry-pick, force-push ni escritura en main.
-- PR #11, #12, #13 y #14 permanecen abiertos en draft y apuntan a ramas distintas; #12 es la rama de reconciliación separada basada en main. No existe PR abierto para la rama actual y no se ha duplicado ninguno.
-- La reconciliación requiere análisis de tres vías por archivo y no se automatiza sobre una divergencia de 573/185 commits.
+- Comparación de tres puntos: **573 commits exclusivos de main y 186 exclusivos de la rama de auditoría**. No es una divergencia de un único commit.
+- PR #2 está cerrado y fusionado (merge commit 478c6ddc676221e4c07b8c5780f127bc5a9e749e). PR #11, #12, #13 y #14 siguen abiertos en draft sobre ramas distintas. No existe PR abierto para la rama actual.
+- main permanece intacto. No se ejecutó merge, rebase, cherry-pick ni force-push. La reconciliación sigue reservada para una rama separada y una revisión de tres vías.
 
-## CI del HEAD abae397
+## Validación previa
 
-- Python Tests: **success**, 624 pruebas, 4 skipped — [run 44761016119](https://github.com/Xero-29/CYBER_AI/actions/runs/44761016119).
-- Docker Sandbox: **success**, 624 pruebas, 4 skipped, build endurecido y Ruff ejecutado dentro del contenedor sin red — [run 44761016049](https://github.com/Xero-29/CYBER_AI/actions/runs/44761016049).
-- Se publicaron SBOM CycloneDX para aplicación (9 componentes), sandbox (8) y extractores de documentos (9), con manifiestos de artefactos/procedencia — [artefacto SBOM](https://github.com/Xero-29/CYBER_AI/actions/runs/44761016119/artifacts/14641340924).
-- Evidencia del sandbox publicada — [artefacto de evidencias](https://github.com/Xero-29/CYBER_AI/actions/runs/44761016049/artifacts/14641940096).
-- Estos checks validan exactamente el SHA abae3977ed147e79b2612b0dad4ddf3598b7b1d9. No validan aún los cambios posteriores de autorización.
+- HEAD abae3977ed147e79b2612b0dad4ddf3598b7b1d9: Python Tests **success** (624 pruebas, 4 skipped), [run 44761016119](https://github.com/Xero-29/CYBER_AI/actions/runs/44761016119); Docker Sandbox **success** (624 pruebas, 4 skipped y Ruff aislado), [run 44761016049](https://github.com/Xero-29/CYBER_AI/actions/runs/44761016049).
+- SBOM CycloneDX de aplicación, sandbox y extractores, más manifiestos de artefactos/procedencia: [artefacto SBOM](https://github.com/Xero-29/CYBER_AI/actions/runs/44761016119/artifacts/14641340924). Evidencia Docker: [artefacto](https://github.com/Xero-29/CYBER_AI/actions/runs/44761016049/artifacts/14641940096).
+- En el HEAD 324318803abe7c2cceb8dfce28ed987b1b134ca2, Python Tests falló solo por dos aserciones de texto que esperaban el mensaje singular “directorio padre”; 627 pruebas, 2 failures y 4 skipped. Docker Sandbox seguía en curso al registrar este estado; no se declara verde ese SHA.
 
-## Endurecimiento adicional de autorización implementado
+## Corrección de la política de autorización
 
-- execution_policy.py valida ahora toda la cadena de directorios padre, no solo el padre inmediato; rechaza symlinks/junctions en cualquier nivel, directorios modificables por grupo/otros y cambios de identidad de directorios durante la lectura.
-- El archivo de política no puede tener hardlinks; se verifica la identidad y metadatos del archivo antes/después de leer para detectar sustitución o mutación.
-- Las autorizaciones activas deben residir fuera del repositorio. El archivo de configuración por defecto puede seguir vacío y deny-by-default, pero no puede contener grants activos que terminen versionados en Git.
-- tests/test_execution_policy.py añade regresiones para symlink en ancestro, hardlink y política activa dentro del repositorio.
-- Los checks de Actions del nuevo HEAD quedan pendientes; no se extrapola el CI verde del SHA anterior.
+- execution_policy.py ahora inspecciona todos los componentes de la ruta y vuelve a comprobar la identidad de la cadena de directorios durante la lectura. Rechaza enlaces simbólicos/junctions en cualquier ancestro, directorios modificables por grupo/otros y hardlinks del archivo de política.
+- Las autorizaciones activas deben residir fuera del repositorio. La comprobación usa la ruta absoluta ya validada, sin volver a resolverla después de leer el descriptor, evitando una ventana de sustitución al aplicar la regla de ubicación.
+- tests/test_execution_policy.py cubre ancestros enlazados, hardlinks y políticas activas dentro del repositorio.
+- La ejecución CI del siguiente HEAD debe validar estos cambios; no se extrapola el resultado de 624 pruebas del SHA anterior.
 
 ## Capacidades y límites que siguen siendo reales
 
