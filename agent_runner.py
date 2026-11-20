@@ -15,6 +15,7 @@ from pathlib import Path
 from model_memory_manager import load_config, resolve_agent, record
 from execution_ledger import ExecutionLedger
 from safe_io import SafeWriteError, open_private_file
+from secret_redaction import redact_sensitive_data
 
 
 def _ledger_required(environ=None):
@@ -45,6 +46,8 @@ PROJECT = Path(__file__).resolve().parent
 LOCK_FILE = PROJECT / "data" / "agent_runner.lock"
 TASK_LOG = PROJECT / "data" / "agent_tasks.jsonl"
 EMBED_LOG = PROJECT / "data" / "eco_embeddings.jsonl"
+MAX_AGENT_LOG_BYTES = 64 * 1024 * 1024
+MAX_AGENT_EVENT_BYTES = 8 * 1024 * 1024
 
 # Esquema JSON que se utiliza exclusivamente para las revisiones de agentes.
 REVIEW_OUTPUT_SCHEMA = {
@@ -183,10 +186,19 @@ def unload_other_models(target_model):
 
 
 def save_jsonl(path, event):
-    """Añade una experiencia sin sobrescribir el historial."""
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("a", encoding="utf-8") as file:
-        file.write(json.dumps(event, ensure_ascii=False) + "\n")
+    """Añade evidencia saneada a un archivo privado, acotado y append-only."""
+    safe_event = redact_sensitive_data(event)
+    rendered = json.dumps(
+        safe_event, ensure_ascii=False, allow_nan=False
+    ) + "\n"
+    encoded_size = len(rendered.encode("utf-8"))
+    if encoded_size > MAX_AGENT_EVENT_BYTES:
+        raise ValueError("El evento del agente supera 8 MiB.")
+    with open_private_file(path, "a") as file:
+        current_size = os.fstat(file.fileno()).st_size
+        if current_size + encoded_size > MAX_AGENT_LOG_BYTES:
+            raise ValueError("El historial del agente alcanzó el límite de 64 MiB.")
+        file.write(rendered)
 
 
 def build_task_prompt(
@@ -300,6 +312,8 @@ def build_task_prompt(
             # para el límite ni pueden ocupar los lugares del historial.
             lines = []
             with open_private_file(TASK_LOG, "r") as file:
+                if os.fstat(file.fileno()).st_size > MAX_AGENT_LOG_BYTES:
+                    raise ValueError("El historial del agente supera 64 MiB.")
                 for line in file:
                     try:
                         item = json.loads(line)
@@ -320,6 +334,8 @@ def build_task_prompt(
                             lines.pop(0)
         else:
             with open_private_file(TASK_LOG, "r") as file:
+                if os.fstat(file.fileno()).st_size > MAX_AGENT_LOG_BYTES:
+                    raise ValueError("El historial del agente supera 64 MiB.")
                 lines = list(deque(file, maxlen=limit))
     except SafeWriteError:
         raise
@@ -333,7 +349,7 @@ def build_task_prompt(
         try:
             item = json.loads(line)
             if isinstance(item, dict):
-                records.append(item)
+                records.append(redact_sensitive_data(item))
         except json.JSONDecodeError:
             continue
 

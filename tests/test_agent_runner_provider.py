@@ -39,6 +39,50 @@ class AgentRunnerTransportTests(unittest.TestCase):
         self.assertIs(request.call_args.args[0], provider)
 
 
+class AgentRunnerPrivateHistoryTests(unittest.TestCase):
+    def test_save_jsonl_redacts_secrets_and_creates_private_file(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "data" / "agent_tasks.jsonl"
+            secret = "agent-history-secret"
+            agent_runner.save_jsonl(path, {
+                "task": f"token={secret}",
+                "api_key": secret,
+                "safe": "visible",
+            })
+            stored = path.read_text(encoding="utf-8")
+            self.assertNotIn(secret, stored)
+            self.assertIn("token=[REDACTED]", stored)
+            self.assertIn('"api_key": "[REDACTED]"', stored)
+            if os.name == "posix":
+                import stat
+                self.assertEqual(stat.S_IMODE(path.stat().st_mode), 0o600)
+                self.assertEqual(stat.S_IMODE(path.parent.stat().st_mode), 0o700)
+
+    def test_legacy_history_is_redacted_before_prompt_inclusion(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "data" / "agent_tasks.jsonl"
+            path.parent.mkdir(mode=0o700)
+            path.write_text(json.dumps({
+                "agent": "NEXO",
+                "task": "password=legacy-task-secret",
+                "response": "token=legacy-response-secret",
+            }) + "\n", encoding="utf-8")
+            agent = {
+                "context": {
+                    "enabled": True,
+                    "sources": ["recent_agent_tasks"],
+                    "max_items": 4,
+                    "max_chars_per_field": 700,
+                }
+            }
+            with patch.object(agent_runner, "TASK_LOG", path):
+                prompt = agent_runner.build_task_prompt(agent, "tarea actual")
+            self.assertNotIn("legacy-task-secret", prompt)
+            self.assertNotIn("legacy-response-secret", prompt)
+            self.assertIn("password=[REDACTED]", prompt)
+            self.assertIn("token=[REDACTED]", prompt)
+
+
 class AgentRunnerRemoteEmbeddingTests(unittest.TestCase):
     def test_embed_text_sends_one_item_and_records_remote_provider(self):
         provider = {
