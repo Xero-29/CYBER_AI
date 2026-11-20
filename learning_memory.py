@@ -12,10 +12,13 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from execution_ledger import ExecutionLedger
+from safe_io import SafeWriteError, open_private_file
 
 PROJECT = Path(__file__).resolve().parent
 MEMORY_FILE = PROJECT / "data" / "verified_lessons.jsonl"
 APPROVAL_KEY_ENV = "CYBER_AI_VERITAS_APPROVAL_KEY"
+MAX_MEMORY_BYTES = 16 * 1024 * 1024
+MAX_MEMORY_RECORDS = 10_000
 
 STOPWORDS = {
     "como", "para", "pero", "porque", "desde", "donde", "cuando",
@@ -244,19 +247,17 @@ def save_verified_lesson_from_ledger(
         "approval_key_id": hashlib.sha256(key.encode("utf-8")).hexdigest()[:16],
     }
 
-    if MEMORY_FILE.parent.is_symlink():
-        raise ValueError("El directorio de memoria no puede ser un enlace simbólico.")
-    MEMORY_FILE.parent.mkdir(parents=True, exist_ok=True)
-    if MEMORY_FILE.is_symlink():
-        raise ValueError("El archivo de memoria no puede ser un enlace simbólico.")
     lock_path = MEMORY_FILE.with_suffix(MEMORY_FILE.suffix + ".lock")
-    if lock_path.is_symlink():
-        raise ValueError("El lock de memoria no puede ser un enlace simbólico.")
-    nofollow = getattr(os, "O_NOFOLLOW", 0)
-    lock_fd = os.open(lock_path, os.O_CREAT | os.O_RDWR | nofollow, 0o600)
-    try:
-        with os.fdopen(lock_fd, "r+") as lock:
-            fcntl.flock(lock, fcntl.LOCK_EX)
+    rendered = json.dumps(
+        record, ensure_ascii=False, allow_nan=False
+    ) + "\n"
+    encoded_size = len(rendered.encode("utf-8"))
+    if encoded_size > MAX_MEMORY_BYTES:
+        raise ValueError("La lección supera el límite de 16 MiB.")
+
+    with open_private_file(lock_path, "a+") as lock:
+        fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+        try:
             for previous in read_lessons():
                 if (
                     previous.get("topic", "").casefold() == fields["topic"].casefold()
@@ -269,21 +270,13 @@ def save_verified_lesson_from_ledger(
                         "timestamp": previous.get("timestamp"),
                     }
 
-            file_fd = os.open(
-                MEMORY_FILE, os.O_CREAT | os.O_APPEND | os.O_WRONLY | nofollow, 0o600
-            )
-            try:
-                os.fchmod(file_fd, 0o600)
-                with os.fdopen(file_fd, "a", encoding="utf-8") as output:
-                    output.write(json.dumps(record, ensure_ascii=False) + "\n")
-                    output.flush()
-                    os.fsync(output.fileno())
-            except Exception:
-                raise
-            finally:
-                fcntl.flock(lock, fcntl.LOCK_UN)
-    except Exception:
-        raise
+            with open_private_file(MEMORY_FILE, "a") as output:
+                current_size = os.fstat(output.fileno()).st_size
+                if current_size + encoded_size > MAX_MEMORY_BYTES:
+                    raise ValueError("La memoria verificada alcanzó el límite de 16 MiB.")
+                output.write(rendered)
+        finally:
+            fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
 
     return {"saved": True, "path": str(MEMORY_FILE), "timestamp": record["timestamp"]}
 
@@ -316,14 +309,14 @@ def read_lessons(path=None):
     """Lee únicamente lecciones con firma VERITAS válida."""
     path = Path(path) if path else MEMORY_FILE
     key = os.environ.get(APPROVAL_KEY_ENV, "")
-    if len(key.encode("utf-8")) < 32 or not path.is_file():
+    if len(key.encode("utf-8")) < 32:
         return []
-    if path.is_symlink() or path.parent.is_symlink():
-        raise RuntimeError("El archivo y directorio de memoria no pueden ser enlaces simbólicos.")
 
     lessons = []
     try:
-        with path.open(encoding="utf-8") as file:
+        with open_private_file(path, "r") as file:
+            if os.fstat(file.fileno()).st_size > MAX_MEMORY_BYTES:
+                raise RuntimeError("La memoria verificada supera 16 MiB.")
             for line in file:
                 try:
                     item = json.loads(line)
@@ -346,9 +339,17 @@ def read_lessons(path=None):
                     )
                 ):
                     continue
+                if len(lessons) >= MAX_MEMORY_RECORDS:
+                    raise RuntimeError("La memoria verificada supera 10.000 registros.")
                 lessons.append(item)
+    except SafeWriteError:
+        if not path.exists() and not path.is_symlink():
+            return []
+        raise RuntimeError(
+            "La memoria verificada no es un archivo privado seguro."
+        ) from None
     except OSError as error:
-        raise RuntimeError(f"No se pudo leer la memoria: {error}") from error
+        raise RuntimeError("No se pudo leer la memoria verificada.") from error
     return lessons
 
 

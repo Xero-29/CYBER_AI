@@ -117,6 +117,31 @@ class LearningMemoryTests(unittest.TestCase):
         self.assertEqual(lessons[0]["verified_by"], "VERITAS")
         self.assertEqual(lessons[0]["schema_version"], 2)
 
+    def test_memory_file_and_directory_are_private(self):
+        self.save_lesson()
+        if os.name == "posix":
+            import stat
+            self.assertEqual(stat.S_IMODE(self.memory_path.stat().st_mode), 0o600)
+            self.assertEqual(stat.S_IMODE(self.memory_path.parent.stat().st_mode), 0o700)
+
+    def test_read_lessons_rejects_symlink_and_hardlink_files(self):
+        outside = Path(self.temp_dir.name) / "outside.jsonl"
+        outside.write_text("{}\\n", encoding="utf-8")
+        try:
+            self.memory_path.symlink_to(outside)
+        except (OSError, NotImplementedError):
+            self.skipTest("symlinks unavailable")
+        with self.assertRaisesRegex(RuntimeError, "archivo privado seguro"):
+            learning_memory.read_lessons()
+        self.memory_path.unlink()
+        self.memory_path.write_text("{}\\n", encoding="utf-8")
+        try:
+            os.link(self.memory_path, Path(self.temp_dir.name) / "hard-link.jsonl")
+        except (OSError, NotImplementedError):
+            self.skipTest("hard links unavailable")
+        with self.assertRaisesRegex(RuntimeError, "archivo privado seguro"):
+            learning_memory.read_lessons()
+
     def test_without_approval_key_memory_fails_closed(self):
         self.save_lesson()
         with patch.dict(os.environ, {learning_memory.APPROVAL_KEY_ENV: ""}):
