@@ -97,7 +97,9 @@
           "Full comparative validation of reliability and functional-safety models"
         ],
         "no_maturity_promotion": true
-      }
+      },
+      "layer_coverage_map": "FOUNDATIONS_LAYER_COVERAGE_MAP_2026-11-20.md",
+      "layer_coverage_status": "all_12_layers_in_progress_no_pass"
     },
     {
       "id": "FND-01.02",
@@ -153,7 +155,9 @@
           "Sectoral and Colombian applicability review"
         ],
         "no_maturity_promotion": true
-      }
+      },
+      "layer_coverage_map": "FOUNDATIONS_LAYER_COVERAGE_MAP_2026-11-20.md",
+      "layer_coverage_status": "all_12_layers_in_progress_no_pass"
     },
     {
       "id": "FND-01.03",
