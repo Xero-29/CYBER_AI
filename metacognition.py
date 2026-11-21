@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import fcntl
 import json
+import math
 import os
 import re
 import stat
@@ -408,31 +409,142 @@ def build_verification_prompt(task: str, assessment: dict, research: str) -> str
     )
 
 
+def _provider_context(agent_names, *, capability="chat"):
+    from llm_providers import resolve_provider
+    from model_memory_manager import load_config, resolve_agent
+
+    config = load_config()
+    meta = config.get("metacognition", {})
+    allow_remote = (
+        isinstance(meta, dict)
+        and meta.get("allow_remote_provider") is True
+        and os.environ.get("CYBER_AI_METACOGNITION_ALLOW_REMOTE") == "1"
+    )
+    providers = []
+    for agent_name in agent_names:
+        _, agent = resolve_agent(agent_name, config)
+        provider = resolve_provider(config, agent, capability=capability)
+        if provider.get("protocol") != "ollama" and not allow_remote:
+            raise MetacognitionError(
+                "Proveedor remoto bloqueado para metacognición; requiere "
+                "allow_remote_provider=true y CYBER_AI_METACOGNITION_ALLOW_REMOTE=1."
+            )
+        providers.append(provider)
+    return config, providers, allow_remote
+
+
+def _child_environment(home: str, config: dict, allow_remote: bool) -> dict:
+    path_entries = [str(Path(sys.executable).resolve().parent)]
+    path_entries.extend(entry for entry in os.defpath.split(os.pathsep) if entry)
+    env = {
+        "PATH": os.pathsep.join(dict.fromkeys(path_entries)),
+        "HOME": home,
+        "TMPDIR": home,
+        "TEMP": home,
+        "TMP": home,
+        "XDG_CONFIG_HOME": str(Path(home) / "config"),
+        "XDG_CACHE_HOME": str(Path(home) / "cache"),
+        "PYTHONNOUSERSITE": "1",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONIOENCODING": "utf-8",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "NO_PROXY": "localhost,127.0.0.1,::1",
+    }
+    for key in ("CYBER_AI_TENANT_ID", "CYBER_AI_LEDGER_PATH", "CYBER_AI_LEDGER_REQUIRED"):
+        if key in os.environ:
+            env[key] = os.environ[key]
+    if allow_remote:
+        registry = config.get("llm_providers", {})
+        if isinstance(registry, dict):
+            for provider in registry.values():
+                if isinstance(provider, dict):
+                    key_name = provider.get("api_key_env")
+                    if isinstance(key_name, str) and key_name in os.environ:
+                        env[key_name] = os.environ[key_name]
+        for key in ("HTTP_PROXY", "HTTPS_PROXY", "NO_PROXY", "SSL_CERT_FILE", "SSL_CERT_DIR"):
+            if key in os.environ:
+                env[key] = os.environ[key]
+    return env
+
+
+def _run_bounded_command(
+    command, *, timeout: int, max_output_bytes: int,
+    agent_names=(), config=None, allow_remote=False,
+):
+    if type(timeout) is not int or not 1 <= timeout <= 1800:
+        raise ValueError("El timeout del subproceso debe estar entre 1 y 1800 segundos.")
+    if config is None:
+        config = {}
+    with tempfile.TemporaryDirectory(prefix="cyber-ai-metacognition-") as home:
+        os.chmod(home, 0o700)
+        env = _child_environment(home, config, allow_remote)
+        try:
+            result = run_bounded_process(
+                command,
+                cwd=str(PROJECT),
+                env=env,
+                timeout=timeout,
+                max_output_bytes=max_output_bytes,
+            )
+        except (OSError, ProcessIsolationError, ValueError) as error:
+            raise MetacognitionError(
+                f"No se pudo ejecutar el subproceso metacognitivo ({type(error).__name__})."
+            ) from error
+    if result.get("timed_out"):
+        raise MetacognitionError("El subproceso metacognitivo superó su timeout.")
+    if result.get("output_truncated"):
+        raise MetacognitionError("La salida del subproceso superó el límite permitido.")
+    result["stdout"] = redact_text(result.get("stdout", ""))
+    result["stderr"] = redact_text(result.get("stderr", ""))
+    return result
+
+
 def _runner_call(agent: str, prompt: str, *, knowledge: bool = True, timeout: int = 1800) -> str:
-    command = [sys.executable, str(PROJECT / "agent_runner.py"), "ask", agent, "--task-text", prompt]
+    if not isinstance(agent, str) or not re.fullmatch(r"[A-Za-z0-9_-]{1,64}", agent):
+        raise ValueError("Identificador de agente inválido.")
+    if not isinstance(prompt, str) or not prompt.strip() or len(prompt) > MAX_REPORT_CHARS:
+        raise ValueError("El prompt del agente está vacío o supera 100.000 caracteres.")
+    if not isinstance(knowledge, bool):
+        raise TypeError("knowledge debe ser booleano.")
+    config, _, allow_remote = _provider_context([agent])
+    command = [
+        sys.executable, str(PROJECT / "agent_runner.py"),
+        "ask", agent, "--task-text", prompt,
+    ]
     if knowledge:
         command.append("--knowledge")
-    completed = subprocess.run(
-        command, cwd=PROJECT, capture_output=True, text=True, timeout=timeout, check=False
+    completed = _run_bounded_command(
+        command, timeout=timeout, max_output_bytes=2_000_000,
+        agent_names=[agent], config=config, allow_remote=allow_remote,
     )
-    if completed.returncode:
-        detail = (completed.stderr or completed.stdout)[-4000:]
-        raise RuntimeError(f"Agente {agent} falló (código {completed.returncode}): {detail}")
-    output = completed.stdout
+    if completed.get("returncode") != 0:
+        detail = (completed.get("stderr") or completed.get("stdout") or "")[-4000:]
+        raise RuntimeError(
+            f"Agente {agent} falló (código {completed.get('returncode')}): {detail}"
+        )
+    output = completed.get("stdout", "")
     if ANSWER_MARKER in output:
         output = output.rsplit(ANSWER_MARKER, 1)[1]
     answer = output.strip()
     if not answer:
         raise RuntimeError(f"Agente {agent} devolvió una respuesta vacía.")
-    return answer
+    return answer[:MAX_REPORT_CHARS]
 
 
 def publish_research_report(report: str, task_id: str) -> dict:
-    """Indexa el informe aprobado como conocimiento provisional, nunca como dominio."""
+    """Indexa como conocimiento privado y provisional, nunca como dominio."""
     from knowledge_embeddings import generate_embedding
     from knowledge_library import store_chunks
 
-    vector = generate_embedding(report, agent_name="ECO")
+    if not isinstance(report, str) or not report.strip() or len(report) > MAX_REPORT_CHARS:
+        raise MetacognitionError("El informe de investigación está vacío o supera el límite.")
+    tenant_id = os.environ.get("CYBER_AI_TENANT_ID", "local")
+    if not re.fullmatch(r"[A-Za-z0-9._:-]{1,128}", tenant_id):
+        raise MetacognitionError("CYBER_AI_TENANT_ID no cumple el formato permitido.")
+    _provider_context(["ECO"], capability="embeddings")
+    safe_report = redact_text(report)
+    vector = generate_embedding(safe_report, agent_name="ECO")
     embedding_model = vector.get("embedding_space") or vector.get("model")
     stored = store_chunks([{
         "title": "Investigación metacognitiva " + task_id,
@@ -440,70 +552,99 @@ def publish_research_report(report: str, task_id: str) -> dict:
         "license": "UNSPECIFIED",
         "category": "research_provisional",
         "tags": ["metacognition", "ai-research", "provisional", "independently-reviewed"],
-        "visibility": "shared",
-        "content": report,
+        "visibility": "tenant",
+        "tenant_id": tenant_id,
+        "content": safe_report,
         "embedding": vector["embedding"],
         "embedding_model": embedding_model,
     }])
-    return {"indexed": True, "document": stored[0]}
+    return {"indexed": True, "document": stored[0], "visibility": "tenant"}
 
 
-def collect_web_evidence(task: str, assessment: dict, *, timeout: int = 900) -> str:
-    """Consulta el buscador curado y ejecuta revisión de fuentes existente.
-
-    Solo devuelve informes generados por web_research.py y review_web_report.py.
-    Un fallo o ausencia de fuentes se declara explícitamente; nunca se simula búsqueda.
-    """
+def collect_web_evidence(task: str, assessment: dict, *, timeout: int = 900) -> dict:
+    """Busca fuentes registradas, las revisa y solo cuenta páginas con revisión completada."""
+    if type(timeout) is not int or not 5 <= timeout <= 900:
+        raise ValueError("El timeout de investigación web debe estar entre 5 y 900 segundos.")
     gaps = assessment.get("gaps", [])[:4]
     if not gaps:
-        return "No se definieron brechas concretas; no se lanzó búsqueda web."
+        return {"status": "unavailable", "verified_sources": 0, "report": "No hay brechas para investigar."}
     collected = []
+    verified_sources = 0
     for gap in gaps:
-        query = f"{task} {gap['topic']} " + " ".join(gap.get("prerequisites", [])[:3])
-        search = subprocess.run(
-            [sys.executable, str(PROJECT / "web_research.py"), query,
-             "--max-results", "5"],
-            cwd=PROJECT, capture_output=True, text=True, timeout=timeout, check=False,
+        query = redact_text(
+            f"{task} {gap['topic']} " + " ".join(gap.get("prerequisites", [])[:3])
         )
-        output = (search.stdout or "") + "\n" + (search.stderr or "")
+        search = _run_bounded_command(
+            [sys.executable, str(PROJECT / "web_research.py"), query, "--max-results", "5"],
+            timeout=timeout, max_output_bytes=1_000_000,
+        )
+        output = (search.get("stdout", "") + "\n" + search.get("stderr", ""))[-8000:]
         match = re.search(r"Datos JSON:\s*(reports/web_research/[^\s]+\.json)", output)
-        if search.returncode != 0 or not match:
+        if search.get("returncode") != 0 or not match:
             collected.append(
                 f"BRECHA: {gap['topic']}\nESTADO: búsqueda fallida o sin informe. "
                 f"DETALLE: {output[-1200:]}"
             )
             continue
         relative = Path(match.group(1))
-        report_path = (PROJECT / relative).resolve()
-        if PROJECT.resolve() not in report_path.parents or not report_path.is_file():
+        if relative.is_absolute() or ".." in relative.parts:
             collected.append(f"BRECHA: {gap['topic']}\nESTADO: ruta de informe no válida.")
             continue
+        report_path = PROJECT / relative
         report = _read_json(report_path, {})
-        if report.get("search_status") != "ok" or not report.get("results"):
+        if (
+            not isinstance(report, dict)
+            or report.get("search_status") != "ok"
+            or not isinstance(report.get("results"), list)
+        ):
             collected.append(
-                f"BRECHA: {gap['topic']}\nESTADO: sin resultados confiables. "
-                "No se interpreta la ausencia de resultados como ausencia de conocimiento."
+                f"BRECHA: {gap['topic']}\nESTADO: sin resultados confiables."
             )
             continue
-        review = subprocess.run(
+        pages = [
+            item for item in report["results"]
+            if isinstance(item, dict)
+            and item.get("registered_source") is True
+            and item.get("fetch_status") == "pagina consultada"
+            and isinstance(item.get("page_text"), str)
+            and item.get("page_text")
+            and isinstance(item.get("url"), str)
+        ][:4]
+        if not pages:
+            collected.append(
+                f"BRECHA: {gap['topic']}\nESTADO: no hay páginas registradas consultadas."
+            )
+            continue
+        review_config, _, review_remote = _provider_context(["NEXO", "FILTRO", "VERITAS"])
+        review = _run_bounded_command(
             [sys.executable, str(PROJECT / "review_web_report.py"), str(relative)],
-            cwd=PROJECT, capture_output=True, text=True, timeout=timeout, check=False,
+            timeout=timeout, max_output_bytes=1_000_000,
+            agent_names=["NEXO", "FILTRO", "VERITAS"],
+            config=review_config, allow_remote=review_remote,
         )
-        review_output = (review.stdout or "") + "\n" + (review.stderr or "")
-        draft_match = re.search(r"(reports/web_research/[^\s]+\.md)", review_output)
-        draft_text = ""
-        if draft_match:
-            draft_path = (PROJECT / draft_match.group(1)).resolve()
-            if PROJECT.resolve() in draft_path.parents and draft_path.is_file():
-                draft_text = draft_path.read_text(encoding="utf-8")[:12000]
+        review_output = (review.get("stdout", "") + "\n" + review.get("stderr", ""))[-8000:]
+        review_ok = review.get("returncode") == 0
+        if review_ok:
+            verified_sources += len(pages)
+        safe_report = redact_sensitive_data({
+            "query": report.get("query"),
+            "retrieved_at_utc": report.get("retrieved_at_utc"),
+            "results": pages,
+        })
         collected.append(
-            f"BRECHA: {gap['topic']}\nESTADO DE BÚSQUEDA: {report.get('search_status')}\n"
-            f"ESTADO DE REVISIÓN: {'completada' if review.returncode == 0 else 'fallida'}\n"
-            f"DATOS DE FUENTES:\n{json.dumps(report, ensure_ascii=False)[:12000]}\n"
-            f"BORRADOR DE REVISIÓN:\n{draft_text or review_output[-5000:]}"
+            f"BRECHA: {gap['topic']}\n"
+            f"ESTADO DE BÚSQUEDA: ok\n"
+            f"ESTADO DE REVISIÓN: {'completada' if review_ok else 'fallida'}\n"
+            f"FUENTES REGISTRADAS: {len(pages) if review_ok else 0}\n"
+            f"DATOS DE FUENTES:\n{json.dumps(safe_report, ensure_ascii=False)[:12000]}\n"
+            f"BORRADOR DE REVISIÓN:\n{review_output[-5000:]}"
         )
-    return "\n\n--- SIGUIENTE BRECHA ---\n\n".join(collected)[:30000]
-
+    status = "ok" if verified_sources > 0 else "unavailable"
+    return {
+        "status": status,
+        "verified_sources": verified_sources,
+        "report": redact_text("\n\n--- SIGUIENTE BRECHA ---\n\n".join(collected)[:MAX_CONTEXT_CHARS]),
+    }
 
 def run_cycle(
     task: str,
