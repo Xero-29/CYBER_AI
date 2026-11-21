@@ -19,6 +19,7 @@ from nuclei_scanner import (
 )
 from execution_ledger import ExecutionLedger
 from binary_integrity import BinaryIntegrityError
+from execution_policy import AuthorizationError
 
 
 class FakeProcess:
@@ -78,6 +79,51 @@ class NucleiScannerTests(unittest.TestCase):
                         )
         self.assertEqual(result["status"], "isolation_required")
         which.assert_not_called()
+
+    def test_grant_revoked_during_preflight_blocks_process_start(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            executable = root / "nuclei"
+            executable.write_bytes(b"nuclei-test-binary")
+            self._create_templates(root)
+            reports = root / "reports"
+            reports.mkdir()
+            provenance = {
+                "resolved_path": str(executable),
+                "sha256": "a" * 64,
+                "allowlist": {"enforced": True, "status": "approved"},
+            }
+            with (
+                patch(
+                    "nuclei_scanner.authorize_target",
+                    side_effect=[
+                        {"authorization_id": "test-grant"},
+                        AuthorizationError("revoked"),
+                    ],
+                ) as authorize,
+                patch("nuclei_scanner.shutil.which", return_value=str(executable)),
+                patch("nuclei_scanner.require_approved_executable", return_value=provenance),
+                patch("nuclei_scanner.Path.home", return_value=root),
+                patch("nuclei_scanner.ensure_private_directory", return_value=reports),
+                patch("nuclei_scanner._record_scan_start", return_value="start-event"),
+                patch(
+                    "nuclei_scanner._finalize_scan",
+                    side_effect=lambda target, result, *args, **kwargs: result,
+                ),
+                patch("nuclei_scanner.subprocess.Popen") as popen,
+            ):
+                result = scan_target(
+                    "http://127.0.0.1:8765",
+                    authorized=True,
+                    authorization_id="test-grant",
+                    require_ledger=False,
+                )
+            self.assertEqual(result["status"], "authorization_denied")
+            self.assertEqual(
+                result["reason"], "authorization_revoked_or_expired_before_launch"
+            )
+            self.assertEqual(authorize.call_count, 2)
+            popen.assert_not_called()
 
     def test_scan_requires_explicit_authorization(self):
         result = scan_target("http://127.0.0.1:8765")
