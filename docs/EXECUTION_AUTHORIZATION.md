@@ -60,6 +60,7 @@ El cargador valida la política antes de considerar cualquier permiso:
 - rechaza claves JSON duplicadas, IDs repetidos, acciones que no sean listas de identificadores y campos desconocidos;
 - limita el archivo a 1 MiB y a 500 autorizaciones;
 - rechaza symlinks, puntos de reanálisis y archivos que no sean regulares; compara la identidad del archivo abierto con la ruta para detectar sustituciones durante la apertura;
+- en POSIX, los directorios padre y todos sus ancestros deben pertenecer a `root` o al usuario efectivo; no pueden ser modificables por grupo u otros, salvo directorios sticky propiedad de `root` como `/tmp`;
 - cuando existen permisos, exige modo POSIX `0600`; la verificación de ACL NTFS debe realizarse en el sistema operativo;
 - rechaza destinos con dominios, credenciales, query, fragmentos, rutas ambiguas/escapadas y puertos fuera de rango. Solo admite IP literales globales o privadas expresamente incluidas en el permiso; nunca link-local, multicast, no especificadas ni reservadas.
 
