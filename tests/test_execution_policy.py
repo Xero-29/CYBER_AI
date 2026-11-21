@@ -4,6 +4,7 @@ import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import execution_policy
@@ -141,9 +142,24 @@ class ExecutionPolicyTests(unittest.TestCase):
     @unittest.skipIf(os.name == "nt", "La propiedad POSIX no se valida en Windows.")
     def test_policy_owned_by_another_user_is_rejected(self):
         other_uid = os.geteuid() + 1
-        with patch("execution_policy.os.geteuid", return_value=other_uid):
-            with self.assertRaisesRegex(AuthorizationError, "pertenecer al usuario"):
-                authorize_target("https://8.8.8.8", "nuclei_scan", "grant-001")
+        with patch("execution_policy._validate_policy_parent_chain", return_value=[]):
+            with patch("execution_policy.os.geteuid", return_value=other_uid):
+                with self.assertRaisesRegex(AuthorizationError, "pertenecer al usuario"):
+                    authorize_target("https://8.8.8.8", "nuclei_scan", "grant-001")
+
+    @unittest.skipIf(os.name == "nt", "La propiedad POSIX no se valida en Windows.")
+    def test_policy_parent_owned_by_untrusted_user_is_rejected(self):
+        parent_info = self.policy.parent.lstat()
+        untrusted_info = SimpleNamespace(
+            st_mode=parent_info.st_mode,
+            st_uid=os.geteuid() + 1,
+            st_file_attributes=0,
+            st_dev=parent_info.st_dev,
+            st_ino=parent_info.st_ino,
+        )
+        with patch("execution_policy.Path.lstat", return_value=untrusted_info):
+            with self.assertRaisesRegex(AuthorizationError, "pertenecer a root"):
+                execution_policy._validate_policy_parent_chain(self.policy)
 
     @unittest.skipIf(os.name == "nt", "Los permisos POSIX no representan ACL de Windows.")
     def test_group_writable_policy_parent_is_rejected(self):
