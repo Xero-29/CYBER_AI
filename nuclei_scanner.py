@@ -330,6 +330,8 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
         if os.name == "posix":
             os.chmod(isolated_home.name, 0o700)
         process_env = build_minimal_environment(isolated_home.name, executable)
+        # The grant may expire or be revoked during binary/template preflight.
+        authorize_target(target, "nuclei_scan", authorization_id)
         process = subprocess.Popen(
             command,
             stdout=subprocess.PIPE,
@@ -366,6 +368,20 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
         reader.start()
 
         while process.poll() is None:
+            try:
+                authorize_target(target, "nuclei_scan", authorization_id)
+            except AuthorizationError as error:
+                _terminate_process_tree(process)
+                result = {
+                    "target": target,
+                    "status": "authorization_denied",
+                    "error": str(error),
+                    "reason": "authorization_revoked_or_expired_during_scan",
+                    "findings": [],
+                }
+                return _finalize_scan(
+                    target, result, started, authorization_id, start_event_id, require_ledger
+                )
             output_state = _inspect_output_file(output_file)
             if output_state == "over_limit":
                 output_limit_exceeded = True
