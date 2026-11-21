@@ -40,8 +40,8 @@ def _reject_symlink_components(directory):
             )
             if not trusted_owner or (mode & 0o022 and not root_sticky):
                 raise SafeWriteError(
-                    "Los directorios de salida deben pertenecer a root o al usuario "
-                    "efectivo y no ser modificables por terceros."
+                    "El directorio padre o uno de sus ancestros debe pertenecer a root o al usuario "
+                    "efectivo y no ser modificable por terceros."
                 )
         if current.parent == current:
             return

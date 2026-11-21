@@ -198,7 +198,7 @@ class SafeIoTests(unittest.TestCase):
             parent = Path(temp) / "shared"
             parent.mkdir(mode=0o700)
             parent.chmod(0o770)
-            with self.assertRaisesRegex(SafeWriteError, "modificables por terceros"):
+            with self.assertRaisesRegex(SafeWriteError, "modificable por terceros"):
                 atomic_write_text(parent / "private.json", "{}")
             self.assertFalse((parent / "private.json").exists())
 
