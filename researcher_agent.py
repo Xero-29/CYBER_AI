@@ -1,6 +1,7 @@
 """Contrato neutral del investigador: desacopla metodología y proveedor de IA."""
 from __future__ import annotations
 
+import json
 import os
 import re
 from dataclasses import dataclass
@@ -45,8 +46,14 @@ class ResearcherAgent:
     def investigate(self, task: str, gap_report: dict, *, context: str = "") -> dict:
         if not isinstance(task, str) or not task.strip() or len(task) > MAX_TASK_CHARS:
             raise ValueError("La tarea debe ser texto no vacío de hasta 20.000 caracteres.")
-        if not isinstance(gap_report, dict) or len(str(gap_report)) > MAX_CONTEXT_CHARS:
-            raise ValueError("El informe de brechas debe ser un objeto acotado.")
+        if not isinstance(gap_report, dict):
+            raise ValueError("El informe de brechas debe ser un objeto.")
+        try:
+            gap_text = json.dumps(gap_report, ensure_ascii=False, allow_nan=False)
+        except (TypeError, ValueError) as error:
+            raise ValueError("El informe de brechas debe contener solo datos JSON.") from error
+        if len(gap_text) > MAX_CONTEXT_CHARS:
+            raise ValueError("El informe de brechas supera 30.000 caracteres.")
         if not isinstance(context, str) or len(context) > MAX_CONTEXT_CHARS:
             raise ValueError("El contexto supera 30.000 caracteres.")
         if self.backend.remote and os.environ.get("CYBER_AI_METACOGNITION_ALLOW_REMOTE") != "1":
@@ -59,7 +66,7 @@ class ResearcherAgent:
             "estándares y documentación oficial. Devuelve un informe técnico con: "
             "objetivo, brechas, fundamentos, explicación, metodología, ejemplos, límites, "
             "fuentes trazables y preguntas abiertas.\n\n"
-            f"TAREA:\n{task}\n\nBRECHAS:\n{gap_report!r}\n\nCONTEXTO:\n{context}"
+            f"TAREA:\n{task}\n\nBRECHAS:\n{gap_text}\n\nCONTEXTO:\n{context}"
         )
         report = self.backend.generate(prompt)
         if not isinstance(report, str) or not report.strip() or len(report) > MAX_REPORT_CHARS:
