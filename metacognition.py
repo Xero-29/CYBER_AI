@@ -7,53 +7,222 @@ cuando un verificador separado aprueba la evidencia; el resultado queda trazable
 from __future__ import annotations
 
 import argparse
+import fcntl
 import json
+import os
 import re
-import subprocess
+import stat
 import sys
+import tempfile
 import uuid
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
+
+from process_isolation import ProcessIsolationError, run_bounded_process
+from safe_io import (
+    SafeWriteError, atomic_write_text, ensure_private_directory, open_private_file,
+)
+from secret_redaction import redact_sensitive_data, redact_text
 
 PROJECT = Path(__file__).resolve().parent
 STATE_DIR = PROJECT / "data" / "metacognition"
 STATE_FILE = STATE_DIR / "competency_map.json"
 RESEARCH_LOG = STATE_DIR / "research_log.jsonl"
 MAX_RESEARCH_ROUNDS = 2
+MAX_TASK_CHARS = 20_000
+MAX_CONTEXT_CHARS = 30_000
+MAX_REPORT_CHARS = 100_000
+MAX_STATE_BYTES = 4 * 1024 * 1024
+MAX_LOG_BYTES = 64 * 1024 * 1024
+MAX_EVENT_BYTES = 2 * 1024 * 1024
+MAX_GAPS = 32
 ANSWER_MARKER = "=== RESPUESTA ==="
+
+
+class MetacognitionError(RuntimeError):
+    """El ciclo no puede continuar sin preservar sus límites de seguridad."""
 
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def _read_json(path: Path, default: Any) -> Any:
+def _unique_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("JSON contiene claves duplicadas.")
+        result[key] = value
+    return result
+
+
+def _enforce_json_depth(text: str, max_depth: int = 64) -> None:
+    depth = 0
+    in_string = False
+    escaped = False
+    for character in text:
+        if in_string:
+            if escaped:
+                escaped = False
+            elif character == "\\\\":
+                escaped = True
+            elif character == '"':
+                in_string = False
+            continue
+        if character == '"':
+            in_string = True
+        elif character in "[{":
+            depth += 1
+            if depth > max_depth:
+                raise MetacognitionError("El JSON supera la profundidad permitida.")
+        elif character in "]}":
+            depth -= 1
+            if depth < 0:
+                raise MetacognitionError("El JSON tiene delimitadores desbalanceados.")
+    if in_string or depth != 0:
+        raise MetacognitionError("El JSON está incompleto o mal formado.")
+
+
+def _decode_json(raw: bytes) -> Any:
+    text = raw.decode("utf-8")
+    _enforce_json_depth(text)
+    return json.loads(text, object_pairs_hook=_unique_object)
+
+
+def _read_private_json(path: Path, default: Any) -> Any:
+    path = Path(path)
+    ensure_private_directory(path.parent, create=True)
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
+        with open_private_file(path, "rb") as stream:
+            raw = stream.read(MAX_STATE_BYTES + 1)
+    except SafeWriteError as error:
+        if not path.exists() and not path.is_symlink():
+            return default
+        raise MetacognitionError("El estado metacognitivo no es un archivo privado seguro.") from error
+    if len(raw) > MAX_STATE_BYTES:
+        raise MetacognitionError("El estado metacognitivo supera 4 MiB.")
+    try:
+        return _decode_json(raw)
+    except (UnicodeError, json.JSONDecodeError, ValueError, RecursionError) as error:
+        raise MetacognitionError("El estado metacognitivo está dañado o no es JSON válido.") from error
+
+
+def _read_json(path: Path, default: Any, *, max_bytes: int = MAX_REPORT_CHARS * 4) -> Any:
+    """Lee un informe del repositorio con ruta confinada, sin symlinks ni tamaño ilimitado."""
+    path = Path(path)
+    try:
+        resolved = path.resolve(strict=True)
+        relative = resolved.relative_to(PROJECT.resolve())
+    except FileNotFoundError:
         return default
+    except (OSError, ValueError) as error:
+        raise MetacognitionError("La ruta del informe no está confinada al repositorio.") from error
+    current = PROJECT.resolve()
+    for index, part in enumerate(relative.parts):
+        current = current / part
+        try:
+            info = current.lstat()
+        except OSError as error:
+            raise MetacognitionError("No se pudo inspeccionar la ruta del informe.") from error
+        if stat.S_ISLNK(info.st_mode) or getattr(info, "st_file_attributes", 0) & getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400):
+            raise MetacognitionError("No se permiten symlinks ni puntos de reanálisis en informes.")
+        if index < len(relative.parts) - 1 and not stat.S_ISDIR(info.st_mode):
+            raise MetacognitionError("Un componente de la ruta del informe no es directorio.")
+        if index == len(relative.parts) - 1 and not stat.S_ISREG(info.st_mode):
+            raise MetacognitionError("El informe debe ser un archivo regular.")
+    descriptor = None
+    try:
+        before = resolved.lstat()
+        descriptor = os.open(resolved, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_CLOEXEC", 0))
+        opened = os.fstat(descriptor)
+        if opened.st_size > max_bytes:
+            raise MetacognitionError("El informe supera el límite de lectura.")
+        chunks = []
+        total = 0
+        while True:
+            block = os.read(descriptor, min(8192, max_bytes + 1 - total))
+            if not block:
+                break
+            total += len(block)
+            if total > max_bytes:
+                raise MetacognitionError("El informe supera el límite de lectura.")
+            chunks.append(block)
+        after = os.fstat(descriptor)
+        path_after = resolved.lstat()
+        if (
+            (before.st_dev, before.st_ino) != (opened.st_dev, opened.st_ino)
+            or (opened.st_dev, opened.st_ino) != (after.st_dev, after.st_ino)
+            or (after.st_dev, after.st_ino) != (path_after.st_dev, path_after.st_ino)
+            or after.st_size != opened.st_size
+            or after.st_mtime_ns != opened.st_mtime_ns
+            or total != after.st_size
+        ):
+            raise MetacognitionError("El informe cambió durante su lectura.")
+        return _decode_json(b"".join(chunks))
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError, RecursionError) as error:
+        if isinstance(error, MetacognitionError):
+            raise
+        raise MetacognitionError("No se pudo leer un informe JSON seguro.") from error
+    finally:
+        if descriptor is not None:
+            os.close(descriptor)
+
+
+@contextmanager
+def _state_lock(path: Path):
+    ensure_private_directory(path.parent, create=True)
+    lock_path = path.parent / ".metacognition.lock"
+    with open_private_file(lock_path, "a+") as lock:
+        fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
 
 
 def load_competency_map(path: Path = STATE_FILE) -> dict:
-    data = _read_json(path, {"schema_version": 1, "competencies": {}, "updated_at": None})
-    if not isinstance(data, dict) or not isinstance(data.get("competencies"), dict):
-        return {"schema_version": 1, "competencies": {}, "updated_at": None}
+    default = {"schema_version": 1, "competencies": {}, "updated_at": None}
+    data = _read_private_json(path, default)
+    if (
+        not isinstance(data, dict)
+        or data.get("schema_version") != 1
+        or not isinstance(data.get("competencies"), dict)
+    ):
+        raise MetacognitionError("El mapa de competencias no cumple el esquema esperado.")
     return data
 
 
-def save_competency_map(data: dict, path: Path = STATE_FILE) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
+def _save_competency_map_unlocked(data: dict, path: Path) -> None:
+    if not isinstance(data, dict) or not isinstance(data.get("competencies"), dict):
+        raise MetacognitionError("El mapa de competencias no cumple el esquema esperado.")
+    data["schema_version"] = 1
     data["updated_at"] = _now()
-    temp = path.with_suffix(path.suffix + ".tmp")
-    temp.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    temp.replace(path)
+    rendered = json.dumps(redact_sensitive_data(data), ensure_ascii=False, indent=2) + "\n"
+    if len(rendered.encode("utf-8")) > MAX_STATE_BYTES:
+        raise MetacognitionError("El mapa de competencias supera 4 MiB.")
+    ensure_private_directory(path.parent, create=True)
+    atomic_write_text(path, rendered, mode=0o600)
+
+
+def save_competency_map(data: dict, path: Path = STATE_FILE) -> None:
+    with _state_lock(path):
+        _save_competency_map_unlocked(data, path)
 
 
 def append_event(event: dict, path: Path = RESEARCH_LOG) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("a", encoding="utf-8") as stream:
-        stream.write(json.dumps(event, ensure_ascii=False) + "\n")
+    safe_event = redact_sensitive_data(event)
+    rendered = json.dumps(safe_event, ensure_ascii=False, separators=(",", ":")) + "\n"
+    encoded_size = len(rendered.encode("utf-8"))
+    if encoded_size > MAX_EVENT_BYTES:
+        raise MetacognitionError("El evento de investigación supera 2 MiB.")
+    ensure_private_directory(path.parent, create=True)
+    with _state_lock(path):
+        with open_private_file(path, "a") as stream:
+            if os.fstat(stream.fileno()).st_size + encoded_size > MAX_LOG_BYTES:
+                raise MetacognitionError("El registro de investigación alcanzó 64 MiB.")
+            stream.write(rendered)
 
 
 def extract_json_object(text: str) -> dict:
