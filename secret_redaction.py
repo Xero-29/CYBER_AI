@@ -6,15 +6,18 @@ SECRET_FIELD = re.compile(
     r"(?:api[_-]?key|access[_-]?key|access[_-]?token|refresh[_-]?token|token|"
     r"authorization|password|passwd|secret|credential|private[_-]?key|cookie|"
     r"set[_-]?cookie|session[_-]?(?:id|token|key)|hmac[_-]?key|"
-    r"signing[_-]?key|encryption[_-]?key)",
+    r"signing[_-]?key|encryption[_-]?key|signature|\bsig\b|"
+    r"aws[_-]?access[_-]?key[_-]?id|access[_-]?key[_-]?id)",
     re.IGNORECASE,
 )
 SECRET_ASSIGNMENT = re.compile(
     r'''(?i)(["']?(?:api[_-]?key|access[_-]?key|access[_-]?token|refresh[_-]?token|token|password|'''
     r'''passwd|secret|client[_-]?secret|authorization|credential|private[_-]?key|cookie|'''
-    r'''set[_-]?cookie|session[_-]?(?:id|token|key)|hmac[_-]?key|signing[_-]?key|encryption[_-]?key)'''
-    r'''["']?\s*[:=]\s*)(\\"(?:[^"\\]|\\.)*\\"|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|[^\s,;}\]"']+)'''
+    r'''set[_-]?cookie|session[_-]?(?:id|token|key)|hmac[_-]?key|signing[_-]?key|encryption[_-]?key|signature|\bsig\b|'''
+    r'''aws[_-]?access[_-]?key[_-]?id|access[_-]?key[_-]?id)'''
+    r'''["']?\s*[:=]\s*)(\\"(?:[^"\\]|\\.)*\\"|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|[^\s,&;}\]"']+)'''
 )
+
 PRIVATE_KEY = re.compile(
     r"-----BEGIN [^-]*PRIVATE KEY-----.*?-----END [^-]*PRIVATE KEY-----",
     re.DOTALL,

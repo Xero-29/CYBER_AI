@@ -1,5 +1,8 @@
+import io
 import tempfile
 import unittest
+from contextlib import redirect_stdout
+from types import SimpleNamespace
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -125,6 +128,51 @@ class KnowledgeDownloaderSecurityTests(unittest.TestCase):
                 downloader._validated_egress_proxy(),
                 "https://egress.example.org:8443",
             )
+
+
+    def test_dry_run_redacts_signed_url_query_values(self):
+        item = self.item(url=(
+            "https://docs.example.org/file.pdf?"
+            "X-Amz-Signature=signature-secret&token=query-token-secret"
+        ))
+        output = io.StringIO()
+        with redirect_stdout(output):
+            result = downloader.download(item, {"resources": {}}, dry_run=True)
+        self.assertEqual(result, "dry_run")
+        self.assertNotIn("signature-secret", output.getvalue())
+        self.assertNotIn("query-token-secret", output.getvalue())
+        self.assertIn("X-Amz-Signature=[REDACTED]", output.getvalue())
+
+    def test_save_json_redacts_signed_urls_and_error_messages(self):
+        path = Path(self.temp.name) / "manifest.json"
+        signed_url = (
+            "https://docs.example.org/file.pdf?"
+            "X-Amz-Credential=credential-secret&X-Amz-Signature=signature-secret"
+        )
+        downloader.save_json(path, {
+            "resources": {
+                "docs-example": {
+                    "url": signed_url,
+                    "error": f"request failed for {signed_url}",
+                }
+            }
+        })
+        saved = path.read_text(encoding="utf-8")
+        self.assertNotIn("credential-secret", saved)
+        self.assertNotIn("signature-secret", saved)
+        self.assertIn("X-Amz-Signature=[REDACTED]", saved)
+
+    def test_run_rejects_unhashable_resource_ids_without_crashing(self):
+        catalog = {
+            "resources": [{"id": ["invalid"], "verified_for_download": True}]
+        }
+        manifest = {"resources": {}}
+        args = SimpleNamespace(area=None, dry_run=True, retry_failed=False)
+        with patch.object(
+            downloader, "load_json", side_effect=[catalog, manifest]
+        ):
+            result = downloader._run(args)
+        self.assertEqual(result, 1)
 
 if __name__ == "__main__":
     unittest.main()

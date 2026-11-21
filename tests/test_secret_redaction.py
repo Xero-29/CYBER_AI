@@ -113,5 +113,25 @@ class SecretRedactionTests(unittest.TestCase):
         self.assertEqual(cleaned, "[REDACTED: nesting limit]")
 
 
+
+    def test_redacts_signed_url_query_credentials(self):
+        raw = (
+            "https://cdn.example.org/file.pdf?"
+            "X-Amz-Credential=aws-credential-secret&"
+            "X-Amz-Signature=signature-secret&"
+            "X-Amz-Security-Token=security-token-secret&"
+            "sig=short-signature-secret&response-content-type=application%2Fpdf"
+        )
+        cleaned = redact_text(raw)
+        for secret in (
+            "aws-credential-secret",
+            "signature-secret",
+            "security-token-secret",
+            "short-signature-secret",
+        ):
+            self.assertNotIn(secret, cleaned)
+        self.assertIn("response-content-type=application%2Fpdf", cleaned)
+        self.assertIn("X-Amz-Signature=[REDACTED]", cleaned)
+
 if __name__ == "__main__":
     unittest.main()

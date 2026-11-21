@@ -22,6 +22,7 @@ from urllib.parse import urljoin, urlparse
 
 import requests
 from safe_io import atomic_write_text
+from secret_redaction import redact_sensitive_data, redact_text
 
 ROOT = Path(__file__).resolve().parent
 CATALOG = ROOT / "data/knowledge_sources/download_catalog.json"
@@ -53,7 +54,7 @@ def load_json(path, default):
 def save_json(path, data):
     atomic_write_text(
         path,
-        json.dumps(data, ensure_ascii=False, indent=2) + "\n",
+        json.dumps(redact_sensitive_data(data), ensure_ascii=False, indent=2) + "\n",
         create_parents=True,
     )
 
@@ -210,12 +211,13 @@ def download(item, manifest, dry_run=False):
     proxy = None if dry_run else _validated_egress_proxy()
     destination = _safe_destination(item, create=not dry_run)
     url = item.get("url")
+    safe_url = redact_text(url)
     host = _validate_public_https(url, resolve=not dry_run)
     item_id = item["id"]
     state = manifest["resources"].get(item_id)
     if state is None:
         state = {} if dry_run else manifest["resources"].setdefault(item_id, {
-            "status": "pending", "url": url, "updated_at": now(),
+            "status": "pending", "url": safe_url, "updated_at": now(),
         })
 
     if destination.exists() and state.get("sha256"):
@@ -233,7 +235,7 @@ def download(item, manifest, dry_run=False):
         raise ValueError("expected_sha256 debe contener 64 caracteres hexadecimales.")
 
     if dry_run:
-        print(f"[SIMULACIÓN] {item_id}: {url}")
+        print(f"[SIMULACIÓN] {item_id}: {safe_url}")
         return "dry_run"
 
     session = requests.Session()
@@ -288,7 +290,7 @@ def download(item, manifest, dry_run=False):
         session.close()
 
     state.update({
-        "status": "downloaded", "url": url,
+        "status": "downloaded", "url": safe_url,
         "final_host": host,
         "file": str(destination.relative_to(ROOT)),
         "bytes": received, "sha256": sha256(destination),
@@ -331,26 +333,33 @@ def _run(args):
         if not isinstance(item, dict):
             print("[ERROR] Recurso inválido en catálogo")
             continue
-        if item.get("verified_for_download") is not True:
-            print(f"[NO VERIFICADO] {item.get('id', 'sin-id')}: se omite")
+        item_id = item.get("id")
+        if not isinstance(item_id, str) or not re.fullmatch(r"[A-Za-z0-9_.-]{1,100}", item_id):
+            errors += 1
+            print("[ERROR] Recurso con ID inválido")
             continue
-        state = manifest["resources"].get(item.get("id"), {})
+        safe_id = redact_text(item_id)
+        if item.get("verified_for_download") is not True:
+            print(f"[NO VERIFICADO] {safe_id}: se omite")
+            continue
+        state = manifest["resources"].get(item_id, {})
         if state.get("status") == "downloaded":
-            print(f"[OMITIDO] {item['id']}: ya descargado")
+            print(f"[OMITIDO] {safe_id}: ya descargado")
             continue
         if state.get("status") == "failed" and not args.retry_failed:
-            print(f"[PENDIENTE DE REINTENTO] {item['id']}")
+            print(f"[PENDIENTE DE REINTENTO] {safe_id}")
             continue
         try:
             result = download(item, manifest, args.dry_run)
-            print(f"[{result.upper()}] {item['id']}")
+            print(f"[{result.upper()}] {safe_id}")
         except Exception as error:
             errors += 1
+            safe_error = redact_text(str(error))
             if not args.dry_run:
-                manifest["resources"].setdefault(item.get("id", "invalid"), {}).update({
-                    "status": "failed", "error": str(error), "updated_at": now(),
+                manifest["resources"].setdefault(item_id, {}).update({
+                    "status": "failed", "error": safe_error, "updated_at": now(),
                 })
-            print(f"[ERROR] {item.get('id', 'sin-id')}: {error}")
+            print(f"[ERROR] {safe_id}: {safe_error}")
         finally:
             if not args.dry_run:
                 manifest["updated_at"] = now()
