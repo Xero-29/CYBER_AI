@@ -331,7 +331,19 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
             os.chmod(isolated_home.name, 0o700)
         process_env = build_minimal_environment(isolated_home.name, executable)
         # The grant may expire or be revoked during binary/template preflight.
-        authorize_target(target, "nuclei_scan", authorization_id)
+        try:
+            authorize_target(target, "nuclei_scan", authorization_id)
+        except AuthorizationError as error:
+            result = {
+                "target": target,
+                "status": "authorization_denied",
+                "error": str(error),
+                "reason": "authorization_revoked_or_expired_before_launch",
+                "findings": [],
+            }
+            return _finalize_scan(
+                target, result, started, authorization_id, start_event_id, require_ledger
+            )
         process = subprocess.Popen(
             command,
             stdout=subprocess.PIPE,
