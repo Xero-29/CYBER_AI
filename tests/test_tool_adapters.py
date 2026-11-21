@@ -76,6 +76,9 @@ class ToolAdapterTests(unittest.TestCase):
         self.assertEqual(command[:3], ["/usr/bin/ruff", "check", "--no-cache"])
         self.assertIn("--output-format=json", command)
         self.assertFalse(popen.call_args.kwargs["shell"])
+        self.assertEqual(
+            popen.call_args.kwargs["cwd"], popen.call_args.kwargs["env"]["HOME"]
+        )
         self.assertEqual(evidence["status"], "completed")
         self.assertEqual(evidence["tool_version"], "ruff 0.14.5")
         self.assertEqual(version_run.call_args.kwargs["timeout"], 5)
@@ -114,6 +117,7 @@ class ToolAdapterTests(unittest.TestCase):
         self.assertNotEqual(process_env["HOME"], "/home/private-user")
         self.assertEqual(process_env["HOME"], process_env["TMPDIR"])
         self.assertEqual(process_env, version_env)
+        self.assertEqual(version_run.call_args.kwargs["cwd"], version_env["HOME"])
         self.assertNotIn("AWS_SECRET_ACCESS_KEY", process_env)
         self.assertNotIn("OPENAI_API_KEY", process_env)
         self.assertNotIn("/home/private-user", process_env["PATH"])
@@ -169,11 +173,21 @@ class ToolAdapterTests(unittest.TestCase):
             with self.subTest(result=result):
                 with patch.object(tool_adapters, "run_bounded_process", return_value=result) as runner:
                     self.assertEqual(
-                        tool_adapters._probe_tool_version("/usr/bin/ruff", "ruff", {}),
+                        tool_adapters._probe_tool_version(
+                            "/usr/bin/ruff", "ruff", {"HOME": "/tmp/cyber-probe"}
+                        ),
                         "unknown",
                     )
                 self.assertEqual(runner.call_args.kwargs["timeout"], 5)
                 self.assertEqual(runner.call_args.kwargs["max_output_bytes"], 8192)
+                self.assertEqual(runner.call_args.kwargs["cwd"], "/tmp/cyber-probe")
+
+        with patch.object(tool_adapters, "run_bounded_process") as runner:
+            self.assertEqual(
+                tool_adapters._probe_tool_version("/usr/bin/ruff", "ruff", {}),
+                "unknown",
+            )
+        runner.assert_not_called()
 
     @patch("tool_adapters.subprocess.Popen")
     @patch("tool_adapters.shutil.which", return_value="/usr/bin/semgrep")
