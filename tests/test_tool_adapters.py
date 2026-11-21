@@ -31,6 +31,25 @@ class FakeProcess:
         return None
 
 
+def _version_result(
+    stdout="ruff 0.14.5\n",
+    *,
+    returncode=0,
+    timed_out=False,
+    output_truncated=False,
+    process_group=True,
+):
+    return {
+        "returncode": returncode,
+        "stdout": stdout,
+        "stderr": "",
+        "timed_out": timed_out,
+        "output_truncated": output_truncated,
+        "process_group_isolation_enforced": process_group,
+        "process_tree_isolation_enforced": False,
+    }
+
+
 class ToolAdapterTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -45,9 +64,9 @@ class ToolAdapterTests(unittest.TestCase):
 
     @patch("tool_adapters.subprocess.Popen")
     @patch("tool_adapters.shutil.which", return_value="/usr/bin/ruff")
-    @patch("tool_adapters.subprocess.run")
+    @patch("tool_adapters.run_bounded_process")
     def test_ruff_uses_argument_vector_and_returns_structured_evidence(self, version_run, which, popen):
-        version_run.return_value = subprocess.CompletedProcess(["ruff", "--version"], 0, stdout="ruff 0.14.5\n", stderr="")
+        version_run.return_value = _version_result("ruff 0.14.5\n")
         process = FakeProcess()
         popen.return_value = process
         provenance = {"resolved_path": "/usr/bin/ruff", "sha256": "a" * 64}
@@ -59,6 +78,8 @@ class ToolAdapterTests(unittest.TestCase):
         self.assertFalse(popen.call_args.kwargs["shell"])
         self.assertEqual(evidence["status"], "completed")
         self.assertEqual(evidence["tool_version"], "ruff 0.14.5")
+        self.assertEqual(version_run.call_args.kwargs["timeout"], 5)
+        self.assertEqual(version_run.call_args.kwargs["max_output_bytes"], 8192)
         self.assertEqual(evidence["parsed_json"], [])
         self.assertEqual(evidence["network_access"], "not_enforced")
         self.assertFalse(evidence["network_isolation_enforced"])
@@ -71,13 +92,11 @@ class ToolAdapterTests(unittest.TestCase):
 
     @patch("tool_adapters.subprocess.Popen")
     @patch("tool_adapters.shutil.which", return_value="/usr/bin/ruff")
-    @patch("tool_adapters.subprocess.run")
+    @patch("tool_adapters.run_bounded_process")
     def test_host_tool_uses_ephemeral_home_and_does_not_forward_secrets(
         self, version_run, which, popen
     ):
-        version_run.return_value = subprocess.CompletedProcess(
-            ["ruff", "--version"], 0, stdout="ruff 0.14.5\n", stderr=""
-        )
+        version_run.return_value = _version_result("ruff 0.14.5\n")
         popen.return_value = FakeProcess()
         provenance = {"resolved_path": "/usr/bin/ruff", "sha256": "a" * 64}
         with (
@@ -104,9 +123,9 @@ class ToolAdapterTests(unittest.TestCase):
 
     @patch("tool_adapters.subprocess.Popen")
     @patch("tool_adapters.shutil.which", return_value="/usr/bin/ruff")
-    @patch("tool_adapters.subprocess.run")
+    @patch("tool_adapters.run_bounded_process")
     def test_binary_replacement_during_execution_invalidates_evidence(self, version_run, which, popen):
-        version_run.return_value = subprocess.CompletedProcess(["ruff", "--version"], 0, stdout="ruff 0.14.5", stderr="")
+        version_run.return_value = _version_result("ruff 0.14.5")
         popen.return_value = FakeProcess()
         hashes = [
             {"resolved_path": "/usr/bin/ruff", "sha256": "a" * 64},
@@ -130,10 +149,8 @@ class ToolAdapterTests(unittest.TestCase):
             patch.object(tool_adapters, "_hash_binary", return_value=provenance),
             patch.object(tool_adapters.shutil, "which", return_value="/usr/bin/ruff"),
             patch.object(
-                tool_adapters.subprocess, "run",
-                return_value=subprocess.CompletedProcess(
-                    ["ruff", "--version"], 0, stdout="ruff 0.14.5\\n", stderr=""
-                ),
+                tool_adapters, "run_bounded_process",
+                return_value=_version_result("ruff 0.14.5\\n"),
             ),
             patch.object(tool_adapters.subprocess, "Popen", side_effect=start_process),
         ):
@@ -142,6 +159,21 @@ class ToolAdapterTests(unittest.TestCase):
         self.assertTrue(evidence["target_modified"])
         self.assertFalse(evidence["tool_reported_success"])
         self.assertEqual(evidence["return_code"], 0)
+
+    def test_version_probe_fails_closed_on_timeout_truncation_or_missing_group(self):
+        for result in (
+            _version_result(timed_out=True),
+            _version_result(output_truncated=True),
+            _version_result(process_group=False),
+        ):
+            with self.subTest(result=result):
+                with patch.object(tool_adapters, "run_bounded_process", return_value=result) as runner:
+                    self.assertEqual(
+                        tool_adapters._probe_tool_version("/usr/bin/ruff", "ruff", {}),
+                        "unknown",
+                    )
+                self.assertEqual(runner.call_args.kwargs["timeout"], 5)
+                self.assertEqual(runner.call_args.kwargs["max_output_bytes"], 8192)
 
     @patch("tool_adapters.subprocess.Popen")
     @patch("tool_adapters.shutil.which", return_value="/usr/bin/semgrep")
@@ -166,9 +198,9 @@ class ToolAdapterTests(unittest.TestCase):
 
     @patch("tool_adapters.subprocess.Popen")
     @patch("tool_adapters.shutil.which", return_value="/usr/bin/bandit")
-    @patch("tool_adapters.subprocess.run")
+    @patch("tool_adapters.run_bounded_process")
     def test_timeout_is_recorded(self, version_run, which, popen):
-        version_run.return_value = subprocess.CompletedProcess(["bandit", "--version"], 0, stdout="Bandit 1.8.6", stderr="")
+        version_run.return_value = _version_result("Bandit 1.8.6")
         process = FakeProcess(timeout=True)
         popen.return_value = process
         provenance = {"resolved_path": "/usr/bin/bandit", "sha256": "b" * 64}
