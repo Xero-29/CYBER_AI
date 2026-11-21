@@ -330,5 +330,61 @@ class DataBackupTests(unittest.TestCase):
         self.assertFalse(destination.exists())
         self.assertEqual(list(self.root.glob(".backup.tmp-*")), [])
 
+    def _symlink_directory(self, link, target):
+        try:
+            link.symlink_to(target, target_is_directory=True)
+        except (OSError, NotImplementedError):
+            self.skipTest("Los symlinks de directorio no están disponibles.")
+
+    def test_backup_rejects_symlinked_data_ancestor(self):
+        link = self.root / "data-link"
+        self._symlink_directory(link, self.root)
+        with self.assertRaisesRegex(BackupError, "symlinks"):
+            create_backup(link / "data", self.root / "backup")
+
+    def test_backup_rejects_symlinked_destination_parent(self):
+        real_parent = self.root / "real-backups"
+        real_parent.mkdir()
+        link = self.root / "backup-link"
+        self._symlink_directory(link, real_parent)
+        with self.assertRaisesRegex(BackupError, "symlinks"):
+            create_backup(self.data, link / "backup")
+        self.assertFalse((real_parent / "backup").exists())
+
+    def test_verify_rejects_symlinked_snapshot_ancestor(self):
+        snapshot = self.root / "backup"
+        create_backup(self.data, snapshot)
+        link = self.root / "snapshot-link"
+        self._symlink_directory(link, self.root)
+        with self.assertRaisesRegex(BackupError, "symlinks"):
+            verify_backup(link / "backup")
+
+    def test_restore_rejects_symlinked_destination_parent(self):
+        snapshot = self.root / "backup"
+        create_backup(self.data, snapshot)
+        real_parent = self.root / "restore-parent"
+        real_parent.mkdir()
+        link = self.root / "restore-link"
+        self._symlink_directory(link, real_parent)
+        with self.assertRaisesRegex(BackupError, "symlinks"):
+            restore_backup(
+                snapshot, link / "data", confirm_quiesced=True
+            )
+        self.assertFalse((real_parent / "data").exists())
+
+    @unittest.skipUnless(os.name == "posix", "Los permisos POSIX se prueban en POSIX.")
+    def test_backup_rejects_untrusted_writable_destination_parent(self):
+        parent = self.root / "world-writable"
+        parent.mkdir()
+        original_mode = parent.stat().st_mode & 0o777
+        try:
+            parent.chmod(0o777)
+            with self.assertRaisesRegex(BackupError, "modificables por terceros"):
+                create_backup(self.data, parent / "backup")
+            self.assertFalse((parent / "backup").exists())
+        finally:
+            parent.chmod(original_mode)
+
+
 if __name__ == "__main__":
     unittest.main()
