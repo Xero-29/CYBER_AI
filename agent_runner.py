@@ -251,7 +251,7 @@ def build_task_prompt(
                 )
             except (OSError, RuntimeError, ValueError, KeyError) as error:
                 print(
-                    f"AVISO: no se pudo recuperar la salida parcial: {error}",
+                    f"AVISO: no se pudo recuperar la salida parcial: {redact_text(str(error))}",
                     flush=True,
                 )
                 partial = ""
@@ -287,7 +287,7 @@ def build_task_prompt(
         except (OSError, RuntimeError, ValueError) as error:
             # Una avería en la memoria no debe impedir ejecutar al agente.
             print(
-                f"AVISO: no se pudo consultar la memoria compartida: {error}",
+                f"AVISO: no se pudo consultar la memoria compartida: {redact_text(str(error))}",
                 flush=True,
             )
             lessons = ""
@@ -556,7 +556,7 @@ def _run_agent_impl(
             duration_ms=0, metadata={"task_id": task_id, "session_id": session_id},
         )
     except Exception as ledger_error:
-        print(f"AVISO: no se pudo registrar el inicio del agente en el ledger: {ledger_error}", flush=True)
+        print(f"AVISO: no se pudo registrar el inicio del agente en el ledger: {redact_text(str(ledger_error))}", flush=True)
         if ledger_required:
             raise RuntimeError("Ejecución bloqueada: no se pudo registrar el inicio en el ledger.") from ledger_error
 
@@ -839,7 +839,7 @@ def _run_agent_impl(
                     except (OSError, RuntimeError, ValueError, KeyError) as error:
                         print(
                             "AVISO: no se pudo comprimir el bloque; "
-                            f"se conservará el texto completo en el checkpoint: {error}",
+                            f"se conservará el texto completo en el checkpoint: {redact_text(str(error))}",
                             flush=True,
                         )
                         # Respaldo sin pérdida: una futura ejecución podrá
@@ -1316,7 +1316,7 @@ def main():
             from model_memory_manager import status
             status()
     except (OSError, ValueError, RuntimeError, TimeoutError) as error:
-        parser.exit(1, f"Error: {error}\n")
+        parser.exit(1, f"Error: {redact_text(str(error))}\n")
 
 
 if __name__ == "__main__":

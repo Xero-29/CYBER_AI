@@ -13,7 +13,7 @@ from pathlib import Path
 
 from execution_ledger import ExecutionLedger
 from safe_io import atomic_write_text, ensure_private_directory, open_private_file
-from secret_redaction import redact_sensitive_data
+from secret_redaction import redact_sensitive_data, redact_text
 
 from model_memory_manager import load_config
 import experiment_engine
@@ -1269,7 +1269,7 @@ def main(argv=None):
         return 1
 
     except (OSError, ValueError, RuntimeError) as error:
-        print(f"Error: {error}", file=sys.stderr)
+        print(f"Error: {redact_text(str(error))}", file=sys.stderr)
         return 1
 
 

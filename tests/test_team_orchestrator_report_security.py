@@ -1,8 +1,10 @@
+import io
 import json
 import os
 import stat
 import tempfile
 import unittest
+from contextlib import redirect_stderr
 from pathlib import Path
 from unittest.mock import patch
 
@@ -37,6 +39,26 @@ class TeamOrchestratorReportSecurityTests(unittest.TestCase):
                     team_orchestrator.save_report(path, {"data": "x" * 100})
             self.assertFalse(path.exists())
 
+
+
+    def test_cli_redacts_provider_errors_before_printing(self):
+        secret = "team-provider-secret"
+        output = io.StringIO()
+        with tempfile.TemporaryDirectory() as directory:
+            workflow_file = Path(directory) / "workflows.json"
+            workflow_file.write_text(
+                json.dumps({"default_workflow": "test"}),
+                encoding="utf-8",
+            )
+            with patch.object(team_orchestrator, "WORKFLOW_FILE", workflow_file), \\
+                 patch.object(
+                     team_orchestrator, "execute_workflow",
+                     side_effect=RuntimeError(f"falló el proveedor: token={secret}"),
+                 ), redirect_stderr(output):
+                result = team_orchestrator.main(["--workflow", "test", "tarea"])
+        self.assertEqual(result, 1)
+        self.assertNotIn(secret, output.getvalue())
+        self.assertIn("token=[REDACTED]", output.getvalue())
 
 if __name__ == "__main__":
     unittest.main()

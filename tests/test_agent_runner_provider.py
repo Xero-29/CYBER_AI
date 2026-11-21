@@ -1,7 +1,9 @@
+import io
 import json
 import os
 import tempfile
 import unittest
+from contextlib import redirect_stderr
 from pathlib import Path
 from unittest.mock import patch
 
@@ -118,6 +120,24 @@ class AgentRunnerRemoteEmbeddingTests(unittest.TestCase):
         record.assert_called_once_with(
             "ECO", "crear embedding: texto único",
             model="gemini-embed", provider="gemini")
+
+
+
+class AgentRunnerErrorRedactionTests(unittest.TestCase):
+    def test_cli_redacts_provider_errors_before_printing(self):
+        secret = "provider-api-secret"
+        output = io.StringIO()
+        with patch("sys.argv", [
+            "agent_runner.py", "ask", "NEXO", "--task-text", "tarea de prueba"
+        ]), patch.object(
+            agent_runner, "run_agent",
+            side_effect=RuntimeError(f"falló el proveedor: token={secret}"),
+        ), redirect_stderr(output):
+            with self.assertRaises(SystemExit) as raised:
+                agent_runner.main()
+        self.assertEqual(raised.exception.code, 1)
+        self.assertNotIn(secret, output.getvalue())
+        self.assertIn("token=[REDACTED]", output.getvalue())
 
 
 if __name__ == "__main__":
