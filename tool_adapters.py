@@ -19,6 +19,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 from tool_allowlist import ToolAllowlistError, verify_tool_allowed
+from process_isolation import ProcessIsolationError, run_bounded_process
 from secret_redaction import redact_sensitive_data, redact_text
 
 
@@ -167,20 +168,32 @@ def _hash_binary(binary):
 
 
 def _probe_tool_version(binary, tool_id, env):
-    """Obtiene la versión instalada sin shell ni acceso de red intencional."""
+    """Obtiene la versión con timeout, salida acotada y grupo POSIX propio."""
     arguments = TOOL_SPECS[tool_id].get("version_args", ["--version"])
     try:
-        result = subprocess.run(
-            [binary, *arguments], cwd=str(PROJECT_ROOT), env=env,
-            stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT, text=True, timeout=5,
-            shell=False, check=False,
+        result = run_bounded_process(
+            [binary, *arguments],
+            cwd=str(PROJECT_ROOT),
+            env=env,
+            timeout=5,
+            max_output_bytes=8192,
         )
-    except (OSError, subprocess.TimeoutExpired):
+    except (OSError, ProcessIsolationError, ValueError):
         return "unknown"
-    if result.returncode != 0 or not result.stdout.strip():
+    if (
+        result.get("timed_out")
+        or result.get("output_truncated")
+        or not result.get("process_group_isolation_enforced")
+        or result.get("returncode") != 0
+    ):
         return "unknown"
-    return redact_text(result.stdout.strip().splitlines()[0][:256])
+    output = "\n".join(
+        part for part in (result.get("stdout", ""), result.get("stderr", ""))
+        if isinstance(part, str) and part
+    )
+    if not output.strip():
+        return "unknown"
+    return redact_text(output.strip().splitlines()[0][:256])
 
 
 def run_local_tool(tool_id, target, *, config_path=None, timeout=None):
