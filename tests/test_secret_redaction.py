@@ -23,6 +23,25 @@ class SecretRedactionTests(unittest.TestCase):
         self.assertEqual(parsed["message"], "password=[REDACTED]")
         self.assertEqual(parsed["safe"], "ok")
 
+    def test_redacts_escaped_quoted_assignments_without_breaking_json(self):
+        message = 'password="prefix\\"suffix"'
+        raw = json.dumps({"message": message, "safe": "ok"})
+        cleaned = redact_text(raw)
+        parsed = json.loads(cleaned)
+        self.assertEqual(parsed["message"], 'password="[REDACTED]"')
+        self.assertNotIn("prefix", cleaned)
+        self.assertNotIn("suffix", cleaned)
+
+        structured = redact_sensitive_data({"message": message})
+        self.assertEqual(structured["message"], 'password="[REDACTED]"')
+
+    def test_redacts_credentials_in_non_http_uris(self):
+        raw = "postgresql://cyber_user:db-secret@db.internal:5432/cyber"
+        cleaned = redact_text(raw)
+        self.assertNotIn("cyber_user:db-secret", cleaned)
+        self.assertNotIn("db-secret", cleaned)
+        self.assertIn("postgresql://[REDACTED]@db.internal", cleaned)
+
     def test_redacts_common_provider_token_formats(self):
         tokens = (
             "AKIAIOSFODNN7EXAMPLE",
