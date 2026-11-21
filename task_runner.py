@@ -63,6 +63,11 @@ def _record_task_scan(task, target, report, started, authorization_id=None, star
         return None
 
 
+def _revalidate_target_authorization(target, authorization_id):
+    """Revalida el permiso inmediatamente antes de iniciar el escáner."""
+    return authorize_target(target, "nuclei_scan", authorization_id)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Ejecutor de tareas CYBER_AI")
     parser.add_argument("--task", required=True, help="Objetivo del análisis")
@@ -258,6 +263,29 @@ def main():
             if os.name == "posix":
                 os.chmod(isolated_home, 0o700)
             process_env = build_minimal_environment(isolated_home, nuclei)
+            try:
+                _revalidate_target_authorization(args.target, args.authorization_id)
+            except AuthorizationError as error:
+                report = {
+                    "task": args.task,
+                    "target": args.target,
+                    "status": "authorization_denied",
+                    "reason": "authorization_revoked_or_expired_before_launch",
+                    "error_type": type(error).__name__,
+                    "findings": [],
+                }
+                atomic_write_text(
+                    report_file,
+                    json.dumps(report, indent=2, ensure_ascii=False) + "\n",
+                )
+                recorded = _record_task_scan(
+                    args.task, args.target, report, task_started,
+                    args.authorization_id, start_event_id,
+                )
+                if args.require_ledger and recorded is None:
+                    return 3
+                print("ERROR: la autorización expiró o fue revocada antes del escaneo.")
+                return 2
             process_result = run_bounded_process(
                 command,
                 cwd=isolated_home,
