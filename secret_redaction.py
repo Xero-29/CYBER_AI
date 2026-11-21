@@ -13,7 +13,7 @@ SECRET_ASSIGNMENT = re.compile(
     r'''(?i)(["']?(?:api[_-]?key|access[_-]?key|access[_-]?token|refresh[_-]?token|token|password|'''
     r'''passwd|secret|client[_-]?secret|authorization|credential|private[_-]?key|cookie|'''
     r'''set[_-]?cookie|session[_-]?(?:id|token|key)|hmac[_-]?key|signing[_-]?key|encryption[_-]?key)'''
-    r'''["']?\s*[:=]\s*)("[^"]*"|'[^']*'|[^\s,;}\]"\x27]+)'''
+    r'''["']?\s*[:=]\s*)(\\"(?:[^"\\]|\\.)*\\"|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|[^\s,;}\]"']+)'''
 )
 PRIVATE_KEY = re.compile(
     r"-----BEGIN [^-]*PRIVATE KEY-----.*?-----END [^-]*PRIVATE KEY-----",
@@ -21,7 +21,9 @@ PRIVATE_KEY = re.compile(
 )
 BEARER_TOKEN = re.compile(r"(?i)\bBearer\s+[A-Za-z0-9._~+/=-]+")
 BASIC_AUTH = re.compile(r"(?i)\bBasic\s+[A-Za-z0-9+/=]{12,}")
-URL_CREDENTIALS = re.compile(r"(?i)(https?://)[^/@\s:]+:[^/@\s]+@")
+URL_CREDENTIALS = re.compile(
+    r"(?i)([a-z][a-z0-9+.-]*://)[^/@\s:]+:[^/@\s]+@"
+)
 TOKEN_PATTERNS = (
     re.compile(r"\b(?:AKIA|ASIA)[0-9A-Z]{16}\b"),
     re.compile(r"\b(?:gh[pousr]_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]{20,})\b"),
@@ -34,7 +36,9 @@ TOKEN_PATTERNS = (
 
 def _replace_assignment(match):
     prefix, value = match.groups()
-    if len(value) >= 2 and value[0] in {"'", '"'} and value[-1] == value[0]:
+    if value.startswith(r'\"') and value.endswith(r'\"'):
+        value = r'\"[REDACTED]\"'
+    elif len(value) >= 2 and value[0] in {"'", '"'} and value[-1] == value[0]:
         value = f"{value[0]}[REDACTED]{value[0]}"
     else:
         value = "[REDACTED]"
