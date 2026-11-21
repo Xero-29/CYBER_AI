@@ -233,5 +233,29 @@ class SandboxRunnerTests(unittest.TestCase):
                 sandbox_runner.build_docker_command("ruff", outside, evidence)
 
 
+
+    @unittest.skipIf(os.name == "nt", "Los permisos POSIX no representan ACL de Windows.")
+    def test_evidence_mount_rejects_group_writable_ancestor(self):
+        parent = self.root / "shared"
+        parent.mkdir(mode=0o700)
+        parent.chmod(0o770)
+        evidence = parent / "private"
+        with self.assertRaisesRegex(ToolExecutionError, "ruta de evidencias"):
+            sandbox_runner.build_docker_command("ruff", "sample.py", evidence)
+        self.assertFalse(evidence.exists())
+
+    def test_evidence_mount_rejects_symlinked_ancestor(self):
+        real = self.root / "real-evidence-parent"
+        real.mkdir()
+        linked = self.root / "linked-evidence-parent"
+        try:
+            linked.symlink_to(real, target_is_directory=True)
+        except (OSError, NotImplementedError):
+            self.skipTest("symlinks unavailable")
+        evidence = linked / "private"
+        with self.assertRaisesRegex(ToolExecutionError, "ruta de evidencias"):
+            sandbox_runner.build_docker_command("ruff", "sample.py", evidence)
+        self.assertFalse((real / "private").exists())
+
 if __name__ == "__main__":
     unittest.main()

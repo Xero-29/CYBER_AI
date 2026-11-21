@@ -12,6 +12,7 @@ from pathlib import Path
 
 from tool_adapters import TOOL_SPECS, ToolExecutionError, _confined_path, PROJECT_ROOT
 from tool_allowlist import ToolAllowlistError, load_signed_tool_allowlist
+from safe_io import SafeWriteError, ensure_private_directory
 
 
 DEFAULT_IMAGE = "cyber-ai-tool-sandbox:local"
@@ -101,16 +102,26 @@ def build_docker_command(tool_id, target, evidence_dir, image=DEFAULT_IMAGE, tim
     target_path = _confined_path(target)
     relative_target = target_path.relative_to(PROJECT_ROOT).as_posix()
     evidence = Path(evidence_dir)
-    if any(character in str(evidence) for character in (",", "\n", "\r")):
+    if any(character in str(evidence) for character in (",", "\\n", "\\r")):
         raise ToolExecutionError("La ruta de evidencias contiene caracteres no permitidos para Docker --mount.")
     if evidence.is_symlink():
         raise ToolExecutionError("La carpeta de evidencias no puede ser un enlace simbólico.")
-    evidence.mkdir(parents=True, exist_ok=True, mode=0o700)
-    evidence = evidence.resolve(strict=True)
-    if os.name != "nt" and stat.S_IMODE(evidence.stat().st_mode) & 0o077:
+    if evidence.exists() and evidence.is_dir() and os.name != "nt":
+        existing_info = evidence.stat(follow_symlinks=False)
+        if (
+            existing_info.st_uid != os.geteuid()
+            or stat.S_IMODE(existing_info.st_mode) & 0o077
+        ):
+            raise ToolExecutionError(
+                "La carpeta de evidencias existente debe pertenecer al usuario y ser privada (0700)."
+            )
+    try:
+        evidence = ensure_private_directory(evidence, create=True)
+    except SafeWriteError as exc:
         raise ToolExecutionError(
-            "La carpeta de evidencias debe ser privada (permisos 0700)."
-        )
+            "La ruta de evidencias no cumple la política de directorios privados."
+        ) from exc
+    evidence = evidence.resolve(strict=True)
     try:
         evidence.relative_to(PROJECT_ROOT.resolve())
     except ValueError:
