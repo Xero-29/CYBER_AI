@@ -164,7 +164,7 @@ class ExecutionPolicyTests(unittest.TestCase):
     @unittest.skipIf(os.name == "nt", "Los permisos POSIX no representan ACL de Windows.")
     def test_group_writable_policy_parent_is_rejected(self):
         self.policy.parent.chmod(0o770)
-        with self.assertRaisesRegex(AuthorizationError, "directorio padre"):
+        with self.assertRaisesRegex(AuthorizationError, "directorios padres de autorizaciones"):
             authorize_target("https://8.8.8.8", "nuclei_scan", "grant-001")
 
     def test_policy_parent_symlink_is_rejected(self):
@@ -175,7 +175,7 @@ class ExecutionPolicyTests(unittest.TestCase):
             self.skipTest("symlinks unavailable")
         linked_policy = link / self.policy.name
         with patch.dict("os.environ", {"CYBER_AI_AUTHORIZATIONS_FILE": str(linked_policy)}):
-            with self.assertRaisesRegex(AuthorizationError, "directorio padre"):
+            with self.assertRaisesRegex(AuthorizationError, "directorios padres de autorizaciones"):
                 authorize_target("https://8.8.8.8", "nuclei_scan", "grant-001")
 
     def test_ancestor_symlink_is_rejected(self):
@@ -196,7 +196,7 @@ class ExecutionPolicyTests(unittest.TestCase):
         with patch.dict(
             "os.environ", {"CYBER_AI_AUTHORIZATIONS_FILE": str(linked_policy)}
         ):
-            with self.assertRaisesRegex(AuthorizationError, "directorio padre"):
+            with self.assertRaisesRegex(AuthorizationError, "directorios padres de autorizaciones"):
                 authorize_target("https://8.8.8.8", "nuclei_scan", "grant-001")
 
     def test_policy_hardlink_is_rejected(self):
