@@ -9,6 +9,8 @@ import unicodedata
 from pathlib import Path
 
 from model_memory_manager import load_config, resolve_agent
+from metacognition import MetacognitionError, _runner_call, run_cycle
+from secret_redaction import redact_sensitive_data
 
 PROJECT = Path(__file__).resolve().parent
 
@@ -109,34 +111,44 @@ def main():
             return 0
 
         meta_config = config.get("metacognition", {})
+        if not isinstance(meta_config, dict):
+            raise ValueError("La configuración metacognitiva debe ser un objeto.")
         if meta_config.get("enabled", False) and not args.no_metacognition:
             researcher = meta_config.get("researcher_agent", "INVESTIGADOR")
             verifier = meta_config.get("verifier_agent", "VERITAS")
-            meta_command = [
-                sys.executable, str(PROJECT / "metacognition.py"), "run",
-                "--principal", name,
-                "--researcher", researcher,
-                "--verifier", verifier,
-                "--max-rounds", str(meta_config.get("max_rounds", 2)),
-                "--task-text", task,
-            ]
-            if args.no_knowledge:
-                meta_command.append("--no-knowledge")
+            max_rounds = meta_config.get("max_rounds", 2)
             print("DIRECTOR: iniciando diagnóstico metacognitivo.", flush=True)
-            meta_result = subprocess.run(
-                meta_command, cwd=PROJECT, capture_output=True, text=True, check=False
+            try:
+                meta_result = run_cycle(
+                    task,
+                    principal=name,
+                    researcher=researcher,
+                    verifier=verifier,
+                    model_call=lambda agent_name, prompt: _runner_call(
+                        agent_name, prompt, knowledge=not args.no_knowledge
+                    ),
+                    max_rounds=max_rounds,
+                )
+            except (MetacognitionError, OSError, ValueError, RuntimeError) as error:
+                print(
+                    "DIRECTOR: diagnóstico bloqueado: "
+                    + str(redact_sensitive_data(str(error)))[:1000],
+                    file=sys.stderr, flush=True,
+                )
+                return 2
+            print(
+                json.dumps(redact_sensitive_data(meta_result), ensure_ascii=False, indent=2),
+                flush=True,
             )
-            if meta_result.stdout:
-                print(meta_result.stdout, flush=True)
-            if meta_result.stderr:
-                print(meta_result.stderr, file=sys.stderr, flush=True)
-            if meta_result.returncode != 0:
+            if meta_result.get("status") not in {
+                "sufficient", "knowledge_acquired_needs_task_execution",
+            }:
                 print(
                     "DIRECTOR: no se demostró conocimiento suficiente; "
                     "la tarea original no se ejecutará como si estuviera resuelta.",
                     file=sys.stderr, flush=True,
                 )
-                return meta_result.returncode
+                return 2
         elif args.no_metacognition:
             print("DIRECTOR: metacognición desactivada explícitamente.", flush=True)
 
