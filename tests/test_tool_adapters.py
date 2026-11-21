@@ -248,7 +248,7 @@ class ToolAdapterTests(unittest.TestCase):
         outside.mkdir()
         link = self.root / "linked-evidence"
         link.symlink_to(outside, target_is_directory=True)
-        with self.assertRaisesRegex(ToolExecutionError, "enlace simbólico"):
+        with self.assertRaisesRegex(ToolExecutionError, "enlaces simbólicos"):
             write_evidence({"tool": "ruff"}, link)
         with self.assertRaisesRegex(ToolExecutionError, "Identificador"):
             write_evidence({"tool": "../escape"}, "reports/unsafe")
@@ -258,7 +258,7 @@ class ToolAdapterTests(unittest.TestCase):
         outside.mkdir()
         link = self.root / "linked-parent"
         link.symlink_to(outside, target_is_directory=True)
-        with self.assertRaisesRegex(ToolExecutionError, "enlace simbólico"):
+        with self.assertRaisesRegex(ToolExecutionError, "enlaces simbólicos"):
             write_evidence({"tool": "ruff"}, link / "new" / "evidence")
         self.assertFalse((outside / "new").exists())
 
