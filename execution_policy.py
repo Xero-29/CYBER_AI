@@ -169,12 +169,14 @@ def _validate_policy_parent_chain(path):
                 "El directorio padre de autorizaciones o uno de sus ancestros no puede ser un enlace ni un no-directorio."
             )
         if os.name != "nt":
+            mode = stat.S_IMODE(info.st_mode)
+            parent_is_trusted = info.st_uid in {0, os.geteuid()}
             parent_is_root_sticky = (
                 info.st_uid == 0 and bool(info.st_mode & stat.S_ISVTX)
             )
-            if stat.S_IMODE(info.st_mode) & 0o022 and not parent_is_root_sticky:
+            if not parent_is_trusted or (mode & 0o022 and not parent_is_root_sticky):
                 raise AuthorizationError(
-                    "El directorio padre de autorizaciones o uno de sus ancestros no puede ser modificable por grupo u otros."
+                    "Los directorios padres de autorizaciones deben pertenecer a root o al usuario efectivo y no ser modificables por terceros."
                 )
         chain.append((parent, info))
     return chain
