@@ -1,3 +1,48 @@
+# Estado vigente — 2026-11-21
+
+> Esta sección es la fotografía autoritativa de la rama `codex/security-integrity-audit` a esta fecha. Las secciones históricas que siguen son registros de iteraciones anteriores y no sustituyen este estado.
+
+## Repositorio, ramas y PRs
+
+- Rama de trabajo: `codex/security-integrity-audit`.
+- HEAD revisado y validado: `639f42955d53f2dbd26a571c1b629493b54f8b80`.
+- `main`: `387104756d0f8307c39a46a1ea2df07671bd81c9` (`feat: add metacognitive research loop`).
+- Ancestro común: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.
+- Divergencia total: **250 commits exclusivos de esta rama y 574 exclusivos de `main`**. Por tanto, no es una divergencia de un solo commit y no se debe rebasar, fusionar ni forzar esta rama como operación automática.
+- El commit nuevo de `main` identificado desde el registro anterior (`3871047`, bucle de investigación metacognitiva) permanece intacto en `main`; no se ha copiado, revertido ni sobrescrito.
+- PR #2: **cerrado y fusionado** el 2026-11-17; merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. No crear un PR duplicado.
+- PRs de integración existentes: #12 y #17 siguen abiertos como draft contra `main`; #18 sigue abierto como draft y toma #17 como base. #17 está actualmente 31 commits por delante y 0 detrás de `main`. No se ha modificado ni fusionado ninguno de ellos.
+- No existe PR abierto para la rama de trabajo actual. No se creó otro PR porque el historial divergente incluiría cientos de commits y ya hay líneas de integración abiertas.
+
+## Cambios implementados en esta iteración
+
+- `safe_io.py`: la escritura atómica valida todos los ancestros como directorios reales; en POSIX exige propietario root/usuario efectivo y prohíbe escritura de grupo/otros, salvo directorios sticky propiedad de root. Los directorios nuevos se crean con modo `0700`.
+- `sandbox_runner.py`: el directorio de evidencias se crea/valida mediante `ensure_private_directory`; se rechazan ancestros enlazados o modificables por terceros. Se añadieron regresiones para ancestros symlink y directorios compartidos.
+- `secret_redaction.py`: se amplió la redacción de firmas de URL (`signature`, `sig`), credenciales AWS y valores de query; la separación por `&` evita ocultar parámetros seguros posteriores.
+- `knowledge_downloader.py`: las URLs firmadas y errores se redactan antes de imprimirse o persistirse en el manifiesto. Los IDs de recursos se validan antes de usarlos como claves, evitando excepciones por IDs no hashables.
+- Se añadieron pruebas de regresión para permisos/ancestros de salida, mounts de evidencia, URLs firmadas, persistencia segura del manifiesto e IDs de catálogo inválidos.
+
+## Validación automatizada del HEAD de código
+
+- SHA exacto: `639f42955d53f2dbd26a571c1b629493b54f8b80`.
+- `unit-tests`: **success** — [run 44918685934](https://github.com/Xero-29/CYBER_AI/actions/runs/44918685934).
+- `sandbox-smoke`: **success** — [run 44918685929](https://github.com/Xero-29/CYBER_AI/actions/runs/44918685929).
+- Una iteración intermedia tuvo checks fallidos por asertos de permisos; se corrigieron en commits posteriores. Los dos checks anteriores corresponden al HEAD final indicado, no a un SHA anterior.
+- No se ejecutó la suite desde un checkout local: no se dispuso de un checkout de trabajo funcional en este entorno. La validación reportada procede de GitHub Actions y está ligada al SHA exacto.
+
+## Pendiente real
+
+- **Integración:** decidir qué línea existente (#12/#17) debe recibir los cambios de esta rama. La divergencia 250/574 impide una integración segura por merge/rebase directo; requiere selección y portabilidad de cambios en una rama de integración separada, preservando el commit de `main`.
+- **Windows:** implementar y probar Job Objects y validación efectiva de ACL; el runner host continúa bloqueando ejecución donde no puede garantizar el cierre del árbol de procesos.
+- **Egress de conocimiento:** provisionar y probar el proxy/gateway con allowlist y DNS pinning; el cliente por sí solo no elimina la ventana TOCTOU.
+- **Operación externa:** KMS/HSM y rotación de claves, almacenamiento WORM/offsite, cifrado y restauración real/DR, RBAC/IdP/MFA, observabilidad central y pruebas de carga.
+- **Pruebas en caliente:** Docker daemon/host de despliegue, Nuclei contra objetivos de laboratorio explícitamente autorizados, proveedores IA con credenciales reales y pruebas E2E de recuperación.
+- **Biblioteca:** las agendas y dossiers documentales no equivalen a conocimiento experto validado. Siguen pendientes lectura integral de fuentes, revisión técnica independiente, laboratorios ejecutados y reproducción de resultados.
+
+**Conclusión:** las correcciones de esta iteración están implementadas y los dos checks de GitHub Actions pasaron para el SHA indicado. El repositorio no se declara integrado ni listo para producción: la divergencia con `main`, la selección de la línea de integración y las validaciones que requieren infraestructura/ejecución real siguen abiertas.
+
+---
+
 # Estado de ingeniería y auditoría — 2026-11-21
 
 **Repositorio:** \`Xero-29/CYBER_AI\`  
