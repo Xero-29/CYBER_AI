@@ -293,6 +293,29 @@ def main():
                 timeout=90,
                 max_output_bytes=2_000_000,
             )
+        try:
+            _revalidate_target_authorization(args.target, args.authorization_id)
+        except AuthorizationError as error:
+            report = {
+                "task": args.task,
+                "target": args.target,
+                "status": "authorization_denied",
+                "reason": "authorization_revoked_or_expired_before_result_acceptance",
+                "error_type": type(error).__name__,
+                "findings": [],
+            }
+            atomic_write_text(
+                report_file,
+                json.dumps(report, indent=2, ensure_ascii=False) + "\n",
+            )
+            recorded = _record_task_scan(
+                args.task, args.target, report, task_started,
+                args.authorization_id, start_event_id,
+            )
+            if args.require_ledger and recorded is None:
+                return 3
+            print("ERROR: autorización revocada o expirada; se descartan los resultados.")
+            return 2
         elapsed = round(time.monotonic() - started, 2)
         scanner_output = redact_text(
             (process_result["stdout"] + "\n" + process_result["stderr"])[-12000:]
