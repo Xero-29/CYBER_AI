@@ -421,6 +421,11 @@ def write_evidence(evidence, output_dir="reports/tool_evidence", *, allow_extern
     if not raw.is_absolute():
         raw = PROJECT_ROOT / raw
     raw = Path(os.path.abspath(os.fspath(raw)))
+    project_root = PROJECT_ROOT.resolve()
+    if raw == project_root or raw in project_root.parents:
+        raise ToolExecutionError(
+            "El destino de evidencias no puede ser la raíz del repositorio ni un ancestro."
+        )
     try:
         if not allow_external:
             existing = raw
