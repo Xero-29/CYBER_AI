@@ -7,6 +7,7 @@ import threading
 
 
 DEFAULT_MAX_OUTPUT_BYTES = 2_000_000
+MAX_PROCESS_OUTPUT_BYTES = 64 * 1024 * 1024
 MAX_PROCESS_TIMEOUT_SECONDS = 86_400
 
 
@@ -49,6 +50,29 @@ def run_bounded_process(
         )
     if not isinstance(command, (list, tuple)) or not command:
         raise ValueError("command debe ser una lista no vacía de argumentos.")
+    normalized_command = []
+    for index, argument in enumerate(command):
+        try:
+            value = os.fspath(argument)
+        except TypeError as error:
+            raise ValueError("Todos los argumentos del proceso deben ser texto o PathLike.") from error
+        if not isinstance(value, str) or "\x00" in value or (index == 0 and not value):
+            raise ValueError("Los argumentos del proceso deben ser texto válido sin NUL.")
+        normalized_command.append(value)
+    try:
+        working_directory = os.fspath(cwd)
+    except TypeError as error:
+        raise ValueError("cwd debe ser una ruta de texto.") from error
+    if not isinstance(working_directory, str) or "\x00" in working_directory:
+        raise ValueError("cwd debe ser una ruta de texto sin NUL.")
+    if not isinstance(env, dict):
+        raise ValueError("env debe ser un diccionario explícito de texto.")
+    for key, value in env.items():
+        if (
+            not isinstance(key, str) or not key or "=" in key or "\x00" in key
+            or not isinstance(value, str) or "\x00" in value
+        ):
+            raise ValueError("env contiene una clave o valor no válido.")
     if isinstance(timeout, bool) or not isinstance(timeout, (int, float)):
         raise ValueError("timeout debe ser positivo, finito y no superar 86400 segundos.")
     try:
@@ -57,8 +81,13 @@ def run_bounded_process(
         valid_timeout = False
     if not valid_timeout:
         raise ValueError("timeout debe ser un número positivo y finito.")
-    if type(max_output_bytes) is not int or max_output_bytes < 2:
-        raise ValueError("max_output_bytes debe ser un entero de al menos 2 bytes.")
+    if (
+        type(max_output_bytes) is not int
+        or not 2 <= max_output_bytes <= MAX_PROCESS_OUTPUT_BYTES
+    ):
+        raise ValueError(
+            f"max_output_bytes debe estar entre 2 y {MAX_PROCESS_OUTPUT_BYTES} bytes."
+        )
 
     per_stream_limit = max_output_bytes // 2
     captured = {"stdout": bytearray(), "stderr": bytearray()}
@@ -83,8 +112,8 @@ def run_bounded_process(
     timed_out = False
     try:
         process = subprocess.Popen(
-            list(command),
-            cwd=cwd,
+            normalized_command,
+            cwd=working_directory,
             env=env,
             stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,
@@ -139,6 +168,7 @@ def run_bounded_process(
 
 __all__ = [
     "DEFAULT_MAX_OUTPUT_BYTES",
+    "MAX_PROCESS_OUTPUT_BYTES",
     "ProcessIsolationError",
     "run_bounded_process",
     "terminate_process_tree",
