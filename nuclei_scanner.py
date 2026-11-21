@@ -491,6 +491,20 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
                 )
 
     try:
+        authorize_target(target, "nuclei_scan", authorization_id)
+    except AuthorizationError as error:
+        result = {
+            "target": target,
+            "status": "authorization_denied",
+            "error": str(error),
+            "reason": "authorization_revoked_or_expired_before_result_acceptance",
+            "findings": [],
+        }
+        return _finalize_scan(
+            target, result, started, authorization_id, start_event_id, require_ledger
+        )
+
+    try:
         binary_after = hash_executable(executable)
         binary_modified = binary_after["sha256"] != binary_provenance["sha256"]
     except BinaryIntegrityError:
