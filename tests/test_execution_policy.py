@@ -175,7 +175,7 @@ class ExecutionPolicyTests(unittest.TestCase):
             self.skipTest("symlinks unavailable")
         linked_policy = link / self.policy.name
         with patch.dict("os.environ", {"CYBER_AI_AUTHORIZATIONS_FILE": str(linked_policy)}):
-            with self.assertRaisesRegex(AuthorizationError, "directorios padres de autorizaciones"):
+            with self.assertRaisesRegex(AuthorizationError, "directorio padre de autorizaciones"):
                 authorize_target("https://8.8.8.8", "nuclei_scan", "grant-001")
 
     def test_ancestor_symlink_is_rejected(self):
@@ -196,7 +196,7 @@ class ExecutionPolicyTests(unittest.TestCase):
         with patch.dict(
             "os.environ", {"CYBER_AI_AUTHORIZATIONS_FILE": str(linked_policy)}
         ):
-            with self.assertRaisesRegex(AuthorizationError, "directorios padres de autorizaciones"):
+            with self.assertRaisesRegex(AuthorizationError, "directorio padre de autorizaciones"):
                 authorize_target("https://8.8.8.8", "nuclei_scan", "grant-001")
 
     def test_policy_hardlink_is_rejected(self):
