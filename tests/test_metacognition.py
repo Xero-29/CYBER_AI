@@ -4,7 +4,8 @@ import unittest
 from pathlib import Path
 
 from metacognition import (
-    extract_json_object, validate_assessment, run_cycle, load_competency_map,
+    extract_json_object, validate_assessment, validate_verification, run_cycle,
+    load_competency_map, append_event, MetacognitionError,
 )
 from researcher_agent import ModelBackend, ResearcherAgent
 
@@ -34,7 +35,10 @@ class MetacognitionTests(unittest.TestCase):
             })
         with tempfile.TemporaryDirectory() as tmp:
             result = run_cycle("Explicar TCP", principal="MAIN", researcher="R", verifier="V",
-                               model_call=model, publisher=lambda report, task_id: {"indexed": True}, source_researcher=lambda task, assessment: "test evidence", state_path=Path(tmp) / "state.json",
+                               model_call=model, publisher=lambda report, task_id: {"indexed": True}, source_researcher=lambda task, assessment: {
+                                   "status": "ok", "verified_sources": 1,
+                                   "report": "test evidence from a reviewed source",
+                               }, state_path=Path(tmp) / "state.json",
                                log_path=Path(tmp) / "events.jsonl")
         self.assertEqual(result["status"], "sufficient")
         self.assertEqual(calls, ["MAIN"])
@@ -58,7 +62,10 @@ class MetacognitionTests(unittest.TestCase):
             result = run_cycle("Explicar control de congestión", principal="MAIN",
                 researcher="RESEARCHER", verifier="VERIFIER", model_call=model,
                 publisher=lambda report, task_id: {"indexed": True},
-                source_researcher=lambda task, assessment: "test evidence",
+                source_researcher=lambda task, assessment: {
+                    "status": "ok", "verified_sources": 1,
+                    "report": "test evidence from a reviewed source",
+                },
                 state_path=state_path, log_path=log_path)
             state = load_competency_map(state_path)
         self.assertEqual(result["status"], "knowledge_acquired_needs_task_execution")
@@ -76,14 +83,18 @@ class MetacognitionTests(unittest.TestCase):
             if agent == "RESEARCHER":
                 return "Informe con fuentes."
             if agent == "VERIFIER":
-                return json.dumps({"approved": True, "score": 90, "reasons": []})
+                return json.dumps({"approved": True, "score": 90, "evidence_quality": "good",
+                                   "gaps_remaining": [], "reasons": []})
             return json.dumps({"knowledge_sufficient": True, "confidence": 0.9, "gaps": []})
         with tempfile.TemporaryDirectory() as tmp:
             result = run_cycle(
                 "Diseñar validación DNSSEC", principal="MAIN",
                 researcher="RESEARCHER", verifier="VERIFIER", model_call=model,
                 publisher=lambda report, task_id: {"indexed": False},
-                source_researcher=lambda task, assessment: "fuentes revisadas",
+                source_researcher=lambda task, assessment: {
+                    "status": "ok", "verified_sources": 1,
+                    "report": "fuentes revisadas y verificadas",
+                },
                 state_path=Path(tmp) / "state.json",
                 log_path=Path(tmp) / "events.jsonl",
             )
@@ -102,6 +113,75 @@ class MetacognitionTests(unittest.TestCase):
         self.assertEqual(result["status"], "pending_independent_verification")
         self.assertFalse(result["self_verified"])
         self.assertTrue(seen)
+
+    
+    def test_source_evidence_failure_blocks_researcher(self):
+        calls = []
+        def model(agent, prompt):
+            calls.append(agent)
+            return json.dumps({
+                "knowledge_sufficient": False, "confidence": 0.2,
+                "gaps": [{"topic": "DNSSEC", "why": "missing",
+                          "prerequisites": ["DNS"], "priority": 4}],
+            })
+        with tempfile.TemporaryDirectory() as tmp:
+            result = run_cycle(
+                "Investigar DNSSEC", principal="MAIN", researcher="RESEARCHER",
+                verifier="VERIFIER", model_call=model,
+                source_researcher=lambda task, assessment: {
+                    "status": "unavailable", "verified_sources": 0, "report": "",
+                },
+                state_path=Path(tmp) / "state.json",
+                log_path=Path(tmp) / "events.jsonl",
+            )
+        self.assertEqual(result["status"], "source_evidence_unavailable")
+        self.assertEqual(calls, ["MAIN"])
+
+    def test_verifier_cannot_approve_low_score_or_remaining_gaps(self):
+        low = validate_verification({
+            "approved": True, "score": 74, "evidence_quality": "good",
+            "gaps_remaining": [], "reasons": [],
+        })
+        incomplete = validate_verification({
+            "approved": True, "score": 95, "evidence_quality": "excellent",
+            "gaps_remaining": ["DNSSEC validation"], "reasons": [],
+        })
+        self.assertFalse(low["approved"])
+        self.assertFalse(incomplete["approved"])
+
+    def test_assessment_rejects_non_text_prerequisites(self):
+        with self.assertRaises(ValueError):
+            validate_assessment({
+                "knowledge_sufficient": False, "confidence": 0.2,
+                "gaps": [{"topic": "DNSSEC", "priority": 4, "prerequisites": [42]}],
+            })
+
+    def test_state_symlink_is_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            target = root / "target.json"
+            target.write_text(json.dumps({
+                "schema_version": 1, "competencies": {}, "updated_at": None,
+            }), encoding="utf-8")
+            link = root / "state.json"
+            link.symlink_to(target)
+            with self.assertRaises(MetacognitionError):
+                load_competency_map(link)
+
+    def test_research_log_is_private_and_redacted(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            log = root / "events.jsonl"
+            secret = "sk-proj-abcdefghijklmnopqrstuvwxyz012345"
+            append_event({"status": "test", "api_key": secret}, log)
+            stored = log.read_text(encoding="utf-8")
+            self.assertNotIn(secret, stored)
+            self.assertEqual(log.stat().st_mode & 0o777, 0o600)
+            self.assertEqual(root.stat().st_mode & 0o777, 0o700)
+
+    def test_duplicate_json_keys_are_rejected(self):
+        with self.assertRaises(ValueError):
+            extract_json_object('{"knowledge_sufficient": false, "knowledge_sufficient": true}')
 
 
 if __name__ == "__main__":
