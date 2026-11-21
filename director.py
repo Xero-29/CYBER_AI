@@ -2,6 +2,7 @@
 """DIRECTOR: selecciona y coordina especialistas configurados."""
 
 import argparse
+import json
 import subprocess
 import sys
 import unicodedata
@@ -78,6 +79,14 @@ def main():
         help="Seleccionar un especialista manualmente",
     )
     parser.add_argument(
+        "--no-knowledge", action="store_true",
+        help="Desactivar la recuperación de la biblioteca de conocimiento.",
+    )
+    parser.add_argument(
+        "--no-metacognition", action="store_true",
+        help="Omitir el diagnóstico de conocimiento y ejecutar directamente el especialista.",
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Mostrar la selección sin ejecutar el modelo",
@@ -99,13 +108,47 @@ def main():
             print("Simulación: no se cargó ningún modelo.")
             return 0
 
+        meta_config = config.get("metacognition", {})
+        if meta_config.get("enabled", False) and not args.no_metacognition:
+            researcher = meta_config.get("researcher_agent", "INVESTIGADOR")
+            verifier = meta_config.get("verifier_agent", "VERITAS")
+            meta_command = [
+                sys.executable, str(PROJECT / "metacognition.py"), "run",
+                "--principal", name,
+                "--researcher", researcher,
+                "--verifier", verifier,
+                "--max-rounds", str(meta_config.get("max_rounds", 2)),
+                "--task-text", task,
+            ]
+            if args.no_knowledge:
+                meta_command.append("--no-knowledge")
+            print("DIRECTOR: iniciando diagnóstico metacognitivo.", flush=True)
+            meta_result = subprocess.run(
+                meta_command, cwd=PROJECT, capture_output=True, text=True, check=False
+            )
+            if meta_result.stdout:
+                print(meta_result.stdout, flush=True)
+            if meta_result.stderr:
+                print(meta_result.stderr, file=sys.stderr, flush=True)
+            if meta_result.returncode != 0:
+                print(
+                    "DIRECTOR: no se demostró conocimiento suficiente; "
+                    "la tarea original no se ejecutará como si estuviera resuelta.",
+                    file=sys.stderr, flush=True,
+                )
+                return meta_result.returncode
+        elif args.no_metacognition:
+            print("DIRECTOR: metacognición desactivada explícitamente.", flush=True)
+
         command = [
             sys.executable,
             str(PROJECT / "agent_runner.py"),
             "ask",
             name,
-            task,
+            "--task-text", task,
         ]
+        if not args.no_knowledge:
+            command.append("--knowledge")
         result = subprocess.run(command, cwd=PROJECT, check=False)
         return result.returncode
 
