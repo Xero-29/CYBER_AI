@@ -426,6 +426,15 @@ def write_evidence(evidence, output_dir="reports/tool_evidence", *, allow_extern
         raise ToolExecutionError(
             "El destino de evidencias no puede ser la raíz del repositorio ni un ancestro."
         )
+    if raw.exists() and not raw.is_symlink() and raw.is_dir() and os.name == "posix":
+        existing_info = raw.stat(follow_symlinks=False)
+        if (
+            existing_info.st_uid != os.geteuid()
+            or stat.S_IMODE(existing_info.st_mode) & 0o077
+        ):
+            raise ToolExecutionError(
+                "Un directorio de evidencias existente debe ser del usuario y ya tener modo privado 0700."
+            )
     try:
         if not allow_external:
             existing = raw
