@@ -97,7 +97,20 @@ def _read_private_json(path: Path, default: Any) -> Any:
     ensure_private_directory(path.parent, create=True)
     try:
         with open_private_file(path, "rb") as stream:
+            initial = os.fstat(stream.fileno())
+            if initial.st_size > MAX_STATE_BYTES:
+                raise MetacognitionError("El estado metacognitivo supera 4 MiB.")
             raw = stream.read(MAX_STATE_BYTES + 1)
+            final = os.fstat(stream.fileno())
+            if (
+                (initial.st_dev, initial.st_ino) != (final.st_dev, final.st_ino)
+                or initial.st_size != final.st_size
+                or initial.st_mtime_ns != final.st_mtime_ns
+                or getattr(initial, "st_ctime_ns", 0) != getattr(final, "st_ctime_ns", 0)
+                or initial.st_nlink != final.st_nlink
+                or len(raw) != final.st_size
+            ):
+                raise MetacognitionError("El estado cambió durante su lectura.")
     except SafeWriteError as error:
         if not path.exists() and not path.is_symlink():
             return default
@@ -109,34 +122,46 @@ def _read_private_json(path: Path, default: Any) -> Any:
     except (UnicodeError, json.JSONDecodeError, ValueError, RecursionError) as error:
         raise MetacognitionError("El estado metacognitivo está dañado o no es JSON válido.") from error
 
-
 def _read_json(path: Path, default: Any, *, max_bytes: int = MAX_REPORT_CHARS * 4) -> Any:
     """Lee un informe del repositorio con ruta confinada, sin symlinks ni tamaño ilimitado."""
-    path = Path(path)
+    candidate = Path(os.path.abspath(os.fspath(path)))
     try:
-        resolved = path.resolve(strict=True)
-        relative = resolved.relative_to(PROJECT.resolve())
-    except FileNotFoundError:
-        return default
-    except (OSError, ValueError) as error:
+        relative_input = candidate.relative_to(PROJECT.resolve())
+    except ValueError as error:
         raise MetacognitionError("La ruta del informe no está confinada al repositorio.") from error
     current = PROJECT.resolve()
-    for index, part in enumerate(relative.parts):
+    for index, part in enumerate(relative_input.parts):
         current = current / part
         try:
             info = current.lstat()
+        except FileNotFoundError:
+            return default
         except OSError as error:
             raise MetacognitionError("No se pudo inspeccionar la ruta del informe.") from error
-        if stat.S_ISLNK(info.st_mode) or getattr(info, "st_file_attributes", 0) & getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400):
+        if (
+            stat.S_ISLNK(info.st_mode)
+            or getattr(info, "st_file_attributes", 0)
+            & getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
+        ):
             raise MetacognitionError("No se permiten symlinks ni puntos de reanálisis en informes.")
-        if index < len(relative.parts) - 1 and not stat.S_ISDIR(info.st_mode):
+        if index < len(relative_input.parts) - 1 and not stat.S_ISDIR(info.st_mode):
             raise MetacognitionError("Un componente de la ruta del informe no es directorio.")
-        if index == len(relative.parts) - 1 and not stat.S_ISREG(info.st_mode):
+        if index == len(relative_input.parts) - 1 and not stat.S_ISREG(info.st_mode):
             raise MetacognitionError("El informe debe ser un archivo regular.")
+    try:
+        resolved = candidate.resolve(strict=True)
+        resolved.relative_to(PROJECT.resolve())
+    except FileNotFoundError:
+        return default
+    except (OSError, ValueError) as error:
+        raise MetacognitionError("La ruta del informe cambió al resolverla.") from error
     descriptor = None
     try:
         before = resolved.lstat()
-        descriptor = os.open(resolved, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_CLOEXEC", 0))
+        descriptor = os.open(
+            resolved,
+            os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_CLOEXEC", 0),
+        )
         opened = os.fstat(descriptor)
         if opened.st_size > max_bytes:
             raise MetacognitionError("El informe supera el límite de lectura.")
@@ -158,6 +183,7 @@ def _read_json(path: Path, default: Any, *, max_bytes: int = MAX_REPORT_CHARS * 
             or (after.st_dev, after.st_ino) != (path_after.st_dev, path_after.st_ino)
             or after.st_size != opened.st_size
             or after.st_mtime_ns != opened.st_mtime_ns
+            or getattr(after, "st_ctime_ns", 0) != getattr(opened, "st_ctime_ns", 0)
             or total != after.st_size
         ):
             raise MetacognitionError("El informe cambió durante su lectura.")
@@ -169,7 +195,6 @@ def _read_json(path: Path, default: Any, *, max_bytes: int = MAX_REPORT_CHARS * 
     finally:
         if descriptor is not None:
             os.close(descriptor)
-
 
 @contextmanager
 def _state_lock(path: Path):
