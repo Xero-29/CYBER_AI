@@ -22,7 +22,7 @@ PRIVATE_KEY = re.compile(
 BEARER_TOKEN = re.compile(r"(?i)\bBearer\s+[A-Za-z0-9._~+/=-]+")
 BASIC_AUTH = re.compile(r"(?i)\bBasic\s+[A-Za-z0-9+/=]{12,}")
 URL_CREDENTIALS = re.compile(
-    r"(?i)([a-z][a-z0-9+.-]*://)[^/@\s:]+:[^/@\s]+@"
+    r"(?i)([a-z][a-z0-9+.-]*://)[^/@\s:]*:[^/@\s]+@"
 )
 TOKEN_PATTERNS = (
     re.compile(r"\b(?:AKIA|ASIA)[0-9A-Z]{16}\b"),
