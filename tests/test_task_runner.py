@@ -5,6 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import task_runner
+from execution_policy import AuthorizationError
 
 
 class TaskRunnerLedgerTests(unittest.TestCase):
@@ -29,6 +30,23 @@ class TaskRunnerLedgerTests(unittest.TestCase):
         with patch.object(task_runner, "ExecutionLedger") as ledger:
             task_runner._record_task_scan("web headers", "http://127.0.0.1", report, 0.0)
         self.assertEqual(ledger.return_value.append.call_args.kwargs["status"], "denied")
+
+    def test_prelaunch_revalidation_uses_exact_target_action_and_grant(self):
+        target = "https://198.51.100.25"
+        with patch("task_runner.authorize_target", return_value={"authorization_id": "auth-7"}) as authorize:
+            grant = task_runner._revalidate_target_authorization(target, "auth-7")
+        self.assertEqual(grant["authorization_id"], "auth-7")
+        authorize.assert_called_once_with(target, "nuclei_scan", "auth-7")
+
+    def test_prelaunch_revalidation_propagates_revocation(self):
+        with patch(
+            "task_runner.authorize_target",
+            side_effect=AuthorizationError("expired"),
+        ):
+            with self.assertRaises(AuthorizationError):
+                task_runner._revalidate_target_authorization(
+                    "https://198.51.100.25", "auth-7"
+                )
 
 
 
