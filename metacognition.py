@@ -66,7 +66,7 @@ def _enforce_json_depth(text: str, max_depth: int = 64) -> None:
         if in_string:
             if escaped:
                 escaped = False
-            elif character == "\\\\":
+            elif character == "\\":
                 escaped = True
             elif character == '"':
                 in_string = False
@@ -226,18 +226,30 @@ def append_event(event: dict, path: Path = RESEARCH_LOG) -> None:
 
 
 def extract_json_object(text: str) -> dict:
-    """Extrae un objeto JSON sin ejecutar contenido ni aceptar arrays como raíz."""
-    if not isinstance(text, str):
-        raise ValueError("La respuesta del modelo no es texto.")
-    decoder = json.JSONDecoder()
+    """Extrae un objeto JSON acotado, sin claves duplicadas ni anidamiento excesivo."""
+    if not isinstance(text, str) or len(text) > MAX_REPORT_CHARS:
+        raise ValueError("La respuesta del modelo debe ser texto de hasta 100.000 caracteres.")
+    decoder = json.JSONDecoder(object_pairs_hook=_unique_object)
     for match in re.finditer(r"\{", text):
         try:
-            value, _ = decoder.raw_decode(text[match.start():])
-        except json.JSONDecodeError:
+            value, end = decoder.raw_decode(text[match.start():])
+        except (json.JSONDecodeError, ValueError, RecursionError):
             continue
         if isinstance(value, dict):
+            _enforce_json_depth(text[match.start():match.start() + end])
             return value
     raise ValueError("El modelo no devolvió un objeto JSON válido.")
+
+
+def _bounded_text_list(value, field, *, maximum=64, item_chars=240):
+    if not isinstance(value, list) or len(value) > maximum:
+        raise ValueError(f"{field} debe ser una lista de hasta {maximum} elementos.")
+    cleaned = []
+    for item in value:
+        if not isinstance(item, str) or not item.strip() or len(item) > item_chars:
+            raise ValueError(f"{field} contiene un elemento inválido.")
+        cleaned.append(item.strip())
+    return cleaned
 
 
 def validate_assessment(value: dict) -> dict:
@@ -248,40 +260,100 @@ def validate_assessment(value: dict) -> dict:
     gaps = value.get("gaps", [])
     if not isinstance(sufficient, bool):
         raise ValueError("knowledge_sufficient debe ser booleano.")
-    if isinstance(confidence, bool) or not isinstance(confidence, (int, float)) or not 0 <= confidence <= 1:
-        raise ValueError("confidence debe estar entre 0 y 1.")
-    if not isinstance(gaps, list):
-        raise ValueError("gaps debe ser una lista.")
+    if (
+        isinstance(confidence, bool)
+        or not isinstance(confidence, (int, float))
+        or not math.isfinite(float(confidence))
+        or not 0 <= confidence <= 1
+    ):
+        raise ValueError("confidence debe ser finita y estar entre 0 y 1.")
+    if not isinstance(gaps, list) or len(gaps) > MAX_GAPS:
+        raise ValueError(f"gaps debe ser una lista de hasta {MAX_GAPS} elementos.")
     clean_gaps = []
+    seen_topics = set()
     for item in gaps:
-        if not isinstance(item, dict) or not str(item.get("topic", "")).strip():
-            raise ValueError("Cada brecha necesita un topic.")
+        if not isinstance(item, dict):
+            raise ValueError("Cada brecha debe ser un objeto.")
+        topic = item.get("topic")
+        why = item.get("why", "")
         prerequisites = item.get("prerequisites", [])
-        if not isinstance(prerequisites, list):
-            raise ValueError("prerequisites debe ser una lista.")
         priority = item.get("priority", 3)
+        if not isinstance(topic, str) or not topic.strip() or len(topic) > 240:
+            raise ValueError("Cada brecha necesita un topic de hasta 240 caracteres.")
+        key = topic.strip().casefold()
+        if key in seen_topics:
+            raise ValueError("La evaluación contiene brechas duplicadas.")
+        seen_topics.add(key)
+        if not isinstance(why, str) or len(why) > 2000:
+            raise ValueError("why debe ser texto de hasta 2.000 caracteres.")
+        if not isinstance(prerequisites, list) or len(prerequisites) > 16:
+            raise ValueError("prerequisites debe contener hasta 16 elementos.")
+        clean_prerequisites = []
+        for prerequisite in prerequisites:
+            if not isinstance(prerequisite, str) or not prerequisite.strip() or len(prerequisite) > 240:
+                raise ValueError("Cada prerrequisito debe ser texto de hasta 240 caracteres.")
+            clean_prerequisites.append(prerequisite.strip())
         if isinstance(priority, bool) or not isinstance(priority, int) or not 1 <= priority <= 5:
             raise ValueError("priority debe ser un entero de 1 a 5.")
         clean_gaps.append({
-            "topic": str(item["topic"]).strip(),
-            "why": str(item.get("why", "")).strip(),
-            "prerequisites": [str(x).strip() for x in prerequisites if str(x).strip()],
+            "topic": topic.strip(),
+            "why": why.strip(),
+            "prerequisites": clean_prerequisites,
             "priority": priority,
         })
-    # Si declara suficiencia, no puede ocultar brechas críticas en la misma respuesta.
-    if sufficient and confidence < 0.75:
-        sufficient = False
-    if sufficient and any(item["priority"] >= 4 for item in clean_gaps):
+    known_topics = _bounded_text_list(value.get("known_topics", []), "known_topics")
+    uncertainties = _bounded_text_list(value.get("uncertainties", []), "uncertainties")
+    reasoning_summary = value.get("reasoning_summary", "")
+    if not isinstance(reasoning_summary, str) or len(reasoning_summary) > 3000:
+        raise ValueError("reasoning_summary debe ser texto de hasta 3.000 caracteres.")
+    # Una declaración de suficiencia no puede ocultar brechas críticas ni incertidumbre.
+    if sufficient and (
+        confidence < 0.75
+        or uncertainties
+        or any(item["priority"] >= 4 for item in clean_gaps)
+        or clean_gaps
+    ):
         sufficient = False
     return {
         "knowledge_sufficient": sufficient,
         "confidence": float(confidence),
-        "known_topics": value.get("known_topics", []) if isinstance(value.get("known_topics", []), list) else [],
+        "known_topics": known_topics,
         "gaps": clean_gaps,
-        "uncertainties": value.get("uncertainties", []) if isinstance(value.get("uncertainties", []), list) else [],
-        "reasoning_summary": str(value.get("reasoning_summary", ""))[:3000],
+        "uncertainties": uncertainties,
+        "reasoning_summary": reasoning_summary.strip(),
     }
 
+
+def validate_verification(value: dict) -> dict:
+    if not isinstance(value, dict) or not isinstance(value.get("approved"), bool):
+        raise ValueError("La verificación debe declarar approved como booleano.")
+    score = value.get("score")
+    quality = value.get("evidence_quality", "insufficient")
+    if isinstance(score, bool) or not isinstance(score, int) or not 0 <= score <= 100:
+        raise ValueError("score debe ser un entero de 0 a 100.")
+    if not isinstance(quality, str) or quality not in {
+        "insufficient", "low", "medium", "good", "high", "strong", "excellent",
+    }:
+        raise ValueError("evidence_quality no pertenece al vocabulario permitido.")
+    gaps_remaining = _bounded_text_list(
+        value.get("gaps_remaining", []), "gaps_remaining", maximum=MAX_GAPS
+    )
+    reasons = _bounded_text_list(
+        value.get("reasons", []), "reasons", maximum=32, item_chars=1000
+    )
+    approved = (
+        value["approved"]
+        and score >= 75
+        and quality in {"good", "high", "strong", "excellent"}
+        and not gaps_remaining
+    )
+    return {
+        "approved": approved,
+        "score": score,
+        "evidence_quality": quality,
+        "gaps_remaining": gaps_remaining,
+        "reasons": reasons,
+    }
 
 def build_assessment_prompt(task: str, knowledge_context: str = "", prior_state: dict | None = None) -> str:
     return (
