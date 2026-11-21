@@ -260,6 +260,10 @@ def _copy_regular_file(source, destination):
                     not _is_regular_file_info(final_destination)
                     or (opened_destination.st_dev, opened_destination.st_ino)
                     != (final_destination.st_dev, final_destination.st_ino)
+                    or (
+                        os.name == "posix"
+                        and (opened_destination.st_nlink != 1 or final_destination.st_nlink != 1)
+                    )
                 ):
                     raise BackupError("El destino cambió durante la copia.")
         except OSError as error:
@@ -481,12 +485,27 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None):
                     raise BackupError("data/manifest.json está reservado para el manifiesto del backup.")
                 target = staging / relative
                 target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+                source_parent_chain = _validate_directory_path(source.parent)
                 if source.suffix.lower() in {".sqlite", ".sqlite3", ".db"}:
+                    target_parent_chain = _validate_directory_path(target.parent)
                     _sqlite_snapshot(source, target)
+                    if not _same_directory_chain(
+                        target_parent_chain, _validate_directory_path(target.parent)
+                    ):
+                        raise BackupError("La ruta del snapshot SQLite cambió durante la copia.")
                     kind = "sqlite_snapshot"
                 else:
                     _copy_regular_file(source, target)
                     kind = "file_copy_quiesced"
+                source_after = source.lstat()
+                if (
+                    not _is_regular_file_info(source_after)
+                    or _file_state(source_info) != _file_state(source_after)
+                    or not _same_directory_chain(
+                        source_parent_chain, _validate_directory_path(source.parent)
+                    )
+                ):
+                    raise BackupError(f"El origen cambió durante el backup: {relative_source}")
                 try:
                     os.chmod(target, 0o600)
                 except OSError:
@@ -520,6 +539,8 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None):
             os.chmod(staging, 0o700)
         except OSError:
             pass
+        if not _same_directory_chain(data_directory_chain, _validate_directory_path(data_dir)):
+            raise BackupError("El directorio de datos cambió durante el backup.")
         current_parent_chain = _validate_directory_path(destination.parent)
         if not _same_directory_chain(destination_parent_chain, current_parent_chain):
             raise BackupError("El directorio padre del backup cambió durante la creación.")
@@ -536,9 +557,11 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None):
 
 def verify_backup(snapshot, *, require_signature=False):
     snapshot = Path(os.path.abspath(os.fspath(snapshot)))
-    snapshot_chain = _validate_directory_path(snapshot)
+    input_snapshot_chain = _validate_directory_path(snapshot)
     snapshot = snapshot.resolve(strict=True)
     snapshot_chain = _validate_directory_path(snapshot)
+    if not _same_directory_chain(input_snapshot_chain, snapshot_chain):
+        raise BackupError("La ruta del backup cambió al resolverla.")
     if not snapshot.is_dir():
         raise BackupError("El backup debe ser un directorio existente.")
     manifest_path = snapshot / "manifest.json"
@@ -565,9 +588,11 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
     if confirm_quiesced is not True:
         raise BackupError("La restauración requiere --confirm-quiesced.")
     snapshot = Path(os.path.abspath(os.fspath(snapshot)))
-    _validate_directory_path(snapshot)
+    input_snapshot_chain = _validate_directory_path(snapshot)
     snapshot = snapshot.resolve(strict=True)
     snapshot_chain = _validate_directory_path(snapshot)
+    if not _same_directory_chain(input_snapshot_chain, snapshot_chain):
+        raise BackupError("La ruta del backup cambió al resolverla.")
     report = verify_backup(snapshot, require_signature=require_signature)
     data_dir = Path(os.path.abspath(os.fspath(data_dir)))
     data_dir_chain = None
@@ -617,6 +642,8 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
                 os.chmod(target, 0o600)
             except OSError:
                 pass
+        if not _same_directory_chain(snapshot_chain, _validate_directory_path(snapshot)):
+            raise BackupError("La ruta del backup cambió durante la restauración.")
         if not _same_directory_chain(data_parent_chain, _validate_directory_path(data_dir.parent)):
             raise BackupError("El directorio padre del destino cambió durante la restauración.")
         if data_dir.exists():
@@ -635,7 +662,14 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
     except Exception:
         shutil.rmtree(staging, ignore_errors=True)
         if previous and previous.exists() and not data_dir.exists():
-            os.replace(previous, data_dir)
+            try:
+                if _same_directory_chain(
+                    data_parent_chain, _validate_directory_path(data_dir.parent)
+                ):
+                    os.replace(previous, data_dir)
+            except BackupError:
+                # Preserve the previous snapshot in place if its parent path changed.
+                pass
         raise
     return {"restored": True, "files": report["files"],
             "previous_data_preserved_at": str(previous) if previous else None,
