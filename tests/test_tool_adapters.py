@@ -239,6 +239,22 @@ class ToolAdapterTests(unittest.TestCase):
         with self.assertRaisesRegex(ToolExecutionError, "Identificador"):
             write_evidence({"tool": "../escape"}, "reports/unsafe")
 
+    def test_evidence_rejects_symlinked_parent_before_creating_children(self):
+        outside = self.root / "outside"
+        outside.mkdir()
+        link = self.root / "linked-parent"
+        link.symlink_to(outside, target_is_directory=True)
+        with self.assertRaisesRegex(ToolExecutionError, "enlace simbólico"):
+            write_evidence({"tool": "ruff"}, link / "new" / "evidence")
+        self.assertFalse((outside / "new").exists())
+
+    def test_evidence_rejects_external_path_before_creating_directory(self):
+        with tempfile.TemporaryDirectory() as outside:
+            destination = Path(outside) / "new-evidence"
+            with self.assertRaisesRegex(ToolExecutionError, "dentro del repositorio"):
+                write_evidence({"tool": "ruff"}, destination)
+            self.assertFalse(destination.exists())
+
 
 
     def test_checkov_builds_local_json_command(self):
