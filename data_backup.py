@@ -80,9 +80,74 @@ def _file_state(info):
     )
 
 
+def _is_directory_info(info):
+    reparse_flag = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
+    return (
+        stat.S_ISDIR(info.st_mode)
+        and not (getattr(info, "st_file_attributes", 0) & reparse_flag)
+    )
+
+
+def _validate_directory_path(path):
+    """Reject symlink/reparse ancestors and directories writable by untrusted users."""
+    candidate = Path(os.path.abspath(os.fspath(path)))
+    chain = []
+    for directory in (*reversed(candidate.parents), candidate):
+        try:
+            info = directory.lstat()
+        except (OSError, ValueError) as error:
+            raise BackupError("La ruta de directorios del backup no está disponible.") from error
+        if not _is_directory_info(info):
+            raise BackupError("No se permiten symlinks, puntos de reanálisis ni archivos en la ruta del backup.")
+        if os.name == "posix":
+            mode = stat.S_IMODE(info.st_mode)
+            trusted_owner = info.st_uid in {0, os.geteuid()}
+            root_sticky = info.st_uid == 0 and bool(info.st_mode & stat.S_ISVTX)
+            if not trusted_owner or (mode & 0o022 and not root_sticky):
+                raise BackupError("Los directorios del backup deben pertenecer a root/usuario y no ser modificables por terceros.")
+        chain.append((directory, info.st_dev, info.st_ino))
+    return chain
+
+
+def _same_directory_chain(before, after):
+    return (
+        len(before) == len(after)
+        and all(
+            old_path == new_path and (old_dev, old_ino) == (new_dev, new_ino)
+            for (old_path, old_dev, old_ino), (new_path, new_dev, new_ino)
+            in zip(before, after)
+        )
+    )
+
+
+def _ensure_directory_path(path):
+    """Create missing private path components only after validating their ancestors."""
+    candidate = Path(os.path.abspath(os.fspath(path)))
+    missing = []
+    current = candidate
+    while True:
+        try:
+            current.lstat()
+            break
+        except FileNotFoundError:
+            missing.append(current)
+            current = current.parent
+        except (OSError, ValueError) as error:
+            raise BackupError("No se pudo inspeccionar el directorio del backup.") from error
+    _validate_directory_path(current)
+    for directory in reversed(missing):
+        try:
+            directory.mkdir(mode=0o700)
+        except FileExistsError:
+            pass
+        _validate_directory_path(directory)
+    return _validate_directory_path(candidate)
+
+
 def _open_regular_file(path):
-    """Open one regular file without following its final symlink or hard links."""
-    path = Path(path)
+    """Open one regular file without following links in its path or hard links."""
+    path = Path(os.path.abspath(os.fspath(path)))
+    parent_chain_before = _validate_directory_path(path.parent)
     descriptor = None
     try:
         before = path.lstat()
@@ -97,11 +162,13 @@ def _open_regular_file(path):
         descriptor = os.open(path, flags)
         opened = os.fstat(descriptor)
         after = path.lstat()
+        parent_chain_after = _validate_directory_path(path.parent)
         if (
             not _is_regular_file_info(opened)
             or not _is_regular_file_info(after)
             or (before.st_dev, before.st_ino) != (opened.st_dev, opened.st_ino)
             or (opened.st_dev, opened.st_ino) != (after.st_dev, after.st_ino)
+            or not _same_directory_chain(parent_chain_before, parent_chain_after)
         ):
             raise BackupError("El archivo cambió durante su apertura o no es regular.")
         if os.name == "posix" and opened.st_nlink != 1:
@@ -165,7 +232,9 @@ def _sha256(path):
 
 
 def _copy_regular_file(source, destination):
-    """Copy a regular source without following its final symlink or overwriting."""
+    """Copy a regular source without following links or overwriting a destination."""
+    destination = Path(os.path.abspath(os.fspath(destination)))
+    destination_parent_chain = _validate_directory_path(destination.parent)
     with _open_regular_file(source) as src:
         initial = os.fstat(src.fileno())
         flags = (
@@ -180,15 +249,34 @@ def _copy_regular_file(source, destination):
             descriptor = os.open(destination, flags, 0o600)
             with os.fdopen(descriptor, "wb") as dst:
                 descriptor = None
+                opened_destination = os.fstat(dst.fileno())
+                if not _is_regular_file_info(opened_destination):
+                    raise BackupError("El destino de copia debe ser un archivo regular.")
                 shutil.copyfileobj(src, dst, length=1024 * 1024)
                 dst.flush()
                 os.fsync(dst.fileno())
+                final_destination = os.fstat(dst.fileno())
+                if (
+                    not _is_regular_file_info(final_destination)
+                    or (opened_destination.st_dev, opened_destination.st_ino)
+                    != (final_destination.st_dev, final_destination.st_ino)
+                ):
+                    raise BackupError("El destino cambió durante la copia.")
         except OSError as error:
             raise BackupError("No se pudo copiar un archivo regular del backup.") from error
         finally:
             if descriptor is not None:
                 os.close(descriptor)
         _assert_open_file_stable(source, src, initial)
+        destination_after = destination.lstat()
+        parent_chain_after = _validate_directory_path(destination.parent)
+        if (
+            not _is_regular_file_info(destination_after)
+            or (opened_destination.st_dev, opened_destination.st_ino)
+            != (destination_after.st_dev, destination_after.st_ino)
+            or not _same_directory_chain(destination_parent_chain, parent_chain_after)
+        ):
+            raise BackupError("El destino o su ruta cambió durante la copia.")
 
 
 def _backup_signing_key():
@@ -269,12 +357,17 @@ def _validate_manifest(snapshot, manifest, *, require_signature=False):
             raise BackupError("Conflicto entre archivo y directorio en manifiesto.")
         path = snapshot.joinpath(*relative.parts)
         cursor = snapshot
-        for part in relative.parts:
+        for index, part in enumerate(relative.parts):
             cursor = cursor / part
-            if cursor.is_symlink():
-                raise BackupError(f"Hay symlink en el backup: {key}")
-        if not path.is_file():
-            raise BackupError(f"Falta archivo: {key}")
+            try:
+                info = cursor.lstat()
+            except OSError as error:
+                raise BackupError(f"Falta archivo o directorio del backup: {key}") from error
+            if index < len(relative.parts) - 1:
+                if not _is_directory_info(info):
+                    raise BackupError(f"Hay un directorio no seguro en el backup: {key}")
+            elif not _is_regular_file_info(info):
+                raise BackupError(f"El archivo del backup no es regular: {key}")
         try:
             path.resolve().relative_to(snapshot)
         except ValueError as error:
@@ -288,12 +381,20 @@ def _validate_manifest(snapshot, manifest, *, require_signature=False):
     for current, dirs, names in os.walk(snapshot, followlinks=False):
         current_path = Path(current)
         for name in dirs:
-            if (current_path / name).is_symlink():
-                raise BackupError("No se permiten symlinks en el backup.")
+            try:
+                info = (current_path / name).lstat()
+            except OSError as error:
+                raise BackupError("No se pudo inspeccionar un directorio del backup.") from error
+            if not _is_directory_info(info):
+                raise BackupError("No se permiten symlinks ni puntos de reanálisis en el backup.")
         for name in names:
             path = current_path / name
-            if path.is_symlink():
-                raise BackupError("No se permiten symlinks en el backup.")
+            try:
+                info = path.lstat()
+            except OSError as error:
+                raise BackupError("No se pudo inspeccionar un archivo del backup.") from error
+            if not _is_regular_file_info(info):
+                raise BackupError("El backup solo puede contener archivos regulares.")
             actual.add(path.relative_to(snapshot).as_posix())
     if actual != expected:
         raise BackupError("El contenido del backup no coincide con el manifiesto.")
@@ -333,38 +434,41 @@ def _sqlite_snapshot(source, destination):
 
 def create_backup(data_dir=DEFAULT_DATA, destination=None):
     signing_key = _backup_signing_key()
-    data_dir = Path(data_dir)
-    if data_dir.is_symlink():
-        raise BackupError("El directorio de datos no puede ser symlink.")
-    data_dir = data_dir.resolve()
+    data_dir = Path(os.path.abspath(os.fspath(data_dir)))
+    _validate_directory_path(data_dir)
+    data_dir = data_dir.resolve(strict=True)
+    data_directory_chain = _validate_directory_path(data_dir)
     if not data_dir.is_dir():
         raise BackupError("El directorio de datos debe existir y no ser symlink.")
     if destination is None:
         raise BackupError("Indica un destino de backup.")
-    destination = Path(destination)
+    destination = Path(os.path.abspath(os.fspath(destination)))
     if destination.exists() or destination.is_symlink():
         raise BackupError("El destino ya existe; no se sobrescriben backups.")
+    destination_parent_chain = _ensure_directory_path(destination.parent)
     resolved_destination = destination.resolve()
     if resolved_destination == data_dir or data_dir in resolved_destination.parents:
         raise BackupError("El backup no puede guardarse dentro del directorio de datos.")
-    destination.parent.mkdir(parents=True, exist_ok=True)
     staging = destination.parent / f".{destination.name}.tmp-{uuid.uuid4().hex}"
     staging.mkdir(mode=0o700)
+    _validate_directory_path(staging)
     entries = []
     try:
         for current, dirs, files in os.walk(data_dir, followlinks=False):
             current_path = Path(current)
             for name in list(dirs):
                 child = current_path / name
-                if child.is_symlink():
-                    raise BackupError(f"No se permiten symlinks: {child.relative_to(data_dir)}")
+                child_info = child.lstat()
+                if not _is_directory_info(child_info):
+                    raise BackupError(f"No se permiten symlinks ni puntos de reanálisis: {child.relative_to(data_dir)}")
             for name in sorted(files):
                 source = current_path / name
                 source_info = source.lstat()
                 relative_source = source.relative_to(data_dir)
-                if stat.S_ISLNK(source_info.st_mode):
-                    raise BackupError(f"No se permiten symlinks: {relative_source}")
-                if not stat.S_ISREG(source_info.st_mode):
+                if not _is_regular_file_info(source_info):
+                    reparse_flag = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
+                    if stat.S_ISLNK(source_info.st_mode) or getattr(source_info, "st_file_attributes", 0) & reparse_flag:
+                        raise BackupError(f"No se permiten symlinks ni puntos de reanálisis: {relative_source}")
                     raise BackupError(
                         f"Solo se respaldan archivos regulares: {relative_source}"
                     )
@@ -416,6 +520,11 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None):
             os.chmod(staging, 0o700)
         except OSError:
             pass
+        current_parent_chain = _validate_directory_path(destination.parent)
+        if not _same_directory_chain(destination_parent_chain, current_parent_chain):
+            raise BackupError("El directorio padre del backup cambió durante la creación.")
+        if destination.exists() or destination.is_symlink():
+            raise BackupError("El destino apareció durante la creación; no se sobrescribe.")
         os.replace(staging, destination)
         return {"destination": str(destination), "files": len(entries),
                 "encrypted": False, "signed": signing_key is not None,
@@ -426,10 +535,10 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None):
 
 
 def verify_backup(snapshot, *, require_signature=False):
-    snapshot = Path(snapshot)
-    if snapshot.is_symlink():
-        raise BackupError("El backup no puede ser symlink.")
-    snapshot = snapshot.resolve()
+    snapshot = Path(os.path.abspath(os.fspath(snapshot)))
+    snapshot_chain = _validate_directory_path(snapshot)
+    snapshot = snapshot.resolve(strict=True)
+    snapshot_chain = _validate_directory_path(snapshot)
     if not snapshot.is_dir():
         raise BackupError("El backup debe ser un directorio existente.")
     manifest_path = snapshot / "manifest.json"
@@ -445,6 +554,8 @@ def verify_backup(snapshot, *, require_signature=False):
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
         raise BackupError("El manifiesto no es JSON UTF-8 válido.") from error
     report = _validate_manifest(snapshot, manifest, require_signature=require_signature)
+    if not _same_directory_chain(snapshot_chain, _validate_directory_path(snapshot)):
+        raise BackupError("La ruta del backup cambió durante la verificación.")
     report["manifest_sha256"] = hashlib.sha256(manifest_bytes).hexdigest()
     return report
 
@@ -453,15 +564,20 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
                    confirm_replace=False, require_signature=False):
     if confirm_quiesced is not True:
         raise BackupError("La restauración requiere --confirm-quiesced.")
-    snapshot = Path(snapshot)
-    if snapshot.is_symlink():
-        raise BackupError("El backup no puede ser symlink.")
-    snapshot = snapshot.resolve()
+    snapshot = Path(os.path.abspath(os.fspath(snapshot)))
+    _validate_directory_path(snapshot)
+    snapshot = snapshot.resolve(strict=True)
+    snapshot_chain = _validate_directory_path(snapshot)
     report = verify_backup(snapshot, require_signature=require_signature)
-    data_dir = Path(data_dir)
-    if data_dir.is_symlink():
-        raise BackupError("El directorio de datos no puede ser symlink.")
-    data_dir = data_dir.resolve()
+    data_dir = Path(os.path.abspath(os.fspath(data_dir)))
+    data_dir_chain = None
+    if data_dir.exists() or data_dir.is_symlink():
+        data_dir_chain = _validate_directory_path(data_dir)
+        data_dir = data_dir.resolve(strict=True)
+        data_dir_chain = _validate_directory_path(data_dir)
+    else:
+        _ensure_directory_path(data_dir.parent)
+    data_parent_chain = _validate_directory_path(data_dir.parent)
     if (
         data_dir == snapshot
         or data_dir in snapshot.parents
@@ -470,11 +586,9 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
         raise BackupError("El destino de restauración y el backup deben ser rutas independientes.")
     if data_dir.exists() and not confirm_replace:
         raise BackupError("El destino existe; usa --confirm-replace para sustituirlo.")
-    if data_dir.is_symlink():
-        raise BackupError("El directorio de datos no puede ser symlink.")
-    data_dir.parent.mkdir(parents=True, exist_ok=True)
     staging = data_dir.parent / f".{data_dir.name}.restore-{uuid.uuid4().hex}"
     staging.mkdir(mode=0o700)
+    _validate_directory_path(staging)
     previous = None
     try:
         manifest_path = snapshot / "manifest.json"
@@ -503,9 +617,20 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
                 os.chmod(target, 0o600)
             except OSError:
                 pass
+        if not _same_directory_chain(data_parent_chain, _validate_directory_path(data_dir.parent)):
+            raise BackupError("El directorio padre del destino cambió durante la restauración.")
         if data_dir.exists():
+            current_data_chain = _validate_directory_path(data_dir)
+            if data_dir_chain is None or not _same_directory_chain(data_dir_chain, current_data_chain):
+                raise BackupError("El destino de restauración cambió durante la operación.")
             previous = data_dir.parent / f"{data_dir.name}.pre-restore-{uuid.uuid4().hex}"
             os.replace(data_dir, previous)
+        elif data_dir_chain is not None:
+            raise BackupError("El destino de restauración desapareció durante la operación.")
+        if data_dir.exists() or data_dir.is_symlink():
+            raise BackupError("El destino apareció antes de publicar la restauración.")
+        if not _same_directory_chain(data_parent_chain, _validate_directory_path(data_dir.parent)):
+            raise BackupError("El directorio padre del destino cambió antes de publicar la restauración.")
         os.replace(staging, data_dir)
     except Exception:
         shutil.rmtree(staging, ignore_errors=True)
