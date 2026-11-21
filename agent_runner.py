@@ -465,6 +465,7 @@ def retrieve_knowledge_context(
         min_score=min_score,
         categories=categories,
         tags=tags,
+        tenant_id=os.environ.get("CYBER_AI_TENANT_ID", "local"),
     )
 
     metadata = []
