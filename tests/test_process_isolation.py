@@ -4,7 +4,11 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from process_isolation import ProcessIsolationError, run_bounded_process
+from process_isolation import (
+    MAX_PROCESS_OUTPUT_BYTES,
+    ProcessIsolationError,
+    run_bounded_process,
+)
 
 
 class ProcessIsolationTests(unittest.TestCase):
@@ -57,6 +61,35 @@ class ProcessIsolationTests(unittest.TestCase):
                             cwd=".",
                             env=os.environ.copy(),
                             timeout=timeout,
+                        )
+        popen.assert_not_called()
+
+    def test_output_limit_has_a_hard_upper_bound(self):
+        with patch("process_isolation.subprocess.Popen") as popen:
+            with self.assertRaises(ValueError):
+                run_bounded_process(
+                    [sys.executable, "-c", "pass"],
+                    cwd=".",
+                    env=os.environ.copy(),
+                    timeout=1,
+                    max_output_bytes=MAX_PROCESS_OUTPUT_BYTES + 1,
+                )
+        popen.assert_not_called()
+
+    def test_invalid_command_and_environment_are_rejected_before_start(self):
+        invalid_cases = (
+            ([sys.executable, "\x00"], os.environ.copy(), "."),
+            ([sys.executable, object()], os.environ.copy(), "."),
+            ([sys.executable], {"BAD=KEY": "value"}, "."),
+            ([sys.executable], {"GOOD": "bad\x00value"}, "."),
+            ([sys.executable], os.environ.copy(), "\x00"),
+        )
+        with patch("process_isolation.subprocess.Popen") as popen:
+            for command, env, cwd in invalid_cases:
+                with self.subTest(command=repr(command), cwd=repr(cwd)):
+                    with self.assertRaises(ValueError):
+                        run_bounded_process(
+                            command, cwd=cwd, env=env, timeout=1
                         )
         popen.assert_not_called()
 
