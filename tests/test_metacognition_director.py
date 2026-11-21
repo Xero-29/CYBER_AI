@@ -6,47 +6,78 @@ from unittest.mock import patch
 
 class MetacognitionDirectorTests(unittest.TestCase):
     @patch("director.subprocess.run")
+    @patch("director.run_cycle")
     @patch("director.select_agent")
     @patch("director.load_config")
-    def test_failed_knowledge_assessment_blocks_original_task(self, load_config, select_agent, run):
+    def test_failed_knowledge_assessment_blocks_original_task(
+        self, load_config, select_agent, run_cycle, run_process
+    ):
         load_config.return_value = {
             "metacognition": {
                 "enabled": True, "researcher_agent": "INVESTIGADOR",
                 "verifier_agent": "VERITAS", "max_rounds": 2,
             }
         }
-        select_agent.return_value = ("NEXO", {"model": "principal", "type": "reasoning"}, [])
-        run.return_value = SimpleNamespace(returncode=2, stdout='{"status":"verification_failed"}', stderr="")
+        select_agent.return_value = (
+            "NEXO", {"model": "principal", "type": "reasoning"}, [],
+        )
+        run_cycle.return_value = {"status": "verification_failed"}
         with patch.object(sys, "argv", ["director.py", "explicar un tema desconocido"]):
             from director import main
             self.assertEqual(main(), 2)
-        self.assertEqual(run.call_count, 1)
-        command = run.call_args.args[0]
-        self.assertIn("metacognition.py", command[1])
-        self.assertIn("--researcher", command)
-        self.assertIn("INVESTIGADOR", command)
+        run_cycle.assert_called_once()
+        self.assertEqual(run_cycle.call_args.kwargs["principal"], "NEXO")
+        self.assertEqual(run_cycle.call_args.kwargs["researcher"], "INVESTIGADOR")
+        run_process.assert_not_called()
 
     @patch("director.subprocess.run")
+    @patch("director.run_cycle")
     @patch("director.select_agent")
     @patch("director.load_config")
-    def test_successful_assessment_then_runs_original_task(self, load_config, select_agent, run):
+    def test_successful_assessment_then_runs_original_task(
+        self, load_config, select_agent, run_cycle, run_process
+    ):
         load_config.return_value = {
             "metacognition": {
                 "enabled": True, "researcher_agent": "INVESTIGADOR",
                 "verifier_agent": "VERITAS", "max_rounds": 2,
             }
         }
-        select_agent.return_value = ("NEXO", {"model": "principal", "type": "reasoning"}, [])
-        run.side_effect = [
-            SimpleNamespace(returncode=0, stdout='{"status":"sufficient"}', stderr=""),
-            SimpleNamespace(returncode=0, stdout="", stderr=""),
-        ]
+        select_agent.return_value = (
+            "NEXO", {"model": "principal", "type": "reasoning"}, [],
+        )
+        run_cycle.return_value = {"status": "sufficient"}
+        run_process.return_value = SimpleNamespace(returncode=0)
         with patch.object(sys, "argv", ["director.py", "explicar TCP"]):
             from director import main
             self.assertEqual(main(), 0)
-        self.assertEqual(run.call_count, 2)
-        self.assertIn("metacognition.py", run.call_args_list[0].args[0][1])
-        self.assertIn("agent_runner.py", run.call_args_list[1].args[0][1])
+        run_cycle.assert_called_once()
+        run_process.assert_called_once()
+        command = run_process.call_args.args[0]
+        self.assertIn("agent_runner.py", command[1])
+        self.assertIn("--task-text", command)
+
+    @patch("director.subprocess.run")
+    @patch("director.run_cycle")
+    @patch("director.select_agent")
+    @patch("director.load_config")
+    def test_explicit_bypass_does_not_run_metacognition(
+        self, load_config, select_agent, run_cycle, run_process
+    ):
+        load_config.return_value = {
+            "metacognition": {"enabled": True},
+        }
+        select_agent.return_value = (
+            "NEXO", {"model": "principal", "type": "reasoning"}, [],
+        )
+        run_process.return_value = SimpleNamespace(returncode=0)
+        with patch.object(
+            sys, "argv", ["director.py", "--no-metacognition", "explicar TCP"]
+        ):
+            from director import main
+            self.assertEqual(main(), 0)
+        run_cycle.assert_not_called()
+        run_process.assert_called_once()
 
 
 if __name__ == "__main__":
