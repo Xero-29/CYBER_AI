@@ -10,7 +10,9 @@ Los archivos generados por herramientas de dependencias, SBOM y biblioteca no de
 - `knowledge_downloader.py`: manifiesto de descargas y estado de la biblioteca.
 
 La función:
-- valida que los componentes existentes de la ruta no sean symlinks ni puntos de reanálisis;
+- valida que todos los componentes de la ruta sean directorios reales, sin symlinks ni puntos de reanálisis;
+- en POSIX, exige que los directorios pertenezcan a root o al usuario efectivo y no sean escribibles por grupo/otros, salvo padres sticky propiedad de root (por ejemplo, `/tmp`);
+- crea los directorios nuevos con modo `0700`;
 - rechaza destinos existentes que no sean archivos regulares;
 - crea el temporal de forma exclusiva en el mismo directorio;
 - escribe y sincroniza el contenido antes de reemplazar el destino;
@@ -21,4 +23,4 @@ Las pruebas `tests/test_safe_io.py` cubren escritura/reemplazo, destino symlink,
 
 ## Límites
 
-Esto evita clases comunes de sobrescritura por symlink y evita seguir rutas que ya contienen componentes enlazados al validarlas. No constituye una frontera frente a un atacante local con capacidad de modificar simultáneamente los directorios padre ni sustituye permisos de filesystem, sandbox, WORM o almacenamiento externo. La custodia, retención y recuperación de artefactos siguen siendo responsabilidades operativas.
+Esto reduce el riesgo de sustitución por symlink y de escritura desde directorios compartidos o modificables por terceros. La validación de rutas sigue siendo sensible a carreras frente a procesos con el mismo UID o privilegios equivalentes; no es una frontera de aislamiento frente a un atacante local del mismo usuario. En Windows no se verifica la ACL efectiva: debe validarse en el entorno de despliegue. Esto tampoco sustituye sandbox, WORM o almacenamiento externo. La custodia, retención y recuperación de artefactos siguen siendo responsabilidades operativas.

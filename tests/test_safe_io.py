@@ -191,5 +191,35 @@ class SafeIoTests(unittest.TestCase):
             with self.assertRaises(SafeWriteError):
                 ensure_private_directory(link)
 
+
+    @unittest.skipIf(os.name == "nt", "Los permisos POSIX no representan ACL de Windows.")
+    def test_atomic_write_rejects_group_writable_parent(self):
+        with tempfile.TemporaryDirectory() as temp:
+            parent = Path(temp) / "shared"
+            parent.mkdir(mode=0o700)
+            parent.chmod(0o770)
+            with self.assertRaisesRegex(SafeWriteError, "modificables por terceros"):
+                atomic_write_text(parent / "private.json", "{}")
+            self.assertFalse((parent / "private.json").exists())
+
+    @unittest.skipIf(os.name == "nt", "Los permisos POSIX no representan ACL de Windows.")
+    def test_atomic_write_creates_private_parent_directories(self):
+        with tempfile.TemporaryDirectory() as temp:
+            destination = Path(temp) / "new" / "nested" / "report.json"
+            atomic_write_text(destination, "{}", create_parents=True)
+            for directory in (destination.parent, destination.parent.parent):
+                self.assertEqual(stat.S_IMODE(directory.stat().st_mode) & 0o077, 0)
+
+    @unittest.skipIf(os.name == "nt", "Los permisos POSIX no representan ACL de Windows.")
+    def test_atomic_write_accepts_root_owned_sticky_ancestor(self):
+        parent = Path(tempfile.gettempdir())
+        info = parent.stat()
+        if info.st_uid != 0 or not (info.st_mode & stat.S_ISVTX):
+            self.skipTest("el directorio temporal no es root-owned sticky")
+        with tempfile.TemporaryDirectory(dir=parent) as temp:
+            destination = Path(temp) / "private.json"
+            atomic_write_text(destination, "{}")
+            self.assertEqual(destination.read_text(encoding="utf-8"), "{}")
+
 if __name__ == "__main__":
     unittest.main()

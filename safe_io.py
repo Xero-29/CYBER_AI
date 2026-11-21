@@ -16,14 +16,33 @@ def _is_reparse_point(info):
 
 
 def _reject_symlink_components(directory):
+    """Validate every directory component against links and untrusted writers."""
     current = Path(directory)
     while True:
         try:
             info = current.lstat()
         except OSError as error:
             raise SafeWriteError("El directorio de salida no está disponible.") from error
-        if stat.S_ISLNK(info.st_mode) or _is_reparse_point(info):
-            raise SafeWriteError("No se permiten symlinks ni puntos de reanálisis en la ruta.")
+        if (
+            stat.S_ISLNK(info.st_mode)
+            or _is_reparse_point(info)
+            or not stat.S_ISDIR(info.st_mode)
+        ):
+            raise SafeWriteError(
+                "La ruta de salida solo puede contener directorios reales, sin enlaces."
+            )
+        if os.name == "posix":
+            effective_uid = os.geteuid()
+            mode = stat.S_IMODE(info.st_mode)
+            trusted_owner = info.st_uid in {0, effective_uid}
+            root_sticky = (
+                info.st_uid == 0 and bool(info.st_mode & stat.S_ISVTX)
+            )
+            if not trusted_owner or (mode & 0o022 and not root_sticky):
+                raise SafeWriteError(
+                    "Los directorios de salida deben pertenecer a root o al usuario "
+                    "efectivo y no ser modificables por terceros."
+                )
         if current.parent == current:
             return
         current = current.parent
@@ -221,7 +240,7 @@ def atomic_write_text(path, text, *, encoding="utf-8", mode=0o600, create_parent
             raise SafeWriteError("Un componente de la ruta de salida no es un directorio.")
         for directory in reversed(missing):
             try:
-                directory.mkdir()
+                directory.mkdir(mode=0o700)
             except FileExistsError:
                 pass
             _reject_symlink_components(directory)
