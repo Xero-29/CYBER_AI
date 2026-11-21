@@ -72,6 +72,8 @@ Los dos puntos de entrada activos (`nuclei_scanner.py` y `task_runner.py`) exige
 
 La allowlist general puede seguir en modo de compatibilidad para herramientas locales, pero Nuclei —por realizar conexiones activas— no admite ese modo. Consulta [la guía de allowlist firmada](TOOL_ALLOWLIST.md) para enrolar el binario fuera del repositorio. La clave HMAC y el manifiesto real deben permanecer fuera de Git.
 
+El escáner `nuclei_scanner.py` revalida el permiso inmediatamente antes de lanzar el proceso, en cada ciclo de supervisión y antes de aceptar los resultados; si el permiso expira o se revoca, termina el grupo POSIX y descarta los hallazgos. `task_runner.py` revalida antes del lanzamiento y al terminar; su ejecución síncrona no puede interrumpir el proceso en el instante de la revocación, por lo que descarta el resultado al finalizar si el permiso ya no está vigente.
+
 ## Ejecución
 
 ```bash
