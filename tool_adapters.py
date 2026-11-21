@@ -20,6 +20,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from tool_allowlist import ToolAllowlistError, verify_tool_allowed
 from process_isolation import ProcessIsolationError, run_bounded_process
+from safe_io import ensure_private_directory
 from secret_redaction import redact_sensitive_data, redact_text
 
 
@@ -416,20 +417,20 @@ def write_evidence(evidence, output_dir="reports/tool_evidence", *, allow_extern
     raw = Path(output_dir)
     if not raw.is_absolute():
         raw = PROJECT_ROOT / raw
-    if raw.is_symlink():
-        raise ToolExecutionError("El destino de evidencias no puede ser un enlace simbólico.")
+    raw = Path(os.path.abspath(os.fspath(raw)))
     try:
-        raw.mkdir(parents=True, exist_ok=True, mode=0o700)
-        if raw.is_symlink():
-            raise ToolExecutionError("El destino de evidencias no puede ser un enlace simbólico.")
+        if not allow_external:
+            existing = raw
+            while not existing.exists() and not existing.is_symlink():
+                existing = existing.parent
+            _confined_path(existing)
+        destination = ensure_private_directory(raw, create=True)
         if allow_external:
-            destination = raw.resolve(strict=True)
-            if not destination.is_dir():
-                raise ToolExecutionError("El destino de evidencias debe ser un directorio.")
+            destination = destination.resolve(strict=True)
         else:
-            destination = _confined_path(raw)
-            if not destination.is_dir():
-                raise ToolExecutionError("El destino de evidencias debe ser un directorio.")
+            destination = _confined_path(destination)
+        if not destination.is_dir():
+            raise ToolExecutionError("El destino de evidencias debe ser un directorio.")
 
         # Tool output may contain sensitive paths or data. Keep the directory
         # private on POSIX and create every evidence file with mode 0600.
