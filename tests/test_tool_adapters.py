@@ -275,6 +275,15 @@ class ToolAdapterTests(unittest.TestCase):
             write_evidence({"tool": "ruff"}, self.root)
         self.assertEqual(stat.S_IMODE(self.root.stat().st_mode), original_mode)
 
+    @unittest.skipUnless(os.name == "posix", "Los permisos POSIX se prueban en POSIX.")
+    def test_evidence_refuses_to_chmod_existing_shared_directory(self):
+        shared = self.root / "shared"
+        shared.mkdir()
+        shared.chmod(0o755)
+        with self.assertRaisesRegex(ToolExecutionError, "modo privado 0700"):
+            write_evidence({"tool": "ruff"}, shared)
+        self.assertEqual(stat.S_IMODE(shared.stat().st_mode), 0o755)
+
 
 
     def test_checkov_builds_local_json_command(self):
