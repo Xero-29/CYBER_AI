@@ -171,10 +171,13 @@ def _hash_binary(binary):
 def _probe_tool_version(binary, tool_id, env):
     """Obtiene la versión con timeout, salida acotada y grupo POSIX propio."""
     arguments = TOOL_SPECS[tool_id].get("version_args", ["--version"])
+    isolated_cwd = env.get("HOME") if isinstance(env, dict) else None
+    if not isinstance(isolated_cwd, str) or not isolated_cwd:
+        return "unknown"
     try:
         result = run_bounded_process(
             [binary, *arguments],
-            cwd=str(PROJECT_ROOT),
+            cwd=isolated_cwd,
             env=env,
             timeout=5,
             max_output_bytes=8192,
@@ -298,7 +301,7 @@ def _run_local_tool_with_home(
     process_finished = False
     try:
         process = subprocess.Popen(
-            command, cwd=str(PROJECT_ROOT), env=env,
+            command, cwd=isolated_home, env=env,
             stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
             stderr=subprocess.PIPE, shell=False,
             start_new_session=(os.name == "posix"),
