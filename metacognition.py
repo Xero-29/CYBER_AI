@@ -654,103 +654,172 @@ def run_cycle(
     verifier: str,
     model_call: Callable[[str, str], str] = _runner_call,
     publisher: Callable[[str, str], dict] = publish_research_report,
-    source_researcher: Callable[[str, dict], str] = collect_web_evidence,
+    source_researcher: Callable[[str, dict], dict] = collect_web_evidence,
     knowledge_context: str = "",
     state_path: Path = STATE_FILE,
     log_path: Path = RESEARCH_LOG,
     max_rounds: int = MAX_RESEARCH_ROUNDS,
 ) -> dict:
-    """Ejecuta evaluación → investigación → verificación → reevaluación.
-
-    model_call recibe (nombre_agente, prompt). Los callbacks facilitan pruebas y
-    permiten sustituir proveedores sin cambiar el controlador.
-    """
-    if not task.strip():
-        raise ValueError("La tarea no puede estar vacía.")
-    if principal == researcher or principal == verifier or researcher == verifier:
+    """Evalúa → investiga con fuentes revisadas → verifica → reevalúa; nunca certifica dominio."""
+    if not isinstance(task, str) or not task.strip() or len(task) > MAX_TASK_CHARS:
+        raise ValueError("La tarea debe ser texto no vacío de hasta 20.000 caracteres.")
+    if not isinstance(knowledge_context, str) or len(knowledge_context) > MAX_CONTEXT_CHARS:
+        raise ValueError("El contexto de conocimiento supera 30.000 caracteres.")
+    for role_name, role in (("principal", principal), ("researcher", researcher), ("verifier", verifier)):
+        if not isinstance(role, str) or not re.fullmatch(r"[A-Za-z0-9_-]{1,64}", role):
+            raise ValueError(f"El rol {role_name} es inválido.")
+    if len({principal.casefold(), researcher.casefold(), verifier.casefold()}) != 3:
         raise ValueError("Principal, investigador y verificador deben ser roles separados.")
-    if not 1 <= max_rounds <= 5:
-        raise ValueError("max_rounds debe estar entre 1 y 5.")
+    if type(max_rounds) is not int or not 1 <= max_rounds <= 5:
+        raise ValueError("max_rounds debe ser un entero de 1 a 5.")
+    if not all(callable(item) for item in (model_call, publisher, source_researcher)):
+        raise TypeError("Los adaptadores de modelo, publicación e investigación deben ser invocables.")
 
+    state_path = Path(state_path)
+    log_path = Path(log_path)
     state = load_competency_map(state_path)
+    task_id = uuid.uuid4().hex
     assessment = validate_assessment(extract_json_object(
         model_call(principal, build_assessment_prompt(task, knowledge_context, state))
     ))
+    append_event({
+        "task_id": task_id, "created_at": _now(), "task": task,
+        "principal": principal, "assessment": assessment,
+        "status": "assessment_sufficient" if assessment["knowledge_sufficient"] else "assessment_insufficient",
+    }, log_path)
     if assessment["knowledge_sufficient"]:
-        return {"status": "sufficient", "assessment": assessment, "research_rounds": 0}
+        return {"status": "sufficient", "task_id": task_id, "assessment": assessment, "research_rounds": 0}
+    if not assessment["gaps"]:
+        return {
+            "status": "insufficient_no_gaps", "task_id": task_id,
+            "assessment": assessment, "research_rounds": 0,
+            "note": "La IA declaró insuficiencia sin identificar brechas accionables.",
+        }
 
-    task_id = uuid.uuid4().hex
     accepted_reports = []
     all_reports_indexed = True
     for round_number in range(1, max_rounds + 1):
         if not assessment["gaps"]:
             break
         source_evidence = source_researcher(task, assessment)
+        if not isinstance(source_evidence, dict):
+            raise MetacognitionError("El adaptador de fuentes no devolvió un resultado estructurado.")
+        source_status = source_evidence.get("status")
+        verified_sources = source_evidence.get("verified_sources")
+        source_report = source_evidence.get("report", "")
+        if (
+            source_status not in {"ok", "partial"}
+            or isinstance(verified_sources, bool)
+            or not isinstance(verified_sources, int)
+            or verified_sources < 1
+            or not isinstance(source_report, str)
+            or not source_report.strip()
+            or len(source_report) > MAX_CONTEXT_CHARS
+        ):
+            append_event({
+                "task_id": task_id, "round": round_number, "created_at": _now(),
+                "task": task, "principal": principal, "assessment": assessment,
+                "source_status": source_status, "verified_sources": verified_sources,
+                "status": "source_evidence_unavailable",
+            }, log_path)
+            return {
+                "status": "source_evidence_unavailable", "task_id": task_id,
+                "assessment": assessment, "research_rounds": round_number,
+                "verified_sources": 0,
+                "note": "No se invoca al investigador ni se acepta conocimiento sin al menos una fuente registrada y revisada.",
+            }
+
         research_context = (
-            knowledge_context + "\n\nEVIDENCIA DE INVESTIGACIÓN WEB CURADA:\n"
-            + source_evidence
-        )[-30000:]
+            knowledge_context + "\n\nEVIDENCIA DE INVESTIGACIÓN WEB REVISADA:\n" + source_report
+        )[-MAX_CONTEXT_CHARS:]
         research = model_call(
             researcher, build_research_request(task, assessment, research_context)
         )
-        verification = extract_json_object(
+        if not isinstance(research, str) or not research.strip() or len(research) > MAX_REPORT_CHARS:
+            raise MetacognitionError("El investigador devolvió un informe vacío o demasiado grande.")
+        verification = validate_verification(extract_json_object(
             model_call(verifier, build_verification_prompt(task, assessment, research))
-        )
-        approved = verification.get("approved") is True
-        score = verification.get("score", 0)
-        if isinstance(score, bool) or not isinstance(score, int) or not 0 <= score <= 100:
-            approved = False
-            score = 0
-        event = {
+        ))
+        approved = verification["approved"]
+        pending_event = {
             "task_id": task_id, "round": round_number, "created_at": _now(),
             "task": task, "principal": principal, "researcher": researcher,
-            "verifier": verifier, "assessment": assessment, "research": research,
-            "verification": verification, "status": "verified_provisional" if approved else "rejected",
+            "verifier": verifier, "assessment": assessment,
+            "source_status": source_status, "verified_sources": verified_sources,
+            "research": research, "verification": verification,
+            "status": "verified_provisional_pending_index" if approved else "rejected",
         }
-        append_event(event, log_path)
+        append_event(pending_event, log_path)
         if not approved:
             return {
                 "status": "verification_failed", "task_id": task_id,
                 "assessment": assessment, "verification": verification,
                 "research_rounds": round_number,
             }
-        accepted_reports.append(event)
+
         try:
             publication = publisher(research, task_id)
+            if not isinstance(publication, dict):
+                raise MetacognitionError("El publicador no devolvió un objeto.")
         except Exception as publish_error:
             publication = {
                 "indexed": False,
-                "error": type(publish_error).__name__ + ": " + str(publish_error)[:500],
+                "error_type": type(publish_error).__name__,
             }
-        all_reports_indexed = all_reports_indexed and bool(publication.get("indexed"))
-        # "known" significa informe revisado; no significa dominio. El estado
-        # registra por separado si el informe quedó indexado para recuperación.
-        for gap in assessment["gaps"]:
-            key = gap["topic"].casefold()
-            state["competencies"][key] = {
-                "topic": gap["topic"], "status": "known",
-                "source_task_id": task_id, "verification_score": score,
-                "verified_at": _now(), "prerequisites": gap["prerequisites"],
-                "evidence_log": str(log_path),
-                "library_indexed": bool(publication.get("indexed")),
-                "library_document": publication.get("document", {}).get("document_id"),
-            }
-        save_competency_map(state, state_path)
-        # Entregar también el informe aceptado directamente al principal para
-        # reevaluación, aunque la indexación semántica esté temporalmente caída.
+        indexed = publication.get("indexed") is True
+        all_reports_indexed = all_reports_indexed and indexed
+        document = publication.get("document")
+        document_id = (
+            document.get("document_id") or document.get("id")
+            if isinstance(document, dict) else None
+        )
+        append_event({
+            "task_id": task_id, "round": round_number, "created_at": _now(),
+            "status": "research_indexed" if indexed else "research_index_failed",
+            "library_visibility": publication.get("visibility"),
+            "library_document_id": document_id,
+            "error_type": publication.get("error_type"),
+        }, log_path)
+        accepted_reports.append(pending_event)
+
+        # Fusiona bajo bloqueo para no perder competencias añadidas por otro ciclo.
+        with _state_lock(state_path):
+            latest_state = load_competency_map(state_path)
+            for gap in assessment["gaps"]:
+                key = gap["topic"].casefold()
+                latest_state["competencies"][key] = {
+                    "topic": gap["topic"],
+                    "status": "known",
+                    "source_task_id": task_id,
+                    "verification_score": verification["score"],
+                    "verified_at": _now(),
+                    "prerequisites": gap["prerequisites"],
+                    "evidence_log": str(log_path),
+                    "library_indexed": indexed,
+                    "library_document": document_id,
+                    "knowledge_status": "provisional_not_mastered",
+                }
+            _save_competency_map_unlocked(latest_state, state_path)
+            state = latest_state
+
         knowledge_context = (
             knowledge_context + "\n\nINFORME REVISADO PROVISIONALMENTE:\n" + research
-        )[-30000:]
+        )[-MAX_CONTEXT_CHARS:]
         assessment = validate_assessment(extract_json_object(
             model_call(principal, build_assessment_prompt(task, knowledge_context, state))
         ))
+        append_event({
+            "task_id": task_id, "round": round_number, "created_at": _now(),
+            "principal": principal, "assessment": assessment,
+            "status": "reassessment_sufficient" if assessment["knowledge_sufficient"] else "reassessment_insufficient",
+        }, log_path)
         if assessment["knowledge_sufficient"]:
             if not all_reports_indexed:
                 return {
                     "status": "knowledge_acquired_not_indexed",
                     "task_id": task_id, "assessment": assessment,
                     "accepted_reports": len(accepted_reports), "research_rounds": round_number,
-                    "note": "El conocimiento fue revisado, pero no quedó indexado; se bloquea la ejecución para no perder el contexto adquirido.",
+                    "note": "El informe fue revisado, pero no quedó indexado; la tarea original sigue bloqueada.",
                 }
             return {
                 "status": "knowledge_acquired_needs_task_execution",
@@ -777,23 +846,26 @@ def main() -> int:
     args = parser.parse_args()
     try:
         def selected_backend(agent_name: str, prompt: str) -> str:
-            return _runner_call(
-                agent_name, prompt, knowledge=not args.no_knowledge
-            )
+            return _runner_call(agent_name, prompt, knowledge=not args.no_knowledge)
 
         result = run_cycle(
             args.task_text, principal=args.principal, researcher=args.researcher,
             verifier=args.verifier, model_call=selected_backend,
             knowledge_context="", max_rounds=args.max_rounds,
         )
-        print(json.dumps(result, ensure_ascii=False, indent=2))
-        if result["status"] in {"verification_failed", "insufficient_after_research", "knowledge_acquired_not_indexed"}:
+        print(json.dumps(redact_sensitive_data(result), ensure_ascii=False, indent=2))
+        if result["status"] in {
+            "verification_failed", "insufficient_after_research",
+            "knowledge_acquired_not_indexed", "source_evidence_unavailable",
+            "insufficient_no_gaps",
+        }:
+            return 2
+        if result["status"] not in {"sufficient", "knowledge_acquired_needs_task_execution"}:
             return 2
         return 0
-    except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as exc:
-        print(f"Error en ciclo metacognitivo: {exc}", file=sys.stderr)
+    except (OSError, ValueError, RuntimeError, ProcessIsolationError, SafeWriteError) as exc:
+        print(f"Error en ciclo metacognitivo: {redact_text(str(exc))[:1000]}", file=sys.stderr)
         return 1
-
 
 if __name__ == "__main__":
     raise SystemExit(main())
