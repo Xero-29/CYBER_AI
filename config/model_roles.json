@@ -371,6 +371,8 @@
     "researcher_agent": "INVESTIGADOR",
     "verifier_agent": "VERITAS",
     "max_rounds": 2,
-    "policy": "research_then_independent_verification"
+    "policy": "research_then_independent_verification",
+    "allow_remote_provider": false,
+    "tenant_id_env": "CYBER_AI_TENANT_ID"
   }
 }
