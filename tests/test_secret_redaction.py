@@ -36,11 +36,15 @@ class SecretRedactionTests(unittest.TestCase):
         self.assertEqual(structured["message"], 'password="[REDACTED]"')
 
     def test_redacts_credentials_in_non_http_uris(self):
-        raw = "postgresql://cyber_user:db-secret@db.internal:5432/cyber"
+        raw = (
+            "postgresql://cyber_user:db-secret@db.internal:5432/cyber "
+            "postgres://:empty-user-secret@db.internal/cyber"
+        )
         cleaned = redact_text(raw)
-        self.assertNotIn("cyber_user:db-secret", cleaned)
-        self.assertNotIn("db-secret", cleaned)
+        for secret in ("cyber_user:db-secret", "db-secret", "empty-user-secret"):
+            self.assertNotIn(secret, cleaned)
         self.assertIn("postgresql://[REDACTED]@db.internal", cleaned)
+        self.assertIn("postgres://[REDACTED]@db.internal", cleaned)
 
     def test_redacts_common_provider_token_formats(self):
         tokens = (
