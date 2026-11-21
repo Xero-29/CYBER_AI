@@ -269,6 +269,12 @@ class ToolAdapterTests(unittest.TestCase):
                 write_evidence({"tool": "ruff"}, destination)
             self.assertFalse(destination.exists())
 
+    def test_evidence_cannot_chmod_repository_root(self):
+        original_mode = stat.S_IMODE(self.root.stat().st_mode)
+        with self.assertRaisesRegex(ToolExecutionError, "raíz del repositorio"):
+            write_evidence({"tool": "ruff"}, self.root)
+        self.assertEqual(stat.S_IMODE(self.root.stat().st_mode), original_mode)
+
 
 
     def test_checkov_builds_local_json_command(self):
