@@ -62,9 +62,10 @@ class BatchAnalyzerTests(unittest.TestCase):
                 link.symlink_to(target)
             except (OSError, NotImplementedError):
                 self.skipTest("symlinks unavailable")
-            with self.assertRaises(ValueError):
-                process_file(link)
-            self.assertFalse(Path("reports").exists())
+            with patch("batch_analyzer.ensure_private_directory") as ensure_output:
+                with self.assertRaises(ValueError):
+                    process_file(link)
+                ensure_output.assert_not_called()
 
     def test_process_directory_rejects_symlink_directory(self):
         with tempfile.TemporaryDirectory() as temp:
