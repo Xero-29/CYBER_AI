@@ -1,4 +1,6 @@
 import os
+import json
+import stat
 import tempfile
 import unittest
 from pathlib import Path
@@ -20,7 +22,11 @@ class BatchAnalyzerTests(unittest.TestCase):
             old_cwd = os.getcwd()
             try:
                 os.chdir(root)
+                secret = "report-output-secret"
                 with patch(
+                    "batch_analyzer.analyze_report",
+                    return_value={"classification": "pending_validation", "api_key": secret},
+                ), patch(
                     "batch_analyzer.enrich_analysis",
                     side_effect=lambda value: value,
                 ), patch(
@@ -31,7 +37,13 @@ class BatchAnalyzerTests(unittest.TestCase):
 
                 self.assertEqual(len(results), 1)
                 self.assertEqual(results[0]["classification"], "pending_validation")
-                self.assertTrue(Path(results[0]["output"]).is_file())
+                output = Path(results[0]["output"])
+                self.assertTrue(output.is_file())
+                self.assertNotIn(secret, output.read_text(encoding="utf-8"))
+                self.assertEqual(json.loads(output.read_text(encoding="utf-8"))["api_key"], "[REDACTED]")
+                if os.name == "posix":
+                    self.assertEqual(stat.S_IMODE(output.stat().st_mode), 0o600)
+                    self.assertEqual(stat.S_IMODE(output.parent.stat().st_mode), 0o700)
             finally:
                 os.chdir(old_cwd)
 
