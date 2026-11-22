@@ -15,13 +15,14 @@ import json
 import os
 import re
 import socket
+import tempfile
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urljoin, urlparse
 
 import requests
-from safe_io import atomic_write_text
+from safe_io import SafeWriteError, atomic_write_text, ensure_private_directory
 from secret_redaction import redact_sensitive_data, redact_text
 
 ROOT = Path(__file__).resolve().parent
@@ -97,8 +98,12 @@ def _safe_destination(item, *, create=True):
     if BASE.is_symlink():
         raise ValueError("La biblioteca base no puede ser un enlace simbólico.")
     if create:
-        BASE.mkdir(parents=True, exist_ok=True)
-    base = BASE.resolve(strict=create)
+        try:
+            base = ensure_private_directory(BASE, create=True).resolve(strict=True)
+        except SafeWriteError as error:
+            raise ValueError("La biblioteca base no cumple la política de directorios privados.") from error
+    else:
+        base = BASE.resolve(strict=False)
     if not base.is_relative_to(ROOT.resolve()):
         raise ValueError("La biblioteca base escapa del repositorio.")
     target_dir = base
@@ -107,8 +112,12 @@ def _safe_destination(item, *, create=True):
         if target_dir.is_symlink():
             raise ValueError("No se permiten enlaces simbólicos en el destino.")
     if create:
-        target_dir.mkdir(parents=True, exist_ok=True)
-    resolved_dir = target_dir.resolve(strict=create)
+        try:
+            resolved_dir = ensure_private_directory(target_dir, create=True).resolve(strict=True)
+        except SafeWriteError as error:
+            raise ValueError("El directorio de destino no cumple la política de privacidad.") from error
+    else:
+        resolved_dir = target_dir.resolve(strict=False)
     if not resolved_dir.is_relative_to(base):
         raise ValueError("El destino escapa de la biblioteca.")
     destination = resolved_dir / filename
@@ -242,7 +251,8 @@ def download(item, manifest, dry_run=False):
     session.trust_env = False
     session.proxies = {"https": proxy}
     response = None
-    temp = destination.with_name(destination.name + ".part")
+    temp = None
+    descriptor = None
     try:
         response = _request_public_resource(session, url)
         content_type = response.headers.get("Content-Type", "").split(";", 1)[0].strip().lower()
@@ -257,9 +267,18 @@ def download(item, manifest, dry_run=False):
             if declared < 0 or declared > limit:
                 raise ValueError("El archivo supera el tamaño máximo permitido.")
 
+        try:
+            ensure_private_directory(destination.parent, create=True)
+        except SafeWriteError as error:
+            raise ValueError("El directorio de descarga no es privado.") from error
+        descriptor, temporary_name = tempfile.mkstemp(
+            prefix=f".{destination.name}.", suffix=".part", dir=str(destination.parent)
+        )
+        temp = Path(temporary_name)
         initial_used = used_bytes()
         received = 0
-        with temp.open("xb") as stream:
+        with os.fdopen(descriptor, "wb") as stream:
+            descriptor = None
             for block in response.iter_content(64 * 1024):
                 if not block:
                     continue
@@ -269,6 +288,8 @@ def download(item, manifest, dry_run=False):
                 if initial_used + received > MAX_BYTES:
                     raise ValueError("Se alcanzó el límite global de 2 GB.")
                 stream.write(block)
+            stream.flush()
+            os.fsync(stream.fileno())
 
         if received < 100:
             raise ValueError("Respuesta demasiado pequeña para ser un recurso.")
@@ -280,11 +301,18 @@ def download(item, manifest, dry_run=False):
         digest = sha256(temp)
         if expected is not None and digest.lower() != expected.lower():
             raise ValueError("El SHA-256 descargado no coincide con el esperado.")
-        temp.replace(destination)
+        if destination.is_symlink() or (destination.exists() and not destination.is_file()):
+            raise ValueError("El destino cambió y dejó de ser un archivo regular.")
+        ensure_private_directory(destination.parent, create=False)
+        os.replace(temp, destination)
+        temp = None
     except Exception:
-        temp.unlink(missing_ok=True)
+        if temp is not None:
+            temp.unlink(missing_ok=True)
         raise
     finally:
+        if descriptor is not None:
+            os.close(descriptor)
         if response is not None:
             response.close()
         session.close()
