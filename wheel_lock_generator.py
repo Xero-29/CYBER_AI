@@ -10,6 +10,7 @@ import zipfile
 from email.parser import Parser
 from pathlib import Path
 from safe_io import atomic_write_text
+from secret_redaction import redact_text
 
 
 MAX_WHEEL_METADATA_BYTES = 2 * 1024 * 1024
@@ -214,7 +215,7 @@ def main(argv=None):
         else:
             sys.stdout.write(lock)
     except (OSError, WheelLockError) as error:
-        print(f"ERROR: {error}", file=sys.stderr)
+        print(f"ERROR: {redact_text(str(error))}", file=sys.stderr)
         return 2
     return 0
 
