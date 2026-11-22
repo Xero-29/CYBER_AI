@@ -31,6 +31,10 @@ echo "== Procedencia y vigencia de la biblioteca =="
 "$PYTHON_BIN" knowledge_provenance.py
 
 echo
+echo "== Calidad y evidencia de la biblioteca =="
+"$PYTHON_BIN" knowledge_pack_quality.py
+
+echo
 echo "== Suite automatizada =="
 "$PYTHON_BIN" -m unittest discover -s tests -v
 
