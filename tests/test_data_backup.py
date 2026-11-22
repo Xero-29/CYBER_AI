@@ -1,12 +1,15 @@
+import io
 import json
 import os
 import shutil
 import sqlite3
 import tempfile
 import unittest
+from contextlib import redirect_stderr
 from pathlib import Path
 from unittest.mock import patch
 
+import data_backup
 from data_backup import BackupError, create_backup, restore_backup, verify_backup
 
 
@@ -385,6 +388,36 @@ class DataBackupTests(unittest.TestCase):
         finally:
             parent.chmod(original_mode)
 
+
+    def test_cli_redacts_secrets_from_errors(self):
+        secret = "backup-provider-secret"
+        output = io.StringIO()
+        with patch(
+            "data_backup.verify_backup",
+            side_effect=BackupError(f"Ruta insegura en manifiesto: token={secret}"),
+        ), redirect_stderr(output):
+            result = data_backup.main([
+                "verify", "--snapshot", str(self.root / "snapshot")
+            ])
+        self.assertEqual(result, 2)
+        self.assertNotIn(secret, output.getvalue())
+        self.assertIn("token=[REDACTED]", output.getvalue())
+
+    def test_cli_redacts_secret_like_values_in_success_output(self):
+        secret = "backup-path-secret"
+        output = io.StringIO()
+        with patch(
+            "data_backup.create_backup",
+            return_value={"destination": f"/tmp/api_key={secret}", "files": 1},
+        ), patch("sys.stdout", output):
+            result = data_backup.main([
+                "--data-dir", str(self.data), "backup",
+                "--destination", str(self.root / "snapshot"),
+                "--confirm-quiesced",
+            ])
+        self.assertEqual(result, 0)
+        self.assertNotIn(secret, output.getvalue())
+        self.assertIn("[REDACTED]", output.getvalue())
 
 if __name__ == "__main__":
     unittest.main()
