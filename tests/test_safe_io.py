@@ -5,7 +5,10 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from safe_io import SafeWriteError, atomic_write_text, ensure_private_directory, open_private_file
+from safe_io import (
+    SafeWriteError, atomic_write_text, ensure_private_directory, is_real_directory,
+    open_private_file, read_regular_file, read_regular_text,
+)
 
 
 class SafeIoTests(unittest.TestCase):
@@ -220,6 +223,51 @@ class SafeIoTests(unittest.TestCase):
             destination = Path(temp) / "private.json"
             atomic_write_text(destination, "{}")
             self.assertEqual(destination.read_text(encoding="utf-8"), "{}")
+
+    def test_read_regular_file_is_bounded_and_decodes_text(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "report.txt"
+            path.write_text("safe report", encoding="utf-8")
+            self.assertEqual(read_regular_file(path), b"safe report")
+            self.assertEqual(read_regular_text(path), "safe report")
+            with self.assertRaisesRegex(SafeWriteError, "límite"):
+                read_regular_file(path, max_bytes=4)
+
+    def test_read_regular_file_rejects_symlink_and_hard_link(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            target = root / "target.txt"
+            target.write_text("private", encoding="utf-8")
+            symlink = root / "symlink.txt"
+            hardlink = root / "hardlink.txt"
+            try:
+                symlink.symlink_to(target)
+                os.link(target, hardlink)
+            except (OSError, NotImplementedError):
+                self.skipTest("symlinks or hard links unavailable")
+            with self.assertRaisesRegex(SafeWriteError, "archivo regular"):
+                read_regular_file(symlink)
+            if os.name == "posix":
+                with self.assertRaisesRegex(SafeWriteError, "enlaces duros"):
+                    read_regular_file(hardlink)
+
+    def test_read_regular_file_rejects_non_regular_input(self):
+        with tempfile.TemporaryDirectory() as temp:
+            with self.assertRaises(SafeWriteError):
+                read_regular_file(Path(temp))
+
+    def test_is_real_directory_rejects_symlink(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            real = root / "real"
+            real.mkdir()
+            link = root / "link"
+            try:
+                link.symlink_to(real, target_is_directory=True)
+            except (OSError, NotImplementedError):
+                self.skipTest("symlinks unavailable")
+            self.assertTrue(is_real_directory(real))
+            self.assertFalse(is_real_directory(link))
 
 if __name__ == "__main__":
     unittest.main()
