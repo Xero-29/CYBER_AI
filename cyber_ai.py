@@ -21,7 +21,7 @@ def process_one(filename):
     """Analiza un informe individual y guarda el resultado."""
     source = Path(filename)
     if not source.is_file():
-        print(f"No existe el informe: {source}", file=sys.stderr)
+        print(f"No existe el informe: {redact_text(str(source))}", file=sys.stderr)
         return 2
 
     try:
@@ -43,7 +43,7 @@ def process_one(filename):
             mode=0o600,
             create_parents=True,
         )
-        print(f"Resultado: {output}")
+        print(f"Resultado: {redact_text(str(output))}")
         print(f"Clasificación: {result['classification']}")
         print(f"Referencias CVE: {len(result['cve_references'])}")
         print(f"Duplicado exacto: {'sí' if duplicate['duplicate'] else 'no'}")
@@ -54,11 +54,11 @@ def process_one(filename):
 
 
 
-def print_scan_summary(summary):
+def print_scan_summary(safe_summary):
     """Muestra un resumen legible de los hallazgos de Nuclei."""
     print("\\n========== RESUMEN DE SEGURIDAD ==========")
-    print(f"Objetivo: {summary.get('target') or 'No disponible'}")
-    print(f"Estado: {summary.get('scan_status') or 'Desconocido'}")
+    print(f"Objetivo: {redact_text(summary.get('target') or 'No disponible')}")
+    print(f"Estado: {redact_text(summary.get('scan_status') or 'Desconocido')}")
     print(f"Hallazgos: {summary.get('raw_findings_count', 0)}")
     print(f"Grupos: {summary.get('grouped_findings_count', 0)}")
 
@@ -66,7 +66,7 @@ def print_scan_summary(summary):
     severities = summary.get("severity_counts", {})
     if severities:
         for severity, count in sorted(severities.items()):
-            print(f"{severity.upper()}: {count}")
+            print(f"{redact_text(severity).upper()}: {count}")
     else:
         print("No se registraron hallazgos.")
 
@@ -116,27 +116,31 @@ def main():
                 authorized=args.confirm_authorized,
                 authorization_id=args.authorization_id,
             )
-            output_dir = Path("reports")
-            output_dir.mkdir(parents=True, exist_ok=True)
+            output_dir = ensure_private_directory(Path("reports"), create=True)
 
             # Guardamos el resultado completo de Nuclei sin perder evidencias.
             scan_id = uuid.uuid4().hex
             output = output_dir / f"nuclei_scan_{scan_id}_analysis.json"
-            output.write_text(
-                json.dumps(result, ensure_ascii=False, indent=2) + "\n",
-                encoding="utf-8",
+            atomic_write_text(
+                output,
+                json.dumps(redact_sensitive_data(result), ensure_ascii=False, indent=2) + "\n",
+                mode=0o600,
+                create_parents=True,
             )
 
             # Generamos un segundo informe agrupado por plantilla y severidad.
             summary = analyze_scan(result)
             summary_output = output_dir / f"nuclei_scan_{scan_id}_summary.json"
-            summary_output.write_text(
-                json.dumps(summary, ensure_ascii=False, indent=2) + "\n",
-                encoding="utf-8",
+            safe_summary = redact_sensitive_data(summary)
+            atomic_write_text(
+                summary_output,
+                json.dumps(safe_summary, ensure_ascii=False, indent=2) + "\n",
+                mode=0o600,
+                create_parents=True,
             )
 
-            print(f"Informe completo: {output}")
-            print(f"Resumen analizado: {summary_output}")
+            print(f"Informe completo: {redact_text(str(output))}")
+            print(f"Resumen analizado: {redact_text(str(summary_output))}")
             print_scan_summary(summary)
             return 0 if result.get("status") == "completed" else 1
         except ValueError as exc:
@@ -165,7 +169,7 @@ def main():
             print(json.dumps(redact_sensitive_data(results), ensure_ascii=False, indent=2))
             return 1 if any("error" in item for item in results) else 0
         except (OSError, ValueError) as exc:
-            print(f"Error: {exc}", file=sys.stderr)
+            print(f"Error: {redact_text(str(exc))}", file=sys.stderr)
             return 2
 
     parser.print_help()
