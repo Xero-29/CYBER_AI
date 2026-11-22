@@ -1,9 +1,13 @@
 """Pruebas del motor controlado de experimentos."""
 
+import io
 import json
+import os
+import stat
 import subprocess
 import tempfile
 import unittest
+from contextlib import redirect_stderr
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -142,6 +146,47 @@ class TestExperimentEngine(unittest.TestCase):
         self.assertIn("inconcluso", report["outcome_interpretation"])
         self.assertIsNone(report["return_code"])
 
+
+    def test_experiment_redacts_output_and_writes_private_report(self):
+        secret = "experiment-output-secret"
+
+        def fake_run(command, cwd, stdout, stderr, timeout, check):
+            stdout.write(f"provider token={secret}\n".encode("utf-8"))
+            stderr.write(f"password={secret}\n".encode("utf-8"))
+            return SimpleNamespace(returncode=0)
+
+        with patch.object(engine.subprocess, "run", side_effect=fake_run):
+            report = engine.run_experiment(
+                hypothesis="La salida de prueba debe quedar protegida.",
+                test_path="tests/test_sample.py",
+                timeout=10,
+                execute=True,
+            )
+
+        self.assertNotIn(secret, report["stdout"])
+        self.assertNotIn(secret, report["stderr"])
+        self.assertIn("token=[REDACTED]", report["stdout"])
+        self.assertIn("password=[REDACTED]", report["stderr"])
+        report_path = self.root / report["report_path"]
+        rendered = report_path.read_text(encoding="utf-8")
+        self.assertNotIn(secret, rendered)
+        if os.name == "posix":
+            self.assertEqual(stat.S_IMODE(report_path.stat().st_mode), 0o600)
+
+    def test_cli_redacts_unexpected_errors(self):
+        secret = "experiment-cli-secret"
+        output = io.StringIO()
+        with patch(
+            "sys.argv",
+            ["experiment_engine.py", "--hypothesis", "prueba", "--test", "tests/test_sample.py"],
+        ), patch.object(
+            engine, "run_experiment",
+            side_effect=RuntimeError(f"falló el proceso token={secret}"),
+        ), redirect_stderr(output):
+            result = engine.main()
+        self.assertEqual(result, 2)
+        self.assertNotIn(secret, output.getvalue())
+        self.assertIn("token=[REDACTED]", output.getvalue())
 
 if __name__ == "__main__":
     unittest.main()
