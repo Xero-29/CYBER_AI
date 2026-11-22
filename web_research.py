@@ -6,7 +6,9 @@ El modulo no afirma que una fuente sea verdadera solo por estar registrada.
 """
 
 import argparse
+import ipaddress
 import json
+import os
 import re
 import sys
 from datetime import datetime, timezone
@@ -17,6 +19,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urljoin, urlparse
 from urllib.request import (
     HTTPRedirectHandler,
+    ProxyHandler,
     Request,
     build_opener,
 )
@@ -28,6 +31,7 @@ from secret_redaction import redact_sensitive_data, redact_text
 ROOT = Path(__file__).resolve().parent
 CONFIG_PATH = ROOT / "config" / "trusted_sources.json"
 REPORT_DIR = ROOT / "reports" / "web_research"
+WEB_RESEARCH_PROXY_ENV = "CYBER_AI_WEB_RESEARCH_EGRESS_PROXY"
 MAX_PAGE_BYTES = 1_500_000
 MAX_EXCERPT_CHARS = 4000
 
@@ -60,14 +64,61 @@ def load_sources():
     return data, sources
 
 
+
+def _validate_web_egress_proxy(value):
+    """Validate an explicit proxy; plaintext HTTP is restricted to loopback."""
+    if (
+        not isinstance(value, str)
+        or not value
+        or any(character.isspace() or ord(character) < 0x20 for character in value)
+    ):
+        raise ValueError("El proxy de investigación web es inválido.")
+    try:
+        parsed = urlparse(value)
+        port = parsed.port
+    except ValueError as error:
+        raise ValueError("El proxy de investigación web es inválido.") from error
+    if (
+        parsed.scheme not in {"http", "https"}
+        or not parsed.hostname
+        or parsed.username is not None
+        or parsed.password is not None
+        or parsed.query
+        or parsed.fragment
+        or parsed.path not in {"", "/"}
+        or (port is not None and not 1 <= port <= 65535)
+    ):
+        raise ValueError("El proxy de investigación web es inválido.")
+    if parsed.scheme == "http":
+        host = parsed.hostname.lower().rstrip(".")
+        try:
+            loopback = ipaddress.ip_address(host).is_loopback
+        except ValueError:
+            loopback = host == "localhost"
+        if not loopback:
+            raise ValueError("Un proxy HTTP sin TLS solo se permite en loopback.")
+    return value
+
+
+def _validated_web_egress_proxy():
+    """Fail closed until an administrator provisions the DNS-pinning egress gateway."""
+    value = os.environ.get(WEB_RESEARCH_PROXY_ENV, "").strip()
+    if not value:
+        raise ValueError(
+            f"Investigación web bloqueada: configura {WEB_RESEARCH_PROXY_ENV} "
+            "con un gateway que aplique allowlist y pinning DNS."
+        )
+    return _validate_web_egress_proxy(value)
+
+
 def trusted_domain_for_url(url, sources):
     """Devuelve la fuente registrada que coincide con el dominio."""
     try:
         parsed = urlparse(url)
         host = (parsed.hostname or "").lower().rstrip(".")
 
-        # Solo admitimos HTTP/HTTPS y rechazamos URLs con usuario o clave.
-        if parsed.scheme not in {"http", "https"}:
+        # Solo HTTPS evita degradación de transporte en las fuentes registradas.
+        if parsed.scheme != "https":
             return None
         if not host or parsed.username or parsed.password:
             return None
@@ -224,8 +275,9 @@ class TrustedRedirectHandler(HTTPRedirectHandler):
         )
 
 
-def fetch_trusted_page(url, sources):
-    """Consulta únicamente páginas registradas y extrae metadatos básicos."""
+def fetch_trusted_page(url, sources, *, proxy=None):
+    """Consulta por el gateway explícito únicamente páginas HTTPS registradas."""
+    proxy = _validate_web_egress_proxy(proxy) if proxy is not None else _validated_web_egress_proxy()
     if not trusted_domain_for_url(url, sources):
         return {"fetch_status": "omitida: dominio no registrado"}
 
@@ -236,7 +288,10 @@ def fetch_trusted_page(url, sources):
             "Accept": "text/html,application/xhtml+xml"
         }
     )
-    opener = build_opener(TrustedRedirectHandler(sources))
+    opener = build_opener(
+        ProxyHandler({"http": proxy, "https": proxy}),
+        TrustedRedirectHandler(sources),
+    )
 
     try:
         with opener.open(request, timeout=12) as response:
@@ -279,6 +334,7 @@ def fetch_trusted_page(url, sources):
 def search_web(query, max_results=5, include_untrusted=False):
     """Busca, filtra dominios y consulta páginas confiables disponibles."""
     config, sources = load_sources()
+    proxy = _validated_web_egress_proxy()
     now = utc_now()
     raw_results = []
     backend_used = None
@@ -287,7 +343,7 @@ def search_web(query, max_results=5, include_untrusted=False):
 
     for backend in ("auto", "brave", "duckduckgo", "google", "mojeek", "startpage", "yahoo"):
         try:
-            found = DDGS(timeout=8).text(
+            found = DDGS(proxy=proxy, timeout=8).text(
                 query, max_results=max_results,
                 region="us-en", safesearch="moderate",
                 backend=backend,
@@ -304,7 +360,7 @@ def search_web(query, max_results=5, include_untrusted=False):
             search_errors.append(f"{backend}: sin resultados registrados")
         except Exception as error:
             search_errors.append(
-                f"{backend}: {type(error).__name__}: {str(error)[:100]}"
+                f"{backend}: {type(error).__name__}: {redact_text(str(error))[:100]}"
             )
 
     if raw_results:
@@ -350,7 +406,7 @@ def search_web(query, max_results=5, include_untrusted=False):
         }
 
         if is_trusted:
-            entry.update(fetch_trusted_page(url, sources))
+            entry.update(fetch_trusted_page(url, sources, proxy=proxy))
 
         results.append(entry)
 

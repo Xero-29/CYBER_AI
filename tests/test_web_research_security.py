@@ -6,7 +6,7 @@ import unittest
 from contextlib import redirect_stderr
 from io import StringIO
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import web_research
 
@@ -62,6 +62,109 @@ class WebResearchOutputSecurityTests(unittest.TestCase):
         self.assertEqual(result, 1)
         self.assertNotIn(secret, output.getvalue())
         self.assertIn("token=[REDACTED]", output.getvalue())
+
+
+
+class WebResearchEgressSecurityTests(unittest.TestCase):
+    def setUp(self):
+        self.sources = [{
+            "id": "official",
+            "name": "Official",
+            "domains": ["example.org"],
+            "tier": 1,
+            "limitations": "Test source",
+        }]
+
+    def test_missing_proxy_blocks_search_before_network(self):
+        with patch.dict(os.environ, {}, clear=True):
+            with patch.object(web_research, "load_sources", return_value=({}, self.sources)):
+                with patch.object(web_research, "DDGS") as ddgs:
+                    with self.assertRaisesRegex(ValueError, web_research.WEB_RESEARCH_PROXY_ENV):
+                        web_research.search_web("non-sensitive test query")
+        ddgs.assert_not_called()
+
+    def test_proxy_validation_rejects_plaintext_remote_and_credentials(self):
+        invalid = (
+            "http://proxy.example.org:8080",
+            "http://user:password@127.0.0.1:8080",
+            "https://proxy.example.org:8443/path",
+            "https://proxy.example.org:8443/?token=secret",
+            "http://127.0.0.1:0",
+        )
+        for value in invalid:
+            with self.subTest(value=value):
+                with self.assertRaises(ValueError):
+                    web_research._validate_web_egress_proxy(value)
+
+    def test_proxy_validation_accepts_loopback_http_and_remote_https(self):
+        self.assertEqual(
+            web_research._validate_web_egress_proxy("http://127.0.0.1:8080"),
+            "http://127.0.0.1:8080",
+        )
+        self.assertEqual(
+            web_research._validate_web_egress_proxy("https://egress.example.org:8443"),
+            "https://egress.example.org:8443",
+        )
+
+    def test_search_and_page_fetch_use_the_same_explicit_proxy(self):
+        proxy = "http://127.0.0.1:8080"
+        result_item = {
+            "href": "https://example.org/advisory",
+            "title": "Advisory",
+            "body": "Summary",
+            "date": None,
+        }
+        with patch.dict(os.environ, {web_research.WEB_RESEARCH_PROXY_ENV: proxy}):
+            with patch.object(web_research, "load_sources", return_value=({}, self.sources)):
+                with patch.object(web_research, "DDGS") as ddgs:
+                    ddgs.return_value.text.return_value = [result_item]
+                    with patch.object(
+                        web_research, "fetch_trusted_page",
+                        return_value={"fetch_status": "pagina consultada"},
+                    ) as fetch:
+                        report = web_research.search_web("non-sensitive test query")
+        ddgs.assert_called_once_with(proxy=proxy, timeout=8)
+        fetch.assert_called_once_with(result_item["href"], self.sources, proxy=proxy)
+        self.assertEqual(report["search_status"], "ok")
+        self.assertEqual(report["results"][0]["fetch_status"], "pagina consultada")
+
+    def test_page_fetch_installs_explicit_proxy_and_rejects_http_sources(self):
+        proxy = "http://127.0.0.1:8080"
+
+        class Headers:
+            def get(self, name, default=None):
+                return "text/html; charset=utf-8" if name.lower() == "content-type" else default
+
+            def get_content_charset(self):
+                return "utf-8"
+
+        class Response:
+            headers = Headers()
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+            def geturl(self):
+                return "https://example.org/advisory"
+
+            def read(self, limit):
+                return b"<html><title>Advisory</title><p>Evidence</p></html>"
+
+        opener = Mock()
+        opener.open.return_value = Response()
+        with patch.object(web_research, "build_opener", return_value=opener) as build:
+            result = web_research.fetch_trusted_page(
+                "https://example.org/advisory", self.sources, proxy=proxy
+            )
+        handlers = build.call_args.args
+        self.assertIsInstance(handlers[0], web_research.ProxyHandler)
+        self.assertEqual(handlers[0].proxies, {"http": proxy, "https": proxy})
+        self.assertIsInstance(handlers[1], web_research.TrustedRedirectHandler)
+        self.assertEqual(result["fetch_status"], "pagina consultada")
+        self.assertIsNone(web_research.trusted_domain_for_url("http://example.org/advisory", self.sources))
 
 
 if __name__ == "__main__":
