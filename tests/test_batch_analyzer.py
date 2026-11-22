@@ -52,5 +52,32 @@ class BatchAnalyzerTests(unittest.TestCase):
             process_directory("directorio_inexistente_cyber_ai")
 
 
+    def test_process_file_rejects_symlink_input(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            target = root / "outside.txt"
+            target.write_text("secret external report", encoding="utf-8")
+            link = root / "linked.txt"
+            try:
+                link.symlink_to(target)
+            except (OSError, NotImplementedError):
+                self.skipTest("symlinks unavailable")
+            with self.assertRaises(ValueError):
+                process_file(link)
+            self.assertFalse(Path("reports").exists())
+
+    def test_process_directory_rejects_symlink_directory(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            real = root / "real"
+            real.mkdir()
+            link = root / "linked"
+            try:
+                link.symlink_to(real, target_is_directory=True)
+            except (OSError, NotImplementedError):
+                self.skipTest("symlinks unavailable")
+            with self.assertRaises(NotADirectoryError):
+                process_directory(link)
+
 if __name__ == "__main__":
     unittest.main()
