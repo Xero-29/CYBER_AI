@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 import skillbook
+from secret_redaction import redact_text
 
 MAX_DATASET_BYTES = 2 * 1024 * 1024
 MAX_CASES = 5000
@@ -155,7 +156,7 @@ def main(argv=None):
             print(serialized, end="")
         return 0 if passed else 1
     except (OSError, SkillRegressionError, ValueError) as error:
-        print(f"ERROR: {error}", file=sys.stderr)
+        print(f"ERROR: {redact_text(str(error))}", file=sys.stderr)
         return 2
 
 
