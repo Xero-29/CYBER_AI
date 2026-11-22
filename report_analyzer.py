@@ -8,6 +8,8 @@ from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
+from secret_redaction import redact_text
+
 CVE_PATTERN = re.compile(r"\bCVE-\d{4}-\d{4,}\b", re.IGNORECASE)
 
 
@@ -215,14 +217,14 @@ def main():
 
     source = Path(sys.argv[1])
     if not source.is_file():
-        print(f"Error: no existe el archivo: {source}", file=sys.stderr)
+        print(f"Error: no existe el archivo: {redact_text(str(source))}", file=sys.stderr)
         return 2
 
     try:
         raw = source.read_text(encoding="utf-8")
         data = json.loads(raw)
     except (OSError, UnicodeError, json.JSONDecodeError) as exc:
-        print(f"Error al leer el informe JSON: {exc}", file=sys.stderr)
+        print(f"Error al leer el informe JSON: {redact_text(str(exc))}", file=sys.stderr)
         return 2
 
     result = analyze_scan(data)
