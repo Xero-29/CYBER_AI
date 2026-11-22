@@ -27,11 +27,25 @@ class DataBackupTests(unittest.TestCase):
     def tearDown(self):
         self.temp.cleanup()
 
+
+    def create_unsigned_backup(self, destination, *, data_dir=None):
+        return create_backup(
+            data_dir or self.data, destination, allow_unsigned=True
+        )
+
+    def verify_unsigned_backup(self, snapshot):
+        return verify_backup(snapshot, require_signature=False)
+
+    def restore_unsigned_backup(self, *args, **kwargs):
+        kwargs.setdefault("require_signature", False)
+        return restore_backup(*args, **kwargs)
+
+
     def test_backup_verify_and_restore_preserves_sqlite_and_files(self):
         snapshot = self.root / "backup"
-        result = create_backup(self.data, snapshot)
+        result = self.create_unsigned_backup(snapshot)
         self.assertFalse(result["encrypted"])
-        self.assertTrue(verify_backup(snapshot)["valid"])
+        self.assertTrue(self.verify_unsigned_backup(snapshot)["valid"])
         with sqlite3.connect(self.data / "memory.sqlite3") as db:
             db.execute("UPDATE notes SET value='changed'")
         restored = restore_backup(
@@ -117,15 +131,15 @@ class DataBackupTests(unittest.TestCase):
     def test_refuses_symlinks_in_data(self):
         (self.data / "outside").symlink_to(self.root, target_is_directory=True)
         with self.assertRaises(BackupError):
-            create_backup(self.data, self.root / "backup")
+            self.create_unsigned_backup(self.root / "backup")
 
     def test_restore_requires_explicit_quiescence_and_replace(self):
         snapshot = self.root / "backup"
         create_backup(self.data, snapshot)
         with self.assertRaises(BackupError):
-            restore_backup(snapshot, self.data)
+            self.restore_unsigned_backup(snapshot, self.data)
         with self.assertRaises(BackupError):
-            restore_backup(snapshot, self.data, confirm_quiesced=True)
+            self.restore_unsigned_backup(snapshot, self.data, confirm_quiesced=True)
 
 
     def test_rejects_malformed_manifest_metadata(self):
@@ -193,7 +207,7 @@ class DataBackupTests(unittest.TestCase):
 
         with patch("data_backup.os.open", side_effect=swap_on_restore):
             with self.assertRaises(BackupError):
-                restore_backup(
+                self.restore_unsigned_backup(
                     snapshot, self.data, confirm_quiesced=True, confirm_replace=True
                 )
         self.assertEqual(
@@ -211,7 +225,7 @@ class DataBackupTests(unittest.TestCase):
         with sqlite3.connect(destination / "memory.sqlite3") as db:
             self.assertEqual(db.execute("SELECT value FROM notes").fetchone()[0], "verified")
         with self.assertRaises(BackupError):
-            restore_backup(snapshot, snapshot / "inside", confirm_quiesced=True)
+            self.restore_unsigned_backup(snapshot, snapshot / "inside", confirm_quiesced=True)
 
     def test_hmac_signature_is_verified_and_required_when_requested(self):
         key = "backup-signing-key-with-at-least-32-bytes"
@@ -240,7 +254,7 @@ class DataBackupTests(unittest.TestCase):
     def test_short_hmac_key_is_rejected_before_backup_creation(self):
         with patch.dict(os.environ, {"CYBER_AI_BACKUP_HMAC_KEY": "too-short"}):
             with self.assertRaisesRegex(BackupError, "al menos 32 bytes"):
-                create_backup(self.data, self.root / "invalid-backup")
+                self.create_unsigned_backup(self.root / "invalid-backup")
 
     def test_restore_detects_source_changes_after_verification(self):
         snapshot = self.root / "backup"
@@ -254,7 +268,7 @@ class DataBackupTests(unittest.TestCase):
 
         with patch("data_backup._copy_regular_file", side_effect=mutate_before_copy):
             with self.assertRaisesRegex(BackupError, "cambió durante la restauración"):
-                restore_backup(
+                self.restore_unsigned_backup(
                     snapshot, self.data, confirm_quiesced=True, confirm_replace=True
                 )
         self.assertEqual(
@@ -329,7 +343,7 @@ class DataBackupTests(unittest.TestCase):
         destination = self.root / "backup"
         with patch("data_backup.os.replace", side_effect=OSError("simulated publish failure")):
             with self.assertRaisesRegex(OSError, "simulated publish failure"):
-                create_backup(self.data, destination)
+                self.create_unsigned_backup(destination)
         self.assertFalse(destination.exists())
         self.assertEqual(list(self.root.glob(".backup.tmp-*")), [])
 
@@ -343,7 +357,7 @@ class DataBackupTests(unittest.TestCase):
         link = self.root / "data-link"
         self._symlink_directory(link, self.root)
         with self.assertRaisesRegex(BackupError, "symlinks"):
-            create_backup(link / "data", self.root / "backup")
+            self.create_unsigned_backup(self.root / "backup", data_dir=link / "data")
 
     def test_backup_rejects_symlinked_destination_parent(self):
         real_parent = self.root / "real-backups"
@@ -351,7 +365,7 @@ class DataBackupTests(unittest.TestCase):
         link = self.root / "backup-link"
         self._symlink_directory(link, real_parent)
         with self.assertRaisesRegex(BackupError, "symlinks"):
-            create_backup(self.data, link / "backup")
+            self.create_unsigned_backup(link / "backup")
         self.assertFalse((real_parent / "backup").exists())
 
     def test_verify_rejects_symlinked_snapshot_ancestor(self):
@@ -370,7 +384,7 @@ class DataBackupTests(unittest.TestCase):
         link = self.root / "restore-link"
         self._symlink_directory(link, real_parent)
         with self.assertRaisesRegex(BackupError, "symlinks"):
-            restore_backup(
+            self.restore_unsigned_backup(
                 snapshot, link / "data", confirm_quiesced=True
             )
         self.assertFalse((real_parent / "data").exists())
@@ -383,7 +397,7 @@ class DataBackupTests(unittest.TestCase):
         try:
             parent.chmod(0o777)
             with self.assertRaisesRegex(BackupError, "modificables por terceros"):
-                create_backup(self.data, parent / "backup")
+                self.create_unsigned_backup(parent / "backup")
             self.assertFalse((parent / "backup").exists())
         finally:
             parent.chmod(original_mode)
@@ -413,11 +427,56 @@ class DataBackupTests(unittest.TestCase):
             result = data_backup.main([
                 "--data-dir", str(self.data), "backup",
                 "--destination", str(self.root / "snapshot"),
-                "--confirm-quiesced",
+                "--confirm-quiesced", "--allow-unsigned",
             ])
         self.assertEqual(result, 0)
         self.assertNotIn(secret, output.getvalue())
         self.assertIn("[REDACTED]", output.getvalue())
+
+    def test_backup_api_requires_signing_key_unless_unsigned_is_explicit(self):
+        with patch.dict(os.environ, {}, clear=True):
+            with self.assertRaisesRegex(BackupError, "CYBER_AI_BACKUP_HMAC_KEY"):
+                create_backup(self.data, self.root / "strict-backup")
+            result = create_backup(
+                self.data, self.root / "explicit-unsigned", allow_unsigned=True
+            )
+        self.assertFalse(result["signed"])
+
+    def test_cli_requires_signature_and_explicit_unsigned_override(self):
+        snapshot = self.root / "snapshot"
+        output = io.StringIO()
+        with patch("data_backup.verify_backup", return_value={"valid": True}) as verify, patch(
+            "sys.stdout", output
+        ):
+            result = data_backup.main([
+                "--data-dir", str(self.data), "verify", "--snapshot", str(snapshot)
+            ])
+        self.assertEqual(result, 0)
+        verify.assert_called_once_with(snapshot, require_signature=True)
+
+        with patch("data_backup.verify_backup", return_value={"valid": True}) as verify, patch(
+            "sys.stdout", io.StringIO()
+        ):
+            result = data_backup.main([
+                "--data-dir", str(self.data), "verify", "--snapshot", str(snapshot),
+                "--allow-unsigned",
+            ])
+        self.assertEqual(result, 0)
+        verify.assert_called_once_with(snapshot, require_signature=False)
+
+    def test_cli_requires_signing_key_for_backup_unless_explicitly_unsigned(self):
+        output = io.StringIO()
+        with patch.dict(os.environ, {}, clear=True), patch(
+            "data_backup.create_backup"
+        ) as create, redirect_stderr(output):
+            result = data_backup.main([
+                "--data-dir", str(self.data), "backup",
+                "--destination", str(self.root / "backup"),
+                "--confirm-quiesced",
+            ])
+        self.assertEqual(result, 2)
+        create.assert_not_called()
+        self.assertIn("CYBER_AI_BACKUP_HMAC_KEY", output.getvalue())
 
 if __name__ == "__main__":
     unittest.main()
