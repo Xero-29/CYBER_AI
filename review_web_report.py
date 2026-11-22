@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlparse
 from learning_memory import save_verified_lesson
+from secret_redaction import redact_text
 
 ROOT = Path(__file__).resolve().parent
 OUTPUT_DIR = ROOT / "reports" / "web_research"
@@ -127,7 +128,7 @@ def main():
                         task_record = record
 
         except OSError as error:
-            print(f"ERROR leyendo el registro: {error}")
+            print(f"ERROR leyendo el registro: {redact_text(str(error))}")
 
         if not task_record or not task_record.get("done_reason"):
             print(
