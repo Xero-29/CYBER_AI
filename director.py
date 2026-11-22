@@ -8,6 +8,7 @@ import unicodedata
 from pathlib import Path
 
 from model_memory_manager import load_config, resolve_agent
+from secret_redaction import redact_text
 
 PROJECT = Path(__file__).resolve().parent
 
@@ -110,7 +111,7 @@ def main():
         return result.returncode
 
     except (OSError, ValueError, RuntimeError) as error:
-        print(f"Error: {error}", file=sys.stderr)
+        print(f"Error: {redact_text(str(error))}", file=sys.stderr)
         return 1
 
 
