@@ -14,6 +14,8 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 
+from secret_redaction import redact_sensitive_data, redact_text
+
 PROJECT = Path(__file__).resolve().parent
 DEFAULT_DATA = PROJECT / "data"
 LOCK_SUFFIXES = {".lock", ".pid", ".sock", "-wal", "-shm"}
@@ -707,9 +709,9 @@ def main(argv=None):
                 require_signature=args.require_signature,
             )
     except (OSError, sqlite3.Error, BackupError, json.JSONDecodeError) as error:
-        print(f"ERROR: {error}", file=sys.stderr)
+        print(f"ERROR: {redact_text(str(error))}", file=sys.stderr)
         return 2
-    print(json.dumps(result, ensure_ascii=False, indent=2))
+    print(json.dumps(redact_sensitive_data(result), ensure_ascii=False, indent=2))
     return 0
 
 
