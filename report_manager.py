@@ -3,9 +3,11 @@
 import hashlib
 import json
 import os
-import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
+
+from safe_io import SafeWriteError, atomic_write_text, ensure_private_directory, open_private_file
+from secret_redaction import redact_sensitive_data
 
 
 REPORTS_DIR = Path("reports")
@@ -21,11 +23,13 @@ def fingerprint(text):
 
 def load_index():
     """Carga el índice; ante corrupción falla de forma segura y no lo reinicia."""
-    if not INDEX_FILE.exists():
-        return {}
     try:
-        data = json.loads(INDEX_FILE.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
+        ensure_private_directory(DATA_DIR, create=True)
+        if not INDEX_FILE.exists() and not INDEX_FILE.is_symlink():
+            return {}
+        with open_private_file(INDEX_FILE, "r") as stream:
+            data = json.load(stream)
+    except (OSError, SafeWriteError, json.JSONDecodeError) as exc:
         raise ValueError(
             f"El índice de informes no se puede leer; se conserva sin modificar: {INDEX_FILE}"
         ) from exc
@@ -35,29 +39,19 @@ def load_index():
 
 
 def _write_index_atomic(index):
-    """Reemplaza el índice de forma atómica para evitar archivos parciales."""
-    serialized = json.dumps(index, ensure_ascii=False, indent=2) + "\n"
-    fd, temporary_name = tempfile.mkstemp(
-        prefix=f".{INDEX_FILE.name}.", suffix=".tmp", dir=INDEX_FILE.parent
+    """Reemplaza el índice con permisos privados y publicación atómica."""
+    serialized = json.dumps(
+        redact_sensitive_data(index), ensure_ascii=False, indent=2
+    ) + "\n"
+    atomic_write_text(
+        INDEX_FILE, serialized, mode=0o600, create_parents=True
     )
-    try:
-        with os.fdopen(fd, "w", encoding="utf-8") as temporary:
-            temporary.write(serialized)
-            temporary.flush()
-            os.fsync(temporary.fileno())
-        os.replace(temporary_name, INDEX_FILE)
-    except Exception:
-        try:
-            os.unlink(temporary_name)
-        except FileNotFoundError:
-            pass
-        raise
 
 
 def register_report(source_text, output_path):
     """Registra un informe y señala duplicados de texto exacto."""
-    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    ensure_private_directory(REPORTS_DIR, create=True)
+    ensure_private_directory(DATA_DIR, create=True)
 
     digest = fingerprint(source_text)
     index = load_index()
