@@ -24,3 +24,14 @@ Las pruebas `tests/test_safe_io.py` cubren escritura/reemplazo, destino symlink,
 ## Límites
 
 Esto reduce el riesgo de sustitución por symlink y de escritura desde directorios compartidos o modificables por terceros. La validación de rutas sigue siendo sensible a carreras frente a procesos con el mismo UID o privilegios equivalentes; no es una frontera de aislamiento frente a un atacante local del mismo usuario. En Windows no se verifica la ACL efectiva: debe validarse en el entorno de despliegue. Esto tampoco sustituye sandbox, WORM o almacenamiento externo. La custodia, retención y recuperación de artefactos siguen siendo responsabilidades operativas.
+
+## Flujos adicionales cubiertos
+
+Además de los generadores anteriores:
+
+- `knowledge_downloader.py` crea directorios de biblioteca privados y usa `tempfile.mkstemp` en el mismo directorio para cada descarga binaria; el temporal nace con permisos restrictivos, se sincroniza y se publica con reemplazo atómico. No usa un nombre `.part` predecible.
+- `report_manager.py` protege el índice de informes; `batch_analyzer.py` y `cyber_ai.py` publican resultados JSON mediante `atomic_write_text` y redactan campos/texto sensible.
+- `web_research.py` y `experiment_engine.py` escriben artefactos JSON/Markdown con directorios privados y archivos `0600`; las salidas externas se redactan antes de persistirlas. Los hashes de stdout/stderr de experimentos siguen calculándose sobre los bytes originales, mientras el texto almacenado se redacta.
+- Las CLI de backups, checkpoints, proveedores, manifiestos, herramientas, investigación y DIRECTOR redactan errores antes de imprimirlos. Las regresiones verifican que los valores de prueba no aparezcan en stdout/stderr ni en artefactos.
+
+La redacción es una defensa adicional, no un gestor de secretos ni una garantía de detección de todos los formatos. No se deben introducir credenciales en prompts, reportes o artefactos; los secretos operativos deben permanecer en variables/servicios externos. Las ACL efectivas de Windows siguen pendientes de validación.
