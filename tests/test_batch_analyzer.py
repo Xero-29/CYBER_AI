@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from batch_analyzer import process_directory
+from batch_analyzer import process_directory, process_file
 
 
 class BatchAnalyzerTests(unittest.TestCase):
