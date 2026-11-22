@@ -48,7 +48,7 @@ class DataBackupTests(unittest.TestCase):
         self.assertTrue(self.verify_unsigned_backup(snapshot)["valid"])
         with sqlite3.connect(self.data / "memory.sqlite3") as db:
             db.execute("UPDATE notes SET value='changed'")
-        restored = restore_backup(
+        restored = self.restore_unsigned_backup(
             snapshot, self.data, confirm_quiesced=True, confirm_replace=True
         )
         self.assertTrue(restored["restored"])
@@ -59,16 +59,16 @@ class DataBackupTests(unittest.TestCase):
 
     def test_rejects_oversized_manifest_before_json_parsing(self):
         snapshot = self.root / "backup"
-        create_backup(self.data, snapshot)
+        self.create_unsigned_backup(snapshot, data_dir=self.data)
         manifest_path = snapshot / "manifest.json"
         with patch("data_backup.MAX_MANIFEST_BYTES", 32):
             manifest_path.write_bytes(b" " * 33)
             with self.assertRaisesRegex(BackupError, "16 MiB"):
-                verify_backup(snapshot)
+                self.verify_unsigned_backup(snapshot)
 
     def test_manifest_duplicate_json_keys_are_rejected(self):
         snapshot = self.root / "backup"
-        create_backup(self.data, snapshot)
+        self.create_unsigned_backup(snapshot, data_dir=self.data)
         (snapshot / "manifest.json").write_text(
             '{"schema":"cyber-ai-data-backup-v1",'
             '"schema":"cyber-ai-data-backup-v1",'
@@ -76,47 +76,47 @@ class DataBackupTests(unittest.TestCase):
             encoding="utf-8",
         )
         with self.assertRaisesRegex(BackupError, "claves JSON duplicadas"):
-            verify_backup(snapshot)
+            self.verify_unsigned_backup(snapshot)
 
     def test_excessive_manifest_nesting_is_reported_as_backup_error(self):
         snapshot = self.root / "backup"
-        create_backup(self.data, snapshot)
+        self.create_unsigned_backup(snapshot, data_dir=self.data)
         (snapshot / "manifest.json").write_text(
             '{"a":' * 2000 + "0" + "}" * 2000, encoding="utf-8"
         )
         with self.assertRaisesRegex(BackupError, "profundidad JSON"):
-            verify_backup(snapshot)
+            self.verify_unsigned_backup(snapshot)
 
     def test_manifest_depth_scanner_ignores_delimiters_inside_strings(self):
         snapshot = self.root / "backup"
-        create_backup(self.data, snapshot)
+        self.create_unsigned_backup(snapshot, data_dir=self.data)
         manifest_path = snapshot / "manifest.json"
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         manifest["description"] = '[]{}"\\\\' * 256
         manifest_path.write_text(
             json.dumps(manifest, ensure_ascii=False), encoding="utf-8"
         )
-        self.assertTrue(verify_backup(snapshot)["valid"])
+        self.assertTrue(self.verify_unsigned_backup(snapshot)["valid"])
 
     def test_backup_and_verifier_enforce_file_count_limit(self):
         snapshot = self.root / "backup"
         with patch("data_backup.MAX_BACKUP_FILES", 1):
             with self.assertRaisesRegex(BackupError, "límite de archivos"):
-                create_backup(self.data, snapshot)
+                self.create_unsigned_backup(snapshot, data_dir=self.data)
             self.assertFalse(snapshot.exists())
 
         snapshot = self.root / "valid-backup"
-        create_backup(self.data, snapshot)
+        self.create_unsigned_backup(snapshot, data_dir=self.data)
         with patch("data_backup.MAX_BACKUP_FILES", 1):
             with self.assertRaisesRegex(BackupError, "límite de archivos"):
-                verify_backup(snapshot)
+                self.verify_unsigned_backup(snapshot)
 
     def test_detects_modified_backup_file(self):
         snapshot = self.root / "backup"
-        create_backup(self.data, snapshot)
+        self.create_unsigned_backup(snapshot, data_dir=self.data)
         (snapshot / "events.jsonl").write_text("tampered", encoding="utf-8")
         with self.assertRaises(BackupError):
-            verify_backup(snapshot)
+            self.verify_unsigned_backup(snapshot)
 
     @unittest.skipUnless(hasattr(os, "mkfifo"), "FIFO solo está disponible en POSIX.")
     def test_rejects_fifo_sources_instead_of_blocking_on_copy(self):
@@ -124,7 +124,7 @@ class DataBackupTests(unittest.TestCase):
         os.mkfifo(fifo)
         snapshot = self.root / "fifo-backup"
         with self.assertRaisesRegex(BackupError, "archivos regulares"):
-            create_backup(self.data, snapshot)
+            self.create_unsigned_backup(snapshot, data_dir=self.data)
         self.assertFalse(snapshot.exists())
         self.assertEqual(list(self.root.glob(".fifo-backup.tmp-*")), [])
 
@@ -135,7 +135,7 @@ class DataBackupTests(unittest.TestCase):
 
     def test_restore_requires_explicit_quiescence_and_replace(self):
         snapshot = self.root / "backup"
-        create_backup(self.data, snapshot)
+        self.create_unsigned_backup(snapshot, data_dir=self.data)
         with self.assertRaises(BackupError):
             self.restore_unsigned_backup(snapshot, self.data)
         with self.assertRaises(BackupError):
@@ -144,20 +144,20 @@ class DataBackupTests(unittest.TestCase):
 
     def test_rejects_malformed_manifest_metadata(self):
         snapshot = self.root / "backup"
-        create_backup(self.data, snapshot)
+        self.create_unsigned_backup(snapshot, data_dir=self.data)
         manifest_path = snapshot / "manifest.json"
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         manifest["files"][0]["size"] = True
         manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
         with self.assertRaises(BackupError):
-            verify_backup(snapshot)
+            self.verify_unsigned_backup(snapshot)
 
     def test_rejects_unlisted_files_and_reserved_manifest_path(self):
         snapshot = self.root / "backup"
-        create_backup(self.data, snapshot)
+        self.create_unsigned_backup(snapshot, data_dir=self.data)
         (snapshot / "injected.txt").write_text("untracked", encoding="utf-8")
         with self.assertRaisesRegex(BackupError, "no coincide"):
-            verify_backup(snapshot)
+            self.verify_unsigned_backup(snapshot)
 
         (snapshot / "injected.txt").unlink()
         manifest_path = snapshot / "manifest.json"
@@ -168,29 +168,29 @@ class DataBackupTests(unittest.TestCase):
         })
         manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
         with self.assertRaises(BackupError):
-            verify_backup(snapshot)
+            self.verify_unsigned_backup(snapshot)
 
     def test_rejects_noncanonical_and_conflicting_paths(self):
         snapshot = self.root / "backup"
-        create_backup(self.data, snapshot)
+        self.create_unsigned_backup(snapshot, data_dir=self.data)
         manifest_path = snapshot / "manifest.json"
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         manifest["files"][0]["path"] = "./" + manifest["files"][0]["path"]
         manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
         with self.assertRaises(BackupError):
-            verify_backup(snapshot)
+            self.verify_unsigned_backup(snapshot)
 
     def test_rejects_symlink_inside_backup(self):
         snapshot = self.root / "backup"
-        create_backup(self.data, snapshot)
+        self.create_unsigned_backup(snapshot, data_dir=self.data)
         (snapshot / "escape").symlink_to(self.root, target_is_directory=True)
         with self.assertRaises(BackupError):
-            verify_backup(snapshot)
+            self.verify_unsigned_backup(snapshot)
 
 
     def test_restore_rejects_manifest_symlink_swap_after_verification(self):
         snapshot = self.root / "backup"
-        create_backup(self.data, snapshot)
+        self.create_unsigned_backup(snapshot, data_dir=self.data)
         manifest_path = snapshot / "manifest.json"
         outside = self.root / "outside-manifest.json"
         outside.write_text("not a backup manifest", encoding="utf-8")
@@ -218,9 +218,9 @@ class DataBackupTests(unittest.TestCase):
 
     def test_restore_creates_missing_parent_and_rejects_overlap(self):
         snapshot = self.root / "backup"
-        create_backup(self.data, snapshot)
+        self.create_unsigned_backup(snapshot, data_dir=self.data)
         destination = self.root / "new" / "nested" / "data"
-        result = restore_backup(snapshot, destination, confirm_quiesced=True)
+        result = self.restore_unsigned_backup(snapshot, destination, confirm_quiesced=True)
         self.assertTrue(result["restored"])
         with sqlite3.connect(destination / "memory.sqlite3") as db:
             self.assertEqual(db.execute("SELECT value FROM notes").fetchone()[0], "verified")
@@ -231,22 +231,22 @@ class DataBackupTests(unittest.TestCase):
         key = "backup-signing-key-with-at-least-32-bytes"
         snapshot = self.root / "signed-backup"
         with patch.dict(os.environ, {"CYBER_AI_BACKUP_HMAC_KEY": key}):
-            result = create_backup(self.data, snapshot)
+            result = self.create_unsigned_backup(snapshot, data_dir=self.data)
             self.assertTrue(result["signed"])
             self.assertTrue(verify_backup(snapshot, require_signature=True)["signed"])
 
         with patch.dict(os.environ, {}, clear=True):
             with self.assertRaisesRegex(BackupError, "falta CYBER_AI_BACKUP_HMAC_KEY"):
-                verify_backup(snapshot)
+                self.verify_unsigned_backup(snapshot)
 
         with patch.dict(os.environ, {"CYBER_AI_BACKUP_HMAC_KEY": "different-key-with-at-least-32-bytes"}):
             with self.assertRaisesRegex(BackupError, "firma HMAC"):
-                verify_backup(snapshot)
+                self.verify_unsigned_backup(snapshot)
 
     def test_unsigned_backup_is_rejected_when_signature_is_required(self):
         snapshot = self.root / "unsigned-backup"
         with patch.dict(os.environ, {}, clear=True):
-            result = create_backup(self.data, snapshot)
+            result = self.create_unsigned_backup(snapshot, data_dir=self.data)
             self.assertFalse(result["signed"])
             with self.assertRaisesRegex(BackupError, "no tiene firma"):
                 verify_backup(snapshot, require_signature=True)
@@ -258,7 +258,7 @@ class DataBackupTests(unittest.TestCase):
 
     def test_restore_detects_source_changes_after_verification(self):
         snapshot = self.root / "backup"
-        create_backup(self.data, snapshot)
+        self.create_unsigned_backup(snapshot, data_dir=self.data)
         original_copy = __import__("data_backup")._copy_regular_file
 
         def mutate_before_copy(source, target):
@@ -280,15 +280,15 @@ class DataBackupTests(unittest.TestCase):
     @unittest.skipUnless(os.name == "posix", "Los enlaces duros se validan en POSIX.")
     def test_rejects_hard_link_file_inside_backup(self):
         snapshot = self.root / "backup"
-        create_backup(self.data, snapshot)
+        self.create_unsigned_backup(snapshot, data_dir=self.data)
         target = snapshot / "events.jsonl"
         os.link(target, self.root / "outside-hard-link")
         with self.assertRaisesRegex(BackupError, "enlaces duros"):
-            verify_backup(snapshot)
+            self.verify_unsigned_backup(snapshot)
 
     def test_rejects_symlink_swap_between_inspection_and_open(self):
         snapshot = self.root / "backup"
-        create_backup(self.data, snapshot)
+        self.create_unsigned_backup(snapshot, data_dir=self.data)
         target = snapshot / "events.jsonl"
         outside = self.root / "outside.txt"
         outside.write_text("outside", encoding="utf-8")
@@ -304,34 +304,34 @@ class DataBackupTests(unittest.TestCase):
 
         with patch("data_backup.os.open", side_effect=swap_then_open):
             with self.assertRaises(BackupError):
-                verify_backup(snapshot)
+                self.verify_unsigned_backup(snapshot)
         self.assertEqual(outside.read_text(encoding="utf-8"), "outside")
 
     def test_rejects_symlink_file_inside_backup(self):
         snapshot = self.root / "backup"
-        create_backup(self.data, snapshot)
+        self.create_unsigned_backup(snapshot, data_dir=self.data)
         target = snapshot / "events.jsonl"
         target.unlink()
         target.symlink_to(self.root / "outside.txt")
         (self.root / "outside.txt").write_text("outside", encoding="utf-8")
         with self.assertRaises(BackupError):
-            verify_backup(snapshot)
+            self.verify_unsigned_backup(snapshot)
 
     def test_rejects_parent_traversal_in_manifest(self):
         snapshot = self.root / "backup"
-        create_backup(self.data, snapshot)
+        self.create_unsigned_backup(snapshot, data_dir=self.data)
         manifest_path = snapshot / "manifest.json"
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         manifest["files"][0]["path"] = "../outside"
         manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
         with self.assertRaisesRegex(BackupError, "Ruta insegura"):
-            verify_backup(snapshot)
+            self.verify_unsigned_backup(snapshot)
 
     def test_signed_manifest_tampering_is_detected(self):
         key = "backup-signing-key-with-at-least-32-bytes"
         snapshot = self.root / "signed-backup"
         with patch.dict(os.environ, {"CYBER_AI_BACKUP_HMAC_KEY": key}):
-            create_backup(self.data, snapshot)
+            self.create_unsigned_backup(snapshot, data_dir=self.data)
             manifest_path = snapshot / "manifest.json"
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
             manifest["created_at"] = "2000-01-01T00:00:00+00:00"
@@ -370,15 +370,15 @@ class DataBackupTests(unittest.TestCase):
 
     def test_verify_rejects_symlinked_snapshot_ancestor(self):
         snapshot = self.root / "backup"
-        create_backup(self.data, snapshot)
+        self.create_unsigned_backup(snapshot, data_dir=self.data)
         link = self.root / "snapshot-link"
         self._symlink_directory(link, self.root)
         with self.assertRaisesRegex(BackupError, "symlinks"):
-            verify_backup(link / "backup")
+            self.verify_unsigned_backup(link / "backup")
 
     def test_restore_rejects_symlinked_destination_parent(self):
         snapshot = self.root / "backup"
-        create_backup(self.data, snapshot)
+        self.create_unsigned_backup(snapshot, data_dir=self.data)
         real_parent = self.root / "restore-parent"
         real_parent.mkdir()
         link = self.root / "restore-link"
