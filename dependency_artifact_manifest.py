@@ -12,6 +12,7 @@ import zipfile
 from email.parser import Parser
 from pathlib import Path
 from safe_io import atomic_write_text
+from secret_redaction import redact_text
 
 from sbom_generator import _read_requirements
 
@@ -227,7 +228,7 @@ def main(argv=None):
         print(f"Manifiesto de artefactos generado: {len(manifest['artifacts'])} wheels")
         return 0
     except (OSError, ArtifactManifestError, ValueError) as error:
-        print(f"ERROR: {error}", file=sys.stderr)
+        print(f"ERROR: {redact_text(str(error))}", file=sys.stderr)
         return 2
 
 
