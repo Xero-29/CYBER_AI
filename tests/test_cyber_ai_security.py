@@ -74,5 +74,28 @@ class CyberAiOutputSecurityTests(unittest.TestCase):
         self.assertIn("token=[REDACTED]", output.getvalue())
 
 
+    def test_process_one_rejects_symlink_input(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            target = root / "outside.txt"
+            target.write_text("token=must-not-be-read", encoding="utf-8")
+            link = root / "linked.txt"
+            try:
+                link.symlink_to(target)
+            except (OSError, NotImplementedError):
+                self.skipTest("symlinks unavailable")
+            old_cwd = os.getcwd()
+            try:
+                os.chdir(root)
+                output = StringIO()
+                from contextlib import redirect_stderr
+                with redirect_stderr(output):
+                    result = cyber_ai.process_one(link)
+                self.assertEqual(result, 2)
+                self.assertNotIn("must-not-be-read", output.getvalue())
+                self.assertFalse((root / "reports").exists())
+            finally:
+                os.chdir(old_cwd)
+
 if __name__ == "__main__":
     unittest.main()
