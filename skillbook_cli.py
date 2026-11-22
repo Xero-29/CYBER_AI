@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 import skillbook
+from secret_redaction import redact_text
 
 
 MANIFEST_FIELDS = {
@@ -111,7 +112,7 @@ def main(argv=None):
             )
             result = skillbook.deprecate_skill(args.skill_id, args.reason, signed)
     except (OSError, ValueError, json.JSONDecodeError) as error:
-        print(f"ERROR: {error}", file=sys.stderr)
+        print(f"ERROR: {redact_text(str(error))}", file=sys.stderr)
         return 2
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0
