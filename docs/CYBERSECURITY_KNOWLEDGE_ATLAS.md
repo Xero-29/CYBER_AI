@@ -3,6 +3,13 @@
 ## Objetivo
 Construir una biblioteca técnica modular, profunda, trazable y utilizable offline. El repositorio contiene código, catálogos, metadatos, documentación y pruebas. Los corpus, datasets, modelos y paquetes grandes se descargan por especialidad bajo demanda y se guardan fuera de Git.
 
+
+## Estado de madurez verificado
+
+Los 48 paquetes actuales son **borradores editoriales de base**, no dossiers expertos L3/L4. El manifiesto marca cada área como authored_foundation_unverified; las 48 declaran cero fuentes externas verificadas y no incluyen evidencia de laboratorios ejecutados ni revisión técnica independiente. La presencia de secciones, palabras o referencias nominales no equivale a profundidad ni validación.
+
+Ejecuta python knowledge_pack_quality.py --json para obtener la brecha por especialidad. El estado expert_ready exige simultáneamente cobertura técnica completa, al menos cinco fuentes con licencia y procedencia verificadas, evidencia de laboratorio reproducible y aprobación de una revisión independiente ligada a un commit. El auditor no concede aprobación por volumen de texto.
+
 ## Niveles de profundidad
 - L0: orientación, vocabulario, objetivos y límites.
 - L1: fundamentos, arquitectura, protocolos y conceptos.
