@@ -1,4 +1,5 @@
-"""Ejecución local con captura acotada y terminación de grupos de procesos."""
+"""Ejecución local con entorno explícito, captura acotada y grupos POSIX."""
+import hashlib
 import math
 import os
 import signal
@@ -42,6 +43,7 @@ def run_bounded_process(
     env,
     timeout,
     max_output_bytes=DEFAULT_MAX_OUTPUT_BYTES,
+    capture_tail=False,
 ):
     """Ejecuta sin shell, con entorno explícito, salida acotada y grupo POSIX propio."""
     if os.name != "posix":
@@ -89,9 +91,14 @@ def run_bounded_process(
             f"max_output_bytes debe estar entre 2 y {MAX_PROCESS_OUTPUT_BYTES} bytes."
         )
 
+    if not isinstance(capture_tail, bool):
+        raise ValueError("capture_tail debe ser booleano.")
+
     per_stream_limit = max_output_bytes // 2
     captured = {"stdout": bytearray(), "stderr": bytearray()}
-    truncated = {"value": False}
+    digests = {"stdout": hashlib.sha256(), "stderr": hashlib.sha256()}
+    total_bytes = {"stdout": 0, "stderr": 0}
+    truncated = {"stdout": False, "stderr": False}
 
     def drain(stream, key):
         try:
@@ -99,11 +106,19 @@ def run_bounded_process(
                 chunk = stream.read(65536)
                 if not chunk:
                     break
-                remaining = per_stream_limit - len(captured[key])
-                if remaining > 0:
-                    captured[key].extend(chunk[:remaining])
-                if len(chunk) > remaining:
-                    truncated["value"] = True
+                total_bytes[key] += len(chunk)
+                digests[key].update(chunk)
+                if capture_tail:
+                    captured[key].extend(chunk)
+                    if len(captured[key]) > per_stream_limit:
+                        del captured[key][:-per_stream_limit]
+                        truncated[key] = True
+                else:
+                    remaining = per_stream_limit - len(captured[key])
+                    if remaining > 0:
+                        captured[key].extend(chunk[:remaining])
+                    if len(chunk) > remaining:
+                        truncated[key] = True
         except (OSError, ValueError):
             return
 
@@ -158,7 +173,13 @@ def run_bounded_process(
         "stdout": captured["stdout"].decode("utf-8", errors="replace"),
         "stderr": captured["stderr"].decode("utf-8", errors="replace"),
         "timed_out": timed_out,
-        "output_truncated": truncated["value"],
+        "output_truncated": any(truncated.values()),
+        "stdout_sha256": digests["stdout"].hexdigest(),
+        "stderr_sha256": digests["stderr"].hexdigest(),
+        "stdout_bytes": total_bytes["stdout"],
+        "stderr_bytes": total_bytes["stderr"],
+        "stdout_truncated": truncated["stdout"],
+        "stderr_truncated": truncated["stderr"],
         # POSIX process groups do not contain descendants that deliberately call
         # setsid()/setpgid(); stronger containment requires cgroups or a container.
         "process_group_isolation_enforced": True,

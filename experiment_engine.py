@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""Motor inicial de experimentos reproducibles para CYBER_AI.
+"""Motor controlado de experimentos reproducibles para CYBER_AI.
 
 Solo permite ejecutar archivos test_*.py situados dentro de tests/.
-La ejecución requiere --execute explícitamente.
-Esta restricción no convierte pytest en un sandbox para código no confiable.
+La ejecución requiere --execute explícitamente, usa entorno mínimo y limita
+la captura y el grupo de procesos. No es un sandbox de filesystem o de red.
+Windows permanece bloqueado hasta disponer de Job Objects.
 """
 
 import argparse
 import hashlib
 import json
-import os
-import subprocess
+import hashlib
 import sys
 import tempfile
 import time
@@ -21,6 +21,8 @@ import evidence_graph
 from compressed_evidence import store_evidence
 from safe_io import atomic_write_text, ensure_private_directory
 from secret_redaction import redact_sensitive_data, redact_text
+from binary_integrity import build_minimal_environment
+from process_isolation import ProcessIsolationError, run_bounded_process
 
 PROJECT = Path(__file__).resolve().parent
 MAX_TIMEOUT_SECONDS = 120
@@ -93,32 +95,6 @@ def build_plan(hypothesis, test_path, timeout=60):
     }
 
 
-def _summarize_stream(stream):
-    """Calcula el hash de toda la salida y conserva solo sus últimos bytes."""
-    stream.flush()
-    stream.seek(0, os.SEEK_END)
-    size = stream.tell()
-
-    digest = hashlib.sha256()
-    stream.seek(0)
-
-    while True:
-        chunk = stream.read(65536)
-        if not chunk:
-            break
-        digest.update(chunk)
-
-    stream.seek(max(0, size - MAX_CAPTURE_BYTES))
-    tail = stream.read(MAX_CAPTURE_BYTES)
-
-    return {
-        "text": tail.decode("utf-8", errors="replace"),
-        "sha256": digest.hexdigest(),
-        "bytes": size,
-        "truncated": size > MAX_CAPTURE_BYTES,
-    }
-
-
 def _interpret_outcome(status):
     """No confunde el resultado de pytest con un veredicto de seguridad."""
     interpretations = {
@@ -160,35 +136,47 @@ def run_experiment(*, hypothesis, test_path, timeout=60, execute=False):
     return_code = None
     error_message = None
 
-    # Usamos archivos temporales para no acumular una salida ilimitada
-    # en memoria durante la ejecución de pytest.
-    with (
-        tempfile.TemporaryFile(mode="w+b") as stdout_file,
-        tempfile.TemporaryFile(mode="w+b") as stderr_file,
-    ):
-        try:
-            result = subprocess.run(
+    empty_hash = hashlib.sha256(b"").hexdigest()
+    stdout = {"text": "", "sha256": empty_hash, "bytes": 0, "truncated": False}
+    stderr = {"text": "", "sha256": empty_hash, "bytes": 0, "truncated": False}
+    process_result = None
+    try:
+        with tempfile.TemporaryDirectory(prefix="cyber-ai-experiment-home-") as isolated_home:
+            environment = build_minimal_environment(isolated_home, sys.executable)
+            process_result = run_bounded_process(
                 plan["command"],
                 cwd=PROJECT,
-                stdout=stdout_file,
-                stderr=stderr_file,
+                env=environment,
                 timeout=timeout,
-                check=False,
+                max_output_bytes=MAX_CAPTURE_BYTES * 2,
+                capture_tail=True,
             )
-            return_code = result.returncode
-            status = "passed" if return_code == 0 else "failed"
-
-        except subprocess.TimeoutExpired:
-            status = "timeout"
+        timed_out = process_result["timed_out"] is True
+        return_code = None if timed_out else process_result["returncode"]
+        status = (
+            "timeout" if timed_out
+            else "passed" if return_code == 0
+            else "failed"
+        )
+        if timed_out:
             error_message = f"Tiempo límite agotado: {timeout} segundos."
+        stdout = {
+            "text": process_result["stdout"],
+            "sha256": process_result["stdout_sha256"],
+            "bytes": process_result["stdout_bytes"],
+            "truncated": process_result["stdout_truncated"],
+        }
+        stderr = {
+            "text": process_result["stderr"],
+            "sha256": process_result["stderr_sha256"],
+            "bytes": process_result["stderr_bytes"],
+            "truncated": process_result["stderr_truncated"],
+        }
+    except (OSError, ValueError, ProcessIsolationError) as error:
+        status = "execution_error"
+        error_message = redact_text(f"{type(error).__name__}: {error}")
 
-        except OSError as error:
-            status = "execution_error"
-            error_message = redact_text(f"{type(error).__name__}: {error}")
-
-        elapsed = round(time.monotonic() - started, 3)
-        stdout = _summarize_stream(stdout_file)
-        stderr = _summarize_stream(stderr_file)
+    elapsed = round(time.monotonic() - started, 3)
 
     report = {
         **plan,
@@ -207,6 +195,18 @@ def run_experiment(*, hypothesis, test_path, timeout=60, execute=False):
         "error": error_message,
         "outcome_interpretation": _interpret_outcome(status),
         "security_conclusion": "not_determined_by_test_runner",
+        "process_group_isolation_enforced": (
+            process_result is not None
+            and process_result.get("process_group_isolation_enforced") is True
+        ),
+        "process_tree_isolation_enforced": (
+            process_result is not None
+            and process_result.get("process_tree_isolation_enforced") is True
+        ),
+        "execution_environment": (
+            "minimal_without_application_secrets"
+            if process_result is not None else "not_started"
+        ),
     }
 
     # Guardar la hipótesis y el resultado en la sesión de evidencia existente.

@@ -1,3 +1,4 @@
+import hashlib
 import os
 import sys
 import tempfile
@@ -29,9 +30,30 @@ class ProcessIsolationTests(unittest.TestCase):
         self.assertLessEqual(len(result["stdout"].encode()), 512)
         self.assertLessEqual(len(result["stderr"].encode()), 512)
         self.assertTrue(result["output_truncated"])
+        self.assertEqual(result["stdout_bytes"], 5000)
+        self.assertEqual(result["stderr_bytes"], 5000)
+        self.assertEqual(result["stdout_sha256"], hashlib.sha256(b"x" * 5000).hexdigest())
+        self.assertEqual(result["stderr_sha256"], hashlib.sha256(b"y" * 5000).hexdigest())
         self.assertFalse(result["timed_out"])
         self.assertTrue(result["process_group_isolation_enforced"])
         self.assertFalse(result["process_tree_isolation_enforced"])
+
+
+    def test_tail_capture_preserves_the_last_bytes_and_hashes_the_full_stream(self):
+        payload = b"0123456789abcdef"
+        with tempfile.TemporaryDirectory() as cwd:
+            result = run_bounded_process(
+                [sys.executable, "-c", "import sys; sys.stdout.buffer.write(b'0123456789abcdef')"],
+                cwd=cwd,
+                env=os.environ.copy(),
+                timeout=5,
+                max_output_bytes=16,
+                capture_tail=True,
+            )
+        self.assertEqual(result["stdout"], "89abcdef")
+        self.assertEqual(result["stdout_bytes"], len(payload))
+        self.assertEqual(result["stdout_sha256"], hashlib.sha256(payload).hexdigest())
+        self.assertTrue(result["stdout_truncated"])
 
     def test_timeout_terminates_the_process_group(self):
         with tempfile.TemporaryDirectory() as cwd:

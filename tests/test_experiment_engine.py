@@ -2,14 +2,13 @@
 
 import io
 import json
+import hashlib
 import os
 import stat
-import subprocess
 import tempfile
 import unittest
 from contextlib import redirect_stderr
 from pathlib import Path
-from types import SimpleNamespace
 from unittest.mock import patch
 
 import compressed_store
@@ -46,9 +45,27 @@ class TestExperimentEngine(unittest.TestCase):
         compressed_store.DB_PATH = self.old_compressed_db
         self.temp_dir.cleanup()
 
+
+    def _process_result(self, *, stdout=b"", stderr=b"", returncode=0, timed_out=False):
+        return {
+            "returncode": returncode,
+            "stdout": stdout.decode("utf-8", errors="replace"),
+            "stderr": stderr.decode("utf-8", errors="replace"),
+            "stdout_sha256": hashlib.sha256(stdout).hexdigest(),
+            "stderr_sha256": hashlib.sha256(stderr).hexdigest(),
+            "stdout_bytes": len(stdout),
+            "stderr_bytes": len(stderr),
+            "stdout_truncated": False,
+            "stderr_truncated": False,
+            "output_truncated": False,
+            "timed_out": timed_out,
+            "process_group_isolation_enforced": True,
+            "process_tree_isolation_enforced": False,
+        }
+
     def test_plan_does_not_execute_or_persist(self):
         with (
-            patch.object(engine.subprocess, "run") as fake_run,
+            patch.object(engine, "run_bounded_process") as fake_run,
             patch.object(evidence_graph, "create_session") as fake_session,
         ):
             plan = engine.run_experiment(
@@ -76,11 +93,12 @@ class TestExperimentEngine(unittest.TestCase):
             )
 
     def test_success_records_evidence_and_links_hypothesis(self):
-        def fake_run(command, cwd, stdout, stderr, timeout, check):
-            stdout.write(b"1 passed in 0.01s\n")
-            return SimpleNamespace(returncode=0)
+        def fake_run(command, cwd, env, timeout, max_output_bytes, capture_tail):
+            self.assertNotIn("CYBER_AI_EXPERIMENT_SECRET", env)
+            return self._process_result(stdout=b"1 passed in 0.01s\n")
 
-        with patch.object(engine.subprocess, "run", side_effect=fake_run):
+        with patch.dict(os.environ, {"CYBER_AI_EXPERIMENT_SECRET": "do-not-inherit"}):
+            with patch.object(engine, "run_bounded_process", side_effect=fake_run):
             report = engine.run_experiment(
                 hypothesis="La prueba de ejemplo pasa.",
                 test_path="tests/test_sample.py",
@@ -92,6 +110,9 @@ class TestExperimentEngine(unittest.TestCase):
         self.assertEqual(report["return_code"], 0)
         self.assertEqual(report["security_conclusion"], "not_determined_by_test_runner")
         self.assertTrue(report["stdout_sha256"])
+        self.assertTrue(report["process_group_isolation_enforced"])
+        self.assertFalse(report["process_tree_isolation_enforced"])
+        self.assertEqual(report["execution_environment"], "minimal_without_application_secrets")
         self.assertTrue(report["evidence_node_id"])
         self.assertTrue(report["hypothesis_node_id"])
         self.assertTrue(report["evidence_edge_id"])
@@ -111,11 +132,10 @@ class TestExperimentEngine(unittest.TestCase):
         self.assertTrue(report_path.is_file())
 
     def test_failed_test_is_not_called_a_confirmed_vulnerability(self):
-        def fake_run(command, cwd, stdout, stderr, timeout, check):
-            stdout.write(b"1 failed\n")
-            return SimpleNamespace(returncode=1)
+        def fake_run(command, cwd, env, timeout, max_output_bytes, capture_tail):
+            return self._process_result(stdout=b"1 failed\n", returncode=1)
 
-        with patch.object(engine.subprocess, "run", side_effect=fake_run):
+        with patch.object(engine, "run_bounded_process", side_effect=fake_run):
             report = engine.run_experiment(
                 hypothesis="Una prueba de ejemplo podría fallar.",
                 test_path="tests/test_sample.py",
@@ -131,10 +151,10 @@ class TestExperimentEngine(unittest.TestCase):
         self.assertEqual(report["security_conclusion"], "not_determined_by_test_runner")
 
     def test_timeout_is_recorded_as_inconclusive(self):
-        def fake_run(command, cwd, stdout, stderr, timeout, check):
-            raise subprocess.TimeoutExpired(command, timeout)
+        def fake_run(command, cwd, env, timeout, max_output_bytes, capture_tail):
+            return self._process_result(returncode=-9, timed_out=True)
 
-        with patch.object(engine.subprocess, "run", side_effect=fake_run):
+        with patch.object(engine, "run_bounded_process", side_effect=fake_run):
             report = engine.run_experiment(
                 hypothesis="La prueba puede terminar dentro del límite.",
                 test_path="tests/test_sample.py",
@@ -150,12 +170,13 @@ class TestExperimentEngine(unittest.TestCase):
     def test_experiment_redacts_output_and_writes_private_report(self):
         secret = "experiment-output-secret"
 
-        def fake_run(command, cwd, stdout, stderr, timeout, check):
-            stdout.write(f"provider token={secret}\n".encode("utf-8"))
-            stderr.write(f"password={secret}\n".encode("utf-8"))
-            return SimpleNamespace(returncode=0)
+        def fake_run(command, cwd, env, timeout, max_output_bytes, capture_tail):
+            return self._process_result(
+                stdout=f"provider token={secret}\n".encode("utf-8"),
+                stderr=f"password={secret}\n".encode("utf-8"),
+            )
 
-        with patch.object(engine.subprocess, "run", side_effect=fake_run):
+        with patch.object(engine, "run_bounded_process", side_effect=fake_run):
             report = engine.run_experiment(
                 hypothesis="La salida de prueba debe quedar protegida.",
                 test_path="tests/test_sample.py",
@@ -172,6 +193,25 @@ class TestExperimentEngine(unittest.TestCase):
         self.assertNotIn(secret, rendered)
         if os.name == "posix":
             self.assertEqual(stat.S_IMODE(report_path.stat().st_mode), 0o600)
+
+
+    def test_execution_fails_closed_when_process_isolation_is_unavailable(self):
+        from process_isolation import ProcessIsolationError
+
+        with patch.object(
+            engine, "run_bounded_process",
+            side_effect=ProcessIsolationError("Job Objects no disponibles"),
+        ):
+            report = engine.run_experiment(
+                hypothesis="La ejecución debe bloquearse sin aislamiento.",
+                test_path="tests/test_sample.py",
+                timeout=5,
+                execute=True,
+            )
+
+        self.assertEqual(report["status"], "execution_error")
+        self.assertFalse(report["process_group_isolation_enforced"])
+        self.assertEqual(report["execution_environment"], "not_started")
 
     def test_cli_redacts_unexpected_errors(self):
         secret = "experiment-cli-secret"
