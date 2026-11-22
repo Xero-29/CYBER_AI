@@ -6,6 +6,7 @@
 
 - Rama de trabajo: `codex/security-integrity-audit`.
 - HEAD de código validado: `fee9792ae7c8526ccdf12e1891bd8bd7b5e9dc3f`.
+- Commit documental posterior: `5cd63959b9fb5ffa81ad9bb9e975968688dbf385` (solo `PROJECT_STATUS.md` y `docs/SECURE_FILE_OUTPUTS.md`; sin cambios de código). El siguiente push debe validar también este estado documental.
 - `main`: `387104756d0f8307c39a46a1ea2df07671bd81c9` — `feat: add metacognitive research loop`.
 - Ancestro común de `main` y la rama de auditoría: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.
 - Divergencia actual: **285 commits exclusivos de la rama de auditoría y 574 exclusivos de `main`**. No es seguro un merge/rebase directo ni un force-push.
