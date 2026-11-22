@@ -7,17 +7,14 @@ from pathlib import Path
 from report_analyzer import analyze_report
 from nvd_client import enrich_analysis
 from report_manager import register_report
-from safe_io import atomic_write_text, ensure_private_directory
+from safe_io import atomic_write_text, ensure_private_directory, is_real_directory, read_regular_text
 from secret_redaction import redact_sensitive_data, redact_text
 
 
 def process_file(source):
     """Analiza un archivo y guarda su resultado en reports/."""
     source = Path(source)
-    if not source.is_file():
-        raise FileNotFoundError(f"No existe el informe: {source}")
-
-    text = source.read_text(encoding="utf-8")
+    text = read_regular_text(source)
     result = enrich_analysis(analyze_report(text))
 
     output_dir = ensure_private_directory(Path("reports"), create=True)
@@ -48,8 +45,8 @@ def process_file(source):
 def process_directory(directory):
     """Procesa archivos TXT y Markdown sin volver a leer análisis JSON."""
     folder = Path(directory)
-    if not folder.is_dir():
-        raise NotADirectoryError(f"No existe la carpeta: {folder}")
+    if not is_real_directory(folder):
+        raise NotADirectoryError("La carpeta de informes debe ser un directorio real sin enlaces.")
 
     files = sorted(
         p for p in folder.iterdir()
