@@ -1,54 +1,55 @@
-# Estado vigente — 2026-11-22
+# Estado vigente — 2026-11-22 (corte actualizado)
 
-> Fotografía de la rama de auditoría. La validación de código descrita aquí corresponde al SHA exacto indicado; los registros históricos posteriores no sustituyen esta sección.
+> Estado contrastado contra GitHub y los workflows del HEAD de código indicado. Las secciones históricas posteriores se conservan como registro, no como estado vigente.
 
-## Repositorio, ramas y PRs
+## Repositorio, ramas, PRs e integración
 
-- Rama de trabajo: `codex/security-integrity-audit`.
-- HEAD de código validado: `fee9792ae7c8526ccdf12e1891bd8bd7b5e9dc3f`.
-- Commit documental posterior: `5cd63959b9fb5ffa81ad9bb9e975968688dbf385` (solo `PROJECT_STATUS.md` y `docs/SECURE_FILE_OUTPUTS.md`; sin cambios de código). El siguiente push debe validar también este estado documental.
-- `main`: `387104756d0f8307c39a46a1ea2df07671bd81c9` — `feat: add metacognitive research loop`.
-- Ancestro común de `main` y la rama de auditoría: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.
-- Divergencia actual: **285 commits exclusivos de la rama de auditoría y 574 exclusivos de `main`**. No es seguro un merge/rebase directo ni un force-push.
-- El commit `3871047` es el único commit nuevo de `main` desde la revisión anterior, no el único commit exclusivo de `main` en el grafo completo. Se conserva íntegro en `main`; no se copió, revirtió ni sobrescribió.
-- La rama `codex/reconcile-metacognition-security-audit-2026-11-21` también está divergida: frente a la rama actual tiene 19 commits exclusivos de reconciliación y 39 exclusivos de auditoría. Contiene una implementación independiente de metacognición; la comparación con `main` confirma que no es una integración completa del historial de `main`. No se fusionó.
-- PR #2: **cerrado y fusionado** el 2026-11-17; merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. No crear un PR duplicado.
-- PR #12: abierto como draft, desde `codex/reconcile-main-security-audit-2026-11-18`, con base antigua `main@9bab38f`.
-- PR #17: abierto como draft, desde `codex/reconcile-pr11-pr12-2026-11-20`, contra `main@3871047`.
-- PR #18: abierto como draft y apilado sobre la rama de PR #17. Ninguno fue modificado ni fusionado.
-- No existe PR abierto para `codex/security-integrity-audit`; no se creó otro PR porque el historial de esta rama está muy divergido y ya existen líneas de integración. No se hizo merge, rebase, cherry-pick ni escritura en `main`.
+- Repositorio: Xero-29/CYBER_AI.
+- Rama de trabajo: codex/security-integrity-audit.
+- HEAD de código y pruebas: 8ac5846d937892046548bd302b85ca90f0e88b84.
+- main: 387104756d0f8307c39a46a1ea2df07671bd81c9 (feat: add metacognitive research loop).
+- Ancestro común: cae816d6037b56f017c2fbdbb3e98ef00df58c1d.
+- Comparación exacta main...codex/security-integrity-audit: **309 commits exclusivos de la rama y 574 exclusivos de main**. Estado divergido. No es seguro hacer merge, rebase o force-push.
+- El commit 3871047 es el único avance nuevo de main desde el corte anterior (su padre es 9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea), pero **no es el único commit exclusivo de main en el grafo completo**: la divergencia actual contiene 574.
+- 3871047 incorpora el ciclo metacognitivo (INVESTIGADOR, VERITAS, diagnóstico y reevaluación). Se conserva intacto en main; no se cherry-pickeó ni se sobrescribió.
+- codex/reconcile-metacognition-security-audit-2026-11-21 también está divergida frente a esta rama: 19 commits exclusivos de esa rama y 65 exclusivos de la rama de auditoría, con merge-base 22910bbb667b9103d88a87ebbe97972ae729c3e6. No se fusionó.
+- PR #2 está **cerrado y fusionado** desde 2026-11-17; merge commit 478c6ddc676221e4c07b8c5780f127bc5a9e749e. No crear un PR duplicado.
+- PR #17 permanece abierto en Draft contra main; PR #18 permanece abierto en Draft y apilado sobre #17. PR #12 y las propuestas de conocimiento/locks relacionadas siguen abiertas en Draft. No existe PR abierto para la rama actual.
+- La rama actual no tiene PR; no se creó uno porque la divergencia 309/574 y las líneas #17/#18 requieren reconciliación selectiva antes de proponer integración.
+- Las ramas consultadas, incluida main, reportan protected=false. No hay protección de rama ni required checks configurados.
+- No se hizo merge, rebase, cherry-pick, force-push ni escritura en main. No se cerró ni alteró ningún PR.
 
 ## Cambios implementados en este corte
 
-- Se corrigió la sintaxis de la regresión de redacción de errores del orquestador; el contexto múltiple ahora usa la forma parentizada compatible.
-- `data_backup.py`: la CLI redacta errores y el JSON de resultado antes de imprimirlos. Se añadieron pruebas de salida/error sin secretos.
-- `knowledge_downloader.py`: los directorios de biblioteca se crean/validan como privados; las descargas binarias usan temporales aleatorios creados de forma exclusiva, modo POSIX `0600`, `fsync` y publicación atómica. El manifiesto sigue usando escritura atómica segura. Se añadió regresión de permisos.
-- `report_manager.py`, `batch_analyzer.py` y `cyber_ai.py`: índice y reportes se guardan con directorios privados, archivos `0600`, publicación atómica y redacción de campos/texto sensible.
-- `web_research.py`: los informes JSON/Markdown se redactan y publican con permisos privados y escritura atómica; también se redactan errores de proveedores.
-- `experiment_engine.py`: stdout/stderr se redactan antes de persistir evidencia; los SHA-256 siguen refiriéndose a los bytes originales. Los informes se escriben atómicamente con permisos privados.
-- Se cerraron salidas de error sin redacción en `skillbook_cli.py`, `ledger_checkpoint.py`, `model_memory_manager.py`, `review_web_report.py`, `sbom_generator.py`, `skill_regression.py`, `wheel_lock_generator.py`, `report_analyzer.py`, `sandbox_runner.py`, `dependency_artifact_manifest.py` y `director.py`.
-- Se añadieron regresiones de redacción y permisos para backups, descargas, reportes, investigación web, experimentos, checkpoints, skillbook, manifiestos de dependencias y DIRECTOR.
-- Una ejecución intermedia falló por un import `os` omitido en la nueva prueba de descarga; se corrigió antes del SHA validado `fee9792`. La ejecución anterior en `6ac2867` no se considera verde.
+- knowledge_pack_quality.py ya no acepta un hash escrito en JSON como prueba suficiente: comprueba el SHA-256 de los bytes reales del artefacto del laboratorio y de los archivos de evidencia de cada fuente.
+- Las fuentes verificadas exigen HTTPS, sin credenciales, query, fragmento, IP no global ni host local, además de archivo de evidencia y hash coincidente.
+- La aprobación experta requiere una atestación Ed25519: firma Base64 sobre un payload canónico que enlaza área, commit revisado, identidad, decisión y hashes exactos del paquete, registro de fuentes, registro de laboratorio y evidencias de revisión.
+- La clave pública, su fingerprint SHA-256 y el reviewer_id esperado se provisionan fuera del repositorio mediante CYBER_AI_KNOWLEDGE_REVIEW_PUBLIC_KEY_PEM, CYBER_AI_KNOWLEDGE_REVIEW_PUBLIC_KEY_SHA256 y CYBER_AI_KNOWLEDGE_REVIEWER_ID. OpenSSL ausente, clave no fijada, identidad distinta, firma inválida o evidencia alterada producen rechazo.
+- verify.sh ejecuta ahora el auditor de calidad de biblioteca. La comprobación diagnóstica no exige que los paquetes estén aprobados; sí detecta manifiestos, rutas y evidencias estructuralmente inválidos.
+- docs/KNOWLEDGE_PACK_QUALITY.md documenta el esquema de evidencia, la firma y el límite de confianza. Las claves privadas no se almacenan ni se generan en el repositorio.
+- La primera pasada de CI del commit 24937bb falló por un helper de pruebas que no pasaba la raíz temporal a audit_packs. Se corrigió en 8ac5846; no se consideran verdes los runs fallidos del commit anterior.
 
-## Validación automatizada
+## Validación automatizada del código
 
-- SHA exacto de código validado: `fee9792ae7c8526ccdf12e1891bd8bd7b5e9dc3f`.
-- Python Tests: **success** — [run 45036766985](https://github.com/Xero-29/CYBER_AI/actions/runs/45036766985). La suite completa se ejecutó de nuevo después de instalar las dependencias documentales opcionales: **700 tests, OK**. La pasada previa sin esas dependencias omitió 4 pruebas opcionales.
-- Docker Sandbox: **success** — [run 45036766973](https://github.com/Xero-29/CYBER_AI/actions/runs/45036766973). Suite: 700 tests; Ruff ejecutado dentro del contenedor endurecido; la allowlist firmada aprobó el binario; evidencia cargada.
-- SBOM CycloneDX generado para runtime (9 componentes), sandbox (8) y documentos (9). Artefacto principal: `14759723955`. Evidencia sandbox: `14759552983`.
-- No se ejecutó la suite desde un checkout local: el entorno no permitió clonar el repositorio. La validación reportada procede de GitHub Actions y está ligada al SHA exacto.
-- Esta actualización también modifica documentación; el commit documental resultante debe obtener sus propios checks antes de considerar verde su HEAD.
+- HEAD exacto validado: 8ac5846d937892046548bd302b85ca90f0e88b84.
+- Python tests: **success** — [run 45041993819](https://github.com/Xero-29/CYBER_AI/actions/runs/45041993819). La verificación completa se ejecutó dos veces (antes y después de instalar extractores documentales opcionales): **730 tests, 4 skipped** en cada pasada.
+- Docker sandbox: **success** — [run 45041993818](https://github.com/Xero-29/CYBER_AI/actions/runs/45041993818). Verificación completa: **730 tests, 4 skipped**; build Docker aprobado; Ruff ejecutado con allowlist firmada y red deshabilitada dentro del contenedor.
+- SBOM CycloneDX y provenance: artefacto [14761913409](https://github.com/Xero-29/CYBER_AI/actions/runs/45041993819). Runtime: 9 componentes; sandbox: 8; documentos: 9.
+- El auditor de calidad ejecutado por ambos workflows informa: **48 áreas; 0 expert_ready; 48 foundation_draft**. No hay paquetes con fuentes verificadas, laboratorios con artefactos aprobados ni revisiones firmadas. No se infiere profundidad experta por palabras o secciones.
+- No se ejecutaron pruebas desde un checkout local: no hay copia local del repositorio disponible en este entorno. La evidencia de código procede de GitHub Actions sobre el SHA exacto.
+- Este registro actualiza documentación después del HEAD de código validado; el commit documental resultante debe obtener sus propios checks antes de informar que su HEAD está verde.
 
 ## Pendiente real
 
-- **Integración:** seleccionar una línea de integración y portar cambios con revisión de tres vías. La divergencia 285/574 impide un merge/rebase directo; preservar exactamente `3871047` de `main`. PR #12 tiene base antigua; #17/#18 son drafts apilados y requieren revisión antes de usarlos.
-- **Windows:** Job Objects y validación efectiva de ACL; la ejecución permanece cerrada cuando no se puede garantizar el cierre del árbol de procesos.
-- **Egress:** provisionar y probar gateway/proxy con allowlist y DNS pinning; la validación DNS del cliente no elimina por sí sola TOCTOU.
-- **Pruebas en caliente:** Docker daemon/host de despliegue, Nuclei solo contra laboratorio con autorización explícita, proveedores IA con credenciales reales, cargas/latencia/coste y E2E de restauración.
-- **Operación externa:** KMS/HSM y rotación de claves, cifrado, WORM/offsite, DR, RBAC/IdP/MFA, observabilidad central y pruebas de carga.
-- **Biblioteca:** las 48 áreas y sus dossiers no se consideran aprobados por volumen ni documentación. Siguen pendientes revisión experta independiente, trazabilidad claim-to-source, licencias, laboratorios ejecutados y reproducción de resultados.
+- **Integración:** decidir y ejecutar una reconciliación selectiva en rama separada. Preservar 3871047 y todo el historial de main; no integrar directamente 309/574. PR #17/#18 son candidatos encadenados, pero sus bases y diffs requieren revisión de tres vías.
+- **Biblioteca:** 48 paquetes continúan en borrador. Faltan lectura integral de fuentes primarias, evidencia claim-to-source, licencias verificadas, laboratorios reproducibles y revisión disciplinar independiente. La nueva compuerta Ed25519 requiere una clave pública confiable y la identidad de reviewer configuradas por un canal administrativo separado.
+- **Ejecución y aislamiento:** Job Objects/ACL Windows; cgroups/namespaces o microVM para código hostil; gateway de egress con allowlist y DNS pinning probado. Docker comparte kernel.
+- **Operación:** KMS/HSM, custodia y rotación de claves, cifrado y backups offsite/WORM, pruebas de restauración/DR, RBAC/IdP/MFA, observabilidad central, alertas y carga/soak.
+- **Pruebas calientes:** host Docker de despliegue, Nuclei únicamente contra laboratorio autorizado, proveedores IA/embeddings reales, costes/cuotas/latencia/fallos y pruebas de recuperación ante fallos físicos.
+- **Administración GitHub:** activar branch protection y required checks tras decidir la línea de integración.
 
-**Conclusión:** el código de la rama pasó 700 pruebas y los dos workflows para `fee9792`; se corrigieron errores de exposición de secretos y permisos en varias rutas de salida. La rama no está integrada ni lista para producción. La validación final del usuario todavía no es el siguiente paso: quedan trabajo de integración y pruebas/infraestructura externas que deben resolverse antes.
+**Conclusión:** la rama superó 730 pruebas (4 omitidas) y los dos workflows en el SHA 8ac5846. Se endureció de forma verificable la compuerta de calidad de la biblioteca con hashes de archivos reales y firma Ed25519 de revisor externo. La rama sigue divergida y no está integrada ni lista para la validación final del usuario; continúan existiendo trabajo de integración y controles operacionales que pueden desarrollarse sin intervención del usuario.
+
 
 # Estado de ingeniería y auditoría — 2026-11-21
 
