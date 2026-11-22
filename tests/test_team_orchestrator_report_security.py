@@ -50,11 +50,15 @@ class TeamOrchestratorReportSecurityTests(unittest.TestCase):
                 json.dumps({"default_workflow": "test"}),
                 encoding="utf-8",
             )
-            with patch.object(team_orchestrator, "WORKFLOW_FILE", workflow_file), \\
-                 patch.object(
-                     team_orchestrator, "execute_workflow",
-                     side_effect=RuntimeError(f"falló el proveedor: token={secret}"),
-                 ), redirect_stderr(output):
+            with (
+                patch.object(team_orchestrator, "WORKFLOW_FILE", workflow_file),
+                patch.object(
+                    team_orchestrator,
+                    "execute_workflow",
+                    side_effect=RuntimeError(f"falló el proveedor: token={secret}"),
+                ),
+                redirect_stderr(output),
+            ):
                 result = team_orchestrator.main(["--workflow", "test", "tarea"])
         self.assertEqual(result, 1)
         self.assertNotIn(secret, output.getvalue())
