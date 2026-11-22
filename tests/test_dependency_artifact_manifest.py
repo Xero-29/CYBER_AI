@@ -1,10 +1,13 @@
 import hashlib
+import io
 import tempfile
 import unittest
+from contextlib import redirect_stderr
 import zipfile
 from pathlib import Path
 from unittest.mock import patch
 
+import dependency_artifact_manifest
 from dependency_artifact_manifest import ArtifactManifestError, build_manifest
 
 
@@ -199,6 +202,21 @@ class DependencyArtifactManifestTests(unittest.TestCase):
         with self.assertRaisesRegex(ArtifactManifestError, "directorio real"):
             build_manifest(self.root, link)
 
+
+    def test_cli_redacts_manifest_errors(self):
+        secret = "artifact-cli-secret"
+        output = io.StringIO()
+        with patch(
+            "sys.argv",
+            ["dependency_artifact_manifest.py", "--wheelhouse", str(self.wheelhouse), "--output", str(self.root / "manifest.json")],
+        ), patch.object(
+            dependency_artifact_manifest, "build_manifest",
+            side_effect=ArtifactManifestError(f"invalid token={secret}"),
+        ), redirect_stderr(output):
+            result = dependency_artifact_manifest.main()
+        self.assertEqual(result, 2)
+        self.assertNotIn(secret, output.getvalue())
+        self.assertIn("token=[REDACTED]", output.getvalue())
 
 if __name__ == "__main__":
     unittest.main()
