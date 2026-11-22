@@ -1,8 +1,8 @@
 """Pruebas del motor controlado de experimentos."""
 
+import hashlib
 import io
 import json
-import hashlib
 import os
 import stat
 import tempfile
@@ -99,12 +99,12 @@ class TestExperimentEngine(unittest.TestCase):
 
         with patch.dict(os.environ, {"CYBER_AI_EXPERIMENT_SECRET": "do-not-inherit"}):
             with patch.object(engine, "run_bounded_process", side_effect=fake_run):
-            report = engine.run_experiment(
-                hypothesis="La prueba de ejemplo pasa.",
-                test_path="tests/test_sample.py",
-                timeout=10,
-                execute=True,
-            )
+                report = engine.run_experiment(
+                    hypothesis="La prueba de ejemplo pasa.",
+                    test_path="tests/test_sample.py",
+                    timeout=10,
+                    execute=True,
+                )
 
         self.assertEqual(report["status"], "passed")
         self.assertEqual(report["return_code"], 0)
