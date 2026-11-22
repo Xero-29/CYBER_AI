@@ -22,6 +22,8 @@ from urllib.request import (
 )
 
 from ddgs import DDGS
+from safe_io import atomic_write_text, ensure_private_directory
+from secret_redaction import redact_sensitive_data, redact_text
 
 ROOT = Path(__file__).resolve().parent
 CONFIG_PATH = ROOT / "config" / "trusted_sources.json"
@@ -371,17 +373,20 @@ def search_web(query, max_results=5, include_untrusted=False):
 
 
 def write_report(report):
-    """Guarda informe legible y datos JSON para futuras etapas de FILTRO."""
-    REPORT_DIR.mkdir(parents=True, exist_ok=True)
+    """Guarda informe privado, atómico y sin credenciales visibles."""
+    report = redact_sensitive_data(report)
+    ensure_private_directory(REPORT_DIR, create=True)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     base = REPORT_DIR / f"research_{stamp}"
 
     json_path = base.with_suffix(".json")
     md_path = base.with_suffix(".md")
 
-    json_path.write_text(
+    atomic_write_text(
+        json_path,
         json.dumps(report, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8"
+        mode=0o600,
+        create_parents=True,
     )
 
     lines = [
@@ -464,7 +469,9 @@ def write_report(report):
         "",
     ])
 
-    md_path.write_text("\n".join(lines), encoding="utf-8")
+    atomic_write_text(
+        md_path, redact_text("\n".join(lines)), mode=0o600, create_parents=True
+    )
     return md_path, json_path
 
 
@@ -487,11 +494,11 @@ def main():
     query = " ".join(args.query).strip()
 
     try:
-        report = search_web(
+        report = redact_sensitive_data(search_web(
             query,
             max_results=limit,
             include_untrusted=args.include_untrusted,
-        )
+        ))
         md_path, json_path = write_report(report)
 
         print(f"Consulta: {report['query']}")
@@ -520,7 +527,7 @@ def main():
 
     except Exception as error:
         print(
-            f"Error de investigacion: {type(error).__name__}: {error}",
+            f"Error de investigacion: {type(error).__name__}: {redact_text(str(error))}",
             file=sys.stderr
         )
         return 1
