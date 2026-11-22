@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from safe_io import SafeWriteError, atomic_write_text, ensure_private_directory, open_private_file
-from secret_redaction import redact_sensitive_data
+from secret_redaction import redact_sensitive_data, redact_text
 
 
 REPORTS_DIR = Path("reports")
