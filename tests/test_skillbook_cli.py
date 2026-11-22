@@ -1,6 +1,8 @@
+import io
 import json
 import tempfile
 import unittest
+from contextlib import redirect_stderr
 from pathlib import Path
 from unittest.mock import patch
 
@@ -98,6 +100,19 @@ class SkillbookCliTests(unittest.TestCase):
             ])
         self.assertEqual(result, 0)
         deprecate.assert_called_once_with("skill-1", "metodología obsoleta", "a" * 64)
+
+    def test_cli_redacts_secret_values_in_errors(self):
+        secret = "skillbook-cli-secret"
+        output = io.StringIO()
+        with patch.object(
+            skillbook_cli.skillbook,
+            "propose_skill_from_ledger",
+            side_effect=ValueError(f"falló el registro token={secret}"),
+        ), redirect_stderr(output):
+            result = skillbook_cli.main(["propose", "--manifest", str(self.manifest)])
+        self.assertEqual(result, 2)
+        self.assertNotIn(secret, output.getvalue())
+        self.assertIn("token=[REDACTED]", output.getvalue())
 
 if __name__ == "__main__":
     unittest.main()
