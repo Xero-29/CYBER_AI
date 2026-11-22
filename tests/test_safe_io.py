@@ -269,5 +269,20 @@ class SafeIoTests(unittest.TestCase):
             self.assertTrue(is_real_directory(real))
             self.assertFalse(is_real_directory(link))
 
+    def test_read_regular_file_rejects_symlink_parent(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            real = root / "real"
+            real.mkdir()
+            target = real / "report.txt"
+            target.write_text("external", encoding="utf-8")
+            link = root / "linked"
+            try:
+                link.symlink_to(real, target_is_directory=True)
+            except (OSError, NotImplementedError):
+                self.skipTest("symlinks unavailable")
+            with self.assertRaisesRegex(SafeWriteError, "ruta de entrada"):
+                read_regular_file(link / "report.txt")
+
 if __name__ == "__main__":
     unittest.main()
