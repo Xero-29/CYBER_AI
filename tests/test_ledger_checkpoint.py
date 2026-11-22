@@ -1,11 +1,14 @@
+import io
 import json
 import os
 import tempfile
 import unittest
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
 
 from execution_ledger import ExecutionLedger
+import ledger_checkpoint
 from ledger_checkpoint import CheckpointError, create_checkpoint, verify_checkpoint
 
 
@@ -57,6 +60,28 @@ class LedgerCheckpointTests(unittest.TestCase):
         with self.assertRaises(CheckpointError):
             create_checkpoint(checkpoint, ledger=self.ledger, environ=self.env)
 
+
+    def test_cli_redacts_error_and_result_paths(self):
+        secret = "checkpoint-cli-secret"
+        error_output = io.StringIO()
+        with patch("sys.argv", ["ledger_checkpoint.py", "create", "--output", str(self.root / "x")]), patch.object(
+            ledger_checkpoint, "create_checkpoint",
+            side_effect=CheckpointError(f"checkpoint failed token={secret}"),
+        ), redirect_stderr(error_output):
+            result = ledger_checkpoint.main()
+        self.assertEqual(result, 2)
+        self.assertNotIn(secret, error_output.getvalue())
+        self.assertIn("token=[REDACTED]", error_output.getvalue())
+
+        success_output = io.StringIO()
+        with patch("sys.argv", ["ledger_checkpoint.py", "create", "--output", str(self.root / "x")]), patch.object(
+            ledger_checkpoint, "create_checkpoint",
+            return_value={"checkpoint": f"/tmp/api_key={secret}", "sequence": 1},
+        ), redirect_stdout(success_output):
+            result = ledger_checkpoint.main()
+        self.assertEqual(result, 0)
+        self.assertNotIn(secret, success_output.getvalue())
+        self.assertIn("[REDACTED]", success_output.getvalue())
 
 if __name__ == "__main__":
     unittest.main()
