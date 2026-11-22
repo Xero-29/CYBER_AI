@@ -438,8 +438,13 @@ def _sqlite_snapshot(source, destination):
                 raise BackupError(f"SQLite integrity_check falló para {source.name}.")
 
 
-def create_backup(data_dir=DEFAULT_DATA, destination=None):
+def create_backup(data_dir=DEFAULT_DATA, destination=None, *, allow_unsigned=False):
     signing_key = _backup_signing_key()
+    if signing_key is None and allow_unsigned is not True:
+        raise BackupError(
+            "Se requiere CYBER_AI_BACKUP_HMAC_KEY para crear backups firmados; "
+            "allow_unsigned=True solo se admite para desarrollo explícito."
+        )
     data_dir = Path(os.path.abspath(os.fspath(data_dir)))
     _validate_directory_path(data_dir)
     data_dir = data_dir.resolve(strict=True)
@@ -557,7 +562,7 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None):
         raise
 
 
-def verify_backup(snapshot, *, require_signature=False):
+def verify_backup(snapshot, *, require_signature=True):
     snapshot = Path(os.path.abspath(os.fspath(snapshot)))
     input_snapshot_chain = _validate_directory_path(snapshot)
     snapshot = snapshot.resolve(strict=True)
@@ -586,7 +591,7 @@ def verify_backup(snapshot, *, require_signature=False):
 
 
 def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
-                   confirm_replace=False, require_signature=False):
+                   confirm_replace=False, require_signature=True):
     if confirm_quiesced is not True:
         raise BackupError("La restauración requiere --confirm-quiesced.")
     snapshot = Path(os.path.abspath(os.fspath(snapshot)))
@@ -685,20 +690,27 @@ def main(argv=None):
     backup = sub.add_parser("backup")
     backup.add_argument("--destination", type=Path, required=True)
     backup.add_argument("--confirm-quiesced", action="store_true")
+    backup.add_argument("--allow-unsigned", action="store_true")
     verify = sub.add_parser("verify")
     verify.add_argument("--snapshot", type=Path, required=True)
-    verify.add_argument("--require-signature", action="store_true")
+    verify.add_argument("--require-signature", dest="require_signature", action="store_true")
+    verify.add_argument("--allow-unsigned", dest="require_signature", action="store_false")
+    verify.set_defaults(require_signature=True)
     restore = sub.add_parser("restore")
     restore.add_argument("--snapshot", type=Path, required=True)
     restore.add_argument("--confirm-quiesced", action="store_true")
     restore.add_argument("--confirm-replace", action="store_true")
-    restore.add_argument("--require-signature", action="store_true")
+    restore.add_argument("--require-signature", dest="require_signature", action="store_true")
+    restore.add_argument("--allow-unsigned", dest="require_signature", action="store_false")
+    restore.set_defaults(require_signature=True)
     args = parser.parse_args(argv)
     try:
         if args.command == "backup":
             if not args.confirm_quiesced:
                 raise BackupError("El backup requiere --confirm-quiesced para evitar copiar logs activos.")
-            result = create_backup(args.data_dir, args.destination)
+            result = create_backup(
+                args.data_dir, args.destination, allow_unsigned=args.allow_unsigned
+            )
         elif args.command == "verify":
             result = verify_backup(args.snapshot, require_signature=args.require_signature)
         else:
