@@ -220,11 +220,33 @@ def open_private_file(path, mode="r", *, encoding="utf-8"):
 
 
 
+
+def _reject_link_components(directory):
+    """Reject symlinks and reparse points in every input-path directory."""
+    current = Path(directory)
+    while True:
+        try:
+            info = current.lstat()
+        except OSError as error:
+            raise SafeWriteError("El directorio de entrada no está disponible.") from error
+        if (
+            stat.S_ISLNK(info.st_mode)
+            or _is_reparse_point(info)
+            or not stat.S_ISDIR(info.st_mode)
+        ):
+            raise SafeWriteError("La ruta de entrada no puede contener enlaces.")
+        if current.parent == current:
+            return
+        current = current.parent
+
+
 def is_real_directory(path):
     """Return whether path is a real directory, not a symlink or reparse point."""
     try:
-        info = Path(path).lstat()
-    except OSError:
+        candidate = Path(os.path.abspath(os.fspath(path)))
+        _reject_link_components(candidate.parent)
+        info = candidate.lstat()
+    except (OSError, SafeWriteError):
         return False
     return (
         stat.S_ISDIR(info.st_mode)
@@ -243,6 +265,7 @@ def read_regular_file(path, *, max_bytes=16 * 1024 * 1024):
         raise SafeWriteError("El límite de lectura debe ser un entero no negativo.")
 
     destination = Path(os.path.abspath(os.fspath(path)))
+    _reject_link_components(destination.parent)
     try:
         before = destination.lstat()
     except OSError as error:
@@ -268,6 +291,7 @@ def read_regular_file(path, *, max_bytes=16 * 1024 * 1024):
     try:
         descriptor = os.open(destination, flags)
         opened = os.fstat(descriptor)
+        _reject_link_components(destination.parent)
         after = destination.lstat()
         if (
             not stat.S_ISREG(opened.st_mode)
@@ -289,6 +313,7 @@ def read_regular_file(path, *, max_bytes=16 * 1024 * 1024):
             if len(content) > max_bytes:
                 raise SafeWriteError("El archivo de entrada supera el límite de lectura.")
             final = os.fstat(stream.fileno())
+            _reject_link_components(destination.parent)
             path_info = destination.lstat()
             if (
                 not stat.S_ISREG(final.st_mode)
