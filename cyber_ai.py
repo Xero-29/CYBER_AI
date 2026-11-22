@@ -13,19 +13,15 @@ from nvd_client import enrich_analysis
 from report_manager import register_report
 from batch_analyzer import process_directory
 from nuclei_scanner import scan_target
-from safe_io import atomic_write_text, ensure_private_directory
+from safe_io import atomic_write_text, ensure_private_directory, read_regular_text
 from secret_redaction import redact_sensitive_data, redact_text
 
 
 def process_one(filename):
     """Analiza un informe individual y guarda el resultado."""
     source = Path(filename)
-    if not source.is_file():
-        print(f"No existe el informe: {redact_text(str(source))}", file=sys.stderr)
-        return 2
-
     try:
-        text = source.read_text(encoding="utf-8")
+        text = read_regular_text(source)
         result = enrich_analysis(analyze_report(text))
         output_dir = ensure_private_directory(Path("reports"), create=True)
         source_identity = str(source.resolve()).encode("utf-8")
