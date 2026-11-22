@@ -478,5 +478,31 @@ class DataBackupTests(unittest.TestCase):
         create.assert_not_called()
         self.assertIn("CYBER_AI_BACKUP_HMAC_KEY", output.getvalue())
 
+    def test_restore_api_requires_signature_by_default(self):
+        snapshot = self.create_unsigned_backup(self.root / "unsigned-restore")
+        with self.assertRaisesRegex(BackupError, "no tiene firma"):
+            restore_backup(
+                snapshot, self.data, confirm_quiesced=True, confirm_replace=True
+            )
+
+    def test_restore_cli_requires_signature_by_default(self):
+        snapshot = self.root / "snapshot"
+        with patch(
+            "data_backup.restore_backup", return_value={"restored": True}
+        ) as restore, patch("sys.stdout", io.StringIO()):
+            result = data_backup.main([
+                "--data-dir", str(self.data), "restore",
+                "--snapshot", str(snapshot),
+                "--confirm-quiesced", "--confirm-replace",
+            ])
+        self.assertEqual(result, 0)
+        restore.assert_called_once_with(
+            snapshot,
+            self.data,
+            confirm_quiesced=True,
+            confirm_replace=True,
+            require_signature=True,
+        )
+
 if __name__ == "__main__":
     unittest.main()
