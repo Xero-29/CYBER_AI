@@ -206,7 +206,7 @@ class KnowledgePackQualityTests(unittest.TestCase):
     def _audit_fixture(self, manifest, environment=None):
         configured = self._review_environment() if environment is None else environment
         with patch.dict(os.environ, configured, clear=True):
-            return audit_packs(manifest)
+            return audit_packs(manifest, root=Path(manifest).parents[2])
 
     def test_current_48_packs_are_not_misreported_as_expert_ready(self):
         with patch.dict(os.environ, {}, clear=True):
