@@ -19,6 +19,8 @@ from pathlib import Path
 
 import evidence_graph
 from compressed_evidence import store_evidence
+from safe_io import atomic_write_text, ensure_private_directory
+from secret_redaction import redact_sensitive_data, redact_text
 
 PROJECT = Path(__file__).resolve().parent
 MAX_TIMEOUT_SECONDS = 120
@@ -182,7 +184,7 @@ def run_experiment(*, hypothesis, test_path, timeout=60, execute=False):
 
         except OSError as error:
             status = "execution_error"
-            error_message = f"{type(error).__name__}: {error}"
+            error_message = redact_text(f"{type(error).__name__}: {error}")
 
         elapsed = round(time.monotonic() - started, 3)
         stdout = _summarize_stream(stdout_file)
@@ -194,11 +196,11 @@ def run_experiment(*, hypothesis, test_path, timeout=60, execute=False):
         "executed": True,
         "return_code": return_code,
         "elapsed_seconds": elapsed,
-        "stdout": stdout["text"],
+        "stdout": redact_text(stdout["text"]),
         "stdout_sha256": stdout["sha256"],
         "stdout_bytes": stdout["bytes"],
         "stdout_truncated": stdout["truncated"],
-        "stderr": stderr["text"],
+        "stderr": redact_text(stderr["text"]),
         "stderr_sha256": stderr["sha256"],
         "stderr_bytes": stderr["bytes"],
         "stderr_truncated": stderr["truncated"],
@@ -255,14 +257,17 @@ def run_experiment(*, hypothesis, test_path, timeout=60, execute=False):
     )
     report["evidence_edge_id"] = edge_id
 
-    report_dir = PROJECT / "reports" / "experiments"
-    report_dir.mkdir(parents=True, exist_ok=True)
+    report_dir = ensure_private_directory(
+        PROJECT / "reports" / "experiments", create=True
+    )
     report_path = report_dir / f"experiment_{plan['experiment_id']}.json"
 
     report["report_path"] = report_path.relative_to(PROJECT).as_posix()
-    report_path.write_text(
-        json.dumps(report, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
+    atomic_write_text(
+        report_path,
+        json.dumps(redact_sensitive_data(report), ensure_ascii=False, indent=2) + "\n",
+        mode=0o600,
+        create_parents=True,
     )
 
     return report
@@ -290,10 +295,10 @@ def main(argv=None):
             execute=args.execute,
         )
     except (OSError, ValueError, RuntimeError) as error:
-        print(f"Error: {error}", file=sys.stderr)
+        print(f"Error: {redact_text(str(error))}", file=sys.stderr)
         return 2
 
-    print(json.dumps(report, ensure_ascii=False, indent=2))
+    print(json.dumps(redact_sensitive_data(report), ensure_ascii=False, indent=2))
 
     if not args.execute:
         print("Plan validado: no se ejecutó ninguna prueba.")
