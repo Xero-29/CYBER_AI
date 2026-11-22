@@ -54,7 +54,7 @@ def process_one(filename):
 
 
 
-def print_scan_summary(safe_summary):
+def print_scan_summary(summary):
     """Muestra un resumen legible de los hallazgos de Nuclei."""
     print("\\n========== RESUMEN DE SEGURIDAD ==========")
     print(f"Objetivo: {redact_text(summary.get('target') or 'No disponible')}")
@@ -141,7 +141,7 @@ def main():
 
             print(f"Informe completo: {redact_text(str(output))}")
             print(f"Resumen analizado: {redact_text(str(summary_output))}")
-            print_scan_summary(summary)
+            print_scan_summary(safe_summary)
             return 0 if result.get("status") == "completed" else 1
         except ValueError as exc:
             print(f"Objetivo inválido: {redact_text(str(exc))}", file=sys.stderr)
