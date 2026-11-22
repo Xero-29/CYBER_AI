@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from llm_providers import request as provider_request
 from safe_io import SafeWriteError, open_private_file
-from secret_redaction import redact_sensitive_data
+from secret_redaction import redact_sensitive_data, redact_text
 
 PROJECT = Path(__file__).resolve().parent
 CONFIG_FILE = PROJECT / "config" / "model_roles.json"
@@ -353,7 +353,7 @@ def main():
         elif args.command == "warm":
             warm(args.agent)
     except (OSError, ValueError, RuntimeError, TimeoutError) as error:
-        print(f"Error: {error}")
+        print(f"Error: {redact_text(str(error))}")
         return 1
 
     return 0
