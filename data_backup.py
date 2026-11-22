@@ -708,6 +708,11 @@ def main(argv=None):
         if args.command == "backup":
             if not args.confirm_quiesced:
                 raise BackupError("El backup requiere --confirm-quiesced para evitar copiar logs activos.")
+            if not args.allow_unsigned and _backup_signing_key() is None:
+                raise BackupError(
+                    "Configura CYBER_AI_BACKUP_HMAC_KEY o usa --allow-unsigned "
+                    "solo para backups no productivos."
+                )
             result = create_backup(
                 args.data_dir, args.destination, allow_unsigned=args.allow_unsigned
             )
