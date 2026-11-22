@@ -174,5 +174,33 @@ class KnowledgeDownloaderSecurityTests(unittest.TestCase):
             result = downloader._run(args)
         self.assertEqual(result, 1)
 
+    @patch.object(downloader.socket, "getaddrinfo")
+    @patch.object(downloader.requests, "Session")
+    def test_successful_download_uses_private_directory_and_file(self, session_factory, resolver):
+        resolver.return_value = [(None, None, None, None, ("93.184.216.34", 443))]
+        session = MagicMock()
+        response = MagicMock()
+        response.status_code = 200
+        response.headers = {"Content-Type": "text/plain"}
+        response.iter_content.return_value = [b"verified-content-" * 10]
+        session.get.return_value = response
+        session_factory.return_value = session
+        manifest = {"resources": {}}
+
+        with patch.dict(downloader.os.environ, {
+            "CYBER_AI_KNOWLEDGE_EGRESS_PROXY": "http://127.0.0.1:8080"
+        }):
+            result = downloader.download(self.item(), manifest)
+
+        destination = downloader.BASE / "docs" / "file.txt"
+        self.assertEqual(result, "downloaded")
+        self.assertEqual(destination.read_bytes(), b"verified-content-" * 10)
+        if os.name == "posix":
+            self.assertEqual(destination.stat().st_mode & 0o777, 0o600)
+            self.assertEqual(destination.parent.stat().st_mode & 0o777, 0o700)
+        self.assertEqual(manifest["resources"]["docs-example"]["status"], "downloaded")
+        session.close.assert_called_once()
+        response.close.assert_called_once()
+
 if __name__ == "__main__":
     unittest.main()
