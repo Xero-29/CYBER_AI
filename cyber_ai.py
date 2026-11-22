@@ -13,6 +13,8 @@ from nvd_client import enrich_analysis
 from report_manager import register_report
 from batch_analyzer import process_directory
 from nuclei_scanner import scan_target
+from safe_io import atomic_write_text, ensure_private_directory
+from secret_redaction import redact_sensitive_data, redact_text
 
 
 def process_one(filename):
@@ -25,8 +27,7 @@ def process_one(filename):
     try:
         text = source.read_text(encoding="utf-8")
         result = enrich_analysis(analyze_report(text))
-        output_dir = Path("reports")
-        output_dir.mkdir(parents=True, exist_ok=True)
+        output_dir = ensure_private_directory(Path("reports"), create=True)
         source_identity = str(source.resolve()).encode("utf-8")
         source_suffix = hashlib.sha256(source_identity).hexdigest()[:12]
         output = output_dir / f"{source.stem}_{source_suffix}_analysis.json"
@@ -36,9 +37,11 @@ def process_one(filename):
         if duplicate["duplicate"]:
             result["classification"] = "possible_duplicate"
 
-        output.write_text(
-            json.dumps(result, ensure_ascii=False, indent=2) + "\n",
-            encoding="utf-8",
+        atomic_write_text(
+            output,
+            json.dumps(redact_sensitive_data(result), ensure_ascii=False, indent=2) + "\n",
+            mode=0o600,
+            create_parents=True,
         )
         print(f"Resultado: {output}")
         print(f"Clasificación: {result['classification']}")
@@ -46,7 +49,7 @@ def process_one(filename):
         print(f"Duplicado exacto: {'sí' if duplicate['duplicate'] else 'no'}")
         return 0
     except (OSError, UnicodeError, ValueError) as exc:
-        print(f"Error: {exc}", file=sys.stderr)
+        print(f"Error: {redact_text(str(exc))}", file=sys.stderr)
         return 2
 
 
@@ -74,19 +77,19 @@ def print_scan_summary(summary):
         print("No hay hallazgos registrados.")
     else:
         for index, finding in enumerate(findings, 1):
-            print(f"\\n{index}. {finding.get('name', 'Sin nombre')}")
-            print(f"   Severidad: {finding.get('severity', 'unknown').upper()}")
-            print(f"   Plantilla: {finding.get('template_id', 'unknown')}")
-            print(f"   Comprobación: {finding.get('matcher_name', 'unspecified')}")
+            print(f"\\n{index}. {redact_text(finding.get('name', 'Sin nombre'))}")
+            print(f"   Severidad: {redact_text(finding.get('severity', 'unknown')).upper()}")
+            print(f"   Plantilla: {redact_text(finding.get('template_id', 'unknown'))}")
+            print(f"   Comprobación: {redact_text(finding.get('matcher_name', 'unspecified'))}")
             print(f"   Coincidencias: {finding.get('count', 0)}")
 
             for url in finding.get("matched_urls", []):
-                print(f"   Ubicación: {url}")
+                print(f"   Ubicación: {redact_text(url)}")
 
-            print(f"   Descripción: {finding.get('description', 'No disponible')}")
-            print(f"   Riesgo potencial: {finding.get('potential_risk', 'No evaluado')}")
-            print(f"   Verificación manual: {finding.get('manual_validation', 'No disponible')}")
-            print(f"   Recomendación: {finding.get('recommendation', 'No disponible')}")
+            print(f"   Descripción: {redact_text(finding.get('description', 'No disponible'))}")
+            print(f"   Riesgo potencial: {redact_text(finding.get('potential_risk', 'No evaluado'))}")
+            print(f"   Verificación manual: {redact_text(finding.get('manual_validation', 'No disponible'))}")
+            print(f"   Recomendación: {redact_text(finding.get('recommendation', 'No disponible'))}")
 
     print("\\n--- VALIDACIÓN ---")
     if summary.get("requires_manual_validation", True):
@@ -137,7 +140,7 @@ def main():
             print_scan_summary(summary)
             return 0 if result.get("status") == "completed" else 1
         except ValueError as exc:
-            print(f"Objetivo inválido: {exc}", file=sys.stderr)
+            print(f"Objetivo inválido: {redact_text(str(exc))}", file=sys.stderr)
             return 2
 
     if args.self_test:
@@ -159,7 +162,7 @@ def main():
     if args.batch:
         try:
             results = process_directory(args.batch)
-            print(json.dumps(results, ensure_ascii=False, indent=2))
+            print(json.dumps(redact_sensitive_data(results), ensure_ascii=False, indent=2))
             return 1 if any("error" in item for item in results) else 0
         except (OSError, ValueError) as exc:
             print(f"Error: {exc}", file=sys.stderr)
