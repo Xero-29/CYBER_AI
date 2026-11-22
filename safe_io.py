@@ -220,6 +220,107 @@ def open_private_file(path, mode="r", *, encoding="utf-8"):
 
 
 
+def is_real_directory(path):
+    """Return whether path is a real directory, not a symlink or reparse point."""
+    try:
+        info = Path(path).lstat()
+    except OSError:
+        return False
+    return (
+        stat.S_ISDIR(info.st_mode)
+        and not stat.S_ISLNK(info.st_mode)
+        and not _is_reparse_point(info)
+    )
+
+
+def read_regular_file(path, *, max_bytes=16 * 1024 * 1024):
+    """Read a bounded regular file without following symlinks or hard links."""
+    if (
+        isinstance(max_bytes, bool)
+        or not isinstance(max_bytes, int)
+        or max_bytes < 0
+    ):
+        raise SafeWriteError("El límite de lectura debe ser un entero no negativo.")
+
+    destination = Path(os.path.abspath(os.fspath(path)))
+    try:
+        before = destination.lstat()
+    except OSError as error:
+        raise SafeWriteError("El archivo de entrada no está disponible.") from error
+    if (
+        stat.S_ISLNK(before.st_mode)
+        or _is_reparse_point(before)
+        or not stat.S_ISREG(before.st_mode)
+    ):
+        raise SafeWriteError("La entrada debe ser un archivo regular sin enlaces.")
+    if os.name == "posix" and before.st_nlink != 1:
+        raise SafeWriteError("No se permiten enlaces duros en archivos de entrada.")
+    if before.st_size > max_bytes:
+        raise SafeWriteError("El archivo de entrada supera el límite de lectura.")
+
+    flags = (
+        os.O_RDONLY
+        | getattr(os, "O_CLOEXEC", 0)
+        | getattr(os, "O_NOFOLLOW", 0)
+        | getattr(os, "O_NONBLOCK", 0)
+    )
+    descriptor = None
+    try:
+        descriptor = os.open(destination, flags)
+        opened = os.fstat(descriptor)
+        after = destination.lstat()
+        if (
+            not stat.S_ISREG(opened.st_mode)
+            or _is_reparse_point(opened)
+            or stat.S_ISLNK(after.st_mode)
+            or _is_reparse_point(after)
+            or (before.st_dev, before.st_ino) != (opened.st_dev, opened.st_ino)
+            or (opened.st_dev, opened.st_ino) != (after.st_dev, after.st_ino)
+        ):
+            raise SafeWriteError("El archivo de entrada cambió durante su apertura.")
+        if os.name == "posix" and opened.st_nlink != 1:
+            raise SafeWriteError("No se permiten enlaces duros en archivos de entrada.")
+        if opened.st_size > max_bytes:
+            raise SafeWriteError("El archivo de entrada supera el límite de lectura.")
+
+        with os.fdopen(descriptor, "rb") as stream:
+            descriptor = None
+            content = stream.read(max_bytes + 1)
+            if len(content) > max_bytes:
+                raise SafeWriteError("El archivo de entrada supera el límite de lectura.")
+            final = os.fstat(stream.fileno())
+            path_info = destination.lstat()
+            if (
+                not stat.S_ISREG(final.st_mode)
+                or _is_reparse_point(final)
+                or stat.S_ISLNK(path_info.st_mode)
+                or _is_reparse_point(path_info)
+                or (final.st_dev, final.st_ino) != (path_info.st_dev, path_info.st_ino)
+                or final.st_size != len(content)
+                or final.st_size != opened.st_size
+                or final.st_mtime_ns != opened.st_mtime_ns
+            ):
+                raise SafeWriteError("El archivo de entrada cambió durante su lectura.")
+            if os.name == "posix" and final.st_nlink != 1:
+                raise SafeWriteError("No se permiten enlaces duros en archivos de entrada.")
+        return content
+    except SafeWriteError:
+        raise
+    except OSError as error:
+        raise SafeWriteError("No se pudo leer el archivo de forma segura.") from error
+    finally:
+        if descriptor is not None:
+            os.close(descriptor)
+
+
+def read_regular_text(path, *, encoding="utf-8", max_bytes=16 * 1024 * 1024):
+    """Read and decode a bounded regular text file without following links."""
+    try:
+        return read_regular_file(path, max_bytes=max_bytes).decode(encoding)
+    except UnicodeError as error:
+        raise SafeWriteError("El archivo de entrada no contiene texto válido.") from error
+
+
 def atomic_write_text(path, text, *, encoding="utf-8", mode=0o600, create_parents=False):
     """Write text through a private temporary file and atomically replace a regular file."""
     if not isinstance(text, str):
