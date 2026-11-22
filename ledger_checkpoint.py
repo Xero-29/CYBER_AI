@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from execution_ledger import ExecutionLedger, GENESIS
+from secret_redaction import redact_sensitive_data, redact_text
 
 SCHEMA = "cyber-ai-ledger-checkpoint-v1"
 KEY_ENV = "CYBER_AI_LEDGER_CHECKPOINT_KEY"
@@ -120,9 +121,9 @@ def main(argv=None):
             else verify_checkpoint(args.checkpoint)
         )
     except (OSError, ValueError, json.JSONDecodeError) as error:
-        print(f"ERROR: {error}", file=sys.stderr)
+        print(f"ERROR: {redact_text(str(error))}", file=sys.stderr)
         return 2
-    print(json.dumps(result, ensure_ascii=False, indent=2))
+    print(json.dumps(redact_sensitive_data(result), ensure_ascii=False, indent=2))
     return 0
 
 
