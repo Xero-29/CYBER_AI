@@ -13,6 +13,7 @@ from pathlib import Path
 from tool_adapters import TOOL_SPECS, ToolExecutionError, _confined_path, PROJECT_ROOT
 from tool_allowlist import ToolAllowlistError, load_signed_tool_allowlist
 from safe_io import SafeWriteError, ensure_private_directory
+from secret_redaction import redact_text
 
 
 DEFAULT_IMAGE = "cyber-ai-tool-sandbox:local"
@@ -209,7 +210,7 @@ def main(argv=None):
         print("El proceso Docker superó el límite de tiempo del host; se solicitó eliminar el contenedor.", file=sys.stderr)
         return 124
     except (ToolExecutionError, OSError) as exc:
-        print(f"Ejecución denegada: {exc}", file=sys.stderr)
+        print(f"Ejecución denegada: {redact_text(str(exc))}", file=sys.stderr)
         return 2
     return result.returncode
 
