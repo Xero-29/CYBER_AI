@@ -437,6 +437,12 @@ def run_cycle(
                 "indexed": False,
                 "error": type(publish_error).__name__ + ": " + str(publish_error)[:500],
             }
+        event["publication"] = publication
+        append_event({
+            "task_id": task_id, "round": round_number,
+            "event_type": "publication", "created_at": _now(),
+            "publication": publication,
+        }, log_path)
         all_reports_indexed = all_reports_indexed and bool(publication.get("indexed"))
         # "known" significa informe revisado; no significa dominio. El estado
         # registra por separado si el informe quedó indexado para recuperación.
@@ -465,18 +471,21 @@ def run_cycle(
                     "status": "knowledge_acquired_not_indexed",
                     "task_id": task_id, "assessment": assessment,
                     "accepted_reports": len(accepted_reports), "research_rounds": round_number,
+                    "artifacts": [item.get("publication", {}) for item in accepted_reports],
                     "note": "El conocimiento fue revisado, pero no quedó indexado; se bloquea la ejecución para no perder el contexto adquirido.",
                 }
             return {
                 "status": "knowledge_acquired_needs_task_execution",
                 "task_id": task_id, "assessment": assessment,
                 "accepted_reports": len(accepted_reports), "research_rounds": round_number,
+                "artifacts": [item.get("publication", {}) for item in accepted_reports],
                 "note": "La tarea original aún debe ejecutarse y evaluarse; investigación aprobada no equivale a dominio.",
             }
     return {
         "status": "insufficient_after_research", "task_id": task_id,
         "assessment": assessment, "accepted_reports": len(accepted_reports),
         "research_rounds": len(accepted_reports),
+        "artifacts": [item.get("publication", {}) for item in accepted_reports],
     }
 
 
