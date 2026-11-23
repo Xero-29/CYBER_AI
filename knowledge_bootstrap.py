@@ -99,19 +99,19 @@ def load_deep_modules(area_id=None):
     """
     areas = load_packs(area_id)
     module_root = PROJECT / "knowledge" / "deep_modules"
-    if not module_root.exists():
-        return []
     if module_root.is_symlink():
         raise ValueError("No se permiten symlinks en knowledge/deep_modules.")
+    if not module_root.exists():
+        return []
 
     root = PROJECT.resolve()
     documents = []
     for area in areas:
         area_dir = module_root / area["id"]
-        if not area_dir.exists():
-            continue
         if area_dir.is_symlink():
             raise ValueError(f"No se permiten symlinks: {area_dir}")
+        if not area_dir.exists():
+            continue
         for candidate in sorted(area_dir.rglob("*.md")):
             if candidate.is_symlink():
                 raise ValueError(f"No se permiten symlinks: {candidate}")
