@@ -20,6 +20,26 @@ Este subsistema añade un controlador que hace explícita la secuencia:
 - `data/metacognition/research_log.jsonl`: historial auditable de solicitudes, informes y verificaciones.
 - `INVESTIGADOR`: rol pequeño separado en `config/model_roles.json`.
 
+## Acceso a la biblioteca y artefactos de investigación
+
+- DIRECTOR activa este ciclo por defecto cuando `metacognition.enabled=true`; puede omitirse explícitamente con `--no-metacognition`.
+- La evaluación principal y la tarea posterior reciben recuperación de conocimiento mediante `agent_runner.py --knowledge`.
+- `knowledge_bootstrap.py` indexa los paquetes base y los documentos Markdown de `knowledge/deep_modules/<area>/`: README, agendas, revisiones y compendios. El índice conserva IDs de documento estables por ruta y SHA-256.
+- La carpeta `knowledge/evaluation/` se mantiene fuera de la recuperación operativa para evitar contaminar respuestas con consultas/etiquetas de evaluación.
+- INVESTIGADOR recibe evidencia web curada por `web_research.py`; las páginas se filtran mediante `config/trusted_sources.json` y pasan por revisión antes de llegar al investigador.
+- Un informe aprobado se guarda como Markdown en `knowledge/research_generated/` y se indexa como `research_provisional`.
+- Un informe con similitud semántica muy alta respecto a conocimiento existente se guarda en `knowledge/research_candidates/` y no se indexa automáticamente: requiere fusión/revisión para evitar duplicados o pérdida de información nueva.
+- Un SHA-256 idéntico ya presente en la biblioteca no se vuelve a insertar. La deduplicación semántica usa un umbral conservador (0.965); es un detector de candidatos, no una prueba de equivalencia.
+- Los artefactos generados se crean localmente. Para compartirlos en Git, deben revisarse y añadirse/confirmarse explícitamente; no se hace push automático.
+
+Comandos:
+
+```bash
+python knowledge_bootstrap.py --dry-run
+python knowledge_bootstrap.py
+python director.py "Resuelve esta tarea y detecta qué conocimiento falta"
+```
+
 ## Estados de conocimiento
 
 - `unknown`: no hay evidencia suficiente para evaluar el tema.
