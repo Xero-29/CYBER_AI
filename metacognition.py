@@ -7,7 +7,9 @@ cuando un verificador separado aprueba la evidencia; el resultado queda trazable
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import os
 import re
 import subprocess
 import sys
@@ -186,25 +188,127 @@ def _runner_call(agent: str, prompt: str, *, knowledge: bool = True, timeout: in
     return answer
 
 
-def publish_research_report(report: str, task_id: str) -> dict:
-    """Indexa el informe aprobado como conocimiento provisional, nunca como dominio."""
-    from knowledge_embeddings import generate_embedding
-    from knowledge_library import store_chunks
+def _write_research_artifact(report: str, task_id: str, digest: str, *,
+                            candidate: bool = False, related: list | None = None) -> str:
+    """Guarda el informe aprobado o una propuesta de fusión sin sobrescribir archivos."""
+    knowledge_root = PROJECT / "knowledge"
+    if knowledge_root.is_symlink():
+        raise RuntimeError("La raíz de conocimiento no puede ser un symlink.")
+    directory = knowledge_root / (
+        "research_candidates" if candidate else "research_generated"
+    )
+    if directory.is_symlink():
+        raise RuntimeError("El directorio de artefactos no puede ser un symlink.")
+    directory.mkdir(parents=True, exist_ok=True)
+    if PROJECT.resolve() not in directory.resolve().parents:
+        raise RuntimeError("El directorio de artefactos queda fuera del proyecto.")
+    prefix = "candidate" if candidate else "research"
+    path = directory / f"{prefix}-{digest[:16]}.md"
+    if path.is_symlink():
+        raise RuntimeError("El artefacto de investigación no puede ser un symlink.")
 
-    vector = generate_embedding(report, agent_name="ECO")
+    metadata = {
+        "schema_version": 1,
+        "task_id": task_id,
+        "content_sha256": digest,
+        "status": "merge_review_required" if candidate else "provisional_independently_reviewed",
+        "related_chunks": related or [],
+        "created_at": _now(),
+    }
+    content = (
+        "<!-- CYBER_AI_RESEARCH_METADATA\n"
+        + json.dumps(metadata, ensure_ascii=False, sort_keys=True)
+        + "\n-->\n\n"
+        + ("# Candidato de investigación: requiere fusión\n\n" if candidate
+           else "# Investigación metacognitiva aprobada provisionalmente\n\n")
+        + report.strip() + "\n"
+    )
+    if path.exists():
+        existing = path.read_text(encoding="utf-8")
+        if f'"content_sha256": "{digest}"' not in existing or report.strip() not in existing:
+            raise RuntimeError("Conflicto: existe un archivo con el mismo ID y contenido diferente.")
+    else:
+        # Modo exclusivo: dos ejecuciones concurrentes no pueden duplicar ni
+        # sobrescribir el mismo artefacto.
+        with path.open("x", encoding="utf-8") as stream:
+            stream.write(content)
+            stream.flush()
+            os.fsync(stream.fileno())
+    return path.relative_to(PROJECT).as_posix()
+
+
+def publish_research_report(report: str, task_id: str) -> dict:
+    """Publica solo investigación revisada; evita duplicados exactos y semánticos."""
+    if not isinstance(report, str) or not report.strip():
+        raise ValueError("El informe de investigación está vacío.")
+    if len(report.encode("utf-8")) > 2 * 1024 * 1024:
+        raise ValueError("El informe supera el límite de 2 MiB.")
+    digest = hashlib.sha256(report.strip().encode("utf-8")).hexdigest()
+
+    from knowledge_embeddings import generate_embedding
+    import knowledge_library as library
+
+    library.initialize()
+    # Un SHA-256 idéntico ya almacenado no se vuelve a insertar.
+    with library.database() as db:
+        exact = db.execute(
+            "SELECT id, document_id, source, category FROM knowledge_chunks "
+            "WHERE content_sha256 = ? AND visibility = 'shared' "
+            "ORDER BY created_at LIMIT 1",
+            (digest,),
+        ).fetchone()
+    if exact:
+        return {
+            "indexed": True, "duplicate": True,
+            "existing_chunk_id": exact["id"],
+            "existing_document_id": exact["document_id"],
+            "source": exact["source"], "category": exact["category"],
+        }
+
+    vector = generate_embedding(report.strip(), agent_name="ECO")
     embedding_model = vector.get("embedding_space") or vector.get("model")
-    stored = store_chunks([{
-        "title": "Investigación metacognitiva " + task_id,
-        "source": "metacognition://" + task_id,
+    similar = library.search_knowledge(
+        query_embedding=vector["embedding"],
+        embedding_model=embedding_model,
+        top_k=5,
+        min_score=0.965,
+    )
+    if similar:
+        related = [{
+            "chunk_id": item["id"],
+            "document_id": item["document_id"],
+            "title": item["title"],
+            "source": item["source"],
+            "similarity": item["similarity"],
+        } for item in similar]
+        artifact = _write_research_artifact(
+            report.strip(), task_id, digest, candidate=True, related=related
+        )
+        return {
+            "indexed": False, "near_duplicate": True,
+            "status": "merge_review_required",
+            "artifact_path": artifact,
+            "related_chunks": related,
+            "note": "No se publicó contenido potencialmente repetido; requiere fusión y revisión.",
+        }
+
+    artifact = _write_research_artifact(report.strip(), task_id, digest)
+    stored = library.store_chunks([{
+        "title": "Investigación metacognitiva " + digest[:12],
+        "source": "repo://" + artifact,
         "license": "UNSPECIFIED",
         "category": "research_provisional",
-        "tags": ["metacognition", "ai-research", "provisional", "independently-reviewed"],
+        "tags": ["metacognition", "ai-research", "provisional",
+                 "independently-reviewed", "generated_artifact"],
         "visibility": "shared",
-        "content": report,
+        "content": report.strip(),
         "embedding": vector["embedding"],
         "embedding_model": embedding_model,
     }])
-    return {"indexed": True, "document": stored[0]}
+    return {
+        "indexed": True, "duplicate": False,
+        "artifact_path": artifact, "document": stored[0],
+    }
 
 
 def collect_web_evidence(task: str, assessment: dict, *, timeout: int = 900) -> str:
@@ -340,6 +444,12 @@ def run_cycle(
                 "indexed": False,
                 "error": type(publish_error).__name__ + ": " + str(publish_error)[:500],
             }
+        event["publication"] = publication
+        append_event({
+            "task_id": task_id, "round": round_number,
+            "event_type": "publication", "created_at": _now(),
+            "publication": publication,
+        }, log_path)
         all_reports_indexed = all_reports_indexed and bool(publication.get("indexed"))
         # "known" significa informe revisado; no significa dominio. El estado
         # registra por separado si el informe quedó indexado para recuperación.
@@ -368,18 +478,21 @@ def run_cycle(
                     "status": "knowledge_acquired_not_indexed",
                     "task_id": task_id, "assessment": assessment,
                     "accepted_reports": len(accepted_reports), "research_rounds": round_number,
+                    "artifacts": [item.get("publication", {}) for item in accepted_reports],
                     "note": "El conocimiento fue revisado, pero no quedó indexado; se bloquea la ejecución para no perder el contexto adquirido.",
                 }
             return {
                 "status": "knowledge_acquired_needs_task_execution",
                 "task_id": task_id, "assessment": assessment,
                 "accepted_reports": len(accepted_reports), "research_rounds": round_number,
+                "artifacts": [item.get("publication", {}) for item in accepted_reports],
                 "note": "La tarea original aún debe ejecutarse y evaluarse; investigación aprobada no equivale a dominio.",
             }
     return {
         "status": "insufficient_after_research", "task_id": task_id,
         "assessment": assessment, "accepted_reports": len(accepted_reports),
         "research_rounds": len(accepted_reports),
+        "artifacts": [item.get("publication", {}) for item in accepted_reports],
     }
 
 

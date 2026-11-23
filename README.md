@@ -165,7 +165,9 @@ python knowledge_bootstrap.py --dry-run
 python knowledge_bootstrap.py
 ```
 
-La primera orden valida rutas y hashes sin IA ni escrituras. La segunda genera embeddings con ECO, ingiere paquetes nuevos/modificados y registra hash y clasificación. El bootstrap es reanudable e idempotente; si cambia el proveedor/modelo de embeddings, vuelve a indexar los paquetes en el nuevo espacio vectorial.
+La primera orden valida rutas y hashes sin IA ni escrituras. La segunda genera embeddings con ECO e ingiere los paquetes base y los documentos Markdown de profundización de las 48 especialidades: README, agendas de investigación, revisiones bibliográficas y compendios técnicos. Cada documento usa un ID estable derivado de su ruta y SHA-256; los archivos sin cambios ya indexados se omiten. Si cambia el proveedor/modelo de embeddings, vuelve a indexar los documentos en el nuevo espacio vectorial.
+
+DIRECTOR activa por defecto el ciclo metacognitivo: NEXO evalúa sus brechas con la biblioteca recuperada; INVESTIGADOR recibe evidencia de la búsqueda web curada; VERITAS revisa el informe; y solo entonces se intenta publicar conocimiento provisional. Los informes aprobados se guardan en `knowledge/research_generated/`. Si el contenido es casi duplicado (similitud semántica >= 0.965), se guarda como candidato en `knowledge/research_candidates/` y no se indexa automáticamente hasta su fusión/revisión. Los hashes idénticos ya presentes en la biblioteca no se insertan otra vez. Este proceso es RAG e ingesta documental; no modifica por sí solo los pesos neuronales del modelo.
 
 Para reconstruir el índice textual FTS5 de una biblioteca existente sin generar embeddings:
 

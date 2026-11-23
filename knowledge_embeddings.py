@@ -40,7 +40,7 @@ def generate_embeddings(texts, agent_name="ECO"):
     if agent.get("type") != "embeddings":
         raise ValueError(f"{name} no es un especialista de embeddings.")
 
-    provider = resolve_provider(config, agent)
+    provider = resolve_provider(config, agent, capability="embeddings")
     model = resolve_model(provider, agent, name)
     available_models = provider_models(provider)
 

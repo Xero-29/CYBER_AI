@@ -10,7 +10,7 @@ import os
 from functools import lru_cache
 from importlib.metadata import entry_points
 from urllib.parse import urlsplit
-from urllib.request import HTTPRedirectHandler, build_opener
+from urllib.request import HTTPRedirectHandler, ProxyHandler, build_opener
 from urllib.request import Request
 from urllib.error import HTTPError, URLError
 
@@ -23,6 +23,24 @@ class _NoRedirect(HTTPRedirectHandler):
 
 
 _HTTP_OPENER = build_opener(_NoRedirect)
+
+
+def _opener_for_url(url):
+    """Evita proxies HTTP del entorno al conectar con servicios loopback.
+
+    Ollama suele escuchar en 127.0.0.1. En entornos con HTTP_PROXY configurado,
+    urllib puede enviar esa petición al proxy y recibir un 405 ajeno a Ollama,
+    aunque curl o una petición local directa funcionen.
+    """
+    parsed = urlsplit(url)
+    hostname = (parsed.hostname or "").lower().rstrip(".")
+    try:
+        is_loopback = ipaddress.ip_address(hostname).is_loopback
+    except ValueError:
+        is_loopback = hostname == "localhost"
+    if is_loopback:
+        return build_opener(ProxyHandler({}), _NoRedirect())
+    return _HTTP_OPENER
 
 
 @lru_cache(maxsize=32)
@@ -177,11 +195,11 @@ def _http_json(url, payload=None, headers=None, timeout=600):
     request = Request(url, data=data, headers={"Content-Type": "application/json", **(headers or {})},
                       method="GET" if payload is None else "POST")
     try:
-        with _HTTP_OPENER.open(request, timeout=timeout) as response:
+        with _opener_for_url(url).open(request, timeout=timeout) as response:
             return json.load(response)
     except HTTPError as exc:
         detail = exc.read().decode("utf-8", errors="replace")[:2000]
-        raise RuntimeError(f"Proveedor IA respondió HTTP {exc.code}: {detail}") from exc
+        raise RuntimeError(f"Proveedor IA respondió HTTP {exc.code} en {url}: {detail}") from exc
     except URLError as exc:
         raise RuntimeError(f"No se pudo conectar con el proveedor IA: {exc}") from exc
 
@@ -332,9 +350,12 @@ def _validate_plugin_response(endpoint, result, protocol):
             dimensions.add(len(vector))
         if len(dimensions) != 1:
             raise RuntimeError(f"El plugin {protocol} devolvió dimensiones inconsistentes.")
-    elif endpoint == "api/ps":
-        if not isinstance(result.get("models"), list):
+    elif endpoint in {"api/tags", "api/ps"}:
+        models = result.get("models")
+        if not isinstance(models, list):
             raise RuntimeError(f"El plugin {protocol} no cumple el contrato de catálogo.")
+        if any(not isinstance(item, dict) for item in models):
+            raise RuntimeError(f"El plugin {protocol} devolvió entradas de catálogo inválidas.")
     else:
         raise ValueError(f"Endpoint no admitido para plugins: {endpoint}")
     return result
@@ -345,7 +366,7 @@ def request(provider, endpoint, payload=None, timeout=600):
     if isinstance(timeout, bool) or not isinstance(timeout, (int, float)) or not math.isfinite(timeout) or not 0 < timeout <= 600:
         raise ValueError("timeout debe ser un número finito mayor que 0 y máximo 600 segundos.")
     protocol = provider.get("protocol")
-    required = {"api/chat": "chat", "api/embed": "embeddings", "api/ps": "model_listing"}.get(endpoint)
+    required = {"api/chat": "chat", "api/embed": "embeddings", "api/tags": "model_listing", "api/ps": "model_listing"}.get(endpoint)
     if required and required not in provider_capabilities(provider):
         raise ValueError(f"El proveedor {provider.get('name', protocol)} no ofrece {required}.")
     request_payload = payload or {}
@@ -353,7 +374,38 @@ def request(provider, endpoint, payload=None, timeout=600):
         base = str(provider.get("base_url", "")).rstrip("/")
         if not base:
             raise ValueError("base_url es obligatorio para Ollama.")
-        result = _http_json(base + "/" + endpoint, request_payload, timeout=timeout)
+        if endpoint == "api/embed":
+            # Ollama 0.4.x y anteriores exponen el endpoint legado
+            # POST /api/embeddings (un texto por petición). Las versiones
+            # recientes usan POST /api/embed y aceptan lotes.
+            try:
+                result = _http_json(base + "/api/embed", request_payload, timeout=timeout)
+            except RuntimeError as error:
+                message = str(error)
+                if "HTTP 404" not in message and "HTTP 405" not in message:
+                    raise
+                legacy_vectors = []
+                for value in request_payload.get("input", []):
+                    legacy = _http_json(
+                        base + "/api/embeddings",
+                        {"model": request_payload["model"], "prompt": value,
+                         "keep_alive": request_payload.get("keep_alive", 0)},
+                        timeout=timeout,
+                    )
+                    vector = legacy.get("embedding")
+                    if not isinstance(vector, list):
+                        raise RuntimeError(
+                            "Ollama respondió al endpoint legado sin un embedding válido."
+                        )
+                    legacy_vectors.append(vector)
+                result = {"embeddings": legacy_vectors}
+        elif endpoint in {"api/tags", "api/ps"}:
+            # Ollama expone los catálogos y procesos activos mediante GET.
+            # Enviar {} como payload convierte accidentalmente la petición en POST
+            # y provoca HTTP 405 (por ejemplo, durante la inicialización de ECO).
+            result = _http_json(base + "/" + endpoint, None, timeout=timeout)
+        else:
+            result = _http_json(base + "/" + endpoint, request_payload, timeout=timeout)
     elif protocol == "openai":
         result = _openai_request(provider, endpoint, request_payload, timeout)
     elif protocol == "anthropic":

@@ -291,7 +291,7 @@
     },
     "INVESTIGADOR": {
       "id": "investigador",
-      "model": "qwen3.5:0.8b",
+      "model": "qwen3.5:2b-q4_K_M",
       "type": "research",
       "description": "Investigador autónomo ligero para cerrar brechas de conocimiento de la IA principal",
       "capabilities": [
@@ -304,7 +304,7 @@
       "instructions": "Investiga únicamente las brechas recibidas. Ordena el trabajo por prerrequisitos. Distingue hechos, inferencias e hipótesis. No inventes fuentes, DOI, URLs, citas ni resultados. Si no tienes acceso a búsqueda externa o una fuente no puede verificarse, declara la limitación y no simules haberla consultado. Prioriza fuentes primarias, estándares y documentación oficial. Devuelve un informe trazable con fundamentos, explicación técnica, metodología, ejemplos, límites, contradicciones y preguntas abiertas.",
       "parameters": {
         "num_ctx": 2048,
-        "num_predict": 1000,
+        "num_predict": 1200,
         "temperature": 0.2
       },
       "memory": {

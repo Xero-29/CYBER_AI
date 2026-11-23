@@ -30,6 +30,41 @@ class KnowledgeBootstrapTests(unittest.TestCase):
             self.assertEqual(result["items"][0]["visibility"], "shared")
             self.assertIsNone(result["items"][0]["tenant_id"])
 
+    def test_dry_run_includes_deep_modules_without_duplicate_paths(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            self._setup(root)
+            module_dir = root / "knowledge/deep_modules/x"
+            module_dir.mkdir(parents=True)
+            (module_dir / "TECHNICAL_COMPENDIUM.md").write_text(
+                "# Compendio\nContenido técnico", encoding="utf-8"
+            )
+            (module_dir / "RESEARCH_AGENDA.md").write_text(
+                "# Agenda\nPreguntas pendientes", encoding="utf-8"
+            )
+            manifest = root / "knowledge/packs/manifest.json"
+            with patch.object(bootstrap, "PROJECT", root), patch.object(bootstrap, "MANIFEST", manifest):
+                result = bootstrap.bootstrap(dry_run=True)
+            self.assertEqual(result["selected"], 3)
+            deep = [item for item in result["items"] if item.get("kind") == "deep_module"]
+            self.assertEqual(len(deep), 2)
+            self.assertEqual({item["area_id"] for item in deep}, {"x"})
+            self.assertEqual(len({item["document_id"] for item in deep}), 2)
+
+    def test_deep_module_rejects_symlink(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            self._setup(root)
+            module_dir = root / "knowledge/deep_modules/x"
+            module_dir.mkdir(parents=True)
+            outside = root / "outside.md"
+            outside.write_text("outside", encoding="utf-8")
+            (module_dir / "linked.md").symlink_to(outside)
+            manifest = root / "knowledge/packs/manifest.json"
+            with patch.object(bootstrap, "PROJECT", root), patch.object(bootstrap, "MANIFEST", manifest):
+                with self.assertRaisesRegex(ValueError, "symlinks"):
+                    bootstrap.load_deep_modules()
+
     def test_windows_lock_uses_byte_range_and_releases(self):
         from types import SimpleNamespace
         calls = []
