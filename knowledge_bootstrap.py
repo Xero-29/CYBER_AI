@@ -91,6 +91,61 @@ def load_packs(area_id=None):
     return packs
 
 
+def load_deep_modules(area_id=None):
+    """Descubre documentos Markdown de profundización para las áreas del currículo.
+
+    Cada archivo tiene un document_id estable basado en ruta y SHA-256; repetir
+    el bootstrap no crea una segunda copia si el archivo no cambió.
+    """
+    areas = load_packs(area_id)
+    module_root = PROJECT / "knowledge" / "deep_modules"
+    if not module_root.exists():
+        return []
+    if module_root.is_symlink():
+        raise ValueError("No se permiten symlinks en knowledge/deep_modules.")
+
+    root = PROJECT.resolve()
+    documents = []
+    for area in areas:
+        area_dir = module_root / area["id"]
+        if not area_dir.exists():
+            continue
+        if area_dir.is_symlink():
+            raise ValueError(f"No se permiten symlinks: {area_dir}")
+        for candidate in sorted(area_dir.rglob("*.md")):
+            if candidate.is_symlink():
+                raise ValueError(f"No se permiten symlinks: {candidate}")
+            current = PROJECT
+            relative_path = candidate.relative_to(PROJECT)
+            for part in relative_path.parts:
+                current = current / part
+                if current.is_symlink():
+                    raise ValueError(f"No se permiten symlinks: {relative_path}")
+            path = candidate.resolve()
+            if root not in path.parents or not path.is_file():
+                raise ValueError(f"Ruta fuera del proyecto o inexistente: {relative_path}")
+            raw = path.read_bytes()
+            digest = hashlib.sha256(raw).hexdigest()
+            relative = path.relative_to(root).as_posix()
+            stable = hashlib.sha256(
+                (relative + ":" + digest).encode("utf-8")
+            ).hexdigest()
+            documents.append({
+                "id": f"deep:{area['id']}:{candidate.stem}",
+                "area_id": area["id"],
+                "name": f"{area.get('name', area['id'])} — {candidate.stem}",
+                "path": path,
+                "relative": relative,
+                "sha256": digest,
+                "document_id": "deep-" + stable,
+                "size": len(raw),
+                "visibility": "shared",
+                "tenant_id": None,
+                "kind": "deep_module",
+            })
+    return documents
+
+
 def _bootstrap_locked(packs, dry_run=False):
     if dry_run:
         return {"dry_run": True, "selected": len(packs), "items": packs,
@@ -122,22 +177,37 @@ def _bootstrap_locked(packs, dry_run=False):
                 continue
             registered = register_resource(
                 pack["path"], sha256=pack["sha256"], file_size=pack["size"],
-                resource_type="knowledge_pack", title=pack["name"],
+                resource_type=(
+                    "knowledge_deep_module"
+                    if pack.get("kind") == "deep_module" else "knowledge_pack"
+                ), title=pack["name"],
                 publisher="CYBER_AI", canonical_uri=f"repo://{pack['relative']}",
             )
             resource_id = registered["resource_id"]
+            area_id = pack.get("area_id", pack["id"])
+            is_deep = pack.get("kind") == "deep_module"
             update_resource_classification(
-                resource_id, area_id=pack["id"], domain_id=pack["id"],
-                topic_id="baseline", subtopic_id="methodology",
+                resource_id, area_id=area_id, domain_id=area_id,
+                topic_id="deep_module" if is_deep else "baseline",
+                subtopic_id=Path(pack["relative"]).stem,
                 classification_status="provisional",
-                reason="Paquete propio offline indexado desde el manifiesto versionado.",
+                reason=(
+                    "Módulo de profundización versionado indexado desde el repositorio."
+                    if is_deep else
+                    "Paquete propio offline indexado desde el manifiesto versionado."
+                ),
             )
             update_resource_processing_status(resource_id, "processing")
             result = ingest_document(
                 pack["path"], title=pack["name"],
-                category=f"cybersecurity:{pack['id']}", source=pack["relative"],
+                category=f"cybersecurity:{area_id}", source=pack["relative"],
                 license="UNSPECIFIED", visibility="shared",
-                tags=["cyber_ai", "offline_pack", pack["id"]],
+                tags=[
+                    "cyber_ai",
+                    "deep_module" if is_deep else "offline_pack",
+                    area_id,
+                    Path(pack["relative"]).stem,
+                ],
                 document_id=pack["document_id"],
                 expected_embedding_model=embedding_model,
             )
@@ -148,7 +218,8 @@ def _bootstrap_locked(packs, dry_run=False):
                 raise RuntimeError("La ingestión no publicó fragmentos verificables.")
             update_resource_processing_status(resource_id, "completed")
             ingested.append({
-                "area": pack["id"], "document_id": result["document_id"],
+                "area": area_id, "artifact": pack["id"],
+                "document_id": result["document_id"],
                 "chunks": result["chunks"], "sha256": pack["sha256"],
                 "already_present": bool(result.get("already_present", False)),
             })
@@ -168,14 +239,17 @@ def _bootstrap_locked(packs, dry_run=False):
 
 
 def bootstrap(area_id=None, dry_run=False):
+    # Indexar tanto los paquetes base como los dossiers profundos.
     packs = load_packs(area_id)
+    deep_modules = load_deep_modules(area_id)
+    documents = packs + deep_modules
     if dry_run:
-        return _bootstrap_locked(packs, dry_run=True)
+        return _bootstrap_locked(documents, dry_run=True)
     lock_path = PROJECT / "data" / "knowledge_bootstrap.lock"
     lock_path.parent.mkdir(parents=True, exist_ok=True)
     with lock_path.open("a+b") as lock:
         with exclusive_file_lock(lock):
-            return _bootstrap_locked(packs)
+            return _bootstrap_locked(documents)
 
 
 def main():
