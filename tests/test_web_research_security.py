@@ -163,6 +163,23 @@ class WebResearchEgressSecurityTests(unittest.TestCase):
         self.assertEqual(report["search_status"], "ok")
         self.assertEqual(report["results"][0]["fetch_status"], "pagina consultada")
 
+    def test_trusted_domain_matching_rejects_ambiguous_url_authorities(self):
+        invalid_urls = (
+            "https://@example.org/advisory",
+            "https://2130706433/advisory",
+            "https://127.1/advisory",
+            "https://example.org:/advisory",
+            "https://example.org:0/advisory",
+            "https://example.org:99999/advisory",
+            "https://user:secret@example.org/advisory",
+        )
+        for url in invalid_urls:
+            with self.subTest(url=url):
+                self.assertIsNone(web_research.trusted_domain_for_url(url, self.sources))
+        self.assertIsNotNone(
+            web_research.trusted_domain_for_url("https://docs.example.org/advisory", self.sources)
+        )
+
     def test_page_fetch_installs_explicit_proxy_and_rejects_http_sources(self):
         proxy = "http://127.0.0.1:8080"
 
