@@ -118,6 +118,40 @@ class WebResearchEgressSecurityTests(unittest.TestCase):
             ["example.org", "xn--exmple-cua.org"],
         )
 
+    def test_source_registry_rejects_symlinked_policy_file(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            actual = root / "actual.json"
+            link = root / "trusted-sources.json"
+            actual.write_text(
+                json.dumps({"sources": [{
+                    "id": "official",
+                    "domains": ["example.org"],
+                }]}),
+                encoding="utf-8",
+            )
+            link.symlink_to(actual)
+            with patch.object(web_research, "CONFIG_PATH", link):
+                with self.assertRaisesRegex(ValueError, "configuración"):
+                    web_research.load_sources()
+
+    def test_source_registry_rejects_oversized_policy_file(self):
+        with tempfile.TemporaryDirectory() as directory:
+            config_path = Path(directory) / "trusted-sources.json"
+            config_path.write_bytes(b" " * (web_research.MAX_SOURCE_CONFIG_BYTES + 1))
+            with patch.object(web_research, "CONFIG_PATH", config_path):
+                with self.assertRaisesRegex(ValueError, "1 MB"):
+                    web_research.load_sources()
+
+    @unittest.skipUnless(os.name == "posix", "FIFO security check is POSIX-specific")
+    def test_source_registry_rejects_fifo_before_open(self):
+        with tempfile.TemporaryDirectory() as directory:
+            config_path = Path(directory) / "trusted-sources.fifo"
+            os.mkfifo(config_path)
+            with patch.object(web_research, "CONFIG_PATH", config_path):
+                with self.assertRaisesRegex(ValueError, "configuración"):
+                    web_research.load_sources()
+
     def test_missing_proxy_blocks_search_before_network(self):
         with patch.dict(os.environ, {}, clear=True):
             with patch.object(web_research, "load_sources", return_value=({}, self.sources)):
