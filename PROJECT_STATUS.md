@@ -1,55 +1,56 @@
-# Estado vigente — 2026-11-22 (corte actualizado)
+# Estado vigente — 2026-11-23
 
-> Estado contrastado contra GitHub y los workflows del HEAD de código indicado. Las secciones históricas posteriores se conservan como registro, no como estado vigente.
+> Corte de auditoría de la rama de trabajo. El HEAD indicado y los checks se distinguen explícitamente; las secciones históricas posteriores se conservan como registro y no sustituyen este estado.
 
 ## Repositorio, ramas, PRs e integración
 
-- Repositorio: Xero-29/CYBER_AI.
-- Rama de trabajo: codex/security-integrity-audit.
-- HEAD de código y pruebas: 8ac5846d937892046548bd302b85ca90f0e88b84.
-- main: 387104756d0f8307c39a46a1ea2df07671bd81c9 (feat: add metacognitive research loop).
-- Ancestro común: cae816d6037b56f017c2fbdbb3e98ef00df58c1d.
-- Comparación exacta main...codex/security-integrity-audit: **309 commits exclusivos de la rama y 574 exclusivos de main**. Estado divergido. No es seguro hacer merge, rebase o force-push.
-- El commit 3871047 es el único avance nuevo de main desde el corte anterior (su padre es 9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea), pero **no es el único commit exclusivo de main en el grafo completo**: la divergencia actual contiene 574.
-- 3871047 incorpora el ciclo metacognitivo (INVESTIGADOR, VERITAS, diagnóstico y reevaluación). Se conserva intacto en main; no se cherry-pickeó ni se sobrescribió.
-- codex/reconcile-metacognition-security-audit-2026-11-21 también está divergida frente a esta rama: 19 commits exclusivos de esa rama y 65 exclusivos de la rama de auditoría, con merge-base 22910bbb667b9103d88a87ebbe97972ae729c3e6. No se fusionó.
-- PR #2 está **cerrado y fusionado** desde 2026-11-17; merge commit 478c6ddc676221e4c07b8c5780f127bc5a9e749e. No crear un PR duplicado.
-- PR #17 permanece abierto en Draft contra main; PR #18 permanece abierto en Draft y apilado sobre #17. PR #12 y las propuestas de conocimiento/locks relacionadas siguen abiertas en Draft. No existe PR abierto para la rama actual.
-- La rama actual no tiene PR; no se creó uno porque la divergencia 309/574 y las líneas #17/#18 requieren reconciliación selectiva antes de proponer integración.
-- Las ramas consultadas, incluida main, reportan protected=false. No hay protección de rama ni required checks configurados.
-- No se hizo merge, rebase, cherry-pick, force-push ni escritura en main. No se cerró ni alteró ningún PR.
+- Repositorio: `Xero-29/CYBER_AI`.
+- Rama de trabajo: `codex/security-integrity-audit`.
+- HEAD de rama al corte: `f511b0d9c91e4f5a09eef59506da66457b8d750b`.
+- `main`: `658a565acd0a5568bb56a1a7482f44260cd9efd1` — documentación del perfil ThinkPad E440 16 GiB.
+- Ancestro común: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.
+- Comparación exacta `main...codex/security-integrity-audit`: **327 commits exclusivos de la rama y 576 exclusivos de `main`**. La divergencia es demasiado grande para merge/rebase directo.
+- El commit `387104756d0f8307c39a46a1ea2df07671bd81c9` (`feat: add metacognitive research loop`) continúa siendo exclusivo de `main` respecto a esta rama. Desde ese commit, `main` añadió otros dos commits: `554ec1cdd45de3bb0e0f24156b0a9a8ac19193da` (ajusta `config/model_roles.json`) y `658a565acd0a5568bb56a1a7482f44260cd9efd1` (añade `docs/HARDWARE_THINKPAD_E440_16GB.md`). Los tres cambios permanecen intactos en `main`; no se copiaron ni descartaron.
+- PR #2 está **cerrado y fusionado**; merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e` (`Merge institutional security integrity improvements`). No crear un PR duplicado.
+- No existe PR abierto para `codex/security-integrity-audit`; la búsqueda por `head:Xero-29:codex/security-integrity-audit` no devolvió resultados.
+- PR #11, #12, #13, #14, #16, #17 y #18 siguen abiertos. PR #15 está cerrado. PR #19 está cerrado **sin merge** por `mergeable_state=dirty`; su rama original se conserva.
+- PR #12: `codex/reconcile-main-security-audit-2026-11-18`, 2 commits adelante y 3 detrás de `main`, con base `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`.
+- PR #17: `codex/reconcile-pr11-pr12-2026-11-20`, HEAD `da589efa5a46fb496c1c02c58fda717ddba604d0`, 31 commits adelante y 2 detrás de `main`; base `387104756d0f8307c39a46a1ea2df07671bd81c9`. Sus workflows de PR terminaron en success (runs [44795901916](https://github.com/Xero-29/CYBER_AI/actions/runs/44795901916) y [44795901820](https://github.com/Xero-29/CYBER_AI/actions/runs/44795901820)); el artefacto SBOM se generó en el contexto de merge del PR, no debe confundirse con un artefacto de push del HEAD aislado.
+- PR #18: `codex/reconcile-knowledge-pr13-pr14-2026-11-20`, HEAD actual `888ac5863eea9554202f9dd66baf6024344e1200`, 142 commits adelante y 2 detrás de `main`; está 111 commits por delante de PR #17 y apilado sobre él. El último CI conocido (run [44800010633](https://github.com/Xero-29/CYBER_AI/actions/runs/44800010633), cinco jobs success) corresponde al SHA anterior `2ea257bdf75ce53905299e2571b8b5ea6d82b705`, **no** al HEAD actual `888ac586`. El HEAD actual no tiene runs/statuses consultables.
+- La rama `codex/reconcile-metacognition-security-audit-2026-11-21` también está divergida: 265 commits adelante y 576 detrás de `main`; frente a la rama de auditoría tiene 19 commits exclusivos de reconciliación y 66 exclusivos de auditoría. No es una base limpia de integración.
+- Las propuestas #17/#18 son líneas selectivas más cercanas a `main`, pero requieren validar el HEAD actual de #18 y reconciliar los dos commits recientes de `main`. No se modificaron esas ramas ni PRs.
+- No se hizo merge, rebase, cherry-pick, force-push ni escritura en `main`. No se cerró ni alteró ningún PR.
+- El último registro de protección indicaba `protected=false`. Las acciones disponibles en esta revisión no permiten consultar rulesets/branch protection; no se cambió esa configuración.
 
-## Cambios implementados en este corte
+## Correcciones implementadas en este corte
 
-- knowledge_pack_quality.py ya no acepta un hash escrito en JSON como prueba suficiente: comprueba el SHA-256 de los bytes reales del artefacto del laboratorio y de los archivos de evidencia de cada fuente.
-- Las fuentes verificadas exigen HTTPS, sin credenciales, query, fragmento, IP no global ni host local, además de archivo de evidencia y hash coincidente.
-- La aprobación experta requiere una atestación Ed25519: firma Base64 sobre un payload canónico que enlaza área, commit revisado, identidad, decisión y hashes exactos del paquete, registro de fuentes, registro de laboratorio y evidencias de revisión.
-- La clave pública, su fingerprint SHA-256 y el reviewer_id esperado se provisionan fuera del repositorio mediante CYBER_AI_KNOWLEDGE_REVIEW_PUBLIC_KEY_PEM, CYBER_AI_KNOWLEDGE_REVIEW_PUBLIC_KEY_SHA256 y CYBER_AI_KNOWLEDGE_REVIEWER_ID. OpenSSL ausente, clave no fijada, identidad distinta, firma inválida o evidencia alterada producen rechazo.
-- verify.sh ejecuta ahora el auditor de calidad de biblioteca. La comprobación diagnóstica no exige que los paquetes estén aprobados; sí detecta manifiestos, rutas y evidencias estructuralmente inválidos.
-- docs/KNOWLEDGE_PACK_QUALITY.md documenta el esquema de evidencia, la firma y el límite de confianza. Las claves privadas no se almacenan ni se generan en el repositorio.
-- La primera pasada de CI del commit 24937bb falló por un helper de pruebas que no pasaba la raíz temporal a audit_packs. Se corrigió en 8ac5846; no se consideran verdes los runs fallidos del commit anterior.
+- `knowledge_pack_quality.py`: la validación de referencias HTTPS rechaza IPv4 abreviado/numérico (por ejemplo `127.1`, `2130706433`, octal y hexadecimal), nombres de una sola etiqueta, etiquetas DNS inválidas, autoridades con puerto ambiguo, userinfo, controles, hosts locales y sufijos reservados. Normaliza IDNA y solo acepta IP literales globales. Commits: [3079685](https://github.com/Xero-29/CYBER_AI/commit/3079685e6c3ec9e08ba3c122005ef70b1cbdcb13), [ef5d260](https://github.com/Xero-29/CYBER_AI/commit/ef5d260a44a0a7a6a149eed6674c5c29cd2d074b).
+- `web_research.py`: valida IDs únicos y sufijos DNS específicos en `config/trusted_sources.json`; rechaza comodines, IP, IPv4 abreviado, nombres locales/reservados y DNS malformado; normaliza IDNA. `trusted_domain_for_url` rechaza userinfo vacío o explícito, IPs ambiguas, puertos inválidos y autoridades no canónicas. Mantiene el gateway explícito obligatorio; la validación local no resuelve DNS ni sustituye el pinning del gateway. Commits: [4ebf187](https://github.com/Xero-29/CYBER_AI/commit/4ebf187641a5ff14bb26bfabbdc4db72e2324ff9), [9f67dbe](https://github.com/Xero-29/CYBER_AI/commit/9f67dbeaa2c34a169be9bf2099f94d7a3d5d3747), [172a74c](https://github.com/Xero-29/CYBER_AI/commit/172a74ceadcde031b3f4f4faed0176e12d33504b).
+- `tool_adapters.write_evidence`: `allow_external` exige booleano real; valores truthy como `"false"` o `1` ya no pueden desactivar accidentalmente la confinación de rutas. Commit: [ea57eb7](https://github.com/Xero-29/CYBER_AI/commit/ea57eb7456715321009ba24d3a949cdadc5d95c4).
+- Se añadieron cinco métodos de regresión para hosts numéricos/ambiguos, dominios confiables, normalización IDNA y bypass del parámetro de salida externa. Commits de pruebas: [0423b97](https://github.com/Xero-29/CYBER_AI/commit/0423b971e4e3e5f04e31956f87418fbe09074910), [548aba0](https://github.com/Xero-29/CYBER_AI/commit/548aba0aab2dd77a7b3c833c797728aee0304db1), [3a0f0e1](https://github.com/Xero-29/CYBER_AI/commit/3a0f0e1d65b3ef0bbdcf802952165aa376b3242b), [f1150a7](https://github.com/Xero-29/CYBER_AI/commit/f1150a7ce5e8fb7048430b624ea016d7733ea5dc), [30fa3a4](https://github.com/Xero-29/CYBER_AI/commit/30fa3a4e82bf86c30b2c9bce17eaade51545e8f7), [f511b0d](https://github.com/Xero-29/CYBER_AI/commit/f511b0d9c91e4f5a09eef59506da66457b8d750b).
+- Documentación actualizada: [criterio de calidad de biblioteca](https://github.com/Xero-29/CYBER_AI/commit/0eab6b79b03b01ea0f493067924cabadb6d52810), [salidas seguras](https://github.com/Xero-29/CYBER_AI/commit/d500d56836935cb1d91dc0426a85be59b98f94db) y nueva [política de egress de investigación web](https://github.com/Xero-29/CYBER_AI/commit/8d4c2885d2cd4440132106a2abada1248dfd7931).
+- Los sufijos DNS se validan sintácticamente; no se incorporó una Public Suffix List. La revisión humana del alcance de cada dominio y la política real del gateway siguen siendo necesarias.
 
-## Validación automatizada del código
+## Validación automatizada
 
-- HEAD exacto validado: 8ac5846d937892046548bd302b85ca90f0e88b84.
-- Python tests: **success** — [run 45041993819](https://github.com/Xero-29/CYBER_AI/actions/runs/45041993819). La verificación completa se ejecutó dos veces (antes y después de instalar extractores documentales opcionales): **730 tests, 4 skipped** en cada pasada.
-- Docker sandbox: **success** — [run 45041993818](https://github.com/Xero-29/CYBER_AI/actions/runs/45041993818). Verificación completa: **730 tests, 4 skipped**; build Docker aprobado; Ruff ejecutado con allowlist firmada y red deshabilitada dentro del contenedor.
-- SBOM CycloneDX y provenance: artefacto [14761913409](https://github.com/Xero-29/CYBER_AI/actions/runs/45041993819). Runtime: 9 componentes; sandbox: 8; documentos: 9.
-- El auditor de calidad ejecutado por ambos workflows informa: **48 áreas; 0 expert_ready; 48 foundation_draft**. No hay paquetes con fuentes verificadas, laboratorios con artefactos aprobados ni revisiones firmadas. No se infiere profundidad experta por palabras o secciones.
-- No se ejecutaron pruebas desde un checkout local: no hay copia local del repositorio disponible en este entorno. La evidencia de código procede de GitHub Actions sobre el SHA exacto.
-- Este registro actualiza documentación después del HEAD de código validado; el commit documental resultante debe obtener sus propios checks antes de informar que su HEAD está verde.
+- HEAD actual de la rama: `f511b0d9c91e4f5a09eef59506da66457b8d750b`. Los workflows configurados son: **Python tests** en cada push y PR a `main`; **Docker sandbox** en push a esta rama, PR a `main` y ejecución manual.
+- Para `f511b0d`, `fetch_commit_workflow_runs` no devuelve runs de PR y el combined status no contiene contextos. La integración disponible no expone aquí la lista de runs de push; por tanto **no se declara CI verde** para este HEAD. Los commits nuevos disparan los workflows por sus triggers, pero su conclusión exacta no está verificada.
+- Último HEAD de código con ambos workflows verificados en esta rama: `8ac5846d937892046548bd302b85ca90f0e88b84`. Python Tests: **success, 730 tests, 4 skipped**, run [45041993819](https://github.com/Xero-29/CYBER_AI/actions/runs/45041993819). Docker Sandbox: **success**, run [45041993818](https://github.com/Xero-29/CYBER_AI/actions/runs/45041993818). Esa evidencia **no** valida los cambios posteriores de este corte.
+- Se intentó clonar el repositorio para ejecutar `verify.sh` localmente; el entorno no permitió acceso de red. No se afirma que la suite completa se haya ejecutado localmente.
+- Sí se ejecutó una comprobación focalizada en Python de la lógica de URL/DNS: 15 casos de URL y 11 casos de registro de dominios pasaron. Es una prueba aislada de la lógica, no sustituye los cinco métodos nuevos ni la suite del repositorio.
+- El auditor de biblioteca sigue informando **48 áreas, 0 expert_ready y 48 foundation_draft**. No se elevó ninguna especialidad por volumen, estructura o presencia de referencias.
 
 ## Pendiente real
 
-- **Integración:** decidir y ejecutar una reconciliación selectiva en rama separada. Preservar 3871047 y todo el historial de main; no integrar directamente 309/574. PR #17/#18 son candidatos encadenados, pero sus bases y diffs requieren revisión de tres vías.
-- **Biblioteca:** 48 paquetes continúan en borrador. Faltan lectura integral de fuentes primarias, evidencia claim-to-source, licencias verificadas, laboratorios reproducibles y revisión disciplinar independiente. La nueva compuerta Ed25519 requiere una clave pública confiable y la identidad de reviewer configuradas por un canal administrativo separado.
-- **Ejecución y aislamiento:** Job Objects/ACL Windows; cgroups/namespaces o microVM para código hostil; gateway de egress con allowlist y DNS pinning probado. Docker comparte kernel.
-- **Operación:** KMS/HSM, custodia y rotación de claves, cifrado y backups offsite/WORM, pruebas de restauración/DR, RBAC/IdP/MFA, observabilidad central, alertas y carga/soak.
-- **Pruebas calientes:** host Docker de despliegue, Nuclei únicamente contra laboratorio autorizado, proveedores IA/embeddings reales, costes/cuotas/latencia/fallos y pruebas de recuperación ante fallos físicos.
-- **Administración GitHub:** activar branch protection y required checks tras decidir la línea de integración.
+- **CI:** obtener Python Tests y Docker Sandbox concluidos en success sobre el HEAD final después de esta actualización documental; revisar sus logs, SBOM y evidencia del sandbox. No reutilizar los runs de `8ac5846` como prueba del HEAD nuevo.
+- **Integración:** reconciliar en una rama separada y mediante revisión de tres vías. Preservar `3871047`, `554ec1c`, `658a565` y todo el historial de `main`; no integrar directamente los 327/576 commits. PR #17/#18 requieren validar el HEAD actual de #18 y actualizarse frente a los dos commits recientes de `main`.
+- **Biblioteca:** los 48 paquetes siguen en borrador. Faltan lectura integral de fuentes primarias, licencias verificadas, trazabilidad claim-to-source con evidencia material, laboratorios reproducibles, datasets expertos y revisión disciplinar independiente con firma Ed25519 provisionada por canal confiable.
+- **Ejecución/aislamiento:** Job Objects y ACL Windows; cgroups/namespaces o microVM para código hostil; gateway real con allowlist y DNS pinning; pruebas de escape y egress. Docker comparte kernel y los grupos POSIX no contienen descendientes que creen otra sesión.
+- **Operación:** KMS/HSM, custodia/rotación de claves, cifrado y backups WORM/offsite, restauración DR con RPO/RTO, RBAC/IdP/MFA, segregación de funciones, observabilidad central, alertas, carga/soak y pruebas de fallos físicos.
+- **Proveedores y caliente:** probar Ollama y proveedores remotos reales con cuotas, coste, latencia, fallos, continuidad y políticas de datos; ejecutar Nuclei únicamente contra laboratorios con autorización explícita y verificar restauración en host de despliegue.
+- **Administración GitHub:** confirmar branch protection y required checks cuando se decida la línea de integración.
 
-**Conclusión:** la rama superó 730 pruebas (4 omitidas) y los dos workflows en el SHA 8ac5846. Se endureció de forma verificable la compuerta de calidad de la biblioteca con hashes de archivos reales y firma Ed25519 de revisor externo. La rama sigue divergida y no está integrada ni lista para la validación final del usuario; continúan existiendo trabajo de integración y controles operacionales que pueden desarrollarse sin intervención del usuario.
-
+**Conclusión:** se añadieron controles de entrada para URLs de fuentes, sufijos DNS confiables y salida externa de evidencias, con regresiones y documentación. El HEAD actual todavía no tiene CI verificable, la rama sigue 327/576 divergida y la biblioteca permanece 48/48 en borrador. No está listo para la validación final del usuario; queda trabajo de ingeniería e integración que puede continuar sin intervención externa.
 
 # Estado de ingeniería y auditoría — 2026-11-21
 
