@@ -169,7 +169,7 @@ def _public_https_reference(value):
     if (
         not normalized_host
         or normalized_host == "localhost"
-        or normalized_host.endswith((".localhost", ".local", ".internal", ".test", ".invalid"))
+        or normalized_host.endswith((".localhost", ".local", ".internal", ".test", ".invalid", ".example", ".onion", ".arpa"))
     ):
         return False
 
@@ -199,7 +199,7 @@ def _public_https_reference(value):
                 for label in labels
             )
             or ascii_host == "localhost"
-            or ascii_host.endswith((".localhost", ".local", ".internal", ".test", ".invalid"))
+            or ascii_host.endswith((".localhost", ".local", ".internal", ".test", ".invalid", ".example", ".onion", ".arpa"))
         ):
             return False
         return True
