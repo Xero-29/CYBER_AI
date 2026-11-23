@@ -324,6 +324,7 @@ class KnowledgePackQualityTests(unittest.TestCase):
             "https://bad-.example.org/private",
             "https://example.org..private",
             "https://example.org:/source",
+            "https://source.example/private",
         )
         for url in invalid_urls:
             with self.subTest(url=url):
