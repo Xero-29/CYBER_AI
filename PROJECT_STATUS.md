@@ -6,10 +6,10 @@
 
 - Repositorio: `Xero-29/CYBER_AI`.
 - Rama de trabajo: `codex/security-integrity-audit`.
-- HEAD de rama al corte: `f511b0d9c91e4f5a09eef59506da66457b8d750b`.
+- HEAD de código y pruebas antes de las dos actualizaciones documentales de este corte: `f511b0d9c91e4f5a09eef59506da66457b`. Las dos actualizaciones posteriores solo modifican `PROJECT_STATUS.md`; el HEAD final es el segundo commit documental del registro.
 - `main`: `658a565acd0a5568bb56a1a7482f44260cd9efd1` — documentación del perfil ThinkPad E440 16 GiB.
 - Ancestro común: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.
-- Comparación exacta `main...codex/security-integrity-audit`: **327 commits exclusivos de la rama y 576 exclusivos de `main`**. La divergencia es demasiado grande para merge/rebase directo.
+- Comparación exacta en el HEAD de código/pruebas `f511b0d`: **327 commits exclusivos de la rama y 576 exclusivos de `main`**. Las dos actualizaciones documentales posteriores elevan la rama a 329 commits exclusivos, sin cambiar código. La divergencia es demasiado grande para merge/rebase directo.
 - El commit `387104756d0f8307c39a46a1ea2df07671bd81c9` (`feat: add metacognitive research loop`) continúa siendo exclusivo de `main` respecto a esta rama. Desde ese commit, `main` añadió otros dos commits: `554ec1cdd45de3bb0e0f24156b0a9a8ac19193da` (ajusta `config/model_roles.json`) y `658a565acd0a5568bb56a1a7482f44260cd9efd1` (añade `docs/HARDWARE_THINKPAD_E440_16GB.md`). Los tres cambios permanecen intactos en `main`; no se copiaron ni descartaron.
 - PR #2 está **cerrado y fusionado**; merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e` (`Merge institutional security integrity improvements`). No crear un PR duplicado.
 - No existe PR abierto para `codex/security-integrity-audit`; la búsqueda por `head:Xero-29:codex/security-integrity-audit` no devolvió resultados.
@@ -33,7 +33,7 @@
 
 ## Validación automatizada
 
-- HEAD actual de la rama: `f511b0d9c91e4f5a09eef59506da66457b8d750b`. Los workflows configurados son: **Python tests** en cada push y PR a `main`; **Docker sandbox** en push a esta rama, PR a `main` y ejecución manual.
+- HEAD de código/pruebas: `f511b0d9c91e4f5a09eef59506da66457b8d750b`; dos commits documentales posteriores actualizan únicamente `PROJECT_STATUS.md`. Los workflows configurados son: **Python tests** en cada push y PR a `main`; **Docker sandbox** en push a esta rama, PR a `main` y ejecución manual.
 - Para `f511b0d`, `fetch_commit_workflow_runs` no devuelve runs de PR y el combined status no contiene contextos. La integración disponible no expone aquí la lista de runs de push; por tanto **no se declara CI verde** para este HEAD. Los commits nuevos disparan los workflows por sus triggers, pero su conclusión exacta no está verificada.
 - Último HEAD de código con ambos workflows verificados en esta rama: `8ac5846d937892046548bd302b85ca90f0e88b84`. Python Tests: **success, 730 tests, 4 skipped**, run [45041993819](https://github.com/Xero-29/CYBER_AI/actions/runs/45041993819). Docker Sandbox: **success**, run [45041993818](https://github.com/Xero-29/CYBER_AI/actions/runs/45041993818). Esa evidencia **no** valida los cambios posteriores de este corte.
 - Se intentó clonar el repositorio para ejecutar `verify.sh` localmente; el entorno no permitió acceso de red. No se afirma que la suite completa se haya ejecutado localmente.
