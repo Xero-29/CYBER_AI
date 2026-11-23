@@ -427,15 +427,16 @@ def _validate_search_request(query, max_results, include_untrusted):
     """Bound untrusted search inputs before loading policy or contacting providers."""
     if not isinstance(query, str):
         raise ValueError("La consulta debe ser texto.")
-    query = query.strip()
     if (
-        not query
-        or len(query) > MAX_SEARCH_QUERY_CHARS
+        len(query) > MAX_SEARCH_QUERY_CHARS
         or any(ord(char) < 0x20 or 0x7F <= ord(char) <= 0x9F for char in query)
     ):
         raise ValueError(
-            f"La consulta debe contener entre 1 y {MAX_SEARCH_QUERY_CHARS} caracteres sin controles."
+            f"La consulta debe contener como máximo {MAX_SEARCH_QUERY_CHARS} caracteres sin controles."
         )
+    query = query.strip()
+    if not query:
+        raise ValueError("La consulta no puede estar vacía.")
     if type(max_results) is not int or not 1 <= max_results <= MAX_SEARCH_RESULTS:
         raise ValueError(f"max_results debe ser un entero entre 1 y {MAX_SEARCH_RESULTS}.")
     if type(include_untrusted) is not bool:
