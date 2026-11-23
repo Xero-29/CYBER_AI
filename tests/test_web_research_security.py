@@ -103,12 +103,20 @@ class WebResearchEgressSecurityTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             config_path = Path(directory) / "trusted-sources.json"
             config_path.write_text(
-                json.dumps({"sources": [{"id": "official", "domains": ["EXAMPLE.ORG."]}]}),
+                json.dumps({
+                    "sources": [{
+                        "id": "official",
+                        "domains": ["EXAMPLE.ORG.", "exämple.org"],
+                    }]
+                }),
                 encoding="utf-8",
             )
             with patch.object(web_research, "CONFIG_PATH", config_path):
                 _, sources = web_research.load_sources()
-        self.assertEqual(sources[0]["domains"], ["example.org"])
+        self.assertEqual(
+            sources[0]["domains"],
+            ["example.org", "xn--exmple-cua.org"],
+        )
 
     def test_missing_proxy_blocks_search_before_network(self):
         with patch.dict(os.environ, {}, clear=True):
