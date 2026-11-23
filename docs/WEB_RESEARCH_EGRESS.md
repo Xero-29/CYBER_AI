@@ -2,7 +2,7 @@
 
 ## Registro de dominios confiables
 
-`config/trusted_sources.json` define los sufijos DNS autorizados. `load_sources()` exige IDs únicos y dominios DNS canónicos con al menos dos etiquetas. Rechaza comodines, IP literales, IPv4 abreviado/numérico, hosts locales, etiquetas vacías, puertos, rutas y sintaxis ambigua. Los nombres IDN se normalizan a ASCII IDNA.
+`config/trusted_sources.json` define los sufijos DNS autorizados. `load_sources()` lee el archivo con comprobación de tipo/identidad, sin seguir symlinks ni hardlinks, y con un límite de 1 MB. Exige IDs únicos y dominios DNS canónicos con al menos dos etiquetas. Rechaza comodines, IP literales, IPv4 abreviado/numérico, hosts locales, etiquetas vacías, puertos, rutas y sintaxis ambigua. Los nombres IDN se normalizan a ASCII IDNA.
 
 La coincidencia es por sufijo: registrar `example.org` también incluye sus subdominios. Registra únicamente dominios cuya jerarquía completa sea aceptable. No se incorpora una Public Suffix List; por tanto, la revisión humana del alcance del dominio sigue siendo obligatoria.
 
