@@ -408,8 +408,9 @@ def atomic_write_text(path, text, *, encoding="utf-8", mode=0o600, create_parent
                 raise SafeWriteError("El directorio padre cambió durante la publicación.")
             # Persist the directory entry as well as the file contents.
             os.fsync(directory_fd)
-            os.close(directory_fd)
+            descriptor_to_close = directory_fd
             directory_fd = None
+            os.close(descriptor_to_close)
     except SafeWriteError:
         raise
     except (OSError, UnicodeError) as error:
