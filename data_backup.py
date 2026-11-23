@@ -439,6 +439,8 @@ def _sqlite_snapshot(source, destination):
 
 
 def create_backup(data_dir=DEFAULT_DATA, destination=None, *, allow_unsigned=False):
+    if not isinstance(allow_unsigned, bool):
+        raise BackupError("allow_unsigned debe ser un booleano explícito.")
     signing_key = _backup_signing_key()
     if signing_key is None and allow_unsigned is not True:
         raise BackupError(
@@ -563,6 +565,8 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None, *, allow_unsigned=Fal
 
 
 def verify_backup(snapshot, *, require_signature=True):
+    if not isinstance(require_signature, bool):
+        raise BackupError("require_signature debe ser un booleano explícito.")
     snapshot = Path(os.path.abspath(os.fspath(snapshot)))
     input_snapshot_chain = _validate_directory_path(snapshot)
     snapshot = snapshot.resolve(strict=True)
@@ -592,6 +596,10 @@ def verify_backup(snapshot, *, require_signature=True):
 
 def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
                    confirm_replace=False, require_signature=True):
+    if not all(isinstance(value, bool) for value in (
+        confirm_quiesced, confirm_replace, require_signature
+    )):
+        raise BackupError("Las confirmaciones de restauración deben ser booleanos explícitos.")
     if confirm_quiesced is not True:
         raise BackupError("La restauración requiere --confirm-quiesced.")
     snapshot = Path(os.path.abspath(os.fspath(snapshot)))
