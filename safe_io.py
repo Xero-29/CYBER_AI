@@ -394,8 +394,6 @@ def atomic_write_text(path, text, *, encoding="utf-8", mode=0o600, create_parent
             os.fsync(stream.fileno())
         _reject_symlink_components(parent)
         _validate_destination(destination)
-        os.replace(temporary_path, destination)
-        temporary_path = None
         if os.name == "posix":
             directory_flags = (
                 os.O_RDONLY
@@ -404,8 +402,25 @@ def atomic_write_text(path, text, *, encoding="utf-8", mode=0o600, create_parent
                 | getattr(os, "O_NOFOLLOW", 0)
             )
             directory_fd = os.open(parent, directory_flags)
-            if not stat.S_ISDIR(os.fstat(directory_fd).st_mode):
+            opened_directory = os.fstat(directory_fd)
+            path_directory = parent.stat(follow_symlinks=False)
+            if (
+                not stat.S_ISDIR(opened_directory.st_mode)
+                or not stat.S_ISDIR(path_directory.st_mode)
+                or (opened_directory.st_dev, opened_directory.st_ino)
+                != (path_directory.st_dev, path_directory.st_ino)
+            ):
                 raise SafeWriteError("El directorio padre cambió durante la publicación.")
+            os.replace(
+                temporary_path.name,
+                destination.name,
+                src_dir_fd=directory_fd,
+                dst_dir_fd=directory_fd,
+            )
+        else:
+            os.replace(temporary_path, destination)
+        temporary_path = None
+        if directory_fd is not None:
             # Persist the directory entry as well as the file contents.
             os.fsync(directory_fd)
             descriptor_to_close = directory_fd
