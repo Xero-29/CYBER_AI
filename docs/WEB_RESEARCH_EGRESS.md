@@ -10,6 +10,10 @@ La coincidencia es por sufijo: registrar `example.org` también incluye sus subd
 
 Solo se consultan URLs HTTPS cuyo host coincida con un dominio registrado. Se rechazan userinfo, autoridades ambiguas, puertos inválidos, IPs y hosts que no sean DNS canónico. Cada redirección vuelve a comprobarse contra el mismo registro. Los resultados fuera del registro solo pueden incluirse para descubrimiento con `include_untrusted=True`; no se descargan ni se consideran fuentes verificadas.
 
+## Límites de entrada
+
+Antes de cargar la política o contactar proveedores, la consulta debe ser texto no vacío, sin caracteres de control y de hasta 1.000 caracteres. `max_results` debe ser un entero estricto entre 1 y 20; los booleanos no se aceptan como enteros. `include_untrusted` exige un booleano real. Las URLs recibidas de los motores se rechazan si superan 4.096 caracteres o contienen controles. Estos límites reducen abuso de recursos y evitan que entradas malformadas lleguen al cliente de red.
+
 ## Gateway obligatorio
 
 La búsqueda y descarga requieren `CYBER_AI_WEB_RESEARCH_EGRESS_PROXY`. El cliente no intenta resolver ni fijar DNS por sí mismo: la variable debe apuntar a un gateway administrado que aplique allowlist, DNS pinning, bloqueo de redes privadas/no autorizadas, límites de respuesta y trazabilidad. El código local valida la forma del proxy, pero no demuestra que el gateway esté configurado correctamente ni elimina TOCTOU de DNS.
