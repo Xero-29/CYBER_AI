@@ -26,7 +26,7 @@ from urllib.request import (
 )
 
 from ddgs import DDGS
-from safe_io import atomic_write_text, ensure_private_directory
+from safe_io import atomic_write_text, ensure_private_directory, read_regular_file
 from secret_redaction import redact_sensitive_data, redact_text
 
 ROOT = Path(__file__).resolve().parent
@@ -38,6 +38,7 @@ MAX_EXCERPT_CHARS = 4000
 MAX_SEARCH_QUERY_CHARS = 1000
 MAX_SEARCH_RESULTS = 20
 MAX_RESEARCH_URL_CHARS = 4096
+MAX_SOURCE_CONFIG_BYTES = 1_000_000
 
 SKIP_TAGS = {
     "script", "style", "noscript", "svg", "nav", "footer"
@@ -112,8 +113,14 @@ def _canonical_trusted_domain(value):
 
 
 def load_sources():
-    """Carga dominios DNS explícitos y valida que no amplíen la confianza por accidente."""
-    data = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+    """Carga una política de confianza regular, privada de enlaces y de tamaño acotado."""
+    try:
+        raw = read_regular_file(CONFIG_PATH, max_bytes=MAX_SOURCE_CONFIG_BYTES)
+        data = json.loads(raw.decode("utf-8"))
+    except (OSError, UnicodeError, ValueError, RecursionError) as error:
+        raise ValueError(
+            "La configuración de fuentes debe ser JSON UTF-8 regular, estable y de hasta 1 MB."
+        ) from error
     if not isinstance(data, dict):
         raise ValueError("La configuración de fuentes debe ser un objeto JSON.")
     sources = data.get("sources")
