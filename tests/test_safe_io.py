@@ -23,6 +23,25 @@ class SafeIoTests(unittest.TestCase):
             if os.name == "posix":
                 self.assertEqual(stat.S_IMODE(destination.stat().st_mode), 0o600)
 
+    @unittest.skipUnless(os.name == "posix", "Directory fsync is POSIX-specific")
+    def test_atomic_write_fsyncs_parent_directory_after_replace(self):
+        with tempfile.TemporaryDirectory() as temp:
+            destination = Path(temp) / "manifest.json"
+            original_fsync = os.fsync
+            synced_modes = []
+
+            def record_fsync(descriptor):
+                synced_modes.append(os.fstat(descriptor).st_mode)
+                return original_fsync(descriptor)
+
+            with patch("safe_io.os.fsync", side_effect=record_fsync) as fsync:
+                atomic_write_text(destination, "durable")
+
+            self.assertEqual(destination.read_text(encoding="utf-8"), "durable")
+            self.assertEqual(fsync.call_count, 2)
+            self.assertTrue(stat.S_ISREG(synced_modes[0]))
+            self.assertTrue(stat.S_ISDIR(synced_modes[1]))
+
     def test_symlink_destination_is_rejected_without_touching_target(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
