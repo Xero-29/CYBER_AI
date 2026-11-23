@@ -126,6 +126,66 @@ class WebResearchEgressSecurityTests(unittest.TestCase):
                         web_research.search_web("non-sensitive test query")
         ddgs.assert_not_called()
 
+    def test_search_request_rejects_invalid_query_before_loading_policy_or_network(self):
+        invalid_queries = (
+            None,
+            1,
+            "",
+            " \\t ",
+            "x" * (web_research.MAX_SEARCH_QUERY_CHARS + 1),
+            "two\\nlines",
+            "nul\\x00byte",
+            "control\\x85char",
+        )
+        for query in invalid_queries:
+            with self.subTest(query=repr(query)):
+                with patch.object(web_research, "load_sources") as load_sources:
+                    with patch.object(web_research, "_validated_web_egress_proxy") as proxy:
+                        with patch.object(web_research, "DDGS") as ddgs:
+                            with self.assertRaises(ValueError):
+                                web_research.search_web(query)
+                load_sources.assert_not_called()
+                proxy.assert_not_called()
+                ddgs.assert_not_called()
+
+    def test_search_request_rejects_invalid_options_before_loading_policy(self):
+        invalid_limits = (True, False, 0, -1, 21, 1.5, "5", None)
+        for limit in invalid_limits:
+            with self.subTest(max_results=repr(limit)):
+                with patch.object(web_research, "load_sources") as load_sources:
+                    with self.assertRaises(ValueError):
+                        web_research.search_web("valid query", max_results=limit)
+                load_sources.assert_not_called()
+
+        invalid_untrusted_flags = (1, 0, "true", None)
+        for flag in invalid_untrusted_flags:
+            with self.subTest(include_untrusted=repr(flag)):
+                with patch.object(web_research, "load_sources") as load_sources:
+                    with self.assertRaises(ValueError):
+                        web_research.search_web("valid query", include_untrusted=flag)
+                load_sources.assert_not_called()
+
+    def test_search_request_trims_query_and_accepts_explicit_bounded_options(self):
+        proxy = "http://127.0.0.1:8080"
+        with patch.dict(os.environ, {web_research.WEB_RESEARCH_PROXY_ENV: proxy}):
+            with patch.object(web_research, "load_sources", return_value=({}, self.sources)):
+                with patch.object(web_research, "DDGS") as ddgs:
+                    ddgs.return_value.text.return_value = []
+                    report = web_research.search_web(
+                        "  valid query  ",
+                        max_results=web_research.MAX_SEARCH_RESULTS,
+                        include_untrusted=True,
+                    )
+        self.assertEqual(report["query"], "valid query")
+        self.assertFalse(report["trusted_only"])
+        ddgs.return_value.text.assert_any_call(
+            "valid query",
+            max_results=web_research.MAX_SEARCH_RESULTS,
+            region="us-en",
+            safesearch="moderate",
+            backend="auto",
+        )
+
     def test_proxy_validation_rejects_plaintext_remote_and_credentials(self):
         invalid = (
             "http://proxy.example.org:8080",
@@ -180,6 +240,10 @@ class WebResearchEgressSecurityTests(unittest.TestCase):
             "https://example.org:0/advisory",
             "https://example.org:99999/advisory",
             "https://user:secret@example.org/advisory",
+            "https://example.org/advisory\\nforged",
+            "https://example.org/advisory\\x85forged",
+            "https://example.org/" + ("x" * web_research.MAX_RESEARCH_URL_CHARS),
+            None,
         )
         for url in invalid_urls:
             with self.subTest(url=url):
@@ -187,6 +251,14 @@ class WebResearchEgressSecurityTests(unittest.TestCase):
         self.assertIsNotNone(
             web_research.trusted_domain_for_url("https://docs.example.org/advisory", self.sources)
         )
+
+    def test_page_fetch_rejects_oversized_url_before_opening_connection(self):
+        proxy = "http://127.0.0.1:8080"
+        url = "https://example.org/" + ("x" * web_research.MAX_RESEARCH_URL_CHARS)
+        with patch.object(web_research, "build_opener") as build:
+            result = web_research.fetch_trusted_page(url, self.sources, proxy=proxy)
+        self.assertEqual(result["fetch_status"], "omitida: dominio no registrado")
+        build.assert_not_called()
 
     def test_page_fetch_installs_explicit_proxy_and_rejects_http_sources(self):
         proxy = "http://127.0.0.1:8080"
