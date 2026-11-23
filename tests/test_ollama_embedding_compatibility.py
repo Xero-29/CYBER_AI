@@ -12,6 +12,32 @@ class OllamaEmbeddingCompatibilityTests(unittest.TestCase):
     }
 
 
+    def test_loopback_requests_bypass_environment_proxies(self):
+        opener = llm_providers._opener_for_url(
+            "http://127.0.0.1:11434/api/embeddings"
+        )
+        proxy_handlers = [
+            handler for handler in opener.handlers
+            if handler.__class__.__name__ == "ProxyHandler"
+        ]
+        self.assertEqual(len(proxy_handlers), 1)
+        self.assertEqual(proxy_handlers[0].proxies, {})
+
+    def test_localhost_requests_bypass_environment_proxies(self):
+        opener = llm_providers._opener_for_url("http://localhost:11434/api/tags")
+        proxy_handlers = [
+            handler for handler in opener.handlers
+            if handler.__class__.__name__ == "ProxyHandler"
+        ]
+        self.assertEqual(len(proxy_handlers), 1)
+        self.assertEqual(proxy_handlers[0].proxies, {})
+
+    def test_remote_provider_keeps_configured_opener(self):
+        self.assertIs(
+            llm_providers._opener_for_url("https://api.example.com/v1/embeddings"),
+            llm_providers._HTTP_OPENER,
+        )
+
     def test_model_catalog_uses_get_not_post(self):
         response = {"models": [{"name": "nomic-embed-text:latest"}]}
         with patch("llm_providers._http_json", return_value=response) as http:
