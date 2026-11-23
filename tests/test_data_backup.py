@@ -507,7 +507,7 @@ class DataBackupTests(unittest.TestCase):
             )
         self.assertEqual(
             (self.data / "events.jsonl").read_text(encoding="utf-8"),
-            '{"event":"test"}\\n',
+            '{"event":"test"}\n',
         )
 
     def test_restore_api_requires_signature_by_default(self):
