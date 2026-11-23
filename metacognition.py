@@ -191,10 +191,17 @@ def _runner_call(agent: str, prompt: str, *, knowledge: bool = True, timeout: in
 def _write_research_artifact(report: str, task_id: str, digest: str, *,
                             candidate: bool = False, related: list | None = None) -> str:
     """Guarda el informe aprobado o una propuesta de fusión sin sobrescribir archivos."""
-    directory = PROJECT / "knowledge" / (
+    knowledge_root = PROJECT / "knowledge"
+    if knowledge_root.is_symlink():
+        raise RuntimeError("La raíz de conocimiento no puede ser un symlink.")
+    directory = knowledge_root / (
         "research_candidates" if candidate else "research_generated"
     )
+    if directory.is_symlink():
+        raise RuntimeError("El directorio de artefactos no puede ser un symlink.")
     directory.mkdir(parents=True, exist_ok=True)
+    if PROJECT.resolve() not in directory.resolve().parents:
+        raise RuntimeError("El directorio de artefactos queda fuera del proyecto.")
     prefix = "candidate" if candidate else "research"
     path = directory / f"{prefix}-{digest[:16]}.md"
     if path.is_symlink():
