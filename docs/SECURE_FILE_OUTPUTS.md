@@ -21,6 +21,12 @@ La función:
 
 Las pruebas `tests/test_safe_io.py` cubren escritura/reemplazo, destino symlink, padre symlink, creación explícita de directorios y destinos no regulares.
 
+
+## Evidencia de adaptadores de herramientas
+
+`tool_adapters.write_evidence` confina por defecto los artefactos al repositorio y exige que `allow_external` sea un booleano real. Valores truthy como `"false"` o `1` se rechazan; no pueden activar accidentalmente la salida externa. `allow_external=True` es una excepción explícita de ruta, no una autorización de ejecución ni un control de aislamiento: el destino sigue sujeto a permisos privados, validación de directorios y publicación atómica.
+
+
 ## Límites
 
 Esto reduce el riesgo de sustitución por symlink y de escritura desde directorios compartidos o modificables por terceros. La validación de rutas sigue siendo sensible a carreras frente a procesos con el mismo UID o privilegios equivalentes; no es una frontera de aislamiento frente a un atacante local del mismo usuario. En Windows no se verifica la ACL efectiva: debe validarse en el entorno de despliegue. Esto tampoco sustituye sandbox, WORM o almacenamiento externo. La custodia, retención y recuperación de artefactos siguen siendo responsabilidades operativas.
