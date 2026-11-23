@@ -311,7 +311,7 @@ def _parse_nmap_xml(output):
 
 
 
-def _run_scoped_nmap(target, spec, *, timeout=None):
+def _run_scoped_nmap(target, spec, *, timeout=None, isolated_home):
     normalized_target, scope, allowlist_hash = _validated_nmap_scope(target)
     limit = spec["timeout"] if timeout is None else timeout
     if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= 180:
@@ -322,13 +322,33 @@ def _run_scoped_nmap(target, spec, *, timeout=None):
     provenance = _hash_binary(binary)
     allowlist_evidence = verify_tool_allowed("nmap", provenance["sha256"])
     binary = provenance["resolved_path"]
+    # Keep caller credentials and configuration out of host tool processes.
+    safe_path_entries = [str(Path(binary).parent)]
+    safe_path_entries.extend(
+        entry for entry in os.defpath.split(os.pathsep) if entry
+    )
+    safe_path = os.pathsep.join(dict.fromkeys(safe_path_entries))
     env = {
-        "PATH": os.environ.get("PATH", ""),
-        "HOME": os.environ.get("HOME", ""),
+        "PATH": safe_path,
+        "HOME": isolated_home,
+        "TMPDIR": isolated_home,
+        "TEMP": isolated_home,
+        "TMP": isolated_home,
+        "XDG_CONFIG_HOME": str(Path(isolated_home) / "config"),
+        "XDG_CACHE_HOME": str(Path(isolated_home) / "cache"),
+        "PYTHONNOUSERSITE": "1",
+        "PYTHONDONTWRITEBYTECODE": "1",
         "LANG": "C.UTF-8",
         "LC_ALL": "C.UTF-8",
         "NO_COLOR": "1",
     }
+    if os.name == "nt":
+        for variable in ("SYSTEMROOT", "WINDIR", "PATHEXT", "COMSPEC"):
+            if os.environ.get(variable):
+                env[variable] = os.environ[variable]
+        env["USERPROFILE"] = isolated_home
+        env["APPDATA"] = str(Path(isolated_home) / "AppData" / "Roaming")
+        env["LOCALAPPDATA"] = str(Path(isolated_home) / "AppData" / "Local")
     version = _probe_tool_version(binary, "nmap", env)
     if _hash_binary(binary)["sha256"] != provenance["sha256"]:
         raise ToolExecutionError("El ejecutable Nmap cambió durante la identificación.")
@@ -405,7 +425,25 @@ def _run_scoped_nmap(target, spec, *, timeout=None):
 
 
 
-def run_local_tool(tool_id, target, *, config_path=None, plugin=None, timeout=None, allow_external=False, allow_network=False):
+def run_local_tool(
+    tool_id, target, *, config_path=None, plugin=None, timeout=None,
+    allow_external=False, allow_network=False
+):
+    """Ejecuta un adaptador con HOME/TMP efímeros y entorno mínimo."""
+    with tempfile.TemporaryDirectory(prefix="cyber-ai-tool-home-") as isolated_home:
+        if os.name == "posix":
+            os.chmod(isolated_home, 0o700)
+        return _run_local_tool_with_home(
+            tool_id, target, config_path=config_path, plugin=plugin,
+            timeout=timeout, allow_external=allow_external,
+            allow_network=allow_network, isolated_home=isolated_home,
+        )
+
+
+def _run_local_tool_with_home(
+    tool_id, target, *, config_path=None, plugin=None, timeout=None,
+    allow_external=False, allow_network=False, isolated_home
+):
     """Ejecuta un adaptador local; YARA/TShark se delegan al sandbox Docker."""
     if tool_id not in TOOL_SPECS:
         raise ToolExecutionError("Herramienta no registrada.")
@@ -413,7 +451,9 @@ def run_local_tool(tool_id, target, *, config_path=None, plugin=None, timeout=No
     if spec.get("scoped_network"):
         if not allow_network:
             raise ToolExecutionError("Nmap requiere --authorized-network además de la allowlist CIDR.")
-        return _run_scoped_nmap(target, spec, timeout=timeout)
+        return _run_scoped_nmap(
+            target, spec, timeout=timeout, isolated_home=isolated_home
+        )
     if spec.get("requires_isolation"):
         from isolated_tool_runner import run_isolated_tool
         return run_isolated_tool(
@@ -439,13 +479,32 @@ def run_local_tool(tool_id, target, *, config_path=None, plugin=None, timeout=No
         raise ToolExecutionError("El timeout debe estar entre 1 y 600 segundos.")
     if config_path is None and tool_id == "semgrep":
         config_path = os.environ.get("CYBER_AI_SEMGREP_CONFIG")
+    safe_path_entries = [str(Path(binary).parent)]
+    safe_path_entries.extend(
+        entry for entry in os.defpath.split(os.pathsep) if entry
+    )
+    safe_path = os.pathsep.join(dict.fromkeys(safe_path_entries))
     env = {
-        "PATH": os.environ.get("PATH", ""),
-        "HOME": os.environ.get("HOME", ""),
+        "PATH": safe_path,
+        "HOME": isolated_home,
+        "TMPDIR": isolated_home,
+        "TEMP": isolated_home,
+        "TMP": isolated_home,
+        "XDG_CONFIG_HOME": str(Path(isolated_home) / "config"),
+        "XDG_CACHE_HOME": str(Path(isolated_home) / "cache"),
+        "PYTHONNOUSERSITE": "1",
+        "PYTHONDONTWRITEBYTECODE": "1",
         "LANG": "C.UTF-8",
         "LC_ALL": "C.UTF-8",
         "NO_COLOR": "1",
     }
+    if os.name == "nt":
+        for variable in ("SYSTEMROOT", "WINDIR", "PATHEXT", "COMSPEC"):
+            if os.environ.get(variable):
+                env[variable] = os.environ[variable]
+        env["USERPROFILE"] = isolated_home
+        env["APPDATA"] = str(Path(isolated_home) / "AppData" / "Roaming")
+        env["LOCALAPPDATA"] = str(Path(isolated_home) / "AppData" / "Local")
     for variable in (
         "OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY",
         "OSV_SCALIBR_LOCAL_DB_CACHE_DIRECTORY",

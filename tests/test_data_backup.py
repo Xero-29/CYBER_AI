@@ -200,6 +200,28 @@ class DataBackupTests(unittest.TestCase):
             with self.assertRaisesRegex(BackupError, "HMAC"):
                 verify_backup(snapshot, require_signature=True)
 
+    def test_rejects_oversized_manifest_before_json_parsing(self):
+        snapshot = self.root / "backup"
+        create_backup(self.data, snapshot)
+        manifest_path = snapshot / "manifest.json"
+        with patch("data_backup.MAX_MANIFEST_BYTES", 32):
+            manifest_path.write_bytes(b" " * 33)
+            with self.assertRaisesRegex(BackupError, "16 MiB"):
+                verify_backup(snapshot)
+
+    def test_backup_and_verifier_enforce_file_count_limit(self):
+        snapshot = self.root / "backup"
+        with patch("data_backup.MAX_BACKUP_FILES", 1):
+            with self.assertRaisesRegex(BackupError, "límite de archivos"):
+                create_backup(self.data, snapshot)
+            self.assertFalse(snapshot.exists())
+
+        snapshot = self.root / "valid-backup"
+        create_backup(self.data, snapshot)
+        with patch("data_backup.MAX_BACKUP_FILES", 1):
+            with self.assertRaisesRegex(BackupError, "límite de archivos"):
+                verify_backup(snapshot)
+
     def test_failed_atomic_publish_cleans_staging_directory(self):
         destination = self.root / "backup"
         with patch("data_backup.os.replace", side_effect=OSError("simulated publish failure")):
