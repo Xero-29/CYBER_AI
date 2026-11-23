@@ -10,6 +10,7 @@ import ipaddress
 import json
 import os
 import re
+import socket
 import sys
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
@@ -49,17 +50,91 @@ def utc_now():
     return datetime.now(timezone.utc).isoformat()
 
 
-def load_sources():
-    """Carga y valida la lista de dominios autorizados para consulta."""
-    data = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
-    sources = data.get("sources", [])
+def _canonical_trusted_domain(value):
+    """Validate an exact DNS suffix; broad, local, and numeric hosts are denied."""
+    if (
+        not isinstance(value, str)
+        or not value
+        or value != value.strip()
+        or len(value) > 255
+        or any(char.isspace() or ord(char) < 0x20 or ord(char) == 0x7F for char in value)
+        or any(char in value for char in "/\\:@?#%*[]")
+    ):
+        raise ValueError("La lista de fuentes contiene un dominio inválido.")
 
-    if not sources:
+    host = value.lower()
+    if host.endswith("."):
+        host = host[:-1]
+    if (
+        not host
+        or host.endswith(".")
+        or host == "localhost"
+        or host.endswith((".localhost", ".local", ".internal", ".test", ".invalid"))
+    ):
+        raise ValueError("La lista de fuentes contiene un dominio local o no canónico.")
+
+    try:
+        ipaddress.ip_address(host)
+    except ValueError:
+        # Reject legacy IPv4 spellings that some URL stacks still interpret as IPs.
+        try:
+            socket.inet_aton(host)
+        except OSError:
+            pass
+        else:
+            raise ValueError("La lista de fuentes no puede contener IP ni IPv4 abreviado.")
+
+        try:
+            host = host.encode("idna").decode("ascii").lower()
+        except UnicodeError as error:
+            raise ValueError("La lista de fuentes contiene un dominio IDNA inválido.") from error
+        labels = host.split(".")
+        if (
+            len(host) > 253
+            or len(labels) < 2
+            or labels[-1].isdigit()
+            or any(
+                not label or len(label) > 63
+                or not re.fullmatch(r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?", label)
+                for label in labels
+            )
+        ):
+            raise ValueError("La lista de fuentes requiere un nombre DNS público y específico.")
+    else:
+        raise ValueError("La lista de fuentes no puede contener direcciones IP.")
+
+    return host
+
+
+def load_sources():
+    """Carga dominios DNS explícitos y valida que no amplíen la confianza por accidente."""
+    data = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError("La configuración de fuentes debe ser un objeto JSON.")
+    sources = data.get("sources")
+
+    if not isinstance(sources, list) or not sources:
         raise ValueError("No hay fuentes registradas.")
 
+    seen_ids = set()
     for source in sources:
-        if not source.get("id") or not source.get("domains"):
-            raise ValueError("Hay una fuente sin ID o sin dominios.")
+        if not isinstance(source, dict):
+            raise ValueError("Hay una fuente con esquema inválido.")
+        source_id = source.get("id")
+        domains = source.get("domains")
+        if (
+            not isinstance(source_id, str)
+            or not re.fullmatch(r"[a-z0-9_-]{1,64}", source_id)
+            or source_id in seen_ids
+        ):
+            raise ValueError("La lista de fuentes contiene un ID inválido o duplicado.")
+        if not isinstance(domains, list) or not domains or len(domains) > 64:
+            raise ValueError("Hay una fuente sin una lista de dominios válida.")
+        seen_ids.add(source_id)
+        normalized = [_canonical_trusted_domain(domain) for domain in domains]
+        if len(normalized) != len(set(normalized)):
+            raise ValueError("La fuente contiene dominios duplicados.")
+        source["domains"] = normalized
 
     return data, sources
 
