@@ -35,6 +35,9 @@ REPORT_DIR = ROOT / "reports" / "web_research"
 WEB_RESEARCH_PROXY_ENV = "CYBER_AI_WEB_RESEARCH_EGRESS_PROXY"
 MAX_PAGE_BYTES = 1_500_000
 MAX_EXCERPT_CHARS = 4000
+MAX_SEARCH_QUERY_CHARS = 1000
+MAX_SEARCH_RESULTS = 20
+MAX_RESEARCH_URL_CHARS = 4096
 
 SKIP_TAGS = {
     "script", "style", "noscript", "svg", "nav", "footer"
@@ -189,7 +192,14 @@ def _validated_web_egress_proxy():
 
 
 def trusted_domain_for_url(url, sources):
-    """Return the most specific registered DNS suffix for a canonical HTTPS URL."""
+    """Return the most specific registered DNS suffix for a bounded HTTPS URL."""
+    if (
+        not isinstance(url, str)
+        or not url
+        or len(url) > MAX_RESEARCH_URL_CHARS
+        or any(ord(char) < 0x20 or 0x7F <= ord(char) <= 0x9F for char in url)
+    ):
+        return None
     try:
         parsed = urlparse(url)
         host = parsed.hostname
@@ -413,8 +423,29 @@ def fetch_trusted_page(url, sources, *, proxy=None):
         return {"fetch_status": f"error inesperado: {type(error).__name__}"}
 
 
+def _validate_search_request(query, max_results, include_untrusted):
+    """Bound untrusted search inputs before loading policy or contacting providers."""
+    if not isinstance(query, str):
+        raise ValueError("La consulta debe ser texto.")
+    query = query.strip()
+    if (
+        not query
+        or len(query) > MAX_SEARCH_QUERY_CHARS
+        or any(ord(char) < 0x20 or 0x7F <= ord(char) <= 0x9F for char in query)
+    ):
+        raise ValueError(
+            f"La consulta debe contener entre 1 y {MAX_SEARCH_QUERY_CHARS} caracteres sin controles."
+        )
+    if type(max_results) is not int or not 1 <= max_results <= MAX_SEARCH_RESULTS:
+        raise ValueError(f"max_results debe ser un entero entre 1 y {MAX_SEARCH_RESULTS}.")
+    if type(include_untrusted) is not bool:
+        raise ValueError("include_untrusted debe ser un booleano explícito.")
+    return query
+
+
 def search_web(query, max_results=5, include_untrusted=False):
     """Busca, filtra dominios y consulta páginas confiables disponibles."""
+    query = _validate_search_request(query, max_results, include_untrusted)
     config, sources = load_sources()
     proxy = _validated_web_egress_proxy()
     now = utc_now()
