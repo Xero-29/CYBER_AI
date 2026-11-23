@@ -13,6 +13,10 @@ Cada especialidad dispone de una agenda de investigación en `./<area>/RESEARCH_
 - Auditoría estructural y de trazabilidad: `python knowledge_research_audit.py` o `python knowledge_research_audit.py --json`.
 - Revisiones iniciales: [AppSec/API](./appsec/LITERATURE_REVIEW.md), [respuesta a incidentes](./incident_response/LITERATURE_REVIEW.md), [DevSecOps](./devsecops/LITERATURE_REVIEW.md), [gestión de vulnerabilidades](./vuln_management/LITERATURE_REVIEW.md), [OT/ICS](./ot_ics/LITERATURE_REVIEW.md), [arquitectura segura](./secure_arch/LITERATURE_REVIEW.md) y [criptografía](./crypto/LITERATURE_REVIEW.md).
 
+## Acceso desde los agentes
+
+Los 4 documentos Markdown de cada especialidad (README, agenda de investigación, revisión bibliográfica y compendio técnico) se incorporan a la biblioteca indexada mediante `python knowledge_bootstrap.py`. La ingesta es reanudable: utiliza ruta y SHA-256 para detectar archivos sin cambios y no vuelve a procesarlos si ya están indexados en el espacio de embeddings actual.
+
 ## Estado y uso
 
 - Un módulo por cada área declarada en `knowledge/packs/manifest.json`.
