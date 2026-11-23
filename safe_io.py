@@ -378,6 +378,7 @@ def atomic_write_text(path, text, *, encoding="utf-8", mode=0o600, create_parent
     _validate_destination(destination)
 
     descriptor = None
+    directory_fd = None
     temporary_path = None
     try:
         descriptor, temporary_name = tempfile.mkstemp(
@@ -395,6 +396,20 @@ def atomic_write_text(path, text, *, encoding="utf-8", mode=0o600, create_parent
         _validate_destination(destination)
         os.replace(temporary_path, destination)
         temporary_path = None
+        if os.name == "posix":
+            directory_flags = (
+                os.O_RDONLY
+                | getattr(os, "O_DIRECTORY", 0)
+                | getattr(os, "O_CLOEXEC", 0)
+                | getattr(os, "O_NOFOLLOW", 0)
+            )
+            directory_fd = os.open(parent, directory_flags)
+            if not stat.S_ISDIR(os.fstat(directory_fd).st_mode):
+                raise SafeWriteError("El directorio padre cambió durante la publicación.")
+            # Persist the directory entry as well as the file contents.
+            os.fsync(directory_fd)
+            os.close(directory_fd)
+            directory_fd = None
     except SafeWriteError:
         raise
     except (OSError, UnicodeError) as error:
@@ -402,6 +417,8 @@ def atomic_write_text(path, text, *, encoding="utf-8", mode=0o600, create_parent
     finally:
         if descriptor is not None:
             os.close(descriptor)
+        if directory_fd is not None:
+            os.close(directory_fd)
         if temporary_path is not None:
             try:
                 temporary_path.unlink()
