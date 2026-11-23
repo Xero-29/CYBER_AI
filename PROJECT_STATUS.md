@@ -5,9 +5,9 @@
 ## Repositorio, ramas y PRs
 
 - Repositorio: `Xero-29/CYBER_AI`; rama inspeccionada: `codex/security-integrity-audit`.
-- HEAD de código, pruebas y documentación antes de este registro: `8c940c912692f7d6608efac174312a5c62867537`. Este commit de estado es documental.
+- HEAD de código, pruebas y documentación antes de este registro: `c3644dc338cf820e2976abae8e3c2ae5df2e29bc`. Este commit de estado es documental.
 - `main`: `658a565acd0a5568bb56a1a7482f44260cd9efd1`; ancestro común: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.
-- Comparación exacta antes de este registro: **336 commits exclusivos de la rama y 576 exclusivos de `main`**. La divergencia sigue siendo demasiado grande para merge/rebase directo; este registro no modifica código ni reduce esa divergencia.
+- Comparación exacta antes de este registro: **340 commits exclusivos de la rama y 576 exclusivos de `main`**. Este commit documental elevará la rama a 341 exclusivos; la divergencia sigue siendo demasiado grande para merge/rebase directo.
 - No existe un único commit exclusivo de `main` en el grafo completo: son 576 desde el ancestro común. La secuencia reciente que debe preservarse es `387104756d0f8307c39a46a1ea2df07671bd81c9` (bucle metacognitivo), `554ec1cdd45de3bb0e0f24156b0a9a8ac19193da` (perfil de modelos) y `658a565acd0a5568bb56a1a7482f44260cd9efd1` (perfil de hardware). No se copió ni descartó ninguno.
 - PR #2 está **cerrado y fusionado**; merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. No se crea PR duplicado.
 - No hay PR abierto para esta rama. PR #17 sigue abierto con HEAD `da589efa5a46fb496c1c02c58fda717ddba604d0`; los runs asociados consultados son Python tests [44795901916](https://github.com/Xero-29/CYBER_AI/actions/runs/44795901916) y Docker sandbox [44795901820](https://github.com/Xero-29/CYBER_AI/actions/runs/44795901820), ambos success. PR #18 sigue abierto, apilado sobre #17, HEAD `888ac5863eea9554202f9dd66baf6024344e1200`; no se encontraron runs para ese HEAD. El último run conocido de #18 corresponde al SHA anterior `2ea257bdf75ce53905299e2571b8b5ea6d82b705`, no al actual.
@@ -16,11 +16,11 @@
 
 ## Corrección de seguridad de esta ejecución
 
-- `web_research.py`: la consulta se valida antes de cargar la política o contactar proveedores. Rechaza tipos incorrectos, texto vacío, caracteres C0/C1 y consultas de más de 1.000 caracteres; `max_results` exige un entero estricto entre 1 y 20 (sin aceptar booleanos); `include_untrusted` exige booleano real.
+- `web_research.py`: la consulta se valida antes de cargar la política o contactar proveedores. Rechaza tipos incorrectos, texto vacío, caracteres de control C0/C1 (incluidos los que aparecen al principio o al final) y consultas de más de 1.000 caracteres; `max_results` exige un entero estricto entre 1 y 20 (sin aceptar booleanos); `include_untrusted` exige booleano real.
 - Las URLs recibidas de motores se rechazan si superan 4.096 caracteres o contienen controles, antes de crear una petición HTTP.
-- Regresiones nuevas en `tests/test_web_research_security.py`: rechazo previo a red para consultas malformadas, límites/booleanos, normalización de espacios y URLs grandes/con controles.
+- Se añadieron regresiones para rechazo previo a red, límites y tipos estrictos, normalización de espacios y controles C0/C1 en consultas/URLs, además de URLs excesivamente grandes.
 - Documentación de límites actualizada en `docs/WEB_RESEARCH_EGRESS.md`.
-- Commits: [3577933](https://github.com/Xero-29/CYBER_AI/commit/357793381efd0410af2958a23a0b738417d539f8) (código), [ab50b81](https://github.com/Xero-29/CYBER_AI/commit/ab50b815280bfbc5b4783b8f34caed57d17ee814) (regresiones), [8c940c9](https://github.com/Xero-29/CYBER_AI/commit/8c940c912692f7d6608efac174312a5c62867537) (documentación).
+- Commits: [3577933](https://github.com/Xero-29/CYBER_AI/commit/357793381efd0410af2958a23a0b738417d539f8) y [42d428b](https://github.com/Xero-29/CYBER_AI/commit/42d428bd843230c7d2b26ba9ced0987707ae35a6) (código); [ab50b81](https://github.com/Xero-29/CYBER_AI/commit/ab50b815280bfbc5b4783b8f34caed57d17ee814), [3280ef5](https://github.com/Xero-29/CYBER_AI/commit/3280ef5271c4b963e634d3417b83fb9ebf5f4eb1) y [c3644dc](https://github.com/Xero-29/CYBER_AI/commit/c3644dc338cf820e2976abae8e3c2ae5df2e29bc) (regresiones); [8c940c9](https://github.com/Xero-29/CYBER_AI/commit/8c940c912692f7d6608efac174312a5c62867537) (documentación).
 - No se cambió la política de egress: el gateway explícito sigue siendo obligatorio. La validación local no demuestra DNS pinning, bloqueo de redes privadas ni comportamiento seguro del gateway real.
 
 ## Validación y límites
