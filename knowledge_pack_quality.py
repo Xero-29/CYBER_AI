@@ -6,9 +6,11 @@ import base64
 import binascii
 import hashlib
 import hmac
+import ipaddress
 import json
 import os
 import re
+import socket
 import shutil
 import subprocess
 import tempfile
@@ -24,6 +26,7 @@ ROOT = Path(__file__).resolve().parent
 DEFAULT_MANIFEST = ROOT / "knowledge" / "packs" / "manifest.json"
 SHA256_RE = re.compile(r"[a-fA-F0-9]{64}\Z")
 COMMIT_RE = re.compile(r"[a-fA-F0-9]{40}\Z")
+DNS_LABEL_RE = re.compile(r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\Z")
 MAX_PACK_BYTES = 16 * 1024 * 1024
 MAX_EVIDENCE_BYTES = 16 * 1024 * 1024
 MAX_REVIEW_KEY_BYTES = 16 * 1024
@@ -130,8 +133,14 @@ def _aware_timestamp(value):
 
 
 def _public_https_reference(value):
-    """Reject credential-bearing, local, ambiguous, or non-HTTPS source references."""
-    if not isinstance(value, str) or not value or len(value) > 4096:
+    """Reject non-public IPs and ambiguous/non-canonical DNS source hosts."""
+    if (
+        not isinstance(value, str)
+        or not value
+        or len(value) > 4096
+        or "\\" in value
+        or any(char.isspace() or ord(char) < 0x20 or ord(char) == 0x7F for char in value)
+    ):
         return False
     try:
         parsed = urlsplit(value)
@@ -146,20 +155,53 @@ def _public_https_reference(value):
         or parsed.password is not None
         or parsed.query
         or parsed.fragment
+        or "%" in parsed.netloc
+        or parsed.netloc.endswith(":")
         or (port is not None and not 1 <= port <= 65535)
     ):
         return False
 
-    normalized_host = host.rstrip(".").lower()
+    normalized_host = host.lower()
+    if normalized_host.endswith(".."):
+        return False
+    if normalized_host.endswith("."):
+        normalized_host = normalized_host[:-1]
     if (
-        normalized_host == "localhost"
+        not normalized_host
+        or normalized_host == "localhost"
         or normalized_host.endswith((".localhost", ".local", ".internal", ".test", ".invalid"))
     ):
         return False
+
     try:
-        import ipaddress
         address = ipaddress.ip_address(normalized_host)
     except ValueError:
+        # Some URL stacks accept legacy IPv4 forms such as 127.1, 2130706433,
+        # octal, or hexadecimal notation. Never count those as public DNS names.
+        try:
+            socket.inet_aton(normalized_host)
+        except OSError:
+            pass
+        else:
+            return False
+
+        try:
+            ascii_host = normalized_host.encode("idna").decode("ascii").lower()
+        except UnicodeError:
+            return False
+        labels = ascii_host.split(".")
+        if (
+            len(ascii_host) > 253
+            or len(labels) < 2
+            or labels[-1].isdigit()
+            or any(
+                not label or len(label) > 63 or not DNS_LABEL_RE.fullmatch(label)
+                for label in labels
+            )
+            or ascii_host == "localhost"
+            or ascii_host.endswith((".localhost", ".local", ".internal", ".test", ".invalid"))
+        ):
+            return False
         return True
     return address.is_global
 
