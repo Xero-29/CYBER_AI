@@ -9,7 +9,11 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from knowledge_pack_quality import audit_packs, review_signature_payload
+from knowledge_pack_quality import (
+    _public_https_reference,
+    audit_packs,
+    review_signature_payload,
+)
 
 
 class KnowledgePackQualityTests(unittest.TestCase):
@@ -305,6 +309,26 @@ class KnowledgePackQualityTests(unittest.TestCase):
             report = self._audit_fixture(fixture["manifest"])
         self.assertEqual(report["expert_ready_count"], 0)
         self.assertEqual(report["areas"][0]["verified_external_sources"], 4)
+
+
+    def test_public_https_reference_rejects_ambiguous_numeric_and_invalid_dns_hosts(self):
+        invalid_urls = (
+            "https://2130706433/private",
+            "https://127.1/private",
+            "https://0177.0.0.1/private",
+            "https://0x7f000001/private",
+            "https://localhost/private",
+            "https://intranet/private",
+            "https://bad..example.org/private",
+            "https://-bad.example.org/private",
+            "https://bad-.example.org/private",
+            "https://example.org..private",
+            "https://example.org:/source",
+        )
+        for url in invalid_urls:
+            with self.subTest(url=url):
+                self.assertFalse(_public_https_reference(url))
+        self.assertTrue(_public_https_reference("https://docs.example.org/reference"))
 
 
 if __name__ == "__main__":
