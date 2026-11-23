@@ -69,7 +69,7 @@ def _canonical_trusted_domain(value):
         not host
         or host.endswith(".")
         or host == "localhost"
-        or host.endswith((".localhost", ".local", ".internal", ".test", ".invalid"))
+        or host.endswith((".localhost", ".local", ".internal", ".test", ".invalid", ".example", ".onion", ".arpa"))
     ):
         raise ValueError("La lista de fuentes contiene un dominio local o no canónico.")
 
@@ -103,7 +103,7 @@ def _canonical_trusted_domain(value):
     else:
         raise ValueError("La lista de fuentes no puede contener direcciones IP.")
 
-    if host == "localhost" or host.endswith((".localhost", ".local", ".internal", ".test", ".invalid")):
+    if host == "localhost" or host.endswith((".localhost", ".local", ".internal", ".test", ".invalid", ".example", ".onion", ".arpa")):
         raise ValueError("La lista de fuentes contiene un dominio local o no canónico.")
     return host
 
