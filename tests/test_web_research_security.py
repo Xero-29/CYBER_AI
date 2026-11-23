@@ -75,6 +75,41 @@ class WebResearchEgressSecurityTests(unittest.TestCase):
             "limitations": "Test source",
         }]
 
+    def test_source_registry_rejects_broad_local_and_ambiguous_domains(self):
+        invalid_domains = (
+            ["com"],
+            ["localhost"],
+            ["127.0.0.1"],
+            ["2130706433"],
+            ["127.1"],
+            ["*.example.org"],
+            ["example.org/path"],
+            ["bad..example.org"],
+            ["-bad.example.org"],
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            config_path = Path(directory) / "trusted-sources.json"
+            for domains in invalid_domains:
+                with self.subTest(domains=domains):
+                    config_path.write_text(
+                        json.dumps({"sources": [{"id": "test", "domains": domains}]}),
+                        encoding="utf-8",
+                    )
+                    with patch.object(web_research, "CONFIG_PATH", config_path):
+                        with self.assertRaisesRegex(ValueError, "dominio|DNS|fuentes"):
+                            web_research.load_sources()
+
+    def test_source_registry_normalizes_valid_idna_domains(self):
+        with tempfile.TemporaryDirectory() as directory:
+            config_path = Path(directory) / "trusted-sources.json"
+            config_path.write_text(
+                json.dumps({"sources": [{"id": "official", "domains": ["EXAMPLE.ORG."]}]}),
+                encoding="utf-8",
+            )
+            with patch.object(web_research, "CONFIG_PATH", config_path):
+                _, sources = web_research.load_sources()
+        self.assertEqual(sources[0]["domains"], ["example.org"])
+
     def test_missing_proxy_blocks_search_before_network(self):
         with patch.dict(os.environ, {}, clear=True):
             with patch.object(web_research, "load_sources", return_value=({}, self.sources)):
