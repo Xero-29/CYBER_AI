@@ -103,6 +103,8 @@ def _canonical_trusted_domain(value):
     else:
         raise ValueError("La lista de fuentes no puede contener direcciones IP.")
 
+    if host == "localhost" or host.endswith((".localhost", ".local", ".internal", ".test", ".invalid")):
+        raise ValueError("La lista de fuentes contiene un dominio local o no canónico.")
     return host
 
 
@@ -187,28 +189,33 @@ def _validated_web_egress_proxy():
 
 
 def trusted_domain_for_url(url, sources):
-    """Devuelve la fuente registrada que coincide con el dominio."""
+    """Return the most specific registered DNS suffix for a canonical HTTPS URL."""
     try:
         parsed = urlparse(url)
-        host = (parsed.hostname or "").lower().rstrip(".")
-
-        # Solo HTTPS evita degradación de transporte en las fuentes registradas.
-        if parsed.scheme != "https":
+        host = parsed.hostname
+        port = parsed.port
+        if (
+            parsed.scheme != "https"
+            or not host
+            or parsed.username is not None
+            or parsed.password is not None
+            or "%" in parsed.netloc
+            or "\\" in parsed.netloc
+            or parsed.netloc.endswith(":")
+            or (port is not None and not 1 <= port <= 65535)
+        ):
             return None
-        if not host or parsed.username or parsed.password:
-            return None
-
+        normalized_host = _canonical_trusted_domain(host)
         matches = []
         for source in sources:
             for domain in source["domains"]:
-                domain = domain.lower().rstrip(".")
-                if host == domain or host.endswith("." + domain):
-                    matches.append((len(domain), source))
+                canonical_domain = _canonical_trusted_domain(domain)
+                if normalized_host == canonical_domain or normalized_host.endswith("." + canonical_domain):
+                    matches.append((len(canonical_domain), source))
 
-        # Preferir el dominio registrado más específico.
+        # Prefer the most specific registered suffix; subdomains remain in scope.
         return max(matches, key=lambda item: item[0])[1] if matches else None
-
-    except (ValueError, AttributeError):
+    except (ValueError, AttributeError, KeyError, TypeError):
         return None
 
 
