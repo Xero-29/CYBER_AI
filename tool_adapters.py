@@ -417,6 +417,8 @@ def _run_local_tool_with_home(
 
 
 def write_evidence(evidence, output_dir="reports/tool_evidence", *, allow_external=False):
+    if not isinstance(allow_external, bool):
+        raise ToolExecutionError("allow_external debe ser un booleano explícito.")
     raw = Path(output_dir)
     if not raw.is_absolute():
         raw = PROJECT_ROOT / raw
