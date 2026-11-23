@@ -353,7 +353,33 @@ def request(provider, endpoint, payload=None, timeout=600):
         base = str(provider.get("base_url", "")).rstrip("/")
         if not base:
             raise ValueError("base_url es obligatorio para Ollama.")
-        result = _http_json(base + "/" + endpoint, request_payload, timeout=timeout)
+        if endpoint == "api/embed":
+            # Ollama 0.4.x y anteriores exponen el endpoint legado
+            # POST /api/embeddings (un texto por petición). Las versiones
+            # recientes usan POST /api/embed y aceptan lotes.
+            try:
+                result = _http_json(base + "/api/embed", request_payload, timeout=timeout)
+            except RuntimeError as error:
+                message = str(error)
+                if "HTTP 404" not in message and "HTTP 405" not in message:
+                    raise
+                legacy_vectors = []
+                for value in request_payload.get("input", []):
+                    legacy = _http_json(
+                        base + "/api/embeddings",
+                        {"model": request_payload["model"], "prompt": value,
+                         "keep_alive": request_payload.get("keep_alive", 0)},
+                        timeout=timeout,
+                    )
+                    vector = legacy.get("embedding")
+                    if not isinstance(vector, list):
+                        raise RuntimeError(
+                            "Ollama respondió al endpoint legado sin un embedding válido."
+                        )
+                    legacy_vectors.append(vector)
+                result = {"embeddings": legacy_vectors}
+        else:
+            result = _http_json(base + "/" + endpoint, request_payload, timeout=timeout)
     elif protocol == "openai":
         result = _openai_request(provider, endpoint, request_payload, timeout)
     elif protocol == "anthropic":
