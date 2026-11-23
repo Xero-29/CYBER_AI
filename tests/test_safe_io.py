@@ -35,12 +35,18 @@ class SafeIoTests(unittest.TestCase):
                 return original_fsync(descriptor)
 
             with patch("safe_io.os.fsync", side_effect=record_fsync) as fsync:
-                atomic_write_text(destination, "durable")
+                with patch("safe_io.os.replace", wraps=os.replace) as replace:
+                    atomic_write_text(destination, "durable")
 
             self.assertEqual(destination.read_text(encoding="utf-8"), "durable")
             self.assertEqual(fsync.call_count, 2)
             self.assertTrue(stat.S_ISREG(synced_modes[0]))
             self.assertTrue(stat.S_ISDIR(synced_modes[1]))
+            self.assertIsInstance(replace.call_args.kwargs.get("src_dir_fd"), int)
+            self.assertEqual(
+                replace.call_args.kwargs.get("src_dir_fd"),
+                replace.call_args.kwargs.get("dst_dir_fd"),
+            )
 
     def test_symlink_destination_is_rejected_without_touching_target(self):
         with tempfile.TemporaryDirectory() as temp:
