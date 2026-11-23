@@ -10,7 +10,7 @@ import os
 from functools import lru_cache
 from importlib.metadata import entry_points
 from urllib.parse import urlsplit
-from urllib.request import HTTPRedirectHandler, build_opener
+from urllib.request import HTTPRedirectHandler, ProxyHandler, build_opener
 from urllib.request import Request
 from urllib.error import HTTPError, URLError
 
@@ -23,6 +23,24 @@ class _NoRedirect(HTTPRedirectHandler):
 
 
 _HTTP_OPENER = build_opener(_NoRedirect)
+
+
+def _opener_for_url(url):
+    """Evita proxies HTTP del entorno al conectar con servicios loopback.
+
+    Ollama suele escuchar en 127.0.0.1. En entornos con HTTP_PROXY configurado,
+    urllib puede enviar esa petición al proxy y recibir un 405 ajeno a Ollama,
+    aunque curl o una petición local directa funcionen.
+    """
+    parsed = urlsplit(url)
+    hostname = (parsed.hostname or "").lower().rstrip(".")
+    try:
+        is_loopback = ipaddress.ip_address(hostname).is_loopback
+    except ValueError:
+        is_loopback = hostname == "localhost"
+    if is_loopback:
+        return build_opener(ProxyHandler({}), _NoRedirect())
+    return _HTTP_OPENER
 
 
 @lru_cache(maxsize=32)
@@ -177,11 +195,11 @@ def _http_json(url, payload=None, headers=None, timeout=600):
     request = Request(url, data=data, headers={"Content-Type": "application/json", **(headers or {})},
                       method="GET" if payload is None else "POST")
     try:
-        with _HTTP_OPENER.open(request, timeout=timeout) as response:
+        with _opener_for_url(url).open(request, timeout=timeout) as response:
             return json.load(response)
     except HTTPError as exc:
         detail = exc.read().decode("utf-8", errors="replace")[:2000]
-        raise RuntimeError(f"Proveedor IA respondió HTTP {exc.code}: {detail}") from exc
+        raise RuntimeError(f"Proveedor IA respondió HTTP {exc.code} en {url}: {detail}") from exc
     except URLError as exc:
         raise RuntimeError(f"No se pudo conectar con el proveedor IA: {exc}") from exc
 
