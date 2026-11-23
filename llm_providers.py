@@ -332,9 +332,12 @@ def _validate_plugin_response(endpoint, result, protocol):
             dimensions.add(len(vector))
         if len(dimensions) != 1:
             raise RuntimeError(f"El plugin {protocol} devolvió dimensiones inconsistentes.")
-    elif endpoint == "api/ps":
-        if not isinstance(result.get("models"), list):
+    elif endpoint in {"api/tags", "api/ps"}:
+        models = result.get("models")
+        if not isinstance(models, list):
             raise RuntimeError(f"El plugin {protocol} no cumple el contrato de catálogo.")
+        if any(not isinstance(item, dict) for item in models):
+            raise RuntimeError(f"El plugin {protocol} devolvió entradas de catálogo inválidas.")
     else:
         raise ValueError(f"Endpoint no admitido para plugins: {endpoint}")
     return result
@@ -345,7 +348,7 @@ def request(provider, endpoint, payload=None, timeout=600):
     if isinstance(timeout, bool) or not isinstance(timeout, (int, float)) or not math.isfinite(timeout) or not 0 < timeout <= 600:
         raise ValueError("timeout debe ser un número finito mayor que 0 y máximo 600 segundos.")
     protocol = provider.get("protocol")
-    required = {"api/chat": "chat", "api/embed": "embeddings", "api/ps": "model_listing"}.get(endpoint)
+    required = {"api/chat": "chat", "api/embed": "embeddings", "api/tags": "model_listing", "api/ps": "model_listing"}.get(endpoint)
     if required and required not in provider_capabilities(provider):
         raise ValueError(f"El proveedor {provider.get('name', protocol)} no ofrece {required}.")
     request_payload = payload or {}
@@ -378,6 +381,11 @@ def request(provider, endpoint, payload=None, timeout=600):
                         )
                     legacy_vectors.append(vector)
                 result = {"embeddings": legacy_vectors}
+        elif endpoint in {"api/tags", "api/ps"}:
+            # Ollama expone los catálogos y procesos activos mediante GET.
+            # Enviar {} como payload convierte accidentalmente la petición en POST
+            # y provoca HTTP 405 (por ejemplo, durante la inicialización de ECO).
+            result = _http_json(base + "/" + endpoint, None, timeout=timeout)
         else:
             result = _http_json(base + "/" + endpoint, request_payload, timeout=timeout)
     elif protocol == "openai":
