@@ -16,6 +16,7 @@ La función:
 - rechaza destinos existentes que no sean archivos regulares;
 - crea el temporal de forma exclusiva en el mismo directorio;
 - escribe y sincroniza el contenido antes de reemplazar el destino;
+- en POSIX, sincroniza también el directorio padre después del `rename` para persistir la entrada publicada;
 - usa permisos restrictivos `0600` en POSIX;
 - permite crear directorios padre solo cuando el llamador lo solicita expresamente.
 
