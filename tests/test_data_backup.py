@@ -478,6 +478,38 @@ class DataBackupTests(unittest.TestCase):
         create.assert_not_called()
         self.assertIn("CYBER_AI_BACKUP_HMAC_KEY", output.getvalue())
 
+    def test_backup_and_restore_security_overrides_require_real_booleans(self):
+        with patch.dict(os.environ, {}, clear=True):
+            with self.assertRaisesRegex(BackupError, "booleano explícito"):
+                create_backup(
+                    self.data, self.root / "truthy-unsigned", allow_unsigned="true"
+                )
+
+        snapshot = self.root / "unsigned-flags"
+        self.create_unsigned_backup(snapshot)
+        with self.assertRaisesRegex(BackupError, "booleano explícito"):
+            verify_backup(snapshot, require_signature=0)
+        with self.assertRaisesRegex(BackupError, "booleanos explícitos"):
+            restore_backup(
+                snapshot,
+                self.data,
+                confirm_quiesced=True,
+                confirm_replace="false",
+                require_signature=False,
+            )
+        with self.assertRaisesRegex(BackupError, "booleanos explícitos"):
+            restore_backup(
+                snapshot,
+                self.data,
+                confirm_quiesced=True,
+                confirm_replace=True,
+                require_signature=0,
+            )
+        self.assertEqual(
+            (self.data / "events.jsonl").read_text(encoding="utf-8"),
+            '{"event":"test"}\\n',
+        )
+
     def test_restore_api_requires_signature_by_default(self):
         snapshot = self.root / "unsigned-restore"
         self.create_unsigned_backup(snapshot)
