@@ -269,6 +269,19 @@ class ToolAdapterTests(unittest.TestCase):
                 write_evidence({"tool": "ruff"}, destination)
             self.assertFalse(destination.exists())
 
+    def test_external_evidence_override_requires_an_explicit_boolean(self):
+        with tempfile.TemporaryDirectory() as outside:
+            destination = Path(outside) / "new-evidence"
+            for value in ("false", 1, None):
+                with self.subTest(value=value):
+                    with self.assertRaisesRegex(ToolExecutionError, "booleano explícito"):
+                        write_evidence(
+                            {"tool": "ruff", "status": "completed"},
+                            destination,
+                            allow_external=value,
+                        )
+            self.assertFalse(destination.exists())
+
     def test_evidence_cannot_chmod_repository_root(self):
         original_mode = stat.S_IMODE(self.root.stat().st_mode)
         with self.assertRaisesRegex(ToolExecutionError, "raíz del repositorio"):
