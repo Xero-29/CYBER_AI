@@ -1,38 +1,47 @@
 # Estado vigente — 2026-11-23 (auditoría incremental)
 
-> Estado de la rama de trabajo. No se confunde documentación con implementación ni resultados de otros SHA con validación del HEAD actual.
+> Estado de la rama de trabajo. La evidencia de CI siempre se vincula al SHA exacto; un resultado de otro commit no se reutiliza.
 
 ## Repositorio, ramas y PRs
 
-- Repositorio: `Xero-29/CYBER_AI`; rama inspeccionada: `codex/security-integrity-audit`.
-- HEAD de código, pruebas y documentación antes de este registro: `c3644dc338cf820e2976abae8e3c2ae5df2e29bc`. Este commit de estado es documental.
+- Repositorio: `Xero-29/CYBER_AI`; rama de trabajo: `codex/security-integrity-audit`.
+- HEAD de código y pruebas antes de este registro: `fbc4e0df1ed57331245b9d434b90800cb9d1c270`. El commit de este registro es documental y vuelve a disparar CI.
 - `main`: `658a565acd0a5568bb56a1a7482f44260cd9efd1`; ancestro común: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.
-- Comparación exacta antes de este registro: **340 commits exclusivos de la rama y 576 exclusivos de `main`**. Este commit documental elevará la rama a 341 exclusivos; la divergencia sigue siendo demasiado grande para merge/rebase directo.
+- Comparación exacta antes de este registro: **351 commits exclusivos de la rama y 576 exclusivos de `main`**. El commit documental eleva la rama a 352 exclusivos; no hay base segura para merge/rebase directo.
 - No existe un único commit exclusivo de `main` en el grafo completo: son 576 desde el ancestro común. La secuencia reciente que debe preservarse es `387104756d0f8307c39a46a1ea2df07671bd81c9` (bucle metacognitivo), `554ec1cdd45de3bb0e0f24156b0a9a8ac19193da` (perfil de modelos) y `658a565acd0a5568bb56a1a7482f44260cd9efd1` (perfil de hardware). No se copió ni descartó ninguno.
 - PR #2 está **cerrado y fusionado**; merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. No se crea PR duplicado.
-- No hay PR abierto para esta rama. PR #17 sigue abierto con HEAD `da589efa5a46fb496c1c02c58fda717ddba604d0`; los runs asociados consultados son Python tests [44795901916](https://github.com/Xero-29/CYBER_AI/actions/runs/44795901916) y Docker sandbox [44795901820](https://github.com/Xero-29/CYBER_AI/actions/runs/44795901820), ambos success. PR #18 sigue abierto, apilado sobre #17, HEAD `888ac5863eea9554202f9dd66baf6024344e1200`; no se encontraron runs para ese HEAD. El último run conocido de #18 corresponde al SHA anterior `2ea257bdf75ce53905299e2571b8b5ea6d82b705`, no al actual.
+- No hay PR abierto para esta rama. PR #17 sigue abierto; los runs asociados consultados son Python tests [44795901916](https://github.com/Xero-29/CYBER_AI/actions/runs/44795901916) y Docker sandbox [44795901820](https://github.com/Xero-29/CYBER_AI/actions/runs/44795901820), ambos success. PR #18 sigue abierto y apilado sobre #17, HEAD `888ac5863eea9554202f9dd66baf6024344e1200`; no se encontraron runs para ese HEAD. El último run conocido de #18 corresponde al SHA anterior `2ea257bdf75ce53905299e2571b8b5ea6d82b705`, no al actual.
 - PR #11/#12 cubren locks/SBOM y reconciliación de activos; #13/#14/#18 cubren biblioteca. Se conservaron sin cambios. No se ejecutó merge, rebase, cherry-pick, force-push ni escritura en `main`.
-- La protección de rama y los required checks no pudieron verificarse con las acciones disponibles; no se afirma que estén configurados.
+- La protección de rama no pudo verificarse con los permisos/endpoints disponibles; no se afirma que esté configurada.
 
-## Corrección de seguridad de esta ejecución
+## Correcciones de seguridad y durabilidad
 
-- `web_research.py`: la consulta se valida antes de cargar la política o contactar proveedores. Rechaza tipos incorrectos, texto vacío, caracteres de control C0/C1 (incluidos los que aparecen al principio o al final) y consultas de más de 1.000 caracteres; `max_results` exige un entero estricto entre 1 y 20 (sin aceptar booleanos); `include_untrusted` exige booleano real.
-- Las URLs recibidas de motores se rechazan si superan 4.096 caracteres o contienen controles, antes de crear una petición HTTP.
-- Se añadieron regresiones para rechazo previo a red, límites y tipos estrictos, normalización de espacios y controles C0/C1 en consultas/URLs, además de URLs excesivamente grandes.
-- Documentación de límites actualizada en `docs/WEB_RESEARCH_EGRESS.md`.
-- Commits: [3577933](https://github.com/Xero-29/CYBER_AI/commit/357793381efd0410af2958a23a0b738417d539f8) y [42d428b](https://github.com/Xero-29/CYBER_AI/commit/42d428bd843230c7d2b26ba9ced0987707ae35a6) (código); [ab50b81](https://github.com/Xero-29/CYBER_AI/commit/ab50b815280bfbc5b4783b8f34caed57d17ee814), [3280ef5](https://github.com/Xero-29/CYBER_AI/commit/3280ef5271c4b963e634d3417b83fb9ebf5f4eb1) y [c3644dc](https://github.com/Xero-29/CYBER_AI/commit/c3644dc338cf820e2976abae8e3c2ae5df2e29bc) (regresiones); [8c940c9](https://github.com/Xero-29/CYBER_AI/commit/8c940c912692f7d6608efac174312a5c62867537) (documentación).
-- No se cambió la política de egress: el gateway explícito sigue siendo obligatorio. La validación local no demuestra DNS pinning, bloqueo de redes privadas ni comportamiento seguro del gateway real.
+- `web_research.py`: consulta validada antes de cargar política o contactar proveedores; texto no vacío, máximo 1.000 caracteres, rechazo de controles C0/C1 antes de recortar espacios; `max_results` entero estricto 1–20; `include_untrusted` booleano real. URLs de resultados limitadas a 4.096 caracteres y sin controles.
+- `load_sources()` ya no usa `Path.read_text()` sobre la política de confianza: lee con `safe_io.read_regular_file`, comprueba identidad/tipo, rechaza symlinks/puntos de reanálisis y hardlinks en POSIX, y limita el JSON a 1 MB.
+- `safe_io.atomic_write_text()`: en POSIX publica el archivo con `os.replace` relativo a un descriptor de directorio verificado y sincroniza el directorio padre después de sincronizar el contenido. La publicación falla si no se puede confirmar la sincronización; Windows sigue sin ACL verificadas.
+- Regresiones nuevas: consultas/URLs malformadas y grandes, controles C0/C1 al inicio/interior/final, política de confianza enlazada/FIFO/sobredimensionada y fsync del directorio con rename relativo a `dir_fd`.
+- Documentación actualizada en `docs/WEB_RESEARCH_EGRESS.md` y `docs/SECURE_FILE_OUTPUTS.md`.
+- Commits de código: [3577933](https://github.com/Xero-29/CYBER_AI/commit/357793381efd0410af2958a23a0b738417d539f8), [42d428b](https://github.com/Xero-29/CYBER_AI/commit/42d428bd843230c7d2b26ba9ced0987707ae35a6), [e3dae9d](https://github.com/Xero-29/CYBER_AI/commit/e3dae9dd94075de620cd834910a0f197083087b7), [9d7cf32](https://github.com/Xero-29/CYBER_AI/commit/9d7cf32d234c73357dc218c71b7bd63ed907b510), [c4e01f8](https://github.com/Xero-29/CYBER_AI/commit/c4e01f895d8d8f85933202913f8c7a28d5ba82d4), [5801af0](https://github.com/Xero-29/CYBER_AI/commit/5801af031d27331b7711683e7ea3bf7ed56ff310).
+- Commits de regresiones: [ab50b81](https://github.com/Xero-29/CYBER_AI/commit/ab50b815280bfbc5b4783b8f34caed57d17ee814), [3280ef5](https://github.com/Xero-29/CYBER_AI/commit/3280ef5271c4b963e634d3417b83fb9ebf5f4eb1), [c3644dc](https://github.com/Xero-29/CYBER_AI/commit/c3644dc338cf820e2976abae8e3c2ae5df2e29bc), [a72c1bb](https://github.com/Xero-29/CYBER_AI/commit/a72c1bb170f7854b76d83fa571dac094356c463a), [9a50403](https://github.com/Xero-29/CYBER_AI/commit/9a5040372c857af0e2807b4bba60d1480884aeb1), [fbc4e0d](https://github.com/Xero-29/CYBER_AI/commit/fbc4e0df1ed57331245b9d434b90800cb9d1c270).
+- Commits documentales: [8c940c9](https://github.com/Xero-29/CYBER_AI/commit/8c940c912692f7d6608efac174312a5c62867537), [c202572](https://github.com/Xero-29/CYBER_AI/commit/c202572d9c6317cd7aa8d58128c8034cf2c41435), [51a143e](https://github.com/Xero-29/CYBER_AI/commit/51a143e8a605fea4a96ed4298f4ab512e7115b15), [2b55510](https://github.com/Xero-29/CYBER_AI/commit/2b555106dd28421339baaea3c63671dde33c0724).
 
-## Validación y límites
+## CI, SBOM y evidencia exacta
 
-- **CI del HEAD de esta rama: no verificado.** El estado combinado del commit no devolvió checks y el conector de runs consultado solo devuelve ejecuciones disparadas por PR; no se declara CI verde. Los éxitos de #17 o de HEAD anteriores no validan este código.
-- Último par de checks conocido de esta rama antes de los cambios recientes: Python Tests [45041993819](https://github.com/Xero-29/CYBER_AI/actions/runs/45041993819), 730 tests y 4 skipped; Docker Sandbox [45041993818](https://github.com/Xero-29/CYBER_AI/actions/runs/45041993818). No cubren este HEAD.
-- No hay checkout local de este repositorio en el entorno de esta ejecución; no se afirma que se haya ejecutado `verify.sh` ni la suite completa localmente.
-- La biblioteca sigue en **48 áreas, 0 expert_ready y 48 foundation_draft**. Ningún paquete se aprueba por volumen o estructura.
-- Pendiente de ingeniería: CI exacto de Python y Docker para el nuevo HEAD; revisión adicional de adaptadores, almacenamiento, proveedores y observabilidad; evaluación de fuentes/laboratorios por especialidad; integración selectiva en rama separada.
-- Pendiente externo/operacional: gateway con DNS pinning y egress controlado; Job Objects/ACL Windows y cgroups/namespaces o microVM; KMS/HSM y custodia/rotación; cifrado y WORM/offsite; RBAC/IdP/MFA; pruebas DR/RPO/RTO, carga y fallos físicos; proveedores reales y revisión experta independiente.
+- En el HEAD `fbc4e0df1ed57331245b9d434b90800cb9d1c270`, **Python tests** [45212327951](https://github.com/Xero-29/CYBER_AI/actions/runs/45212327951) terminó **success**; job `unit-tests`, **744 tests, 4 skipped**, incluyendo verificación de locks y generación de SBOM.
+- En el mismo SHA, **Docker sandbox** [45212327718](https://github.com/Xero-29/CYBER_AI/actions/runs/45212327718) terminó **success**; job `sandbox-smoke`, **744 tests, 4 skipped**, Ruff terminó con código 0 y la evidencia se subió.
+- SBOM/provenance artifact [14837780058](https://github.com/Xero-29/CYBER_AI/actions/runs/45212327951) contiene tres CycloneDX 1.5: core (9 componentes), sandbox (8) y documentos (9), sin PURLs duplicados en cada SBOM. Los tres manifiestos de artefactos enlazan hashes de wheels con sus respectivos locks; provenance identifica el commit `fbc4e0d` y el run `45212327951`.
+- Evidencia sandbox artifact [14837475478](https://github.com/Xero-29/CYBER_AI/actions/runs/45212327718) contiene ledger SQLite (2 eventos start/completed enlazados por hash) y evidencia Ruff. El ejecutable Ruff figura aprobado por allowlist firmada. La evidencia del adaptador indica `network_isolation_enforced=false`; el workflow ejecutó el contenedor con `--network=none`, pero eso no demuestra aislamiento de red de procesos ejecutados directamente en el host.
+- Este commit documental dispara nuevas ejecuciones; **no se atribuye success al SHA documental hasta consultar sus propios runs**.
+- No hay checkout local de este repositorio en el entorno; no se afirma que se ejecutara `verify.sh` localmente.
 
-**Conclusión:** se cerró una brecha concreta de validación de entradas de investigación web con regresiones. El proyecto no está listo para la validación final del usuario: falta CI exacto y todavía hay trabajo de ingeniería e integración que puede hacerse sin intervención externa. `main` permanece intacta.
+## Pendiente real
+
+- Verificar Python tests y Docker sandbox sobre el nuevo HEAD documental; revisar logs/artefactos de ese SHA.
+- Reconciliar la divergencia únicamente en una rama separada con revisión de tres vías; preservar los 576 commits exclusivos de `main`, en particular `3871047`, `554ec1c` y `658a565`. No integrar directamente los 351/576 commits.
+- La biblioteca sigue en **48 áreas, 0 expert_ready y 48 foundation_draft**. Faltan lectura de fuentes primarias, licencias verificadas, evidencia claim-to-source, laboratorios reproducibles, datasets expertos y revisión independiente firmada por canal confiable.
+- Pendiente externo/operacional: gateway real con DNS pinning y egress controlado; Job Objects/ACL Windows y cgroups/namespaces o microVM; KMS/HSM, rotación y custodia; cifrado y backups WORM/offsite; RBAC/IdP/MFA; pruebas DR/RPO/RTO, carga y fallos físicos; proveedores reales y revisión disciplinar independiente.
+
+**Conclusión:** el HEAD de código/pruebas `fbc4e0d` tiene Python y Docker CI exitosos y artefactos SBOM/evidencia revisados. El HEAD documental que genera este registro aún debe pasar sus propios checks. El proyecto no está listo para la validación final del usuario: quedan trabajo de ingeniería e integración que puede realizarse sin intervención externa. `main` permanece intacta.
 
 
 # Estado de ingeniería y auditoría — 2026-11-21
