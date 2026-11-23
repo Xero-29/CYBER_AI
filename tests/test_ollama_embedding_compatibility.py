@@ -11,6 +11,37 @@ class OllamaEmbeddingCompatibilityTests(unittest.TestCase):
         "base_url": "http://127.0.0.1:11434",
     }
 
+
+    def test_model_catalog_uses_get_not_post(self):
+        response = {"models": [{"name": "nomic-embed-text:latest"}]}
+        with patch("llm_providers._http_json", return_value=response) as http:
+            result = llm_providers.request(self.provider, "api/tags")
+
+        self.assertEqual(result, response)
+        http.assert_called_once_with(
+            "http://127.0.0.1:11434/api/tags", None, timeout=600
+        )
+
+    def test_active_process_catalog_uses_get_not_post(self):
+        response = {"models": []}
+        with patch("llm_providers._http_json", return_value=response) as http:
+            result = llm_providers.request(self.provider, "api/ps")
+
+        self.assertEqual(result, response)
+        http.assert_called_once_with(
+            "http://127.0.0.1:11434/api/ps", None, timeout=600
+        )
+
+    def test_installed_models_reads_ollama_catalog(self):
+        response = {"models": [{"name": "nomic-embed-text:latest"}]}
+        with patch("llm_providers._http_json", return_value=response) as http:
+            result = llm_providers.installed_models(self.provider)
+
+        self.assertEqual(result, {"nomic-embed-text:latest"})
+        http.assert_called_once_with(
+            "http://127.0.0.1:11434/api/tags", None, timeout=600
+        )
+
     def test_uses_modern_batch_endpoint_when_available(self):
         payload = {"model": "nomic-embed-text:latest", "input": ["uno", "dos"]}
         response = {"embeddings": [[0.1, 0.2], [0.3, 0.4]]}
