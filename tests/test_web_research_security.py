@@ -131,11 +131,11 @@ class WebResearchEgressSecurityTests(unittest.TestCase):
             None,
             1,
             "",
-            " \\t ",
+            " \t ",
             "x" * (web_research.MAX_SEARCH_QUERY_CHARS + 1),
-            "two\\nlines",
-            "nul\\x00byte",
-            "control\\x85char",
+            "two\nlines",
+            "nul\x00byte",
+            "control\x85char",
         )
         for query in invalid_queries:
             with self.subTest(query=repr(query)):
@@ -240,8 +240,8 @@ class WebResearchEgressSecurityTests(unittest.TestCase):
             "https://example.org:0/advisory",
             "https://example.org:99999/advisory",
             "https://user:secret@example.org/advisory",
-            "https://example.org/advisory\\nforged",
-            "https://example.org/advisory\\x85forged",
+            "https://example.org/advisory\nforged",
+            "https://example.org/advisory\x85forged",
             "https://example.org/" + ("x" * web_research.MAX_RESEARCH_URL_CHARS),
             None,
         )
