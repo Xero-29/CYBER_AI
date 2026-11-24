@@ -26,6 +26,29 @@ Los paquetes versionados contienen guías editoriales iniciales. No deben descri
 
 El registro de revisión se invalida si cambia el paquete, el registro de fuentes, el registro de laboratorio o cualquiera de los artefactos firmados. Una revisión debe repetirse sobre los nuevos hashes.
 
+## Diagnóstico de bloqueos por especialidad
+
+El informe JSON de `knowledge_pack_quality.py` incluye `readiness_blockers` para cada área. Los códigos son deliberadamente conservadores:
+
+- `pack_missing_or_unsafe`: el paquete no existe, no es un archivo regular seguro o su ruta no supera la validación.
+- `missing_required_sections`: faltan una o más de las secciones técnicas requeridas; el detalle está en `missing_sections`.
+- `verified_sources_below_minimum`: hay menos de cinco fuentes que superan todas las comprobaciones de licencia, procedencia, fecha y hash de evidencia.
+- `lab_evidence_missing_or_unverified`: no existe una ejecución aprobada vinculada a un artefacto real cuyo SHA-256 coincida.
+- `independent_review_missing_or_untrusted`: no hay una revisión independiente válida ligada a los hashes exactos del paquete, fuentes y laboratorio y verificada con la clave pública Ed25519 configurada fuera del repositorio.
+
+Un área sin bloqueos solo significa que satisface las comprobaciones automatizadas definidas por este auditor. No demuestra por sí sola que un experto haya validado la corrección semántica, ni sustituye la revisión disciplinar independiente.
+
+Comandos recomendados:
+
+~~~bash
+python3 knowledge_pack_quality.py
+python3 knowledge_pack_quality.py --json
+python3 knowledge_pack_quality.py --area foundations --json
+python3 knowledge_pack_quality.py --require-expert-ready
+~~~
+
+El resultado de `knowledge_bootstrap.py` (documentos indexados/sin cambios/fallidos) mide el trabajo de ingesta; no cambia ni satisface los requisitos de calidad, fuentes, laboratorio o revisión independiente.
+
 ## Auditoría
 
 ~~~bash
