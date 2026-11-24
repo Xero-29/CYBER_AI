@@ -88,6 +88,8 @@ class OpenAICompatibleChatClient:
             raise RuntimeError("model endpoint returned an invalid chat-completion response") from None
         if not isinstance(content, str):
             raise RuntimeError("model response content must be text")
+        if not content.strip():
+            raise RuntimeError("model endpoint returned empty message content")
         return content, time.monotonic() - started
 
 
