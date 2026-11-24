@@ -308,6 +308,7 @@ El contenido histórico que sigue registra implementaciones y validaciones de co
 
 - Se añadió `knowledge/deep_modules/ai_red_team/model_probe.py`: adaptador opt-in OpenAI-compatible para ejecutar probes de inyección directa/indirecta, extracción de canary sintético y conformidad JSON contra un modelo local o endpoint remoto autorizado.
 - Por defecto, HTTP solo se permite en loopback. Endpoints remotos requieren HTTPS y `--allow-remote`; la clave se lee desde `CYBER_AI_MODEL_API_KEY`. No se exponen herramientas ni se envían datos reales.
-- Se añadieron pruebas del cliente HTTP con servidor local simulado. No ejecutan un modelo real; la ejecución Ollama/proveedor queda para la validación local del usuario.
+- Se añadieron pruebas del cliente HTTP con servidor local simulado, incluyendo rechazo de redirecciones y query parameters en el endpoint. No ejecutan un modelo real; la ejecución Ollama/proveedor queda para la validación local del usuario.
 - El adaptador mide cuatro casos a nivel de salida del modelo. No prueba retrieval real, aislamiento multi-tenant, ejecución de herramientas, memoria ni loops del agente.
+- Se indexaron en `knowledge/packs/manifest.json` los runners de Foundations, el harness AI Red Team, el adaptador de probes y la guía de ejecución; una prueba de regresión comprueba que el bootstrap los incluye.
 - El CI de este nuevo HEAD queda pendiente de verificación; no declarar la ampliación validada hasta comprobar todos los jobs y el SHA exacto.
