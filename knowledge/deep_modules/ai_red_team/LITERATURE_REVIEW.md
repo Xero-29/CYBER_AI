@@ -73,5 +73,6 @@ Fijar versiones, commit, configuración, dataset, semillas y criterios antes de 
 - `RESEARCH-AI-RED-TEAM`
 - `OWASP-LLM-TOP10-2026`
 - `OWASP-GENAI-REDTEAM-GUIDE`
+- `OWASP-AGENTIC-TOP10-2026`
 - `NIST-AI-200-3-ARIA`
 - `NIST-AI-600-1`
