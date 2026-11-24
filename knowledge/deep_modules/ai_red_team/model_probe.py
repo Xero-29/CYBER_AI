@@ -21,8 +21,8 @@ def validate_endpoint(endpoint: str, *, allow_remote: bool = False) -> str:
     parts = urlsplit(endpoint)
     if parts.scheme not in {"http", "https"} or not parts.hostname:
         raise ValueError("endpoint must be an absolute HTTP(S) URL")
-    if parts.username or parts.password or parts.fragment:
-        raise ValueError("endpoint must not contain credentials or a fragment")
+    if parts.username or parts.password or parts.fragment or parts.query:
+        raise ValueError("endpoint must not contain credentials, query parameters or a fragment")
     host = parts.hostname.lower()
     try:
         loopback = ipaddress.ip_address(host).is_loopback
@@ -35,6 +35,11 @@ def validate_endpoint(endpoint: str, *, allow_remote: bool = False) -> str:
     if not parts.path.rstrip("/").endswith("/chat/completions"):
         raise ValueError("endpoint path must end in /chat/completions")
     return endpoint
+
+
+class _NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
 
 
 class OpenAICompatibleChatClient:
@@ -67,7 +72,8 @@ class OpenAICompatibleChatClient:
                                          headers=headers, method="POST")
         started = time.monotonic()
         try:
-            with urllib.request.urlopen(request, timeout=self.timeout) as response:
+            opener = urllib.request.build_opener(_NoRedirectHandler)
+            with opener.open(request, timeout=self.timeout) as response:
                 if response.status != 200:
                     raise RuntimeError(f"model endpoint returned HTTP {response.status}")
                 raw = response.read(2_000_001)
