@@ -64,6 +64,7 @@ Fijar versiones, commit, configuración, dataset, semillas y criterios antes de 
 | `RESEARCH-AI-RED-TEAM` | MITRE ATLAS | Localizada; lectura integral pendiente |
 | `OWASP-LLM-TOP10-2026` | OWASP Top 10 for LLM Applications 2026 | Página oficial consultada; lectura integral pendiente |
 | `OWASP-GENAI-REDTEAM-GUIDE` | OWASP GenAI Red Teaming Guide | Página oficial consultada; manual completo pendiente |
+| `OWASP-AGENTIC-TOP10-2026` | OWASP Top 10 for Agentic Applications 2026 (ASI01–ASI10) | Página oficial consultada; lectura integral pendiente |
 | `NIST-AI-200-3-ARIA` | NIST AI 200-3 ARIA Evaluation Planning Manual | Ficha oficial consultada; lectura integral pendiente |
 | `NIST-AI-600-1` | NIST AI 600-1 Generative AI Profile | Referencia oficial registrada; lectura integral pendiente |
 
