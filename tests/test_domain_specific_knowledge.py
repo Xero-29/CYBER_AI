@@ -32,7 +32,7 @@ class DomainSpecificKnowledgeTests(unittest.TestCase):
 
     def test_ai_red_team_readme_topics_are_specific_not_generic_placeholders(self):
         text = self.read("knowledge/deep_modules/ai_red_team/README.md")
-        self.assertIn("procedencia e integridad", text)
+        self.assertIn("origen e integridad", text)
         self.assertIn("aislamiento entre tenants", text)
         self.assertNotIn("Investigar arquitectura y dependencias; conceptos y variantes", text)
 
