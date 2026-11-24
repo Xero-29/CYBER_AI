@@ -1,45 +1,48 @@
-# Estado vigente — 2026-11-24
+# Estado vigente — 2026-11-24 (corte de seguridad y persistencia)
 
-> Corte de auditoría de la rama de trabajo. Los estados de CI se atribuyen únicamente al SHA exacto que ejecutó cada workflow. No se extrapolan resultados entre commits.
+> Cada resultado CI se atribuye al SHA exacto ejecutado. Los commits documentales posteriores requieren su propia validación.
 
 ## Repositorio, ramas y PRs
 
 - Repositorio: `Xero-29/CYBER_AI`; rama: `codex/security-integrity-audit`.
-- HEAD inmediatamente anterior a este registro: `b26386c33d886e3304ba39daa68ecd534e64cad3`. Este commit de estado cambia el HEAD y dispara nuevamente los workflows; la validación de este nuevo SHA queda pendiente hasta consultar ambos runs.
+- HEAD de código/documentación antes de este registro: `32d32ce0dd313ec77fa7e8951cad3ae774f41df3`. Este registro cambia el HEAD y vuelve a disparar ambos workflows.
 - `main`: `658a565acd0a5568bb56a1a7482f44260cd9efd1`; ancestro común: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.
-- Divergencia exacta antes de este registro: **358 commits exclusivos de la rama y 576 exclusivos de `main`**. La comparación no justifica un merge/rebase directo.
-- Se preservan los commits recientes de `main`: `387104756d0f8307c39a46a1ea2df07671bd81c9` (bucle metacognitivo), `554ec1cdd45de3bb0e0f24156b0a9a8ac19193da` (perfil secuencial de modelos) y `658a565acd0a5568bb56a1a7482f44260cd9efd1` (perfil de hardware). No existe un único commit exclusivo de `main` en el grafo completo: el total es 576 desde el ancestro común.
-- PR #2: **cerrado y fusionado**, merge `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. No se crea un PR duplicado para la misma rama.
-- PR #17: abierto, Draft, head `da589efa5a46fb496c1c02c58fda717ddba604d0`, base `main`.
-- PR #18: abierto, Draft, head `888ac5863eea9554202f9dd66baf6024344e1200`, base en la rama de PR #17. No integrarlo antes de resolver #17.
-- PR #20: abierto, Draft, head `2eabd925cf8cc01433b3d7fea324dcc5e43d7257`, rama `feature/metacognitive-knowledge-access`, base `main`; es una línea separada y no se duplicó en esta rama.
-- No hay PR abierto asociado a `codex/security-integrity-audit`. No se ejecutó merge, rebase, cherry-pick, force-push ni escritura en `main`. La reconciliación, si se decide, debe hacerse en una rama separada con revisión de tres vías.
+- Divergencia exacta antes de este registro: **362 commits exclusivos de la rama y 576 exclusivos de `main`**. No hay base segura para merge/rebase directo.
+- Se preservan los commits recientes de `main`: `387104756d0f8307c39a46a1ea2df07671bd81c9` (bucle metacognitivo), `554ec1cdd45de3bb0e0f24156b0a9a8ac19193da` (perfil secuencial de modelos) y `658a565acd0a5568bb56a1a7482f44260cd9efd1` (perfil de hardware). No existe un único commit exclusivo de `main` en el grafo completo: hay 576 desde el ancestro común.
+- PR #2: **cerrado y fusionado**, merge `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. No se crea un PR duplicado.
+- PR #17: abierto, Draft; head `da589efa5a46fb496c1c02c58fda717ddba604d0`; Python Tests y Docker Sandbox concluyeron success.
+- PR #18: abierto, Draft y apilado sobre #17; head `888ac5863eea9554202f9dd66baf6024344e1200`. Unit tests y Windows allowlist smoke pasan, pero las matrices Foundations Python 3.11/3.12/3.13 fallan porque el runner difiere de `results.json` comprometido ([run 44803535878](https://github.com/Xero-29/CYBER_AI/actions/runs/44803535878)). No integrar hasta reconciliar evidencia reproducible.
+- PR #20: abierto, Draft, rama `feature/metacognitive-knowledge-access`, head `2eabd925cf8cc01433b3d7fea324dcc5e43d7257`, base `main`. Python Tests y Docker Sandbox fallan ([45239646872](https://github.com/Xero-29/CYBER_AI/actions/runs/45239646872), [45239646954](https://github.com/Xero-29/CYBER_AI/actions/runs/45239646954)): dos regresiones en `tests/test_ollama_embedding_compatibility.py` esperan un `ProxyHandler` para localhost/loopback y reciben cero. Es una rama separada; no se modificó.
+- No hay PR abierto asociado a `codex/security-integrity-audit`. No se ejecutó merge, rebase, cherry-pick, force-push ni escritura en `main`. Cualquier reconciliación debe hacerse en rama separada y con revisión de tres vías.
 
-## Correcciones de esta ejecución
+## Correcciones implementadas
 
-- `web_research.load_sources()` ahora rechaza claves JSON duplicadas en cualquier nivel del archivo de fuentes y constantes no estándar `NaN`/`Infinity`. Se evita que dos parsers o revisores interpreten de manera distinta una política de dominios confiables.
-- La CLI de investigación web rechaza `--max-results` fuera de 1–10 mediante argparse; ya no recorta silenciosamente valores negativos o excesivos.
-- Se añadieron regresiones para claves duplicadas en raíz y objetos anidados, valores no finitos y límites CLI 0/11/-1. Las pruebas verifican que la búsqueda no se invoque ante parámetros inválidos.
-- Documentación actualizada en `docs/WEB_RESEARCH_EGRESS.md`.
-- Commits: [87167cc](https://github.com/Xero-29/CYBER_AI/commit/87167cc22c3956f5514498e48b53d347a04e9cd7), [2cdb492](https://github.com/Xero-29/CYBER_AI/commit/2cdb492c9268190ec13de66d918e609ab3229f49), [854d8fd](https://github.com/Xero-29/CYBER_AI/commit/854d8fd435deb5558968cbc72a76a71ce9abde87), [b26386c](https://github.com/Xero-29/CYBER_AI/commit/b26386c33d886e3304ba39daa68ecd534e64cad3).
+- `web_research.load_sources()` rechaza claves JSON duplicadas en cualquier nivel y constantes no estándar `NaN`/`Infinity`; evita interpretaciones ambiguas de la política de dominios confiables.
+- La CLI de investigación web rechaza `--max-results` fuera de 1–10; ya no recorta silenciosamente valores negativos o excesivos.
+- `safe_io.atomic_write_text()` rechaza en POSIX modos que concedan permisos a grupo/otros o bits de ejecución, incluso si el llamador los solicita explícitamente. Los usos internos encontrados emplean el modo privado predeterminado o `0600`.
+- Regresiones para claves JSON duplicadas en raíz/objetos anidados, valores no finitos, límites CLI 0/11/-1 y modos POSIX `0640`, `0644`, `0700`, `0755`. Se comprueba que no se cree el archivo ante un modo inseguro.
+- Documentación actualizada en `docs/WEB_RESEARCH_EGRESS.md` y `docs/SECURE_FILE_OUTPUTS.md`.
+- Commits: [87167cc](https://github.com/Xero-29/CYBER_AI/commit/87167cc22c3956f5514498e48b53d347a04e9cd7), [2cdb492](https://github.com/Xero-29/CYBER_AI/commit/2cdb492c9268190ec13de66d918e609ab3229f49), [854d8fd](https://github.com/Xero-29/CYBER_AI/commit/854d8fd435deb5558968cbc72a76a71ce9abde87), [b26386c](https://github.com/Xero-29/CYBER_AI/commit/b26386c33d886e3304ba39daa68ecd534e64cad3), [f2f85c1](https://github.com/Xero-29/CYBER_AI/commit/f2f85c1edb5946135678be7a3220bc2d166eaeb5), [726d8a3](https://github.com/Xero-29/CYBER_AI/commit/726d8a375d1598c55342bada1bb03011cf900545), [32d32ce](https://github.com/Xero-29/CYBER_AI/commit/32d32ce0dd313ec77fa7e8951cad3ae774f41df3).
 
-## CI y ejecución
+## CI y evidencia
 
-- Último HEAD anterior a estas correcciones con ambos workflows concluidos: `19624fc9f201696eb2cc9fd44fd9090589faea94`. Python Tests [45213197197](https://github.com/Xero-29/CYBER_AI/actions/runs/45213197197) y Docker Sandbox [45213197319](https://github.com/Xero-29/CYBER_AI/actions/runs/45213197319) terminaron **success**, con 744 pruebas y 4 omitidas por job.
-- En `b26386c33d886e3304ba39daa68ecd534e64cad3`, Python Tests [45413148862](https://github.com/Xero-29/CYBER_AI/actions/runs/45413148862) y Docker Sandbox [45413148652](https://github.com/Xero-29/CYBER_AI/actions/runs/45413148652) estaban `in_progress` al capturar este estado. Los runs de commits intermedios fueron cancelados por la política de concurrencia; no se cuentan como aprobaciones.
-- El commit de estado actual dispara nuevos workflows. **No declarar CI verde hasta comprobar que Python Tests y Docker Sandbox terminen en `completed/success` sobre el SHA final de este registro.**
-- No hay checkout local del repositorio en este entorno. No se afirma ejecución local de `verify.sh` ni de las pruebas unitarias.
+- En el HEAD exacto `32d32ce0dd313ec77fa7e8951cad3ae774f41df3`: Python Tests [45414075079](https://github.com/Xero-29/CYBER_AI/actions/runs/45414075079) y Docker Sandbox [45414074990](https://github.com/Xero-29/CYBER_AI/actions/runs/45414074990), ambos **completed/success**.
+- Ambos jobs ejecutaron **747 pruebas, 4 omitidas**. Python completó verificación base y con extractores documentales; Docker completó build, verificación y Ruff dentro del contenedor.
+- SBOM/provenance artifact [14930107760](https://github.com/Xero-29/CYBER_AI/actions/runs/45414075079/artifacts/14930107760): tres CycloneDX con 9/8/9 componentes para core/sandbox/documentos. Evidencia sandbox [14930467281](https://github.com/Xero-29/CYBER_AI/actions/runs/45414074990).
+- La evidencia del adaptador conserva `network_isolation_enforced=false`; el comando Docker aplica `--network=none`, pero el campo falso impide presentar el ledger como demostración de aislamiento de red del host. No se eleva ese indicador a “enforced”.
+- Este commit de estado dispara nuevos workflows. No se reutilizan los resultados de `32d32ce` para el SHA que se cree ahora; hay que consultar ambos runs del HEAD resultante.
+- No hay checkout local del repositorio en este entorno; no se afirma ejecución local de `verify.sh`.
 
-## Pendiente y límites reales
+## Pendiente real
 
-- Consultar ambos workflows del SHA final de este registro y revisar jobs/logs/artefactos; corregir cualquier fallo reproducible.
-- Reconciliar la divergencia solo en una rama independiente, preservando íntegros los 576 commits exclusivos de `main`; no hacer integración automática.
-- Biblioteca: 48 áreas, 0 `expert_ready`, 48 `foundation_draft`. Faltan lectura de fuentes primarias, licencias verificadas, trazabilidad claim-to-source, laboratorios reproducibles, datasets expertos y revisión independiente.
-- Aislamiento host: el grupo POSIX no impide que descendientes escapen con `setsid/setpgid`; faltan cgroups/namespaces o microVM. Windows sigue requiriendo Job Objects y validación de ACL. El runner host no impone egress.
+- Verificar Python Tests y Docker Sandbox del HEAD de este registro y revisar sus logs/artefactos.
+- Reconciliar la divergencia únicamente en rama independiente, preservando los 576 commits exclusivos de `main`; no hacer integración automática.
+- Resolver las fallas de reproducibilidad de PR #18 y las dos pruebas de proxy/loopback de PR #20 en sus respectivas ramas antes de integrarlas; no duplicar su trabajo en esta rama.
+- Biblioteca: 48 áreas, 0 `expert_ready`, 48 `foundation_draft`. Faltan fuentes primarias leídas, licencias verificadas, trazabilidad claim-to-source, laboratorios reproducibles, datasets expertos y revisión independiente.
+- Aislamiento host: el grupo POSIX no impide que descendientes escapen con `setsid/setpgid`; faltan cgroups/namespaces o microVM. Windows requiere Job Objects y validación de ACL. El runner host no impone egress.
 - Operación externa: gateway con DNS pinning y política de egress demostrada, KMS/HSM y rotación, RBAC/IdP/MFA, cifrado y backups WORM/offsite, restauración DR con RPO/RTO, observabilidad central, pruebas de carga/soak/fallo físico y validación de proveedores reales.
-- La documentación y los tests sintéticos no sustituyen pruebas en ThinkPad, proveedores, red corporativa ni infraestructura real.
 
-**Conclusión:** se cerraron dos ambigüedades de entrada en investigación web y se añadieron regresiones. La rama sigue muy divergida de `main`; PR #17/#18/#20 siguen independientes y en Draft. No se ha tocado `main`. El proyecto todavía no está listo para la validación final del usuario.
+**Conclusión:** el endurecimiento de investigación web y escritura atómica tiene regresiones y dos workflows exitosos sobre `32d32ce`. La divergencia, la biblioteca y el aislamiento/operación siguen abiertos. El proyecto todavía no está listo para la validación final del usuario.
 
 ---
 
