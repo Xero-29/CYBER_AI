@@ -19,6 +19,7 @@
 
 ## Estado de evidencia y pendientes
 
+- Los dos documentos nuevos están registrados como `supplemental_documents` del manifiesto (Foundations risk engineering y AI Red Team test catalog); el bootstrap offline los selecciona con IDs estables por ruta y SHA-256. El total declarado de documentos seleccionables pasa de 332 a 334.
 - No se añadieron afirmaciones a `CLAIM_EVIDENCE_REGISTER.json`; continúa vacío. Las 192 tareas de investigación mantienen estado experimental no evaluado y revisión independiente no iniciada.
 - Ningún subtema de Foundations o AI Red Team se promueve de T0/O0 por este trabajo. Los ocho temas remediados son contenido editorial específico, no aceptación experta.
 - Los nueve casos AI Red Team y el ejemplo de riesgo Foundations no se han ejecutado. No hay resultados experimentales ni revisión independiente asociados a estos documentos.
@@ -56,7 +57,7 @@ PR #18 tiene como base la rama de PR #17. No se debe fusionar #18 antes de integ
 - Foundations: 102 subtemas; 1.224 comprobaciones de capa (36 en progreso, 1.188 no evaluadas); 408 comprobaciones de capacidad (12 en progreso, 396 no evaluadas); 0 aprobadas; todos los subtemas T0/O0.
 - AI Red Team: siete temas base, 84 celdas en progreso, 0 aprobadas; G5/G7 sin iniciar y G8 bloqueada.
 - Seis reescrituras disciplinares importadas como borradores: identity, malware, forensics, incident_response, threat_intel y reverse. Otras 40 áreas tienen expansión específica pendiente.
-- El bootstrap offline valida e indexa 332 documentos: 48 paquetes, 48 dossiers DEEP_SECTIONS, 48 estudios RESEARCH_STUDY, 48 compendios técnicos, 48 agendas, 48 revisiones bibliográficas, 41 documentos suplementarios y 3 Skills candidatas. Las candidatas no son Skills activas.
+- El bootstrap offline valida e indexa 334 documentos: 48 paquetes, 48 dossiers DEEP_SECTIONS, 48 estudios RESEARCH_STUDY, 48 compendios técnicos, 48 agendas, 48 revisiones bibliográficas, 43 documentos suplementarios y 3 Skills candidatas. Las candidatas no son Skills activas.
 - FND-01.01, FND-01.02 y FND-01.03 tienen ampliaciones teóricas, instrumentos de evaluación en frío preparados y seis laboratorios sintéticos nuevos; ningún instrumento se ha administrado.
 - Los laboratorios sintéticos incluyen conflictos safety/security, privacidad vs confidencialidad, recuperación confiable, causa común y autenticidad/integridad vs verdad. CI no equivale a prueba física u operacional.
 - Los gates de estructura no son gates de aceptación experta. La madurez editorial M2 no equivale a T4/T5 ni a O4/O5.
