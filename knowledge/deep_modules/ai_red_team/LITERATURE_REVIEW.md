@@ -1,6 +1,6 @@
 # Revisión de literatura exploratoria — Red teaming de IA
 
-**Corte:** 2026-11-17  
+**Corte:** 2026-11-24  
 **Madurez:** M1 (mapa temático y referencia institucional localizada); **no M3/M4/M5**.  
 **Alcance:** revisión exploratoria inicial y protocolo de investigación.  
 **Procedencia:** la referencia nueva se localizó en el sitio del emisor, pero su texto completo no se declara leído. No es revisión sistemática ni validación empírica.
@@ -57,6 +57,20 @@ Fijar versiones, commit, configuración, dataset, semillas y criterios antes de 
 |---|---|---|
 | `RESEARCH-AI-RED-TEAM` | MITRE ATLAS | Localizada; texto íntegro pendiente |
 
+## Referencias y procedencia
+
+| ID | Referencia | Estado al corte |
+|---|---|---|
+| `RESEARCH-AI-RED-TEAM` | MITRE ATLAS | Localizada; lectura integral pendiente |
+| `OWASP-LLM-TOP10-2026` | OWASP Top 10 for LLM Applications 2026 | Página oficial consultada; lectura integral pendiente |
+| `OWASP-GENAI-REDTEAM-GUIDE` | OWASP GenAI Red Teaming Guide | Página oficial consultada; manual completo pendiente |
+| `NIST-AI-200-3-ARIA` | NIST AI 200-3 ARIA Evaluation Planning Manual | Ficha oficial consultada; lectura integral pendiente |
+| `NIST-AI-600-1` | NIST AI 600-1 Generative AI Profile | Referencia oficial registrada; lectura integral pendiente |
+
 ## Identificadores del registro de fuentes
 
 - `RESEARCH-AI-RED-TEAM`
+- `OWASP-LLM-TOP10-2026`
+- `OWASP-GENAI-REDTEAM-GUIDE`
+- `NIST-AI-200-3-ARIA`
+- `NIST-AI-600-1`
