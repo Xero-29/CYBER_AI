@@ -50,7 +50,7 @@ PR #18 tiene como base la rama de PR #17. No se debe fusionar #18 antes de integ
 
 - 48/48 paquetes con estructura base; 48 estudios `RESEARCH_STUDY.md`; 48 `DEEP_SECTIONS.md`.
 - 20.588 palabras en estudios y 218 referencias HTTPS. Son borradores con umbral editorial mínimo; no implican lectura integral ni verificación de afirmaciones.
-- 48/48 agendas estructuralmente completas; 223 IDs de fuente registrados (16 añadidos en FND-01.01/01.02/01.03); 0 fuentes con lectura integral registrada en la worklist; 192 tareas siguen con fuentes candidatas, no claims verificados.
+- 48/48 agendas estructuralmente completas; 226 IDs de fuente registrados (16 añadidos en FND-01.01/01.02/01.03); 0 fuentes con lectura integral registrada en la worklist; 192 tareas siguen con fuentes candidatas, no claims verificados.
 - Registro de claims: 0 claims aprobados.
 - Las 192 brechas tienen 1.344 bloques de sección, 77 variantes únicas y reutilización de boilerplate. La auditoría encontró 84.015 pares de duplicación exacta, 82.208 entre dominios; cero brechas elegibles como expertas.
 - Foundations: 102 subtemas; 1.224 comprobaciones de capa (36 en progreso, 1.188 no evaluadas); 408 comprobaciones de capacidad (12 en progreso, 396 no evaluadas); 0 aprobadas; todos los subtemas T0/O0.
