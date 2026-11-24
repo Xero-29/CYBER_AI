@@ -173,3 +173,51 @@ Referencias primarias para consulta y contraste:
 
 **Estado de fuentes:** referencias registradas; no se declara lectura integral en esta entrega. Deben anotarse edición, erratas, localizador exacto, licencia y extractos antes de respaldar claims individuales.  
 **Estado de laboratorio:** el ejemplo es un protocolo propuesto para un harness sintético; no se declara ejecutado por esta documentación.
+
+
+## 11. Ejemplo cuantitativo reproducible — pérdida anual esperada
+
+El runner `labs/risk_engineering.py` implementa un ejemplo sintético para el escenario de publicación no autorizada de un artefacto de producción. Ejecutar desde la raíz:
+
+```bash
+python3 knowledge/deep_modules/foundations/labs/risk_engineering.py
+python3 -m unittest tests.test_foundations_risk_lab -v
+```
+
+**Supuestos hipotéticos, no observaciones de CYBER_AI ni de una empresa real:**
+
+- Frecuencia basal: 0,40 eventos/año.
+- Pérdida condicional media por evento: USD 120.000.
+- Frecuencia residual estimada tras controles: 0,15 eventos/año.
+- Pérdida condicional residual: USD 80.000.
+- Coste anual de controles: USD 15.000.
+
+[
+EAL_{base}=0,40\times 120.000=USD\ 48.000/año
+]
+
+[
+EAL_{residual}=0,15\times 80.000=USD\ 12.000/año
+]
+
+[
+Pérdida\ evitada=48.000-12.000=USD\ 36.000/año
+]
+
+[
+Beneficio\ neto\ modelado=36.000-15.000=USD\ 21.000/año
+]
+
+El coste anual de equilibrio es USD 36.000 bajo estos supuestos. No significa que el control deba comprarse automáticamente: faltan incertidumbre estadística, distribución de pérdidas, colas, correlaciones, efectos secundarios, coste de implementación, coste de oportunidad y apetito/autoridad de riesgo.
+
+**Sensibilidad:** se conserva la eficacia relativa asumida para los controles (frecuencia residual = 37,5 % de la basal; impacto residual = 66,7 % de la basal).
+
+| Escenario | EAL basal | EAL residual | Pérdida evitada | Neto tras USD 15.000 |
+|---|---:|---:|---:|---:|
+| Bajo: 0,20 × USD 80.000 | USD 16.000 | USD 4.000 | USD 12.000 | -USD 3.000 |
+| Base: 0,40 × USD 120.000 | USD 48.000 | USD 12.000 | USD 36.000 | USD 21.000 |
+| Alto: 0,60 × USD 160.000 | USD 96.000 | USD 24.000 | USD 72.000 | USD 57.000 |
+
+La decisión económica cambia en el escenario bajo: el beneficio modelado no cubre el coste. Esto muestra por qué no se debe publicar una cifra puntual sin rango ni declarar que el tratamiento es rentable con evidencia débil.
+
+**Límites de inferencia:** la multiplicación frecuencia × pérdida condicional solo es interpretable para el mismo escenario, población y horizonte. No sumar escenarios solapados como si fueran mutuamente excluyentes. Las cifras de eficacia son supuestos y deben sustituirse por evidencia local, con intervalos y procedencia. El runner prueba aritmética y sensibilidad; no valida los supuestos ni la eficacia de controles reales.
