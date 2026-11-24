@@ -62,7 +62,7 @@ class ResearchValidationTests(unittest.TestCase):
         self.assertTrue(report["structurally_valid"], report["structural_errors"])
         self.assertEqual(report["counts"]["domains"], 48)
         self.assertEqual(report["counts"]["tasks"], 192)
-        self.assertEqual(report["counts"]["sources"], 92)
+        self.assertEqual(report["counts"]["sources"], 95)
         self.assertEqual(report["counts"]["claims"], 0)
         self.assertEqual(report["counts"]["claims_supported"], 0)
         self.assertEqual(report["counts"]["sources_full_text_reviewed"], 0)
