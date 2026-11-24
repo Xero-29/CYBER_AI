@@ -65,7 +65,7 @@ Evaluar precisión, cobertura, reproducibilidad, calidad de evidencia, seguridad
 
 ## Fuentes y procedencia
 
-Fuentes candidatas registradas en `knowledge/research/source_registry.json` y `knowledge/research/field_studies/SOURCE_REGISTER_2026-11-18.json`. Se consultaron a nivel de página OWASP LLM Top 10 2026, OWASP GenAI Red Teaming Guide y la ficha NIST AI 200-3. La lectura integral, licencia, localizadores por afirmación y revisión independiente siguen pendientes. Registrar título, editor, URL canónica, versión, fechas, SHA-256 del artefacto cuando aplique y alcance. La mera inclusión no convierte una fuente en evidencia verificada.
+Fuentes candidatas registradas en `knowledge/research/source_registry.json` y `knowledge/research/field_studies/SOURCE_REGISTER_2026-11-18.json`. Se consultaron a nivel de página OWASP LLM Top 10 2026, OWASP Top 10 for Agentic Applications 2026 (ASI01–ASI10), OWASP GenAI Red Teaming Guide y la ficha NIST AI 200-3. La lectura integral, licencia, localizadores por afirmación y revisión independiente siguen pendientes. Registrar título, editor, URL canónica, versión, fechas, SHA-256 del artefacto cuando aplique y alcance. La mera inclusión no convierte una fuente en evidencia verificada.
 
 ## Criterios de publicación
 
