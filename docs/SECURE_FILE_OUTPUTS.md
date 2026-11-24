@@ -17,10 +17,10 @@ La función:
 - crea el temporal de forma exclusiva en el mismo directorio;
 - escribe y sincroniza el contenido antes de reemplazar el destino;
 - en POSIX, sincroniza también el directorio padre después del `rename` para persistir la entrada publicada;
-- usa permisos restrictivos `0600` en POSIX;
+- usa permisos restrictivos `0600` en POSIX; incluso si un llamador solicita otro modo, rechaza permisos de grupo/otros y bits de ejecución;
 - permite crear directorios padre solo cuando el llamador lo solicita expresamente.
 
-Las pruebas `tests/test_safe_io.py` cubren escritura/reemplazo, destino symlink, padre symlink, creación explícita de directorios y destinos no regulares.
+Las pruebas `tests/test_safe_io.py` cubren escritura/reemplazo, destino symlink, padre symlink, creación explícita de directorios, destinos no regulares y rechazo de modos POSIX legibles/escribibles por grupo/otros o ejecutables.
 
 
 ## Evidencia de adaptadores de herramientas
