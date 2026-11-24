@@ -437,3 +437,18 @@ No declarar el sistema completo ni certificado hasta que cada brecha tenga códi
   - Docker build + suite completa + Ruff en sandbox sin red: **success** — https://github.com/Xero-29/CYBER_AI/actions/runs/44107553436
 - **Límite:** el runner Docker solo cubre herramientas incluidas en la imagen. Los demás adaptadores no heredan automáticamente aislamiento de red ni microVM.
 
+## Diagnóstico de evaluación de conocimientos — 2026-11-24
+
+- Se comparó el código de la rama con `main`. El archivo `knowledge_global_coverage_audit.py` y su matriz `knowledge/research/global_coverage_matrix.json` están en `main`, pero no existen en `codex/security-integrity-audit`. Por tanto, el informe local de 336 requisitos temáticos/432 artefactos no corresponde al conjunto de herramientas versionado en esta rama; no se deben copiar sus contadores ni modificar estados de esa matriz como si fueran evidencia de calidad.
+- La rama sí contiene `knowledge_pack_quality.py`, que evalúa directamente los 48 paquetes del manifiesto `knowledge/packs/manifest.json`: secciones técnicas, fuentes verificadas y hashes de evidencia, ejecución de laboratorio con artefacto y revisión independiente Ed25519 ligada a los hashes exactos.
+- Se amplió cada fila del informe con `readiness_blockers`: `pack_missing_or_unsafe`, `missing_required_sections`, `verified_sources_below_minimum`, `lab_evidence_missing_or_unverified` e `independent_review_missing_or_untrusted`. El auditor no promueve automáticamente estados ni acepta volumen de texto como aprobación.
+- Se añadieron regresiones para comprobar que las 48 áreas actuales muestran bloqueos concretos, que un fixture completamente evidenciado y firmado no presenta bloqueos, y que una fuente con licencia pendiente mantiene el bloqueo de fuentes.
+- Se documentó la diferencia entre ingesta e indexación (`knowledge_bootstrap.py`) y evaluación de calidad (`knowledge_pack_quality.py`). Que 240 documentos aparezcan como “sin cambios” no demuestra calidad semántica ni aprobación experta.
+- Comandos locales de diagnóstico:
+  - `python3 knowledge_pack_quality.py --json`
+  - `python3 knowledge_pack_quality.py --area foundations --json`
+  - `python3 knowledge_pack_quality.py --require-expert-ready` (debe devolver código 1 mientras existan áreas pendientes; código 2 indica manifiesto inválido).
+- Commits de esta iteración: [9cdcade](https://github.com/Xero-29/CYBER_AI/commit/9cdcade3e970797e059b17356f914901734a927f), [e1c04e9](https://github.com/Xero-29/CYBER_AI/commit/e1c04e92e076d2c6305a8fbcc1257b5d70a45780), [8afa8fe](https://github.com/Xero-29/CYBER_AI/commit/8afa8feec8a34d853d60051119f08f4b3d44b377).
+- Estos commits todavía requieren workflows concluidos sobre el HEAD final de la rama. No se ejecutaron pruebas locales en este entorno y no se afirma CI verde para estos commits.
+- Estado de integración consultado: rama `codex/security-integrity-audit` divergida de `main` (363 commits exclusivos de la rama y 576 exclusivos de `main`; ancestro común `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`). PR #2 sigue cerrado y fusionado. PR #17, #18 y #20 permanecen abiertos en sus ramas respectivas; no se creó un PR duplicado ni se modificó `main`.
+
