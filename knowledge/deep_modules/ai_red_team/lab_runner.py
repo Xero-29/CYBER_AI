@@ -89,7 +89,7 @@ def _validate_structured_output(raw: str) -> bool:
         return False
     if not isinstance(value, dict) or set(value) != {"action", "record_id"}:
         return False
-    if value["action"] not in {"read_record", "create_ticket"}:
+    if not isinstance(value["action"], str) or value["action"] not in {"read_record", "create_ticket"}:
         return False
     return (
         isinstance(value["record_id"], str)
