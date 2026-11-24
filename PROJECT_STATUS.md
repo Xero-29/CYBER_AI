@@ -461,3 +461,15 @@ No declarar el sistema completo ni certificado hasta que cada brecha tenga códi
 - Commits: [8e4b51b](https://github.com/Xero-29/CYBER_AI/commit/8e4b51b09a8f1a3c7d5299c5684c534cc82ed248), [8804fab](https://github.com/Xero-29/CYBER_AI/commit/8804fabad87de96fd1405e1c03d30b328d73589f), [246660f](https://github.com/Xero-29/CYBER_AI/commit/246660ffeffd473a368266ce9051f217889b4f44).
 - Pruebas locales del cambio nuevo: no ejecutadas por el entorno remoto de edición. Deben ejecutarse en el clon local. CI del HEAD final aún no confirmado; no declarar checks verdes.
 - Auditoría de integración: rama `codex/security-integrity-audit` tiene 367 commits exclusivos y está 576 commits detrás de `main`; ancestro común `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. No se ha intentado integrar ni modificar `main`. PRs abiertos existentes #20, #18, #16, #17, #14 y #13 entre otros; no se creó PR duplicado. PR #2 se mantiene cerrado/fusionado según la inspección anterior.
+
+
+## Verificación local confirmada del HEAD de conocimiento — 2026-11-24
+
+- El usuario confirmó que el clon local quedó exactamente en `f5d5db43fef8008a71cee8639cc1f0a1d953ee00` mediante `git rev-parse HEAD` después de `git pull --ff-only`.
+- En ese HEAD, `python3 -m unittest discover -s tests -p 'test_knowledge_pack_quality.py' -v` ejecutó 11 pruebas y todas pasaron.
+- La CLI reportó: 48 áreas; 0 expert-ready; 48 borradores; 48 con evidencia externa pendiente; 48 con bloqueo de fuentes; 48 con bloqueo de laboratorio; 48 con revisión independiente pendiente. `--json` confirmó los mismos contadores y `errors: []`.
+- El contador `awaiting_external_evidence_count=0` se mantiene deliberadamente con su definición estricta: solo áreas con estructura editorial completa y evidencia externa pendiente. No contradice `external_evidence_pending_count=48`, que incluye también los borradores incompletos.
+- Esta ejecución verifica el comportamiento del evaluador y las regresiones, no la calidad sustantiva de la biblioteca. Ninguna especialidad está aprobada: las 48 siguen en `foundation_draft`, con 0 fuentes verificadas y sin evidencia de laboratorio ni revisión independiente.
+- GitHub no reportó status checks ni workflow runs asociados a este HEAD en la consulta realizada. CI para este SHA sigue sin estar demostrado; no declarar CI verde.
+- Reconsulta de divergencia en GitHub: `codex/security-integrity-audit` está 371 commits por delante y 576 por detrás de `main`, con ancestro común `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. No se modificó `main` ni se inició integración automática.
+- Trabajo de conocimiento ya presente en PR #18 (#17 como base) no está incorporado en esta rama: incluye dossiers para las 48 especialidades, desarrollo granular de Foundations y AI Red Team, y auditorías que identifican 0 claims respaldados y duplicación transversal sustancial. PR #18 permanece Draft; su material debe reconciliarse con la rama de seguridad antes de integrarlo, no copiarse a ciegas ni duplicarse.
