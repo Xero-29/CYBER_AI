@@ -35,6 +35,12 @@ Cada especialidad dispone de una agenda de investigación en `./<area>/RESEARCH_
 6. Revisar técnicamente, comprobar vigencia y ejecutar pruebas de reproducibilidad.
 7. Registrar revisión, autoría, cambios y madurez demostrada.
 
+## Remediación específica en curso — 2026-11-24
+
+- [Foundations: ingeniería del riesgo y assurance](./foundations/FOUNDATIONS_RISK_ENGINEERING_V1.md) — desarrollo específico de FND-04, aún sin validación experta.
+- [AI Red Team: dossier de doce capas](./ai_red_team/AI_RED_TEAM_THEORETICAL_DEVELOPMENT_V1.md) y [catálogo de nueve pruebas](./ai_red_team/AI_RED_TEAM_TEST_CATALOG_V1.md) — protocolos propuestos, ejecución pendiente.
+- Las referencias nuevas se registran como páginas oficiales consultadas, no como lectura integral ni claims aprobados.
+
 ## Índice
 
 - [Fundamentos](./foundations/README.md) — `foundations` · [Agenda de investigación](./foundations/RESEARCH_AGENDA.md) · [Revisión bibliográfica](./foundations/LITERATURE_REVIEW.md)
