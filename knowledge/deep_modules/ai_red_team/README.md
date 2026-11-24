@@ -77,3 +77,16 @@ Fuentes candidatas registradas en `knowledge/research/source_registry.json` y `k
 - [ ] Revisión técnica independiente y pruebas de reproducibilidad.
 
 **Madurez:** `draft_structured_not_expert_validated`.
+
+
+## Harness sintético ejecutable
+
+Se añadió `lab_runner.py` y la guía `LAB_EXECUTION_GUIDE_V1.md`. Desde la raíz del repositorio:
+
+```bash
+python3 knowledge/deep_modules/ai_red_team/lab_runner.py
+python3 knowledge/deep_modules/ai_red_team/lab_runner.py --json
+python3 -m unittest tests.test_ai_red_team_lab -v
+```
+
+El runner cubre ART-01…ART-09 con fixtures sintéticos, modelos deterministas de controles server-side y evidencia estructurada. No invoca un LLM, no accede a red y no prueba un agente desplegado. Sus PASS significan únicamente que los controles de referencia y las pruebas del harness se comportan como se definieron; la integración con un modelo, RAG, broker y caché reales sigue pendiente.
