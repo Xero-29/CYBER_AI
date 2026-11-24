@@ -302,3 +302,12 @@ El contenido histórico que sigue registra implementaciones y validaciones de co
 - Foundations: se añadió `knowledge/deep_modules/foundations/labs/risk_engineering.py` (LAB-FND-14A) con cálculo EAL basal/residual, pérdida evitada, coste de equilibrio y sensibilidad. Las cifras son supuestos sintéticos, no datos observados.
 - Se añadieron pruebas unitarias para ambos runners y guías de ejecución. CI run `45458382690` concluyó `success` en el SHA funcional `7de199e54a439d3d7807d8eb5b9337c0172ad49a`: 702 pruebas, 1 skipped, suite principal y suite con extractores documentales; jobs Python 3.11/3.12/3.13 y Windows allowlist smoke en success. El harness sigue limitado a simulación sintética, no a pruebas de modelo real.
 - La madurez no cambia: no hay lectura integral acreditada de las fuentes, claims respaldados ni revisión independiente. Los resultados sintéticos no demuestran robustez de un LLM ni eficacia de controles productivos.
+
+
+## Probes de modelo AI Red Team — 2026-11-24 (seguimiento)
+
+- Se añadió `knowledge/deep_modules/ai_red_team/model_probe.py`: adaptador opt-in OpenAI-compatible para ejecutar probes de inyección directa/indirecta, extracción de canary sintético y conformidad JSON contra un modelo local o endpoint remoto autorizado.
+- Por defecto, HTTP solo se permite en loopback. Endpoints remotos requieren HTTPS y `--allow-remote`; la clave se lee desde `CYBER_AI_MODEL_API_KEY`. No se exponen herramientas ni se envían datos reales.
+- Se añadieron pruebas del cliente HTTP con servidor local simulado. No ejecutan un modelo real; la ejecución Ollama/proveedor queda para la validación local del usuario.
+- El adaptador mide cuatro casos a nivel de salida del modelo. No prueba retrieval real, aislamiento multi-tenant, ejecución de herramientas, memoria ni loops del agente.
+- El CI de este nuevo HEAD queda pendiente de verificación; no declarar la ampliación validada hasta comprobar todos los jobs y el SHA exacto.
