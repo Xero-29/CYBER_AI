@@ -44,6 +44,7 @@ NIST AI 200-3 (ARIA Evaluation Planning Manual, 2026) organiza la evaluación ho
 
 ### Referencias añadidas
 - OWASP Top 10 for LLM Applications 2026: https://genai.owasp.org/top-10-for-llm-applications-2026/
+- OWASP Top 10 for Agentic Applications 2026 (ASI01–ASI10): https://genai.owasp.org/top-10-for-agentic-applications-2026/
 - OWASP LLM01:2026 Prompt Injection: https://genai.owasp.org/llm2026/llm012026-prompt-injection/
 - OWASP GenAI Red Teaming Guide: https://genai.owasp.org/resource/genai-red-teaming-guide/
 - NIST AI 200-3, ARIA Evaluation Planning Manual: https://doi.org/10.6028/NIST.AI.200-3
