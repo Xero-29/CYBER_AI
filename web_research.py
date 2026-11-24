@@ -112,11 +112,30 @@ def _canonical_trusted_domain(value):
     return host
 
 
+def _unique_json_object(pairs):
+    """Reject duplicate keys at every level of the trusted-source policy."""
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("La configuración de fuentes contiene claves JSON duplicadas.")
+        result[key] = value
+    return result
+
+
+def _reject_json_constant(value):
+    """Reject non-standard NaN/Infinity values accepted by Python's JSON parser."""
+    raise ValueError("La configuración de fuentes contiene un número no finito.")
+
+
 def load_sources():
     """Carga una política de confianza regular, privada de enlaces y de tamaño acotado."""
     try:
         raw = read_regular_file(CONFIG_PATH, max_bytes=MAX_SOURCE_CONFIG_BYTES)
-        data = json.loads(raw.decode("utf-8"))
+        data = json.loads(
+            raw.decode("utf-8"),
+            object_pairs_hook=_unique_json_object,
+            parse_constant=_reject_json_constant,
+        )
     except (OSError, UnicodeError, ValueError, RecursionError) as error:
         raise ValueError(
             "La configuración de fuentes debe ser JSON UTF-8 regular, estable y de hasta 1 MB."
