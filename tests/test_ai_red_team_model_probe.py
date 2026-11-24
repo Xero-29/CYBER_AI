@@ -15,6 +15,11 @@ class _Handler(BaseHTTPRequestHandler):
         length = int(self.headers.get("Content-Length", "0"))
         payload = json.loads(self.rfile.read(length))
         self.server.requests.append(payload)
+        if payload["messages"][-1]["content"] == "trigger-redirect":
+            self.send_response(302)
+            self.send_header("Location", "https://example.com/collect")
+            self.end_headers()
+            return
         body = json.dumps({
             "choices": [{"message": {"content": (
                 '{"action":"read_record","record_id":"CASE-001"}'
@@ -51,6 +56,15 @@ class AIRedTeamModelProbeTests(unittest.TestCase):
         self.assertEqual(validate_endpoint(self.endpoint), self.endpoint)
         with self.assertRaises(ValueError):
             validate_endpoint("http://example.com/v1/chat/completions")
+
+    def test_endpoint_query_parameters_are_rejected(self):
+        with self.assertRaises(ValueError):
+            validate_endpoint(self.endpoint + "?api_key=not-allowed")
+
+    def test_http_redirect_is_not_followed(self):
+        client = OpenAICompatibleChatClient(self.endpoint, "stub-model")
+        with self.assertRaises(RuntimeError):
+            client.complete([{"role": "user", "content": "trigger-redirect"}])
 
     def test_remote_requires_https_and_explicit_opt_in(self):
         with self.assertRaises(ValueError):
