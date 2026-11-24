@@ -88,6 +88,7 @@ class DomainSpecificKnowledgeTests(unittest.TestCase):
             "OWASP-LLM-TOP10-2026",
             "OWASP-GENAI-REDTEAM-GUIDE",
             "NIST-AI-200-3-ARIA",
+            "OWASP-AGENTIC-TOP10-2026",
         }
         self.assertTrue(expected.issubset(by_id))
         for source_id in expected:
