@@ -1863,6 +1863,38 @@
       "path": "knowledge/deep_modules/ai_red_team/AI_RED_TEAM_TEST_CATALOG_V1.md",
       "topic_id": "adversarial_testing",
       "subtopic_id": "test_catalog"
+    },
+    {
+      "id": "FOUNDATIONS_RISK_LAB_RUNNER_V1",
+      "area_id": "foundations",
+      "name": "Runner LAB-FND-14A de ingeniería del riesgo",
+      "path": "knowledge/deep_modules/foundations/labs/risk_engineering.py",
+      "topic_id": "risk_engineering",
+      "subtopic_id": "lab_runner"
+    },
+    {
+      "id": "AI_RED_TEAM_LAB_RUNNER_V1",
+      "area_id": "ai_red_team",
+      "name": "Harness sintético ART-01 a ART-09",
+      "path": "knowledge/deep_modules/ai_red_team/lab_runner.py",
+      "topic_id": "adversarial_testing",
+      "subtopic_id": "lab_runner"
+    },
+    {
+      "id": "AI_RED_TEAM_MODEL_PROBE_V1",
+      "area_id": "ai_red_team",
+      "name": "Adaptador de probes de modelo AI Red Team",
+      "path": "knowledge/deep_modules/ai_red_team/model_probe.py",
+      "topic_id": "adversarial_testing",
+      "subtopic_id": "model_probe"
+    },
+    {
+      "id": "AI_RED_TEAM_LAB_EXECUTION_GUIDE_V1",
+      "area_id": "ai_red_team",
+      "name": "Guía de ejecución de laboratorio AI Red Team",
+      "path": "knowledge/deep_modules/ai_red_team/LAB_EXECUTION_GUIDE_V1.md",
+      "topic_id": "adversarial_testing",
+      "subtopic_id": "execution_guide"
     }
   ]
 }

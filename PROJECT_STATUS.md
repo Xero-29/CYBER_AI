@@ -293,3 +293,22 @@ El contenido histórico que sigue registra implementaciones y validaciones de co
 - Cada especialidad incluye un diseño de laboratorio con cuatro casos (baseline, fallo sintético, detección y mitigación/regresión), salvaguardas, métricas, preguntas de investigación y artefactos de aceptación.
 - Se añadió el índice de los 48 compendios.
 - **Límite:** son cuadernos técnicos y planes de trabajo, no libros exhaustivos ni revisiones sistemáticas completas. Los laboratorios están diseñados, no ejecutados; no se elevó la madurez de ninguna especialidad.
+
+
+## Remediación ejecutable Foundations + AI Red Team — 2026-11-24 (seguimiento)
+
+- Se abrió una rama de seguimiento basada exactamente en el HEAD de PR #21: `codex/foundations-ai-redteam-executable-labs-2026-11-24`. No modifica `main`, no integra PR #18 y no altera el worktree local anterior.
+- AI Red Team: se añadió `knowledge/deep_modules/ai_red_team/lab_runner.py`, harness determinista sintético para ART-01…ART-09. Incluye aislamiento de tenant, integridad de corpus, allowlist/ownership/idempotencia de herramientas, canaries, validación de salida estructurada, límites de presupuesto y separación train/holdout. No ejecuta LLM ni pruebas contra infraestructura real.
+- Foundations: se añadió `knowledge/deep_modules/foundations/labs/risk_engineering.py` (LAB-FND-14A) con cálculo EAL basal/residual, pérdida evitada, coste de equilibrio y sensibilidad. Las cifras son supuestos sintéticos, no datos observados.
+- Se añadieron pruebas unitarias para ambos runners y guías de ejecución. CI run `45458382690` concluyó `success` en el SHA funcional `7de199e54a439d3d7807d8eb5b9337c0172ad49a`: 702 pruebas, 1 skipped, suite principal y suite con extractores documentales; jobs Python 3.11/3.12/3.13 y Windows allowlist smoke en success. El harness sigue limitado a simulación sintética, no a pruebas de modelo real.
+- La madurez no cambia: no hay lectura integral acreditada de las fuentes, claims respaldados ni revisión independiente. Los resultados sintéticos no demuestran robustez de un LLM ni eficacia de controles productivos.
+
+
+## Probes de modelo AI Red Team — 2026-11-24 (seguimiento)
+
+- Se añadió `knowledge/deep_modules/ai_red_team/model_probe.py`: adaptador opt-in OpenAI-compatible para ejecutar probes de inyección directa/indirecta, extracción de canary sintético y conformidad JSON contra un modelo local o endpoint remoto autorizado.
+- Por defecto, HTTP solo se permite en loopback. Endpoints remotos requieren HTTPS y `--allow-remote`; la clave se lee desde `CYBER_AI_MODEL_API_KEY`. No se exponen herramientas ni se envían datos reales.
+- Se añadieron pruebas del cliente HTTP con servidor local simulado, incluyendo rechazo de redirecciones y query parameters en el endpoint. No ejecutan un modelo real; la ejecución Ollama/proveedor queda para la validación local del usuario.
+- El adaptador mide cuatro casos a nivel de salida del modelo. No prueba retrieval real, aislamiento multi-tenant, ejecución de herramientas, memoria ni loops del agente.
+- Se indexaron en `knowledge/packs/manifest.json` los runners de Foundations, el harness AI Red Team, el adaptador de probes y la guía de ejecución; una prueba de regresión comprueba que el bootstrap los incluye.
+- CI run `45459225819` concluyó `success` en el SHA funcional `da5e8c096b36cf5e793856ce227dfa4d7b669176`: 709 pruebas, 1 skipped, suite principal y suite con extractores documentales; Python 3.11/3.12/3.13 y Windows allowlist smoke en success. Este registro de estado es un commit documental posterior y requiere su propia verificación CI antes de integrar.

@@ -127,3 +127,15 @@ Solo dos de 102 subtemas tienen esta ampliación documental. L1–L12 continúan
 ### FND-01.03 — Ontología e inventario de activos
 
 Se añadió el tercer subtema del orden curricular: ontología activo/recurso/sujeto/objeto/dato/proceso/servicio/misión/stakeholder, grafo de dependencias, esquema de inventario, fuentes NIST/CISA/ISO, evaluación en frío V1 y laboratorio sintético LAB-FND-13A. Sigue en progreso y T0/O0.
+
+
+## Laboratorio de ingeniería del riesgo
+
+El ejemplo cuantitativo del dossier se ejecuta con:
+
+```bash
+python3 knowledge/deep_modules/foundations/labs/risk_engineering.py
+python3 -m unittest discover -s tests -p 'test_foundations_risk_lab.py' -v
+```
+
+Produce LAB-FND-14A: EAL basal/residual, pérdida evitada, beneficio neto simplificado y sensibilidad bajo supuestos sintéticos. No sustituye calibración con datos reales ni aceptación formal del riesgo. La integración y el resultado CI de esta ampliación deben verificarse en el SHA correspondiente antes de registrar el laboratorio como validado.

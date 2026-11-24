@@ -94,6 +94,22 @@ class DomainSpecificKnowledgeTests(unittest.TestCase):
         for source_id in expected:
             self.assertNotEqual(by_id[source_id]["verification_status"], "full_text_reviewed")
 
+    def test_executable_labs_and_guides_are_indexed_in_offline_bootstrap(self):
+        from knowledge_bootstrap import load_packs
+
+        foundations = {item["relative"] for item in load_packs(area_id="foundations")}
+        ai_red_team = {item["relative"] for item in load_packs(area_id="ai_red_team")}
+        self.assertIn(
+            "knowledge/deep_modules/foundations/labs/risk_engineering.py",
+            foundations,
+        )
+        for path in (
+            "knowledge/deep_modules/ai_red_team/lab_runner.py",
+            "knowledge/deep_modules/ai_red_team/model_probe.py",
+            "knowledge/deep_modules/ai_red_team/LAB_EXECUTION_GUIDE_V1.md",
+        ):
+            self.assertIn(path, ai_red_team)
+
     def test_new_domain_documents_are_included_in_offline_knowledge_bootstrap(self):
         from knowledge_bootstrap import load_packs
 
