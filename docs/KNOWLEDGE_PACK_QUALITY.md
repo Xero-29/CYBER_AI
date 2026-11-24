@@ -35,6 +35,7 @@ El informe JSON de `knowledge_pack_quality.py` incluye `readiness_blockers` para
 - `verified_sources_below_minimum`: hay menos de cinco fuentes que superan todas las comprobaciones de licencia, procedencia, fecha y hash de evidencia.
 - `lab_evidence_missing_or_unverified`: no existe una ejecución aprobada vinculada a un artefacto real cuyo SHA-256 coincida.
 - `independent_review_missing_or_untrusted`: no hay una revisión independiente válida ligada a los hashes exactos del paquete, fuentes y laboratorio y verificada con la clave pública Ed25519 configurada fuera del repositorio.
+- El campo `external_evidence_pending` y el contador `external_evidence_pending_count` son independientes de `quality_status`: una especialidad puede seguir siendo `foundation_draft` por secciones incompletas y, simultáneamente, tener fuentes, laboratorio y revisión pendientes. Los contadores `source_evidence_pending_count`, `lab_evidence_pending_count` e `independent_review_pending_count` muestran cada categoría por separado. No interpretar `awaiting_external_evidence_count` como el total de áreas con evidencia pendiente: ese contador representa únicamente áreas cuya estructura editorial ya está completa.
 
 Un área sin bloqueos solo significa que satisface las comprobaciones automatizadas definidas por este auditor. No demuestra por sí sola que un experto haya validado la corrección semántica, ni sustituye la revisión disciplinar independiente.
 
