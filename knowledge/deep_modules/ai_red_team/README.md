@@ -19,33 +19,30 @@ Las pruebas activas requieren autorización escrita, alcance, ventana, límites 
 
 ## Temas técnicos del dominio
 
-### 1. plan de pruebas y threat model
+### 1. Plan de pruebas y threat model
+Delimitar el sistema, activos, actores, capacidades, objetivos, rutas y reglas de parada. Producir manifiesto de alcance, diagrama de arquitectura/flujo de datos y matriz amenaza-control-evidencia. No iniciar pruebas sin autorización y baseline.
 
-Investigar arquitectura y dependencias; conceptos y variantes; configuraciones relevantes; fallos frecuentes y escenarios de abuso; controles y telemetría; criterios de prueba y regresión. Producir un esquema, procedimiento reproducible, resultado esperado/observado, análisis de impacto y limitaciones.
+### 2. Prompt injection
+Evaluar entradas directas, documentos indirectos, contenido multimodal, salidas de herramientas, memoria y persistencia multi-turn. Conservar etiquetas de origen e integridad; demostrar que el contenido no confiable no adquiere autoridad ni activa efectos privilegiados.
 
-### 2. prompt injection
+### 3. Abuso de herramientas y agencia
+Probar exceso de funcionalidad, permisos y autonomía. Validar principal confiable, autorización server-side, esquemas cerrados, validación semántica, aprobación humana, idempotencia, límites de destino y kill switch.
 
-Investigar arquitectura y dependencias; conceptos y variantes; configuraciones relevantes; fallos frecuentes y escenarios de abuso; controles y telemetría; criterios de prueba y regresión. Producir un esquema, procedimiento reproducible, resultado esperado/observado, análisis de impacto y limitaciones.
+### 4. RAG poisoning y aislamiento entre tenants
+Probar ingestión no autorizada, alteración de corpus, chunking, embeddings, filtros ACL, caché, citas y memoria derivada. El aislamiento debe comprobarse en el servicio de datos, no solo por instrucciones del prompt.
 
-### 3. abuso de herramientas y agencia
+### 5. Exposición y extracción
+Usar canaries sintéticos para medir fuga por respuesta, citas, logs, errores, herramientas y canales laterales permitidos por el harness. Distinguir divulgación de datos, extracción de modelo y exposición de contexto interno; no usar secretos reales.
 
-Investigar arquitectura y dependencias; conceptos y variantes; configuraciones relevantes; fallos frecuentes y escenarios de abuso; controles y telemetría; criterios de prueba y regresión. Producir un esquema, procedimiento reproducible, resultado esperado/observado, análisis de impacto y limitaciones.
+### 6. Evaluación adversarial
+Construir datasets versionados y no contaminados, con ground truth, splits, denominadores y métricas por clase. Medir acciones no autorizadas, fuga, falsos positivos/negativos, utilidad, coste y latencia; evitar scores agregados que oculten fallos críticos.
 
-### 4. RAG poisoning y cross-tenant
+### 7. Retest y reporte
+Repetir el mismo caso tras mitigación con versiones fijadas. Comparar baseline, efecto, regresiones, falsos positivos, rollback y límites de generalización. PASS solo aplica a la configuración y casos ejecutados.
 
-Investigar arquitectura y dependencias; conceptos y variantes; configuraciones relevantes; fallos frecuentes y escenarios de abuso; controles y telemetría; criterios de prueba y regresión. Producir un esquema, procedimiento reproducible, resultado esperado/observado, análisis de impacto y limitaciones.
-
-### 5. exfiltración y extracción
-
-Investigar arquitectura y dependencias; conceptos y variantes; configuraciones relevantes; fallos frecuentes y escenarios de abuso; controles y telemetría; criterios de prueba y regresión. Producir un esquema, procedimiento reproducible, resultado esperado/observado, análisis de impacto y limitaciones.
-
-### 6. evaluación adversarial
-
-Investigar arquitectura y dependencias; conceptos y variantes; configuraciones relevantes; fallos frecuentes y escenarios de abuso; controles y telemetría; criterios de prueba y regresión. Producir un esquema, procedimiento reproducible, resultado esperado/observado, análisis de impacto y limitaciones.
-
-### 7. retest y reporte
-
-Investigar arquitectura y dependencias; conceptos y variantes; configuraciones relevantes; fallos frecuentes y escenarios de abuso; controles y telemetría; criterios de prueba y regresión. Producir un esquema, procedimiento reproducible, resultado esperado/observado, análisis de impacto y limitaciones.
+**Desarrollo por capas:** [dossier teórico de doce capas](AI_RED_TEAM_THEORETICAL_DEVELOPMENT_V1.md).  
+**Protocolo de laboratorio:** [catálogo de nueve pruebas adversariales](AI_RED_TEAM_TEST_CATALOG_V1.md).  
+**Compendio y mapa de navegación:** [TECHNICAL_COMPENDIUM.md](TECHNICAL_COMPENDIUM.md).
 
 ## Procedimiento operativo
 
@@ -68,7 +65,7 @@ Evaluar precisión, cobertura, reproducibilidad, calidad de evidencia, seguridad
 
 ## Fuentes y procedencia
 
-Pendiente de curación. Registrar título, editor, URL canónica, versión, fechas de publicación/consulta, licencia, SHA-256 del artefacto cuando aplique, temas respaldados y revisor. Priorizar documentación primaria oficial. No declarar verificada una fuente por su mera inclusión.
+Fuentes candidatas registradas en `knowledge/research/source_registry.json` y `knowledge/research/field_studies/SOURCE_REGISTER_2026-11-18.json`. Se consultaron a nivel de página OWASP LLM Top 10 2026, OWASP Top 10 for Agentic Applications 2026 (ASI01–ASI10), OWASP GenAI Red Teaming Guide y la ficha NIST AI 200-3. La lectura integral, licencia, localizadores por afirmación y revisión independiente siguen pendientes. Registrar título, editor, URL canónica, versión, fechas, SHA-256 del artefacto cuando aplique y alcance. La mera inclusión no convierte una fuente en evidencia verificada.
 
 ## Criterios de publicación
 

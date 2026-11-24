@@ -1847,6 +1847,22 @@
       "path": "knowledge/skills/candidates/FND-01-03_ASSET_MISSION_INVENTORY.md",
       "topic_id": "skills",
       "subtopic_id": "candidate_spec"
+    },
+    {
+      "id": "FOUNDATIONS_RISK_ENGINEERING_V1",
+      "area_id": "foundations",
+      "name": "Foundations — ingeniería del riesgo y assurance V1",
+      "path": "knowledge/deep_modules/foundations/FOUNDATIONS_RISK_ENGINEERING_V1.md",
+      "topic_id": "risk_engineering",
+      "subtopic_id": "risk_assessment_assurance"
+    },
+    {
+      "id": "AI_RED_TEAM_TEST_CATALOG_V1",
+      "area_id": "ai_red_team",
+      "name": "AI Red Team — catálogo de pruebas adversariales reproducibles V1",
+      "path": "knowledge/deep_modules/ai_red_team/AI_RED_TEAM_TEST_CATALOG_V1.md",
+      "topic_id": "adversarial_testing",
+      "subtopic_id": "test_catalog"
     }
   ]
 }

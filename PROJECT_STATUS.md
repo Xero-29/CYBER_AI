@@ -1,5 +1,38 @@
 # Estado canónico de CYBER_AI — 2026-11-20
 
+
+# Remediación disciplinar Foundations y AI Red Team — 2026-11-24
+
+**Rama de trabajo:** `codex/foundations-ai-redteam-remediation-2026-11-24`  
+**Base:** `codex/reconcile-knowledge-pr13-pr14-2026-11-20` (PR #18; PR #18 continúa Draft).  
+**Regla de integración:** no se modifica `main`, no se fusiona PR #18 ni se altera la rama `codex/security-integrity-audit`.
+
+## Trabajo incorporado
+
+- Foundations: nuevo `knowledge/deep_modules/foundations/FOUNDATIONS_RISK_ENGINEERING_V1.md`, con escenarios de pérdida, estimación cuantitativa y ordinal, incertidumbre, assurance, análisis de controles, ejemplo de CI/CD, evaluación y preguntas en frío. El texto declara explícitamente que las fuentes no se han leído integralmente y que el laboratorio propuesto no se ha ejecutado.
+- AI Red Team: sustituido `TECHNICAL_COMPENDIUM.md` que repetía bloques genéricos por un mapa disciplinar con siete líneas específicas y navegación a los dossiers. Reescritas las siete áreas temáticas del README para eliminar el placeholder común.
+- AI Red Team: nuevo `AI_RED_TEAM_TEST_CATALOG_V1.md` con nueve casos ART-01…ART-09: inyección directa/indirecta, persistencia RAG, aislamiento multi-tenant, poisoning, abuso de herramientas, canaries, salida insegura, consumo/bucles y validez del benchmark. Incluye fixtures sintéticos, invariantes, evidencia, métricas y estados PASS/FAIL/INCONCLUSIVE/NOT RUN. Son protocolos; no se reportan como ejecutados.
+- Advanced gap development: reemplazados los siete bloques de plantilla en cuatro temas de Foundations y cuatro de AI Red Team por análisis disciplinar específico. Los otros 46 dominios no se modificaron.
+- Auditoría exacta del documento después del cambio: 48 dominios, 192 temas y 1.344 bloques conservados. Los pares de duplicación exacta bajaron de 84.015 a 77.338 (-6.677); los pares entre dominios bajaron de 82.208 a 75.610 (-6.598). La duplicación residual sigue siendo alta; esta remediación no la resuelve globalmente.
+- Se añadieron pruebas de regresión para evitar el retorno de placeholders, comprobar que los cinco bloques centrales de los ocho temas remediados son únicos por tema y verificar el estado honesto de las fuentes. Se ajustó la expectativa del auditor: la reutilización máxima del bloque de arquitectura baja de 192 a 184.
+- Se actualizaron los registros canónico y de field studies con OWASP LLM Top 10 2026, OWASP Top 10 for Agentic Applications 2026, OWASP GenAI Red Teaming Guide y NIST AI 200-3 ARIA. Se registraron como páginas/fichas consultadas; no como lectura integral ni claims respaldados.
+
+## Estado de evidencia y pendientes
+
+- **CI verde en HEAD `ce82f4dd7318f093cbdc0f1926f6ac2bd50a866b`:** [Actions run 45453949310](https://github.com/Xero-29/CYBER_AI/actions/runs/45453949310) concluyó `success`. `verify.sh` ejecutó 694 pruebas (1 skipped); reproducibilidad Foundations pasó en Python 3.11, 3.12 y 3.13; Windows allowlist smoke pasó. El artefacto `results.json` fue alineado con el orden determinista del runner.
+- En ese mismo HEAD, `knowledge_bootstrap.py --dry-run` seleccionó 334 documentos.
+- Auditoría de profundidad: 77.338 pares de duplicación exacta, 75.610 entre dominios, 0 claims respaldados, 192 experimentos no evaluados, 192 revisiones independientes no iniciadas, 0 brechas expert-ready.
+- Auditoría de investigación: 48 agendas completas, 48 revisiones bibliográficas, 226 fuentes en el registro canónico; 5 solo con metadatos revisados, 52 páginas/documentos revisados y 63 referencias de catálogo sin revisión de contenido.
+- Auditoría de validación: 48 dominios, 192 módulos, 96 fuentes en el registro de field studies; 0 afirmaciones respaldadas y 0 fuentes con lectura integral registrada. Integridad estructural OK; estado `structurally_valid_needs_research`.
+- Auditoría global: 48 áreas con referencias asociadas; 336 requisitos, 432 artefactos y 336 puertas, todos con 0 evaluados; 0 especialidades validadas y cobertura exhaustiva no demostrada.
+- Auditoría de procedencia: `needs_review`, 138 fuentes, 0 revisadas, 276 pendientes y 0 errores. La revisión de página/ficha en el registro bibliográfico no sustituye aprobación de licencia, fecha de revisión ni intervalo de vigencia de cada fuente de módulo.
+- Los dos documentos nuevos están registrados como `supplemental_documents` del manifiesto (Foundations risk engineering y AI Red Team test catalog); el bootstrap offline los selecciona con IDs estables por ruta y SHA-256. El total declarado de documentos seleccionables pasa de 332 a 334.
+- No se añadieron afirmaciones a `CLAIM_EVIDENCE_REGISTER.json`; continúa vacío. Las 192 tareas de investigación mantienen estado experimental no evaluado y revisión independiente no iniciada.
+- Ningún subtema de Foundations o AI Red Team se promueve de T0/O0 por este trabajo. Los ocho temas remediados son contenido editorial específico, no aceptación experta.
+- Los nueve casos AI Red Team y el ejemplo de riesgo Foundations no se han ejecutado. No hay resultados experimentales ni revisión independiente asociados a estos documentos.
+- Pendiente: ejecutar CI en el HEAD final de esta rama, revisar fallos, continuar los 98 subtemas restantes de Foundations (102 total; solo cuatro temas avanzados de este documento y contenido previo no implican cierre granular), desarrollar las restantes brechas de AI Red Team, reducir la duplicación de los otros 40 dominios y realizar lectura integral de fuentes.
+
+
 **Repositorio:** https://github.com/Xero-29/CYBER_AI  
 **Rama principal:** `main` — sin modificar durante esta secuencia.  
 **HEAD de main auditado:** `387104756d0f8307c39a46a1ea2df07671bd81c9`.
@@ -25,13 +58,13 @@ PR #18 tiene como base la rama de PR #17. No se debe fusionar #18 antes de integ
 
 - 48/48 paquetes con estructura base; 48 estudios `RESEARCH_STUDY.md`; 48 `DEEP_SECTIONS.md`.
 - 20.588 palabras en estudios y 218 referencias HTTPS. Son borradores con umbral editorial mínimo; no implican lectura integral ni verificación de afirmaciones.
-- 48/48 agendas estructuralmente completas; 223 IDs de fuente registrados (16 añadidos en FND-01.01/01.02/01.03); 0 fuentes con lectura integral registrada en la worklist; 192 tareas siguen con fuentes candidatas, no claims verificados.
+- 48/48 agendas estructuralmente completas; 226 IDs de fuente registrados (16 añadidos en FND-01.01/01.02/01.03); 0 fuentes con lectura integral registrada en la worklist; 192 tareas siguen con fuentes candidatas, no claims verificados.
 - Registro de claims: 0 claims aprobados.
 - Las 192 brechas tienen 1.344 bloques de sección, 77 variantes únicas y reutilización de boilerplate. La auditoría encontró 84.015 pares de duplicación exacta, 82.208 entre dominios; cero brechas elegibles como expertas.
 - Foundations: 102 subtemas; 1.224 comprobaciones de capa (36 en progreso, 1.188 no evaluadas); 408 comprobaciones de capacidad (12 en progreso, 396 no evaluadas); 0 aprobadas; todos los subtemas T0/O0.
 - AI Red Team: siete temas base, 84 celdas en progreso, 0 aprobadas; G5/G7 sin iniciar y G8 bloqueada.
 - Seis reescrituras disciplinares importadas como borradores: identity, malware, forensics, incident_response, threat_intel y reverse. Otras 40 áreas tienen expansión específica pendiente.
-- El bootstrap offline valida e indexa 332 documentos: 48 paquetes, 48 dossiers DEEP_SECTIONS, 48 estudios RESEARCH_STUDY, 48 compendios técnicos, 48 agendas, 48 revisiones bibliográficas, 41 documentos suplementarios y 3 Skills candidatas. Las candidatas no son Skills activas.
+- El bootstrap offline valida e indexa 334 documentos: 48 paquetes, 48 dossiers DEEP_SECTIONS, 48 estudios RESEARCH_STUDY, 48 compendios técnicos, 48 agendas, 48 revisiones bibliográficas, 43 documentos suplementarios y 3 Skills candidatas. Las candidatas no son Skills activas.
 - FND-01.01, FND-01.02 y FND-01.03 tienen ampliaciones teóricas, instrumentos de evaluación en frío preparados y seis laboratorios sintéticos nuevos; ningún instrumento se ha administrado.
 - Los laboratorios sintéticos incluyen conflictos safety/security, privacidad vs confidencialidad, recuperación confiable, causa común y autenticidad/integridad vs verdad. CI no equivale a prueba física u operacional.
 - Los gates de estructura no son gates de aceptación experta. La madurez editorial M2 no equivale a T4/T5 ni a O4/O5.

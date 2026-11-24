@@ -169,13 +169,13 @@
       ],
       "high_criticality_without_logging": [
         "HMI-01",
-        "SaaS-01",
-        "SENSOR-01"
+        "SENSOR-01",
+        "SaaS-01"
       ],
       "unknown_support_status": [
         "DATA-01",
-        "SaaS-01",
-        "SENSOR-01"
+        "SENSOR-01",
+        "SaaS-01"
       ],
       "asset_quality_findings_detected": true,
       "warning": "Synthetic inventory only; discovery coverage, owner truth and OT safety require field validation."

@@ -44,7 +44,7 @@ Una fuente con estado \`official_*_reviewed\` en el registro actual solo indica 
 
 ## Límites y seguridad
 
-- Las 92 referencias del registro son fuentes candidatas; el mapeo temático no demuestra que respalden cada módulo.
+- Las 96 referencias del registro de estudios de campo son fuentes candidatas; el mapeo temático no demuestra que respalden cada módulo.
 - No se descargaron automáticamente documentos protegidos ni se modificaron licencias. El descargador existente mantiene su compuerta de licencia, proxy de salida seguro y verificación SHA-256.
 - La ingestión existente extrae y fragmenta documentos; la indexación semántica depende del proveedor de embeddings configurado y de la política de datos.
 - El motor de experimentos existente ejecuta únicamente pruebas dentro de \`tests/\`; un resultado pytest no es por sí mismo una conclusión de seguridad.

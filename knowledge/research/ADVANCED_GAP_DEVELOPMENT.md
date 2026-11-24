@@ -12,132 +12,138 @@
 ## 1. cuantificación de riesgo y análisis de incertidumbre
 
 ### Propósito y alcance
-El módulo define qué propiedad técnica debe protegerse, qué activos y procesos cubre, qué queda fuera y qué evidencia permitiría demostrar el resultado. Trata riesgo como decisión bajo incertidumbre: distingue frecuencia, impacto, exposición, eficacia de controles y confianza en evidencia.
+
+Este tema desarrolla métodos para estimar riesgo bajo incertidumbre sin fingir precisión. La unidad de análisis es el escenario de pérdida asociado a una misión, activo y horizonte definidos. Se estudian estimación cuantitativa, escalas ordinales, sensibilidad, dependencia entre eventos y límites de los datos. No se pretende que una puntuación universal decida por el propietario del riesgo.
 
 ### Arquitectura y modelo de amenazas
-Descompón actores, activos, interfaces, estados, flujos, dependencias y autoridades. Marca trust boundaries y puntos de autenticación, autorización, transformación, almacenamiento y exportación. Considera abuso de privilegios, manipulación de estado, entrada no confiable, replay, exposición lateral, dependencia comprometida, mala configuración y pérdida de telemetría. Para cada escenario registra precondiciones, capacidad del adversario, impacto, señales y supuestos; no infieras atribución sin evidencia.
+
+El modelo comienza por misión, activos, propietarios, procesos y dependencias. Cada escenario registra actor o causa, capacidad, precondiciones, secuencia, control, consecuencia y horizonte. Separar eventos iniciadores, eventos intermedios y pérdidas; dibujar árboles de eventos cuando existan rutas alternativas y evitar sumar escenarios solapados. Distinguir frecuencia de intento, probabilidad de éxito condicionada, probabilidad de impacto y magnitud de pérdida. Una matriz de severidad técnica no es una distribución de probabilidad.
 
 ### Desarrollo técnico y controles
-Define variables, población, horizonte y unidad de análisis; declara supuestos, incertidumbre, sensibilidad y sesgos. Compara contra línea base y no interpretes una escala ordinal como probabilidad calibrada. Aplica mínimo privilegio, separación de funciones, validación en el componente de confianza, límites de recursos, segmentación, gestión de secretos, logging resistente a manipulación y recuperación probada. Cada control requiere owner, alcance, modo de fallo, evidencia y excepción con vencimiento. Un gateway, escáner o agente no sustituye la decisión de autorización en el componente dueño del recurso.
+
+Si los escenarios son mutuamente excluyentes y las probabilidades están justificadas, usar E[L] = Σ P(S_i | contexto, controles) × L_i. Para eventos recurrentes puede estimarse frecuencia anual × magnitud condicionada, declarando periodo y distribución. No multiplicar categorías ordinales. Separar incertidumbre aleatoria, epistémica, de modelo, medición y juicio. Hacer sensibilidad de supuestos y correlaciones. Documentar fuente, denominador, intervalo, confianza y evidencia de eficacia de controles; no asignar decimales cuando solo existe juicio experto.
 
 ### Procedimiento reproducible
-1. Inventariar activos, versiones y dependencias.
-2. Establecer línea base y supuestos.
-3. Formular una hipótesis falsable y casos de abuso.
-4. Ejecutar pruebas en staging, simulador o entorno aislado con datos sintéticos.
-5. Capturar configuración, logs, hashes y resultados.
-6. Corregir causa raíz y repetir pruebas de regresión.
-7. Registrar owner, fecha, limitaciones y criterio de salida.
+
+1. Definir decisión, propietario, horizonte y tolerancia. 2. Delimitar activos y población; registrar exclusiones. 3. Formular escenarios mutuamente excluyentes o documentar solapamientos. 4. Reunir datos y anotar sesgos y datos ausentes. 5. Seleccionar método cuantitativo, ordinal o mixto y justificarlo. 6. Estimar rangos y realizar sensibilidad. 7. Evaluar controles con pruebas observables. 8. Presentar opciones de tratamiento, riesgo residual y condiciones de reevaluación.
 
 ### Laboratorio y evaluación
-Crear un entorno aislado con componentes mock que represente el flujo esencial. Incluir caso nominal, abuso, límite, dependencia no disponible y prueba negativa que demuestre bloqueo. No usar datos personales ni sistemas de terceros. Definir precondiciones, snapshots, limpieza y reglas de parada. Medir cobertura, tasa de casos detectados, falsos positivos/negativos, latencia, impacto operativo y reproducibilidad, usando solo métricas pertinentes y fijando umbrales antes del ensayo.
+
+Usar un dataset sintético de incidentes con tasas base, exposición, eficacia de control, severidad y datos ausentes conocidos. Comparar tres estimadores: escala ordinal, frecuencia×magnitud y simulación con distribuciones declaradas. Incluir escenarios correlacionados y un caso donde la suma ingenua duplica pérdidas. Evaluar calibración contra ground truth sintético, sensibilidad a priors, estabilidad de ranking y comunicación de intervalos. No presentar el ejercicio como estimación de pérdidas reales.
 
 ### Evidencia y limitaciones
-Conservar diseño, configuración, scripts, datos sintéticos, hashes, logs, resultados y decisión. El estado de este módulo es desarrollo documental inicial: no acredita laboratorio ejecutado, exactitud exhaustiva ni revisión independiente. Para declararlo validado se requiere trazabilidad de afirmaciones a secciones concretas de fuentes primarias, resultados reproducibles, pruebas negativas y revisión por otra persona.
+
+Conservar dataset y generador, semilla, definición de variables, supuestos, exclusiones, código, versiones, resultados y análisis de sensibilidad. El ground truth del simulador solo valida el cálculo sobre ese modelo; no prueba que el modelo represente una organización real. La selección de distribuciones y las estimaciones de frecuencia requieren datos externos y revisión. Sin éstos, el resultado permanece exploratorio.
 
 ### Fuentes de partida
-- https://www.nist.gov/cyberframework
-- https://www.cisa.gov/resources-tools
 
-**Estado de las fuentes:** referencias de contexto para lectura y contraste; no se afirma que respalden línea por línea este módulo.
+- NIST SP 800-30 Rev. 1, Guide for Conducting Risk Assessments: https://doi.org/10.6028/NIST.SP.800-30r1
+- NIST Cybersecurity Framework 2.0: https://doi.org/10.6028/NIST.CSWP.29
+- FIRST CVSS: https://www.first.org/cvss/
+
+Las referencias son candidatas; no se declara lectura integral en este módulo.
 
 ## 2. arquitectura de confianza y resiliencia sistémica
 
 ### Propósito y alcance
-El módulo define qué propiedad técnica debe protegerse, qué activos y procesos cubre, qué queda fuera y qué evidencia permitiría demostrar el resultado. Trata riesgo como decisión bajo incertidumbre: distingue frecuencia, impacto, exposición, eficacia de controles y confianza en evidencia.
+
+Este tema analiza cómo las propiedades de seguridad emergen de interacciones entre componentes, identidades, datos, operadores y proveedores. Se centra en límites de confianza, dependencias, fallos comunes, modos degradados y reconstrucción de confianza tras incidentes. No equivale a diseñar una red segmentada sin considerar autoridad y operación.
 
 ### Arquitectura y modelo de amenazas
-Descompón actores, activos, interfaces, estados, flujos, dependencias y autoridades. Marca trust boundaries y puntos de autenticación, autorización, transformación, almacenamiento y exportación. Considera abuso de privilegios, manipulación de estado, entrada no confiable, replay, exposición lateral, dependencia comprometida, mala configuración y pérdida de telemetría. Para cada escenario registra precondiciones, capacidad del adversario, impacto, señales y supuestos; no infieras atribución sin evidencia.
+
+Representar el sistema mediante vistas de contexto, componentes, despliegue y operación. Dibujar flujos de datos y flujos de autoridad por separado; identificar planos de control/datos, dominios administrativos, proveedores, identidades de workload y mecanismos de recuperación. Modelar fallos de DNS, identidad, PKI, energía, conectividad, actualización, logging y proveedor común. Analizar rutas de fallo en cascada, particiones, estados inconsistentes y degradación silenciosa.
 
 ### Desarrollo técnico y controles
-Especifica entradas, estados, invariantes, dependencias y resultados esperados. Construye casos nominales, negativos, límite y fallo; registra condiciones de carrera, bypass y degradación. Aplica mínimo privilegio, separación de funciones, validación en el componente de confianza, límites de recursos, segmentación, gestión de secretos, logging resistente a manipulación y recuperación probada. Cada control requiere owner, alcance, modo de fallo, evidencia y excepción con vencimiento. Un gateway, escáner o agente no sustituye la decisión de autorización en el componente dueño del recurso.
+
+Aplicar separación de dominios, mediación en el recurso, autenticación mutua donde corresponda, aislamiento de procesos/tenants, gestión de configuración, observabilidad independiente y recuperación probada. Para resiliencia, especificar RTO/RPO, SLO, capacidad degradada y dependencias críticas. Comprobar independencia real: dos nodos que comparten identidad, región, plano de control o proveedor no son redundancia independiente. Diseñar fail-safe/fail-secure según consecuencias, especialmente cuando seguridad física y ciberseguridad interactúan.
 
 ### Procedimiento reproducible
-1. Inventariar activos, versiones y dependencias.
-2. Establecer línea base y supuestos.
-3. Formular una hipótesis falsable y casos de abuso.
-4. Ejecutar pruebas en staging, simulador o entorno aislado con datos sintéticos.
-5. Capturar configuración, logs, hashes y resultados.
-6. Corregir causa raíz y repetir pruebas de regresión.
-7. Registrar owner, fecha, limitaciones y criterio de salida.
+
+1. Inventariar servicios y dependencias directas/transitivas. 2. Diagramar fronteras administrativas y flujos de autoridad. 3. Identificar fallos únicos y causas comunes. 4. Definir estados nominales, degradados y de recuperación. 5. Inyectar fallos controlados en simulador. 6. Verificar límites, continuidad y preservación de evidencia. 7. Restaurar dependencias y reconstruir confianza. 8. Comparar tiempos y pérdida de funciones con objetivos predefinidos.
 
 ### Laboratorio y evaluación
-Crear un entorno aislado con componentes mock que represente el flujo esencial. Incluir caso nominal, abuso, límite, dependencia no disponible y prueba negativa que demuestre bloqueo. No usar datos personales ni sistemas de terceros. Definir precondiciones, snapshots, limpieza y reglas de parada. Medir cobertura, tasa de casos detectados, falsos positivos/negativos, latencia, impacto operativo y reproducibilidad, usando solo métricas pertinentes y fijando umbrales antes del ensayo.
+
+Crear un sistema distribuido sintético con servicio de identidad, DNS, dos nodos de aplicación, almacenamiento y un plano de control. Ejecutar escenarios de caída de región, expiración de certificado, revocación de identidad, partición de red y corrupción de configuración. Medir disponibilidad por función, tiempo de detección, RTO/RPO, consistencia, dependencia compartida y recuperación segura. Incluir un caso en que fail-open conserva servicio pero viola autorización, y otro en que fail-closed afecta disponibilidad.
 
 ### Evidencia y limitaciones
-Conservar diseño, configuración, scripts, datos sintéticos, hashes, logs, resultados y decisión. El estado de este módulo es desarrollo documental inicial: no acredita laboratorio ejecutado, exactitud exhaustiva ni revisión independiente. Para declararlo validado se requiere trazabilidad de afirmaciones a secciones concretas de fuentes primarias, resultados reproducibles, pruebas negativas y revisión por otra persona.
+
+Registrar topología, versiones, dependencias, inyección de fallos, telemetría, trazas, resultados, rollback y desviaciones. La simulación no prueba tolerancia de hardware real, comportamiento de proveedores ni seguridad funcional de un sistema físico. La independencia de controles debe demostrarse con arquitectura y pruebas, no inferirse por nombres o número de nodos.
 
 ### Fuentes de partida
-- https://www.nist.gov/cyberframework
-- https://www.cisa.gov/resources-tools
 
-**Estado de las fuentes:** referencias de contexto para lectura y contraste; no se afirma que respalden línea por línea este módulo.
+- NIST SP 800-160 Vol. 1 Rev. 1, Systems Security Engineering: https://doi.org/10.6028/NIST.SP.800-160v1r1
+- NIST SP 800-160 Vol. 2 Rev. 1, Cyber Resiliency Engineering: https://doi.org/10.6028/NIST.SP.800-160v2r1
+- NIST SP 800-34 Rev. 1, Contingency Planning Guide: https://doi.org/10.6028/NIST.SP.800-34r1
+
+Referencias para lectura; la cita no representa lectura integral ni validación de un diseño concreto.
 
 ## 3. economía de seguridad y priorización basada en impacto
 
 ### Propósito y alcance
-El módulo define qué propiedad técnica debe protegerse, qué activos y procesos cubre, qué queda fuera y qué evidencia permitiría demostrar el resultado. Trata riesgo como decisión bajo incertidumbre: distingue frecuencia, impacto, exposición, eficacia de controles y confianza en evidencia.
+
+Este tema estudia la asignación de recursos limitados a tratamientos de seguridad. La pregunta no es “qué control es más barato”, sino qué combinación reduce pérdidas relevantes, satisface obligaciones y conserva capacidad operacional bajo restricciones de presupuesto, tiempo, talento y tolerancia al riesgo. Los modelos económicos apoyan la decisión; no sustituyen autoridad ni obligaciones legales.
 
 ### Arquitectura y modelo de amenazas
-Descompón actores, activos, interfaces, estados, flujos, dependencias y autoridades. Marca trust boundaries y puntos de autenticación, autorización, transformación, almacenamiento y exportación. Considera abuso de privilegios, manipulación de estado, entrada no confiable, replay, exposición lateral, dependencia comprometida, mala configuración y pérdida de telemetría. Para cada escenario registra precondiciones, capacidad del adversario, impacto, señales y supuestos; no infieras atribución sin evidencia.
+
+Identificar decisiones, beneficiarios, pagadores, activos, escenarios, costes directos e indirectos y externalidades sobre clientes/proveedores. Incluir costes de implementación, operación, mantenimiento, interrupción, falsos positivos, deuda técnica, dependencia del proveedor y coste de oportunidad. Modelar escenarios con horizontes y consecuencias diferenciadas; evitar sumar beneficios incompatibles o atribuir a un control toda reducción observada.
 
 ### Desarrollo técnico y controles
-Define variables, población, horizonte y unidad de análisis; declara supuestos, incertidumbre, sensibilidad y sesgos. Compara contra línea base y no interpretes una escala ordinal como probabilidad calibrada. Aplica mínimo privilegio, separación de funciones, validación en el componente de confianza, límites de recursos, segmentación, gestión de secretos, logging resistente a manipulación y recuperación probada. Cada control requiere owner, alcance, modo de fallo, evidencia y excepción con vencimiento. Un gateway, escáner o agente no sustituye la decisión de autorización en el componente dueño del recurso.
+
+Comparar opciones mediante coste total de propiedad, coste incremental, reducción de exposición, impacto esperado y robustez ante incertidumbre. Usar análisis coste-beneficio solo cuando los valores y horizontes sean comparables; declarar supuestos y rangos. El retorno de inversión en seguridad no debe prometer precisión si la pérdida evitada no es observable. Considerar restricciones duras, riesgos de cola, requisitos no negociables, distribución de costes y efectos sobre privacidad/seguridad. Priorizar primero controles que eliminan rutas críticas o fallos sistémicos, no solo los que producen mejor ratio.
 
 ### Procedimiento reproducible
-1. Inventariar activos, versiones y dependencias.
-2. Establecer línea base y supuestos.
-3. Formular una hipótesis falsable y casos de abuso.
-4. Ejecutar pruebas en staging, simulador o entorno aislado con datos sintéticos.
-5. Capturar configuración, logs, hashes y resultados.
-6. Corregir causa raíz y repetir pruebas de regresión.
-7. Registrar owner, fecha, limitaciones y criterio de salida.
+
+1. Definir misión, decisión y presupuesto. 2. Establecer baseline y escenarios de pérdida. 3. Listar opciones, costes de ciclo de vida y dependencias. 4. Identificar restricciones legales/contractuales y criterios no monetizables. 5. Estimar rangos de eficacia y coste. 6. Comparar sensibilidad y escenarios adversos. 7. Documentar trade-offs, distribución de impactos y riesgo residual. 8. Asignar responsable, fecha y disparadores de revisión.
 
 ### Laboratorio y evaluación
-Crear un entorno aislado con componentes mock que represente el flujo esencial. Incluir caso nominal, abuso, límite, dependencia no disponible y prueba negativa que demuestre bloqueo. No usar datos personales ni sistemas de terceros. Definir precondiciones, snapshots, limpieza y reglas de parada. Medir cobertura, tasa de casos detectados, falsos positivos/negativos, latencia, impacto operativo y reproducibilidad, usando solo métricas pertinentes y fijando umbrales antes del ensayo.
+
+Construir un caso sintético con cuatro inversiones: MFA resistente a phishing, segmentación, backup inmutable y telemetría. Asignar rangos de coste y eficacia con ground truth del ejercicio, pero incluir correlación entre controles y una obligación que no pueda compensarse con dinero. Comparar ranking por coste simple, coste-beneficio, cobertura de escenarios y robustez minimax. Evaluar si el método oculta una pérdida de baja frecuencia y alto impacto o concentra riesgos en un proveedor.
 
 ### Evidencia y limitaciones
-Conservar diseño, configuración, scripts, datos sintéticos, hashes, logs, resultados y decisión. El estado de este módulo es desarrollo documental inicial: no acredita laboratorio ejecutado, exactitud exhaustiva ni revisión independiente. Para declararlo validado se requiere trazabilidad de afirmaciones a secciones concretas de fuentes primarias, resultados reproducibles, pruebas negativas y revisión por otra persona.
+
+Conservar hojas de cálculo, fórmulas, supuestos, fuentes de costes, escenarios, criterios no monetizables y análisis de sensibilidad. Las estimaciones de eficacia son específicas al contexto y no se extrapolan sin datos. Un beneficio monetario modelado no demuestra causalidad ni evita sesgos de selección. La decisión final y aceptación deben quedar en manos de la autoridad competente.
 
 ### Fuentes de partida
-- https://www.nist.gov/cyberframework
-- https://www.cisa.gov/resources-tools
 
-**Estado de las fuentes:** referencias de contexto para lectura y contraste; no se afirma que respalden línea por línea este módulo.
+- NIST SP 800-30 Rev. 1: https://doi.org/10.6028/NIST.SP.800-30r1
+- NIST CSF 2.0: https://doi.org/10.6028/NIST.CSWP.29
+- CISA Cross-Sector Cybersecurity Performance Goals: https://www.cisa.gov/cross-sector-cybersecurity-performance-goals
+
+Fuentes de orientación; estimaciones económicas requieren datos organizacionales propios y revisión.
 
 ## 4. gestión de exposición externa y attack surface management
 
 ### Propósito y alcance
-El módulo define qué propiedad técnica debe protegerse, qué activos y procesos cubre, qué queda fuera y qué evidencia permitiría demostrar el resultado. Trata riesgo como decisión bajo incertidumbre: distingue frecuencia, impacto, exposición, eficacia de controles y confianza en evidencia.
+
+Este tema desarrolla la gestión continua de activos expuestos desde Internet y superficies accesibles a terceros. Incluye descubrimiento, atribución, validación de exposición, priorización, remediación y verificación. No autoriza escaneo fuera de los dominios, rangos, cuentas o activos expresamente incluidos en el alcance.
 
 ### Arquitectura y modelo de amenazas
-Descompón actores, activos, interfaces, estados, flujos, dependencias y autoridades. Marca trust boundaries y puntos de autenticación, autorización, transformación, almacenamiento y exportación. Considera abuso de privilegios, manipulación de estado, entrada no confiable, replay, exposición lateral, dependencia comprometida, mala configuración y pérdida de telemetría. Para cada escenario registra precondiciones, capacidad del adversario, impacto, señales y supuestos; no infieras atribución sin evidencia.
+
+Modelar dominios, DNS, certificados, direcciones, servicios cloud, repositorios públicos, SaaS, APIs, portales, VPN, dispositivos edge y relaciones con proveedores. Las fuentes de descubrimiento (CMDB, DNS pasivo, cloud inventory, EASM, CT logs, repositorios) tienen cobertura y latencia distintas. La amenaza incluye activos olvidados, takeover, configuración expuesta, servicio sin propietario, credencial filtrada y dependencia externa. La atribución debe distinguir evidencia de titularidad de mera coincidencia de nombre.
 
 ### Desarrollo técnico y controles
-Define hipótesis, fuentes, campos, normalización, ventana temporal y calidad de eventos. Prueba positivos, negativos y benignos parecidos; mide precisión, recall estimado, falsos positivos, latencia y cobertura. Aplica mínimo privilegio, separación de funciones, validación en el componente de confianza, límites de recursos, segmentación, gestión de secretos, logging resistente a manipulación y recuperación probada. Cada control requiere owner, alcance, modo de fallo, evidencia y excepción con vencimiento. Un gateway, escáner o agente no sustituye la decisión de autorización en el componente dueño del recurso.
+
+Mantener un grafo de activos con identificador estable, propietario, fuente, confianza, fecha de observación, resolución DNS, certificado, servicio, versión, criticidad y exposición. Reconciliar duplicados sin perder procedencia. Validar manualmente hallazgos críticos dentro de scope. Priorizar por explotación conocida, exposición, criticidad, accesibilidad, controles y consecuencia, no solo CVSS. Definir SLA por clase y excepción con vencimiento. Vigilar drift y activos efímeros.
 
 ### Procedimiento reproducible
-1. Inventariar activos, versiones y dependencias.
-2. Establecer línea base y supuestos.
-3. Formular una hipótesis falsable y casos de abuso.
-4. Ejecutar pruebas en staging, simulador o entorno aislado con datos sintéticos.
-5. Capturar configuración, logs, hashes y resultados.
-6. Corregir causa raíz y repetir pruebas de regresión.
-7. Registrar owner, fecha, limitaciones y criterio de salida.
+
+1. Aprobar alcance y listas de exclusión. 2. Recoger inventarios y fuentes pasivas. 3. Normalizar dominios, IPs, cloud IDs y certificados. 4. Resolver titularidad y confianza. 5. Validar exposición mediante pruebas permitidas y no destructivas. 6. Clasificar hallazgos y falsos positivos. 7. Asignar propietario y remediación. 8. Repetir descubrimiento y verificar cierre, DNS/certificados y servicios residuales.
 
 ### Laboratorio y evaluación
-Crear un entorno aislado con componentes mock que represente el flujo esencial. Incluir caso nominal, abuso, límite, dependencia no disponible y prueba negativa que demuestre bloqueo. No usar datos personales ni sistemas de terceros. Definir precondiciones, snapshots, limpieza y reglas de parada. Medir cobertura, tasa de casos detectados, falsos positivos/negativos, latencia, impacto operativo y reproducibilidad, usando solo métricas pertinentes y fijando umbrales antes del ensayo.
+
+Usar un dominio ficticio y activos locales simulados con DNS estático, certificados de laboratorio, endpoints y registros CMDB incompletos. Introducir subdominio huérfano, IP reasignada, API olvidada, certificado expirado y activo duplicado. Evaluar precisión de atribución, cobertura contra ground truth, tiempo de detección, falsos positivos y latencia de actualización. El laboratorio no debe enviar tráfico a direcciones públicas ni intentar takeover real.
 
 ### Evidencia y limitaciones
-Conservar diseño, configuración, scripts, datos sintéticos, hashes, logs, resultados y decisión. El estado de este módulo es desarrollo documental inicial: no acredita laboratorio ejecutado, exactitud exhaustiva ni revisión independiente. Para declararlo validado se requiere trazabilidad de afirmaciones a secciones concretas de fuentes primarias, resultados reproducibles, pruebas negativas y revisión por otra persona.
+
+Guardar scope firmado, snapshot de fuentes, timestamps, consultas, resultados, decisión de titularidad, hallazgo, evidencia de remediación y retest. El inventario es una vista temporal: DNS pasivo no muestra todos los servicios y un escaneo no garantiza cobertura. Los activos de terceros y SaaS requieren autorización y coordinación contractual. No reportar un activo como vulnerable solo por banner o versión sin validar aplicabilidad.
 
 ### Fuentes de partida
-- https://www.nist.gov/cyberframework
-- https://www.cisa.gov/resources-tools
 
-**Estado de las fuentes:** referencias de contexto para lectura y contraste; no se afirma que respalden línea por línea este módulo.
+- CISA Known Exploited Vulnerabilities Catalog: https://www.cisa.gov/known-exploited-vulnerabilities-catalog
+- NIST SP 800-30 Rev. 1: https://doi.org/10.6028/NIST.SP.800-30r1
+- FIRST CVSS: https://www.first.org/cvss/
 
-
+Los catálogos y taxonomías apoyan priorización, no sustituyen atribución y validación contextual.
 
 # appsec
 
@@ -5598,132 +5604,138 @@ Conservar diseño, configuración, scripts, datos sintéticos, hashes, logs, res
 ## 1. ataques multimodales y prompt injection indirecta
 
 ### Propósito y alcance
-El módulo define qué propiedad técnica debe protegerse, qué activos y procesos cubre, qué queda fuera y qué evidencia permitiría demostrar el resultado. Prueba prompts, retrieval, memoria, herramientas, identidad y multimodalidad con datos sintéticos y límites seguros.
+
+Evaluar contenido no confiable que llega al modelo por texto, documentos, imágenes, OCR, audio, vídeo, subtítulos, resultados de herramientas o memoria. El foco es el paso de datos a instrucciones y la propagación de esa influencia a decisiones o acciones. Las pruebas se limitan a artefactos sintéticos y canales presentes en el sistema autorizado.
 
 ### Arquitectura y modelo de amenazas
-Descompón actores, activos, interfaces, estados, flujos, dependencias y autoridades. Marca trust boundaries y puntos de autenticación, autorización, transformación, almacenamiento y exportación. Considera abuso de privilegios, manipulación de estado, entrada no confiable, replay, exposición lateral, dependencia comprometida, mala configuración y pérdida de telemetría. Para cada escenario registra precondiciones, capacidad del adversario, impacto, señales y supuestos; no infieras atribución sin evidencia.
+
+Trazar ingestión, decodificación, OCR/transcripción, normalización, chunking, embedding, retrieval, resumen, memoria y prompt final. Cada transformación puede perder contexto o procedencia. El adversario puede ocultar instrucciones en capas no visibles, dividir payloads entre fragmentos, usar idiomas mezclados o activar instrucciones en turnos posteriores. Identificar si los límites de confianza se mantienen en el ensamblador de contexto y en el broker de herramientas.
 
 ### Desarrollo técnico y controles
-Clasifica datos y derivados, define propósito, tenant, owner, retención y permisos. Evalúa filtración, envenenamiento, inferencia y reidentificación; incluye segregación, auditoría y borrado verificable. Aplica mínimo privilegio, separación de funciones, validación en el componente de confianza, límites de recursos, segmentación, gestión de secretos, logging resistente a manipulación y recuperación probada. Cada control requiere owner, alcance, modo de fallo, evidencia y excepción con vencimiento. Un gateway, escáner o agente no sustituye la decisión de autorización en el componente dueño del recurso.
+
+Etiquetar cada fragmento con origen, tenant, integridad, ACL, fecha y hash. Separar instrucciones de control de contenido citado, aunque el modelo no pueda garantizar esa separación semántica. Reducir contexto, limitar herramientas, validar cada acción en servidor y no confiar en filtros de prompt como frontera de seguridad. Analizar OCR y transcripciones como entradas no confiables; preservar metadatos y transformaciones. Aplicar políticas de retención a memoria derivada y permitir invalidación.
 
 ### Procedimiento reproducible
-1. Inventariar activos, versiones y dependencias.
-2. Establecer línea base y supuestos.
-3. Formular una hipótesis falsable y casos de abuso.
-4. Ejecutar pruebas en staging, simulador o entorno aislado con datos sintéticos.
-5. Capturar configuración, logs, hashes y resultados.
-6. Corregir causa raíz y repetir pruebas de regresión.
-7. Registrar owner, fecha, limitaciones y criterio de salida.
+
+1. Congelar modelo, parser, OCR, prompt, corpus y herramientas. 2. Crear documentos benignos y adversariales sintéticos en formatos autorizados. 3. Registrar hashes y procedencia. 4. Ingerir por cada canal multimodal habilitado. 5. Consultar con usuario de prueba y observar retrieval, resumen, memoria y llamadas. 6. Repetir en nueva sesión y tras compactación de contexto. 7. Verificar limpieza de índices y cachés. 8. Comparar con baseline benigno.
 
 ### Laboratorio y evaluación
-Crear un entorno aislado con componentes mock que represente el flujo esencial. Incluir caso nominal, abuso, límite, dependencia no disponible y prueba negativa que demuestre bloqueo. No usar datos personales ni sistemas de terceros. Definir precondiciones, snapshots, limpieza y reglas de parada. Medir cobertura, tasa de casos detectados, falsos positivos/negativos, latencia, impacto operativo y reproducibilidad, usando solo métricas pertinentes y fijando umbrales antes del ensayo.
+
+Crear fixtures con instrucciones visibles, OCR de imagen, transcripción de audio y contenido dividido entre dos chunks. Incluir control negativo con texto similar pero benigno. Medir tasa de influencia no deseada, acciones no autorizadas, pérdida de provenance, persistencia entre sesiones y falsos positivos. El harness debe detectar tool calls y efectos, no inferir éxito a partir de la redacción de la respuesta.
 
 ### Evidencia y limitaciones
-Conservar diseño, configuración, scripts, datos sintéticos, hashes, logs, resultados y decisión. El estado de este módulo es desarrollo documental inicial: no acredita laboratorio ejecutado, exactitud exhaustiva ni revisión independiente. Para declararlo validado se requiere trazabilidad de afirmaciones a secciones concretas de fuentes primarias, resultados reproducibles, pruebas negativas y revisión por otra persona.
+
+Conservar archivos sintéticos, hashes, pipeline/versiones, chunks, etiquetas, retrieval, memoria antes/después, llamadas de herramienta y resultados. No almacenar payloads con secretos reales. Un conjunto finito no demuestra resistencia universal a prompt injection; modelos y parsers pueden cambiar comportamiento con versiones y modalidades.
 
 ### Fuentes de partida
-- https://www.nist.gov/itl/ai-risk-management-framework
-- https://owasp.org/www-project-top-10-for-large-language-model-applications/
 
-**Estado de las fuentes:** referencias de contexto para lectura y contraste; no se afirma que respalden línea por línea este módulo.
+- OWASP LLM01:2026 Prompt Injection: https://genai.owasp.org/llm2026/llm012026-prompt-injection/
+- OWASP Top 10 for LLM Applications 2026: https://genai.owasp.org/top-10-for-llm-applications-2026/
+- NIST AI 600-1: https://doi.org/10.6028/NIST.AI.600-1
+
+Taxonomías consultadas a nivel de página; lectura integral y validación experimental pendientes.
 
 ## 2. tool abuse, excessive agency y autorización
 
 ### Propósito y alcance
-El módulo define qué propiedad técnica debe protegerse, qué activos y procesos cubre, qué queda fuera y qué evidencia permitiría demostrar el resultado. Prueba prompts, retrieval, memoria, herramientas, identidad y multimodalidad con datos sintéticos y límites seguros.
+
+Analizar el riesgo de que el modelo seleccione, encadene o parametrice herramientas con una autoridad mayor que la necesaria. Separar errores de modelo, prompt injection y fallos de autorización del servidor. El objetivo es probar efectos en un broker mock, no ejecutar comandos ni acciones sobre servicios reales.
 
 ### Arquitectura y modelo de amenazas
-Descompón actores, activos, interfaces, estados, flujos, dependencias y autoridades. Marca trust boundaries y puntos de autenticación, autorización, transformación, almacenamiento y exportación. Considera abuso de privilegios, manipulación de estado, entrada no confiable, replay, exposición lateral, dependencia comprometida, mala configuración y pérdida de telemetría. Para cada escenario registra precondiciones, capacidad del adversario, impacto, señales y supuestos; no infieras atribución sin evidencia.
+
+Representar usuario, sesión, agente, planificador, broker, policy decision point, policy enforcement point y herramienta. Identificar quién crea el principal, quién valida tenant, recurso, acción y finalidad, y quién confirma el efecto. Modelar confused deputy, scopes amplios, credenciales compartidas, tool chaining, reintentos duplicados, destinos controlados por modelo y aprobación simulada por el propio agente.
 
 ### Desarrollo técnico y controles
-Clasifica datos y derivados, define propósito, tenant, owner, retención y permisos. Evalúa filtración, envenenamiento, inferencia y reidentificación; incluye segregación, auditoría y borrado verificable. Aplica mínimo privilegio, separación de funciones, validación en el componente de confianza, límites de recursos, segmentación, gestión de secretos, logging resistente a manipulación y recuperación probada. Cada control requiere owner, alcance, modo de fallo, evidencia y excepción con vencimiento. Un gateway, escáner o agente no sustituye la decisión de autorización en el componente dueño del recurso.
+
+Aplicar capability security: cada herramienta recibe solo capacidades mínimas, acotadas por recurso, acción, duración y volumen. El servidor reconstruye principal desde sesión confiable, valida esquema cerrado y semántica de argumentos, aplica autorización por objeto, idempotencia, límites de destino y aprobación independiente. Prohibir que el modelo elija identidad o modifique permisos. Aislar ejecución y retirar shell/red/secretos cuando no sean imprescindibles.
 
 ### Procedimiento reproducible
-1. Inventariar activos, versiones y dependencias.
-2. Establecer línea base y supuestos.
-3. Formular una hipótesis falsable y casos de abuso.
-4. Ejecutar pruebas en staging, simulador o entorno aislado con datos sintéticos.
-5. Capturar configuración, logs, hashes y resultados.
-6. Corregir causa raíz y repetir pruebas de regresión.
-7. Registrar owner, fecha, limitaciones y criterio de salida.
+
+1. Definir roles y matriz de capacidades. 2. Crear broker mock y fixtures de recursos. 3. Ejecutar acciones permitidas para baseline. 4. Intentar acción fuera de rol, ID de otro usuario, argumento extra, destino no permitido y repetición. 5. Verificar decisión del PEP y estado final. 6. Introducir timeout y retry. 7. Confirmar idempotencia y kill switch. 8. Revisar trazas sin confiar en la respuesta textual del agente.
 
 ### Laboratorio y evaluación
-Crear un entorno aislado con componentes mock que represente el flujo esencial. Incluir caso nominal, abuso, límite, dependencia no disponible y prueba negativa que demuestre bloqueo. No usar datos personales ni sistemas de terceros. Definir precondiciones, snapshots, limpieza y reglas de parada. Medir cobertura, tasa de casos detectados, falsos positivos/negativos, latencia, impacto operativo y reproducibilidad, usando solo métricas pertinentes y fijando umbrales antes del ensayo.
+
+Implementar tres herramientas simuladas: lectura de expediente, creación de ticket y envío de mensaje ficticio. Asignar al agente solo creación de ticket de baja criticidad. Probar nueve variaciones de privilegio, recurso, schema, destino y repetición. Medir efectos no autorizados/intentados, bloqueo legítimo, duplicados y latencia de enforcement. Todo efecto externo debe ser imposible por diseño del harness.
 
 ### Evidencia y limitaciones
-Conservar diseño, configuración, scripts, datos sintéticos, hashes, logs, resultados y decisión. El estado de este módulo es desarrollo documental inicial: no acredita laboratorio ejecutado, exactitud exhaustiva ni revisión independiente. Para declararlo validado se requiere trazabilidad de afirmaciones a secciones concretas de fuentes primarias, resultados reproducibles, pruebas negativas y revisión por otra persona.
+
+Guardar matriz de permisos, esquema, código del broker, identidad sintética, decisiones, argumentos normalizados y estado de recursos antes/después. Un broker mock valida su propia lógica, no IAM del proveedor ni aislamiento del sistema operativo. La revisión debe comprobar que el entorno de pruebas no dispone de credenciales ni rutas de red productivas.
 
 ### Fuentes de partida
-- https://www.nist.gov/itl/ai-risk-management-framework
-- https://owasp.org/www-project-top-10-for-large-language-model-applications/
 
-**Estado de las fuentes:** referencias de contexto para lectura y contraste; no se afirma que respalden línea por línea este módulo.
+- OWASP Top 10 for LLM Applications 2026: https://genai.owasp.org/top-10-for-llm-applications-2026/
+- OWASP Top 10 for Agentic Applications 2026: https://genai.owasp.org/initiatives/ai-red-teaming-initiative/
+- OWASP GenAI Red Teaming Guide: https://genai.owasp.org/resource/genai-red-teaming-guide/
+
+Las taxonomías LLM y Agentic son distintas; no intercambiar IDs sin verificar versión.
 
 ## 3. RAG poisoning, memory poisoning y cross-tenant
 
 ### Propósito y alcance
-El módulo define qué propiedad técnica debe protegerse, qué activos y procesos cubre, qué queda fuera y qué evidencia permitiría demostrar el resultado. Prueba prompts, retrieval, memoria, herramientas, identidad y multimodalidad con datos sintéticos y límites seguros.
+
+Examinar integridad, aislamiento y procedencia de corpus, índices vectoriales, cachés y memoria de agentes. El alcance cubre ingestión, chunking, embeddings, filtros, ranking, citas, resúmenes y borrado derivado. No basta con comprobar que el prompt menciona un tenant: el enforcement debe ocurrir en el almacenamiento y retrieval.
 
 ### Arquitectura y modelo de amenazas
-Descompón actores, activos, interfaces, estados, flujos, dependencias y autoridades. Marca trust boundaries y puntos de autenticación, autorización, transformación, almacenamiento y exportación. Considera abuso de privilegios, manipulación de estado, entrada no confiable, replay, exposición lateral, dependencia comprometida, mala configuración y pérdida de telemetría. Para cada escenario registra precondiciones, capacidad del adversario, impacto, señales y supuestos; no infieras atribución sin evidencia.
+
+Dibujar pipeline de ingestión y recuperación, metadatos, ACL, filtros pre/post retrieval, claves de caché y relaciones entre documentos originales y derivados. Amenazas: documento no autorizado, reemplazo bajo mismo nombre, cambio de tenant, poisoning de ranking, metadata spoofing, colisión/deduplicación entre tenants, memoria persistente y fuga por citas o títulos.
 
 ### Desarrollo técnico y controles
-Clasifica datos y derivados, define propósito, tenant, owner, retención y permisos. Evalúa filtración, envenenamiento, inferencia y reidentificación; incluye segregación, auditoría y borrado verificable. Aplica mínimo privilegio, separación de funciones, validación en el componente de confianza, límites de recursos, segmentación, gestión de secretos, logging resistente a manipulación y recuperación probada. Cada control requiere owner, alcance, modo de fallo, evidencia y excepción con vencimiento. Un gateway, escáner o agente no sustituye la decisión de autorización en el componente dueño del recurso.
+
+Verificar identidad y autorización antes de consultar el índice; aplicar filtro tenant/ACL en backend y validar de nuevo cada resultado antes de enviarlo al modelo. Conservar hash, fuente, propietario, versión, etiqueta de integridad y permiso en cada chunk y resumen. Separar namespaces/keys por tenant; no deduplicar contenido si se pierde aislamiento. La eliminación debe invalidar vectores, cachés, memoria y resúmenes derivados. Monitorizar cambios de corpus y accesos anómalos.
 
 ### Procedimiento reproducible
-1. Inventariar activos, versiones y dependencias.
-2. Establecer línea base y supuestos.
-3. Formular una hipótesis falsable y casos de abuso.
-4. Ejecutar pruebas en staging, simulador o entorno aislado con datos sintéticos.
-5. Capturar configuración, logs, hashes y resultados.
-6. Corregir causa raíz y repetir pruebas de regresión.
-7. Registrar owner, fecha, limitaciones y criterio de salida.
+
+1. Crear dos tenants con documentos canary distintos. 2. Registrar hashes, ACL y ground truth. 3. Ingerir documentos autorizados y un documento adversarial no autorizado. 4. Ejecutar consultas equivalentes alternando tenant, filtros y caché fría/caliente. 5. Cambiar metadatos e intentar reemplazo. 6. Eliminar un documento y comprobar todos los derivados. 7. Revisar citas, IDs y logs. 8. Repetir tras reconstruir el índice.
 
 ### Laboratorio y evaluación
-Crear un entorno aislado con componentes mock que represente el flujo esencial. Incluir caso nominal, abuso, límite, dependencia no disponible y prueba negativa que demuestre bloqueo. No usar datos personales ni sistemas de terceros. Definir precondiciones, snapshots, limpieza y reglas de parada. Medir cobertura, tasa de casos detectados, falsos positivos/negativos, latencia, impacto operativo y reproducibilidad, usando solo métricas pertinentes y fijando umbrales antes del ensayo.
+
+Usar un índice local con documentos sintéticos de igual similitud semántica y un stub de embedding determinista. Probar bypass de filtro, caché compartida, ID directo, metadata tampering, chunk boundary, documento duplicado y borrado incompleto. Métricas: leakage cross-tenant, precisión de ACL, tasa de detección de cambios, falsos positivos de ingestión y latencia. El resultado debe incluir consultas negativas por tenant y ground truth.
 
 ### Evidencia y limitaciones
-Conservar diseño, configuración, scripts, datos sintéticos, hashes, logs, resultados y decisión. El estado de este módulo es desarrollo documental inicial: no acredita laboratorio ejecutado, exactitud exhaustiva ni revisión independiente. Para declararlo validado se requiere trazabilidad de afirmaciones a secciones concretas de fuentes primarias, resultados reproducibles, pruebas negativas y revisión por otra persona.
+
+Conservar corpus, ACL, hashes, modelo de embedding, versión del índice, filtros, consultas, IDs recuperados, cache keys y resultados. Un embedding no cifra el contenido ni representa una frontera de acceso. La similitud semántica no es autorización. Un laboratorio local no prueba la separación de un servicio vectorial gestionado sin evaluación contractual y técnica.
 
 ### Fuentes de partida
-- https://www.nist.gov/itl/ai-risk-management-framework
-- https://owasp.org/www-project-top-10-for-large-language-model-applications/
 
-**Estado de las fuentes:** referencias de contexto para lectura y contraste; no se afirma que respalden línea por línea este módulo.
+- OWASP LLM09:2026 Vector and Embedding Weaknesses: https://genai.owasp.org/llm2026/llm092026-vector-and-embedding-weaknesses/
+- OWASP LLM01:2026 Prompt Injection: https://genai.owasp.org/llm2026/llm012026-prompt-injection/
+- NIST AI 600-1: https://doi.org/10.6028/NIST.AI.600-1
+
+Comprobar la ruta canónica y versión de cada referencia antes de una revisión formal; lectura integral pendiente.
 
 ## 4. evaluación de agentes, costes y recuperación
 
 ### Propósito y alcance
-El módulo define qué propiedad técnica debe protegerse, qué activos y procesos cubre, qué queda fuera y qué evidencia permitiría demostrar el resultado. Prueba prompts, retrieval, memoria, herramientas, identidad y multimodalidad con datos sintéticos y límites seguros.
+
+Evaluar calidad de la evidencia adversarial, límites de consumo y capacidad de detener/recuperar un agente. El tema integra validez de benchmark con seguridad operacional: un sistema puede bloquear ataques y aun así fallar por bucles, presupuesto, reintentos, degradación o recuperación incompleta.
 
 ### Arquitectura y modelo de amenazas
-Descompón actores, activos, interfaces, estados, flujos, dependencias y autoridades. Marca trust boundaries y puntos de autenticación, autorización, transformación, almacenamiento y exportación. Considera abuso de privilegios, manipulación de estado, entrada no confiable, replay, exposición lateral, dependencia comprometida, mala configuración y pérdida de telemetría. Para cada escenario registra precondiciones, capacidad del adversario, impacto, señales y supuestos; no infieras atribución sin evidencia.
+
+Modelar el ciclo planificar→llamar herramienta→observar→replanificar, colas, subagentes, retries, memoria, límites de cuota, proveedor y mecanismos de cancelación. Amenazas: fan-out, bucle, respuesta recursiva, prompt de consumo, herramienta lenta, dependencia caída, dataset contaminado, fuga del holdout y métrica agregada que oculta un fallo crítico.
 
 ### Desarrollo técnico y controles
-Clasifica datos y derivados, define propósito, tenant, owner, retención y permisos. Evalúa filtración, envenenamiento, inferencia y reidentificación; incluye segregación, auditoría y borrado verificable. Aplica mínimo privilegio, separación de funciones, validación en el componente de confianza, límites de recursos, segmentación, gestión de secretos, logging resistente a manipulación y recuperación probada. Cada control requiere owner, alcance, modo de fallo, evidencia y excepción con vencimiento. Un gateway, escáner o agente no sustituye la decisión de autorización en el componente dueño del recurso.
+
+Aplicar presupuesto por tarea/tenant, límite de pasos, deadline, tokens máximos, concurrencia, cuota de herramienta, backoff, circuit breaker y cancelación cooperativa. El kill switch debe residir fuera del agente. Para evaluación, versionar datasets, separar train/dev/test, deduplicar, ocultar holdout, publicar denominadores y métricas por clase. Incluir pruebas de regresión de utilidad para detectar mitigaciones que bloquean también trabajo legítimo.
 
 ### Procedimiento reproducible
-1. Inventariar activos, versiones y dependencias.
-2. Establecer línea base y supuestos.
-3. Formular una hipótesis falsable y casos de abuso.
-4. Ejecutar pruebas en staging, simulador o entorno aislado con datos sintéticos.
-5. Capturar configuración, logs, hashes y resultados.
-6. Corregir causa raíz y repetir pruebas de regresión.
-7. Registrar owner, fecha, limitaciones y criterio de salida.
+
+1. Congelar modelo, wrapper, prompts, herramientas y dataset. 2. Definir clases, severidad y ground truth. 3. Establecer baseline benigno y adversarial. 4. Inyectar timeout, retry, fan-out y payload de consumo sintético. 5. Observar corte por presupuesto y kill switch. 6. Ejecutar evaluación por clase y revisar contaminación. 7. Aplicar mitigación y repetir mismos casos. 8. Registrar coste, latencia, efectos y exclusiones.
 
 ### Laboratorio y evaluación
-Crear un entorno aislado con componentes mock que represente el flujo esencial. Incluir caso nominal, abuso, límite, dependencia no disponible y prueba negativa que demuestre bloqueo. No usar datos personales ni sistemas de terceros. Definir precondiciones, snapshots, limpieza y reglas de parada. Medir cobertura, tasa de casos detectados, falsos positivos/negativos, latencia, impacto operativo y reproducibilidad, usando solo métricas pertinentes y fijando umbrales antes del ensayo.
+
+Construir un agente stub que repite una llamada y una herramienta mock con latencia controlada. Probar límites de pasos, tokens, tiempo, concurrencia y presupuesto; confirmar que el corte no depende de que el modelo obedezca. Para benchmark, usar holdout sellado, clases desbalanceadas y casos duplicados. Medir overrun rate, tiempo de parada, cobertura por clase, falsos positivos, utilidad y variación entre repeticiones.
 
 ### Evidencia y limitaciones
-Conservar diseño, configuración, scripts, datos sintéticos, hashes, logs, resultados y decisión. El estado de este módulo es desarrollo documental inicial: no acredita laboratorio ejecutado, exactitud exhaustiva ni revisión independiente. Para declararlo validado se requiere trazabilidad de afirmaciones a secciones concretas de fuentes primarias, resultados reproducibles, pruebas negativas y revisión por otra persona.
+
+Conservar manifiestos, hashes, semilla, dataset, split, métricas por clase, logs de presupuesto, tiempos, eventos de cancelación y resultados antes/después. El consumo del harness no predice facturación de otro proveedor. Un score de benchmark puede sobreajustarse al dataset; el holdout finito no demuestra resistencia general. La recuperación del agente no equivale a restaurar la confianza de un sistema productivo.
 
 ### Fuentes de partida
-- https://www.nist.gov/itl/ai-risk-management-framework
-- https://owasp.org/www-project-top-10-for-large-language-model-applications/
 
-**Estado de las fuentes:** referencias de contexto para lectura y contraste; no se afirma que respalden línea por línea este módulo.
+- NIST AI 200-3 ARIA Evaluation Planning Manual: https://doi.org/10.6028/NIST.AI.200-3
+- NIST AI 600-1 Generative AI Profile: https://doi.org/10.6028/NIST.AI.600-1
+- OWASP Top 10 for LLM Applications 2026: https://genai.owasp.org/top-10-for-llm-applications-2026/
 
-
+La ficha NIST AI 200-3 fue consultada; el manual completo, datasets y experimentos siguen pendientes.
 
 # pki_hsm
 

@@ -21,103 +21,31 @@ Al completar el módulo, el analista debe poder:
 
 ## Ruta técnica por temas
 
-### 1. modelos de seguridad y confianza
+### 1. Modelos de seguridad y confianza
+Distinguir propiedades, políticas, mecanismos, controles y garantías. Comparar DAC, MAC, RBAC y ABAC; analizar mediación completa, separación de funciones, Zero Trust y límites de confianza. No confundir autenticación con autorización ni una VLAN con una frontera de seguridad.
 
-**Objetivo técnico:** dominar este componente dentro del alcance de Fundamentos, entender sus dependencias y reconocer sus modos de fallo.
+### 2. Inventario y clasificación de activos
+Reconciliar fuentes de descubrimiento con identificadores estables y procedencia. Asignar propietario, custodio, entorno, criticidad, clasificación de datos, dependencias y frescura. Explicar sesgo de observación, shadow IT, activos efímeros y límites del CMDB.
 
-**Trabajo de estudio y validación:**
-- Definir términos, arquitectura, activos, flujos y límites de confianza relacionados con el tema.
-- Identificar precondiciones, superficies expuestas, amenazas, impactos y supuestos.
-- Comparar al menos dos enfoques de implementación o control y documentar ventajas, costes y limitaciones.
-- Describir señales observables, fuentes de telemetría, falsos positivos y criterios de escalamiento.
-- Formular controles preventivos, detectivos y correctivos, indicando cómo probar cada uno.
-- Construir un ejemplo reproducible con datos sintéticos y una prueba de regresión.
+### 3. Superficie de ataque y modelado de amenazas
+Construir DFD y grafos de activos/identidades; aplicar STRIDE, misuse cases y árboles de ataque según la pregunta. Toda ruta debe contener actor, precondiciones, transición, activo, efecto, control, telemetría e incertidumbre. Una ruta en un grafo no demuestra explotabilidad.
 
-**Evidencia exigida:** diagrama o esquema, procedimiento reproducible, resultado esperado, resultado observado, limitaciones y revisión técnica.
+### 4. Identidad, privilegios y autenticación
+Distinguir identificación, autenticación, autorización y auditoría. Analizar ciclo de vida, sesión, token, scopes, audience, revocación, privilegios, cuentas de servicio y acceso de emergencia. Los detalles de protocolos y configuración avanzada pertenecen al módulo Identity.
 
-### 2. inventario y clasificación de activos
+### 5. Seguridad de redes y sistemas
+Razonar sobre capas, procesos, interfaces, servicios, segmentación, configuración, dependencias y telemetría. Identificar límites administrativos y fallos comunes; derivar controles verificables sin sustituir las especialidades de Network, Linux, Windows/AD y Cloud.
 
-**Objetivo técnico:** dominar este componente dentro del alcance de Fundamentos, entender sus dependencias y reconocer sus modos de fallo.
+### 6. Gestión de vulnerabilidades
+Distinguir vulnerabilidad, exposición, severidad técnica, explotación y riesgo contextual. Validar inventario, aplicabilidad, exposición, KEV, ventana de parcheo, mitigación compensatoria y retest. CVSS no equivale automáticamente a prioridad de negocio.
 
-**Trabajo de estudio y validación:**
-- Definir términos, arquitectura, activos, flujos y límites de confianza relacionados con el tema.
-- Identificar precondiciones, superficies expuestas, amenazas, impactos y supuestos.
-- Comparar al menos dos enfoques de implementación o control y documentar ventajas, costes y limitaciones.
-- Describir señales observables, fuentes de telemetría, falsos positivos y criterios de escalamiento.
-- Formular controles preventivos, detectivos y correctivos, indicando cómo probar cada uno.
-- Construir un ejemplo reproducible con datos sintéticos y una prueba de regresión.
+### 7. Telemetría, respuesta y recuperación
+Diseñar cobertura de eventos, sincronización temporal, integridad, retención, correlación, escalamiento y preservación de evidencia. Separar contención, erradicación, recuperación y reconstrucción de confianza. Un backup existente no demuestra que la restauración sea íntegra ni oportuna.
 
-**Evidencia exigida:** diagrama o esquema, procedimiento reproducible, resultado esperado, resultado observado, limitaciones y revisión técnica.
-
-### 3. superficie de ataque y modelado de amenazas
-
-**Objetivo técnico:** dominar este componente dentro del alcance de Fundamentos, entender sus dependencias y reconocer sus modos de fallo.
-
-**Trabajo de estudio y validación:**
-- Definir términos, arquitectura, activos, flujos y límites de confianza relacionados con el tema.
-- Identificar precondiciones, superficies expuestas, amenazas, impactos y supuestos.
-- Comparar al menos dos enfoques de implementación o control y documentar ventajas, costes y limitaciones.
-- Describir señales observables, fuentes de telemetría, falsos positivos y criterios de escalamiento.
-- Formular controles preventivos, detectivos y correctivos, indicando cómo probar cada uno.
-- Construir un ejemplo reproducible con datos sintéticos y una prueba de regresión.
-
-**Evidencia exigida:** diagrama o esquema, procedimiento reproducible, resultado esperado, resultado observado, limitaciones y revisión técnica.
-
-### 4. identidad, privilegios y autenticación
-
-**Objetivo técnico:** dominar este componente dentro del alcance de Fundamentos, entender sus dependencias y reconocer sus modos de fallo.
-
-**Trabajo de estudio y validación:**
-- Definir términos, arquitectura, activos, flujos y límites de confianza relacionados con el tema.
-- Identificar precondiciones, superficies expuestas, amenazas, impactos y supuestos.
-- Comparar al menos dos enfoques de implementación o control y documentar ventajas, costes y limitaciones.
-- Describir señales observables, fuentes de telemetría, falsos positivos y criterios de escalamiento.
-- Formular controles preventivos, detectivos y correctivos, indicando cómo probar cada uno.
-- Construir un ejemplo reproducible con datos sintéticos y una prueba de regresión.
-
-**Evidencia exigida:** diagrama o esquema, procedimiento reproducible, resultado esperado, resultado observado, limitaciones y revisión técnica.
-
-### 5. seguridad de redes y sistemas
-
-**Objetivo técnico:** dominar este componente dentro del alcance de Fundamentos, entender sus dependencias y reconocer sus modos de fallo.
-
-**Trabajo de estudio y validación:**
-- Definir términos, arquitectura, activos, flujos y límites de confianza relacionados con el tema.
-- Identificar precondiciones, superficies expuestas, amenazas, impactos y supuestos.
-- Comparar al menos dos enfoques de implementación o control y documentar ventajas, costes y limitaciones.
-- Describir señales observables, fuentes de telemetría, falsos positivos y criterios de escalamiento.
-- Formular controles preventivos, detectivos y correctivos, indicando cómo probar cada uno.
-- Construir un ejemplo reproducible con datos sintéticos y una prueba de regresión.
-
-**Evidencia exigida:** diagrama o esquema, procedimiento reproducible, resultado esperado, resultado observado, limitaciones y revisión técnica.
-
-### 6. gestión de vulnerabilidades
-
-**Objetivo técnico:** dominar este componente dentro del alcance de Fundamentos, entender sus dependencias y reconocer sus modos de fallo.
-
-**Trabajo de estudio y validación:**
-- Definir términos, arquitectura, activos, flujos y límites de confianza relacionados con el tema.
-- Identificar precondiciones, superficies expuestas, amenazas, impactos y supuestos.
-- Comparar al menos dos enfoques de implementación o control y documentar ventajas, costes y limitaciones.
-- Describir señales observables, fuentes de telemetría, falsos positivos y criterios de escalamiento.
-- Formular controles preventivos, detectivos y correctivos, indicando cómo probar cada uno.
-- Construir un ejemplo reproducible con datos sintéticos y una prueba de regresión.
-
-**Evidencia exigida:** diagrama o esquema, procedimiento reproducible, resultado esperado, resultado observado, limitaciones y revisión técnica.
-
-### 7. telemetría, respuesta y recuperación
-
-**Objetivo técnico:** dominar este componente dentro del alcance de Fundamentos, entender sus dependencias y reconocer sus modos de fallo.
-
-**Trabajo de estudio y validación:**
-- Definir términos, arquitectura, activos, flujos y límites de confianza relacionados con el tema.
-- Identificar precondiciones, superficies expuestas, amenazas, impactos y supuestos.
-- Comparar al menos dos enfoques de implementación o control y documentar ventajas, costes y limitaciones.
-- Describir señales observables, fuentes de telemetría, falsos positivos y criterios de escalamiento.
-- Formular controles preventivos, detectivos y correctivos, indicando cómo probar cada uno.
-- Construir un ejemplo reproducible con datos sintéticos y una prueba de regresión.
-
-**Evidencia exigida:** diagrama o esquema, procedimiento reproducible, resultado esperado, resultado observado, limitaciones y revisión técnica.
+### Profundización específica
+- [Ingeniería del riesgo y assurance V1](FOUNDATIONS_RISK_ENGINEERING_V1.md): escenarios de pérdida, incertidumbre, estimación, control y ejemplo resuelto.
+- [Compendio técnico general](TECHNICAL_COMPENDIUM.md): modelos, activos, arquitectura, amenaza, control, assurance y recuperación.
+- [Mapa curricular de 102 subtemas](FOUNDATIONS_CURRICULUM_MAP_V2.md): frontera y desglose disciplinar.
 
 ## Procedimiento de trabajo del dominio
 

@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
-  "research_cutoff": "2026-11-18",
-  "policy": "El registro diferencia fuentes oficiales inspeccionadas a nivel de página/metadatos de documentos leídos íntegramente. Una referencia no equivale a evidencia experimental ni validación experta. Las referencias nuevas de esta ampliación se han verificado a nivel de ficha/versión oficial, no como lectura integral.",
+  "research_cutoff": "2026-11-24",
+  "policy": "El registro diferencia fuentes oficiales inspeccionadas a nivel de página/metadatos de documentos leídos íntegramente. Una referencia no equivale a evidencia experimental ni validación experta. Las referencias nuevas de esta ampliación se han verificado a nivel de ficha/versión oficial, no como lectura integral. Actualización 2026-11-24: las páginas oficiales OWASP GenAI LLM Top 10 2026, OWASP GenAI Red Teaming Guide y NIST AI 200-3 fueron consultadas a nivel de página; sus estados no equivalen a lectura integral ni a claims respaldados.",
   "sources": [
     {
       "id": "NIST-CSF-2.0",
@@ -1314,6 +1314,65 @@
       ],
       "verification_status": "official_final_metadata_and_abstract_reviewed",
       "review_note": "Revisada ficha y resumen oficiales; falta lectura integral y validación de arquitectura en laboratorio."
+    },
+    {
+      "id": "OWASP-LLM-TOP10-2026",
+      "title": "OWASP Top 10 for LLM Applications 2026",
+      "publisher": "OWASP GenAI Security Project",
+      "version": "2026",
+      "published": "2026-10",
+      "url": "https://genai.owasp.org/top-10-for-llm-applications-2026/",
+      "domains": [
+        "ai_red_team",
+        "ai_security",
+        "machine_learning"
+      ],
+      "verification_status": "official_page_reviewed_not_full_text",
+      "review_note": "Página oficial y taxonomía 2026 consultadas el 2026-11-24. No equivale a lectura integral de cada documento ni respalda automáticamente claims."
+    },
+    {
+      "id": "OWASP-GENAI-REDTEAM-GUIDE",
+      "title": "GenAI Red Teaming Guide",
+      "publisher": "OWASP GenAI Security Project",
+      "version": "2025-01-22",
+      "published": "2025-01-22",
+      "url": "https://genai.owasp.org/resource/genai-red-teaming-guide/",
+      "domains": [
+        "ai_red_team",
+        "ai_security"
+      ],
+      "verification_status": "official_page_reviewed_not_full_text",
+      "review_note": "Página oficial de recurso consultada el 2026-11-24. Revisar el manual completo, versión y licencia antes de usar como evidencia específica."
+    },
+    {
+      "id": "NIST-AI-200-3-ARIA",
+      "title": "ARIA Evaluation Planning Manual: Elements of ARIA-Style AI Evaluations",
+      "publisher": "NIST",
+      "version": "NIST AI 200-3",
+      "published": "2026-09-18",
+      "url": "https://doi.org/10.6028/NIST.AI.200-3",
+      "domains": [
+        "ai_red_team",
+        "ai_security",
+        "machine_learning",
+        "governance"
+      ],
+      "verification_status": "official_publication_page_reviewed_not_full_text",
+      "review_note": "Página oficial NIST consultada el 2026-11-24. Describe planificación de evaluación combinando model testing, red teaming y user testing; lectura integral pendiente."
+    },
+    {
+      "id": "OWASP-AGENTIC-TOP10-2026",
+      "title": "OWASP Top 10 for Agentic Applications 2026",
+      "publisher": "OWASP GenAI Security Project",
+      "version": "2026",
+      "published": "2025-12-09",
+      "url": "https://genai.owasp.org/top-10-for-agentic-applications-2026/",
+      "domains": [
+        "ai_red_team",
+        "ai_security"
+      ],
+      "verification_status": "official_page_reviewed_not_full_text",
+      "review_note": "Página oficial consultada el 2026-11-24. Taxonomía ASI01–ASI10 distinta del OWASP LLM Top 10; lectura integral pendiente."
     }
   ]
 }

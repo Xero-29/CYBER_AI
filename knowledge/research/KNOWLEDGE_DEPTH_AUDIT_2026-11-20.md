@@ -41,3 +41,17 @@ La auditoría compara texto normalizado y detecta duplicación exacta. No detect
 ## Puerta de promoción
 
 Una brecha no puede promoverse por número de palabras, encabezados o estructura. Requiere contenido específico, fuentes leídas en el alcance declarado, claims trazables, experimentos cuando aplican, resultados reproducibles y revisión independiente. Actualmente el resultado es 0/192 elegibles.
+
+
+## Reauditoría focalizada — 2026-11-24
+
+Se reemplazaron las secciones genéricas en cuatro temas de Foundations y cuatro de AI Red Team dentro de `ADVANCED_GAP_DEVELOPMENT.md`. La relectura exacta del documento conserva 48 dominios, 192 temas y 1.344 bloques de sección.
+
+| Métrica | Línea base PR #18 | Tras remediación | Cambio |
+|---|---:|---:|---:|
+| Pares de duplicación exacta | 84.015 | 77.338 | -6.677 |
+| Pares de duplicación exacta entre dominios | 82.208 | 75.610 | -6.598 |
+
+En los ocho temas remediados, los cinco bloques centrales (arquitectura/modelo de amenazas, desarrollo/controles, procedimiento, laboratorio/evaluación y evidencia/limitaciones) tienen ocho variantes distintas por sección. El máximo de reutilización del bloque de arquitectura cae de 192 a 184 porque los otros 184 temas conservan el bloque previo.
+
+**Interpretación:** mejora cuantificable pero parcial. La duplicación residual sigue siendo alta; 40 dominios no fueron modificados en esta tanda. El resultado mide igualdad textual normalizada, no profundidad semántica ni validez técnica. No se promueve ningún estado experto.

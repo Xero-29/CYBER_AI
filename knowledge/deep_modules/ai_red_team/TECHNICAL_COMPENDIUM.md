@@ -1,147 +1,101 @@
-> **Actualización de navegación (2026-11-19):** el desarrollo teórico disciplinar ampliado de los siete temas está en [AI_RED_TEAM_THEORETICAL_DEVELOPMENT_V1.md](AI_RED_TEAM_THEORETICAL_DEVELOPMENT_V1.md). Este compendio conserva el material anterior como línea base; sus secciones genéricas no sustituyen el nuevo dossier ni se consideran prueba de completitud.
+# Compendio técnico: Red Team de IA y agentes
 
-# Compendio técnico: Red teaming de IA y agentes
+ID: `ai_red_team` · Versión: 1.0.0 · Idioma: español.  
+**Estado:** mapa disciplinar y guía de navegación. El contenido técnico por tema vive en `AI_RED_TEAM_THEORETICAL_DEVELOPMENT_V1.md`; el protocolo ejecutable propuesto vive en `AI_RED_TEAM_TEST_CATALOG_V1.md`. Este archivo no duplica esos capítulos ni declara validación operativa.
 
-ID: `ai_red_team` · Versión 0.1.0 · Cuaderno de desarrollo, no validación experta.
+## 1. Alcance del dominio
 
-## Alcance
-Currículo técnico de Red teaming de IA y agentes; adaptar a arquitectura, criticidad, contexto y jurisdicción del entorno.
+El Red Team de IA evalúa el sistema sociotécnico completo: modelo y versión, aplicación, instrucciones, ensamblado de contexto, RAG, corpus, memoria, herramientas, agentes, conectores, identidad, infraestructura, proveedor, personas y gobierno.
 
-Este documento transforma el currículo en una ruta de trabajo técnico y experimental; no certifica cobertura exhaustiva ni lectura integral de fuentes. Usar solo activos propios/autorizados, datos sintéticos y laboratorios aislados. Para entornos críticos/físicos, simular y preservar seguridad funcional y continuidad.
+La unidad de resultado es el efecto observable, no la respuesta textual. Una negativa del modelo no demuestra seguridad si una herramienta ya se invocó, un dato ya se recuperó o un estado ya cambió.
 
-## Desarrollo por subtema
-### 1. plan de pruebas y threat model
+### Fuera de alcance
 
-- **Fundamentos y modelo:** explicar arquitectura, componentes, estados, interfaces, identidades, datos, dependencias y límites de confianza.
-- **Amenazas y fallos:** identificar abuso, debilidades, errores de configuración, fallos operativos y precondiciones; separar hipótesis de observaciones.
-- **Controles:** asociar prevención, detección, respuesta y recuperación con amenazas; indicar cobertura, riesgo residual y efectos secundarios.
-- **Verificación:** diseñar pruebas positivas, negativas, límites y regresión con entradas sintéticas, resultados esperados, evidencia y criterio de parada.
-- **Análisis crítico:** comparar enfoques, revisar desacuerdos, sesgos, incertidumbre y límites de generalización.
-- **Entregable:** explicación técnica original, diagrama/modelo, matriz amenaza→control→evidencia, procedimiento y limitaciones.
+- Auditoría de seguridad de un proveedor externo sin autorización contractual.
+- Uso de secretos, datos personales o modelos de terceros no autorizados.
+- Pruebas que ejecuten acciones externas, destructivas o con impacto físico.
+- Certificación de seguridad universal de un modelo a partir de un benchmark.
 
-### 2. prompt injection
+## 2. Mapa de siete líneas de trabajo
 
-- **Fundamentos y modelo:** explicar arquitectura, componentes, estados, interfaces, identidades, datos, dependencias y límites de confianza.
-- **Amenazas y fallos:** identificar abuso, debilidades, errores de configuración, fallos operativos y precondiciones; separar hipótesis de observaciones.
-- **Controles:** asociar prevención, detección, respuesta y recuperación con amenazas; indicar cobertura, riesgo residual y efectos secundarios.
-- **Verificación:** diseñar pruebas positivas, negativas, límites y regresión con entradas sintéticas, resultados esperados, evidencia y criterio de parada.
-- **Análisis crítico:** comparar enfoques, revisar desacuerdos, sesgos, incertidumbre y límites de generalización.
-- **Entregable:** explicación técnica original, diagrama/modelo, matriz amenaza→control→evidencia, procedimiento y limitaciones.
-
-### 3. abuso de herramientas y agencia
-
-- **Fundamentos y modelo:** explicar arquitectura, componentes, estados, interfaces, identidades, datos, dependencias y límites de confianza.
-- **Amenazas y fallos:** identificar abuso, debilidades, errores de configuración, fallos operativos y precondiciones; separar hipótesis de observaciones.
-- **Controles:** asociar prevención, detección, respuesta y recuperación con amenazas; indicar cobertura, riesgo residual y efectos secundarios.
-- **Verificación:** diseñar pruebas positivas, negativas, límites y regresión con entradas sintéticas, resultados esperados, evidencia y criterio de parada.
-- **Análisis crítico:** comparar enfoques, revisar desacuerdos, sesgos, incertidumbre y límites de generalización.
-- **Entregable:** explicación técnica original, diagrama/modelo, matriz amenaza→control→evidencia, procedimiento y limitaciones.
-
-### 4. RAG poisoning y cross-tenant
-
-- **Fundamentos y modelo:** explicar arquitectura, componentes, estados, interfaces, identidades, datos, dependencias y límites de confianza.
-- **Amenazas y fallos:** identificar abuso, debilidades, errores de configuración, fallos operativos y precondiciones; separar hipótesis de observaciones.
-- **Controles:** asociar prevención, detección, respuesta y recuperación con amenazas; indicar cobertura, riesgo residual y efectos secundarios.
-- **Verificación:** diseñar pruebas positivas, negativas, límites y regresión con entradas sintéticas, resultados esperados, evidencia y criterio de parada.
-- **Análisis crítico:** comparar enfoques, revisar desacuerdos, sesgos, incertidumbre y límites de generalización.
-- **Entregable:** explicación técnica original, diagrama/modelo, matriz amenaza→control→evidencia, procedimiento y limitaciones.
-
-### 5. exfiltración y extracción
-
-- **Fundamentos y modelo:** explicar arquitectura, componentes, estados, interfaces, identidades, datos, dependencias y límites de confianza.
-- **Amenazas y fallos:** identificar abuso, debilidades, errores de configuración, fallos operativos y precondiciones; separar hipótesis de observaciones.
-- **Controles:** asociar prevención, detección, respuesta y recuperación con amenazas; indicar cobertura, riesgo residual y efectos secundarios.
-- **Verificación:** diseñar pruebas positivas, negativas, límites y regresión con entradas sintéticas, resultados esperados, evidencia y criterio de parada.
-- **Análisis crítico:** comparar enfoques, revisar desacuerdos, sesgos, incertidumbre y límites de generalización.
-- **Entregable:** explicación técnica original, diagrama/modelo, matriz amenaza→control→evidencia, procedimiento y limitaciones.
-
-### 6. evaluación adversarial
-
-- **Fundamentos y modelo:** explicar arquitectura, componentes, estados, interfaces, identidades, datos, dependencias y límites de confianza.
-- **Amenazas y fallos:** identificar abuso, debilidades, errores de configuración, fallos operativos y precondiciones; separar hipótesis de observaciones.
-- **Controles:** asociar prevención, detección, respuesta y recuperación con amenazas; indicar cobertura, riesgo residual y efectos secundarios.
-- **Verificación:** diseñar pruebas positivas, negativas, límites y regresión con entradas sintéticas, resultados esperados, evidencia y criterio de parada.
-- **Análisis crítico:** comparar enfoques, revisar desacuerdos, sesgos, incertidumbre y límites de generalización.
-- **Entregable:** explicación técnica original, diagrama/modelo, matriz amenaza→control→evidencia, procedimiento y limitaciones.
-
-### 7. retest y reporte
-
-- **Fundamentos y modelo:** explicar arquitectura, componentes, estados, interfaces, identidades, datos, dependencias y límites de confianza.
-- **Amenazas y fallos:** identificar abuso, debilidades, errores de configuración, fallos operativos y precondiciones; separar hipótesis de observaciones.
-- **Controles:** asociar prevención, detección, respuesta y recuperación con amenazas; indicar cobertura, riesgo residual y efectos secundarios.
-- **Verificación:** diseñar pruebas positivas, negativas, límites y regresión con entradas sintéticas, resultados esperados, evidencia y criterio de parada.
-- **Análisis crítico:** comparar enfoques, revisar desacuerdos, sesgos, incertidumbre y límites de generalización.
-- **Entregable:** explicación técnica original, diagrama/modelo, matriz amenaza→control→evidencia, procedimiento y limitaciones.
-
-## Laboratorio
-Entorno: Laboratorio local o cuenta de pruebas aislada, sin datos reales ni objetivos de terceros.
-Escenarios:
-1. establecer baseline seguro y recoger evidencia
-2. introducir un fallo/configuración sintética
-3. detectar y analizar con procedimiento documentado
-4. remediar de forma reversible y ejecutar regresión
-Seguridad: Solo activos propios o expresamente autorizados; privilegios mínimos, límites de recursos, snapshots y reglas de parada.
-
-| ID | Caso | Evidencia |
+| Línea | Pregunta central | Evidencia mínima específica |
 |---|---|---|
-| ai_red_team-LAB-01 | Baseline | Configuración, versiones, hashes y salida |
-| ai_red_team-LAB-02 | Fallo/abuso sintético | Precondiciones, entrada, logs y resultado |
-| ai_red_team-LAB-03 | Detección/diagnóstico | Señal, cobertura, precisión y límites |
-| ai_red_team-LAB-04 | Mitigación y retest | Diff, antes/después, rollback |
+| 1. Plan y threat model | ¿Qué activos, actores, capacidades y rutas están dentro del alcance? | scope manifest, arquitectura, DFD, trust boundaries y escenarios |
+| 2. Prompt injection | ¿Contenido no confiable altera decisiones o acciones? | provenance, corpus/control de memoria, llamadas y efectos |
+| 3. Tool misuse y agencia | ¿Puede el agente exceder función, permiso o autonomía? | principal, decisión server-side, schema, efecto y aprobación |
+| 4. RAG poisoning y aislamiento | ¿Se altera corpus/recuperación o se cruza tenant? | hashes, ACL, filtros, IDs recuperados, cache keys y citas |
+| 5. Exposición/extracción | ¿Se divulgan datos, secretos o contexto oculto? | canaries, canales probados, logs redactados y permisos |
+| 6. Evaluación adversarial | ¿El resultado es válido, reproducible y no está contaminado? | dataset versionado, splits, denominadores, métricas por clase |
+| 7. Retest y reporte | ¿La mitigación corrige el efecto sin romper utilidad? | baseline, diff, pruebas repetidas, regresiones y límites |
 
-Diseño definido; ejecución pendiente.
+Cada línea está desarrollada en doce capas en el dossier teórico. El catálogo de pruebas contiene nueve casos con fixtures sintéticos, resultados esperados y criterios de fallo.
 
-## Métricas
-Seleccionar según la pregunta: cobertura, eficacia, falsos positivos/negativos, latencia, disponibilidad, impacto colateral, tiempo de recuperación y repetibilidad. Registrar muestra, baseline, unidad de análisis, versiones, repeticiones e incertidumbre.
+## 3. Arquitectura de referencia para evaluación
 
-## Investigación bibliográfica
-- Registrar bases, cadenas de búsqueda, fecha, idioma y criterios de inclusión/exclusión.
-- Priorizar estándares, especificaciones, documentación primaria y literatura revisada por pares.
-- Marcar texto completo revisado solo tras inspección real.
-- Extraer método, muestra, resultados, limitaciones, sesgos y amenazas a validez.
-- Contrastar resultados y distinguir evidencia primaria, secundaria, inferencia e hipótesis.
-- Registrar edición, licencia, URL canónica, fecha y SHA-256 cuando el archivo pueda archivarse legalmente.
+`Usuario/tenant → aplicación → ensamblador de contexto → modelo`
 
-## Preguntas de investigación
-1. ¿Qué medidas producen mejora cuantificable frente a un baseline?
-2. ¿Qué variables explican divergencias entre fuentes y resultados reproducidos?
-3. ¿Qué controles equilibran seguridad, privacidad, resiliencia, coste y operación?
+`                                             ↘ RAG/memoria`
 
-Definir H0/H1, variables, población, comparadores, criterio de refutación, análisis, ética y limitaciones.
+`Modelo → broker de herramientas → PEP/autorización → servicio mock`
 
-## Artefactos obligatorios
-- [ ] Arquitectura y límites de confianza.
-- [ ] Inventario de activos, datos, identidades, versiones y dependencias.
-- [ ] Modelo de amenazas y abuso.
-- [ ] Matriz amenaza→control→responsable→evidencia.
-- [ ] Procedimiento reproducible con precondiciones, rollback y parada.
-- [ ] Laboratorio y casos con resultados medidos.
-- [ ] Caso práctico con hallazgo, impacto, mitigación y retest.
-- [ ] Evaluación con rúbrica.
-- [ ] Fuentes, licencias, ediciones, fechas y hashes.
-- [ ] Incertidumbre, sesgos y amenazas a validez.
-- [ ] Revisión independiente y reproducción externa para M5.
+`                                     ↘ auditoría/provenance`
 
-## Madurez
-M0/M1 estructural. No acredita profundidad ni M3/M4/M5. Para avanzar: leer fuentes completas, producir artefactos específicos, ejecutar laboratorios y registrar evidencia auditable.
+Las flechas representan flujos de datos o autoridad que deben evaluarse. El modelo no es un punto de enforcement. La autorización se aplica en un componente determinista fuera del modelo, con principal obtenido de identidad confiable.
 
+## 4. Modelo de amenazas mínimo
 
-## Profundización técnica específica: Red Team de sistemas de IA
+Activos: datos y documentos, secretos, prompts privilegiados, identidad, scopes, permisos, memoria, corpus, modelos, configuración, herramientas, presupuesto, logs y reputación.
 
-### Alcance y threat model
-Evaluar modelo, wrapper, system prompt, RAG, memoria, herramientas, agentes, plugins, sandbox, conectores, usuarios y políticas de datos. Definir atacante, acceso, objetivo, capacidades, impacto y restricciones. Separar pruebas de seguridad de calidad general del modelo.
+Actores: usuario malicioso, documento indirecto, proveedor comprometido, insider, tenant vecino, dependencia alterada y agente/herramienta defectuosos.
 
-### Vectores de ataque
-Probar prompt injection directo/indirecto, retrieval poisoning, data exfiltration, tool misuse, privilege escalation, insecure output handling, excessive agency, model extraction, denial of service, training data leakage y supply chain. Usar canary secrets sintéticos, documentos controlados y herramientas simuladas.
+Superficies: entradas textuales y multimodales, retrieval, memoria, resultados de herramientas, serialización, conectores, APIs, pipelines de ingestión, cachés, logs, evaluación y actualización de modelos.
 
-### Controles y límites
-Instrucciones no son frontera de seguridad. Aplicar autorización fuera del modelo, allowlists, validación de esquema, sandbox, separación tenant, egress control, secret isolation, approval gates y logging. El modelo debe recibir solo datos necesarios. La salida se valida antes de ejecutar acciones.
+Para cada ruta: acceso, precondición, transición, activo, efecto, control esperado, telemetría, evidencia y regla de parada.
 
-### Evaluación adversarial
-Crear casos reproducibles por modelo/version, prompt, corpus, herramientas y configuración. Medir attack success rate, leakage rate, tool misuse, false refusal, utility, severity y reproducibility. Reportar tasa por categoría y severidad; no generalizar de un modelo a otro. Registrar fallos y mitigaciones.
+## 5. Controles arquitectónicos
 
-### Laboratorios
-RAG con documentos maliciosos sintéticos, herramientas mock, secrets canary, tenant isolation y aprobación humana. No intentar extraer datos reales ni atacar proveedores externos.
+- Autorizar cada operación en el servidor con identidad y política independientes del texto del modelo.
+- Aplicar ACL por tenant en el servicio de datos; filtrar de nuevo resultados y citas.
+- Etiquetar procedencia e integridad de cada fragmento de contexto.
+- Reducir permisos, herramientas y autonomía a la mínima capacidad necesaria.
+- Validar argumentos mediante esquemas cerrados y reglas semánticas.
+- Requerir aprobación para efectos de alto impacto y verificar el aprobador fuera del modelo.
+- Separar secretos del contexto y redactar logs.
+- Limitar tokens, llamadas, tiempo, concurrencia y presupuesto.
+- Mantener kill switch, revocación, rollback y preservación de evidencia.
 
-## Estado de validación de la ampliación
-Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.
+No existe una mitigación única que elimine prompt injection. La estrategia es limitar consecuencias y detectar fallos de frontera.
+
+## 6. Evaluación y reporte
+
+Reportar por caso, modelo, versión, configuración y clase de riesgo. Incluir denominadores, intentos, efectos, severidad, falsos positivos, casos no aplicables, latencia, coste y limitaciones. No mezclar resultados de modelos o arquitecturas distintas sin estratificar.
+
+El resultado se clasifica como PASS, FAIL, INCONCLUSIVE o NOT RUN. PASS se limita a la prueba y configuración exactas. Cero fallos en una muestra finita no equivale a riesgo cero.
+
+## 7. Fuentes y control de versiones
+
+Usar como mínimo:
+- OWASP Top 10 for LLM Applications 2026 (taxonomía LLM).
+- OWASP Top 10 for Agentic Applications 2026 (ASI01–ASI10; taxonomía separada): https://genai.owasp.org/top-10-for-agentic-applications-2026/.
+- OWASP GenAI Red Teaming Guide/Manual (metodología de evaluación).
+- NIST AI RMF y NIST AI 600-1 (gestión de riesgos).
+- NIST AI 200-3 (planificación de evaluación ARIA).
+- MITRE ATLAS (conocimiento adversario vivo).
+
+Las fuentes candidatas, fechas de consulta y estados de lectura se registran en `knowledge/research/field_studies/SOURCE_REGISTER_2026-11-18.json`. Referencia o consulta de página no significa lectura integral ni respaldo automático de una afirmación.
+
+## 8. Puertas de madurez
+
+- Teórica: T0–T5.
+- Operativa: O0–O5.
+- Las dimensiones se evalúan por separado.
+- El contenido de este compendio y del dossier es un borrador técnico; los laboratorios del catálogo están propuestos, no ejecutados.
+- No elevar a T3/O3 sin pruebas repetibles con evidencia; no elevar a T4 sin revisión independiente cualificada; no elevar a T5 por volumen editorial.
+
+## 9. Navegación
+
+- [Desarrollo teórico profundo V1](AI_RED_TEAM_THEORETICAL_DEVELOPMENT_V1.md)
+- [Catálogo de pruebas reproducibles V1](AI_RED_TEAM_TEST_CATALOG_V1.md)
+- [Agenda de investigación](RESEARCH_AGENDA.md)
+- [Estudio de investigación](RESEARCH_STUDY.md)
+- [Secciones de profundización](DEEP_SECTIONS.md)

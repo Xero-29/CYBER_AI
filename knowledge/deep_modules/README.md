@@ -13,7 +13,7 @@ Cada especialidad dispone de una agenda de investigación en `./<area>/RESEARCH_
 - Auditoría global de cobertura: [informe](../research/GLOBAL_COVERAGE_AUDIT.md) y [matriz de 61 referencias](../research/global_coverage_matrix.json).
 - Ejecución: `python knowledge_global_coverage_audit.py` o `python knowledge_global_coverage_audit.py --json`.
 - Método obligatorio: `../research/RESEARCH_PROTOCOL.md`.
-- Registro de fuentes: `../research/source_registry.json` (102 entradas registradas al corte; lectura integral no asumida).\n- Agenda de investigación por 48 áreas: [DOMAIN_RESEARCH_AGENDA_48.md](../research/DOMAIN_RESEARCH_AGENDA_48.md).\n- Mapa de evidencia por especialidad: [DOMAIN_EVIDENCE_MAP_48.md](../research/DOMAIN_EVIDENCE_MAP_48.md).\n- Seguimiento de puertas y brechas: [EXPERT_LIBRARY_COMPLETION_TRACKER.md](../EXPERT_LIBRARY_COMPLETION_TRACKER.md).
+- Registro de fuentes: `../research/source_registry.json` (226 entradas registradas al corte; lectura integral no asumida). El registro de estudios de campo contiene 95 fuentes candidatas..\n- Agenda de investigación por 48 áreas: [DOMAIN_RESEARCH_AGENDA_48.md](../research/DOMAIN_RESEARCH_AGENDA_48.md).\n- Mapa de evidencia por especialidad: [DOMAIN_EVIDENCE_MAP_48.md](../research/DOMAIN_EVIDENCE_MAP_48.md).\n- Seguimiento de puertas y brechas: [EXPERT_LIBRARY_COMPLETION_TRACKER.md](../EXPERT_LIBRARY_COMPLETION_TRACKER.md).
 - Auditoría estructural y de trazabilidad: `python knowledge_research_audit.py` o `python knowledge_research_audit.py --json`.
 - Revisiones iniciales: [AppSec/API](./appsec/LITERATURE_REVIEW.md), [respuesta a incidentes](./incident_response/LITERATURE_REVIEW.md), [DevSecOps](./devsecops/LITERATURE_REVIEW.md), [gestión de vulnerabilidades](./vuln_management/LITERATURE_REVIEW.md), [OT/ICS](./ot_ics/LITERATURE_REVIEW.md), [arquitectura segura](./secure_arch/LITERATURE_REVIEW.md) y [criptografía](./crypto/LITERATURE_REVIEW.md).
 
@@ -34,6 +34,12 @@ Cada especialidad dispone de una agenda de investigación en `./<area>/RESEARCH_
 5. Añadir casos de estudio, ejercicios y rúbricas con respuestas razonadas.
 6. Revisar técnicamente, comprobar vigencia y ejecutar pruebas de reproducibilidad.
 7. Registrar revisión, autoría, cambios y madurez demostrada.
+
+## Remediación específica en curso — 2026-11-24
+
+- [Foundations: ingeniería del riesgo y assurance](./foundations/FOUNDATIONS_RISK_ENGINEERING_V1.md) — desarrollo específico de FND-04, aún sin validación experta.
+- [AI Red Team: dossier de doce capas](./ai_red_team/AI_RED_TEAM_THEORETICAL_DEVELOPMENT_V1.md) y [catálogo de nueve pruebas](./ai_red_team/AI_RED_TEAM_TEST_CATALOG_V1.md) — protocolos propuestos, ejecución pendiente.
+- Las referencias nuevas se registran como páginas oficiales consultadas, no como lectura integral ni claims aprobados.
 
 ## Índice
 

@@ -43,7 +43,7 @@ Evidence for the second topic.
         self.assertEqual(report["independent_review_not_started_count"], 192)
         self.assertEqual(report["expert_eligible_count"], 0)
         architecture = report["per_section"]["Arquitectura y modelo de amenazas"]
-        self.assertEqual(architecture["max_reuse"], 192)
+        self.assertEqual(architecture["max_reuse"], 184)
 
     def test_word_count_or_structure_does_not_promote_expert_status(self):
         report = audit_depth(Path(__file__).resolve().parents[1])
