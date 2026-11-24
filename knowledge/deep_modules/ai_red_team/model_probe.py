@@ -154,12 +154,20 @@ def run_model_probes(client: OpenAICompatibleChatClient, *,
                 "response_excerpt": content[:500],
             })
         except Exception as exc:  # provider failures are inconclusive, never PASS
+            detail = None
+            if isinstance(exc, RuntimeError):
+                # RuntimeError messages are generated locally from bounded,
+                # non-body diagnostics (HTTP status / response validation).
+                detail = str(exc)[:200]
+            elif isinstance(exc, TimeoutError):
+                detail = "request timed out"
             results.append({
                 "id": case_id,
                 "title": title,
                 "status": "INCONCLUSIVE",
                 "metrics": {},
                 "error": type(exc).__name__,
+                **({"error_detail": detail} if detail else {}),
             })
 
     try:
@@ -181,12 +189,18 @@ def run_model_probes(client: OpenAICompatibleChatClient, *,
             "response_excerpt": content[:500],
         })
     except Exception as exc:
+        detail = None
+        if isinstance(exc, RuntimeError):
+            detail = str(exc)[:200]
+        elif isinstance(exc, TimeoutError):
+            detail = "request timed out"
         results.append({
             "id": "ART-07",
             "title": "Structured output conformance",
             "status": "INCONCLUSIVE",
             "metrics": {},
             "error": type(exc).__name__,
+            **({"error_detail": detail} if detail else {}),
         })
 
     counts = {state: sum(item["status"] == state for item in results)
