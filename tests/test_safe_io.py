@@ -23,6 +23,16 @@ class SafeIoTests(unittest.TestCase):
             if os.name == "posix":
                 self.assertEqual(stat.S_IMODE(destination.stat().st_mode), 0o600)
 
+    @unittest.skipIf(os.name == "nt", "POSIX file modes do not represent Windows ACLs")
+    def test_atomic_write_rejects_group_other_and_executable_modes(self):
+        with tempfile.TemporaryDirectory() as temp:
+            for index, mode in enumerate((0o640, 0o644, 0o700, 0o755)):
+                with self.subTest(mode=oct(mode)):
+                    destination = Path(temp) / f"unsafe-{index}.json"
+                    with self.assertRaisesRegex(SafeWriteError, "privado"):
+                        atomic_write_text(destination, "secret", mode=mode)
+                    self.assertFalse(destination.exists())
+
     @unittest.skipUnless(os.name == "posix", "Directory fsync is POSIX-specific")
     def test_atomic_write_fsyncs_parent_directory_after_replace(self):
         with tempfile.TemporaryDirectory() as temp:
