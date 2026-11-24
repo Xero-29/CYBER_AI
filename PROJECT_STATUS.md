@@ -19,6 +19,13 @@
 
 ## Estado de evidencia y pendientes
 
+- **CI verde en HEAD `ce82f4dd7318f093cbdc0f1926f6ac2bd50a866b`:** [Actions run 45453949310](https://github.com/Xero-29/CYBER_AI/actions/runs/45453949310) concluyó `success`. `verify.sh` ejecutó 694 pruebas (1 skipped); reproducibilidad Foundations pasó en Python 3.11, 3.12 y 3.13; Windows allowlist smoke pasó. El artefacto `results.json` fue alineado con el orden determinista del runner.
+- En ese mismo HEAD, `knowledge_bootstrap.py --dry-run` seleccionó 334 documentos.
+- Auditoría de profundidad: 77.338 pares de duplicación exacta, 75.610 entre dominios, 0 claims respaldados, 192 experimentos no evaluados, 192 revisiones independientes no iniciadas, 0 brechas expert-ready.
+- Auditoría de investigación: 48 agendas completas, 48 revisiones bibliográficas, 226 fuentes en el registro canónico; 5 solo con metadatos revisados, 52 páginas/documentos revisados y 63 referencias de catálogo sin revisión de contenido.
+- Auditoría de validación: 48 dominios, 192 módulos, 95 fuentes en el registro de field studies; 0 afirmaciones respaldadas y 0 fuentes con lectura integral registrada. Integridad estructural OK; estado `structurally_valid_needs_research`.
+- Auditoría global: 48 áreas con referencias asociadas; 336 requisitos, 432 artefactos y 336 puertas, todos con 0 evaluados; 0 especialidades validadas y cobertura exhaustiva no demostrada.
+- Auditoría de procedencia: `needs_review`, 138 fuentes, 0 revisadas, 276 pendientes y 0 errores. La revisión de página/ficha en el registro bibliográfico no sustituye aprobación de licencia, fecha de revisión ni intervalo de vigencia de cada fuente de módulo.
 - Los dos documentos nuevos están registrados como `supplemental_documents` del manifiesto (Foundations risk engineering y AI Red Team test catalog); el bootstrap offline los selecciona con IDs estables por ruta y SHA-256. El total declarado de documentos seleccionables pasa de 332 a 334.
 - No se añadieron afirmaciones a `CLAIM_EVIDENCE_REGISTER.json`; continúa vacío. Las 192 tareas de investigación mantienen estado experimental no evaluado y revisión independiente no iniciada.
 - Ningún subtema de Foundations o AI Red Team se promueve de T0/O0 por este trabajo. Los ocho temas remediados son contenido editorial específico, no aceptación experta.
