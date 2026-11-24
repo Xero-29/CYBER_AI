@@ -1,7 +1,8 @@
 name: Python tests
 
 concurrency:
-  group: python-tests-${{ github.ref }}
+  # Isolate this remediation branch from an orphaned run; normal branch concurrency is unchanged.
+  group: ${{ github.ref == 'refs/heads/codex/foundations-ai-redteam-remediation-2026-11-24' && format('python-tests-{0}-{1}', github.ref, github.sha) || format('python-tests-{0}', github.ref) }}
   cancel-in-progress: true
 
 on:
