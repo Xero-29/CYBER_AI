@@ -1,4 +1,49 @@
-# Estado vigente — 2026-11-23 (auditoría incremental)
+# Estado vigente — 2026-11-24
+
+> Corte de auditoría de la rama de trabajo. Los estados de CI se atribuyen únicamente al SHA exacto que ejecutó cada workflow. No se extrapolan resultados entre commits.
+
+## Repositorio, ramas y PRs
+
+- Repositorio: `Xero-29/CYBER_AI`; rama: `codex/security-integrity-audit`.
+- HEAD inmediatamente anterior a este registro: `b26386c33d886e3304ba39daa68ecd534e64cad3`. Este commit de estado cambia el HEAD y dispara nuevamente los workflows; la validación de este nuevo SHA queda pendiente hasta consultar ambos runs.
+- `main`: `658a565acd0a5568bb56a1a7482f44260cd9efd1`; ancestro común: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.
+- Divergencia exacta antes de este registro: **358 commits exclusivos de la rama y 576 exclusivos de `main`**. La comparación no justifica un merge/rebase directo.
+- Se preservan los commits recientes de `main`: `387104756d0f8307c39a46a1ea2df07671bd81c9` (bucle metacognitivo), `554ec1cdd45de3bb0e0f24156b0a9a8ac19193da` (perfil secuencial de modelos) y `658a565acd0a5568bb56a1a7482f44260cd9efd1` (perfil de hardware). No existe un único commit exclusivo de `main` en el grafo completo: el total es 576 desde el ancestro común.
+- PR #2: **cerrado y fusionado**, merge `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. No se crea un PR duplicado para la misma rama.
+- PR #17: abierto, Draft, head `da589efa5a46fb496c1c02c58fda717ddba604d0`, base `main`.
+- PR #18: abierto, Draft, head `888ac5863eea9554202f9dd66baf6024344e1200`, base en la rama de PR #17. No integrarlo antes de resolver #17.
+- PR #20: abierto, Draft, head `2eabd925cf8cc01433b3d7fea324dcc5e43d7257`, rama `feature/metacognitive-knowledge-access`, base `main`; es una línea separada y no se duplicó en esta rama.
+- No hay PR abierto asociado a `codex/security-integrity-audit`. No se ejecutó merge, rebase, cherry-pick, force-push ni escritura en `main`. La reconciliación, si se decide, debe hacerse en una rama separada con revisión de tres vías.
+
+## Correcciones de esta ejecución
+
+- `web_research.load_sources()` ahora rechaza claves JSON duplicadas en cualquier nivel del archivo de fuentes y constantes no estándar `NaN`/`Infinity`. Se evita que dos parsers o revisores interpreten de manera distinta una política de dominios confiables.
+- La CLI de investigación web rechaza `--max-results` fuera de 1–10 mediante argparse; ya no recorta silenciosamente valores negativos o excesivos.
+- Se añadieron regresiones para claves duplicadas en raíz y objetos anidados, valores no finitos y límites CLI 0/11/-1. Las pruebas verifican que la búsqueda no se invoque ante parámetros inválidos.
+- Documentación actualizada en `docs/WEB_RESEARCH_EGRESS.md`.
+- Commits: [87167cc](https://github.com/Xero-29/CYBER_AI/commit/87167cc22c3956f5514498e48b53d347a04e9cd7), [2cdb492](https://github.com/Xero-29/CYBER_AI/commit/2cdb492c9268190ec13de66d918e609ab3229f49), [854d8fd](https://github.com/Xero-29/CYBER_AI/commit/854d8fd435deb5558968cbc72a76a71ce9abde87), [b26386c](https://github.com/Xero-29/CYBER_AI/commit/b26386c33d886e3304ba39daa68ecd534e64cad3).
+
+## CI y ejecución
+
+- Último HEAD anterior a estas correcciones con ambos workflows concluidos: `19624fc9f201696eb2cc9fd44fd9090589faea94`. Python Tests [45213197197](https://github.com/Xero-29/CYBER_AI/actions/runs/45213197197) y Docker Sandbox [45213197319](https://github.com/Xero-29/CYBER_AI/actions/runs/45213197319) terminaron **success**, con 744 pruebas y 4 omitidas por job.
+- En `b26386c33d886e3304ba39daa68ecd534e64cad3`, Python Tests [45413148862](https://github.com/Xero-29/CYBER_AI/actions/runs/45413148862) y Docker Sandbox [45413148652](https://github.com/Xero-29/CYBER_AI/actions/runs/45413148652) estaban `in_progress` al capturar este estado. Los runs de commits intermedios fueron cancelados por la política de concurrencia; no se cuentan como aprobaciones.
+- El commit de estado actual dispara nuevos workflows. **No declarar CI verde hasta comprobar que Python Tests y Docker Sandbox terminen en `completed/success` sobre el SHA final de este registro.**
+- No hay checkout local del repositorio en este entorno. No se afirma ejecución local de `verify.sh` ni de las pruebas unitarias.
+
+## Pendiente y límites reales
+
+- Consultar ambos workflows del SHA final de este registro y revisar jobs/logs/artefactos; corregir cualquier fallo reproducible.
+- Reconciliar la divergencia solo en una rama independiente, preservando íntegros los 576 commits exclusivos de `main`; no hacer integración automática.
+- Biblioteca: 48 áreas, 0 `expert_ready`, 48 `foundation_draft`. Faltan lectura de fuentes primarias, licencias verificadas, trazabilidad claim-to-source, laboratorios reproducibles, datasets expertos y revisión independiente.
+- Aislamiento host: el grupo POSIX no impide que descendientes escapen con `setsid/setpgid`; faltan cgroups/namespaces o microVM. Windows sigue requiriendo Job Objects y validación de ACL. El runner host no impone egress.
+- Operación externa: gateway con DNS pinning y política de egress demostrada, KMS/HSM y rotación, RBAC/IdP/MFA, cifrado y backups WORM/offsite, restauración DR con RPO/RTO, observabilidad central, pruebas de carga/soak/fallo físico y validación de proveedores reales.
+- La documentación y los tests sintéticos no sustituyen pruebas en ThinkPad, proveedores, red corporativa ni infraestructura real.
+
+**Conclusión:** se cerraron dos ambigüedades de entrada en investigación web y se añadieron regresiones. La rama sigue muy divergida de `main`; PR #17/#18/#20 siguen independientes y en Draft. No se ha tocado `main`. El proyecto todavía no está listo para la validación final del usuario.
+
+---
+
+# Registro histórico — 2026-11-23 (auditoría incremental)
 
 > Estado de la rama de trabajo. La evidencia de CI siempre se vincula al SHA exacto; un resultado de otro commit no se reutiliza.
 
