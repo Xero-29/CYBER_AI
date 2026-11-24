@@ -177,7 +177,7 @@ Un PASS solo aplica al caso, versión y configuración exactos. No convierte el 
 
 - OWASP Top 10 for LLM Applications 2026: https://genai.owasp.org/top-10-for-llm-applications-2026/
 - OWASP GenAI Red Teaming Guide (2025): https://genai.owasp.org/resource/genai-red-teaming-guide/
-- OWASP Top 10 for Agentic Applications 2026: https://genai.owasp.org/initiatives/ai-red-teaming-initiative/
+- OWASP Top 10 for Agentic Applications 2026 (ASI01–ASI10): https://genai.owasp.org/top-10-for-agentic-applications-2026/
 - NIST ARIA Evaluation Planning Manual, NIST AI 200-3 (2026): https://doi.org/10.6028/NIST.AI.200-3
 - NIST AI RMF Generative AI Profile, NIST AI 600-1 (2024): https://doi.org/10.6028/NIST.AI.600-1
 - MITRE ATLAS: https://atlas.mitre.org/
