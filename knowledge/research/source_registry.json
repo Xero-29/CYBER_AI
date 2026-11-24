@@ -2578,7 +2578,7 @@
       "title": "OWASP Top 10 for Agentic Applications 2026",
       "publisher": "OWASP GenAI Security Project",
       "type": "community_agentic_security_guidance",
-      "url": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+      "url": "https://genai.owasp.org/top-10-for-agentic-applications-2026/",
       "version": "2026",
       "published": "2025-12-09",
       "verification_status": "official_resource_page_reviewed",
@@ -2587,8 +2587,8 @@
         "ai_red_team",
         "ai_security"
       ],
-      "review_date": "2026-11-19",
-      "review_note": "Página oficial y propósito inspeccionados. Requiere revisar entradas, amenazas, mitigaciones y referencias de la publicación."
+      "review_date": "2026-11-24",
+      "review_note": "Página oficial consultada el 2026-11-24; se inspeccionó el índice ASI01–ASI10. La lectura integral de cada entrada, mitigación y referencia sigue pendiente."
     },
     {
       "id": "OWASP-API-TOP10",
