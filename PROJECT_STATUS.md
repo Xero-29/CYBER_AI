@@ -15,7 +15,7 @@
 - Advanced gap development: reemplazados los siete bloques de plantilla en cuatro temas de Foundations y cuatro de AI Red Team por análisis disciplinar específico. Los otros 40 dominios no se modificaron.
 - Auditoría exacta del documento después del cambio: 48 dominios, 192 temas y 1.344 bloques conservados. Los pares de duplicación exacta bajaron de 84.015 a 77.338 (-6.677); los pares entre dominios bajaron de 82.208 a 75.610 (-6.598). La duplicación residual sigue siendo alta; esta remediación no la resuelve globalmente.
 - Se añadieron pruebas de regresión para evitar el retorno de placeholders, comprobar que los cinco bloques centrales de los ocho temas remediados son únicos por tema y verificar el estado honesto de las fuentes. Se ajustó la expectativa del auditor: la reutilización máxima del bloque de arquitectura baja de 192 a 184.
-- Se actualizaron los registros canónico y de field studies con OWASP LLM Top 10 2026, OWASP GenAI Red Teaming Guide y NIST AI 200-3 ARIA. Se registraron como páginas/fichas consultadas; no como lectura integral ni claims respaldados.
+- Se actualizaron los registros canónico y de field studies con OWASP LLM Top 10 2026, OWASP Top 10 for Agentic Applications 2026, OWASP GenAI Red Teaming Guide y NIST AI 200-3 ARIA. Se registraron como páginas/fichas consultadas; no como lectura integral ni claims respaldados.
 
 ## Estado de evidencia y pendientes
 
