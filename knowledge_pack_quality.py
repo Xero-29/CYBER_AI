@@ -510,6 +510,9 @@ def audit_packs(manifest_path=DEFAULT_MANIFEST, *, root=ROOT, area_id=None):
             readiness_blockers.append("lab_evidence_missing_or_unverified")
         if not review_approved:
             readiness_blockers.append("independent_review_missing_or_untrusted")
+        external_evidence_pending = (
+            verified_sources < 5 or not lab_verified or not review_approved
+        )
         if expert_ready:
             quality_status = "expert_ready"
         elif path_error or missing:
@@ -527,6 +530,7 @@ def audit_packs(manifest_path=DEFAULT_MANIFEST, *, root=ROOT, area_id=None):
             "verified_external_sources": verified_sources,
             "lab_evidence_verified": lab_verified,
             "independent_review_approved": review_approved,
+            "external_evidence_pending": external_evidence_pending,
             "readiness_blockers": readiness_blockers,
             "path_error": path_error,
         })
@@ -551,6 +555,18 @@ def audit_packs(manifest_path=DEFAULT_MANIFEST, *, root=ROOT, area_id=None):
         "awaiting_external_evidence_count": sum(
             item["quality_status"] == "awaiting_external_evidence" for item in results
         ),
+        "external_evidence_pending_count": sum(
+            item["external_evidence_pending"] for item in results
+        ),
+        "source_evidence_pending_count": sum(
+            item["verified_external_sources"] < 5 for item in results
+        ),
+        "lab_evidence_pending_count": sum(
+            not item["lab_evidence_verified"] for item in results
+        ),
+        "independent_review_pending_count": sum(
+            not item["independent_review_approved"] for item in results
+        ),
         "areas": results,
         "errors": [],
     }
@@ -574,8 +590,14 @@ def main(argv=None):
         print(
             f"Áreas: {report['area_count']}; expert-ready: "
             f"{report['expert_ready_count']}; borradores: "
-            f"{report.get('foundation_draft_count', 0)}; evidencia externa pendiente: "
-            f"{report.get('awaiting_external_evidence_count', 0)}."
+            f"{report.get('foundation_draft_count', 0)}; con evidencia externa pendiente: "
+            f"{report.get('external_evidence_pending_count', 0)}."
+        )
+        print(
+            "Bloqueos de evidencia — "
+            f"fuentes: {report.get('source_evidence_pending_count', 0)}; "
+            f"laboratorios: {report.get('lab_evidence_pending_count', 0)}; "
+            f"revisión independiente: {report.get('independent_review_pending_count', 0)}."
         )
         for item in report["areas"]:
             if not item["expert_ready"]:
