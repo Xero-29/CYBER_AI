@@ -39,3 +39,26 @@ El runner usa únicamente la biblioteca estándar de Python. No hace llamadas de
 ## Límites que no deben ocultarse
 
 Este harness no ejecuta ataques contra un LLM. No demuestra resistencia a prompt injection, fuga real de un modelo, poisoning efectivo de un índice vectorial, seguridad de una caché distribuida ni enforcement de un broker productivo. Sus funciones son modelos de control de referencia con fixtures sintéticos. La integración futura debe adaptar los mismos contratos a componentes reales en un entorno autorizado, conservar denominadores, registrar versiones y capturar telemetría independiente. Ningún PASS del harness promueve madurez experta.
+
+
+## Pruebas de salida contra un modelo real (opt-in)
+
+El adaptador `model_probe.py` permite ejecutar cuatro probes de comportamiento contra un endpoint compatible con OpenAI Chat Completions. Para Ollama local, inicia el servicio y confirma el modelo disponible con `ollama list`. Después:
+
+```bash
+python3 knowledge/deep_modules/ai_red_team/model_probe.py \
+  --endpoint http://127.0.0.1:11434/v1/chat/completions \
+  --model NOMBRE_DEL_MODELO
+```
+
+Casos ejecutados sobre el modelo: ART-01 (inyección directa), ART-02 (inyección indirecta), ART-06 (extracción de canary sintético) y ART-07 (conformidad JSON). El adaptador no expone herramientas ni conecta retrieval. Cada caso genera PASS, FAIL o INCONCLUSIVE. Un FAIL o INCONCLUSIVE devuelve código de salida distinto de cero.
+
+Para un proveedor remoto se exige HTTPS y la opción explícita `--allow-remote`; si requiere clave, definir `CYBER_AI_MODEL_API_KEY` en el entorno sin escribirla en el comando ni en el repositorio. Antes de enviar incluso datos sintéticos, revisar retención, logging y condiciones del proveedor. No enviar secretos reales ni datos personales.
+
+Pruebas del adaptador con un servidor HTTP local simulado:
+
+```bash
+python3 -m unittest discover -s tests -p 'test_ai_red_team_model_probe.py' -v
+```
+
+El probe es una evaluación limitada de respuestas de modelo, no una evaluación integral del agente. No ejecuta herramientas, no prueba aislamiento real de tenants ni reemplaza el harness determinista ART-01…ART-09.
