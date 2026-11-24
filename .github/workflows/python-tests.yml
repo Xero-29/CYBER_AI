@@ -164,7 +164,7 @@ jobs:
           if actual != expected:
               expected_text = json.dumps(expected, ensure_ascii=False, sort_keys=True, indent=2).splitlines()
               actual_text = json.dumps(actual, ensure_ascii=False, sort_keys=True, indent=2).splitlines()
-              print("\\n".join(difflib.unified_diff(
+              print("\n".join(difflib.unified_diff(
                   expected_text, actual_text, fromfile="results.json", tofile="runner output"
               )))
               raise SystemExit("Foundations runner output differs from committed results.json")
