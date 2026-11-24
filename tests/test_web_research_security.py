@@ -99,6 +99,21 @@ class WebResearchEgressSecurityTests(unittest.TestCase):
                         with self.assertRaisesRegex(ValueError, "dominio|DNS|fuentes"):
                             web_research.load_sources()
 
+    def test_source_registry_rejects_duplicate_json_keys_and_non_finite_values(self):
+        payloads = (
+            b'{"sources":[],"sources":[{"id":"official","domains":["example.org"]}]}',
+            b'{"sources":[{"id":"official","domains":["example.org"],"domains":["evil.example"]}]}',
+            b'{"sources":[{"id":"official","domains":["example.org"],"tier":NaN}]}',
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            config_path = Path(directory) / "trusted-sources.json"
+            for payload in payloads:
+                with self.subTest(payload=payload):
+                    config_path.write_bytes(payload)
+                    with patch.object(web_research, "CONFIG_PATH", config_path):
+                        with self.assertRaisesRegex(ValueError, "configuración"):
+                            web_research.load_sources()
+
     def test_source_registry_normalizes_valid_idna_domains(self):
         with tempfile.TemporaryDirectory() as directory:
             config_path = Path(directory) / "trusted-sources.json"
@@ -200,6 +215,20 @@ class WebResearchEgressSecurityTests(unittest.TestCase):
                     with self.assertRaises(ValueError):
                         web_research.search_web("valid query", include_untrusted=flag)
                 load_sources.assert_not_called()
+
+    def test_cli_rejects_out_of_range_result_limits_without_search(self):
+        for value in ("0", "11", "-1"):
+            with self.subTest(max_results=value):
+                stderr = StringIO()
+                with patch("sys.argv", [
+                    "web_research.py", "--max-results", value, "valid query"
+                ]):
+                    with patch.object(web_research, "search_web") as search:
+                        with redirect_stderr(stderr):
+                            with self.assertRaises(SystemExit) as error:
+                                web_research.main()
+                self.assertEqual(error.exception.code, 2)
+                search.assert_not_called()
 
     def test_search_request_trims_query_and_accepts_explicit_bounded_options(self):
         proxy = "http://127.0.0.1:8080"
