@@ -1,6 +1,6 @@
 # AI Red Team — guía de ejecución del harness sintético V1
 
-**Runner:** \`lab_runner.py\`  
+**Runner:** `lab_runner.py`  
 **Casos:** ART-01 a ART-09  
 **Estado:** controles de referencia ejecutables; integración con un modelo/agente real pendiente.
 
@@ -8,11 +8,11 @@
 
 Desde la raíz del repositorio:
 
-\`\`\`bash
+```bash
 python3 knowledge/deep_modules/ai_red_team/lab_runner.py
 python3 knowledge/deep_modules/ai_red_team/lab_runner.py --json
-python3 -m unittest tests.test_ai_red_team_lab -v
-\`\`\`
+python3 -m unittest discover -s tests -p 'test_ai_red_team_lab.py' -v
+```
 
 El runner usa únicamente la biblioteca estándar de Python. No hace llamadas de red, no inicia un modelo, no lee secretos del host y no ejecuta herramientas externas. Produce nueve resultados por caso, con estado, checks, métricas y evidencia sintética.
 
@@ -32,9 +32,9 @@ El runner usa únicamente la biblioteca estándar de Python. No hace llamadas de
 
 ## Contrato de salida
 
-- \`PASS\`: todos los checks deterministas del caso se cumplieron.
-- \`FAIL\`: al menos un invariante no se cumplió.
-- El informe identifica \`model_execution=false\`, \`network_access=false\` y \`synthetic_only=true\`.
+- `PASS`: todos los checks deterministas del caso se cumplieron.
+- `FAIL`: al menos un invariante no se cumplió.
+- El informe identifica `model_execution=false`, `network_access=false` y `synthetic_only=true`.
 
 ## Límites que no deben ocultarse
 
