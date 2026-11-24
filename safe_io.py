@@ -352,6 +352,11 @@ def atomic_write_text(path, text, *, encoding="utf-8", mode=0o600, create_parent
         raise SafeWriteError("El contenido debe ser texto.")
     if isinstance(mode, bool) or not isinstance(mode, int) or not 0 <= mode <= 0o777:
         raise SafeWriteError("El modo de archivo solicitado es inválido.")
+    if os.name == "posix" and mode & 0o177:
+        raise SafeWriteError(
+            "El modo de salida POSIX debe ser privado y no ejecutable; "
+            "no se permiten permisos de grupo u otros."
+        )
 
     destination = Path(os.path.abspath(os.fspath(path)))
     parent = destination.parent
