@@ -293,3 +293,12 @@ El contenido histórico que sigue registra implementaciones y validaciones de co
 - Cada especialidad incluye un diseño de laboratorio con cuatro casos (baseline, fallo sintético, detección y mitigación/regresión), salvaguardas, métricas, preguntas de investigación y artefactos de aceptación.
 - Se añadió el índice de los 48 compendios.
 - **Límite:** son cuadernos técnicos y planes de trabajo, no libros exhaustivos ni revisiones sistemáticas completas. Los laboratorios están diseñados, no ejecutados; no se elevó la madurez de ninguna especialidad.
+
+
+## Remediación ejecutable Foundations + AI Red Team — 2026-11-24 (seguimiento)
+
+- Se abrió una rama de seguimiento basada exactamente en el HEAD de PR #21: `codex/foundations-ai-redteam-executable-labs-2026-11-24`. No modifica `main`, no integra PR #18 y no altera el worktree local anterior.
+- AI Red Team: se añadió `knowledge/deep_modules/ai_red_team/lab_runner.py`, harness determinista sintético para ART-01…ART-09. Incluye aislamiento de tenant, integridad de corpus, allowlist/ownership/idempotencia de herramientas, canaries, validación de salida estructurada, límites de presupuesto y separación train/holdout. No ejecuta LLM ni pruebas contra infraestructura real.
+- Foundations: se añadió `knowledge/deep_modules/foundations/labs/risk_engineering.py` (LAB-FND-14A) con cálculo EAL basal/residual, pérdida evitada, coste de equilibrio y sensibilidad. Las cifras son supuestos sintéticos, no datos observados.
+- Se añadieron pruebas unitarias para ambos runners y guías de ejecución. El resultado CI del nuevo HEAD queda pendiente; no declarar estos laboratorios aprobados hasta revisar todos los jobs.
+- La madurez no cambia: no hay lectura integral acreditada de las fuentes, claims respaldados ni revisión independiente. Los resultados sintéticos no demuestran robustez de un LLM ni eficacia de controles productivos.
