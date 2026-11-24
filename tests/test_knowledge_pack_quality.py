@@ -219,6 +219,10 @@ class KnowledgePackQualityTests(unittest.TestCase):
         self.assertEqual(report["area_count"], 48)
         self.assertEqual(report["expert_ready_count"], 0)
         self.assertEqual(report["foundation_draft_count"], 48)
+        self.assertEqual(report["external_evidence_pending_count"], 48)
+        self.assertEqual(report["source_evidence_pending_count"], 48)
+        self.assertEqual(report["lab_evidence_pending_count"], 48)
+        self.assertEqual(report["independent_review_pending_count"], 48)
         self.assertTrue(all(not item["expert_ready"] for item in report["areas"]))
         self.assertTrue(all(item["verified_external_sources"] == 0 for item in report["areas"]))
         self.assertTrue(all(
@@ -236,6 +240,8 @@ class KnowledgePackQualityTests(unittest.TestCase):
         self.assertTrue(report["areas"][0]["expert_ready"])
         self.assertEqual(report["areas"][0]["missing_sections"], [])
         self.assertEqual(report["areas"][0]["verified_external_sources"], 5)
+        self.assertFalse(report["areas"][0]["external_evidence_pending"])
+        self.assertEqual(report["external_evidence_pending_count"], 0)
         self.assertEqual(report["areas"][0]["readiness_blockers"], [])
 
     def test_pending_source_license_prevents_expert_ready(self):
@@ -247,6 +253,8 @@ class KnowledgePackQualityTests(unittest.TestCase):
             report = self._audit_fixture(fixture["manifest"])
         self.assertEqual(report["expert_ready_count"], 0)
         self.assertEqual(report["areas"][0]["verified_external_sources"], 4)
+        self.assertTrue(report["areas"][0]["external_evidence_pending"])
+        self.assertEqual(report["source_evidence_pending_count"], 1)
         self.assertIn("verified_sources_below_minimum", report["areas"][0]["readiness_blockers"])
 
     def test_path_traversal_in_pack_manifest_is_not_accepted(self):
