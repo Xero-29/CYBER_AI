@@ -155,12 +155,18 @@ jobs:
       - name: Verify deterministic result artifact
         run: |
           python - <<'PY'
+          import difflib
           import json
           from knowledge.deep_modules.foundations.labs.runner import run_all
           with open("knowledge/deep_modules/foundations/labs/results.json", encoding="utf-8") as handle:
               expected = json.load(handle)
           actual = run_all()
           if actual != expected:
+              expected_text = json.dumps(expected, ensure_ascii=False, sort_keys=True, indent=2).splitlines()
+              actual_text = json.dumps(actual, ensure_ascii=False, sort_keys=True, indent=2).splitlines()
+              print("\\n".join(difflib.unified_diff(
+                  expected_text, actual_text, fromfile="results.json", tofile="runner output"
+              )))
               raise SystemExit("Foundations runner output differs from committed results.json")
           print("Foundations result artifact matches the runner output")
           PY
