@@ -677,7 +677,7 @@ def main():
     )
     parser.add_argument("query", nargs="+", help="Pregunta o tema a investigar")
     parser.add_argument(
-        "--max-results", type=int, default=5,
+        "--max-results", type=int, choices=range(1, 11), default=5,
         help="Cantidad maxima de resultados a solicitar (1-10)"
     )
     parser.add_argument(
@@ -686,7 +686,7 @@ def main():
     )
     args = parser.parse_args()
 
-    limit = max(1, min(args.max_results, 10))
+    limit = args.max_results
     query = " ".join(args.query).strip()
 
     try:
