@@ -4,7 +4,7 @@
 
 `config/trusted_sources.json` define los sufijos DNS autorizados. `load_sources()` lee el archivo con comprobación de tipo/identidad, rechaza symlinks y puntos de reanálisis, y rechaza hardlinks en POSIX; aplica un límite de 1 MB. Exige IDs únicos y dominios DNS canónicos con al menos dos etiquetas. Rechaza comodines, IP literales, IPv4 abreviado/numérico, hosts locales, etiquetas vacías, puertos, rutas y sintaxis ambigua. Los nombres IDN se normalizan a ASCII IDNA.
 
-La coincidencia es por sufijo: registrar `example.org` también incluye sus subdominios. Registra únicamente dominios cuya jerarquía completa sea aceptable. No se incorpora una Public Suffix List; por tanto, la revisión humana del alcance del dominio sigue siendo obligatoria.
+La coincidencia es por sufijo: registrar `example.org` también incluye sus subdominios. Registra únicamente dominios cuya jerarquía completa sea aceptable. No se incorpora una Public Suffix List; por tanto, la revisión humana del alcance del dominio sigue siendo obligatoria. El parser rechaza claves JSON duplicadas en cualquier nivel y constantes no estándar como `NaN` o `Infinity`, para evitar interpretaciones ambiguas de la política.
 
 ## URLs y redirecciones
 
@@ -12,7 +12,7 @@ Solo se consultan URLs HTTPS cuyo host coincida con un dominio registrado. Se re
 
 ## Límites de entrada
 
-Antes de cargar la política o contactar proveedores, la consulta debe ser texto no vacío, sin caracteres de control y de hasta 1.000 caracteres. `max_results` debe ser un entero estricto entre 1 y 20; los booleanos no se aceptan como enteros. `include_untrusted` exige un booleano real. Las URLs recibidas de los motores se rechazan si superan 4.096 caracteres o contienen controles. Estos límites reducen abuso de recursos y evitan que entradas malformadas lleguen al cliente de red.
+Antes de cargar la política o contactar proveedores, la consulta debe ser texto no vacío, sin caracteres de control y de hasta 1.000 caracteres. `max_results` debe ser un entero estricto entre 1 y 20; los booleanos no se aceptan como enteros. La CLI aplica además su contrato documentado de 1 a 10 resultados y rechaza valores fuera de rango, en lugar de recortarlos silenciosamente. `include_untrusted` exige un booleano real. Las URLs recibidas de los motores se rechazan si superan 4.096 caracteres o contienen controles. Estos límites reducen abuso de recursos y evitan que entradas malformadas lleguen al cliente de red.
 
 ## Gateway obligatorio
 
