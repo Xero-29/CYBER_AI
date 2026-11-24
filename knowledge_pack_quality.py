@@ -499,6 +499,17 @@ def audit_packs(manifest_path=DEFAULT_MANIFEST, *, root=ROOT, area_id=None):
             and lab_verified
             and review_approved
         )
+        readiness_blockers = []
+        if path_error:
+            readiness_blockers.append("pack_missing_or_unsafe")
+        if missing:
+            readiness_blockers.append("missing_required_sections")
+        if verified_sources < 5:
+            readiness_blockers.append("verified_sources_below_minimum")
+        if not lab_verified:
+            readiness_blockers.append("lab_evidence_missing_or_unverified")
+        if not review_approved:
+            readiness_blockers.append("independent_review_missing_or_untrusted")
         if expert_ready:
             quality_status = "expert_ready"
         elif path_error or missing:
@@ -516,6 +527,7 @@ def audit_packs(manifest_path=DEFAULT_MANIFEST, *, root=ROOT, area_id=None):
             "verified_external_sources": verified_sources,
             "lab_evidence_verified": lab_verified,
             "independent_review_approved": review_approved,
+            "readiness_blockers": readiness_blockers,
             "path_error": path_error,
         })
 
