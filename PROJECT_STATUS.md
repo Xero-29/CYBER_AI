@@ -1,5 +1,30 @@
 # Estado canónico de CYBER_AI — 2026-11-20
 
+
+# Remediación disciplinar Foundations y AI Red Team — 2026-11-24
+
+**Rama de trabajo:** `codex/foundations-ai-redteam-remediation-2026-11-24`  
+**Base:** `codex/reconcile-knowledge-pr13-pr14-2026-11-20` (PR #18; PR #18 continúa Draft).  
+**Regla de integración:** no se modifica `main`, no se fusiona PR #18 ni se altera la rama `codex/security-integrity-audit`.
+
+## Trabajo incorporado
+
+- Foundations: nuevo `knowledge/deep_modules/foundations/FOUNDATIONS_RISK_ENGINEERING_V1.md`, con escenarios de pérdida, estimación cuantitativa y ordinal, incertidumbre, assurance, análisis de controles, ejemplo de CI/CD, evaluación y preguntas en frío. El texto declara explícitamente que las fuentes no se han leído integralmente y que el laboratorio propuesto no se ha ejecutado.
+- AI Red Team: sustituido `TECHNICAL_COMPENDIUM.md` que repetía bloques genéricos por un mapa disciplinar con siete líneas específicas y navegación a los dossiers. Reescritas las siete áreas temáticas del README para eliminar el placeholder común.
+- AI Red Team: nuevo `AI_RED_TEAM_TEST_CATALOG_V1.md` con nueve casos ART-01…ART-09: inyección directa/indirecta, persistencia RAG, aislamiento multi-tenant, poisoning, abuso de herramientas, canaries, salida insegura, consumo/bucles y validez del benchmark. Incluye fixtures sintéticos, invariantes, evidencia, métricas y estados PASS/FAIL/INCONCLUSIVE/NOT RUN. Son protocolos; no se reportan como ejecutados.
+- Advanced gap development: reemplazados los siete bloques de plantilla en cuatro temas de Foundations y cuatro de AI Red Team por análisis disciplinar específico. Los otros 40 dominios no se modificaron.
+- Auditoría exacta del documento después del cambio: 48 dominios, 192 temas y 1.344 bloques conservados. Los pares de duplicación exacta bajaron de 84.015 a 77.338 (-6.677); los pares entre dominios bajaron de 82.208 a 75.610 (-6.598). La duplicación residual sigue siendo alta; esta remediación no la resuelve globalmente.
+- Se añadieron pruebas de regresión para evitar el retorno de placeholders, comprobar que los cinco bloques centrales de los ocho temas remediados son únicos por tema y verificar el estado honesto de las fuentes. Se ajustó la expectativa del auditor: la reutilización máxima del bloque de arquitectura baja de 192 a 184.
+- Se actualizaron los registros canónico y de field studies con OWASP LLM Top 10 2026, OWASP GenAI Red Teaming Guide y NIST AI 200-3 ARIA. Se registraron como páginas/fichas consultadas; no como lectura integral ni claims respaldados.
+
+## Estado de evidencia y pendientes
+
+- No se añadieron afirmaciones a `CLAIM_EVIDENCE_REGISTER.json`; continúa vacío. Las 192 tareas de investigación mantienen estado experimental no evaluado y revisión independiente no iniciada.
+- Ningún subtema de Foundations o AI Red Team se promueve de T0/O0 por este trabajo. Los ocho temas remediados son contenido editorial específico, no aceptación experta.
+- Los nueve casos AI Red Team y el ejemplo de riesgo Foundations no se han ejecutado. No hay resultados experimentales ni revisión independiente asociados a estos documentos.
+- Pendiente: ejecutar CI en el HEAD final de esta rama, revisar fallos, continuar los 98 subtemas restantes de Foundations (102 total; solo cuatro temas avanzados de este documento y contenido previo no implican cierre granular), desarrollar las restantes brechas de AI Red Team, reducir la duplicación de los otros 40 dominios y realizar lectura integral de fuentes.
+
+
 **Repositorio:** https://github.com/Xero-29/CYBER_AI  
 **Rama principal:** `main` — sin modificar durante esta secuencia.  
 **HEAD de main auditado:** `387104756d0f8307c39a46a1ea2df07671bd81c9`.
