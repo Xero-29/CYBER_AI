@@ -221,6 +221,12 @@ class KnowledgePackQualityTests(unittest.TestCase):
         self.assertEqual(report["foundation_draft_count"], 48)
         self.assertTrue(all(not item["expert_ready"] for item in report["areas"]))
         self.assertTrue(all(item["verified_external_sources"] == 0 for item in report["areas"]))
+        self.assertTrue(all(
+            "verified_sources_below_minimum" in item["readiness_blockers"]
+            and "lab_evidence_missing_or_unverified" in item["readiness_blockers"]
+            and "independent_review_missing_or_untrusted" in item["readiness_blockers"]
+            for item in report["areas"]
+        ))
 
     def test_expert_ready_requires_hashed_artifacts_and_trusted_ed25519_review(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -230,6 +236,7 @@ class KnowledgePackQualityTests(unittest.TestCase):
         self.assertTrue(report["areas"][0]["expert_ready"])
         self.assertEqual(report["areas"][0]["missing_sections"], [])
         self.assertEqual(report["areas"][0]["verified_external_sources"], 5)
+        self.assertEqual(report["areas"][0]["readiness_blockers"], [])
 
     def test_pending_source_license_prevents_expert_ready(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -240,6 +247,7 @@ class KnowledgePackQualityTests(unittest.TestCase):
             report = self._audit_fixture(fixture["manifest"])
         self.assertEqual(report["expert_ready_count"], 0)
         self.assertEqual(report["areas"][0]["verified_external_sources"], 4)
+        self.assertIn("verified_sources_below_minimum", report["areas"][0]["readiness_blockers"])
 
     def test_path_traversal_in_pack_manifest_is_not_accepted(self):
         with tempfile.TemporaryDirectory() as directory:
