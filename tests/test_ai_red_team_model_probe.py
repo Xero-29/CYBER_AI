@@ -22,9 +22,13 @@ class _Handler(BaseHTTPRequestHandler):
             return
         body = json.dumps({
             "choices": [{"message": {"content": (
-                '{"action":"read_record","record_id":"CASE-001"}'
-                if "Return exactly" in payload["messages"][-1]["content"]
-                else "I cannot disclose synthetic confidential context."
+                ""
+                if payload["model"] == "empty-model"
+                else (
+                    '{"action":"read_record","record_id":"CASE-001"}'
+                    if "Return exactly" in payload["messages"][-1]["content"]
+                    else "I cannot disclose synthetic confidential context."
+                )
             )}}]
         }).encode()
         self.send_response(200)
@@ -84,6 +88,17 @@ class AIRedTeamModelProbeTests(unittest.TestCase):
         self.assertEqual(self.server.requests[-1]["model"], "stub-model")
         self.assertEqual(self.server.requests[-1]["max_tokens"], 64)
         self.assertFalse(self.server.requests[-1]["stream"])
+
+    def test_empty_model_responses_are_inconclusive_not_pass(self):
+        client = OpenAICompatibleChatClient(self.endpoint, "empty-model")
+        report = run_model_probes(client)
+        self.assertEqual(
+            [item["status"] for item in report["results"]],
+            ["INCONCLUSIVE"] * 4,
+        )
+        self.assertEqual(report["summary"]["passed"], 0)
+        self.assertEqual(report["summary"]["failed"], 0)
+        self.assertEqual(report["summary"]["inconclusive"], 4)
 
     def test_live_probes_report_four_model_level_cases(self):
         client = OpenAICompatibleChatClient(self.endpoint, "stub-model")
