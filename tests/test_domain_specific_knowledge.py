@@ -50,6 +50,49 @@ class DomainSpecificKnowledgeTests(unittest.TestCase):
         self.assertIn("FOUNDATIONS_RISK_ENGINEERING_V1.md", text)
         self.assertNotIn("dominar este componente dentro del alcance de Fundamentos", text)
 
+    def test_foundations_and_ai_red_team_gap_sections_are_domain_specific(self):
+        import re
+        from knowledge_depth_audit import parse_gap_document
+
+        text = self.read("knowledge/research/ADVANCED_GAP_DEVELOPMENT.md")
+        parsed = parse_gap_document(text)
+        selected = {
+            item["domain_id"]: item["topics"]
+            for item in parsed
+            if item["domain_id"] in {"foundations", "ai_red_team"}
+        }
+        self.assertEqual(set(selected), {"foundations", "ai_red_team"})
+        core = (
+            "Arquitectura y modelo de amenazas",
+            "Desarrollo técnico y controles",
+            "Procedimiento reproducible",
+            "Laboratorio y evaluación",
+            "Evidencia y limitaciones",
+        )
+        for domain_id, expected in (("foundations", 4), ("ai_red_team", 4)):
+            topics = selected[domain_id]
+            self.assertEqual(len(topics), expected)
+            for heading in core:
+                normalized = [
+                    " ".join(re.findall(r"[a-z0-9áéíóúñ_]{3,}", topic["sections"][heading].casefold()))
+                    for topic in topics
+                ]
+                self.assertEqual(len(set(normalized)), expected, (domain_id, heading))
+
+    def test_current_ai_sources_are_registered_as_page_review_only(self):
+        import json
+
+        registry = json.loads(self.read("knowledge/research/source_registry.json"))
+        by_id = {source["id"]: source for source in registry["sources"]}
+        expected = {
+            "OWASP-LLM-TOP10-2026",
+            "OWASP-GENAI-REDTEAM-GUIDE",
+            "NIST-AI-200-3-ARIA",
+        }
+        self.assertTrue(expected.issubset(by_id))
+        for source_id in expected:
+            self.assertNotEqual(by_id[source_id]["verification_status"], "full_text_reviewed")
+
 
 if __name__ == "__main__":
     unittest.main()
