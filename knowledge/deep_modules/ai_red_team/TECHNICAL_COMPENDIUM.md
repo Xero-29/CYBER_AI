@@ -76,7 +76,7 @@ El resultado se clasifica como PASS, FAIL, INCONCLUSIVE o NOT RUN. PASS se limit
 
 Usar como mínimo:
 - OWASP Top 10 for LLM Applications 2026 (taxonomía LLM).
-- OWASP Top 10 for Agentic Applications 2026 (riesgos de sistemas agénticos; taxonomía separada).
+- OWASP Top 10 for Agentic Applications 2026 (ASI01–ASI10; taxonomía separada): https://genai.owasp.org/top-10-for-agentic-applications-2026/.
 - OWASP GenAI Red Teaming Guide/Manual (metodología de evaluación).
 - NIST AI RMF y NIST AI 600-1 (gestión de riesgos).
 - NIST AI 200-3 (planificación de evaluación ARIA).
