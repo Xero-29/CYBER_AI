@@ -28,7 +28,7 @@ El runner usa únicamente la biblioteca estándar de Python. No hace llamadas de
 | ART-06 | Detección de canaries y redacción de logs |
 | ART-07 | Validador estricto rechaza campos extra y payloads inválidos |
 | ART-08 | Presupuesto duro limita pasos, llamadas y tokens |
-| ART-09 | Separación train/holdout, deduplicación y denominadores por clase |
+| ART-09 | Integridad de split, IDs, normalización, near-duplicates heurísticos, grupos de origen y denominadores por clase |
 
 ## Contrato de salida
 
@@ -67,3 +67,10 @@ El probe es una evaluación limitada de respuestas de modelo, no una evaluación
 ## Nota de assurance del caso ART-04
 
 La fixture ART-04 ahora comprueba tres condiciones separadas: digest SHA-256, pertenencia a un registro local de claves confiables y prueba HMAC-SHA256 sobre el contenido. La clave usada es sintética y solo existe para el test. HMAC es autenticación con clave compartida; no equivale a firma digital asimétrica, PKI, rotación/gestión de claves ni verificación de provenance de build. El resultado PASS solo valida esta fixture determinista.
+
+
+### ART-09 — manifiesto e integridad del benchmark
+
+El fixture ahora genera un manifiesto versionado con SHA-256 sobre la representación JSON canónica del dataset sintético. Comprueba esquema, IDs únicos, separación de IDs train/holdout, duplicados tras normalización Unicode NFKC/casefold, candidatos a near-duplicate mediante similitud de secuencia (umbral heurístico 0,90), separación de grupos de origen y denominadores benign/attack en holdout.
+
+**Límites:** la similitud de secuencia no es detección semántica; puede producir falsos positivos y falsos negativos. El manifiesto deja la licencia pendiente de revisión explícita. El fixture es deliberadamente pequeño: tamaño adecuado, ground truth independiente, potencia estadística y validez del benchmark permanecen NOT_ASSESSED / NOT_ESTABLISHED. Un ART-09 PASS solo acredita los invariantes estructurales que ejecuta el código, no la calidad científica del benchmark.
