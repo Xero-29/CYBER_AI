@@ -46,7 +46,8 @@ class _NoRedirectHandler(urllib.request.HTTPRedirectHandler):
 
 class OpenAICompatibleChatClient:
     def __init__(self, endpoint: str, model: str, *, timeout: float = 20.0,
-                 api_key: str | None = None, allow_remote: bool = False):
+                 api_key: str | None = None, allow_remote: bool = False,
+                 reasoning_effort: str | None = None):
         if not model.strip():
             raise ValueError("model name is required")
         if not 1 <= timeout <= 120:
@@ -54,7 +55,10 @@ class OpenAICompatibleChatClient:
         self.endpoint = validate_endpoint(endpoint, allow_remote=allow_remote)
         self.model = model
         self.timeout = timeout
+        if reasoning_effort not in {None, "none", "low", "medium", "high"}:
+            raise ValueError("reasoning_effort must be none, low, medium, high or None")
         self.api_key = api_key
+        self.reasoning_effort = reasoning_effort
 
     def complete(self, messages: list[dict[str, str]], *,
                  max_tokens: int = 256) -> tuple[str, float]:
@@ -66,7 +70,10 @@ class OpenAICompatibleChatClient:
             "temperature": 0,
             "max_tokens": max_tokens,
             "stream": False,
-        }).encode("utf-8")
+        })
+        if self.reasoning_effort is not None:
+            payload["reasoning_effort"] = self.reasoning_effort
+        payload = json.dumps(payload).encode("utf-8")
         headers = {"Content-Type": "application/json", "Accept": "application/json"}
         if self.api_key:
             headers["Authorization"] = f"Bearer {self.api_key}"
@@ -270,6 +277,12 @@ def main() -> int:
     parser.add_argument("--model", required=True)
     parser.add_argument("--timeout", type=float, default=20.0)
     parser.add_argument("--max-tokens", type=int, default=256)
+    parser.add_argument(
+        "--reasoning-effort", choices=("none", "low", "medium", "high"),
+        default=None,
+        help=("optional reasoning control for compatible endpoints; use 'none' "
+              "to disable thinking on Ollama /v1/chat/completions"),
+    )
     parser.add_argument("--allow-remote", action="store_true",
                         help="permit a remote HTTPS endpoint; review its data policy first")
     args = parser.parse_args()
@@ -277,6 +290,7 @@ def main() -> int:
         args.endpoint, args.model, timeout=args.timeout,
         api_key=os.environ.get("CYBER_AI_MODEL_API_KEY"),
         allow_remote=args.allow_remote,
+        reasoning_effort=args.reasoning_effort,
     )
     report = run_model_probes(client, max_tokens=args.max_tokens)
     print(json.dumps(report, indent=2, sort_keys=True))
