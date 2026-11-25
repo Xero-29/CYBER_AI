@@ -1,25 +1,6 @@
-# Build context minimization: the image installs tools and does not COPY source.
-.git
-.github
-.venv
-venv
-env
-**/__pycache__
-**/.pytest_cache
-**/.mypy_cache
-**/.ruff_cache
-**/.tox
-**/node_modules
-reports
-artifacts
-evidence
-cyber-ai-evidence
-.env
-.env.*
-*.pem
-*.key
-*.p12
-*.pfx
-*.kdb
-*.sqlite
-*.db
+# The sandbox image installs dependencies only; Dockerfile is sent separately.
+# Do not send repository data, credentials, reports, or source files to the build daemon.
+**
+!sandbox/
+!sandbox/Dockerfile
+!sandbox/requirements.lock

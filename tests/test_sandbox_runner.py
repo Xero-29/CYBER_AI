@@ -247,6 +247,12 @@ class SandboxRunnerTests(unittest.TestCase):
 
         self.assertIn("COPY sandbox/requirements.lock", docker_content)
         self.assertIn("--require-hashes", docker_content)
+        dockerignore_path = Path(sandbox_runner.__file__).parent / ".dockerignore"
+        dockerignore_content = dockerignore_path.read_text(encoding="utf-8")
+        self.assertIn("**", dockerignore_content.splitlines())
+        self.assertIn("!sandbox/", dockerignore_content.splitlines())
+        self.assertIn("!sandbox/Dockerfile", dockerignore_content.splitlines())
+        self.assertIn("!sandbox/requirements.lock", dockerignore_content.splitlines())
         self.assertIn("ruff==0.14.5", lock_content)
         self.assertIn("bandit==1.8.6", lock_content)
         self.assertIn(
