@@ -132,7 +132,7 @@ def _bounded_execution(requested_steps: int, max_steps: int,
 
 def _normalize_benchmark_text(value: str) -> str:
     normalized = unicodedata.normalize("NFKC", value).casefold()
-    return " ".join(re.findall(r"[\\w]+", normalized, flags=re.UNICODE))
+    return " ".join(re.findall(r"[\w]+", normalized, flags=re.UNICODE))
 
 
 def _benchmark_integrity(
