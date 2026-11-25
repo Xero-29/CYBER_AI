@@ -347,3 +347,13 @@ El contenido histórico que sigue registra implementaciones y validaciones de co
 - Se añaden regresiones para duplicados dentro de un split, IDs repetidos y fuga de grupos de origen.
 - Límite: el fixture sigue siendo pequeño y sintético. Ground truth independiente, tamaño/potencia estadística, representatividad y validez externa no están demostrados. ART-09 PASS solo valida los controles estructurales implementados.
 - **CI pendiente de comprobar en el HEAD final de esta rama.** No declarar esta remediación aprobada hasta revisar todos los jobs y resultados exactos.
+
+
+## Remediación LAB-FND-14A — 2026-11-25
+
+- Rama: `codex/foundations-risk-uncertainty-remediation-2026-11-25`, apilada sobre PR #25. No modifica `main` ni integra PR #21–#25.
+- El cálculo EAL ahora rechaza entradas booleanas, no numéricas, NaN, infinitas y negativas.
+- Se añade una cuadrícula factorial determinista de 27 escenarios para frecuencia basal, pérdida basal y frecuencia residual relativa; pruebas verifican tamaño, método y caso base.
+- Documentación distingue explícitamente sensibilidad de escenarios de Monte Carlo, distribuciones, intervalos de confianza y análisis de dependencia.
+- Límites: supuestos sintéticos, sin calibración empírica, colas, correlaciones ni eficacia observada; no cierra NC-FND-01/02/03 ni eleva T/O.
+- **CI pendiente de comprobar en el HEAD final de esta rama.**
