@@ -213,7 +213,7 @@ def _benchmark_integrity(
     dataset_manifest = {
         "dataset_id": "CYBER-AI-ART-09-SYNTHETIC",
         "version": "1.1.0",
-        "license": "CC0-1.0 synthetic fixture",
+        "license": "pending explicit license review",
         "train": train,
         "holdout": holdout,
     }
