@@ -1,3 +1,4 @@
+import math
 import unittest
 
 from knowledge.deep_modules.foundations.labs.risk_engineering import (
@@ -15,6 +16,14 @@ class FoundationsRiskEngineeringLabTests(unittest.TestCase):
             expected_annual_loss(-0.1, 100)
         with self.assertRaises(ValueError):
             expected_annual_loss(0.1, -100)
+        for invalid in (math.nan, math.inf, -math.inf):
+            with self.subTest(invalid=invalid):
+                with self.assertRaises(ValueError):
+                    expected_annual_loss(invalid, 100)
+                with self.assertRaises(ValueError):
+                    expected_annual_loss(0.1, invalid)
+        with self.assertRaises(ValueError):
+            expected_annual_loss(True, 100)
 
     def test_lab_results_and_sensitivity_are_reproducible(self):
         report = run_lab()
@@ -29,6 +38,21 @@ class FoundationsRiskEngineeringLabTests(unittest.TestCase):
             [item["case"] for item in report["sensitivity"]],
             ["low", "base", "high"],
         )
+        grid = report["multidimensional_sensitivity"]
+        self.assertEqual(grid["row_count"], 27)
+        self.assertEqual(len(grid["rows"]), 27)
+        self.assertEqual(
+            grid["method"],
+            "deterministic_factorial_grid_not_probability_distribution",
+        )
+        base_row = next(
+            item for item in grid["rows"]
+            if item["baseline_frequency_factor"] == 1.0
+            and item["baseline_loss_factor"] == 1.0
+            and item["residual_frequency_factor"] == 1.0
+        )
+        self.assertEqual(base_row["baseline_eal_usd"], 48_000)
+        self.assertEqual(base_row["residual_eal_usd"], 12_000)
 
 
 if __name__ == "__main__":

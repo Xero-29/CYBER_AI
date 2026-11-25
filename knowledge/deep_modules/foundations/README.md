@@ -139,3 +139,8 @@ python3 -m unittest discover -s tests -p 'test_foundations_risk_lab.py' -v
 ```
 
 Produce LAB-FND-14A: EAL basal/residual, pérdida evitada, beneficio neto simplificado y sensibilidad bajo supuestos sintéticos. No sustituye calibración con datos reales ni aceptación formal del riesgo. La integración y el resultado CI de esta ampliación deben verificarse en el SHA correspondiente antes de registrar el laboratorio como validado.
+
+
+### LAB-FND-14A — sensibilidad de riesgo ampliada
+
+El runner valida entradas finitas y genera una cuadrícula determinista de 27 combinaciones de frecuencia basal, pérdida basal y frecuencia residual relativa. La cuadrícula es análisis factorial de escenarios, no Monte Carlo ni estimación probabilística; todos los factores siguen siendo hipotéticos y no elevan la madurez del módulo.
