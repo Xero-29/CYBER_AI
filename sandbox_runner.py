@@ -96,21 +96,26 @@ def _validate_runtime_bundle(runtime_dir):
     path = Path(os.path.abspath(os.fspath(runtime_dir)))
     if any(character in str(path) for character in (",", "\n", "\r")):
         raise ToolExecutionError("La ruta del runtime contiene delimitadores no permitidos.")
-    if path.is_symlink() or not path.is_dir():
-        raise ToolExecutionError("El runtime debe ser un directorio real.")
-    project = PROJECT_ROOT.resolve()
-    if _paths_overlap(path, project):
-        raise ToolExecutionError("El runtime aislado no puede solaparse con el repositorio.")
     try:
-        info = path.stat(follow_symlinks=False)
-        if os.name != "nt" and (
-            info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) & 0o022
+        path = path.resolve(strict=True)
+        info = path.lstat()
+        reparse_flag = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
+        if (
+            not stat.S_ISDIR(info.st_mode)
+            or stat.S_ISLNK(info.st_mode)
+            or getattr(info, "st_file_attributes", 0) & reparse_flag
         ):
-            raise ToolExecutionError("El runtime debe pertenecer al usuario y no ser modificable por terceros.")
+            raise ToolExecutionError("El runtime debe ser un directorio real.")
+        project = PROJECT_ROOT.resolve()
+        if _paths_overlap(path, project):
+            raise ToolExecutionError("El runtime aislado no puede solaparse con el repositorio.")
+        if os.name != "nt" and (
+            info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) & 0o222
+        ):
+            raise ToolExecutionError("El runtime debe pertenecer al usuario y ser de solo lectura.")
         entries = {item.name for item in path.iterdir()}
         if entries != set(RUNTIME_MODULES):
             raise ToolExecutionError("El runtime contiene archivos ausentes o no autorizados.")
-        reparse_flag = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
         for name in RUNTIME_MODULES:
             item = path / name
             file_info = item.lstat()
@@ -120,12 +125,14 @@ def _validate_runtime_bundle(runtime_dir):
                 or not stat.S_ISREG(file_info.st_mode)
                 or file_info.st_size > MAX_RUNTIME_MODULE_BYTES
                 or (os.name == "posix" and file_info.st_nlink != 1)
-                or (os.name != "nt" and stat.S_IMODE(file_info.st_mode) & 0o022)
+                or (os.name != "nt" and stat.S_IMODE(file_info.st_mode) & 0o222)
             ):
                 raise ToolExecutionError("El runtime contiene un módulo inseguro.")
+    except ToolExecutionError:
+        raise
     except OSError as error:
         raise ToolExecutionError("No se pudo validar el runtime aislado.") from error
-    return path.resolve(strict=True)
+    return path
 
 
 def _signed_allowlist_mount_args(tool_id):
@@ -199,13 +206,22 @@ def build_docker_command(
         raise ToolExecutionError("La ruta del objetivo contiene delimitadores no permitidos para Docker --mount.")
     relative_target = "target"
     runtime = _validate_runtime_bundle(runtime_dir)
-    evidence = Path(evidence_dir)
-    if any(character in str(evidence) for character in (",", "\\n", "\\r")):
+    evidence_root = Path(evidence_dir)
+    if not evidence_root.is_absolute():
+        evidence_root = PROJECT_ROOT / evidence_root
+    evidence_root = Path(os.path.abspath(os.fspath(evidence_root)))
+    if any(character in str(evidence_root) for character in (",", "\n", "\r")):
         raise ToolExecutionError("La ruta de evidencias contiene caracteres no permitidos para Docker --mount.")
-    if evidence.is_symlink():
+    try:
+        evidence_candidate = evidence_root.resolve(strict=False)
+    except OSError as error:
+        raise ToolExecutionError("La ruta de evidencias no se puede resolver de forma segura.") from error
+    if _paths_overlap(evidence_candidate, PROJECT_ROOT.resolve()):
+        raise ToolExecutionError("La ruta de evidencias no puede solaparse con el repositorio.")
+    if evidence_root.is_symlink():
         raise ToolExecutionError("La carpeta de evidencias no puede ser un enlace simbólico.")
-    if evidence.exists() and evidence.is_dir() and os.name != "nt":
-        existing_info = evidence.stat(follow_symlinks=False)
+    if evidence_root.exists() and evidence_root.is_dir() and os.name != "nt":
+        existing_info = evidence_root.stat(follow_symlinks=False)
         if (
             existing_info.st_uid != os.geteuid()
             or stat.S_IMODE(existing_info.st_mode) & 0o077
@@ -214,18 +230,19 @@ def build_docker_command(
                 "La carpeta de evidencias existente debe pertenecer al usuario y ser privada (0700)."
             )
     try:
-        evidence = ensure_private_directory(evidence, create=True)
+        evidence_root = ensure_private_directory(evidence_root, create=True).resolve(strict=True)
+        evidence_candidate = evidence_root / ("run-" + uuid.uuid4().hex)
+        evidence = ensure_private_directory(evidence_candidate, create=True).resolve(strict=True)
+        if any(evidence.iterdir()):
+            raise ToolExecutionError("El directorio de evidencia de esta ejecución debe estar vacío.")
+    except ToolExecutionError:
+        raise
     except SafeWriteError as exc:
         raise ToolExecutionError(
             "La ruta de evidencias no cumple la política de directorios privados."
         ) from exc
-    evidence = evidence.resolve(strict=True)
-    try:
-        evidence.relative_to(PROJECT_ROOT.resolve())
-    except ValueError:
-        pass
-    else:
-        raise ToolExecutionError("La carpeta de evidencias debe estar fuera del repositorio.")
+    if _paths_overlap(evidence, PROJECT_ROOT.resolve()):
+        raise ToolExecutionError("La ruta de evidencias no puede solaparse con el repositorio.")
     if _paths_overlap(runtime, evidence):
         raise ToolExecutionError("El runtime y las evidencias no pueden compartir rutas.")
 
@@ -303,6 +320,12 @@ def main(argv=None):
                 runtime_dir=runtime_bundle,
             )
             container_name = command[command.index("--name") + 1]
+            evidence_mount = next(
+                value for value in command
+                if value.startswith("type=bind,src=") and ",dst=/evidence" in value
+            )
+            evidence_path = evidence_mount.split("src=", 1)[1].split(",dst=", 1)[0]
+            print(f"Evidencia aislada de esta ejecución: {evidence_path}", flush=True)
             effective_timeout = args.timeout or TOOL_SPECS[args.tool]["timeout"]
             try:
                 result = subprocess.run(
