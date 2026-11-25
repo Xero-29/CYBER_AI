@@ -59,7 +59,7 @@ class SandboxRunnerTests(unittest.TestCase):
 
     def test_docker_command_enforces_isolation_flags_and_read_only_source(self):
         evidence = self.root.parent / (self.root.name + "-evidence")
-        command = sandbox_runner.build_docker_command(
+        command = self.build_command(
             "ruff", "sample.py", evidence, image="sandbox:test", timeout=60
         )
         joined = " ".join(command)
@@ -119,7 +119,7 @@ class SandboxRunnerTests(unittest.TestCase):
 
     def test_signed_allowlist_is_read_only_mounted_and_key_is_not_in_argv(self):
         evidence = self.root.parent / (self.root.name + "-signed-evidence")
-        command = sandbox_runner.build_docker_command(
+        command = self.build_command(
             "ruff", "sample.py", evidence, image="sandbox:test"
         )
         allowlist_mount = (
@@ -142,7 +142,7 @@ class SandboxRunnerTests(unittest.TestCase):
             "CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY": "",
         }):
             with self.assertRaisesRegex(ToolExecutionError, "allowlist HMAC"):
-                sandbox_runner.build_docker_command("ruff", "sample.py", evidence)
+                self.build_command("ruff", "sample.py", evidence)
 
     def test_invalid_signature_blocks_sandbox_command(self):
         evidence = self.root.parent / (self.root.name + "-invalid-allowlist")
@@ -150,7 +150,7 @@ class SandboxRunnerTests(unittest.TestCase):
         if os.name == "posix":
             self.allowlist_path.chmod(0o600)
         with self.assertRaisesRegex(ToolExecutionError, "allowlist HMAC"):
-            sandbox_runner.build_docker_command("ruff", "sample.py", evidence)
+            self.build_command("ruff", "sample.py", evidence)
 
     def test_allowlist_cannot_authorize_extra_tools(self):
         evidence = self.root.parent / (self.root.name + "-extra-tool-allowlist")
@@ -167,7 +167,7 @@ class SandboxRunnerTests(unittest.TestCase):
         if os.name == "posix":
             self.allowlist_path.chmod(0o600)
         with self.assertRaisesRegex(ToolExecutionError, "exclusivamente"):
-            sandbox_runner.build_docker_command("ruff", "sample.py", evidence)
+            self.build_command("ruff", "sample.py", evidence)
 
     @unittest.skipIf(os.name == "nt", "El UID de host solo existe en POSIX.")
     def test_root_host_is_rejected_instead_of_running_container_as_root(self):
@@ -175,7 +175,7 @@ class SandboxRunnerTests(unittest.TestCase):
         with patch.object(sandbox_runner.os, "getuid", return_value=0), \
              patch.object(sandbox_runner.os, "getgid", return_value=0):
             with self.assertRaisesRegex(ToolExecutionError, "host root"):
-                sandbox_runner.build_docker_command("ruff", "sample.py", evidence)
+                self.build_command("ruff", "sample.py", evidence)
 
     def test_windows_uses_non_root_image_user_without_posix_uid_calls(self):
         with patch.object(sandbox_runner.os, "getuid", side_effect=AssertionError("getuid called")), \
@@ -184,15 +184,42 @@ class SandboxRunnerTests(unittest.TestCase):
 
         evidence = self.root.parent / (self.root.name + "-windows-evidence")
         with patch.object(sandbox_runner, "_docker_user_args", return_value=[]):
-            command = sandbox_runner.build_docker_command("ruff", "sample.py", evidence)
+            command = self.build_command("ruff", "sample.py", evidence)
         self.assertFalse(any(item.startswith("--user=") for item in command))
         self.assertIn("--pull=never", command)
 
     def test_evidence_mount_is_created_with_private_permissions(self):
-        evidence = self.root.parent / (self.root.name + "-private-evidence")
-        sandbox_runner.build_docker_command("ruff", "sample.py", evidence)
+        evidence_root = self.root.parent / (self.root.name + "-private-evidence")
+        command = self.build_command("ruff", "sample.py", evidence_root)
+        mount = next(
+            item for item in command
+            if item.startswith("type=bind,src=") and ",dst=/evidence" in item
+        )
+        mounted = Path(mount.split("src=", 1)[1].split(",dst=", 1)[0])
+        self.assertEqual(mounted.parent, evidence_root.resolve())
+        self.assertTrue(mounted.name.startswith("run-"))
         if os.name == "posix":
-            self.assertEqual(stat.S_IMODE(evidence.stat().st_mode), 0o700)
+            self.assertEqual(stat.S_IMODE(evidence_root.stat().st_mode), 0o700)
+            self.assertEqual(stat.S_IMODE(mounted.stat().st_mode), 0o700)
+
+    def test_evidence_mount_does_not_expose_previous_reports(self):
+        evidence_root = self.root.parent / (self.root.name + "-history-evidence")
+        evidence_root.mkdir(mode=0o700)
+        previous = evidence_root / "previous-secret.json"
+        previous.write_text("must not be mounted", encoding="utf-8")
+        command = self.build_command("ruff", "sample.py", evidence_root)
+        mount = next(
+            item for item in command
+            if item.startswith("type=bind,src=") and ",dst=/evidence" in item
+        )
+        mounted = Path(mount.split("src=", 1)[1].split(",dst=", 1)[0])
+        self.assertNotEqual(mounted, evidence_root.resolve())
+        self.assertFalse((mounted / previous.name).exists())
+        self.assertEqual(previous.read_text(encoding="utf-8"), "must not be mounted")
+
+    def test_evidence_parent_of_repository_is_rejected(self):
+        with self.assertRaisesRegex(ToolExecutionError, "solaparse con el repositorio"):
+            self.build_command("ruff", "sample.py", self.root.parent)
 
     @unittest.skipIf(os.name == "nt", "Los bits POSIX no representan ACL de Windows.")
     def test_existing_public_evidence_mount_is_rejected(self):
@@ -200,7 +227,7 @@ class SandboxRunnerTests(unittest.TestCase):
         evidence.mkdir(mode=0o755)
         evidence.chmod(0o755)
         with self.assertRaisesRegex(ToolExecutionError, "privada"):
-            sandbox_runner.build_docker_command("ruff", "sample.py", evidence)
+            self.build_command("ruff", "sample.py", evidence)
 
     def test_only_tools_bundled_in_image_are_allowed(self):
         self.assertEqual(SANDBOX_TOOLS, frozenset({"ruff", "bandit"}))
@@ -208,7 +235,7 @@ class SandboxRunnerTests(unittest.TestCase):
         for tool in ("semgrep", "syft", "trivy"):
             with self.subTest(tool=tool):
                 with self.assertRaises(ToolExecutionError):
-                    sandbox_runner.build_docker_command(tool, "sample.py", evidence)
+                    self.build_command(tool, "sample.py", evidence)
 
     def test_allowlist_matches_tools_installed_in_image(self):
         sandbox_dir = Path(sandbox_runner.__file__).parent / "sandbox"
@@ -242,8 +269,10 @@ class SandboxRunnerTests(unittest.TestCase):
                      subprocess.CompletedProcess(["docker", "rm"], 0),
                  ],
              ) as run:
+            evidence_root = self.root.parent / (self.root.name + "-main-evidence")
             result = sandbox_runner.main([
-                "--tool", "ruff", "--target", "sample.py", "--execute",
+                "--tool", "ruff", "--target", "sample.py",
+                "--evidence-dir", str(evidence_root), "--execute",
             ])
         self.assertEqual(result, 124)
         self.assertEqual(run.call_args_list[0].kwargs["timeout"], 180)
@@ -255,25 +284,25 @@ class SandboxRunnerTests(unittest.TestCase):
     def test_evidence_path_rejects_mount_delimiters(self):
         evidence = self.root.parent / (self.root.name + ",bad")
         with self.assertRaises(ToolExecutionError):
-            sandbox_runner.build_docker_command(
+            self.build_command(
                 "ruff", "sample.py", evidence, image="sandbox:test"
             )
 
     def test_network_tool_is_denied(self):
         evidence = self.root.parent / (self.root.name + "-evidence")
         with self.assertRaises(ToolExecutionError):
-            sandbox_runner.build_docker_command("pip_audit", "sample.py", evidence)
+            self.build_command("pip_audit", "sample.py", evidence)
 
     def test_invalid_timeout_is_denied(self):
         evidence = self.root.parent / (self.root.name + "-evidence")
         with self.assertRaises(ToolExecutionError):
-            sandbox_runner.build_docker_command("ruff", "sample.py", evidence, timeout=999)
+            self.build_command("ruff", "sample.py", evidence, timeout=999)
 
     def test_target_outside_repo_is_denied(self):
         evidence = self.root.parent / (self.root.name + "-evidence")
         with tempfile.TemporaryDirectory() as outside:
             with self.assertRaises(ToolExecutionError):
-                sandbox_runner.build_docker_command("ruff", outside, evidence)
+                self.build_command("ruff", outside, evidence)
 
 
 
@@ -284,7 +313,7 @@ class SandboxRunnerTests(unittest.TestCase):
         parent.chmod(0o770)
         evidence = parent / "private"
         with self.assertRaisesRegex(ToolExecutionError, "ruta de evidencias"):
-            sandbox_runner.build_docker_command("ruff", "sample.py", evidence)
+            self.build_command("ruff", "sample.py", evidence)
         self.assertFalse(evidence.exists())
 
     def test_evidence_mount_rejects_symlinked_ancestor(self):
@@ -297,7 +326,7 @@ class SandboxRunnerTests(unittest.TestCase):
             self.skipTest("symlinks unavailable")
         evidence = linked / "private"
         with self.assertRaisesRegex(ToolExecutionError, "ruta de evidencias"):
-            sandbox_runner.build_docker_command("ruff", "sample.py", evidence)
+            self.build_command("ruff", "sample.py", evidence)
         self.assertFalse((real / "private").exists())
 
 if __name__ == "__main__":

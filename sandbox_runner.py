@@ -93,11 +93,13 @@ def prepare_runtime_bundle(destination):
 
 
 def _validate_runtime_bundle(runtime_dir):
-    path = Path(os.path.abspath(os.fspath(runtime_dir)))
-    if any(character in str(path) for character in (",", "\n", "\r")):
+    candidate = Path(os.path.abspath(os.fspath(runtime_dir)))
+    if any(character in str(candidate) for character in (",", "\n", "\r")):
         raise ToolExecutionError("La ruta del runtime contiene delimitadores no permitidos.")
+    if candidate.is_symlink():
+        raise ToolExecutionError("El runtime no puede ser un enlace simbólico.")
     try:
-        path = path.resolve(strict=True)
+        path = candidate.resolve(strict=True)
         info = path.lstat()
         reparse_flag = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
         if (
