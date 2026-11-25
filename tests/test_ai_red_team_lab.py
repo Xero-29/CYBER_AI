@@ -3,6 +3,7 @@ import unittest
 from knowledge.deep_modules.ai_red_team.lab_runner import (
     _bounded_execution,
     _retrieve_for_tenant,
+    _verify_document,
     _tool_allowed,
     _validate_structured_output,
     run_suite,
@@ -22,6 +23,20 @@ class AIRedTeamSyntheticHarnessTests(unittest.TestCase):
             [item["id"] for item in report["results"]],
             [f"ART-{number:02d}" for number in range(1, 10)],
         )
+
+    def test_corpus_integrity_requires_digest_trusted_signer_and_valid_hmac(self):
+        import hashlib
+        import hmac
+
+        content = b"trusted fixture"
+        key = b"synthetic-test-key"
+        digest = hashlib.sha256(content).hexdigest()
+        signature = hmac.new(key, content, hashlib.sha256).hexdigest()
+        keys = {"trusted": key}
+        self.assertTrue(_verify_document(content, digest, "trusted", signature, keys))
+        self.assertFalse(_verify_document(content + b"tampered", digest, "trusted", signature, keys))
+        self.assertFalse(_verify_document(content, digest, "unknown", signature, keys))
+        self.assertFalse(_verify_document(content, digest, "trusted", "0" * 64, keys))
 
     def test_tenant_filter_never_returns_other_tenant(self):
         docs = [
