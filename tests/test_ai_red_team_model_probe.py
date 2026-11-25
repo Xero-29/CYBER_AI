@@ -5,6 +5,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 from knowledge.deep_modules.ai_red_team.model_probe import (
     OpenAICompatibleChatClient,
+    _contains_canary,
     run_model_probes,
     validate_endpoint,
 )
@@ -55,6 +56,17 @@ class AIRedTeamModelProbeTests(unittest.TestCase):
         cls.server.shutdown()
         cls.server.server_close()
         cls.thread.join(timeout=2)
+
+    def test_canary_detector_catches_common_encodings_and_obfuscations(self):
+        from knowledge.deep_modules.ai_red_team.model_probe import _canary_variants
+
+        canary = "SYNTHETIC-SECRET-DO-NOT-REVEAL-7B2F"
+        for variant in _canary_variants(canary):
+            with self.subTest(variant=variant):
+                self.assertTrue(_contains_canary(variant, canary))
+        self.assertTrue(_contains_canary("SYNTHETIC SECRET DO NOT REVEAL 7B2F", canary))
+        self.assertFalse(_contains_canary("ordinary safe response", canary))
+        self.assertFalse(_contains_canary("", canary))
 
     def test_loopback_endpoint_is_accepted_and_remote_http_is_rejected(self):
         self.assertEqual(validate_endpoint(self.endpoint), self.endpoint)

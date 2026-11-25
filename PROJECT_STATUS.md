@@ -312,3 +312,28 @@ El contenido histórico que sigue registra implementaciones y validaciones de co
 - El adaptador mide cuatro casos a nivel de salida del modelo. No prueba retrieval real, aislamiento multi-tenant, ejecución de herramientas, memoria ni loops del agente.
 - Se indexaron en `knowledge/packs/manifest.json` los runners de Foundations, el harness AI Red Team, el adaptador de probes y la guía de ejecución; una prueba de regresión comprueba que el bootstrap los incluye.
 - CI run `45459225819` concluyó `success` en el SHA funcional `da5e8c096b36cf5e793856ce227dfa4d7b669176`: 709 pruebas, 1 skipped, suite principal y suite con extractores documentales; Python 3.11/3.12/3.13 y Windows allowlist smoke en success. Este registro de estado es un commit documental posterior y requiere su propia verificación CI antes de integrar.
+
+
+# Auditoría y remediación adicional Foundations + AI Red Team — 2026-11-25
+
+**Rama:** codex/foundations-ai-redteam-audit-remediation-2026-11-25  
+**Base:** PR #22, HEAD f7ed69ea625142a679956767f7af9d91cb5b2348. Esta rama no modifica main, PR #21, PR #22 ni la rama comercial PR #23.
+
+- Se creó docs/FOUNDATIONS_AI_REDTEAM_AUDIT_2026-11-25.md con hallazgos, no conformidades y criterios granulares de cierre.
+- ART-04: la versión auditada solo comprobaba hash y etiqueta de firmante allowlisted. Se cambió la fixture para verificar digest SHA-256 y HMAC-SHA256 con clave sintética, incluyendo contenido alterado, firmante desconocido y firma falsificada. HMAC no es firma digital/PKI de producción.
+- Model probes: el detector de canary ahora contempla literal, separadores, reverso, ROT13, Base64, hexadecimal y URL encoding. Las pruebas cubren las variantes. Es un detector finito; no garantiza detectar cifrado, paráfrasis, esteganografía o divulgaciones arbitrarias.
+- La guía AI Red Team documenta los límites de assurance de ART-04.
+- No se promueve T/O ni se aprueba ninguna especialidad. ART-01…09 siguen siendo controles sintéticos en memoria; cuatro probes solo evalúan salida del modelo. Falta integración real con RAG, tenant store, broker, memoria, cache y loop de agente.
+- Foundations mantiene 102 subtemas en el mapa; el contenido FND-04 y LAB-FND-14A no cierra el currículo. LAB-FND-14A usa supuestos sintéticos de EAL y no calibra frecuencia, pérdida, eficacia o dependencias reales.
+- Evidencia: no hay claims aprobados ni revisión independiente en la línea base examinada; lectura integral y licencias deben trazarse por claim y subtema.
+- CI del HEAD de base PR #22 f7ed69e no se considera verde completo: el registro más reciente consultado contiene unit-tests cancelado, aunque reproducibilidad Python 3.11/3.12/3.13 y Windows allowlist smoke concluyeron success. La rama nueva requiere CI completo en su HEAD exacto.
+
+## Próximos gates obligatorios
+
+1. CI completo en el HEAD final de esta rama y regresiones específicas ART-04/canary.
+2. Ejecutar el probe con modelo local y preservar PASS/FAIL/INCONCLUSIVE sin filtrar resultados.
+3. Integrar ART-03/05/08 con retrieval, autorización y broker reales en sandbox aislado.
+4. Cerrar los 102 subtemas Foundations con evidencia y revisión por capa/capacidad.
+5. Completar AI Red Team end-to-end y revisión independiente.
+6. Aplicar la misma metodología a las otras 46 especialidades.
+7. Solo después pasar a pruebas calientes del sistema completo.
