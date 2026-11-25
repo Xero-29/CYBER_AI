@@ -88,7 +88,7 @@ class TemplateIntegrityTests(unittest.TestCase):
         path = Path(self.temp.name) / "tools.signed.json"
         document = sign_tool_allowlist(entries, key)
         path.write_text(
-            json.dumps(document, sort_keys=True, separators=(",", ":")) + "\\n",
+            json.dumps(document, sort_keys=True, separators=(",", ":")) + "\n",
             encoding="utf-8",
         )
         if os.name != "nt":
@@ -146,7 +146,7 @@ class TemplateIntegrityTests(unittest.TestCase):
     def test_rejects_hardlinked_template(self):
         with tempfile.TemporaryDirectory() as outside:
             source = Path(outside) / "source.yaml"
-            source.write_text("id: linked\\n", encoding="utf-8")
+            source.write_text("id: linked\n", encoding="utf-8")
             linked = self.template.parent / "linked.yaml"
             try:
                 os.link(source, linked)
