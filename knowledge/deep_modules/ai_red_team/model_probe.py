@@ -64,13 +64,13 @@ class OpenAICompatibleChatClient:
                  max_tokens: int = 256) -> tuple[str, float]:
         if not 1 <= max_tokens <= 1024:
             raise ValueError("max_tokens must be between 1 and 1024")
-        payload = json.dumps({
+        payload = {
             "model": self.model,
             "messages": messages,
             "temperature": 0,
             "max_tokens": max_tokens,
             "stream": False,
-        })
+        }
         if self.reasoning_effort is not None:
             payload["reasoning_effort"] = self.reasoning_effort
         payload = json.dumps(payload).encode("utf-8")
