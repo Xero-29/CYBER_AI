@@ -111,6 +111,29 @@ class SandboxRunnerTests(unittest.TestCase):
                     0o444,
                 )
 
+    @unittest.skipIf(os.name == "nt", "Los permisos POSIX no representan ACL de Windows.")
+    def test_runtime_bundle_rejects_extra_files(self):
+        os.chmod(self.runtime_dir, 0o755)
+        (self.runtime_dir / "unexpected.txt").write_text("not allowed", encoding="utf-8")
+        os.chmod(self.runtime_dir, 0o555)
+        with self.assertRaisesRegex(ToolExecutionError, "archivos ausentes o no autorizados"):
+            self.build_command("ruff", "sample.py", self.root.parent / "extra-runtime-evidence")
+
+    @unittest.skipIf(os.name == "nt", "Los permisos POSIX no representan ACL de Windows.")
+    def test_runtime_bundle_rejects_symlinked_modules(self):
+        module = self.runtime_dir / sandbox_runner.RUNTIME_MODULES[0]
+        outside = self.root / "outside-runtime.py"
+        outside.write_text("# external module", encoding="utf-8")
+        os.chmod(self.runtime_dir, 0o755)
+        module.unlink()
+        try:
+            module.symlink_to(outside)
+        except (OSError, NotImplementedError):
+            self.skipTest("symlinks unavailable")
+        os.chmod(self.runtime_dir, 0o555)
+        with self.assertRaisesRegex(ToolExecutionError, "módulo inseguro"):
+            self.build_command("ruff", "sample.py", self.root.parent / "symlink-runtime-evidence")
+
     def test_target_mount_rejects_docker_delimiters(self):
         bad_target = self.root / "bad,target.py"
         bad_target.write_text("print('bad')", encoding="utf-8")
