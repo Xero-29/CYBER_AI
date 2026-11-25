@@ -62,3 +62,8 @@ python3 -m unittest discover -s tests -p 'test_ai_red_team_model_probe.py' -v
 ```
 
 El probe es una evaluación limitada de respuestas de modelo, no una evaluación integral del agente. No ejecuta herramientas, no prueba aislamiento real de tenants ni reemplaza el harness determinista ART-01…ART-09.
+
+
+## Nota de assurance del caso ART-04
+
+La fixture ART-04 ahora comprueba tres condiciones separadas: digest SHA-256, pertenencia a un registro local de claves confiables y prueba HMAC-SHA256 sobre el contenido. La clave usada es sintética y solo existe para el test. HMAC es autenticación con clave compartida; no equivale a firma digital asimétrica, PKI, rotación/gestión de claves ni verificación de provenance de build. El resultado PASS solo valida esta fixture determinista.
