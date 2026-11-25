@@ -337,3 +337,13 @@ El contenido histórico que sigue registra implementaciones y validaciones de co
 5. Completar AI Red Team end-to-end y revisión independiente.
 6. Aplicar la misma metodología a las otras 46 especialidades.
 7. Solo después pasar a pruebas calientes del sistema completo.
+
+
+## Remediación ART-09 benchmark — 2026-11-25
+
+- Rama: `codex/foundations-ai-redteam-benchmark-remediation-2026-11-25`, apilada sobre PR #24; no modifica `main` ni integra PR #21–#24.
+- El harness ART-09 ahora valida esquema, IDs únicos, separación de splits, duplicados normalizados, near-duplicates heurísticos, separación de grupos de origen y denominadores por clase.
+- Se incorpora manifiesto sintético versionado y SHA-256 canónico. La licencia no se presume: queda pendiente de revisión explícita.
+- Se añaden regresiones para duplicados dentro de un split, IDs repetidos y fuga de grupos de origen.
+- Límite: el fixture sigue siendo pequeño y sintético. Ground truth independiente, tamaño/potencia estadística, representatividad y validez externa no están demostrados. ART-09 PASS solo valida los controles estructurales implementados.
+- **CI pendiente de comprobar en el HEAD final de esta rama.** No declarar esta remediación aprobada hasta revisar todos los jobs y resultados exactos.
