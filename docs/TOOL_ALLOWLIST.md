@@ -4,6 +4,8 @@ Los adaptadores locales exigen por defecto que el SHA-256 del ejecutable coincid
 
 La salida capturada se limita a 2.000.000 bytes (máximo 1.000.000 por flujo). Cualquier truncamiento marca el resultado como incompleto y bloquea el estado exitoso, aunque el proceso termine con código 0. Además, el ejecutor termina el grupo POSIX si observa más de 8.000.000 bytes de salida total. Estos límites no sustituyen cgroups ni una cuota de CPU/memoria del sistema operativo.
 
+La ejecución Docker no monta la raíz completa del repositorio. Antes de iniciar crea un árbol temporal de solo lectura con los siete módulos de runtime necesarios y monta por separado únicamente el objetivo seleccionado (y, si aplica, el archivo de configuración explícito). El árbol temporal rechaza archivos adicionales, enlaces, hardlinks y rutas con delimitadores de montaje. La evidencia se monta en una ruta privada distinta. Esto reduce la exposición accidental de archivos `.env`, datos, informes y otros archivos locales que no forman parte del objetivo.
+
 ## Configuración
 
 Define estas variables en el entorno del proceso:

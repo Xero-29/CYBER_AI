@@ -19,10 +19,14 @@ class SandboxRunnerTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.root = Path(self.temp.name)
         (self.root / "sample.py").write_text("print('safe')", encoding="utf-8")
+        for module in sandbox_runner.RUNTIME_MODULES:
+            (self.root / module).write_text("# test runtime module\\n", encoding="utf-8")
         self.root_patch = patch.object(sandbox_runner, "PROJECT_ROOT", self.root)
         self.root_patch.start()
         self.adapter_root_patch = patch.object(tool_adapters, "PROJECT_ROOT", self.root)
         self.adapter_root_patch.start()
+        self.runtime_temp = tempfile.TemporaryDirectory()
+        self.runtime_dir = sandbox_runner.prepare_runtime_bundle(self.runtime_temp.name)
         self.allowlist_temp = tempfile.TemporaryDirectory()
         self.allowlist_path = Path(self.allowlist_temp.name) / "tools.json"
         self.allowlist_key = "unit-test-hmac-key-" + "x" * 48
@@ -41,9 +45,14 @@ class SandboxRunnerTests(unittest.TestCase):
         })
         self.allowlist_env_patch.start()
 
+    def build_command(self, *args, **kwargs):
+        kwargs["runtime_dir"] = self.runtime_dir
+        return sandbox_runner.build_docker_command(*args, **kwargs)
+
     def tearDown(self):
         self.allowlist_env_patch.stop()
         self.allowlist_temp.cleanup()
+        self.runtime_temp.cleanup()
         self.adapter_root_patch.stop()
         self.root_patch.stop()
         self.temp.cleanup()
@@ -69,10 +78,44 @@ class SandboxRunnerTests(unittest.TestCase):
         self.assertIn("--pull=never", command)
         self.assertIn("readonly", joined)
         self.assertIn("dst=/evidence", joined)
+        runtime_mount = (
+            f"type=bind,src={self.runtime_dir},dst=/workspace,readonly"
+        )
+        target_mount = (
+            f"type=bind,src={(self.root / 'sample.py').resolve()},"
+            "dst=/workspace/target,readonly"
+        )
+        self.assertIn(runtime_mount, command)
+        self.assertIn(target_mount, command)
+        self.assertNotIn(
+            f"type=bind,src={self.root.resolve()},dst=/workspace,readonly",
+            joined,
+        )
         self.assertIn("CYBER_AI_LEDGER_PATH=/evidence/execution_ledger.sqlite3", command)
         self.assertIn("--require-ledger", command)
         self.assertNotIn("--privileged", command)
         self.assertNotIn("/var/run/docker.sock", joined)
+
+    def test_runtime_bundle_contains_only_minimal_modules_and_no_target_data(self):
+        self.assertEqual(
+            {item.name for item in self.runtime_dir.iterdir()},
+            set(sandbox_runner.RUNTIME_MODULES),
+        )
+        self.assertNotIn("sample.py", {item.name for item in self.runtime_dir.iterdir()})
+        if os.name == "posix":
+            self.assertEqual(stat.S_IMODE(self.runtime_dir.stat().st_mode), 0o555)
+            for name in sandbox_runner.RUNTIME_MODULES:
+                self.assertEqual(
+                    stat.S_IMODE((self.runtime_dir / name).stat().st_mode),
+                    0o444,
+                )
+
+    def test_target_mount_rejects_docker_delimiters(self):
+        bad_target = self.root / "bad,target.py"
+        bad_target.write_text("print('bad')", encoding="utf-8")
+        evidence = self.root.parent / (self.root.name + "-bad-target-evidence")
+        with self.assertRaisesRegex(ToolExecutionError, "delimitadores"):
+            self.build_command("ruff", "bad,target.py", evidence)
 
     def test_signed_allowlist_is_read_only_mounted_and_key_is_not_in_argv(self):
         evidence = self.root.parent / (self.root.name + "-signed-evidence")

@@ -7,16 +7,33 @@ import shutil
 import subprocess
 import stat
 import sys
+import tempfile
 import uuid
 from pathlib import Path
 
 from tool_adapters import TOOL_SPECS, ToolExecutionError, _confined_path, PROJECT_ROOT
 from tool_allowlist import ToolAllowlistError, load_signed_tool_allowlist
-from safe_io import SafeWriteError, ensure_private_directory
+from safe_io import (
+    SafeWriteError,
+    atomic_write_text,
+    ensure_private_directory,
+    read_regular_file,
+)
 from secret_redaction import redact_text
 
 
 DEFAULT_IMAGE = "cyber-ai-tool-sandbox:local"
+# El contenedor recibe únicamente estos módulos de runtime, no la raíz del repositorio.
+RUNTIME_MODULES = (
+    "tool_executor.py",
+    "tool_adapters.py",
+    "tool_allowlist.py",
+    "execution_ledger.py",
+    "process_isolation.py",
+    "safe_io.py",
+    "secret_redaction.py",
+)
+MAX_RUNTIME_MODULE_BYTES = 2_000_000
 # Debe coincidir con los binarios realmente instalados en sandbox/Dockerfile.
 SANDBOX_TOOLS = frozenset({"ruff", "bandit"})
 
@@ -35,6 +52,80 @@ def _docker_user_args(platform_name=None):
         )
     return [f"--user={host_uid}:{os.getgid()}"]
 
+
+
+def _paths_overlap(left, right):
+    return left == right or left in right.parents or right in left.parents
+
+
+def prepare_runtime_bundle(destination):
+    """Create a minimal, read-only runtime tree containing no repository data."""
+    path = Path(os.path.abspath(os.fspath(destination)))
+    if any(character in str(path) for character in (",", "\n", "\r")):
+        raise ToolExecutionError("La ruta del runtime contiene delimitadores no permitidos.")
+    project = PROJECT_ROOT.resolve()
+    if _paths_overlap(path, project):
+        raise ToolExecutionError("El runtime aislado no puede solaparse con el repositorio.")
+    try:
+        runtime = ensure_private_directory(path, create=True)
+        if any(runtime.iterdir()):
+            raise ToolExecutionError("El directorio temporal del runtime debe estar vacío.")
+        for name in RUNTIME_MODULES:
+            source = PROJECT_ROOT / name
+            raw = read_regular_file(source, max_bytes=MAX_RUNTIME_MODULE_BYTES)
+            content = raw.decode("utf-8")
+            destination_file = runtime / name
+            atomic_write_text(
+                destination_file,
+                content,
+                mode=0o600,
+                create_parents=False,
+            )
+            os.chmod(destination_file, 0o444)
+        os.chmod(runtime, 0o555)
+        return runtime.resolve(strict=True)
+    except ToolExecutionError:
+        raise
+    except (SafeWriteError, OSError, UnicodeError, ValueError) as error:
+        raise ToolExecutionError(
+            "No se pudo preparar el runtime mínimo y verificado de la sandbox."
+        ) from error
+
+
+def _validate_runtime_bundle(runtime_dir):
+    path = Path(os.path.abspath(os.fspath(runtime_dir)))
+    if any(character in str(path) for character in (",", "\n", "\r")):
+        raise ToolExecutionError("La ruta del runtime contiene delimitadores no permitidos.")
+    if path.is_symlink() or not path.is_dir():
+        raise ToolExecutionError("El runtime debe ser un directorio real.")
+    project = PROJECT_ROOT.resolve()
+    if _paths_overlap(path, project):
+        raise ToolExecutionError("El runtime aislado no puede solaparse con el repositorio.")
+    try:
+        info = path.stat(follow_symlinks=False)
+        if os.name != "nt" and (
+            info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) & 0o022
+        ):
+            raise ToolExecutionError("El runtime debe pertenecer al usuario y no ser modificable por terceros.")
+        entries = {item.name for item in path.iterdir()}
+        if entries != set(RUNTIME_MODULES):
+            raise ToolExecutionError("El runtime contiene archivos ausentes o no autorizados.")
+        reparse_flag = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
+        for name in RUNTIME_MODULES:
+            item = path / name
+            file_info = item.lstat()
+            if (
+                stat.S_ISLNK(file_info.st_mode)
+                or getattr(file_info, "st_file_attributes", 0) & reparse_flag
+                or not stat.S_ISREG(file_info.st_mode)
+                or file_info.st_size > MAX_RUNTIME_MODULE_BYTES
+                or (os.name == "posix" and file_info.st_nlink != 1)
+                or (os.name != "nt" and stat.S_IMODE(file_info.st_mode) & 0o022)
+            ):
+                raise ToolExecutionError("El runtime contiene un módulo inseguro.")
+    except OSError as error:
+        raise ToolExecutionError("No se pudo validar el runtime aislado.") from error
+    return path.resolve(strict=True)
 
 
 def _signed_allowlist_mount_args(tool_id):
@@ -89,7 +180,10 @@ def _signed_allowlist_mount_args(tool_id):
     ]
 
 
-def build_docker_command(tool_id, target, evidence_dir, image=DEFAULT_IMAGE, timeout=None, config=None):
+def build_docker_command(
+    tool_id, target, evidence_dir, image=DEFAULT_IMAGE, timeout=None, config=None,
+    *, runtime_dir,
+):
     if tool_id not in TOOL_SPECS:
         raise ToolExecutionError("Herramienta no registrada.")
     if tool_id not in SANDBOX_TOOLS:
@@ -101,7 +195,10 @@ def build_docker_command(tool_id, target, evidence_dir, image=DEFAULT_IMAGE, tim
     if not isinstance(image, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:/@-]{0,254}", image):
         raise ToolExecutionError("Nombre de imagen Docker inválido.")
     target_path = _confined_path(target)
-    relative_target = target_path.relative_to(PROJECT_ROOT).as_posix()
+    if any(character in str(target_path) for character in (",", "\n", "\r")):
+        raise ToolExecutionError("La ruta del objetivo contiene delimitadores no permitidos para Docker --mount.")
+    relative_target = "target"
+    runtime = _validate_runtime_bundle(runtime_dir)
     evidence = Path(evidence_dir)
     if any(character in str(evidence) for character in (",", "\\n", "\\r")):
         raise ToolExecutionError("La ruta de evidencias contiene caracteres no permitidos para Docker --mount.")
@@ -129,6 +226,8 @@ def build_docker_command(tool_id, target, evidence_dir, image=DEFAULT_IMAGE, tim
         pass
     else:
         raise ToolExecutionError("La carpeta de evidencias debe estar fuera del repositorio.")
+    if _paths_overlap(runtime, evidence):
+        raise ToolExecutionError("El runtime y las evidencias no pueden compartir rutas.")
 
     user_args = _docker_user_args()
     allowlist_args = _signed_allowlist_mount_args(tool_id)
@@ -145,7 +244,8 @@ def build_docker_command(tool_id, target, evidence_dir, image=DEFAULT_IMAGE, tim
         "--cpus=2",
         *user_args,
         "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=64m",
-        "--mount", f"type=bind,src={PROJECT_ROOT.resolve()},dst=/workspace,readonly",
+        "--mount", f"type=bind,src={runtime},dst=/workspace,readonly",
+        "--mount", f"type=bind,src={target_path},dst=/workspace/target,readonly",
         "--mount", f"type=bind,src={evidence},dst=/evidence",
         *allowlist_args,
         "--workdir=/workspace",
@@ -165,7 +265,15 @@ def build_docker_command(tool_id, target, evidence_dir, image=DEFAULT_IMAGE, tim
         command.extend(["--timeout", str(timeout)])
     if config:
         config_path = _confined_path(config)
-        command.extend(["--config", config_path.relative_to(PROJECT_ROOT).as_posix()])
+        if not config_path.is_file() or any(
+            character in str(config_path) for character in (",", "\n", "\r")
+        ):
+            raise ToolExecutionError("La configuración debe ser un archivo local válido para Docker --mount.")
+        command.extend([
+            "--mount",
+            f"type=bind,src={config_path},dst=/workspace/config,readonly",
+            "--config", "config",
+        ])
     return command
 
 
@@ -187,28 +295,32 @@ def main(argv=None):
         return 2
     container_name = None
     try:
-        command = build_docker_command(
-            args.tool, args.target, args.evidence_dir, args.image,
-            timeout=args.timeout, config=args.config,
-        )
-        container_name = command[command.index("--name") + 1]
-        effective_timeout = args.timeout or TOOL_SPECS[args.tool]["timeout"]
-        result = subprocess.run(
-            command, cwd=PROJECT_ROOT, check=False,
-            timeout=effective_timeout + 60,
-        )
-    except subprocess.TimeoutExpired:
-        if container_name:
-            for cleanup in (
-                ["docker", "kill", container_name],
-                ["docker", "rm", "--force", container_name],
-            ):
-                try:
-                    subprocess.run(cleanup, check=False, timeout=10)
-                except (OSError, subprocess.TimeoutExpired):
-                    pass
-        print("El proceso Docker superó el límite de tiempo del host; se solicitó eliminar el contenedor.", file=sys.stderr)
-        return 124
+        with tempfile.TemporaryDirectory(prefix="cyber-ai-sandbox-runtime-") as runtime_temp:
+            runtime_bundle = prepare_runtime_bundle(runtime_temp)
+            command = build_docker_command(
+                args.tool, args.target, args.evidence_dir, args.image,
+                timeout=args.timeout, config=args.config,
+                runtime_dir=runtime_bundle,
+            )
+            container_name = command[command.index("--name") + 1]
+            effective_timeout = args.timeout or TOOL_SPECS[args.tool]["timeout"]
+            try:
+                result = subprocess.run(
+                    command, cwd=PROJECT_ROOT, check=False,
+                    timeout=effective_timeout + 60,
+                )
+            except subprocess.TimeoutExpired:
+                if container_name:
+                    for cleanup in (
+                        ["docker", "kill", container_name],
+                        ["docker", "rm", "--force", container_name],
+                    ):
+                        try:
+                            subprocess.run(cleanup, check=False, timeout=10)
+                        except (OSError, subprocess.TimeoutExpired):
+                            pass
+                print("El proceso Docker superó el límite de tiempo del host; se solicitó eliminar el contenedor.", file=sys.stderr)
+                return 124
     except (ToolExecutionError, OSError) as exc:
         print(f"Ejecución denegada: {redact_text(str(exc))}", file=sys.stderr)
         return 2
