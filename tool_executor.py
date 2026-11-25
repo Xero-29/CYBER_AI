@@ -14,18 +14,27 @@ from execution_ledger import MAX_SQLITE_INTEGER, ExecutionLedger, _redact_text
 
 
 def _terminal_status(evidence):
-    status = evidence.get("status") if isinstance(evidence, dict) else None
     if not isinstance(evidence, dict):
         return "failed"
-    if evidence.get("output_truncated") is True or evidence.get("output_limit_exceeded") is True:
-        return "failed"
+    status = evidence.get("status")
     if status == "timeout":
         return "timeout"
     if status == "denied":
         return "denied"
-    return_code = evidence.get("return_code")
-    if status == "completed" and type(return_code) is int and return_code == 0:
-        return "completed"
+    if status == "completed":
+        output_flags = (
+            "output_truncated",
+            "output_limit_exceeded",
+            "output_limit_termination_failed",
+        )
+        if any(
+            type(evidence.get(flag)) is not bool or evidence[flag]
+            for flag in output_flags
+        ):
+            return "failed"
+        return_code = evidence.get("return_code")
+        if type(return_code) is int and return_code == 0:
+            return "completed"
     return "failed"
 
 
@@ -119,10 +128,18 @@ def main(argv=None):
         if not isinstance(evidence, dict):
             raise TypeError("El adaptador debe devolver un objeto de evidencia.")
         evidence = dict(evidence)
-        if evidence.get("output_truncated") is True or evidence.get("output_limit_exceeded") is True:
-            if evidence.get("status") == "completed":
+        if evidence.get("status") == "completed":
+            output_flags = (
+                "output_truncated",
+                "output_limit_exceeded",
+                "output_limit_termination_failed",
+            )
+            if any(type(evidence.get(flag)) is not bool for flag in output_flags):
+                evidence["status"] = "output_integrity_unknown"
+                evidence["tool_reported_success"] = False
+            elif any(evidence[flag] for flag in output_flags):
                 evidence["status"] = "output_incomplete"
-            evidence["tool_reported_success"] = False
+                evidence["tool_reported_success"] = False
         evidence_dir = os.environ.get("CYBER_AI_EVIDENCE_DIR")
         try:
             evidence_path = write_evidence(
@@ -195,10 +212,13 @@ def main(argv=None):
                         },
                         {
                             "name": "output_completeness",
-                            "passed": (
-                                evidence.get("output_truncated", False) is False
-                                and evidence.get("output_limit_exceeded", False) is False
-                                and evidence.get("output_limit_termination_failed", False) is False
+                            "passed": all(
+                                type(evidence.get(flag)) is bool and evidence[flag] is False
+                                for flag in (
+                                    "output_truncated",
+                                    "output_limit_exceeded",
+                                    "output_limit_termination_failed",
+                                )
                             ),
                             "evidence": {
                                 "output_bytes_observed": evidence.get("output_bytes_observed"),
@@ -227,7 +247,19 @@ def main(argv=None):
     print(json.dumps(evidence, ensure_ascii=False, indent=2))
     if evidence.get("status") == "denied":
         return 2
-    return 0 if evidence.get("status") == "completed" and evidence.get("return_code") == 0 else 1
+    return 0 if (
+        evidence.get("status") == "completed"
+        and type(evidence.get("return_code")) is int
+        and evidence.get("return_code") == 0
+        and all(
+            type(evidence.get(flag)) is bool and evidence[flag] is False
+            for flag in (
+                "output_truncated",
+                "output_limit_exceeded",
+                "output_limit_termination_failed",
+            )
+        )
+    ) else 1
 
 
 if __name__ == "__main__":

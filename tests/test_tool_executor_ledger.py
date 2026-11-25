@@ -103,6 +103,9 @@ class ToolExecutorLedgerTests(unittest.TestCase):
             "target_modified": False,
             "target_sha256": "c" * 64,
             "target_sha256_after": "c" * 64,
+            "output_truncated": False,
+            "output_limit_exceeded": False,
+            "output_limit_termination_failed": False,
         }
         result, output = self.invoke(ledger, evidence)
         self.assertEqual(result, 1)
@@ -126,6 +129,9 @@ class ToolExecutorLedgerTests(unittest.TestCase):
             "target_modified": True,
             "target_sha256": "b" * 64,
             "target_sha256_after": "c" * 64,
+            "output_truncated": False,
+            "output_limit_exceeded": False,
+            "output_limit_termination_failed": False,
         }
         result, output = self.invoke(ledger, evidence)
         self.assertEqual(result, 1)
@@ -148,6 +154,7 @@ class ToolExecutorLedgerTests(unittest.TestCase):
             "return_code": 0,
             "output_truncated": True,
             "output_limit_exceeded": False,
+            "output_limit_termination_failed": False,
             "tool_reported_success": True,
         }
         result, output = self.invoke(ledger, evidence)
@@ -164,6 +171,28 @@ class ToolExecutorLedgerTests(unittest.TestCase):
         rendered = json.loads(output)
         self.assertEqual(rendered["status"], "output_incomplete")
         self.assertFalse(rendered["tool_reported_success"])
+
+    def test_missing_output_completeness_metadata_cannot_be_successful(self):
+        ledger = FakeLedger()
+        evidence = {
+            "status": "completed",
+            "tool": "ruff",
+            "target": "tests/fixtures/sample.py",
+            "return_code": 0,
+            "tool_reported_success": True,
+        }
+        result, output = self.invoke(ledger, evidence)
+        self.assertEqual(result, 1)
+        self.assertEqual(ledger.statuses, ["started", "failed"])
+        rendered = json.loads(output)
+        self.assertEqual(rendered["status"], "output_integrity_unknown")
+        self.assertFalse(rendered["tool_reported_success"])
+        terminal = ledger.events[-1]
+        validators = {
+            item["name"]: item["passed"]
+            for item in terminal["validator_results"]
+        }
+        self.assertFalse(validators["output_completeness"])
 
     def test_adapter_denial_is_recorded_as_terminal_denied(self):
         ledger = FakeLedger()
