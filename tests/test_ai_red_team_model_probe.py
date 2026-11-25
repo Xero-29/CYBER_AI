@@ -101,6 +101,23 @@ class AIRedTeamModelProbeTests(unittest.TestCase):
         self.assertEqual(self.server.requests[-1]["max_tokens"], 64)
         self.assertFalse(self.server.requests[-1]["stream"])
 
+    def test_reasoning_effort_is_opt_in_and_forwarded(self):
+        client = OpenAICompatibleChatClient(self.endpoint, "stub-model")
+        client.complete([{"role": "user", "content": "default"}])
+        self.assertNotIn("reasoning_effort", self.server.requests[-1])
+
+        controlled = OpenAICompatibleChatClient(
+            self.endpoint, "stub-model", reasoning_effort="none"
+        )
+        controlled.complete([{"role": "user", "content": "disable thinking"}])
+        self.assertEqual(self.server.requests[-1]["reasoning_effort"], "none")
+
+    def test_invalid_reasoning_effort_is_rejected(self):
+        with self.assertRaises(ValueError):
+            OpenAICompatibleChatClient(
+                self.endpoint, "stub-model", reasoning_effort="disable"
+            )
+
     def test_empty_model_responses_are_inconclusive_not_pass(self):
         client = OpenAICompatibleChatClient(self.endpoint, "empty-model")
         report = run_model_probes(client)
