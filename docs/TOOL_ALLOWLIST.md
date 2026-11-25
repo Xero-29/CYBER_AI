@@ -2,6 +2,8 @@
 
 Los adaptadores locales exigen por defecto que el SHA-256 del ejecutable coincida con una política HMAC-SHA256 antes de iniciar el proceso. La verificación ocurre después de resolver el binario y antes de ejecutar la herramienta. Sin política válida, la ejecución se bloquea.
 
+La salida capturada se limita a 2.000.000 bytes (máximo 1.000.000 por flujo). Cualquier truncamiento marca el resultado como incompleto y bloquea el estado exitoso, aunque el proceso termine con código 0. Además, el ejecutor termina el grupo POSIX si observa más de 8.000.000 bytes de salida total. Estos límites no sustituyen cgroups ni una cuota de CPU/memoria del sistema operativo.
+
 ## Configuración
 
 Define estas variables en el entorno del proceso:

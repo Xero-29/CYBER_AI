@@ -26,6 +26,7 @@ from secret_redaction import redact_sensitive_data, redact_text
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 MAX_OUTPUT_BYTES = 2_000_000
+MAX_TOTAL_OUTPUT_BYTES = 8_000_000
 MAX_TARGET_BYTES = 100_000_000
 MAX_TARGET_FILES = 10_000
 DEFAULT_TIMEOUT = 180
@@ -278,6 +279,11 @@ def _run_local_tool_with_home(
     timestamp = datetime.now(timezone.utc).isoformat()
     captured = {"stdout": bytearray(), "stderr": bytearray()}
     stream_truncated = {"value": False}
+    output_limit_exceeded = threading.Event()
+    output_lock = threading.Lock()
+    output_bytes_observed = {"value": 0}
+    stream_bytes_observed = {"stdout": 0, "stderr": 0}
+    output_limit_termination_failed = {"value": False}
 
     def drain(stream, key):
         cap = MAX_OUTPUT_BYTES // 2
@@ -286,11 +292,33 @@ def _run_local_tool_with_home(
                 chunk = stream.read(65536)
                 if not chunk:
                     break
-                remaining = cap - len(captured[key])
-                if remaining > 0:
-                    captured[key].extend(chunk[:remaining])
-                if len(chunk) > remaining:
-                    stream_truncated["value"] = True
+                terminate = False
+                with output_lock:
+                    if output_limit_exceeded.is_set():
+                        return
+                    stream_bytes_observed[key] += len(chunk)
+                    output_bytes_observed["value"] += len(chunk)
+                    remaining = cap - len(captured[key])
+                    if remaining > 0:
+                        captured[key].extend(chunk[:remaining])
+                    if len(chunk) > remaining:
+                        stream_truncated["value"] = True
+                    if output_bytes_observed["value"] > MAX_TOTAL_OUTPUT_BYTES:
+                        output_limit_exceeded.set()
+                        stream_truncated["value"] = True
+                        terminate = True
+                if terminate and process is not None:
+                    try:
+                        os.killpg(process.pid, signal.SIGKILL)
+                    except ProcessLookupError:
+                        pass
+                    except OSError:
+                        output_limit_termination_failed["value"] = True
+                        try:
+                            process.kill()
+                        except OSError:
+                            pass
+                    return
         except (OSError, ValueError):
             # The owner closes the pipe after the reader has been joined or
             # the isolated process group has been terminated.
@@ -326,7 +354,14 @@ def _run_local_tool_with_home(
             process.wait()
             process_finished = True
             returncode = None
-        status = "timeout" if timed_out else "completed"
+        if timed_out:
+            status = "timeout"
+        elif output_limit_exceeded.is_set():
+            status = "output_limit_exceeded"
+        elif stream_truncated["value"]:
+            status = "output_truncated"
+        else:
+            status = "completed"
     except OSError as exc:
         raise ToolExecutionError("No se pudo iniciar el ejecutable.") from exc
     finally:
@@ -402,8 +437,20 @@ def _run_local_tool_with_home(
         "elapsed_seconds": round(time.monotonic() - started, 3),
         "status": status,
         "return_code": returncode,
-        "tool_reported_success": returncode == 0 and not binary_modified and not target_modified,
+        "tool_reported_success": (
+            returncode == 0
+            and not binary_modified
+            and not target_modified
+            and status == "completed"
+            and not truncated
+        ),
         "output_truncated": truncated,
+        "output_limit_exceeded": output_limit_exceeded.is_set(),
+        "output_bytes_observed": output_bytes_observed["value"],
+        "output_limit_bytes": MAX_TOTAL_OUTPUT_BYTES,
+        "stdout_bytes_observed": stream_bytes_observed["stdout"],
+        "stderr_bytes_observed": stream_bytes_observed["stderr"],
+        "output_limit_termination_failed": output_limit_termination_failed["value"],
         "stdout": out_text,
         "stderr": err_text,
         "parsed_json": parsed,

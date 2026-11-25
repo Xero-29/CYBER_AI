@@ -1,6 +1,7 @@
 import contextlib
 import io
 import json
+import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -26,20 +27,22 @@ class FakeLedger:
 class ToolExecutorLedgerTests(unittest.TestCase):
     def invoke(self, ledger, runner):
         output = io.StringIO()
-        with (
-            patch.object(tool_executor, "ExecutionLedger", return_value=ledger),
-            patch.object(tool_executor, "run_local_tool") as mocked_runner,
-            contextlib.redirect_stdout(output),
-            contextlib.redirect_stderr(io.StringIO()),
-        ):
-            if isinstance(runner, dict):
-                mocked_runner.return_value = runner
-            else:
-                mocked_runner.side_effect = runner
-            result = tool_executor.main([
-                "--tool", "ruff", "--target", "tests/fixtures/sample.py", "--execute",
-                "--require-ledger",
-            ])
+        with tempfile.NamedTemporaryFile() as artifact:
+            with (
+                patch.object(tool_executor, "ExecutionLedger", return_value=ledger),
+                patch.object(tool_executor, "run_local_tool") as mocked_runner,
+                patch.object(tool_executor, "write_evidence", return_value=artifact.name),
+                contextlib.redirect_stdout(output),
+                contextlib.redirect_stderr(io.StringIO()),
+            ):
+                if isinstance(runner, dict):
+                    mocked_runner.return_value = runner
+                else:
+                    mocked_runner.side_effect = runner
+                result = tool_executor.main([
+                    "--tool", "ruff", "--target", "tests/fixtures/sample.py", "--execute",
+                    "--require-ledger",
+                ])
         return result, output.getvalue()
 
     def test_ledger_initialization_failure_blocks_execution_by_default(self):
@@ -135,6 +138,32 @@ class ToolExecutorLedgerTests(unittest.TestCase):
         self.assertEqual(
             terminal["metadata"]["target_sha256_after"], "c" * 64
         )
+
+    def test_truncated_output_is_failed_and_recorded_as_incomplete(self):
+        ledger = FakeLedger()
+        evidence = {
+            "status": "completed",
+            "tool": "ruff",
+            "target": "tests/fixtures/sample.py",
+            "return_code": 0,
+            "output_truncated": True,
+            "output_limit_exceeded": False,
+            "tool_reported_success": True,
+        }
+        result, output = self.invoke(ledger, evidence)
+        self.assertEqual(result, 1)
+        self.assertEqual(ledger.statuses, ["started", "failed"])
+        terminal = ledger.events[-1]
+        self.assertEqual(terminal["status"], "failed")
+        validators = {
+            item["name"]: item["passed"]
+            for item in terminal["validator_results"]
+        }
+        self.assertTrue(validators["process_exit"])
+        self.assertFalse(validators["output_completeness"])
+        rendered = json.loads(output)
+        self.assertEqual(rendered["status"], "output_incomplete")
+        self.assertFalse(rendered["tool_reported_success"])
 
     def test_adapter_denial_is_recorded_as_terminal_denied(self):
         ledger = FakeLedger()

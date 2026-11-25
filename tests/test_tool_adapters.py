@@ -1,6 +1,7 @@
 import io
 import json
 import os
+import signal
 import stat
 import subprocess
 import tempfile
@@ -92,6 +93,48 @@ class ToolAdapterTests(unittest.TestCase):
         self.assertFalse(evidence["tool_binary_modified"])
         self.assertTrue(process.stdout.closed)
         self.assertTrue(process.stderr.closed)
+
+    def test_truncated_output_is_incomplete_even_when_tool_exits_zero(self):
+        process = FakeProcess(stdout=b"x" * (tool_adapters.MAX_OUTPUT_BYTES + 1))
+        provenance = {"resolved_path": "/usr/bin/ruff", "sha256": "a" * 64}
+        with (
+            patch.object(tool_adapters, "_hash_binary", return_value=provenance),
+            patch.object(tool_adapters.shutil, "which", return_value="/usr/bin/ruff"),
+            patch.object(
+                tool_adapters, "run_bounded_process",
+                return_value=_version_result("ruff 0.14.5"),
+            ),
+            patch.object(tool_adapters.subprocess, "Popen", return_value=process),
+        ):
+            evidence = run_local_tool("ruff", "sample.py")
+        self.assertEqual(evidence["return_code"], 0)
+        self.assertEqual(evidence["status"], "output_truncated")
+        self.assertTrue(evidence["output_truncated"])
+        self.assertFalse(evidence["output_limit_exceeded"])
+        self.assertFalse(evidence["tool_reported_success"])
+
+    def test_excessive_total_output_terminates_the_process_group(self):
+        process = FakeProcess(
+            stdout=b"x" * (tool_adapters.MAX_TOTAL_OUTPUT_BYTES + 1)
+        )
+        provenance = {"resolved_path": "/usr/bin/ruff", "sha256": "a" * 64}
+        with (
+            patch.object(tool_adapters, "_hash_binary", return_value=provenance),
+            patch.object(tool_adapters.shutil, "which", return_value="/usr/bin/ruff"),
+            patch.object(
+                tool_adapters, "run_bounded_process",
+                return_value=_version_result("ruff 0.14.5"),
+            ),
+            patch.object(tool_adapters.subprocess, "Popen", return_value=process),
+            patch.object(tool_adapters.os, "killpg") as killpg,
+        ):
+            evidence = run_local_tool("ruff", "sample.py")
+        killpg.assert_called_once_with(process.pid, signal.SIGKILL)
+        self.assertEqual(evidence["status"], "output_limit_exceeded")
+        self.assertTrue(evidence["output_truncated"])
+        self.assertTrue(evidence["output_limit_exceeded"])
+        self.assertFalse(evidence["tool_reported_success"])
+        self.assertFalse(evidence["output_limit_termination_failed"])
 
     @patch("tool_adapters.subprocess.Popen")
     @patch("tool_adapters.shutil.which", return_value="/usr/bin/ruff")

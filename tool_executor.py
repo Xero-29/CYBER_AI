@@ -15,11 +15,16 @@ from execution_ledger import MAX_SQLITE_INTEGER, ExecutionLedger, _redact_text
 
 def _terminal_status(evidence):
     status = evidence.get("status") if isinstance(evidence, dict) else None
+    if not isinstance(evidence, dict):
+        return "failed"
+    if evidence.get("output_truncated") is True or evidence.get("output_limit_exceeded") is True:
+        return "failed"
     if status == "timeout":
         return "timeout"
     if status == "denied":
         return "denied"
-    if status == "completed" and evidence.get("return_code") == 0:
+    return_code = evidence.get("return_code")
+    if status == "completed" and type(return_code) is int and return_code == 0:
         return "completed"
     return "failed"
 
@@ -114,6 +119,10 @@ def main(argv=None):
         if not isinstance(evidence, dict):
             raise TypeError("El adaptador debe devolver un objeto de evidencia.")
         evidence = dict(evidence)
+        if evidence.get("output_truncated") is True or evidence.get("output_limit_exceeded") is True:
+            if evidence.get("status") == "completed":
+                evidence["status"] = "output_incomplete"
+            evidence["tool_reported_success"] = False
         evidence_dir = os.environ.get("CYBER_AI_EVIDENCE_DIR")
         try:
             evidence_path = write_evidence(
@@ -182,6 +191,20 @@ def main(argv=None):
                             "evidence": {
                                 "sha256_before": evidence.get("target_sha256"),
                                 "sha256_after": evidence.get("target_sha256_after"),
+                            },
+                        },
+                        {
+                            "name": "output_completeness",
+                            "passed": (
+                                evidence.get("output_truncated", False) is False
+                                and evidence.get("output_limit_exceeded", False) is False
+                                and evidence.get("output_limit_termination_failed", False) is False
+                            ),
+                            "evidence": {
+                                "output_bytes_observed": evidence.get("output_bytes_observed"),
+                                "output_limit_bytes": evidence.get("output_limit_bytes"),
+                                "output_truncated": evidence.get("output_truncated"),
+                                "output_limit_exceeded": evidence.get("output_limit_exceeded"),
                             },
                         },
                     ],
