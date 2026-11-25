@@ -17,6 +17,7 @@ REQUIRED_FILES = (
     "requirements.txt",
     "requirements.lock",
     "tool_allowlist.py",
+    "template_integrity.py",
     "safe_io.py",
     "config/model_roles.json",
     "tests",
@@ -436,9 +437,18 @@ def collect_checks(root=PROJECT, python_version=None, module_lookup=None,
             approved_tools = load_signed_tool_allowlist(
                 candidate, str(allowlist_key).encode("utf-8")
             )
+            executable_count = sum(
+                not identifier.startswith("nuclei_template_")
+                for identifier in approved_tools
+            )
+            template_count = sum(
+                identifier.startswith("nuclei_template_")
+                for identifier in approved_tools
+            )
             add(
                 "tool_allowlist", "ok",
-                f"Firma HMAC válida; {len(approved_tools)} ejecutables aprobados.",
+                f"Firma HMAC válida; {executable_count} ejecutables y "
+                f"{template_count} plantillas Nuclei aprobadas.",
             )
         except ToolAllowlistError:
             add(

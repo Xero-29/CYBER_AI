@@ -14,9 +14,7 @@ import threading
 import time
 from collections import deque
 from pathlib import Path
-from urllib.parse import urlparse
-
-from execution_policy import AuthorizationError, authorize_target
+from execution_policy import AuthorizationError, authorize_target, canonicalize_target
 from execution_ledger import ExecutionLedger
 from secret_redaction import redact_sensitive_data, redact_text
 from binary_integrity import (
@@ -30,6 +28,7 @@ from template_integrity import (
     TemplateIntegrityError,
     hash_selected_templates,
     resolve_template_path,
+    verify_approved_templates,
 )
 
 
@@ -40,31 +39,14 @@ MAX_SCANNER_CONSOLE_LINES = 2_000
 
 
 def validate_target(target):
-    """Acepta únicamente URLs HTTP/HTTPS bien formadas."""
-    if (
-        not isinstance(target, str)
-        or not target.strip()
-        or any(ord(char) < 0x20 or ord(char) == 0x7F for char in target)
-    ):
-        raise ValueError("El objetivo debe ser una URL HTTP/HTTPS válida.")
+    """Validate and canonicalize a literal-IP URL before it can enter logs."""
     try:
-        parsed = urlparse(target.strip())
-    except ValueError as error:
-        raise ValueError("El objetivo debe ser una URL HTTP/HTTPS válida.") from error
-    target = target.strip()
-
-    if (
-        parsed.scheme not in ("http", "https")
-        or not parsed.hostname
-        or parsed.username
-        or parsed.password
-    ):
+        return canonicalize_target(target)
+    except AuthorizationError as error:
         raise ValueError(
-            "Usa una URL HTTP/HTTPS autorizada, por ejemplo "
-            "http://127.0.0.1:8765"
-        )
-
-    return target
+            "El objetivo debe ser una URL HTTP/HTTPS inequívoca con IP literal, "
+            "sin credenciales, query ni fragmento."
+        ) from error
 
 
 def _terminate_process_tree(process):
@@ -265,6 +247,7 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
         }
 
     template_root = Path.home() / "nuclei-templates"
+    template_allowlist_provenance = {"enforced": False}
     template_candidates = [
         template_root / "http/technologies/bulma-detect.yaml",
         template_root / "http/misconfiguration/http-missing-security-headers.yaml",
@@ -274,6 +257,7 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
             [{"path": str(path)} for path in template_candidates],
             template_root,
         )
+        template_allowlist_provenance = verify_approved_templates(templates_before)
         template_paths = [
             resolve_template_path(path, template_root)
             for path in template_candidates
@@ -428,6 +412,7 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
                         template_root,
                     )
                     templates_modified = templates_after != templates_before
+                    verify_approved_templates(templates_after)
                 except TemplateIntegrityError:
                     templates_after = []
                     templates_modified = True
@@ -445,6 +430,7 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
                     "tool_allowlist": binary_provenance["allowlist"],
                     "templates_before": templates_before,
                     "templates_after": templates_after,
+                    "template_allowlist": template_allowlist_provenance,
                     "templates_modified": templates_modified,
                     "findings": [],
                 }
@@ -517,6 +503,7 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
             template_root,
         )
         templates_modified = templates_after != templates_before
+        verify_approved_templates(templates_after)
     except TemplateIntegrityError:
         templates_after = []
         templates_modified = True
@@ -584,6 +571,7 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
         "tool_allowlist": binary_provenance["allowlist"],
         "templates_before": templates_before,
         "templates_after": templates_after,
+        "template_allowlist": template_allowlist_provenance,
         "templates_modified": templates_modified,
         "discarded_findings_count": discarded_findings,
         "findings_count": len(findings),

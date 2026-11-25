@@ -1,6 +1,9 @@
 import hashlib
+import io
+import sys
 import tempfile
 import unittest
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
 
@@ -37,6 +40,27 @@ class TaskRunnerLedgerTests(unittest.TestCase):
             grant = task_runner._revalidate_target_authorization(target, "auth-7")
         self.assertEqual(grant["authorization_id"], "auth-7")
         authorize.assert_called_once_with(target, "nuclei_scan", "auth-7")
+
+    def test_safe_task_label_redacts_credentials_and_rejects_controls(self):
+        self.assertEqual(
+            task_runner._safe_task_label("audit token=secret-value"),
+            "audit token=[REDACTED]",
+        )
+        with self.assertRaises(ValueError):
+            task_runner._safe_task_label("audit\\nsecond-line")
+
+    def test_query_secret_is_rejected_before_cli_output_or_ledger(self):
+        secret = "never-print-this-query-secret"
+        argv = [
+            "task_runner.py", "--task", "web headers",
+            "--target", f"https://198.51.100.25/?token={secret}",
+        ]
+        output = io.StringIO()
+        with patch.object(sys, "argv", argv):
+            with redirect_stdout(output), redirect_stderr(output):
+                with self.assertRaises(SystemExit):
+                    task_runner.main()
+        self.assertNotIn(secret, output.getvalue())
 
     def test_prelaunch_revalidation_propagates_revocation(self):
         with patch(

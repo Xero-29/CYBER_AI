@@ -1,4 +1,4 @@
-# Allowlist firmada de ejecutables
+# Allowlist HMAC de ejecutables y plantillas Nuclei
 
 Los adaptadores locales exigen por defecto que el SHA-256 del ejecutable coincida con una política HMAC-SHA256 antes de iniciar el proceso. La verificación ocurre después de resolver el binario y antes de ejecutar la herramienta. Sin política válida, la ejecución se bloquea.
 
@@ -31,7 +31,9 @@ El manifiesto contiene el identificador de cada herramienta y el SHA-256 exacto 
 }
 ```
 
-La firma se calcula sobre el JSON canónico sin el campo `signature`. Para firmar durante un proceso de enrolamiento controlado:
+La firma se calcula sobre el JSON canónico sin el campo `signature`. El mismo manifiesto incluye también las plantillas Nuclei aprobadas: cada entrada usa el ID determinista `template_allowlist_id(ruta_relativa)` y el SHA-256 exacto del archivo. Nuclei exige esas entradas incluso si `CYBER_AI_TOOL_ALLOWLIST_REQUIRED=0`; el modo de compatibilidad nunca autoriza plantillas de red.
+
+Para firmar durante un proceso de enrolamiento controlado, inspecciona primero el contenido y el alcance de cada plantilla, calcula sus hashes y agrega las entradas al mismo diccionario `tools`:
 
 ```python
 import json
@@ -39,7 +41,27 @@ import os
 from pathlib import Path
 from tool_allowlist import sign_tool_allowlist
 
-tools = {"ruff": {"sha256": "SHA256_REAL_DEL_BINARIO"}}
+from template_integrity import hash_selected_templates, template_allowlist_id
+
+tools = {"ruff": {"sha256": "SHA256_REAL_DEL_BINARIO"},
+         "nuclei": {"sha256": "SHA256_REAL_DEL_BINARIO_NUCLEI"}}
+template_root = Path.home() / "nuclei-templates"
+template_paths = [
+    "http/technologies/bulma-detect.yaml",
+    "http/misconfiguration/http-missing-security-headers.yaml",
+    "http/technologies/tech-detect.yaml",
+    "http/technologies/favicon-detect.yaml",
+    "http/misconfiguration/cookies-without-secure.yaml",
+    "http/misconfiguration/cookies-without-httponly.yaml",
+    "http/misconfiguration/missing-cookie-samesite-strict.yaml",
+]
+evidence = hash_selected_templates(
+    [{"path": str(template_root / item)} for item in template_paths],
+    template_root,
+)
+for item in evidence:
+    tools[template_allowlist_id(item["path"])] = {"sha256": item["sha256"]}
+
 key = os.environ["CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY"].encode("utf-8")
 document = sign_tool_allowlist(tools, key)
 Path("tools.signed.json").write_text(
@@ -55,6 +77,7 @@ Protege la clave y el manifiesto por separado. No guardes la clave en Git, no la
 
 - `tool_adapters.run_local_tool` consulta la allowlist antes de iniciar cualquier adaptador host.
 - `tool_executor.py` recibe la política a través de esa ruta y conserva su resultado en la evidencia y el ledger.
+- `nuclei_scanner.py` y `task_runner.py` exigen IDs `nuclei_template_*` y hashes exactos para todas las plantillas seleccionadas; vuelven a comprobar la firma y los hashes antes de aceptar resultados.
 - `preflight.py` valida la firma/configuración sin iniciar herramientas ni usar red. En modo obligatorio, una política ausente o inválida bloquea el preflight.
 - El preflight muestra el número de ejecutables aprobados, nunca el secreto HMAC.
 - Las pruebas `tests/test_tool_allowlist.py`, `tests/test_tool_adapters_allowlist.py` y `tests/test_preflight_tool_allowlist.py` cubren firma, manipulación, claves duplicadas, límites, symlinks, denegación previa al proceso y diagnóstico.
@@ -62,7 +85,7 @@ Protege la clave y el manifiesto por separado. No guardes la clave en Git, no la
 ## Límites
 
 - HMAC es simétrico: cualquier verificador que posea la clave también puede firmar. Custodia, rotación, revocación y segregación de funciones requieren un gestor externo/KMS/HSM. Para separar firmantes y verificadores, se necesita una firma asimétrica y una política de claves públicas.
-- La allowlist autentica la correspondencia entre ID de herramienta y hash; no prueba por sí sola la procedencia legítima del binario. El enrolamiento debe verificar origen, firma del proveedor, versión y licencia antes de aprobarlo.
+- La allowlist autentica la correspondencia entre ID de herramienta/plantilla y hash; no prueba por sí sola que el contenido sea seguro. El enrolamiento debe revisar manualmente el origen, la licencia y el comportamiento de red de cada plantilla antes de firmarla.
 - La comprobación de hash no elimina todas las carreras TOCTOU frente a un atacante con control concurrente del host. Usa directorios de instalación inmutables y permisos restrictivos; no confíes en ella como frontera frente a administradores maliciosos.
 - No aísla el proceso, no impide egress y no sustituye Docker endurecido, microVM o VM desechable.
 - La política no activa automáticamente la ejecución de herramientas ni autoriza objetivos externos; los controles de objetivo y confirmación siguen siendo independientes.

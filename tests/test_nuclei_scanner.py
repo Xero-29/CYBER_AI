@@ -20,6 +20,7 @@ from nuclei_scanner import (
 from execution_ledger import ExecutionLedger
 from binary_integrity import BinaryIntegrityError
 from execution_policy import AuthorizationError
+from template_integrity import TemplateIntegrityError
 
 
 class FakeProcess:
@@ -48,8 +49,14 @@ class NucleiScannerTests(unittest.TestCase):
             return_value={"authorization_id": "test-grant"},
         )
         self.authorization.start()
+        self.template_allowlist = patch(
+            "nuclei_scanner.verify_approved_templates",
+            return_value={"enforced": True, "approved_template_ids": ["test-template"]},
+        )
+        self.template_allowlist.start()
 
     def tearDown(self):
+        self.template_allowlist.stop()
         self.authorization.stop()
         self.ledger_env.stop()
         self.temp.cleanup()
@@ -146,6 +153,19 @@ class NucleiScannerTests(unittest.TestCase):
     def test_validate_target_rejects_invalid_scheme(self):
         with self.assertRaises(ValueError):
             validate_target("ftp://127.0.0.1")
+
+    def test_validate_target_rejects_query_and_sensitive_path_values(self):
+        for target in (
+            "https://8.8.8.8/?token=secret-value",
+            "https://8.8.8.8/token=secret-value",
+        ):
+            with self.subTest(target=target):
+                with self.assertRaises(ValueError):
+                    validate_target(target)
+
+    def test_validate_target_rejects_dns_names_before_logging(self):
+        with self.assertRaises(ValueError):
+            validate_target("https://example.com")
 
     def test_validate_target_rejects_embedded_credentials(self):
         with self.assertRaises(ValueError):
@@ -455,6 +475,35 @@ class NucleiScannerTests(unittest.TestCase):
                             )
             self.assertEqual(result["status"], "template_denied")
             popen.assert_not_called()
+
+    def test_unapproved_template_blocks_process_start(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            executable = root / "nuclei"
+            executable.write_bytes(b"nuclei-test-binary")
+            self._create_templates(root)
+            provenance = {
+                "resolved_path": str(executable),
+                "sha256": "a" * 64,
+                "allowlist": {"enforced": True, "status": "approved"},
+            }
+            with (
+                patch("nuclei_scanner.shutil.which", return_value=str(executable)),
+                patch("nuclei_scanner.require_approved_executable", return_value=provenance),
+                patch("nuclei_scanner.Path.home", return_value=root),
+                patch(
+                    "nuclei_scanner.verify_approved_templates",
+                    side_effect=TemplateIntegrityError("template not approved"),
+                ),
+                patch("nuclei_scanner.subprocess.Popen") as popen,
+            ):
+                result = scan_target(
+                    "http://127.0.0.1:8765",
+                    authorized=True,
+                    authorization_id="test-grant",
+                )
+        self.assertEqual(result["status"], "template_denied")
+        popen.assert_not_called()
 
     def test_template_replacement_discards_scan_findings(self):
         finding = {"template-id": "untrusted", "matched-at": "http://127.0.0.1:8765"}

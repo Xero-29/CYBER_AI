@@ -11,10 +11,9 @@ import tempfile
 import time
 import uuid
 from pathlib import Path
-from urllib.parse import urlparse
 
 from capability_selector import select_capabilities
-from execution_policy import AuthorizationError, authorize_target
+from execution_policy import AuthorizationError, authorize_target, canonicalize_target
 from execution_ledger import ExecutionLedger
 from secret_redaction import redact_sensitive_data, redact_text
 from binary_integrity import (
@@ -28,11 +27,24 @@ from process_isolation import ProcessIsolationError, run_bounded_process
 from template_integrity import (
     hash_selected_templates as _hash_selected_templates,
     safe_template_path as _safe_template_path,
+    verify_approved_templates,
 )
 
 
 MAX_SCAN_OUTPUT_BYTES = 20 * 1024 * 1024
 MAX_FINDINGS = 10000
+
+
+def _safe_task_label(task):
+    """Bound and redact the free-text task label before logging or persistence."""
+    if (
+        not isinstance(task, str)
+        or not task.strip()
+        or len(task) > 512
+        or any(ord(char) < 0x20 or ord(char) == 0x7F for char in task)
+    ):
+        raise ValueError("La descripción de tarea debe ser texto breve sin controles.")
+    return redact_text(task.strip())
 
 
 def _record_task_scan(task, target, report, started, authorization_id=None, start_event_id=None):
@@ -76,7 +88,7 @@ def main():
     parser.add_argument(
         "--confirm-authorized",
         action="store_true",
-        help="Confirmación interactiva adicional del operador",
+        help="Confirmación explícita adicional del operador (no abre un diálogo interactivo)",
     )
     parser.add_argument(
         "--authorization-id",
@@ -93,21 +105,21 @@ def main():
     )
     parser.set_defaults(require_ledger=True)
     args = parser.parse_args()
-
-    parsed = urlparse(args.target)
+    selection_task = args.task
+    try:
+        args.target = canonicalize_target(args.target)
+        args.task = _safe_task_label(selection_task)
+    except (AuthorizationError, ValueError):
+        parser.error(
+            "Indica un destino IP HTTP/HTTPS inequívoco, sin credenciales, query ni fragmento, "
+            "y una descripción breve de tarea."
+        )
     task_started = time.monotonic()
-    if (
-        parsed.scheme not in ("http", "https")
-        or not parsed.hostname
-        or parsed.username
-        or parsed.password
-    ):
-        parser.error("Indica una URL HTTP/HTTPS válida.")
 
     # Solo permitir inicialmente comprobaciones de tecnologías
     # y configuraciones; excluimos otras familias de plantillas.
     root = Path.home() / "nuclei-templates"
-    candidates = select_capabilities(args.task, limit=20000)
+    candidates = select_capabilities(selection_task, limit=20000)
     safe_candidates = []
     for item in candidates:
         safe_path = _safe_template_path(item.get("path", ""), root)
@@ -217,6 +229,7 @@ def main():
 
     try:
         template_provenance = _hash_selected_templates(selected, root)
+        template_allowlist_provenance = verify_approved_templates(template_provenance)
     except (OSError, ValueError) as error:
         print("ERROR: integridad de plantillas no válida:", error, file=sys.stderr)
         recorded = _record_task_scan(
@@ -331,6 +344,7 @@ def main():
             try:
                 templates_after = _hash_selected_templates(selected, root)
                 templates_modified = templates_after != template_provenance
+                verify_approved_templates(templates_after)
             except (OSError, ValueError):
                 templates_after = []
                 templates_modified = True
@@ -345,6 +359,7 @@ def main():
                 "tool_allowlist": binary_provenance["allowlist"],
                 "templates_before": template_provenance,
                 "templates_after": templates_after,
+                "template_allowlist": template_allowlist_provenance,
                 "templates_modified": templates_modified,
                 "scanner_output": scanner_output,
                 "output_truncated": process_result["output_truncated"],
@@ -401,6 +416,7 @@ def main():
         try:
             templates_after = _hash_selected_templates(selected, root)
             templates_modified = templates_after != template_provenance
+            verify_approved_templates(templates_after)
         except (OSError, ValueError):
             templates_after = []
             templates_modified = True
@@ -431,6 +447,7 @@ def main():
             "templates_used": [item["path"] for item in selected],
             "templates_before": template_provenance,
             "templates_after": templates_after,
+            "template_allowlist": template_allowlist_provenance,
             "templates_modified": templates_modified,
             "findings_count": len(findings),
             "discarded_findings_count": discarded_findings_count,

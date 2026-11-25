@@ -8,7 +8,7 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 import execution_policy
-from execution_policy import AuthorizationError, authorize_target
+from execution_policy import AuthorizationError, authorize_target, canonicalize_target
 
 
 class ExecutionPolicyTests(unittest.TestCase):
@@ -42,6 +42,20 @@ class ExecutionPolicyTests(unittest.TestCase):
             encoding="utf-8",
         )
         self.policy.chmod(0o600)
+
+    def test_canonicalize_target_rejects_query_fragment_dns_and_sensitive_paths(self):
+        for target in (
+            "https://8.8.8.8/?token=secret-value",
+            "https://8.8.8.8/path#fragment",
+            "https://8.8.8.8/token=secret-value",
+            "https://example.com",
+        ):
+            with self.subTest(target=target):
+                with self.assertRaises(AuthorizationError):
+                    canonicalize_target(target)
+
+    def test_canonicalize_target_normalizes_root_slash_and_default_port(self):
+        self.assertEqual(canonicalize_target("https://8.8.8.8:443/"), "https://8.8.8.8")
 
     def test_exact_target_and_action_grant_is_accepted(self):
         result = authorize_target(

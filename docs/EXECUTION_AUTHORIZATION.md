@@ -68,7 +68,7 @@ Una política vacía no concede permisos y puede permanecer como plantilla versi
 
 ## Integridad del escáner Nuclei
 
-Los dos puntos de entrada activos (`nuclei_scanner.py` y `task_runner.py`) exigen una entrada HMAC firmada para el identificador `nuclei`; si falta la política, el binario no coincide o el archivo no puede verificarse, el proceso no inicia. El ejecutable se resuelve y se hashea antes de ejecutarlo; después se vuelve a hashear y, si cambió o no puede verificarse, se descartan los hallazgos y el resultado queda como `integrity_error`.
+Los dos puntos de entrada activos (`nuclei_scanner.py` y `task_runner.py`) exigen una entrada HMAC firmada para el identificador `nuclei`; si falta la política, el binario no coincide o el archivo no puede verificarse, el proceso no inicia. También exigen una entrada `nuclei_template_*` por cada plantilla seleccionada, ligada a su ruta relativa y SHA-256 exacto. Una plantilla sin aprobación, modificada o revocada bloquea el lanzamiento o descarta los resultados. La comprobación se repite antes de aceptar hallazgos. El opt-out general de allowlist no omite esta barrera de Nuclei.
 
 La allowlist general puede seguir en modo de compatibilidad para herramientas locales, pero Nuclei —por realizar conexiones activas— no admite ese modo. Consulta [la guía de allowlist firmada](TOOL_ALLOWLIST.md) para enrolar el binario fuera del repositorio. La clave HMAC y el manifiesto real deben permanecer fuera de Git.
 
@@ -85,7 +85,7 @@ python task_runner.py --task "revisión de cabeceras" \
   --confirm-authorized --authorization-id CHG-2026-0001
 ```
 
-La confirmación del operador es una barrera adicional; no sustituye al permiso local. El ID no concede acceso por sí solo: destino, acción, responsable, ticket y expiración deben coincidir.
+La confirmación del operador es una bandera explícita de CLI; no abre un diálogo interactivo y no sustituye al permiso local. El ID no concede acceso por sí solo: destino, acción, responsable, ticket y expiración deben coincidir. Los destinos se canonizan antes de mostrarse o registrarse; se rechazan query, fragmentos, credenciales, nombres DNS y patrones sensibles en la ruta.
 
 ## Límites conocidos y trabajo pendiente
 

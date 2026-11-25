@@ -50,7 +50,11 @@ class PreflightToolAllowlistTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             manifest = sign_tool_allowlist(
-                {"ruff": {"sha256": "a" * 64}}, key.encode("utf-8")
+                {
+                    "ruff": {"sha256": "a" * 64},
+                    "nuclei_template_example_12345678": {"sha256": "b" * 64},
+                },
+                key.encode("utf-8"),
             )
             path = root / "tools.json"
             path.write_text(json.dumps(manifest), encoding="utf-8")
@@ -65,6 +69,7 @@ class PreflightToolAllowlistTests(unittest.TestCase):
         self.assertEqual(check["status"], "ok")
         self.assertNotIn(key, check["detail"])
         self.assertIn("1 ejecutables", check["detail"])
+        self.assertIn("1 plantillas Nuclei", check["detail"])
 
     def test_preflight_warns_when_unlogged_execution_override_is_active(self):
         with tempfile.TemporaryDirectory() as temp:

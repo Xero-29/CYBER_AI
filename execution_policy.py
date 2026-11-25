@@ -12,6 +12,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
+from secret_redaction import redact_text
+
 
 PROJECT = Path(__file__).resolve().parent
 DEFAULT_AUTHORIZATIONS = PROJECT / "config" / "authorized_targets.json"
@@ -106,7 +108,16 @@ def _canonical_target(target):
     # Only collapse the empty path and root slash. A trailing slash on
     # any other path can identify a different resource and must remain scoped.
     path = "" if parsed.path in {"", "/"} else parsed.path
-    return urlunsplit((parsed.scheme, netloc, path, "", "")), address
+    canonical = urlunsplit((parsed.scheme, netloc, path, "", ""))
+    if redact_text(canonical) != canonical:
+        raise AuthorizationError("El destino parece contener credenciales o material sensible.")
+    return canonical, address
+
+
+def canonicalize_target(target):
+    """Validate and normalize a target before it is displayed or persisted."""
+    canonical, _ = _canonical_target(target)
+    return canonical
 
 
 def _validate_grants(grants):

@@ -1,4 +1,5 @@
 import hashlib
+import json
 import os
 import tempfile
 import unittest
@@ -9,7 +10,10 @@ from template_integrity import (
     TemplateIntegrityError,
     hash_selected_templates,
     resolve_template_path,
+    template_allowlist_id,
+    verify_approved_templates,
 )
+from tool_allowlist import sign_tool_allowlist
 
 
 class TemplateIntegrityTests(unittest.TestCase):
@@ -71,6 +75,85 @@ class TemplateIntegrityTests(unittest.TestCase):
         self.template.write_bytes(b"x" * (2 * 1024 * 1024 + 1))
         with self.assertRaises(TemplateIntegrityError):
             resolve_template_path(self.template, self.root)
+
+    def test_template_allowlist_id_is_stable_and_rejects_traversal(self):
+        first = template_allowlist_id("http/technologies/tech-detect.yaml")
+        self.assertEqual(first, template_allowlist_id("http/technologies/tech-detect.yaml"))
+        self.assertTrue(first.startswith("nuclei_template_"))
+        self.assertLessEqual(len(first), 64)
+        with self.assertRaises(TemplateIntegrityError):
+            template_allowlist_id("../outside.yaml")
+
+    def _write_signed_template_manifest(self, entries, key):
+        path = Path(self.temp.name) / "tools.signed.json"
+        document = sign_tool_allowlist(entries, key)
+        path.write_text(
+            json.dumps(document, sort_keys=True, separators=(",", ":")) + "\\n",
+            encoding="utf-8",
+        )
+        if os.name != "nt":
+            path.chmod(0o600)
+        return path
+
+    def test_approved_templates_require_signed_manifest(self):
+        with patch.dict(os.environ, {
+            "CYBER_AI_TOOL_ALLOWLIST_PATH": "",
+            "CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY": "",
+        }):
+            with self.assertRaisesRegex(TemplateIntegrityError, "allowlist HMAC"):
+                verify_approved_templates([{"path": "http/test.yaml", "sha256": "a" * 64}])
+
+    def test_approved_templates_accept_exact_signed_path_and_hash(self):
+        key = b"template-allowlist-test-key-material-32-bytes"
+        relative = "http/technologies/tech-detect.yaml"
+        identifier = template_allowlist_id(relative)
+        manifest = self._write_signed_template_manifest(
+            {identifier: {"sha256": "a" * 64}}, key
+        )
+        with patch.dict(os.environ, {
+            "CYBER_AI_TOOL_ALLOWLIST_PATH": str(manifest),
+            "CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY": key.decode("utf-8"),
+        }):
+            result = verify_approved_templates([{"path": relative, "sha256": "a" * 64}])
+        self.assertTrue(result["enforced"])
+        self.assertEqual(result["approved_template_ids"], [identifier])
+
+    def test_approved_templates_reject_hash_mismatch(self):
+        key = b"template-allowlist-test-key-material-32-bytes"
+        relative = "http/technologies/tech-detect.yaml"
+        manifest = self._write_signed_template_manifest(
+            {template_allowlist_id(relative): {"sha256": "a" * 64}}, key
+        )
+        with patch.dict(os.environ, {
+            "CYBER_AI_TOOL_ALLOWLIST_PATH": str(manifest),
+            "CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY": key.decode("utf-8"),
+        }):
+            with self.assertRaisesRegex(TemplateIntegrityError, "no está aprobada"):
+                verify_approved_templates([{"path": relative, "sha256": "b" * 64}])
+
+    def test_approved_templates_reject_manifest_inside_repository(self):
+        key = b"template-allowlist-test-key-material-32-bytes"
+        manifest = self.root / "tools.signed.json"
+        manifest.write_text("{}", encoding="utf-8")
+        with patch("template_integrity.PROJECT_ROOT", self.root):
+            with patch.dict(os.environ, {
+                "CYBER_AI_TOOL_ALLOWLIST_PATH": str(manifest),
+                "CYBER_AI_TOOL_ALLOWLIST_HMAC_KEY": key.decode("utf-8"),
+            }):
+                with self.assertRaisesRegex(TemplateIntegrityError, "fuera del repositorio"):
+                    verify_approved_templates([{"path": "http/test.yaml", "sha256": "a" * 64}])
+
+    def test_rejects_hardlinked_template(self):
+        with tempfile.TemporaryDirectory() as outside:
+            source = Path(outside) / "source.yaml"
+            source.write_text("id: linked\\n", encoding="utf-8")
+            linked = self.template.parent / "linked.yaml"
+            try:
+                os.link(source, linked)
+            except OSError:
+                self.skipTest("hardlinks unavailable")
+            with self.assertRaises(TemplateIntegrityError):
+                resolve_template_path(linked, self.root)
 
     def test_detects_replacement_after_open(self):
         real_open = os.open
