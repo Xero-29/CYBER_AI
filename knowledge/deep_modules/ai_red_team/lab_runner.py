@@ -44,10 +44,23 @@ def _retrieve_for_tenant(principal_tenant: str,
     return [doc for doc in documents if doc.get("tenant_id") == principal_tenant]
 
 
-def _verify_document(content: bytes, expected_sha256: str,
-                     signer: str, allowed_signers: set[str]) -> bool:
-    actual = hashlib.sha256(content).hexdigest()
-    return signer in allowed_signers and hmac.compare_digest(actual, expected_sha256)
+def _verify_document(content: bytes, expected_sha256: str, signer: str,
+                     signature: str,
+                     trusted_signer_keys: dict[str, bytes]) -> bool:
+    """Verify content digest and a synthetic HMAC signer proof.
+
+    HMAC models shared-key authentication for this fixture. It is not a
+    public-key digital signature and must not be treated as production PKI.
+    """
+    key = trusted_signer_keys.get(signer)
+    if not key:
+        return False
+    actual_digest = hashlib.sha256(content).hexdigest()
+    expected_signature = hmac.new(key, content, hashlib.sha256).hexdigest()
+    return (
+        hmac.compare_digest(actual_digest, expected_sha256)
+        and hmac.compare_digest(expected_signature, signature)
+    )
 
 
 def _tool_allowed(role: str, tool: str, owner_id: str,
@@ -196,19 +209,31 @@ def run_suite() -> dict[str, Any]:
 
     original = b"approved synthetic knowledge record v1"
     digest = hashlib.sha256(original).hexdigest()
-    intact = _verify_document(original, digest, "signer-approved", {"signer-approved"})
-    tampered = _verify_document(original + b" altered", digest, "signer-approved", {"signer-approved"})
-    unknown_signer = _verify_document(original, digest, "signer-unknown", {"signer-approved"})
+    signer_keys = {"signer-approved": b"synthetic-fixture-key-not-for-production"}
+    signature = hmac.new(signer_keys["signer-approved"], original, hashlib.sha256).hexdigest()
+    intact = _verify_document(original, digest, "signer-approved", signature, signer_keys)
+    tampered = _verify_document(
+        original + b" altered", digest, "signer-approved", signature, signer_keys
+    )
+    unknown_signer = _verify_document(
+        original, digest, "signer-unknown", signature, signer_keys
+    )
+    forged_signature = _verify_document(
+        original, digest, "signer-approved", "0" * 64, signer_keys
+    )
     results.append(_case(
-        "ART-04", "Corpus integrity and signer authorization are checked",
+        "ART-04", "Corpus integrity and cryptographic source authentication are checked",
         {
             "approved_document_accepted": intact,
             "tampered_document_rejected": not tampered,
             "unknown_signer_rejected": not unknown_signer,
+            "forged_signature_rejected": not forged_signature,
         },
         {"tampered_documents_accepted": int(tampered),
-         "unauthorized_signers_accepted": int(unknown_signer)},
-        {"expected_sha256": digest, "signer": "signer-approved"},
+         "unauthorized_signers_accepted": int(unknown_signer),
+         "forged_signatures_accepted": int(forged_signature)},
+        {"expected_sha256": digest, "signer": "signer-approved",
+         "signature_algorithm": "HMAC-SHA256", "key_material_omitted": True},
     ))
 
     args = {"resource_id": "CASE-001", "idempotency_key": "idem-0001"}
@@ -301,6 +326,7 @@ def run_suite() -> dict[str, Any]:
             "No LLM or agent is invoked; this validates control logic and fixtures only.",
             "A PASS does not establish model robustness or production security.",
             "RAG, tool broker, cache and budget behavior are in-memory reference models.",
+            "ART-04 uses a synthetic shared-key HMAC fixture; it is not a production digital-signature or key-management implementation.",
             "Independent review and integration testing remain required.",
         ],
     }
