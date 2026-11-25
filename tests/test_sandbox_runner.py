@@ -20,7 +20,7 @@ class SandboxRunnerTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         (self.root / "sample.py").write_text("print('safe')", encoding="utf-8")
         for module in sandbox_runner.RUNTIME_MODULES:
-            (self.root / module).write_text("# test runtime module\\n", encoding="utf-8")
+            (self.root / module).write_text("# test runtime module\n", encoding="utf-8")
         self.root_patch = patch.object(sandbox_runner, "PROJECT_ROOT", self.root)
         self.root_patch.start()
         self.adapter_root_patch = patch.object(tool_adapters, "PROJECT_ROOT", self.root)
@@ -263,7 +263,7 @@ class SandboxRunnerTests(unittest.TestCase):
             "run",
             return_value=subprocess.CompletedProcess(
                 ["docker", "image", "inspect"], 0,
-                stdout=image_id + "\\n", stderr="",
+                stdout=image_id + "\n", stderr="",
             ),
         ) as run:
             resolved = sandbox_runner.resolve_local_image_id(
@@ -285,7 +285,7 @@ class SandboxRunnerTests(unittest.TestCase):
             "run",
             return_value=subprocess.CompletedProcess(
                 ["docker", "image", "inspect"], 0,
-                stdout="cyber-ai-tool-sandbox:local\\n", stderr="",
+                stdout="cyber-ai-tool-sandbox:local\n", stderr="",
             ),
         ):
             with self.assertRaisesRegex(ToolExecutionError, "SHA-256"):
@@ -304,7 +304,7 @@ class SandboxRunnerTests(unittest.TestCase):
 
     def test_config_is_mounted_read_only_before_image_and_passed_to_tool(self):
         config = self.root / "ruff.toml"
-        config.write_text("[tool.ruff]\\n", encoding="utf-8")
+        config.write_text("[tool.ruff]\n", encoding="utf-8")
         command = self.build_command("ruff", "sample.py", self.root.parent / "config-evidence", config="ruff.toml")
         mount = (
             f"type=bind,src={config.resolve()},dst=/workspace/config,readonly"
