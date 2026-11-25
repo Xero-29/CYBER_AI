@@ -52,19 +52,61 @@ class ToolExecutionError(RuntimeError):
     """A safe tool execution could not be completed."""
 
 
+def _is_reparse_point(info):
+    flag = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
+    return bool(getattr(info, "st_file_attributes", 0) & flag)
+
+
 def _confined_path(target):
-    candidate = Path(target)
-    if candidate.is_symlink():
-        raise ToolExecutionError("No se permiten enlaces simbólicos como objetivo.")
-    if not candidate.is_absolute():
-        candidate = PROJECT_ROOT / candidate
+    """Resolve a repository path without accepting linked ancestors or hardlinks."""
+    try:
+        candidate = Path(os.path.abspath(os.fspath(target)))
+        project_root = PROJECT_ROOT.resolve(strict=True)
+        relative = candidate.relative_to(project_root)
+    except (OSError, TypeError, ValueError) as exc:
+        raise ToolExecutionError(
+            "La ruta debe existir y permanecer dentro del repositorio."
+        ) from exc
+
+    current = project_root
+    parts = relative.parts
+    if not parts:
+        try:
+            root_info = current.lstat()
+        except OSError as exc:
+            raise ToolExecutionError("La raíz del objetivo no está disponible.") from exc
+        if not stat.S_ISDIR(root_info.st_mode) or _is_reparse_point(root_info):
+            raise ToolExecutionError("La raíz del objetivo debe ser un directorio real.")
+    for index, part in enumerate(parts):
+        current = current / part
+        try:
+            info = current.lstat()
+        except OSError as exc:
+            raise ToolExecutionError("La ruta del objetivo no está disponible.") from exc
+        if stat.S_ISLNK(info.st_mode) or _is_reparse_point(info):
+            raise ToolExecutionError(
+                "No se permiten enlaces simbólicos ni puntos de reanálisis en el objetivo o sus ancestros."
+            )
+        final_component = index == len(parts) - 1
+        if not final_component:
+            if not stat.S_ISDIR(info.st_mode):
+                raise ToolExecutionError("Los componentes padre del objetivo deben ser directorios reales.")
+            continue
+        if stat.S_ISREG(info.st_mode):
+            if info.st_nlink != 1:
+                raise ToolExecutionError("No se permiten enlaces duros en archivos objetivo.")
+        elif not stat.S_ISDIR(info.st_mode):
+            raise ToolExecutionError("El objetivo debe ser un archivo regular o un directorio real.")
+
     try:
         resolved = candidate.resolve(strict=True)
-        resolved.relative_to(PROJECT_ROOT.resolve())
+        resolved.relative_to(project_root)
     except (OSError, ValueError) as exc:
-        raise ToolExecutionError("La ruta debe existir y permanecer dentro del repositorio.") from exc
-    if not (resolved.is_file() or resolved.is_dir()):
-        raise ToolExecutionError("El objetivo debe ser un archivo o directorio.")
+        raise ToolExecutionError(
+            "La ruta debe existir y permanecer dentro del repositorio."
+        ) from exc
+    if os.path.normcase(os.fspath(resolved)) != os.path.normcase(os.fspath(candidate)):
+        raise ToolExecutionError("La ruta del objetivo cambió al resolver sus componentes.")
     return resolved
 
 
@@ -93,28 +135,116 @@ def _terminate_process_tree(process, *, posix=None):
 
 
 def _hash_target(path):
-    digest = hashlib.sha256()
-    files = [path] if path.is_file() else sorted(
-        item for item in path.rglob("*")
-        if item.is_file() and not item.is_symlink()
-    )
-    if path.is_dir():
-        for item in path.rglob("*"):
-            if item.is_symlink():
-                raise ToolExecutionError("El objetivo contiene enlaces simbólicos; análisis bloqueado.")
+    """Hash a bounded target tree while rejecting links and unstable file identities."""
+    path = Path(path)
+    try:
+        root_info = path.lstat()
+    except OSError as exc:
+        raise ToolExecutionError("No se pudo inspeccionar el objetivo.") from exc
+    if stat.S_ISLNK(root_info.st_mode) or _is_reparse_point(root_info):
+        raise ToolExecutionError("El objetivo contiene un enlace o punto de reanálisis.")
+    if stat.S_ISDIR(root_info.st_mode):
+        try:
+            entries = sorted(path.rglob("*"))
+            files = []
+            for item in entries:
+                info = item.lstat()
+                if stat.S_ISLNK(info.st_mode) or _is_reparse_point(info):
+                    raise ToolExecutionError(
+                        "El objetivo contiene enlaces simbólicos o puntos de reanálisis; análisis bloqueado."
+                    )
+                if stat.S_ISDIR(info.st_mode):
+                    continue
+                if not stat.S_ISREG(info.st_mode):
+                    raise ToolExecutionError(
+                        "El objetivo contiene entradas que no son archivos regulares ni directorios."
+                    )
+                if info.st_nlink != 1:
+                    raise ToolExecutionError(
+                        "El objetivo contiene archivos con enlaces duros; análisis bloqueado."
+                    )
+                files.append((item, info))
+        except ToolExecutionError:
+            raise
+        except OSError as exc:
+            raise ToolExecutionError("No se pudo enumerar el objetivo de forma segura.") from exc
+        base = path
+    elif stat.S_ISREG(root_info.st_mode):
+        if root_info.st_nlink != 1:
+            raise ToolExecutionError("No se permiten enlaces duros en archivos objetivo.")
+        files = [(path, root_info)]
+        base = path.parent
+    else:
+        raise ToolExecutionError("El objetivo debe ser un archivo regular o un directorio real.")
+
     if len(files) > MAX_TARGET_FILES:
         raise ToolExecutionError("El objetivo supera el límite de archivos.")
-    total_bytes = sum(item.stat().st_size for item in files)
+    total_bytes = sum(info.st_size for _, info in files)
     if total_bytes > MAX_TARGET_BYTES:
         raise ToolExecutionError("El objetivo supera el límite de tamaño de análisis.")
-    for item in files:
+
+    digest = hashlib.sha256()
+    for item, expected in files:
+        descriptor = None
         try:
-            digest.update(item.relative_to(path if path.is_dir() else path.parent).as_posix().encode())
-            with item.open("rb") as stream:
-                for chunk in iter(lambda: stream.read(1024 * 1024), b""):
-                    digest.update(chunk)
+            _confined_path(item)
+            flags = (
+                os.O_RDONLY
+                | getattr(os, "O_NOFOLLOW", 0)
+                | getattr(os, "O_CLOEXEC", 0)
+                | getattr(os, "O_NONBLOCK", 0)
+            )
+            descriptor = os.open(item, flags)
+            opened = os.fstat(descriptor)
+            path_opened = item.lstat()
+            if (
+                not stat.S_ISREG(opened.st_mode)
+                or _is_reparse_point(opened)
+                or stat.S_ISLNK(path_opened.st_mode)
+                or _is_reparse_point(path_opened)
+                or opened.st_nlink != 1
+                or (opened.st_dev, opened.st_ino) != (expected.st_dev, expected.st_ino)
+                or (opened.st_dev, opened.st_ino) != (path_opened.st_dev, path_opened.st_ino)
+                or opened.st_size != expected.st_size
+                or opened.st_mtime_ns != expected.st_mtime_ns
+            ):
+                raise ToolExecutionError("El archivo objetivo cambió o contiene enlaces durante su apertura.")
+
+            relative = item.relative_to(base).as_posix().encode("utf-8")
+            digest.update(len(relative).to_bytes(4, "big"))
+            digest.update(relative)
+            digest.update(opened.st_size.to_bytes(8, "big"))
+            bytes_read = 0
+            while True:
+                chunk = os.read(descriptor, 1024 * 1024)
+                if not chunk:
+                    break
+                bytes_read += len(chunk)
+                digest.update(chunk)
+
+            final = os.fstat(descriptor)
+            path_final = item.lstat()
+            if (
+                not stat.S_ISREG(final.st_mode)
+                or _is_reparse_point(final)
+                or stat.S_ISLNK(path_final.st_mode)
+                or _is_reparse_point(path_final)
+                or final.st_nlink != 1
+                or (final.st_dev, final.st_ino) != (opened.st_dev, opened.st_ino)
+                or (path_final.st_dev, path_final.st_ino) != (final.st_dev, final.st_ino)
+                or final.st_size != bytes_read
+                or final.st_size != opened.st_size
+                or final.st_mtime_ns != opened.st_mtime_ns
+                or getattr(final, "st_ctime_ns", 0) != getattr(opened, "st_ctime_ns", 0)
+            ):
+                raise ToolExecutionError("El archivo objetivo cambió durante el cálculo de su huella.")
+        except ToolExecutionError:
+            raise
         except OSError as exc:
-            raise ToolExecutionError("No se pudo calcular la huella del objetivo.") from exc
+            raise ToolExecutionError("No se pudo calcular la huella segura del objetivo.") from exc
+        finally:
+            if descriptor is not None:
+                os.close(descriptor)
     return digest.hexdigest()
 
 

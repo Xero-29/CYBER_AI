@@ -260,6 +260,44 @@ class ToolAdapterTests(unittest.TestCase):
             with self.assertRaises(ToolExecutionError):
                 run_local_tool("ruff", outside)
 
+    def test_confined_path_rejects_symlinked_ancestor(self):
+        real_parent = self.root / "real-target"
+        real_parent.mkdir()
+        (real_parent / "sample.py").write_text("print('safe')\\n", encoding="utf-8")
+        linked_parent = self.root / "linked-target"
+        try:
+            linked_parent.symlink_to(real_parent, target_is_directory=True)
+        except (OSError, NotImplementedError):
+            self.skipTest("symlinks unavailable")
+        with self.assertRaisesRegex(ToolExecutionError, "enlaces simbólicos"):
+            tool_adapters._confined_path(linked_parent / "sample.py")
+
+    def test_confined_path_rejects_hardlinked_target_file(self):
+        with tempfile.TemporaryDirectory() as outside:
+            secret = Path(outside) / "secret.py"
+            secret.write_text("private material\\n", encoding="utf-8")
+            linked_target = self.root / "linked-secret.py"
+            try:
+                os.link(secret, linked_target)
+            except OSError:
+                self.skipTest("hardlinks unavailable")
+            with self.assertRaisesRegex(ToolExecutionError, "enlaces duros"):
+                tool_adapters._confined_path(linked_target)
+
+    def test_hash_target_rejects_nested_hardlinked_file(self):
+        target_dir = self.root / "tree"
+        target_dir.mkdir()
+        with tempfile.TemporaryDirectory() as outside:
+            secret = Path(outside) / "secret.py"
+            secret.write_text("private material\\n", encoding="utf-8")
+            try:
+                os.link(secret, target_dir / "linked-secret.py")
+            except OSError:
+                self.skipTest("hardlinks unavailable")
+            self.assertEqual(tool_adapters._confined_path(target_dir), target_dir)
+            with self.assertRaisesRegex(ToolExecutionError, "enlaces duros"):
+                tool_adapters._hash_target(target_dir)
+
     @patch("tool_adapters.subprocess.Popen")
     @patch("tool_adapters.shutil.which", return_value="/usr/bin/bandit")
     @patch("tool_adapters.run_bounded_process")
