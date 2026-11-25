@@ -259,7 +259,10 @@ class SandboxRunnerTests(unittest.TestCase):
         with patch.object(sandbox_runner.shutil, "which", return_value="/usr/bin/docker"), \
              patch.object(
                  sandbox_runner, "build_docker_command",
-                 return_value=["docker", "run", "--name", "cyber-ai-sandbox-" + "a" * 32],
+                 return_value=[
+                     "docker", "run", "--name", "cyber-ai-sandbox-" + "a" * 32,
+                     "--mount", "type=bind,src=/tmp/evidence/run-" + "b" * 32 + ",dst=/evidence",
+                 ],
              ), \
              patch.object(
                  sandbox_runner.subprocess, "run",
