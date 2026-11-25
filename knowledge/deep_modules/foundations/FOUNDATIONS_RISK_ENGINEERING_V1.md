@@ -221,3 +221,10 @@ El coste anual de equilibrio es USD 36.000 bajo estos supuestos. No significa qu
 La decisión económica cambia en el escenario bajo: el beneficio modelado no cubre el coste. Esto muestra por qué no se debe publicar una cifra puntual sin rango ni declarar que el tratamiento es rentable con evidencia débil.
 
 **Límites de inferencia:** la multiplicación frecuencia × pérdida condicional solo es interpretable para el mismo escenario, población y horizonte. No sumar escenarios solapados como si fueran mutuamente excluyentes. Las cifras de eficacia son supuestos y deben sustituirse por evidencia local, con intervalos y procedencia. El runner prueba aritmética y sensibilidad; no valida los supuestos ni la eficacia de controles reales.
+
+
+## 12. Sensibilidad multidimensional del laboratorio
+
+La versión ampliada de LAB-FND-14A genera una cuadrícula factorial determinista de 27 escenarios: tres factores para frecuencia basal (0,5×/1×/1,5×), pérdida basal (0,5×/1×/1,5×) y frecuencia residual relativa (0,75×/1×/1,25×). Se reportan EAL basal/residual, pérdida evitada y neto tras coste para cada combinación. La función de EAL rechaza entradas booleanas, no numéricas, NaN, infinitas y negativas.
+
+La cuadrícula es análisis de escenarios, **no** una distribución de probabilidad, simulación Monte Carlo, intervalo de confianza ni análisis de dependencia. Los factores son supuestos ilustrativos, no estimaciones empíricas. Correlación, colas, cambios de régimen, eficacia de controles observada y calibración permanecen abiertos. La matriz debe usarse para mostrar sensibilidad de decisiones, no para afirmar precisión predictiva.
