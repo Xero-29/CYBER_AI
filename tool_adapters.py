@@ -60,7 +60,10 @@ def _is_reparse_point(info):
 def _confined_path(target):
     """Resolve a repository path without accepting linked ancestors or hardlinks."""
     try:
-        candidate = Path(os.path.abspath(os.fspath(target)))
+        candidate = Path(os.fspath(target))
+        if not candidate.is_absolute():
+            candidate = PROJECT_ROOT / candidate
+        candidate = Path(os.path.abspath(os.fspath(candidate)))
         project_root = PROJECT_ROOT.resolve(strict=True)
         relative = candidate.relative_to(project_root)
     except (OSError, TypeError, ValueError) as exc:

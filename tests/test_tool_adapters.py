@@ -260,6 +260,13 @@ class ToolAdapterTests(unittest.TestCase):
             with self.assertRaises(ToolExecutionError):
                 run_local_tool("ruff", outside)
 
+    def test_relative_target_is_resolved_from_project_root(self):
+        with patch("tool_adapters.os.getcwd", return_value=str(self.root.parent)):
+            self.assertEqual(
+                tool_adapters._confined_path("sample.py"),
+                self.root / "sample.py",
+            )
+
     def test_confined_path_rejects_symlinked_ancestor(self):
         real_parent = self.root / "real-target"
         real_parent.mkdir()
