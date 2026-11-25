@@ -68,6 +68,30 @@ def _confined_path(target):
     return resolved
 
 
+def _terminate_process_tree(process, *, posix=None):
+    """Terminate the process group when possible; report unverified fallbacks."""
+    if posix is None:
+        posix = os.name == "posix"
+    if posix:
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            return True
+        except OSError:
+            try:
+                process.kill()
+            except OSError:
+                pass
+            return False
+        return True
+    try:
+        process.kill()
+    except OSError:
+        pass
+    # Windows fallback kills only the direct child; descendants are not proven dead.
+    return False
+
+
 def _hash_target(path):
     digest = hashlib.sha256()
     files = [path] if path.is_file() else sorted(
@@ -308,16 +332,8 @@ def _run_local_tool_with_home(
                         stream_truncated["value"] = True
                         terminate = True
                 if terminate and process is not None:
-                    try:
-                        os.killpg(process.pid, signal.SIGKILL)
-                    except ProcessLookupError:
-                        pass
-                    except OSError:
+                    if not _terminate_process_tree(process):
                         output_limit_termination_failed["value"] = True
-                        try:
-                            process.kill()
-                        except OSError:
-                            pass
                     return
         except (OSError, ValueError):
             # The owner closes the pipe after the reader has been joined or

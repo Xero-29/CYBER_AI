@@ -21,6 +21,7 @@ class FakeProcess:
         self.stderr = io.BytesIO(stderr)
         self.timeout = timeout
         self.wait_calls = 0
+        self.killed = False
 
     def wait(self, timeout=None):
         self.wait_calls += 1
@@ -29,7 +30,7 @@ class FakeProcess:
         return 0
 
     def kill(self):
-        return None
+        self.killed = True
 
 
 def _version_result(
@@ -93,6 +94,12 @@ class ToolAdapterTests(unittest.TestCase):
         self.assertFalse(evidence["tool_binary_modified"])
         self.assertTrue(process.stdout.closed)
         self.assertTrue(process.stderr.closed)
+
+    def test_non_posix_output_limit_fallback_is_not_claimed_as_tree_isolation(self):
+        process = FakeProcess()
+        terminated = tool_adapters._terminate_process_tree(process, posix=False)
+        self.assertFalse(terminated)
+        self.assertTrue(process.killed)
 
     def test_truncated_output_is_incomplete_even_when_tool_exits_zero(self):
         process = FakeProcess(stdout=b"x" * (tool_adapters.MAX_OUTPUT_BYTES + 1))
