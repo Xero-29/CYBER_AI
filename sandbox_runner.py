@@ -221,7 +221,7 @@ def resolve_local_image_id(image, docker_binary="docker"):
 
 def build_docker_command(
     tool_id, target, evidence_dir, image=DEFAULT_IMAGE, timeout=None, config=None,
-    *, runtime_dir,
+    *, runtime_dir, docker_binary="docker",
 ):
     if tool_id not in TOOL_SPECS:
         raise ToolExecutionError("Herramienta no registrada.")
