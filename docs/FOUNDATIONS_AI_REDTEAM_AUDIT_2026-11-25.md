@@ -130,3 +130,10 @@ Decisión: PR #21 y PR #22 pueden seguir como entregas de desarrollo, pero la bi
 En una rama posterior se amplió el fixture de ART-09 para comprobar esquema, unicidad global de IDs, separación train/holdout, duplicados tras normalización Unicode, candidatos a near-duplicate por similitud de secuencia, separación de grupos de origen y denominadores por clase. Se añade manifiesto versionado con SHA-256 sobre JSON canónico. La licencia queda pendiente de revisión explícita.
 
 Esta mejora reduce omisiones estructurales del fixture anterior, pero no cierra NC-ART-05: el dataset sigue siendo pequeño y sintético; no se ha demostrado tamaño estadístico adecuado, ground truth independiente, representatividad, potencia, validez externa ni ausencia de contaminación semántica. La similitud de secuencia es una heurística finita, no un detector semántico. El resultado ART-09 debe seguir interpretándose como control estructural, nunca como benchmark científicamente validado.
+
+
+## 10. Remediación cuantitativa Foundations — 2026-11-25
+
+LAB-FND-14A incorpora una cuadrícula factorial determinista de 27 combinaciones que varía frecuencia basal, pérdida basal y frecuencia residual relativa. También rechaza entradas no numéricas, booleanas, NaN, infinitas y negativas. Esto mejora la exploración de sensibilidad y la validación de entradas frente al cálculo puntual original.
+
+No cierra NC-FND-01 ni NC-FND-02: los valores siguen siendo hipotéticos; no se usan distribuciones empíricas, Monte Carlo, intervalos de confianza, correlaciones, pérdidas de cola ni validación independiente de eficacia. La cuadrícula es un análisis de escenarios, no un modelo probabilístico ni una estimación de riesgo real. NC-FND-03 permanece abierta para los 102 subtemas.
