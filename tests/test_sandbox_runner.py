@@ -47,6 +47,7 @@ class SandboxRunnerTests(unittest.TestCase):
 
     def build_command(self, *args, **kwargs):
         kwargs["runtime_dir"] = self.runtime_dir
+        kwargs.setdefault("image", "sha256:" + "c" * 64)
         return sandbox_runner.build_docker_command(*args, **kwargs)
 
     def tearDown(self):
@@ -60,7 +61,7 @@ class SandboxRunnerTests(unittest.TestCase):
     def test_docker_command_enforces_isolation_flags_and_read_only_source(self):
         evidence = self.root.parent / (self.root.name + "-evidence")
         command = self.build_command(
-            "ruff", "sample.py", evidence, image="sandbox:test", timeout=60
+            "ruff", "sample.py", evidence, image="sha256:" + "c" * 64, timeout=60
         )
         joined = " ".join(command)
         for flag in (
@@ -120,7 +121,7 @@ class SandboxRunnerTests(unittest.TestCase):
     def test_signed_allowlist_is_read_only_mounted_and_key_is_not_in_argv(self):
         evidence = self.root.parent / (self.root.name + "-signed-evidence")
         command = self.build_command(
-            "ruff", "sample.py", evidence, image="sandbox:test"
+            "ruff", "sample.py", evidence, image="sha256:" + "c" * 64
         )
         allowlist_mount = (
             f"type=bind,src={self.allowlist_path.resolve()},"
@@ -255,8 +256,69 @@ class SandboxRunnerTests(unittest.TestCase):
         )
         self.assertEqual(SANDBOX_TOOLS, frozenset({"ruff", "bandit"}))
 
+    def test_local_image_reference_is_resolved_to_immutable_sha256_id(self):
+        image_id = "sha256:" + "a" * 64
+        with patch.object(
+            sandbox_runner.subprocess,
+            "run",
+            return_value=subprocess.CompletedProcess(
+                ["docker", "image", "inspect"], 0,
+                stdout=image_id + "\\n", stderr="",
+            ),
+        ) as run:
+            resolved = sandbox_runner.resolve_local_image_id(
+                "cyber-ai-tool-sandbox:local", "/usr/bin/docker"
+            )
+        self.assertEqual(resolved, image_id)
+        self.assertEqual(
+            run.call_args.args[0],
+            [
+                "/usr/bin/docker", "image", "inspect", "--format",
+                "{{.Id}}", "cyber-ai-tool-sandbox:local",
+            ],
+        )
+        self.assertEqual(run.call_args.kwargs["timeout"], 15)
+
+    def test_local_image_resolution_rejects_mutable_or_invalid_inspect_output(self):
+        with patch.object(
+            sandbox_runner.subprocess,
+            "run",
+            return_value=subprocess.CompletedProcess(
+                ["docker", "image", "inspect"], 0,
+                stdout="cyber-ai-tool-sandbox:local\\n", stderr="",
+            ),
+        ):
+            with self.assertRaisesRegex(ToolExecutionError, "SHA-256"):
+                sandbox_runner.resolve_local_image_id("cyber-ai-tool-sandbox:local")
+
+    def test_local_image_resolution_fails_when_image_is_not_present(self):
+        with patch.object(
+            sandbox_runner.subprocess,
+            "run",
+            return_value=subprocess.CompletedProcess(
+                ["docker", "image", "inspect"], 1, stdout="", stderr="not found",
+            ),
+        ):
+            with self.assertRaisesRegex(ToolExecutionError, "no está disponible localmente"):
+                sandbox_runner.resolve_local_image_id("cyber-ai-tool-sandbox:local")
+
+    def test_config_is_mounted_read_only_before_image_and_passed_to_tool(self):
+        config = self.root / "ruff.toml"
+        config.write_text("[tool.ruff]\\n", encoding="utf-8")
+        command = self.build_command("ruff", "sample.py", self.root.parent / "config-evidence", config="ruff.toml")
+        mount = (
+            f"type=bind,src={config.resolve()},dst=/workspace/config,readonly"
+        )
+        self.assertIn(mount, command)
+        self.assertLess(command.index(mount), command.index("sha256:" + "c" * 64))
+        self.assertEqual(command[-2:], ["--config", "config"])
+
     def test_host_timeout_bounds_docker_process(self):
         with patch.object(sandbox_runner.shutil, "which", return_value="/usr/bin/docker"), \
+             patch.object(
+                 sandbox_runner, "resolve_local_image_id",
+                 return_value="sha256:" + "c" * 64,
+             ), \
              patch.object(
                  sandbox_runner, "build_docker_command",
                  return_value=[
@@ -288,7 +350,7 @@ class SandboxRunnerTests(unittest.TestCase):
         evidence = self.root.parent / (self.root.name + ",bad")
         with self.assertRaises(ToolExecutionError):
             self.build_command(
-                "ruff", "sample.py", evidence, image="sandbox:test"
+                "ruff", "sample.py", evidence, image="sha256:" + "c" * 64
             )
 
     def test_network_tool_is_denied(self):

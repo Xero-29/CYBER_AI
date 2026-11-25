@@ -189,6 +189,36 @@ def _signed_allowlist_mount_args(tool_id):
     ]
 
 
+def resolve_local_image_id(image, docker_binary="docker"):
+    """Resolve a local image reference to an immutable Docker image ID."""
+    if not isinstance(image, str) or not re.fullmatch(
+        r"[A-Za-z0-9][A-Za-z0-9._:/@-]{0,254}", image
+    ):
+        raise ToolExecutionError("Referencia de imagen Docker inválida.")
+    if not isinstance(docker_binary, str) or not docker_binary:
+        raise ToolExecutionError("Docker CLI no válido.")
+    try:
+        result = subprocess.run(
+            [
+                docker_binary, "image", "inspect", "--format", "{{.Id}}", image,
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=15,
+        )
+    except (OSError, subprocess.TimeoutExpired) as error:
+        raise ToolExecutionError("No se pudo inspeccionar la imagen Docker local.") from error
+    if result.returncode != 0:
+        raise ToolExecutionError(
+            "La imagen no está disponible localmente; constrúyela antes de ejecutar la sandbox."
+        )
+    image_id = result.stdout.strip()
+    if not re.fullmatch(r"sha256:[a-f0-9]{64}", image_id):
+        raise ToolExecutionError("Docker no devolvió un ID de imagen SHA-256 válido.")
+    return image_id
+
+
 def build_docker_command(
     tool_id, target, evidence_dir, image=DEFAULT_IMAGE, timeout=None, config=None,
     *, runtime_dir,
@@ -201,8 +231,8 @@ def build_docker_command(
         )
     if TOOL_SPECS[tool_id]["network"]:
         raise ToolExecutionError("La herramienta requiere red y está bloqueada por política.")
-    if not isinstance(image, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:/@-]{0,254}", image):
-        raise ToolExecutionError("Nombre de imagen Docker inválido.")
+    if not isinstance(image, str) or not re.fullmatch(r"sha256:[a-f0-9]{64}", image):
+        raise ToolExecutionError("La ejecución requiere un ID de imagen Docker SHA-256 inmutable.")
     target_path = _confined_path(target)
     if any(character in str(target_path) for character in (",", "\n", "\r")):
         raise ToolExecutionError("La ruta del objetivo contiene delimitadores no permitidos para Docker --mount.")
@@ -250,9 +280,22 @@ def build_docker_command(
 
     user_args = _docker_user_args()
     allowlist_args = _signed_allowlist_mount_args(tool_id)
+    config_mount_args = []
+    config_cli_args = []
+    if config:
+        config_path = _confined_path(config)
+        if not config_path.is_file() or any(
+            character in str(config_path) for character in (",", "\n", "\r")
+        ):
+            raise ToolExecutionError("La configuración debe ser un archivo local válido para Docker --mount.")
+        config_mount_args = [
+            "--mount",
+            f"type=bind,src={config_path},dst=/workspace/config,readonly",
+        ]
+        config_cli_args = ["--config", "config"]
 
     command = [
-        "docker", "run", "--rm", "--pull=never",
+        docker_binary, "run", "--rm", "--pull=never",
         "--name", "cyber-ai-sandbox-" + uuid.uuid4().hex,
         "--network=none",
         "--read-only",
@@ -267,6 +310,7 @@ def build_docker_command(
         "--mount", f"type=bind,src={target_path},dst=/workspace/target,readonly",
         "--mount", f"type=bind,src={evidence},dst=/evidence",
         *allowlist_args,
+        *config_mount_args,
         "--workdir=/workspace",
         "--env", "CYBER_AI_EVIDENCE_DIR=/evidence",
         "--env", "CYBER_AI_LEDGER_PATH=/evidence/execution_ledger.sqlite3",
@@ -282,17 +326,7 @@ def build_docker_command(
         if isinstance(timeout, bool) or not isinstance(timeout, int) or not 1 <= timeout <= 600:
             raise ToolExecutionError("El timeout debe estar entre 1 y 600 segundos.")
         command.extend(["--timeout", str(timeout)])
-    if config:
-        config_path = _confined_path(config)
-        if not config_path.is_file() or any(
-            character in str(config_path) for character in (",", "\n", "\r")
-        ):
-            raise ToolExecutionError("La configuración debe ser un archivo local válido para Docker --mount.")
-        command.extend([
-            "--mount",
-            f"type=bind,src={config_path},dst=/workspace/config,readonly",
-            "--config", "config",
-        ])
+    command.extend(config_cli_args)
     return command
 
 
@@ -309,17 +343,20 @@ def main(argv=None):
     if not args.execute:
         print("Dry-run: añade --execute para ejecutar dentro del contenedor.")
         return 0
-    if not shutil.which("docker"):
+    docker_binary = shutil.which("docker")
+    if not docker_binary:
         print("Docker CLI no está disponible.", file=sys.stderr)
         return 2
     container_name = None
     try:
+        image_id = resolve_local_image_id(args.image, docker_binary)
+        print(f"Imagen local fijada por ID SHA-256: {image_id}", flush=True)
         with tempfile.TemporaryDirectory(prefix="cyber-ai-sandbox-runtime-") as runtime_temp:
             runtime_bundle = prepare_runtime_bundle(runtime_temp)
             command = build_docker_command(
-                args.tool, args.target, args.evidence_dir, args.image,
+                args.tool, args.target, args.evidence_dir, image_id,
                 timeout=args.timeout, config=args.config,
-                runtime_dir=runtime_bundle,
+                runtime_dir=runtime_bundle, docker_binary=docker_binary,
             )
             container_name = command[command.index("--name") + 1]
             evidence_mount = next(
