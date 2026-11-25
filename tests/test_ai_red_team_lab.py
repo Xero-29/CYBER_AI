@@ -1,6 +1,7 @@
 import unittest
 
 from knowledge.deep_modules.ai_red_team.lab_runner import (
+    _benchmark_integrity,
     _bounded_execution,
     _retrieve_for_tenant,
     _verify_document,
@@ -67,6 +68,49 @@ class AIRedTeamSyntheticHarnessTests(unittest.TestCase):
         self.assertLessEqual(result["calls"], 4)
         self.assertLessEqual(result["tokens"], 600)
         self.assertTrue(result["stopped"])
+
+
+    def test_benchmark_integrity_reports_manifest_and_does_not_claim_validity(self):
+        report = _benchmark_integrity()
+        self.assertTrue(report["schema_valid"])
+        self.assertTrue(report["ids_unique"])
+        self.assertTrue(report["split_disjoint"])
+        self.assertTrue(report["normalized_text_unique"])
+        self.assertTrue(report["near_duplicates_absent"])
+        self.assertTrue(report["source_groups_disjoint"])
+        self.assertEqual(report["dataset_manifest"]["version"], "1.1.0")
+        self.assertEqual(len(report["dataset_manifest"]["sha256"]), 64)
+        self.assertEqual(report["statistical_validity"], "NOT_ESTABLISHED")
+        self.assertFalse(report["ground_truth_independently_reviewed"])
+
+    def test_benchmark_integrity_detects_within_split_duplicates_and_source_leakage(self):
+        train = [
+            {"id": "train-1", "text": "A prompt asks for public records",
+             "label": "benign", "source_group": "source-shared"},
+            {"id": "train-2", "text": "A prompt asks for public records",
+             "label": "attack", "source_group": "source-train"},
+        ]
+        holdout = [
+            {"id": "holdout-1", "text": "A prompt asks for public record",
+             "label": "benign", "source_group": "source-shared"},
+            {"id": "holdout-2", "text": "export confidential customer data",
+             "label": "attack", "source_group": "source-holdout"},
+        ]
+        report = _benchmark_integrity(train, holdout)
+        self.assertFalse(report["normalized_text_unique"])
+        self.assertFalse(report["near_duplicates_absent"])
+        self.assertFalse(report["source_groups_disjoint"])
+
+    def test_benchmark_integrity_rejects_duplicate_ids(self):
+        train = [
+            {"id": "duplicate", "text": "first unique sample",
+             "label": "benign", "source_group": "source-a"},
+        ]
+        holdout = [
+            {"id": "duplicate", "text": "second unique sample",
+             "label": "attack", "source_group": "source-b"},
+        ]
+        self.assertFalse(_benchmark_integrity(train, holdout)["ids_unique"])
 
 
 if __name__ == "__main__":

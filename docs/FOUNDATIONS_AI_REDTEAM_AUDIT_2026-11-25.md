@@ -123,3 +123,10 @@ Por caso se exige arquitectura/versión y alcance autorizado; precondiciones, ac
 - NC-EVID-02: la lectura integral, licencias y vigencia de fuentes debe completarse por claim y subtema.
 
 Decisión: PR #21 y PR #22 pueden seguir como entregas de desarrollo, pero la biblioteca de Foundations y AI Red Team no está aprobada como experta ni operativamente validada.
+
+
+## 9. Remediación ART-09 posterior a esta auditoría — 2026-11-25
+
+En una rama posterior se amplió el fixture de ART-09 para comprobar esquema, unicidad global de IDs, separación train/holdout, duplicados tras normalización Unicode, candidatos a near-duplicate por similitud de secuencia, separación de grupos de origen y denominadores por clase. Se añade manifiesto versionado con SHA-256 sobre JSON canónico. La licencia queda pendiente de revisión explícita.
+
+Esta mejora reduce omisiones estructurales del fixture anterior, pero no cierra NC-ART-05: el dataset sigue siendo pequeño y sintético; no se ha demostrado tamaño estadístico adecuado, ground truth independiente, representatividad, potencia, validez externa ni ausencia de contaminación semántica. La similitud de secuencia es una heurística finita, no un detector semántico. El resultado ART-09 debe seguir interpretándose como control estructural, nunca como benchmark científicamente validado.
