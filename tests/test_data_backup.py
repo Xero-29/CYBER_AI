@@ -149,6 +149,7 @@ class DataBackupTests(unittest.TestCase):
     def test_portable_file_paths_reject_casefold_and_file_directory_collisions(self):
         invalid_sets = (
             ("Folder/Readme.txt", "folder/README.TXT"),
+            ("Folder/first.txt", "folder/second.txt"),
             ("Data", "data/file.txt"),
             ("data/file.txt", "DATA"),
         )
@@ -158,7 +159,7 @@ class DataBackupTests(unittest.TestCase):
                     data_backup._validate_portable_file_paths(paths)
 
         data_backup._validate_portable_file_paths(
-            ("Folder/first.txt", "folder/second.txt")
+            ("Folder/first.txt", "Folder/second.txt")
         )
 
     @unittest.skipIf(os.name == "nt", "Windows no permite crear nombres de dispositivo reservados.")
