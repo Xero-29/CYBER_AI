@@ -114,15 +114,17 @@ def store_block(
     if not isinstance(content, str):
         raise TypeError("content debe ser texto.")
 
-    if not session_id or not str(session_id).strip():
-        raise ValueError("session_id es obligatorio.")
+    if isinstance(session_id, bool) or not isinstance(session_id, (str, int)):
+        raise ValueError("session_id debe ser texto o entero.")
     session_text = str(session_id).strip()
+    if not session_text:
+        raise ValueError("session_id es obligatorio.")
     if len(session_text) > 128 or any(ord(char) < 0x20 for char in session_text):
         raise ValueError("session_id supera el límite o contiene controles.")
 
-    if not kind or not str(kind).strip():
-        raise ValueError("kind es obligatorio.")
-    kind_text = str(kind).strip()
+    if isinstance(kind, bool) or not isinstance(kind, str) or not kind.strip():
+        raise ValueError("kind es obligatorio y debe ser texto.")
+    kind_text = kind.strip()
     if len(kind_text) > 64 or any(ord(char) < 0x20 for char in kind_text):
         raise ValueError("kind supera el límite o contiene controles.")
     if task_id is not None and (
@@ -130,6 +132,7 @@ def store_block(
         or isinstance(task_id, bool)
         or not str(task_id).strip()
         or len(str(task_id)) > 128
+        or any(ord(char) < 0x20 for char in str(task_id))
     ):
         raise ValueError("task_id debe ser texto o entero acotado.")
 
@@ -237,13 +240,18 @@ def read_block(block_id, session_id):
     except UnicodeDecodeError as error:
         raise ValueError("El bloque recuperado no es texto UTF-8 válido.") from error
 
+    try:
+        metadata = _strict_metadata_json(row["metadata_json"])
+    except (TypeError, ValueError, RecursionError) as error:
+        raise ValueError("Los metadatos del bloque no son JSON válido.") from error
+
     return {
         "id": row["id"],
         "session_id": row["session_id"],
         "task_id": row["task_id"],
         "kind": row["kind"],
         "content": content,
-        "metadata": _strict_metadata_json(row["metadata_json"]),
+        "metadata": metadata,
         "created_at": row["created_at"],
     }
 
