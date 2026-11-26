@@ -19,11 +19,15 @@ class DataBackupTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.root = Path(self.temp.name)
         self.data = self.root / "data"
-        self.data.mkdir()
+        self.data.mkdir(mode=0o700)
         with sqlite3.connect(self.data / "memory.sqlite3") as db:
             db.execute("CREATE TABLE notes(value TEXT)")
             db.execute("INSERT INTO notes VALUES('verified')")
         (self.data / "events.jsonl").write_text('{"event":"test"}\n', encoding="utf-8")
+        if os.name == "posix":
+            os.chmod(self.data, 0o700)
+            os.chmod(self.data / "memory.sqlite3", 0o600)
+            os.chmod(self.data / "events.jsonl", 0o600)
 
     def tearDown(self):
         self.temp.cleanup()
@@ -91,8 +95,11 @@ class DataBackupTests(unittest.TestCase):
                 with self.subTest(number=number), tempfile.TemporaryDirectory() as directory:
                     root = Path(directory)
                     data = root / "data"
-                    data.mkdir()
+                    data.mkdir(mode=0o700)
                     (data / "sample.txt").write_text("safe", encoding="utf-8")
+                    if os.name == "posix":
+                        os.chmod(data, 0o700)
+                        os.chmod(data / "sample.txt", 0o600)
                     snapshot = root / "backup"
                     self.create_unsigned_backup(snapshot, data_dir=data)
                     manifest_path = snapshot / "manifest.json"
@@ -194,6 +201,8 @@ class DataBackupTests(unittest.TestCase):
         snapshot = self.root / "backup"
         self.create_unsigned_backup(snapshot, data_dir=self.data)
         (snapshot / "injected.txt").write_text("untracked", encoding="utf-8")
+        if os.name == "posix":
+            os.chmod(snapshot / "injected.txt", 0o600)
         with self.assertRaisesRegex(BackupError, "no coincide"):
             self.verify_unsigned_backup(snapshot)
 
