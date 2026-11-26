@@ -162,6 +162,13 @@ class DataBackupTests(unittest.TestCase):
             ("Folder/first.txt", "Folder/second.txt")
         )
 
+    def test_portable_file_path_validation_handles_large_manifests(self):
+        paths = (
+            f"shard-{index // 100}/file-{index:05d}.txt"
+            for index in range(5000)
+        )
+        data_backup._validate_portable_file_paths(paths)
+
     @unittest.skipIf(os.name == "nt", "Windows no permite crear nombres de dispositivo reservados.")
     def test_backup_rejects_windows_reserved_source_names(self):
         reserved = self.data / "CON.txt"
