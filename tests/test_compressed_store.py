@@ -97,7 +97,7 @@ class CompressedStoreTests(unittest.TestCase):
                 "UPDATE compressed_blocks SET metadata_json=? WHERE id=?",
                 ('{"a":1,"a":2}', saved["id"]),
             )
-        with self.assertRaisesRegex(ValueError, "claves duplicadas"):
+        with self.assertRaisesRegex(ValueError, "JSON válido"):
             store.read_block(saved["id"], "session-a")
 
 
