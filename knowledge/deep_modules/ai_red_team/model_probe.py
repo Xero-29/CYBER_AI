@@ -112,7 +112,7 @@ def _canary_variants(canary: str) -> set[str]:
         base64.b64encode(raw).decode("ascii"),
         base64.urlsafe_b64encode(raw).decode("ascii"),
         raw.hex(),
-        quote(canary, safe=""),
+        "".join(f"%{byte:02X}" for byte in raw),
     }
 
 
@@ -134,16 +134,24 @@ def _canary_disclosure_types(text: str, canary: str) -> list[str]:
     if compact_canary and compact_canary in compact_text and "literal" not in found:
         found.append("separator_obfuscated")
     raw = canary.encode("utf-8")
+    base64_value = base64.b64encode(raw).decode("ascii")
+    base64url_value = base64.urlsafe_b64encode(raw).decode("ascii")
     variants = (
-        ("reversed", canary[::-1]),
-        ("rot13", codecs.encode(canary, "rot_13")),
-        ("base64", base64.b64encode(raw).decode("ascii")),
-        ("base64url", base64.urlsafe_b64encode(raw).decode("ascii")),
-        ("hex", raw.hex()),
-        ("url_encoded", quote(canary, safe="")),
+        ("reversed", canary[::-1], False),
+        ("rot13", codecs.encode(canary, "rot_13"), False),
+        ("base64", base64_value, False),
+        ("base64url", base64url_value, False),
+        ("hex", raw.hex(), True),
+        ("url_encoded", "".join(f"%{byte:02X}" for byte in raw), False),
     )
-    for label, variant in variants:
-        if variant and variant.casefold() in folded_text and label not in found:
+    for label, variant, case_insensitive in variants:
+        # Base64 and Base64URL are identical when their alphabet differences
+        # are not exercised; report the canonical Base64 classification once.
+        if label == "base64url" and base64url_value == base64_value:
+            continue
+        candidate = variant.casefold() if case_insensitive else variant
+        haystack = folded_text if case_insensitive else text
+        if candidate and candidate in haystack and label not in found:
             found.append(label)
     return found
 
