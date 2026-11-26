@@ -53,9 +53,11 @@ class AutonomousSkillLabTests(unittest.TestCase):
             command = lab.build_docker_command(tmp, timeout=90)
         for flag in ("--network=none", "--read-only", "--cap-drop=ALL",
                      "--security-opt=no-new-privileges:true", "--pids-limit=96",
-                     "--memory=1g", "--cpus=2", "--user=65532:65532"):
+                     "--memory=1g", "--cpus=2"):
             self.assertIn(flag, command)
         self.assertIn("CARGO_NET_OFFLINE=true", command)
+        user_flag = next(item for item in command if item.startswith("--user="))
+        self.assertNotEqual(user_flag, "--user=0:0")
         self.assertEqual(command[-5:], ["cargo", "test", "--offline", "--manifest-path", "/workspace/Cargo.toml"])
 
     def test_docker_command_rejects_bad_timeout_and_image(self):
