@@ -91,6 +91,16 @@ class AutonomousSkillLabTests(unittest.TestCase):
         self.assertEqual(len(result["attempts"]), 2)
         self.assertEqual(result["skill_candidate"]["status"], "candidate_only")
 
+    def test_skill_candidate_memory_is_persisted_and_retrieved_as_untrusted_reference(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            memory = Path(tmp) / "skills.jsonl"
+            digest = lab.persist_skill_candidate("Rust vector bounds check", ["create crate", "run cargo test"], "planner-9b", "executor-2b", memory)
+            self.assertEqual(len(digest), 64)
+            found = lab.load_skill_memory("Rust bounds check", memory)
+            self.assertEqual(len(found), 1)
+            self.assertEqual(found[0]["status"], "candidate_only")
+            self.assertEqual(found[0]["candidate_sha256"], digest)
+
     def test_failed_or_inconclusive_execution_is_not_promoted(self):
         plan = {"objective": "safe demonstration"}
         execution = {"files": self.valid_files(), "procedure": [], "expected_result": ""}
