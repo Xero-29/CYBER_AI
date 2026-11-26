@@ -18,6 +18,8 @@ from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 
+from private_sqlite import connect_private_sqlite
+
 PROJECT = Path(__file__).resolve().parent
 DB_PATH = PROJECT / "data" / "knowledge_library.sqlite3"
 MAX_CHUNK_BYTES = 2 * 1024 * 1024
@@ -32,8 +34,7 @@ def utc_now():
 @contextmanager
 def database():
     """Abre SQLite y confirma o revierte cada operación."""
-    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    connection = sqlite3.connect(str(DB_PATH), timeout=10)
+    connection = connect_private_sqlite(DB_PATH, timeout=10)
     connection.row_factory = sqlite3.Row
     connection.execute("PRAGMA busy_timeout = 10000")
 
