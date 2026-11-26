@@ -191,6 +191,48 @@ class TestKnowledgeLibrary(unittest.TestCase):
 
 
 
+    def test_vector_validation_rejects_huge_integer_and_dimension_abuse(self):
+        with self.assertRaisesRegex(ValueError, "fuera de rango"):
+            library.validate_vector([10 ** 1000])
+        with patch.object(library, "MAX_EMBEDDING_DIMENSIONS", 2):
+            with self.assertRaisesRegex(ValueError, "dimensiones"):
+                library.validate_vector([1.0, 0.0, 0.0])
+
+    def test_cosine_similarity_is_stable_for_large_finite_vectors(self):
+        score = library.cosine_similarity(
+            [1e308, 1e308],
+            [1e308, 0.0],
+        )
+        self.assertAlmostEqual(score, 0.7071067811865475, places=14)
+
+    def test_vector_with_unrepresentable_norm_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "magnitud"):
+            library.validate_vector([1e308, 1e308, 1e308, 1e308])
+
+    def test_search_rejects_out_of_range_top_k_and_min_score(self):
+        for top_k in (0, -1, 51, True):
+            with self.subTest(top_k=top_k), self.assertRaisesRegex(ValueError, "top_k"):
+                library.search_knowledge(
+                    query_embedding=[1.0, 0.0],
+                    embedding_model="test-embeddings",
+                    top_k=top_k,
+                )
+        with self.assertRaisesRegex(ValueError, "min_score"):
+            library.search_knowledge(
+                query_embedding=[1.0, 0.0],
+                embedding_model="test-embeddings",
+                min_score=10 ** 1000,
+            )
+
+    def test_list_knowledge_rejects_coerced_or_out_of_range_filters(self):
+        for limit in (True, "10", 0, 201, 1.5):
+            with self.subTest(limit=limit), self.assertRaisesRegex(ValueError, "limit"):
+                library.list_knowledge(limit=limit)
+        with self.assertRaisesRegex(ValueError, "tenant_id"):
+            library.list_knowledge(tenant_id=" ")
+        with self.assertRaisesRegex(ValueError, "category"):
+            library.list_knowledge(category=" ")
+
     def test_document_chunk_count_can_filter_embedding_space(self):
         library.store_chunks([
             {
