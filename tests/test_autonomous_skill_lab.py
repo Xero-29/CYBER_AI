@@ -56,8 +56,7 @@ class AutonomousSkillLabTests(unittest.TestCase):
                      "--memory=1g", "--cpus=2", "--user=65532:65532"):
             self.assertIn(flag, command)
         self.assertIn("CARGO_NET_OFFLINE=true", command)
-        self.assertEqual(command[-5:], ["test", "--offline", "--manifest-path",
-                                        "/workspace/Cargo.toml"][-5:] if False else command[-5:])
+        self.assertEqual(command[-5:], ["cargo", "test", "--offline", "--manifest-path", "/workspace/Cargo.toml"])
 
     def test_docker_command_rejects_bad_timeout_and_image(self):
         with tempfile.TemporaryDirectory() as tmp:
