@@ -171,3 +171,30 @@ jobs:
               raise SystemExit("Foundations runner output differs from committed results.json")
           print("Foundations result artifact matches the runner output")
           PY
+
+  rust-skill-lab-image:
+    name: Rust skill lab sandbox smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Build isolated Rust skill lab image
+        run: docker build --pull --tag cyber-ai-rust-skill-lab:ci --file sandbox/skill-lab.Dockerfile .
+      - name: Execute a real offline Cargo test in the isolated container
+        env:
+          CYBER_AI_RUST_LAB_IMAGE: cyber-ai-rust-skill-lab:ci
+        run: |
+          python - <<'PY'
+          from autonomous_skill_lab import run_rust_lab
+          files = {
+              "Cargo.toml": '[package]\\nname = "ci-rust-lab"\\nversion = "0.1.0"\\nedition = "2021"\\n',
+              "src/main.rs": '#[test]\\nfn checked_add_is_bounded() { assert_eq!(2usize.checked_add(2), Some(4)); }\\nfn main() {}\\n',
+          }
+          result = run_rust_lab(files, image="cyber-ai-rust-skill-lab:ci", timeout=120)
+          if result["status"] != "passed":
+              raise SystemExit(result)
+          print(result["stdout"])
+          PY
