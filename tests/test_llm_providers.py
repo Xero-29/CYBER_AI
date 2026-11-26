@@ -323,6 +323,52 @@ if __name__ == "__main__":
 
 
 class ProviderBoundaryValidationTests(unittest.TestCase):
+    def test_http_json_rejects_duplicate_keys_and_non_finite_numbers(self):
+        invalid_bodies = (
+            b'{"choices":[],"choices":[{"message":{"content":"shadow"}}]}',
+            b'{"nested":{"score":1e999}}',
+            b'{"nested":{"score":-1e-999}}',
+            b'{"score":NaN}',
+        )
+        for body in invalid_bodies:
+            with self.subTest(body=body):
+                response = MagicMock()
+                response.__enter__.return_value = response
+                response.read.return_value = body
+                with patch.object(llm_providers._HTTP_OPENER, "open", return_value=response):
+                    with self.assertRaisesRegex(RuntimeError, "JSON UTF-8 válido"):
+                        llm_providers._http_json("https://provider.example/v1/models")
+
+    def test_http_json_accepts_finite_exponent_values(self):
+        response = MagicMock()
+        response.__enter__.return_value = response
+        response.read.return_value = b'{"score":-1.25e2}'
+        with patch.object(llm_providers._HTTP_OPENER, "open", return_value=response):
+            result = llm_providers._http_json("https://provider.example/v1/models")
+        self.assertEqual(result, {"score": -125.0})
+
+    def test_http_json_rejects_non_finite_request_values_before_network(self):
+        with patch.object(llm_providers._HTTP_OPENER, "open") as open_call:
+            with self.assertRaises(ValueError):
+                llm_providers._http_json(
+                    "https://provider.example/v1/chat",
+                    {"temperature": float("nan")},
+                )
+        open_call.assert_not_called()
+
+    def test_provider_base_url_rejects_whitespace_and_control_characters(self):
+        for base_url in (
+            "https://api.example/v1\n",
+            "https://api.example /v1",
+            "https://api.example/v1\t",
+        ):
+            config = {"llm_providers": {"cloud": {
+                "enabled": True, "protocol": "openai", "base_url": base_url,
+            }}}
+            with self.subTest(base_url=repr(base_url)):
+                with self.assertRaisesRegex(ValueError, "base_url inválida"):
+                    llm_providers.resolve_provider(config, {"provider": "cloud"})
+
     def test_timeout_must_be_finite_and_bounded(self):
         provider = {"name": "local", "protocol": "ollama",
                     "base_url": "http://127.0.0.1:11434"}
