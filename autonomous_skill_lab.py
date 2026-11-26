@@ -246,11 +246,15 @@ def run_learning_cycle(task, *, planner_model="qwen3.5:9b",
         )
         try:
             files = validate_generated_files(execution.get("files"))
-            evidence = run_rust_lab(
-                files, image=image, timeout=min(timeout, 600), docker_bin=docker_bin,
-            )
         except LabError as exc:
-            evidence = {"status": "failed", "error": str(exc), "phase": "artifact_validation_or_sandbox"}
+            evidence = {"status": "failed", "error": str(exc), "phase": "artifact_validation"}
+        else:
+            try:
+                evidence = run_rust_lab(
+                    files, image=image, timeout=min(timeout, 600), docker_bin=docker_bin,
+                )
+            except LabError as exc:
+                evidence = {"status": "inconclusive", "error": str(exc), "phase": "sandbox_execution"}
         attempt = {
             "round": round_number,
             "procedure": execution.get("procedure"),
