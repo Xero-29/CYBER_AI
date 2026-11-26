@@ -5,6 +5,7 @@ El primer perfil ejecutable es deliberadamente acotado a laboratorios Rust sin
 dependencias externas. Los modelos nunca pueden emitir comandos de shell.
 """
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -12,6 +13,7 @@ import shutil
 import subprocess
 import tempfile
 import time
+from datetime import datetime, timezone
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -112,7 +114,7 @@ def build_docker_command(workspace, *, image=DEFAULT_IMAGE, timeout=180):
     ]
 
 
-def run_rust_lab(files, *, image=DEFAULT_IMAGE, timeout=180, docker_bin="docker"):
+def run_rust_lab(files, *, image=DEFAULT_IMAGE, timeout=180, docker_bin="docker", memory_path=None):
     if not shutil.which(docker_bin):
         raise LabError("Docker no está instalado o no está disponible en PATH.")
     safe_files = validate_generated_files(files)
@@ -161,6 +163,57 @@ def _ask_json(model, system, user, *, base_url=None, timeout=180):
     return _json_object(raw)
 
 
+def _memory_tokens(value):
+    return {token.lower() for token in re.findall(r"[a-zA-Z0-9_+-]{3,}", value)}
+
+def load_skill_memory(task, path, *, limit=3):
+    """Recupera candidatos previos como referencias no confiables, nunca como permisos."""
+    memory_file = Path(path)
+    if not memory_file.is_file():
+        return []
+    query = _memory_tokens(task)
+    ranked = []
+    try:
+        lines = memory_file.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return []
+    for line in lines[-500:]:
+        try:
+            item = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(item, dict) or item.get("status") != "candidate_only":
+            continue
+        procedure = item.get("procedure", [])
+        text_value = str(item.get("task", "")) + " " + " ".join(procedure if isinstance(procedure, list) else [])
+        tokens = _memory_tokens(text_value)
+        score = len(query & tokens) / max(1, len(query))
+        if score >= 0.2:
+            ranked.append((score, item))
+    ranked.sort(key=lambda pair: pair[0], reverse=True)
+    return [item for _, item in ranked[:limit]]
+
+def persist_skill_candidate(task, procedure, planner_model, executor_model, path):
+    """Guarda una metodología como candidata no verificada; no la activa ni ejecuta."""
+    if not isinstance(procedure, list) or not procedure or len(procedure) > 30:
+        return None
+    clean = [str(step)[:1000] for step in procedure if isinstance(step, str) and step.strip()]
+    if not clean:
+        return None
+    record = {
+        "schema_version": "1.0", "status": "candidate_only",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "task": task[:4000], "procedure": clean,
+        "planner_model": planner_model, "executor_model": executor_model,
+    }
+    canonical = json.dumps(record, sort_keys=True, ensure_ascii=False)
+    record["candidate_sha256"] = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+    memory_file = Path(path)
+    memory_file.parent.mkdir(parents=True, exist_ok=True)
+    with memory_file.open("a", encoding="utf-8") as stream:
+        stream.write(json.dumps(record, ensure_ascii=False, sort_keys=True) + "\n")
+    return record["candidate_sha256"]
+
 def run_learning_cycle(task, *, planner_model="qwen3.5:9b",
                        executor_model="qwen3.5:2b-q4_K_M",
                        image=DEFAULT_IMAGE, max_rounds=2, base_url=None,
@@ -170,6 +223,8 @@ def run_learning_cycle(task, *, planner_model="qwen3.5:9b",
     if isinstance(max_rounds, bool) or not isinstance(max_rounds, int) or not 1 <= max_rounds <= MAX_ROUNDS:
         raise LabError("max_rounds debe estar entre 1 y 3.")
     history = []
+    memory_path = Path(memory_path) if memory_path else ROOT / "data" / "autonomous_skill_lab" / "skill_candidates.jsonl"
+    remembered = load_skill_memory(task, memory_path)
     plan = _ask_json(
         planner_model,
         "Eres el planificador técnico de CYBER_AI. Diseña una demostración educativa y defensiva "
@@ -186,7 +241,7 @@ def run_learning_cycle(task, *, planner_model="qwen3.5:9b",
             "con files, procedure y expected_result. files solo puede contener Cargo.toml, "
             "src/main.rs y/o src/lib.rs. No incluyas dependencias, build.rs, comandos shell, "
             "acceso a red, secretos ni rutas adicionales. Incluye pruebas unitarias relevantes.",
-            json.dumps({"task": task, "plan": plan, "previous_attempts": history}, ensure_ascii=False),
+            json.dumps({"task": task, "plan": plan, "previous_attempts": history, "relevant_skill_candidates": remembered}, ensure_ascii=False),
             base_url=base_url, timeout=timeout,
         )
         files = validate_generated_files(execution.get("files"))
@@ -214,6 +269,7 @@ def run_learning_cycle(task, *, planner_model="qwen3.5:9b",
             base_url=base_url, timeout=timeout,
         )
     passed = bool(history and history[-1]["evidence"].get("status") == "passed")
+    candidate_hash = persist_skill_candidate(task, history[-1].get("procedure"), planner_model, executor_model, memory_path) if passed else None
     return {
         "schema_version": "1.0",
         "status": "passed" if passed else (
@@ -226,7 +282,10 @@ def run_learning_cycle(task, *, planner_model="qwen3.5:9b",
         "plan": plan,
         "attempts": history,
         "skill_candidate": {
-            "status": "candidate_only" if passed else "not_eligible",
+            "status": "candidate_only" if candidate_hash else "not_eligible",
+            "candidate_sha256": candidate_hash,
+            "memory_path": str(memory_path) if candidate_hash else None,
+            "reused_candidates": len(remembered),
             "promotion_rule": "No se promociona automáticamente: requiere repetición independiente y revisión externa.",
             "procedure": history[-1].get("procedure") if history else None,
         },
@@ -248,11 +307,13 @@ def main(argv=None):
     parser.add_argument("--max-rounds", type=int, default=2)
     parser.add_argument("--timeout", type=int, default=180)
     parser.add_argument("--output", default="reports/skill_lab/latest.json")
+    parser.add_argument("--memory-path", default="data/autonomous_skill_lab/skill_candidates.jsonl")
     args = parser.parse_args(argv)
     try:
         result = run_learning_cycle(
             args.task, planner_model=args.planner_model, executor_model=args.executor_model,
             image=args.image, max_rounds=args.max_rounds, timeout=args.timeout,
+            memory_path=ROOT / args.memory_path,
         )
         output = ROOT / args.output
         output.parent.mkdir(parents=True, exist_ok=True)
