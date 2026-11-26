@@ -54,7 +54,6 @@ def _parse_finite_float(value):
     return parsed
 
 
-
 @lru_cache(maxsize=32)
 def _load_provider_plugin(protocol):
     """Carga solo plugins instalados y declarados en cyber_ai.providers."""
@@ -132,7 +131,7 @@ def resolve_provider(config, agent, capability=None):
         if not isinstance(base_url, str):
             raise ValueError(f"base_url inválida para el proveedor {name}.")
         if (
-            not base_url
+            not base_url or len(base_url) > 2048
             or base_url != base_url.strip()
             or any(
                 character.isspace() or ord(character) < 0x20
@@ -151,6 +150,8 @@ def resolve_provider(config, agent, capability=None):
             parsed.scheme not in {"http", "https"} or not hostname
             or parsed.username is not None or parsed.password is not None
             or parsed.query or parsed.fragment
+            or "?" in base_url or "#" in base_url
+            or "%" in parsed.netloc or "\\" in parsed.netloc or "\\" in parsed.path
             or (port is not None and not 1 <= port <= 65535)
         ):
             raise ValueError(f"base_url inválida para el proveedor {name}.")
