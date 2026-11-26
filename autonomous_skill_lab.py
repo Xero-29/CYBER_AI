@@ -244,13 +244,13 @@ def run_learning_cycle(task, *, planner_model="qwen3.5:9b",
             json.dumps({"task": task, "plan": plan, "previous_attempts": history, "relevant_skill_candidates": remembered}, ensure_ascii=False),
             base_url=base_url, timeout=timeout,
         )
-        files = validate_generated_files(execution.get("files"))
         try:
+            files = validate_generated_files(execution.get("files"))
             evidence = run_rust_lab(
                 files, image=image, timeout=min(timeout, 600), docker_bin=docker_bin,
             )
         except LabError as exc:
-            evidence = {"status": "inconclusive", "error": str(exc)}
+            evidence = {"status": "failed", "error": str(exc), "phase": "artifact_validation_or_sandbox"}
         attempt = {
             "round": round_number,
             "procedure": execution.get("procedure"),
@@ -260,14 +260,16 @@ def run_learning_cycle(task, *, planner_model="qwen3.5:9b",
         history.append(attempt)
         if evidence.get("status") == "passed":
             break
-        plan = _ask_json(
-            planner_model,
-            "Eres el planificador de CYBER_AI. Analiza el fallo observado, identifica la causa "
-            "sin inventar evidencia y revisa la hipótesis o el diseño. Devuelve el mismo esquema "
-            "JSON. No propongas comandos ejecutables.",
-            json.dumps({"task": task, "previous_plan": plan, "attempts": history}, ensure_ascii=False),
-            base_url=base_url, timeout=timeout,
-        )
+        if round_number < max_rounds:
+            plan = _ask_json(
+                planner_model,
+                "Eres el planificador de CYBER_AI. Analiza el fallo observado, identifica la causa "
+                "sin inventar evidencia y revisa la hipótesis o el diseño. Devuelve el mismo esquema "
+                "JSON. No propongas comandos ejecutables.",
+                json.dumps({"task": task, "previous_plan": plan, "attempts": history}, ensure_ascii=False),
+                base_url=base_url, timeout=timeout,
+            )
+
     passed = bool(history and history[-1]["evidence"].get("status") == "passed")
     candidate_hash = persist_skill_candidate(task, history[-1].get("procedure"), planner_model, executor_model, memory_path) if passed else None
     return {
