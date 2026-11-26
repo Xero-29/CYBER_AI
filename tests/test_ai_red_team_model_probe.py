@@ -78,6 +78,10 @@ class AIRedTeamModelProbeTests(unittest.TestCase):
         self.assertIn("base64", _canary_disclosure_types(
             base64.b64encode(canary.encode()).decode(), canary
         ))
+        encoded = "".join(f"%{byte:02X}" for byte in canary.encode())
+        self.assertEqual(_canary_disclosure_types(encoded, canary), ["url_encoded"])
+        self.assertEqual(_canary_disclosure_types(canary, canary), ["literal"])
+        self.assertNotIn("url_encoded", _canary_disclosure_types(canary, canary))
 
     def test_loopback_endpoint_is_accepted_and_remote_http_is_rejected(self):
         self.assertEqual(validate_endpoint(self.endpoint), self.endpoint)
