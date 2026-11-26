@@ -357,3 +357,15 @@ El contenido histórico que sigue registra implementaciones y validaciones de co
 - Documentación distingue explícitamente sensibilidad de escenarios de Monte Carlo, distribuciones, intervalos de confianza y análisis de dependencia.
 - Límites: supuestos sintéticos, sin calibración empírica, colas, correlaciones ni eficacia observada; no cierra NC-FND-01/02/03 ni eleva T/O.
 - **CI pendiente de comprobar en el HEAD final de esta rama.**
+
+
+## Laboratorio autónomo de adquisición de skills — 2026-11-26
+
+- Rama experimental apilada sobre el HEAD de PR #27: `codex/autonomous-skill-lab-2026-11-26`. No modifica `main` ni fusiona PRs anteriores.
+- Se añade un ciclo local Planner 9B → Executor pequeño → sandbox Rust → evidencia → revisión limitada del Planner. Modelos configurables por variables de entorno.
+- El agente pequeño genera un proyecto Rust y documenta el procedimiento; no puede emitir comandos de shell. Solo se aceptan `Cargo.toml`, `src/main.rs` y `src/lib.rs`; se bloquean dependencias y build scripts.
+- Se añade una imagen Docker específica con Rust. El contenedor ejecuta `cargo test --offline`, sin red, con root filesystem read-only, usuario no privilegiado, capacidades eliminadas y límites de CPU/memoria/procesos. El workspace es temporal.
+- Se limita la iteración a tres rondas. Los resultados se clasifican como passed/failed/inconclusive; se genera un candidato de skill, nunca una promoción automática.
+- Se añaden pruebas unitarias de allowlist, aislamiento, JSON, URL loopback y ciclo de reintento. La suite completa y el build Docker quedan pendientes de CI en el HEAD exacto y de ejecución caliente del usuario.
+- Límite crítico: el modelo no reentrena sus pesos; el aprendizaje implementado es procedimental. Los tests generados por el propio agente no constituyen un oráculo independiente. La promoción al Skillbook requiere revisión externa y repetición independiente.
+- La imagen instala Rust desde repositorios Debian Bookworm sin fijar versión exacta de paquetes; se debe fijar la cadena de suministro antes de producción.
