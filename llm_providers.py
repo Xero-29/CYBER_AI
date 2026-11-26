@@ -23,6 +23,7 @@ class _NoRedirect(HTTPRedirectHandler):
 
 
 _HTTP_OPENER = build_opener(_NoRedirect)
+MAX_PROVIDER_REQUEST_BYTES = 16 * 1024 * 1024
 MAX_PROVIDER_RESPONSE_BYTES = 16 * 1024 * 1024
 
 
@@ -214,7 +215,18 @@ def resolve_model(provider, agent, agent_name=None):
 
 
 def _http_json(url, payload=None, headers=None, timeout=600):
-    data = None if payload is None else json.dumps(payload, allow_nan=False).encode("utf-8")
+    try:
+        data = None if payload is None else json.dumps(
+            payload, allow_nan=False
+        ).encode("utf-8")
+    except (TypeError, ValueError, RecursionError, UnicodeError) as error:
+        raise ValueError(
+            "La solicitud al proveedor no se puede serializar como JSON válido."
+        ) from error
+    if data is not None and len(data) > MAX_PROVIDER_REQUEST_BYTES:
+        raise ValueError(
+            "La solicitud al proveedor IA supera el límite permitido de 16 MiB."
+        )
     request = Request(url, data=data, headers={"Content-Type": "application/json", **(headers or {})},
                       method="GET" if payload is None else "POST")
     try:
@@ -225,7 +237,7 @@ def _http_json(url, payload=None, headers=None, timeout=600):
                 "La respuesta del proveedor IA supera el límite de 16 MiB."
             )
         try:
-            return json.loads(
+            parsed = json.loads(
                 raw.decode("utf-8"),
                 object_pairs_hook=_unique_json_object,
                 parse_constant=_reject_json_constant,
@@ -235,6 +247,11 @@ def _http_json(url, payload=None, headers=None, timeout=600):
             raise RuntimeError(
                 "El proveedor IA devolvió una respuesta que no es JSON UTF-8 válido."
             ) from error
+        if not isinstance(parsed, dict):
+            raise RuntimeError(
+                "El proveedor IA devolvió una respuesta JSON que no es un objeto."
+            )
+        return parsed
     except HTTPError as exc:
         # Never echo untrusted provider bodies: they may contain credentials or
         # sensitive prompt fragments reflected by an upstream gateway.

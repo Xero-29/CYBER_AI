@@ -318,10 +318,6 @@ class NativeProtocolTests(unittest.TestCase):
             "https://generativelanguage.googleapis.com/v1beta",
         )
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class ProviderBoundaryValidationTests(unittest.TestCase):
     def test_http_json_rejects_duplicate_keys_and_non_finite_numbers(self):
         invalid_bodies = (
@@ -338,6 +334,33 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
                 with patch.object(llm_providers._HTTP_OPENER, "open", return_value=response):
                     with self.assertRaisesRegex(RuntimeError, "JSON UTF-8 válido"):
                         llm_providers._http_json("https://provider.example/v1/models")
+
+    def test_http_json_rejects_oversized_request_before_network(self):
+        with patch.object(llm_providers, "MAX_PROVIDER_REQUEST_BYTES", 32), \
+             patch.object(llm_providers._HTTP_OPENER, "open") as open_call:
+            with self.assertRaisesRegex(ValueError, "16 MiB"):
+                llm_providers._http_json(
+                    "https://provider.example/v1/chat",
+                    {"prompt": "x" * 64},
+                )
+        open_call.assert_not_called()
+
+    def test_http_json_rejects_unserializable_request_before_network(self):
+        with patch.object(llm_providers._HTTP_OPENER, "open") as open_call:
+            with self.assertRaisesRegex(ValueError, "JSON válido"):
+                llm_providers._http_json(
+                    "https://provider.example/v1/chat",
+                    {"invalid": object()},
+                )
+        open_call.assert_not_called()
+
+    def test_http_json_rejects_non_object_response(self):
+        response = MagicMock()
+        response.__enter__.return_value = response
+        response.read.return_value = b"[]"
+        with patch.object(llm_providers._HTTP_OPENER, "open", return_value=response):
+            with self.assertRaisesRegex(RuntimeError, "no es un objeto"):
+                llm_providers._http_json("https://provider.example/v1/models")
 
     def test_http_json_accepts_finite_exponent_values(self):
         response = MagicMock()
@@ -454,3 +477,7 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
                 llm_providers.request(provider, "api/chat", {
                     "model": "m", "messages": [{"role": "user", "content": "hola"}]
                 })
+
+
+if __name__ == "__main__":
+    unittest.main()
