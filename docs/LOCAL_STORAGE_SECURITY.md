@@ -7,7 +7,7 @@ Los almacenes locales que contienen conocimiento privado, memoria comprimida o S
 - Directorio de datos privado en POSIX: propietario igual al usuario efectivo y permisos `0700`.
 - Base de datos y sidecars `-journal`, `-wal` y `-shm`: archivos regulares, sin symlinks/reparse points ni hardlinks, propiedad del usuario efectivo y permisos `0600`.
 - Apertura con comprobación de identidad del archivo antes/después de conectar; las rutas padre se validan y los cambios detectados fallan de forma cerrada.
-- Aplicado a `knowledge_library.py`, `knowledge_registry.py`, `skillbook.py` y `compressed_store.py`. El ledger de ejecución mantiene su propia validación de almacenamiento. El almacén comprimido limita cada bloque a 2 MiB, metadata a 64 KiB, descomprime con tope de salida y valida JSON sin claves duplicadas ni números no finitos.
+- Aplicado a `knowledge_library.py`, `knowledge_registry.py`, `skillbook.py` y `compressed_store.py`. El ledger de ejecución mantiene su propia validación de almacenamiento. El almacén comprimido limita cada bloque a 2 MiB, metadata a 64 KiB, comprueba longitudes SQL antes de materializar BLOBs, descomprime con tope de salida y valida JSON sin claves duplicadas ni números no finitos.
 
 ## Límites
 
