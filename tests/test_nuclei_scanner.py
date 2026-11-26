@@ -291,10 +291,10 @@ class NucleiScannerTests(unittest.TestCase):
         self.assertTrue(all(len(chunk) <= 2001 for chunk in chunks))
 
     def test_console_output_escapes_terminal_control_and_bidi_characters(self):
-        untrusted = "safe\\x1b]52;c;clipboard\\x07\\u202e"
+        untrusted = "safe\x1b]52;c;clipboard\x07\u202e"
         self.assertEqual(
             _sanitize_console_text(untrusted),
-            "safe\\\\u001b]52;c;clipboard\\\\u0007\\\\u202e",
+            "safe\\u001b]52;c;clipboard\\u0007\\u202e",
         )
 
     def test_output_reader_is_closed_after_drain(self):
