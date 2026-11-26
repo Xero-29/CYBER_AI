@@ -35,3 +35,6 @@ Thumbs.db
 
 # Local autonomous skill lab reports
 reports/skill_lab/
+
+# Local autonomous skill candidate memory
+data/autonomous_skill_lab/
