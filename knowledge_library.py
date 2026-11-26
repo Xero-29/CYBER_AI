@@ -21,6 +21,7 @@ from pathlib import Path
 PROJECT = Path(__file__).resolve().parent
 DB_PATH = PROJECT / "data" / "knowledge_library.sqlite3"
 MAX_CHUNK_BYTES = 2 * 1024 * 1024
+MAX_EMBEDDING_DIMENSIONS = 65_536
 
 
 def utc_now():
@@ -117,18 +118,25 @@ def validate_vector(vector):
     """Valida un vector numérico antes de guardarlo o consultarlo."""
     if not isinstance(vector, (list, tuple)) or not vector:
         raise ValueError("El embedding debe ser una lista numérica no vacía.")
+    if len(vector) > MAX_EMBEDDING_DIMENSIONS:
+        raise ValueError("El embedding supera el límite de dimensiones permitido.")
 
     values = []
     for value in vector:
         if isinstance(value, bool) or not isinstance(value, (int, float)):
             raise ValueError("El embedding contiene un valor no numérico.")
-
-        value = float(value)
+        try:
+            value = float(value)
+        except (OverflowError, ValueError) as error:
+            raise ValueError("El embedding contiene un valor fuera de rango.") from error
         if not math.isfinite(value):
             raise ValueError("El embedding contiene un valor no finito.")
         values.append(value)
 
-    if math.sqrt(sum(value * value for value in values)) == 0:
+    norm = math.hypot(*values)
+    if not math.isfinite(norm):
+        raise ValueError("La magnitud del embedding supera el rango numérico.")
+    if norm == 0:
         raise ValueError("El embedding no puede ser un vector de ceros.")
 
     return values
@@ -142,11 +150,12 @@ def cosine_similarity(left, right):
     if len(left) != len(right):
         raise ValueError("Los embeddings tienen dimensiones diferentes.")
 
-    dot = sum(a * b for a, b in zip(left, right))
-    norm_left = math.sqrt(sum(a * a for a in left))
-    norm_right = math.sqrt(sum(b * b for b in right))
-
-    return dot / (norm_left * norm_right)
+    norm_left = math.hypot(*left)
+    norm_right = math.hypot(*right)
+    return math.fsum(
+        (a / norm_left) * (b / norm_right)
+        for a, b in zip(left, right)
+    )
 
 
 def _prepare_chunk(chunk):
@@ -546,18 +555,16 @@ def search_knowledge(
         raise ValueError("embedding_model es obligatorio.")
     embedding_model = embedding_model.strip()
 
-    if isinstance(top_k, bool) or not isinstance(top_k, int):
-        raise ValueError("top_k debe ser un entero.")
-    top_k = max(1, min(top_k, 50))
-    if (
-        isinstance(min_score, bool)
-        or not isinstance(min_score, (int, float))
-        or not math.isfinite(float(min_score))
-        or min_score < -1
-        or min_score > 1
-    ):
+    if isinstance(top_k, bool) or not isinstance(top_k, int) or not 1 <= top_k <= 50:
+        raise ValueError("top_k debe estar entre 1 y 50.")
+    if isinstance(min_score, bool) or not isinstance(min_score, (int, float)):
         raise ValueError("min_score debe ser un número entre -1 y 1.")
-    min_score = float(min_score)
+    try:
+        min_score = float(min_score)
+    except (OverflowError, ValueError) as error:
+        raise ValueError("min_score debe ser un número entre -1 y 1.") from error
+    if not math.isfinite(min_score) or not -1 <= min_score <= 1:
+        raise ValueError("min_score debe ser un número entre -1 y 1.")
     if tenant_id is not None and (
         not isinstance(tenant_id, str) or not tenant_id.strip()
     ):
@@ -648,7 +655,16 @@ def list_knowledge(
     limit=50,
 ):
     """Lista metadatos sin descomprimir los contenidos."""
-    limit = max(1, min(int(limit), 200))
+    if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= 200:
+        raise ValueError("limit debe ser un entero entre 1 y 200.")
+    if tenant_id is not None and (
+        not isinstance(tenant_id, str) or not tenant_id.strip()
+    ):
+        raise ValueError("tenant_id debe ser texto no vacío.")
+    if category is not None and (
+        not isinstance(category, str) or not category.strip()
+    ):
+        raise ValueError("category debe ser texto no vacío.")
     query = """
         SELECT id, document_id, chunk_index, title, source, license, category,
                tags_json, visibility, tenant_id, original_bytes,
