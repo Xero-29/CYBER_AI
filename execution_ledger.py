@@ -161,6 +161,9 @@ class ExecutionLedger:
         if configure_wal:
             db.execute("PRAGMA journal_mode=WAL")
         db.execute("PRAGMA synchronous=FULL")
+        db.execute("PRAGMA trusted_schema=OFF")
+        db.execute("PRAGMA secure_delete=ON")
+        db.execute("PRAGMA foreign_keys=ON")
         return db
 
     def initialize(self):

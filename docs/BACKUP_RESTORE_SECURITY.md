@@ -16,6 +16,8 @@ En POSIX, el árbol de origen y el snapshot deben ser privados: directorios prop
 
 La restauración verifica el backup antes de preparar un directorio temporal privado. Comprueba de nuevo el manifiesto y los hashes antes de publicar mediante reemplazo atómico. Si sustituye datos existentes, conserva el directorio anterior con un nombre `pre-restore`; ante un fallo intenta restaurarlo y, si no puede hacerlo con seguridad, lo deja preservado en su ubicación anterior.
 
+En POSIX, los archivos copiados se sincronizan antes de publicar; el snapshot SQLite y el manifiesto también se vacían a disco. Antes del reemplazo, se valida el árbol privado y se sincronizan sus directorios en orden descendente; después del rename se sincroniza el directorio padre. La restauración aplica el mismo orden y sincroniza el padre al preservar el directorio anterior y al publicar el nuevo. Si falla un `fsync`, la operación falla y no presenta el backup/restauración como éxito. En Windows no se afirma una garantía equivalente de sincronización de entradas de directorio; deben verificarse ACL y durabilidad con pruebas específicas de esa plataforma.
+
 ## Límites operativos
 
 - Los backups actuales **no están cifrados** (`encrypted: false`). El HMAC autentica integridad, no confidencialidad.

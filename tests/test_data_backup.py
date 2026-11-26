@@ -416,6 +416,61 @@ class DataBackupTests(unittest.TestCase):
         self.assertFalse(destination.exists())
         self.assertEqual(list(self.root.glob(".backup.tmp-*")), [])
 
+    def test_backup_fsyncs_sqlite_and_staging_directories_before_publish(self):
+        destination = self.root / "backup"
+        with patch.object(
+            data_backup, "_fsync_regular_file",
+            wraps=data_backup._fsync_regular_file,
+        ) as file_sync, patch.object(
+            data_backup, "_fsync_directory",
+            wraps=data_backup._fsync_directory,
+        ) as directory_sync:
+            self.create_unsigned_backup(destination)
+
+        self.assertTrue(
+            any(Path(call.args[0]).name == "memory.sqlite3"
+                for call in file_sync.call_args_list)
+        )
+        synced = [Path(call.args[0]) for call in directory_sync.call_args_list]
+        staging = [path for path in synced if path.name.startswith(".backup.tmp-")]
+        self.assertTrue(staging, synced)
+        self.assertIn(self.root, synced)
+        self.assertLess(
+            min(index for index, path in enumerate(synced)
+                if path.name.startswith(".backup.tmp-")),
+            max(index for index, path in enumerate(synced) if path == self.root),
+        )
+        self.assertTrue(destination.is_dir())
+
+    def test_backup_fails_closed_if_staging_directory_cannot_be_synced(self):
+        destination = self.root / "backup"
+        with patch.object(
+            data_backup, "_fsync_directory",
+            side_effect=BackupError("simulated directory sync failure"),
+        ):
+            with self.assertRaisesRegex(BackupError, "sync failure"):
+                self.create_unsigned_backup(destination)
+        self.assertFalse(destination.exists())
+        self.assertEqual(list(self.root.glob(".backup.tmp-*")), [])
+
+    def test_restore_fsyncs_staging_and_parent_after_atomic_publish(self):
+        snapshot = self.root / "backup"
+        self.create_unsigned_backup(snapshot)
+        with patch.object(
+            data_backup, "_fsync_directory",
+            wraps=data_backup._fsync_directory,
+        ) as directory_sync:
+            self.restore_unsigned_backup(
+                snapshot, self.data,
+                confirm_quiesced=True, confirm_replace=True,
+            )
+        synced = [Path(call.args[0]) for call in directory_sync.call_args_list]
+        self.assertTrue(
+            any(path.name.startswith(".data.restore-") for path in synced),
+            synced,
+        )
+        self.assertGreaterEqual(synced.count(self.root), 2)
+
     def _symlink_directory(self, link, target):
         try:
             link.symlink_to(target, target_is_directory=True)

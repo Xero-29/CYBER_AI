@@ -3,7 +3,7 @@
 execution_ledger.py adds a transactional SQLite event log for observed task runs.
 
 ## Guarantees
-- BEGIN IMMEDIATE, WAL and synchronous=FULL for writes.
+- BEGIN IMMEDIATE, WAL and synchronous=FULL for writes; every connection also sets `trusted_schema=OFF`, `secure_delete=ON` and `foreign_keys=ON`.
 - Eventos de ciclo de vida `started` y estados terminales, enlazados mediante `metadata.start_event_id`.
 - Migración automática de bases existentes al esquema que admite `started`, conservando filas y hashes.
 - Namespace, task fingerprint, status, tool/version, model, environment, duration,

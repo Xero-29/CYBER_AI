@@ -76,6 +76,21 @@ class ExecutionLedgerTests(unittest.TestCase):
         self.assertTrue(result["valid"], result)
         self.assertTrue(connect.called)
 
+    def test_connections_apply_defensive_sqlite_pragmas(self):
+        connection = self.ledger.connect()
+        try:
+            self.assertEqual(
+                connection.execute("PRAGMA trusted_schema").fetchone()[0], 0
+            )
+            self.assertEqual(
+                connection.execute("PRAGMA secure_delete").fetchone()[0], 1
+            )
+            self.assertEqual(
+                connection.execute("PRAGMA foreign_keys").fetchone()[0], 1
+            )
+        finally:
+            connection.close()
+
     def test_secrets_are_redacted_from_free_text(self):
         value = _redact_text(
             "Authorization: Bearer abc123 api_key='super secret' "

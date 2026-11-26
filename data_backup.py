@@ -355,7 +355,137 @@ def _copy_regular_file(source, destination):
             raise BackupError("El destino o su ruta cambió durante la copia.")
 
 
-def _backup_signing_key():
+def _write_private_file(path, content):
+    """Create and durably write a new private regular file without overwriting."""
+    if not isinstance(content, bytes):
+        raise BackupError("El contenido del archivo privado debe ser bytes.")
+    path = Path(os.path.abspath(os.fspath(path)))
+    parent_chain_before = _validate_directory_path(path.parent)
+    flags = (
+        os.O_WRONLY | os.O_CREAT | os.O_EXCL
+        | getattr(os, "O_NOFOLLOW", 0)
+        | getattr(os, "O_CLOEXEC", 0)
+    )
+    descriptor = None
+    try:
+        descriptor = os.open(path, flags, 0o600)
+        opened = os.fstat(descriptor)
+        if not _is_regular_file_info(opened):
+            raise BackupError("El archivo privado creado no es regular.")
+        if os.name == "posix" and (
+            opened.st_uid != os.geteuid()
+            or opened.st_nlink != 1
+            or stat.S_IMODE(opened.st_mode) & 0o077
+        ):
+            raise BackupError("El archivo privado no conserva propietario y permisos seguros.")
+        with os.fdopen(descriptor, "wb") as stream:
+            descriptor = None
+            if stream.write(content) != len(content):
+                raise BackupError("La escritura del archivo privado quedó incompleta.")
+            stream.flush()
+            os.fsync(stream.fileno())
+            final = os.fstat(stream.fileno())
+            if (
+                not _is_regular_file_info(final)
+                or (opened.st_dev, opened.st_ino) != (final.st_dev, final.st_ino)
+            ):
+                raise BackupError("El archivo privado cambió durante la escritura.")
+        after = path.lstat()
+        parent_chain_after = _validate_directory_path(path.parent)
+        if (
+            not _is_regular_file_info(after)
+            or (opened.st_dev, opened.st_ino) != (after.st_dev, after.st_ino)
+            or not _same_directory_chain(parent_chain_before, parent_chain_after)
+            or (
+                os.name == "posix"
+                and (
+                    after.st_uid != os.geteuid()
+                    or after.st_nlink != 1
+                    or stat.S_IMODE(after.st_mode) & 0o077
+                )
+            )
+        ):
+            raise BackupError("La ruta del archivo privado cambió durante la escritura.")
+    except BackupError:
+        raise
+    except OSError as error:
+        raise BackupError("No se pudo escribir y sincronizar un archivo privado.") from error
+    finally:
+        if descriptor is not None:
+            os.close(descriptor)
+
+
+def _fsync_regular_file(path):
+    """Flush a completed SQLite snapshot on POSIX before publishing its tree."""
+    if os.name != "posix":
+        return False
+    with _open_regular_file(path) as stream:
+        try:
+            os.fsync(stream.fileno())
+        except OSError as error:
+            raise BackupError("No se pudo sincronizar un archivo del backup.") from error
+    return True
+
+
+def _fsync_directory(path):
+    """Flush one directory entry set after validating its open identity."""
+    if os.name != "posix":
+        return False
+    directory = Path(os.path.abspath(os.fspath(path)))
+    before_chain = _validate_directory_path(directory)
+    descriptor = None
+    try:
+        flags = (
+            os.O_RDONLY
+            | getattr(os, "O_DIRECTORY", 0)
+            | getattr(os, "O_NOFOLLOW", 0)
+            | getattr(os, "O_CLOEXEC", 0)
+        )
+        descriptor = os.open(directory, flags)
+        opened = os.fstat(descriptor)
+        current = directory.lstat()
+        after_chain = _validate_directory_path(directory)
+        if (
+            not _is_directory_info(opened)
+            or not _is_directory_info(current)
+            or (opened.st_dev, opened.st_ino) != (current.st_dev, current.st_ino)
+            or not _same_directory_chain(before_chain, after_chain)
+        ):
+            raise BackupError("El directorio cambió durante la sincronización.")
+        os.fsync(descriptor)
+        return True
+    except BackupError:
+        raise
+    except OSError as error:
+        raise BackupError("No se pudo sincronizar un directorio del backup.") from error
+    finally:
+        if descriptor is not None:
+            os.close(descriptor)
+
+
+def _fsync_directory_tree(root):
+    """Validate a private staging tree and flush its directories bottom-up."""
+    root = Path(os.path.abspath(os.fspath(root)))
+    _validate_private_data_tree(root)
+    directories = []
+    try:
+        for current, dirs, _files in os.walk(root, followlinks=False):
+            current_path = Path(current)
+            directories.append(current_path)
+            for name in dirs:
+                child = current_path / name
+                if not _is_directory_info(child.lstat()):
+                    raise BackupError("El árbol de staging contiene un directorio no seguro.")
+    except BackupError:
+        raise
+    except OSError as error:
+        raise BackupError("No se pudo inspeccionar el árbol de staging.") from error
+    for directory in reversed(directories):
+        _fsync_directory(directory)
+    return os.name == "posix"
+
+
+def _backup_signing_key()
     value = os.environ.get("CYBER_AI_BACKUP_HMAC_KEY", "")
     if not value:
         return None
@@ -548,6 +678,8 @@ def _sqlite_snapshot(source, destination):
         if source_connection is not None:
             source_connection.close()
 
+    _fsync_regular_file(destination)
+
 
 def create_backup(data_dir=DEFAULT_DATA, destination=None, *, allow_unsigned=False):
     if not isinstance(allow_unsigned, bool):
@@ -627,10 +759,6 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None, *, allow_unsigned=Fal
                     )
                 ):
                     raise BackupError(f"El origen cambió durante el backup: {relative_source}")
-                try:
-                    os.chmod(target, 0o600)
-                except OSError:
-                    pass
                 entries.append({
                     "path": relative, "kind": kind, "size": target.stat().st_size,
                     "sha256": _sha256(target),
@@ -654,12 +782,7 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None, *, allow_unsigned=Fal
         )
         if len(rendered_manifest.encode("utf-8")) > MAX_MANIFEST_BYTES:
             raise BackupError("El manifiesto del backup supera 16 MiB.")
-        manifest_path.write_text(rendered_manifest, encoding="utf-8")
-        try:
-            os.chmod(manifest_path, 0o600)
-            os.chmod(staging, 0o700)
-        except OSError:
-            pass
+        _write_private_file(manifest_path, rendered_manifest.encode("utf-8"))
         _validate_private_data_tree(data_dir)
         if not _same_directory_chain(data_directory_chain, _validate_directory_path(data_dir)):
             raise BackupError("El directorio de datos cambió durante el backup.")
@@ -668,7 +791,9 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None, *, allow_unsigned=Fal
             raise BackupError("El directorio padre del backup cambió durante la creación.")
         if destination.exists() or destination.is_symlink():
             raise BackupError("El destino apareció durante la creación; no se sobrescribe.")
+        _fsync_directory_tree(staging)
         os.replace(staging, destination)
+        _fsync_directory(destination.parent)
         return {"destination": str(destination), "files": len(entries),
                 "encrypted": False, "signed": signing_key is not None,
                 "manifest_sha256": _sha256(destination / "manifest.json")}
@@ -777,10 +902,7 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
                         raise BackupError(f"Snapshot SQLite corrupto: {relative.as_posix()}")
                 finally:
                     db.close()
-            try:
-                os.chmod(target, 0o600)
-            except OSError:
-                pass
+        _fsync_directory_tree(staging)
         if not _same_directory_chain(snapshot_chain, _validate_directory_path(snapshot)):
             raise BackupError("La ruta del backup cambió durante la restauración.")
         if not _same_directory_chain(data_parent_chain, _validate_directory_path(data_dir.parent)):
@@ -791,6 +913,7 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
                 raise BackupError("El destino de restauración cambió durante la operación.")
             previous = data_dir.parent / f"{data_dir.name}.pre-restore-{uuid.uuid4().hex}"
             os.replace(data_dir, previous)
+            _fsync_directory(data_dir.parent)
         elif data_dir_chain is not None:
             raise BackupError("El destino de restauración desapareció durante la operación.")
         if data_dir.exists() or data_dir.is_symlink():
@@ -798,6 +921,7 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
         if not _same_directory_chain(data_parent_chain, _validate_directory_path(data_dir.parent)):
             raise BackupError("El directorio padre del destino cambió antes de publicar la restauración.")
         os.replace(staging, data_dir)
+        _fsync_directory(data_dir.parent)
     except Exception:
         shutil.rmtree(staging, ignore_errors=True)
         if previous and previous.exists() and not data_dir.exists():
@@ -806,6 +930,7 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
                     data_parent_chain, _validate_directory_path(data_dir.parent)
                 ):
                     os.replace(previous, data_dir)
+                    _fsync_directory(data_dir.parent)
             except BackupError:
                 # Preserve the previous snapshot in place if its parent path changed.
                 pass
