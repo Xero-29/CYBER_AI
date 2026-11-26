@@ -15,6 +15,7 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 
+from private_sqlite import connect_private_sqlite
 from secret_redaction import redact_sensitive_data, redact_text
 
 PROJECT = Path(__file__).resolve().parent
@@ -454,12 +455,49 @@ def _validate_manifest(snapshot, manifest, *, require_signature=False):
 
 
 def _sqlite_snapshot(source, destination):
-    with sqlite3.connect(str(source), timeout=30) as src:
-        with sqlite3.connect(str(destination), timeout=30) as dst:
-            src.backup(dst)
-            result = dst.execute("PRAGMA integrity_check").fetchone()[0]
-            if result != "ok":
-                raise BackupError(f"SQLite integrity_check falló para {source.name}.")
+    source = Path(source)
+    parent_chain = _validate_directory_path(source.parent)
+    try:
+        initial = source.lstat()
+    except OSError as error:
+        raise BackupError("La base SQLite de origen no está disponible.") from error
+    if not _is_regular_file_info(initial):
+        raise BackupError("La base SQLite de origen debe ser un archivo regular.")
+    if os.name == "posix" and initial.st_nlink != 1:
+        raise BackupError("No se permiten enlaces duros en bases SQLite de origen.")
+
+    source_connection = None
+    destination_connection = None
+    try:
+        source_connection = sqlite3.connect(
+            source.as_uri() + "?mode=ro", uri=True, timeout=30
+        )
+        opened = source.lstat()
+        if (
+            not _is_regular_file_info(opened)
+            or (initial.st_dev, initial.st_ino) != (opened.st_dev, opened.st_ino)
+            or not _same_directory_chain(parent_chain, _validate_directory_path(source.parent))
+        ):
+            raise BackupError("La base SQLite cambió durante su apertura.")
+        source_connection.execute("PRAGMA trusted_schema=OFF")
+
+        destination_connection = connect_private_sqlite(destination, timeout=30)
+        source_connection.backup(destination_connection)
+        result = destination_connection.execute("PRAGMA integrity_check").fetchone()[0]
+        final = source.lstat()
+        if (
+            result != "ok"
+            or _file_state(initial) != _file_state(final)
+            or not _same_directory_chain(parent_chain, _validate_directory_path(source.parent))
+        ):
+            raise BackupError(f"SQLite integrity o estabilidad falló para {source.name}.")
+    except sqlite3.Error as error:
+        raise BackupError(f"No se pudo crear el snapshot SQLite de {source.name}.") from error
+    finally:
+        if destination_connection is not None:
+            destination_connection.close()
+        if source_connection is not None:
+            source_connection.close()
 
 
 def create_backup(data_dir=DEFAULT_DATA, destination=None, *, allow_unsigned=False):
@@ -673,10 +711,13 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
             if target.stat().st_size != item["size"] or _sha256(target) != item["sha256"]:
                 raise BackupError(f"El archivo cambió durante la restauración: {relative.as_posix()}")
             if target.suffix.lower() in {".sqlite", ".sqlite3", ".db"}:
-                with sqlite3.connect(str(target), timeout=30) as db:
+                db = connect_private_sqlite(target, timeout=30)
+                try:
                     integrity = db.execute("PRAGMA integrity_check").fetchone()[0]
                     if integrity != "ok":
                         raise BackupError(f"Snapshot SQLite corrupto: {relative.as_posix()}")
+                finally:
+                    db.close()
             try:
                 os.chmod(target, 0o600)
             except OSError:
