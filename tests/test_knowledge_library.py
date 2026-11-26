@@ -1,5 +1,7 @@
 """Pruebas de la biblioteca indexada de conocimientos."""
 
+import os
+import stat
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -39,6 +41,12 @@ class TestKnowledgeLibrary(unittest.TestCase):
             visibility=visibility,
             tenant_id=tenant_id,
         )
+
+    @unittest.skipUnless(os.name == "posix", "POSIX file permissions required")
+    def test_database_file_and_parent_are_private(self):
+        library.initialize()
+        self.assertEqual(stat.S_IMODE(library.DB_PATH.stat().st_mode), 0o600)
+        self.assertEqual(stat.S_IMODE(library.DB_PATH.parent.stat().st_mode), 0o700)
 
     def test_round_trip_compressed_content(self):
         text = "Los permisos Unix controlan lectura, escritura y ejecución."
