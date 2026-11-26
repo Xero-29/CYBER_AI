@@ -26,6 +26,35 @@ _HTTP_OPENER = build_opener(_NoRedirect)
 MAX_PROVIDER_RESPONSE_BYTES = 16 * 1024 * 1024
 
 
+def _unique_json_object(pairs):
+    """Reject duplicate keys in provider responses, including nested objects."""
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("La respuesta del proveedor contiene claves JSON duplicadas.")
+        result[key] = value
+    return result
+
+
+def _reject_json_constant(value):
+    raise ValueError("La respuesta del proveedor contiene una constante JSON no estándar.")
+
+
+def _parse_finite_float(value):
+    """Reject float overflow and underflow that would corrupt provider evidence."""
+    try:
+        parsed = float(value)
+    except (OverflowError, ValueError) as error:
+        raise ValueError("La respuesta del proveedor contiene un número fuera de rango.") from error
+    if not math.isfinite(parsed):
+        raise ValueError("La respuesta del proveedor contiene un número no finito.")
+    mantissa = value.lower().split("e", 1)[0]
+    if parsed == 0.0 and any(digit in "123456789" for digit in mantissa):
+        raise ValueError("La respuesta del proveedor contiene un número subdesbordado.")
+    return parsed
+
+
+
 @lru_cache(maxsize=32)
 def _load_provider_plugin(protocol):
     """Carga solo plugins instalados y declarados en cyber_ai.providers."""
@@ -102,6 +131,16 @@ def resolve_provider(config, agent, capability=None):
             return result
         if not isinstance(base_url, str):
             raise ValueError(f"base_url inválida para el proveedor {name}.")
+        if (
+            not base_url
+            or base_url != base_url.strip()
+            or any(
+                character.isspace() or ord(character) < 0x20
+                or 0x7F <= ord(character) <= 0x9F
+                for character in base_url
+            )
+        ):
+            raise ValueError(f"base_url inválida para el proveedor {name}.")
         try:
             parsed = urlsplit(base_url)
             hostname = (parsed.hostname or "").lower().rstrip(".")
@@ -174,7 +213,7 @@ def resolve_model(provider, agent, agent_name=None):
 
 
 def _http_json(url, payload=None, headers=None, timeout=600):
-    data = None if payload is None else json.dumps(payload).encode("utf-8")
+    data = None if payload is None else json.dumps(payload, allow_nan=False).encode("utf-8")
     request = Request(url, data=data, headers={"Content-Type": "application/json", **(headers or {})},
                       method="GET" if payload is None else "POST")
     try:
@@ -185,8 +224,13 @@ def _http_json(url, payload=None, headers=None, timeout=600):
                 "La respuesta del proveedor IA supera el límite de 16 MiB."
             )
         try:
-            return json.loads(raw.decode("utf-8"))
-        except (UnicodeDecodeError, json.JSONDecodeError) as error:
+            return json.loads(
+                raw.decode("utf-8"),
+                object_pairs_hook=_unique_json_object,
+                parse_constant=_reject_json_constant,
+                parse_float=_parse_finite_float,
+            )
+        except (UnicodeDecodeError, ValueError, RecursionError) as error:
             raise RuntimeError(
                 "El proveedor IA devolvió una respuesta que no es JSON UTF-8 válido."
             ) from error
