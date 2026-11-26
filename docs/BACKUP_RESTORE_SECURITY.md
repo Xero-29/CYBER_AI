@@ -10,7 +10,7 @@
 
 ## Integridad y publicación
 
-El manifiesto enumera rutas relativas canónicas, tipo de artefacto, tamaño y SHA-256. Se rechazan enlaces simbólicos/puntos de reanálisis, archivos especiales, rutas fuera del snapshot, entradas duplicadas, archivos no declarados y cambios detectados durante lectura/copia. Los snapshots SQLite se validan con `PRAGMA integrity_check`.
+El manifiesto enumera rutas relativas canónicas, tipo de artefacto, tamaño y SHA-256. Se rechazan enlaces simbólicos/puntos de reanálisis, archivos especiales, rutas fuera del snapshot, entradas duplicadas, archivos no declarados y cambios detectados durante lectura/copia. Los snapshots SQLite se validan con `PRAGMA integrity_check`. El parser del manifiesto también rechaza claves JSON duplicadas, constantes no estándar y exponentes que desbordan o subdesbordan el rango `float`.
 
 La restauración verifica el backup antes de preparar un directorio temporal privado. Comprueba de nuevo el manifiesto y los hashes antes de publicar mediante reemplazo atómico. Si sustituye datos existentes, conserva el directorio anterior con un nombre `pre-restore`; ante un fallo intenta restaurarlo y, si no puede hacerlo con seguridad, lo deja preservado en su ubicación anterior.
 
