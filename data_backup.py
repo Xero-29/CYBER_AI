@@ -16,6 +16,7 @@ from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 
 from private_sqlite import connect_private_sqlite
+from safe_io import SafeWriteError
 from secret_redaction import redact_sensitive_data, redact_text
 
 PROJECT = Path(__file__).resolve().parent
@@ -491,7 +492,7 @@ def _sqlite_snapshot(source, destination):
             or not _same_directory_chain(parent_chain, _validate_directory_path(source.parent))
         ):
             raise BackupError(f"SQLite integrity o estabilidad falló para {source.name}.")
-    except sqlite3.Error as error:
+    except (sqlite3.Error, SafeWriteError) as error:
         raise BackupError(f"No se pudo crear el snapshot SQLite de {source.name}.") from error
     finally:
         if destination_connection is not None:
@@ -711,7 +712,12 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
             if target.stat().st_size != item["size"] or _sha256(target) != item["sha256"]:
                 raise BackupError(f"El archivo cambió durante la restauración: {relative.as_posix()}")
             if target.suffix.lower() in {".sqlite", ".sqlite3", ".db"}:
-                db = connect_private_sqlite(target, timeout=30)
+                try:
+                    db = connect_private_sqlite(target, timeout=30)
+                except SafeWriteError as error:
+                    raise BackupError(
+                        f"Snapshot SQLite no seguro: {relative.as_posix()}"
+                    ) from error
                 try:
                     integrity = db.execute("PRAGMA integrity_check").fetchone()[0]
                     if integrity != "ok":
