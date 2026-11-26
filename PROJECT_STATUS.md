@@ -1,41 +1,42 @@
-# Estado vigente — 2026-11-26 (hardening de evidencia, consola y proveedores)
+# Estado vigente — 2026-11-26 (hardening de evidencia, proveedores y biblioteca)
 
-> Cada resultado de CI pertenece exclusivamente al SHA que ejecutó. Los estados pending, in_progress y cancelled no son éxito.
+> Los resultados de CI solo validan el SHA exacto que ejecutaron. Pending, in_progress y cancelled nunca equivalen a éxito.
 
 ## Repositorio, ramas y PRs
 
 - Repositorio: `Xero-29/CYBER_AI`; rama de trabajo: `codex/security-integrity-audit`.
-- HEAD antes de este registro: `c70c51a3a1bc13c2a9c9fb04e7389a5dcfebdf81`. Este registro crea un commit documental posterior; validar el SHA resultante, no reutilizar checks de commits anteriores.
+- HEAD de código, pruebas y documentación antes de este registro: `212a4a719209cc7303fb35f0d313b665b4f6d020`. Este registro crea un commit documental posterior; la validación final debe corresponder al SHA que resulte.
 - `main`: `658a565acd0a5568bb56a1a7482f44260cd9efd1`; ancestro común: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.
-- Comparación exacta antes de este registro: **402 commits exclusivos de la rama y 576 exclusivos de `main`**. No hay un único commit exclusivo de `main`: son 576. La divergencia impide un merge/rebase/cherry-pick directo. Se preservan, entre otros, `387104756d0f8307c39a46a1ea2df07671bd81c9`, `554ec1cdd45de3bb0e0f24156b0a9a8ac19193da` y `658a565acd0a5568bb56a1a7482f44260cd9efd1`.
-- PR #2: **cerrado y fusionado** el 2026-11-17; merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. Se verificó; no se duplica.
-- No existe PR abierto cuyo head sea `codex/security-integrity-audit`. PR #17–#18 y #20–#27 siguen abiertas en Draft en ramas separadas; PR #19 está cerrada sin merge. No se alteran.
-- GitHub informa `protected=false` para esta rama. No se ha demostrado que existan reglasets ni required checks. Antes de integrar, el propietario debe verificar/configurar protección y checks obligatorios.
-- Los últimos runs visibles pertenecían al HEAD anterior `37750cd1e4f4bea9b9b863f86492bca21a95837a`: Python Tests [45849076039](https://github.com/Xero-29/CYBER_AI/actions/runs/45849076039) y Docker Sandbox [45849076144](https://github.com/Xero-29/CYBER_AI/actions/runs/45849076144), ambos **in_progress** al consultar. No validan `c70c51a` ni este registro. Se requiere CI concluido sobre el nuevo HEAD.
+- Comparación exacta antes de este registro: **410 commits exclusivos de la rama y 576 exclusivos de `main`**. No hay un único commit exclusivo de `main`; son 576 desde el ancestro común. La divergencia no permite integración directa. Se preservan, entre otros, `387104756d0f8307c39a46a1ea2df07671bd81c9`, `554ec1cdd45de3bb0e0f24156b0a9a8ac19193da` y `658a565acd0a5568bb56a1a7482f44260cd9efd1`.
+- PR #2: **cerrado y fusionado** el 2026-11-17; merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. Verificado; no se duplica.
+- No hay PR abierto cuyo head sea `codex/security-integrity-audit`. PR #17–#18 y #20–#27 siguen abiertas en Draft en líneas separadas; PR #19 está cerrada sin merge. No se modifican desde esta rama.
+- GitHub informa `protected=false` para esta rama. No se ha demostrado que existan reglasets ni required checks. El propietario debe verificar/configurar la protección de rama antes de usar CI como gate de integración.
+- En el HEAD `212a4a7`, Python Tests [45849614173](https://github.com/Xero-29/CYBER_AI/actions/runs/45849614173) y Docker Sandbox [45849614168](https://github.com/Xero-29/CYBER_AI/actions/runs/45849614168) estaban **in_progress**. No se reutilizan runs cancelados de otros SHA. El commit documental de este registro también requiere validación propia.
 - No se modificó `main`, no se fusionó/rebasó ninguna rama, no se hizo force-push y no se alteró PR #2.
 
 ## Correcciones implementadas en este corte
 
-- `scanner_output.py`: el lector JSONL común rechaza exponentes JSON que desbordan a infinito o subdesbordan a cero; conserva exponentes finitos. Mantiene límites de archivo/línea/hallazgos, rechazo de claves duplicadas, UTF-8 inválido, enlaces y evidencia parcial.
-- `nuclei_scanner.py`: escapa caracteres Unicode de control, formato y sustitutos antes de imprimir salida no confiable, neutralizando secuencias ANSI/OSC y controles bidireccionales. La redacción de secretos se aplica antes de mostrar el texto.
-- `llm_providers.py`: el transporte HTTP limita respuestas a 16 MiB, no sigue redirecciones, rechaza claves JSON duplicadas en cualquier nivel, constantes no estándar, exponentes fuera del rango finito de `float` y payloads salientes con NaN/Infinity.
-- `llm_providers.py`: valida URL base sin espacios ni controles, con límite de longitud, sin query/fragmento incluso vacío, autoridad percent-encoded ni barras inversas.
-- Regresiones nuevas en `tests/test_scanner_output.py`, `tests/test_nuclei_scanner.py` y `tests/test_llm_providers.py` para overflow/underflow, exponentes válidos, terminal escape/bidi, claves duplicadas, JSON no finito, payload inválido y URL base ambigua.
-- Documentación actualizada en `docs/TOOL_ALLOWLIST.md` y `docs/PROVIDER_PLUGIN_CONTRACT.md`.
-- Commits de implementación y pruebas: [9885290](https://github.com/Xero-29/CYBER_AI/commit/98852907aae2e84240f37a7af85a282d8fd27648), [8330723](https://github.com/Xero-29/CYBER_AI/commit/83307233566e2b8018b04cb62b2b8202450e05f5), [a49b638](https://github.com/Xero-29/CYBER_AI/commit/a49b6382272761cfe25887e59e807dc256b3d0c2), [4953978](https://github.com/Xero-29/CYBER_AI/commit/49539780a6d27473528880916473971808a5dc2c), [aaeab41](https://github.com/Xero-29/CYBER_AI/commit/aaeab4113d1dbb786764f8c4b4efefbd10b3b15e), [20897cf](https://github.com/Xero-29/CYBER_AI/commit/20897cf3905205c32919a8a66a0bab0a9db1d24d), [df0ea0c](https://github.com/Xero-29/CYBER_AI/commit/df0ea0c1dcd0cd4b84b34efce21292a5dc460d5d) y [37750cd](https://github.com/Xero-29/CYBER_AI/commit/37750cd1e4f4bea9b9b863f86492bca21a95837a).
+- `scanner_output.py`: JSONL Nuclei rechaza claves duplicadas, UTF-8 inválido, constantes no estándar y exponentes que desbordan/subdesbordan `float`; mantiene límites de archivo/línea/hallazgos y rechazo de evidencia parcial.
+- `nuclei_scanner.py`: escapa caracteres Unicode de control, formato y sustitutos antes de imprimir salida no confiable; neutraliza inyección ANSI/OSC y controles bidireccionales.
+- `llm_providers.py`: respuestas HTTP limitadas a 16 MiB, sin redirecciones, parser estricto para claves duplicadas/constantes/exponentes, rechazo de NaN/Infinity salientes y validación de URL base sin espacios, controles, query/fragmentos vacíos, autoridad percent-encoded ni barras inversas.
+- `knowledge_pack_quality.py`: manifiesto, registros de fuentes, laboratorio y revisión usan parser JSON estricto. Las claves duplicadas, constantes no estándar y exponentes fuera del rango finito no pueden aportar evidencia ni promover un pack.
+- `knowledge_library.py`: limita embeddings a 65.536 dimensiones, rechaza conversiones/magnitudes no representables y calcula similitud coseno con norma estable y suma compensada. `top_k`, `min_score`, `limit`, `tenant_id` y `category` reciben validación estricta.
+- Regresiones nuevas en `tests/test_scanner_output.py`, `tests/test_nuclei_scanner.py`, `tests/test_llm_providers.py`, `tests/test_knowledge_pack_quality.py` y `tests/test_knowledge_library.py`.
+- Documentación actualizada en `docs/TOOL_ALLOWLIST.md`, `docs/PROVIDER_PLUGIN_CONTRACT.md`, `docs/KNOWLEDGE_PACK_QUALITY.md` y `docs/KNOWLEDGE_INGESTION.md`.
+- Límite multi-tenant documentado: `tenant_id` es un filtro, no identidad autenticada. Una API multiusuario debe derivarlo de RBAC/IdP confiable; no se declara aislamiento multi-tenant institucional hasta probar esa frontera.
 
 ## Validación y límites
 
 - No hay checkout local del repositorio en este entorno; no se afirma ejecución local de `verify.sh` ni de las pruebas.
-- Los workflows del HEAD final de este registro deben revisarse por SHA, job y steps. No se declara CI verde hasta que Python Tests y Docker Sandbox concluyan success; revisar también SBOM y provenance del mismo commit.
-- La validación automatizada no demuestra ejecución Nuclei real ni contención frente a un host comprometido. POSIX process groups permiten escapes mediante `setsid/setpgid`; faltan cgroups/namespaces o microVM. Windows sigue necesitando Job Objects y verificación efectiva de ACL.
-- El runner host no impone egress; falta desplegar y probar el gateway con DNS pinning y política de salida.
+- Los workflows del HEAD final deben concluir success sobre el mismo SHA. Revisar todos los jobs/steps de Python Tests y Docker Sandbox y los artefactos SBOM/provenance de ese commit.
+- No se ha demostrado ejecución Nuclei real. Se requiere binario y plantillas aprobados, permiso exacto y vigente, ledger activo y objetivo de laboratorio controlado.
+- POSIX process groups permiten escapes mediante `setsid/setpgid`; faltan cgroups/namespaces o microVM. Windows sigue necesitando Job Objects y validación efectiva de ACL.
+- El runner host no impone egress; falta desplegar/probar el gateway con DNS pinning y política de salida.
 - Faltan KMS/HSM, custodia/rotación, RBAC/IdP/MFA, almacenamiento WORM/offsite, cifrado, simulacros DR con RPO/RTO, observabilidad central, pruebas de carga/soak y fallos físicos.
-- Nuclei requiere ejecución real con binario y plantillas aprobados, autorización exacta y ledger activo. Los tests no equivalen a un escaneo operativo.
 - Biblioteca: 48 áreas, 0 `expert_ready`, 48 `foundation_draft`; no promover sin fuentes primarias leídas, licencias/procedencia verificadas, claims trazables, laboratorios reproducibles, datasets expertos y revisión independiente.
 - La reconciliación con `main` solo puede hacerse en rama separada con revisión de tres vías y preservación de los 576 commits exclusivos de `main`.
 
-**Conclusión:** se endurecieron dos fronteras de entrada de datos no confiables: evidencia Nuclei y respuestas/configuración de proveedores. No es aceptación operativa; el CI del HEAD resultante y las pruebas externas siguen pendientes.
+**Conclusión:** se endurecieron los parsers de evidencia, la salida de consola, el transporte de proveedores y el cálculo/validación de vectores. No es aceptación operacional; CI del HEAD resultante y pruebas externas siguen pendientes.
 
 
 ---
