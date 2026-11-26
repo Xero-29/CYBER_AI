@@ -47,6 +47,18 @@ class ScannerOutputTests(unittest.TestCase):
         self.path.write_text('{"score":NaN}\n', encoding="utf-8")
         self.assertEqual(self.read(), ([], False, True))
 
+    def test_rejects_exponent_overflow_in_nested_json_values(self):
+        self.path.write_text('{"nested":{"score":1e999}}\n', encoding="utf-8")
+        self.assertEqual(self.read(), ([], False, True))
+
+    def test_rejects_exponent_underflow_in_json_values(self):
+        self.path.write_text('{"score":-1e-999}\n', encoding="utf-8")
+        self.assertEqual(self.read(), ([], False, True))
+
+    def test_accepts_finite_exponent_values(self):
+        self.path.write_text('{"score":-1.25e2}\n', encoding="utf-8")
+        self.assertEqual(self.read(), ([{"score": -125.0}], False, False))
+
     def test_rejects_non_object_json_records(self):
         self.path.write_text('[{"id":"not-an-object-record"}]\n', encoding="utf-8")
         self.assertEqual(self.read(), ([], False, True))
