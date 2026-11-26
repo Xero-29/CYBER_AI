@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import hmac
 import json
+import math
 import os
 import re
 import shutil
@@ -36,6 +37,29 @@ def _unique_object(pairs):
             raise BackupError("El manifiesto contiene claves JSON duplicadas.")
         result[key] = value
     return result
+
+
+def _reject_manifest_constant(value):
+    raise BackupError("El manifiesto contiene una constante JSON no estándar.")
+
+
+def _parse_manifest_float(value):
+    parsed = float(value)
+    if not math.isfinite(parsed):
+        raise BackupError("El manifiesto contiene un número no finito.")
+    mantissa = value.lower().split("e", 1)[0]
+    if parsed == 0.0 and any(digit in "123456789" for digit in mantissa):
+        raise BackupError("El manifiesto contiene un número subdesbordado.")
+    return parsed
+
+
+def _strict_manifest_json(text):
+    return json.loads(
+        text,
+        object_pairs_hook=_unique_object,
+        parse_constant=_reject_manifest_constant,
+        parse_float=_parse_manifest_float,
+    )
 
 
 def _enforce_manifest_json_depth(text):
@@ -582,11 +606,11 @@ def verify_backup(snapshot, *, require_signature=True):
         )
         manifest_text = manifest_bytes.decode("utf-8")
         _enforce_manifest_json_depth(manifest_text)
-        manifest = json.loads(manifest_text, object_pairs_hook=_unique_object)
-    except RecursionError as error:
-        raise BackupError("El manifiesto supera la profundidad JSON permitida.") from error
-    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
-        raise BackupError("El manifiesto no es JSON UTF-8 válido.") from error
+        manifest = _strict_manifest_json(manifest_text)
+    except BackupError:
+        raise
+    except (OSError, UnicodeDecodeError, ValueError, RecursionError) as error:
+        raise BackupError("El manifiesto no es JSON UTF-8 válido o contiene números fuera de rango.") from error
     report = _validate_manifest(snapshot, manifest, require_signature=require_signature)
     if not _same_directory_chain(snapshot_chain, _validate_directory_path(snapshot)):
         raise BackupError("La ruta del backup cambió durante la verificación.")
@@ -639,7 +663,7 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
             raise BackupError("El manifiesto cambió después de su verificación.")
         manifest_text = manifest_bytes.decode("utf-8")
         _enforce_manifest_json_depth(manifest_text)
-        manifest = json.loads(manifest_text, object_pairs_hook=_unique_object)
+        manifest = _strict_manifest_json(manifest_text)
         for item in manifest["files"]:
             relative = _safe_relative(item["path"])
             source = snapshot.joinpath(*relative.parts)
