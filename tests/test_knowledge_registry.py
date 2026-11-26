@@ -1,5 +1,7 @@
 """Pruebas del registro persistente de recursos."""
 
+import os
+import stat
 import tempfile
 import unittest
 from pathlib import Path
@@ -26,6 +28,12 @@ class TestKnowledgeRegistry(unittest.TestCase):
             resource_type="pdf",
             title="Documento de prueba",
         )
+
+    def test_database_file_and_parent_are_private(self):
+        registry.initialize()
+        if os.name == "posix":
+            self.assertEqual(stat.S_IMODE(library.DB_PATH.stat().st_mode), 0o600)
+            self.assertEqual(stat.S_IMODE(library.DB_PATH.parent.stat().st_mode), 0o700)
 
     def test_new_resource_creates_first_version(self):
         result = self.register(
