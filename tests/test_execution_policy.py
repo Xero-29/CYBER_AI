@@ -48,6 +48,11 @@ class ExecutionPolicyTests(unittest.TestCase):
             "https://8.8.8.8/?token=secret-value",
             "https://8.8.8.8/path#fragment",
             "https://8.8.8.8/token=secret-value",
+            "https://8.8.8.8?",
+            "https://8.8.8.8#",
+            " https://8.8.8.8",
+            "https://8.8.8.8 ",
+            "https://8.8.8.8/path with space",
             "https://example.com",
         ):
             with self.subTest(target=target):

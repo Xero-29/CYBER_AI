@@ -1,3 +1,44 @@
+# Estado vigente — 2026-11-26 (integridad de autorización y evidencia)
+
+> El estado de CI se atribuye siempre al SHA exacto. No se reutiliza evidencia de un commit anterior ni se declara verde mientras falte un run completado.
+
+## Repositorio, ramas y PRs
+
+- Repositorio: `Xero-29/CYBER_AI`; rama de trabajo: `codex/security-integrity-audit`.
+- HEAD inspeccionado antes de este cambio: `24ff6babe472ac9ed85752ae45a5da0636ec8f39`.
+- `main`: `658a565acd0a5568bb56a1a7482f44260cd9efd1`; ancestro común: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.
+- Comparación exacta antes del cambio: **388 commits exclusivos de la rama y 576 exclusivos de `main`**. La historia está ampliamente divergida; no hacer merge/rebase/cherry-pick directo. No existe un único commit exclusivo de `main`: hay 576 desde el ancestro común. Se preservan, entre otros, `387104756d0f8307c39a46a1ea2df07671bd81c9`, `554ec1cdd45de3bb0e0f24156b0a9a8ac19193da` y `658a565acd0a5568bb56a1a7482f44260cd9efd1`.
+- PR #2: **cerrado y fusionado** el 2026-11-17; merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. Se verificó el estado y no se crea un PR duplicado.
+- No hay PR abierto cuyo head sea `codex/security-integrity-audit`. PR #17–#18 y #20–#27 permanecen como líneas separadas; no se modifican desde esta rama.
+- En el HEAD previo `24ff6ba`, Python Tests [45647861958](https://github.com/Xero-29/CYBER_AI/actions/runs/45647861958) y Docker Sandbox [45647861880](https://github.com/Xero-29/CYBER_AI/actions/runs/45647861880) concluyeron **cancelled**. No hay check verde vigente para ese SHA. El siguiente HEAD debe obtener sus propios runs concluidos.
+- No se modificó `main`, no se hizo merge/rebase/force-push y no se alteró PR #2.
+
+## Correcciones implementadas en este corte
+
+- `scanner_output.py` introduce una lectura JSONL compartida y acotada para ambos entry points Nuclei. Impone límites de archivo, línea y número de hallazgos; usa `safe_io.read_regular_file`; rechaza enlaces/reparse points, hardlinks POSIX, JSON con claves duplicadas, NaN/Infinity, registros no-objeto y UTF-8 inválido; redacta campos sensibles y descarta resultados parciales ante evidencia inválida.
+- `task_runner.py` y `nuclei_scanner.py` dejan de parsear los archivos de salida con lecturas de línea sin un límite total verificado y comparten el mismo lector.
+- `execution_policy.py` rechaza espacios iniciales/finales e internos, y delimitadores `?`/`#` incluso cuando la query o el fragmento están vacíos. Evita normalizaciones silenciosas que podían hacer que la entrada mostrada no coincidiera exactamente con la entrada recibida.
+- Regresiones añadidas para salida JSONL duplicada/no finita/no objeto, UTF-8 inválido, symlink/hardlink, límites de archivo/línea/hallazgos, redacción y URLs ambiguas.
+- Documentación actualizada en `docs/EXECUTION_AUTHORIZATION.md` y `docs/TOOL_ALLOWLIST.md`.
+
+## Validación de este HEAD
+
+- No hay checkout local del repositorio en este entorno; no se afirma ejecución local de `verify.sh` ni de la suite.
+- CI del nuevo HEAD: **pendiente de consultar**. No reutilizar los resultados cancelados de `24ff6ba` ni los éxitos históricos de otros SHA.
+- La imagen Docker base ya está fijada por digest y los locks Python usan hashes; no se cambian en este corte.
+
+## Pendiente de ingeniería y validación externa
+
+- Ejecutar y observar Nuclei real con binario y plantillas aprobados, permisos exactos y ledger activo; validar revocación durante escaneo y comportamiento de salida en un entorno controlado.
+- El grupo de procesos POSIX no impide que descendientes creen otra sesión; faltan cgroups/namespaces o microVM. Windows sigue sin Job Objects y verificación efectiva de ACL.
+- El runner host no impone egress. Falta desplegar/probar el gateway con DNS pinning y política de salida.
+- Faltan KMS/HSM, custodia/rotación, RBAC/IdP/MFA, almacenamiento WORM/offsite, cifrado y simulacros DR con RPO/RTO, observabilidad central y pruebas de carga/soak/fallo físico.
+- Biblioteca: 48 áreas, 0 `expert_ready`, 48 `foundation_draft`; no se promueven niveles sin fuentes primarias leídas, licencias/procedencia verificadas, claims trazables, labs reproducibles, datasets expertos y revisión independiente.
+- Reconciliación de la historia con `main` solo en rama independiente y mediante revisión de tres vías, preservando los 576 commits exclusivos de `main`.
+
+**Conclusión:** el corte añade una defensa concreta sobre el parseo de evidencia del escáner y la canonicalización de objetivos. No es aceptación operativa ni preparación final para producción; la validación de CI del nuevo SHA y las pruebas reales siguen pendientes.
+
+---
 # Estado vigente — 2026-11-24 (corte de seguridad y persistencia)
 
 > Cada resultado CI se atribuye al SHA exacto ejecutado. Los commits documentales posteriores requieren su propia validación.

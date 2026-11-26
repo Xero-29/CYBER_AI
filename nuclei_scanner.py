@@ -23,7 +23,8 @@ from binary_integrity import (
     hash_executable,
     require_approved_executable,
 )
-from safe_io import SafeWriteError, ensure_private_directory, open_private_file
+from safe_io import SafeWriteError, ensure_private_directory
+from scanner_output import read_jsonl_findings
 from template_integrity import (
     TemplateIntegrityError,
     hash_selected_templates,
@@ -510,33 +511,13 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
 
     findings = []
     if not output_limit_exceeded and not evidence_invalid:
-        output_state = _inspect_output_file(output_file)
-        if output_state == "over_limit":
-            output_limit_exceeded = True
-        elif output_state == "invalid":
-            evidence_invalid = True
-        elif output_state == "ok":
-            try:
-                with open_private_file(output_file, "r") as stream:
-                    for line in stream:
-                        if len(line.encode("utf-8")) > MAX_SCAN_LINE_BYTES:
-                            evidence_invalid = True
-                            findings = []
-                            break
-                        if len(findings) >= MAX_FINDINGS:
-                            output_limit_exceeded = True
-                            findings = []
-                            break
-                        if not line.strip():
-                            continue
-                        try:
-                            findings.append(redact_sensitive_data(json.loads(line)))
-                        except json.JSONDecodeError:
-                            evidence_invalid = True
-                            findings = []
-                            break
-            except (OSError, SafeWriteError, UnicodeError):
-                evidence_invalid = True
+        findings, output_limit_exceeded, evidence_invalid = read_jsonl_findings(
+            output_file,
+            max_output_bytes=MAX_SCAN_OUTPUT_BYTES,
+            max_line_bytes=MAX_SCAN_LINE_BYTES,
+            max_findings=MAX_FINDINGS,
+            allow_blank_lines=True,
+        )
 
     status = (
         "output_limit_exceeded" if output_limit_exceeded

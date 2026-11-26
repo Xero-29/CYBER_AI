@@ -62,7 +62,7 @@ El cargador valida la política antes de considerar cualquier permiso:
 - rechaza symlinks, puntos de reanálisis y archivos que no sean regulares; compara la identidad del archivo abierto con la ruta para detectar sustituciones durante la apertura;
 - en POSIX, los directorios padre y todos sus ancestros deben pertenecer a `root` o al usuario efectivo; no pueden ser modificables por grupo u otros, salvo directorios sticky propiedad de `root` como `/tmp`;
 - cuando existen permisos, exige modo POSIX `0600`; la verificación de ACL NTFS debe realizarse en el sistema operativo;
-- rechaza destinos con dominios, credenciales, query, fragmentos, rutas ambiguas/escapadas y puertos fuera de rango. Solo admite IP literales globales o privadas expresamente incluidas en el permiso; nunca link-local, multicast, no especificadas ni reservadas.
+- rechaza destinos con dominios, credenciales, espacios, controles, delimitadores de query/fragmento (incluso si están vacíos), rutas ambiguas/escapadas y puertos fuera de rango. No normaliza silenciosamente espacios externos. Solo admite IP literales globales o privadas expresamente incluidas en el permiso; nunca link-local, multicast, no especificadas ni reservadas.
 
 Una política vacía no concede permisos y puede permanecer como plantilla versionada. No agregues permisos reales a ese archivo dentro del repositorio: crea una copia local privada y configura `CYBER_AI_AUTHORIZATIONS_FILE`.
 
@@ -85,7 +85,7 @@ python task_runner.py --task "revisión de cabeceras" \
   --confirm-authorized --authorization-id CHG-2026-0001
 ```
 
-La confirmación del operador es una bandera explícita de CLI; no abre un diálogo interactivo y no sustituye al permiso local. El ID no concede acceso por sí solo: destino, acción, responsable, ticket y expiración deben coincidir. Los destinos se canonizan antes de mostrarse o registrarse; se rechazan query, fragmentos, credenciales, nombres DNS y patrones sensibles en la ruta.
+La confirmación del operador es una bandera explícita de CLI; no abre un diálogo interactivo y no sustituye al permiso local. El ID no concede acceso por sí solo: destino, acción, responsable, ticket y expiración deben coincidir. Los destinos se canonizan antes de mostrarse o registrarse; se rechazan espacios y controles, query/fragmentos incluso vacíos, credenciales, nombres DNS y patrones sensibles en la ruta. La entrada no se recorta ni se corrige de forma silenciosa.
 
 ## Límites conocidos y trabajo pendiente
 

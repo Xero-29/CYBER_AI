@@ -59,12 +59,14 @@ def _address_is_allowed(address):
 def _canonical_target(target):
     if (
         not isinstance(target, str)
-        or not target.strip()
+        or not target
+        or target != target.strip()
+        or any(char.isspace() for char in target)
         or any(ord(char) < 0x20 or ord(char) == 0x7F for char in target)
     ):
         raise AuthorizationError("Destino HTTP/HTTPS inválido o ambiguo.")
     try:
-        parsed = urlsplit(target.strip())
+        parsed = urlsplit(target)
     except ValueError as exc:
         raise AuthorizationError("Destino HTTP/HTTPS inválido o ambiguo.") from exc
     if (
@@ -74,6 +76,8 @@ def _canonical_target(target):
         or parsed.password is not None
         or parsed.query
         or parsed.fragment
+        or "?" in target
+        or "#" in target
         or "%" in parsed.netloc
         or "\\" in parsed.path
         or "%" in parsed.path

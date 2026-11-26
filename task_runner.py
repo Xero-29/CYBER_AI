@@ -5,7 +5,6 @@ import argparse
 import json
 import os
 import shutil
-import stat
 import sys
 import tempfile
 import time
@@ -29,9 +28,11 @@ from template_integrity import (
     safe_template_path as _safe_template_path,
     verify_approved_templates,
 )
+from scanner_output import read_jsonl_findings
 
 
 MAX_SCAN_OUTPUT_BYTES = 20 * 1024 * 1024
+MAX_SCAN_LINE_BYTES = 1024 * 1024
 MAX_FINDINGS = 10000
 
 
@@ -383,35 +384,13 @@ def main():
             binary_after = None
             binary_modified = True
 
-        findings = []
-        output_limit_exceeded = False
-        evidence_invalid = False
-        if results_file.exists() or results_file.is_symlink():
-            try:
-                output_info = results_file.lstat()
-                if stat.S_ISLNK(output_info.st_mode) or not stat.S_ISREG(output_info.st_mode):
-                    evidence_invalid = True
-                elif output_info.st_size > MAX_SCAN_OUTPUT_BYTES:
-                    output_limit_exceeded = True
-                else:
-                    with results_file.open("r", encoding="utf-8") as stream:
-                        for line in stream:
-                            if len(line.encode("utf-8")) > 1024 * 1024:
-                                evidence_invalid = True
-                                findings = []
-                                break
-                            if len(findings) >= MAX_FINDINGS:
-                                output_limit_exceeded = True
-                                findings = []
-                                break
-                            try:
-                                findings.append(redact_sensitive_data(json.loads(line)))
-                            except json.JSONDecodeError:
-                                evidence_invalid = True
-                                findings = []
-                                break
-            except OSError:
-                evidence_invalid = True
+        findings, output_limit_exceeded, evidence_invalid = read_jsonl_findings(
+            results_file,
+            max_output_bytes=MAX_SCAN_OUTPUT_BYTES,
+            max_line_bytes=MAX_SCAN_LINE_BYTES,
+            max_findings=MAX_FINDINGS,
+            allow_blank_lines=False,
+        )
 
         try:
             templates_after = _hash_selected_templates(selected, root)
