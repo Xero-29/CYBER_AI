@@ -1,4 +1,4 @@
-import hashlib, hmac, json, os, sqlite3, tempfile, unittest
+import hashlib, hmac, json, os, sqlite3, stat, tempfile, unittest
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from unittest.mock import patch
@@ -7,6 +7,10 @@ class SkillbookTests(unittest.TestCase):
  def setUp(self):
   self.tmp=tempfile.TemporaryDirectory(); self.p=patch.object(skillbook,"DB_PATH",Path(self.tmp.name)/"s.db"); self.p.start(); skillbook.initialize()
  def tearDown(self): self.p.stop(); self.tmp.cleanup()
+ @unittest.skipUnless(os.name == "posix", "POSIX file permissions required")
+ def test_skillbook_database_is_private(self):
+  self.assertEqual(stat.S_IMODE(skillbook.DB_PATH.stat().st_mode),0o600)
+  self.assertEqual(stat.S_IMODE(skillbook.DB_PATH.parent.stat().st_mode),0o700)
  def add(self,**kw):
   d=dict(name="Auditoria cabeceras HTTP",task_pattern="auditoria web revision cabeceras HTTP",description="Revisión defensiva de cabeceras",prerequisites=["objetivo autorizado"],methodology=["solicitar raíz con timeout","comparar cabeceras con OWASP","documentar evidencia"],validation=["repetir solicitud","guardar evidencia anonimizada"],tools=["requests"],tags=["web","http","headers"],evidence=["laboratorio A","laboratorio B"],source_urls=["https://owasp.org/"],success_runs=2,failure_runs=0,verified_by="VERITAS",verifier_verdict="RESPALDADA"); d.update(kw); return skillbook._insert_verified_skill(**d)
  def test_retrieval(self):
