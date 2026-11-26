@@ -17,6 +17,7 @@ from private_sqlite import connect_private_sqlite
 PROJECT = Path(__file__).resolve().parent
 DB_PATH = PROJECT / "data" / "compressed_memory.sqlite3"
 MAX_BLOCK_BYTES = 2 * 1024 * 1024
+MAX_COMPRESSED_BYTES = MAX_BLOCK_BYTES + 64 * 1024
 MAX_METADATA_BYTES = 64 * 1024
 
 
@@ -148,6 +149,8 @@ def store_block(
     if len(original) > MAX_BLOCK_BYTES:
         raise ValueError("El bloque supera el límite de 2 MiB.")
     compressed = zlib.compress(original, level=9)
+    if len(compressed) > MAX_COMPRESSED_BYTES:
+        raise ValueError("El bloque comprimido supera el límite permitido.")
     block_id = uuid.uuid4().hex
 
     initialize()
@@ -195,28 +198,46 @@ def read_block(block_id, session_id):
     initialize()
 
     with database() as db:
+        db.execute("BEGIN")
         row = db.execute("""
-            SELECT * FROM compressed_blocks
+            SELECT id, session_id, task_id, kind, sha256, original_bytes,
+                   compressed_bytes, created_at,
+                   length(compressed_data) AS stored_compressed_bytes,
+                   length(CAST(metadata_json AS BLOB)) AS metadata_bytes
+            FROM compressed_blocks
             WHERE id = ? AND session_id = ?
         """, (block_id, session_id)).fetchone()
 
-    if row is None:
-        raise KeyError("Bloque inexistente o ajeno a esta sesión.")
+        if row is None:
+            raise KeyError("Bloque inexistente o ajeno a esta sesión.")
+        if (
+            not isinstance(row["original_bytes"], int)
+            or not 0 <= row["original_bytes"] <= MAX_BLOCK_BYTES
+            or not isinstance(row["compressed_bytes"], int)
+            or not 0 <= row["compressed_bytes"] <= MAX_COMPRESSED_BYTES
+            or row["stored_compressed_bytes"] != row["compressed_bytes"]
+            or not isinstance(row["metadata_bytes"], int)
+            or not 0 <= row["metadata_bytes"] <= MAX_METADATA_BYTES
+        ):
+            raise ValueError("Los tamaños declarados del bloque no son válidos.")
 
-    if (
-        not isinstance(row["original_bytes"], int)
-        or not 0 <= row["original_bytes"] <= MAX_BLOCK_BYTES
-        or not isinstance(row["compressed_bytes"], int)
-        or row["compressed_bytes"] < 0
-        or not isinstance(row["compressed_data"], bytes)
-        or len(row["compressed_data"]) != row["compressed_bytes"]
-    ):
+        payload = db.execute("""
+            SELECT compressed_data, metadata_json
+            FROM compressed_blocks
+            WHERE id = ? AND session_id = ?
+        """, (block_id, session_id)).fetchone()
+        compressed_data = payload["compressed_data"]
+        metadata_json = payload["metadata_json"]
+
+    if not isinstance(compressed_data, bytes) or len(compressed_data) != row["compressed_bytes"]:
         raise ValueError("Los tamaños declarados del bloque no son válidos.")
+    if not isinstance(metadata_json, str) or len(metadata_json.encode("utf-8")) > MAX_METADATA_BYTES:
+        raise ValueError("Los metadatos del bloque superan el límite permitido.")
 
     try:
         decompressor = zlib.decompressobj()
         original = decompressor.decompress(
-            row["compressed_data"], MAX_BLOCK_BYTES + 1
+            compressed_data, MAX_BLOCK_BYTES + 1
         )
     except zlib.error as error:
         raise ValueError("El bloque comprimido está dañado.") from error
@@ -241,7 +262,7 @@ def read_block(block_id, session_id):
         raise ValueError("El bloque recuperado no es texto UTF-8 válido.") from error
 
     try:
-        metadata = _strict_metadata_json(row["metadata_json"])
+        metadata = _strict_metadata_json(metadata_json)
     except (TypeError, ValueError, RecursionError) as error:
         raise ValueError("Los metadatos del bloque no son JSON válido.") from error
 
