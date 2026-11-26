@@ -122,6 +122,9 @@ def connect_private_sqlite(path, *, timeout=10):
             or (before.st_dev, before.st_ino) != (after.st_dev, after.st_ino)
         ):
             raise SafeWriteError("El archivo SQLite cambió durante la conexión.")
+        connection.execute("PRAGMA trusted_schema=OFF")
+        connection.execute("PRAGMA secure_delete=ON")
+        connection.execute("PRAGMA foreign_keys=ON")
         return connection
     except Exception:
         if connection is not None:
