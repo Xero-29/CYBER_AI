@@ -1,39 +1,47 @@
-# Estado vigente — 2026-11-26 (durabilidad de backup y límites de proveedor)
+# Estado vigente — 2026-11-26 (quiescencia API y rutas portables de backup)
 
-> Los checks solo validan el SHA exacto que ejecutaron. Pending, in_progress y cancelled no son éxito.
+> Ningún estado pending, in_progress o cancelled equivale a éxito. La evidencia CI se atribuye únicamente al SHA exacto que ejecutó.
 
-## Repositorio, ramas y PRs
+## Repositorio, ramas, PRs y workflows
 
-- Repositorio: `Xero-29/CYBER_AI`; rama de trabajo: `codex/security-integrity-audit`.
-- HEAD base antes de este corte: `a0aa048c1d8c300c768a4070b4dc38aa243e6288`. Esta ejecución añade tres commits fast-forward; los workflows deben validar el nuevo HEAD exacto.
-- `main`: `658a565acd0a5568bb56a1a7482f44260cd9efd1`; ancestro común: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.
-- Comparación exacta previa: **450 commits exclusivos de esta rama y 576 exclusivos de `main`**. No existe un único commit exclusivo de `main`: son 576 desde el ancestro común. No hacer merge/rebase/cherry-pick directo. Se preservan, entre otros, `387104756d0f8307c39a46a1ea2df07671bd81c9`, `554ec1cdd45de3bb0e0f24156b0a9a8ac19193da` y `658a565acd0a5568bb56a1a7482f44260cd9efd1`.
-- PR #2: **cerrado y fusionado** el 2026-11-17; merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. Verificado; no se crea un PR duplicado.
-- No se abre ni se modifica ningún PR en este corte. La rama sigue sin protección: GitHub informa `protected=false` y no hay rulesets de repositorio. Configurar required checks/protección requiere una decisión administrativa externa.
-- Los runs [Python Tests 45851824219](https://github.com/Xero-29/CYBER_AI/actions/runs/45851824219) y [Docker Sandbox 45851823909](https://github.com/Xero-29/CYBER_AI/actions/runs/45851823909) pertenecen al SHA anterior `a0aa048c1d8c300c768a4070b4dc38aa243e6288`; los runs [Python Tests 45855698243](https://github.com/Xero-29/CYBER_AI/actions/runs/45855698243) y [Docker Sandbox 45855698348](https://github.com/Xero-29/CYBER_AI/actions/runs/45855698348) pertenecen al SHA intermedio `cc61ec435c9678a01b18aad5ef4fe51ec5954b5b`. Ninguno valida el HEAD final.
-- No hay checkout local disponible en este entorno y el acceso de red para clonar GitHub falló por resolución DNS. No se afirma ejecución local de `verify.sh` ni de la suite.
-- No se modificó `main`, no se hizo merge/rebase/force-push y no se alteró PR #2.
+- Repositorio: Xero-29/CYBER_AI; rama de trabajo: codex/security-integrity-audit.
+- HEAD antes de este registro: 3173f2dde77228139ca3102da141c6e3f5cacd93. Este registro añade un commit documental; los workflows deben validar el nuevo SHA que resulte.
+- main: 658a565acd0a5568bb56a1a7482f44260cd9efd1; ancestro común: cae816d6037b56f017c2fbdbb3e98ef00df58c1d.
+- Comparación exacta antes de este registro: **457 commits exclusivos de esta rama y 576 exclusivos de main**. No existe un único commit exclusivo de main; el grafo contiene 576 commits desde el ancestro común. No hacer merge, rebase ni cherry-pick directo. Se preservan los cambios de main, incluidos 387104756d0f8307c39a46a1ea2df07671bd81c9, 554ec1cdd45de3bb0e0f24156b0a9a8ac19193da y 658a565acd0a5568bb56a1a7482f44260cd9efd1.
+- PR #2 está **cerrado y fusionado**; merge commit 478c6ddc676221e4c07b8c5780f127bc5a9e749e. Su head era cae816d6037b56f017c2fbdbb3e98ef00df58c1d. No se crea un PR duplicado.
+- No existe un PR abierto asociado a codex/security-integrity-audit. Siguen abiertos, entre otros, los PRs de conocimiento #17, #18 y #20–#27; #21–#27 forman una cadena separada. No se modifica ni duplica ese trabajo.
+- GitHub informa protected=false para la rama y la consulta de rulesets devuelve una lista vacía. La rama no tiene protección/required checks configurados; habilitarlos requiere una decisión administrativa. El endpoint de detalle de protección no está accesible para esta integración.
+- Python Tests [45859811453](https://github.com/Xero-29/CYBER_AI/actions/runs/45859811453) y Docker Sandbox [45859811448](https://github.com/Xero-29/CYBER_AI/actions/runs/45859811448) estaban in_progress sobre 3173f2d; este commit documental los supersede. Los runs [45855946525](https://github.com/Xero-29/CYBER_AI/actions/runs/45855946525) y [45855944300](https://github.com/Xero-29/CYBER_AI/actions/runs/45855944300) del SHA 5d2149673d7c23b719bef9a66e6124146f01bc46 terminaron cancelled. Los runs [45855698243](https://github.com/Xero-29/CYBER_AI/actions/runs/45855698243) y [45855698348](https://github.com/Xero-29/CYBER_AI/actions/runs/45855698348) fallaron en el SHA intermedio cc61ec435c9678a01b18aad5ef4fe51ec5954b5b; no se reutiliza ninguno como evidencia del HEAD actual.
+- No hay checkout local del repositorio en este entorno y git ls-remote no pudo resolver github.com. No se afirma ejecución local de verify.sh ni de la suite.
+- No se modificó main, no se hizo merge/rebase/force-push y no se alteró PR #2.
 
 ## Correcciones implementadas en este corte
 
-- `data_backup.py`: el snapshot SQLite se sincroniza antes de cerrar el backup; el manifiesto se crea con `O_EXCL`, modo privado y `fsync`; se valida el árbol staging y se sincronizan sus directorios bottom-up antes del rename. Se sincroniza el padre tras publicar y durante los pasos de preservación/restauración. Un fallo de sincronización no se presenta como éxito.
-- Restauración: el staging completo se valida y sincroniza antes de sustituir el destino; el directorio previo se conserva como `pre-restore` y se sincroniza el padre tras mover/publicar/rollback.
-- `execution_ledger.py`: todas las conexiones aplican `trusted_schema=OFF`, `secure_delete=ON` y `foreign_keys=ON`, además de WAL y `synchronous=FULL`.
-- `llm_providers.py`: limita solicitudes JSON salientes a 16 MiB, rechaza payloads no serializables antes de red y exige que las respuestas HTTP sean objetos JSON. Se mantiene el límite de 16 MiB de respuesta y la política sin redirecciones.
-- Regresiones nuevas para fsync de backup/restauración, fallo cerrado de publicación, pragmas del ledger, tamaño/serialización de solicitudes y forma de respuesta de proveedores. Se movió `unittest.main()` al final de `tests/test_llm_providers.py` para que la ejecución directa incluya las pruebas de límites.
-- Documentación actualizada en `docs/BACKUP_RESTORE_SECURITY.md`, `docs/EXECUTION_LEDGER.md`, `docs/LOCAL_STORAGE_SECURITY.md` y `docs/PROVIDER_PLUGIN_CONTRACT.md`.
+- data_backup.py: create_backup() ahora exige confirm_quiesced=True como booleano explícito en la API, no solo en la CLI. La CLI pasa la confirmación únicamente después de recibir --confirm-quiesced. Esto evita que una llamada programática omita accidentalmente la precondición de escritores detenidos.
+- Rutas de backup: _safe_relative() rechaza caracteres de Alternate Data Streams de Windows, nombres de dispositivos reservados, caracteres de control, componentes con punto/espacio final y longitudes de componente no portables. La creación y verificación del backup rechazan también colisiones case-insensitive y conflictos archivo/directorio que podrían sobrescribir o aliasar rutas al restaurar en Windows.
+- Regresiones añadidas en tests/test_data_backup.py: confirmación API estricta, nombres reservados, caracteres inválidos, colisiones por case-fold y conflictos archivo/directorio; se conserva la cobertura de hashes, firmas, SQLite, symlinks y restauración.
+- Documentación actualizada en docs/BACKUP_RESTORE_SECURITY.md para reflejar el nuevo contrato de API y la política de rutas portables.
+- Commits de este corte: [554dab7](https://github.com/Xero-29/CYBER_AI/commit/554dab72c602955b6761f489faf4476a96d9c9a4), [0857c39](https://github.com/Xero-29/CYBER_AI/commit/0857c3950395b009dc7511267cd0e6a1ec411cfc), [38ece35](https://github.com/Xero-29/CYBER_AI/commit/38ece3567fb4e2206ada2a7d904fbd214359ca6a), [3173f2d](https://github.com/Xero-29/CYBER_AI/commit/3173f2dde77228139ca3102da141c6e3f5cacd93).
 
-## Validación y límites
+## Controles que ya estaban implementados y se mantienen
 
-- El nuevo HEAD requiere Python Tests y Docker Sandbox completos en el SHA exacto, incluyendo las dos pasadas de `verify.sh`, Ruff dentro del sandbox, SBOM CycloneDX y provenance. No se reutiliza evidencia de commits anteriores.
-- El fsync de directorios se implementa para POSIX. En Windows no se declara durabilidad equivalente de entradas de directorio ni ACL NTFS verificadas.
-- Los backups siguen sin cifrado (`encrypted: false`); HMAC no proporciona confidencialidad. Faltan cifrado de backup, KMS/HSM, custodia/rotación, WORM/offsite y simulacros RPO/RTO.
-- La confirmación de quiescencia sigue siendo decisión del operador. Restauración en host limpio, corrupción, pérdida de clave, caída de almacenamiento y failover requieren pruebas reales.
-- Nuclei requiere binario/plantillas aprobados, objetivo de laboratorio explícitamente autorizado, ledger activo y ejecución real. POSIX process groups no impiden escapes con `setsid/setpgid`; faltan cgroups/namespaces o microVM. Windows necesita Job Objects y ACL probadas.
+- Backups: snapshot SQLite, manifiesto firmado HMAC opcional solo con override explícito, hashes, apertura sin seguir symlinks, validación de árbol privado, fsync de archivos/directorios POSIX y publicación/restauración con preservación del directorio anterior.
+- Ledger: SQLite con trusted_schema=OFF, secure_delete=ON, foreign_keys=ON, WAL y synchronous=FULL; cadena hash local y eventos de inicio/resultado.
+- Proveedores IA: límites de solicitud/respuesta JSON de 16 MiB, rechazo de JSON no válido y transporte con política de redirecciones restringida.
+- Ejecución de herramientas: allowlist HMAC, huella del binario/objetivo, salida acotada, entorno mínimo, grupos POSIX y sandbox Docker con --network=none, --read-only, --cap-drop=ALL, no-new-privileges, límites de procesos/memoria/CPU e imagen fijada por ID.
+- Autorización de red: deny-by-default, permiso exacto por IP literal/acción/ID/ticket/expiración, sin dominios hasta disponer de DNS pinning.
+
+## Validación y límites pendientes
+
+- El nuevo HEAD necesita Python Tests y Docker Sandbox completos sobre el SHA exacto, incluidas las dos pasadas de verify.sh, los locks de dependencias, SBOM CycloneDX/provenance y Ruff dentro del contenedor. No se declara CI verde hasta que ambos workflows concluyan en success.
+- El backup no está cifrado (encrypted: false); HMAC no da confidencialidad. Faltan KMS/HSM, custodia y rotación de claves, cifrado, WORM/offsite y simulacros RPO/RTO.
+- La quiescencia sigue siendo una atestación del operador: el sistema no puede demostrar que todos los escritores externos estén detenidos. Restauración en host limpio, pérdida de clave, disco lleno, corrupción y caída de almacenamiento requieren pruebas reales.
+- POSIX process groups no contienen descendientes que escapen con setsid/setpgid; faltan cgroups/namespaces o microVM. Windows requiere Job Objects y validación ACL NTFS. La consulta de protección de rama tampoco puede configurarse desde este flujo.
 - El runner host no impone egress; falta gateway con DNS pinning y política de salida. Faltan RBAC/IdP/MFA, observabilidad central, pruebas de carga/soak/fallo físico y revisión independiente.
-- Biblioteca: 48 áreas, 0 `expert_ready`, 48 `foundation_draft`; no promover sin fuentes primarias leídas, licencias/procedencia, claims trazables, labs reproducibles, datasets expertos y revisión independiente.
+- Biblioteca: 48 áreas, 0 expert_ready, 48 foundation_draft; no promover sin fuentes primarias leídas, licencias/procedencia, claims trazables, laboratorios reproducibles, datasets expertos y revisión independiente.
 
-**Conclusión:** se refuerzan la durabilidad POSIX de backups/restauraciones, los pragmas defensivos del ledger y los límites de transporte IA. No es aceptación operacional; faltan CI del HEAD resultante y controles externos descritos arriba.
+**Conclusión:** el contrato de backup por API y la portabilidad de rutas quedan reforzados con regresiones. La rama sigue divergida de main y sin PR propio; CI del nuevo HEAD aún debe completarse. No está lista para la validación final del usuario ni para producción.
+
 ---
 # Estado vigente — 2026-11-24 (corte de seguridad y persistencia)
 
