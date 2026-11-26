@@ -110,7 +110,7 @@ def build_docker_command(workspace, *, image=DEFAULT_IMAGE, timeout=180):
         "--env", "CARGO_HOME=/tmp/cargo-home",
         "--env", "CARGO_TARGET_DIR=/tmp/cargo-target",
         "--env", "CARGO_NET_OFFLINE=true",
-        image, "cargo", "test", "--offline", "--manifest-path", "/workspace/Cargo.toml",
+        image, "test", "--offline", "--manifest-path", "/workspace/Cargo.toml",
     ]
 
 
