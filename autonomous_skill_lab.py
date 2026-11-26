@@ -217,7 +217,7 @@ def persist_skill_candidate(task, procedure, planner_model, executor_model, path
 def run_learning_cycle(task, *, planner_model="qwen3.5:9b",
                        executor_model="qwen3.5:2b-q4_K_M",
                        image=DEFAULT_IMAGE, max_rounds=2, base_url=None,
-                       timeout=180, docker_bin="docker"):
+                       timeout=180, docker_bin="docker", memory_path=None):
     if not isinstance(task, str) or not task.strip() or len(task) > 4000:
         raise LabError("La tarea debe contener entre 1 y 4000 caracteres.")
     if isinstance(max_rounds, bool) or not isinstance(max_rounds, int) or not 1 <= max_rounds <= MAX_ROUNDS:
