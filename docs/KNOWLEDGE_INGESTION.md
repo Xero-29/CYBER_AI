@@ -10,7 +10,7 @@ Instala los extras documentales con:
 pip install -r requirements-documents.txt
 ```
 
-Cada fragmento almacenado está limitado a 2 MiB y la lectura de datos comprimidos está acotada para evitar expansiones descontroladas. El extractor aplica límites de 100 MiB por archivo, 256 MiB de expansión para paquetes Office, 10.000 entradas ZIP, ratio de compresión máximo de 500, 200.000 filas/registros, 5.000 páginas/diapositivas y 10 millones de caracteres extraídos. Los límites de texto se aplican durante la lectura/iteración para HTML, CSV, JSONL, PDF y Office; JSON tiene además un límite de 20 MiB de entrada.
+Cada fragmento almacenado está limitado a 2 MiB y la lectura de datos comprimidos está acotada para evitar expansiones descontroladas. Los embeddings deben ser vectores finitos no nulos de hasta 65.536 dimensiones; la norma y la similitud coseno se calculan de forma estable para evitar overflow numérico. Los límites de `top_k`, `min_score` y `limit` se validan estrictamente y no se corrigen de forma silenciosa. El extractor aplica límites de 100 MiB por archivo, 256 MiB de expansión para paquetes Office, 10.000 entradas ZIP, ratio de compresión máximo de 500, 200.000 filas/registros, 5.000 páginas/diapositivas y 10 millones de caracteres extraídos. Los límites de texto se aplican durante la lectura/iteración para HTML, CSV, JSONL, PDF y Office; JSON tiene además un límite de 20 MiB de entrada.
 
 La generación de embeddings se completa por lotes antes de publicar los fragmentos. Si un lote falla, el documento no deja una importación parcial visible en la biblioteca; el guardado final de los fragmentos es una sola transacción SQLite.
 
@@ -24,6 +24,7 @@ La generación de embeddings se completa por lotes antes de publicar los fragmen
 - Los parsers siguen ejecutándose dentro del proceso local. Hasta disponer de sandbox dedicada para extracción, importa solo documentos confiables.
 - El texto extraído se envía al proveedor de embeddings configurado; no envíes documentos confidenciales a proveedores remotos sin autorización y política de datos.
 - La ingesta no verifica licencias ni concede derechos de redistribución. Registra procedencia y licencia antes de compartir el contenido.
+- `tenant_id` es un filtro de ámbito, no una identidad autenticada. Una API multiusuario debe derivarlo de un contexto RBAC/IdP confiable; nunca debe aceptar el identificador de tenant directamente desde una petición no confiable.
 
 ## Validación pendiente
 
