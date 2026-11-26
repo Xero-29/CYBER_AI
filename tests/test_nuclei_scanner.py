@@ -14,6 +14,7 @@ from nuclei_scanner import (
     _close_process_output,
     _inspect_output_file,
     _iter_output_chunks,
+    _sanitize_console_text,
     _terminate_process_tree,
     MAX_SCAN_OUTPUT_BYTES,
 )
@@ -288,6 +289,13 @@ class NucleiScannerTests(unittest.TestCase):
         chunks = list(_iter_output_chunks(stream, max_chars=2001))
         self.assertGreater(len(chunks), 1)
         self.assertTrue(all(len(chunk) <= 2001 for chunk in chunks))
+
+    def test_console_output_escapes_terminal_control_and_bidi_characters(self):
+        untrusted = "safe\\x1b]52;c;clipboard\\x07\\u202e"
+        self.assertEqual(
+            _sanitize_console_text(untrusted),
+            "safe\\\\u001b]52;c;clipboard\\\\u0007\\\\u202e",
+        )
 
     def test_output_reader_is_closed_after_drain(self):
         process = FakeProcess()
