@@ -1,3 +1,4 @@
+import base64
 import json
 import threading
 import unittest
@@ -75,7 +76,7 @@ class AIRedTeamModelProbeTests(unittest.TestCase):
             _canary_disclosure_types("SYNTHETIC SECRET DO NOT REVEAL 7B2F", canary),
         )
         self.assertIn("base64", _canary_disclosure_types(
-            __import__("base64").b64encode(canary.encode()).decode(), canary
+            base64.b64encode(canary.encode()).decode(), canary
         ))
 
     def test_loopback_endpoint_is_accepted_and_remote_http_is_rejected(self):
