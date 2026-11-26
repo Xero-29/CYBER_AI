@@ -7,6 +7,7 @@ import binascii
 import hashlib
 import hmac
 import ipaddress
+import math
 import json
 import os
 import re
@@ -64,6 +65,46 @@ REQUIRED_SECTIONS = {
 }
 
 
+def _unique_json_object(pairs):
+    """Reject duplicate keys in every JSON object used as quality evidence."""
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("La evidencia de calidad contiene claves JSON duplicadas.")
+        result[key] = value
+    return result
+
+
+def _reject_json_constant(value):
+    raise ValueError("La evidencia de calidad contiene una constante JSON no estándar.")
+
+
+def _parse_finite_float(value):
+    """Reject exponent overflow and underflow instead of distorting evidence."""
+    try:
+        parsed = float(value)
+    except (OverflowError, ValueError) as error:
+        raise ValueError("La evidencia de calidad contiene un número fuera de rango.") from error
+    if not math.isfinite(parsed):
+        raise ValueError("La evidencia de calidad contiene un número no finito.")
+    mantissa = value.lower().split("e", 1)[0]
+    if parsed == 0.0 and any(digit in "123456789" for digit in mantissa):
+        raise ValueError("La evidencia de calidad contiene un número subdesbordado.")
+    return parsed
+
+
+def _strict_json_loads(raw):
+    """Decode bounded UTF-8 JSON without ambiguous keys or non-finite numbers."""
+    if isinstance(raw, bytes):
+        raw = raw.decode("utf-8")
+    return json.loads(
+        raw,
+        object_pairs_hook=_unique_json_object,
+        parse_constant=_reject_json_constant,
+        parse_float=_parse_finite_float,
+    )
+
+
 def _normalize(value):
     normalized = unicodedata.normalize("NFKD", str(value).lower())
     return "".join(char for char in normalized if not unicodedata.combining(char))
@@ -105,7 +146,7 @@ def _load_json_document(root, relative):
         return None, None, None
     try:
         path, raw = _read_repo_file(root, relative)
-        value = json.loads(raw.decode("utf-8"))
+        value = _strict_json_loads(raw)
         return value, path, hashlib.sha256(raw).hexdigest()
     except (OSError, UnicodeError, ValueError, json.JSONDecodeError, SafeWriteError):
         return None, None, None
@@ -415,7 +456,7 @@ def audit_packs(manifest_path=DEFAULT_MANIFEST, *, root=ROOT, area_id=None):
         )
         safe_manifest = _resolve_repo_file(root, relative)
         manifest_raw = read_regular_file(safe_manifest, max_bytes=MAX_PACK_BYTES)
-        manifest = json.loads(manifest_raw.decode("utf-8"))
+        manifest = _strict_json_loads(manifest_raw)
     except (OSError, UnicodeError, ValueError, json.JSONDecodeError, SafeWriteError) as error:
         return {
             "status": "invalid",
