@@ -20,6 +20,9 @@ class PrivateSQLiteTests(unittest.TestCase):
     def test_creates_working_database_with_private_posix_permissions(self):
         connection = connect_private_sqlite(self.database)
         try:
+            self.assertEqual(connection.execute("PRAGMA trusted_schema").fetchone()[0], 0)
+            self.assertEqual(connection.execute("PRAGMA secure_delete").fetchone()[0], 1)
+            self.assertEqual(connection.execute("PRAGMA foreign_keys").fetchone()[0], 1)
             connection.execute("CREATE TABLE sample (value TEXT NOT NULL)")
             connection.execute("INSERT INTO sample(value) VALUES (?)", ("ok",))
             self.assertEqual(
