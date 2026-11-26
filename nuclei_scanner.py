@@ -12,6 +12,7 @@ import subprocess
 import sys
 import threading
 import time
+import unicodedata
 from collections import deque
 from pathlib import Path
 from execution_policy import AuthorizationError, authorize_target, canonicalize_target
@@ -73,6 +74,21 @@ def _iter_output_chunks(stream, max_chars=2001):
             yield chunk
     else:
         yield from stream
+
+
+def _sanitize_console_text(value):
+    """Escape terminal control/formatting characters from untrusted tool output."""
+    safe = []
+    for char in str(value):
+        if unicodedata.category(char) in {"Cc", "Cf", "Cs"}:
+            codepoint = ord(char)
+            safe.append(
+                f"\\u{codepoint:04x}" if codepoint <= 0xFFFF
+                else f"\\U{codepoint:08x}"
+            )
+        else:
+            safe.append(char)
+    return "".join(safe)
 
 
 def _inspect_output_file(path):
@@ -351,7 +367,7 @@ def scan_target(target, timeout=45, authorized=False, authorization_id=None,
                 for line in _iter_output_chunks(process.stdout):
                     line = line.rstrip()
                     if line:
-                        safe_line = redact_text(line[:2000])
+                        safe_line = _sanitize_console_text(redact_text(line[:2000]))
                         messages.append(safe_line)
                         if console_line_count["value"] < MAX_SCANNER_CONSOLE_LINES:
                             print(f"[Nuclei] {safe_line}", flush=True)
