@@ -549,20 +549,36 @@ def _safe_relative(value):
 
 def _validate_portable_file_paths(paths):
     """Reject case-fold collisions and file/directory aliases on Windows."""
-    seen = set()
+    seen_files = set()
+    seen_directories = {}
     for value in paths:
         relative = _safe_relative(value)
-        parts = tuple(part.casefold() for part in relative.parts)
+        original_parts = tuple(relative.parts)
+        parts = tuple(part.casefold() for part in original_parts)
+        for index in range(1, len(parts)):
+            directory_key = parts[:index]
+            directory_spelling = original_parts[:index]
+            previous_spelling = seen_directories.get(directory_key)
+            if (
+                previous_spelling is not None
+                and previous_spelling != directory_spelling
+            ):
+                raise BackupError(
+                    "El backup contiene directorios que colisionan por "
+                    "mayúsculas/minúsculas."
+                )
+            seen_directories[directory_key] = directory_spelling
         if (
-            parts in seen
-            or any(parts[:index] in seen for index in range(1, len(parts)))
-            or any(existing[:len(parts)] == parts for existing in seen)
+            parts in seen_files
+            or any(parts[:index] in seen_files for index in range(1, len(parts)))
+            or parts in seen_directories
+            or any(existing[:len(parts)] == parts for existing in seen_files)
         ):
             raise BackupError(
                 "El backup contiene rutas que colisionan por mayúsculas/minúsculas "
                 "o por conflicto entre archivo y directorio."
             )
-        seen.add(parts)
+        seen_files.add(parts)
 
 
 def _validate_manifest(snapshot, manifest, *, require_signature=False):
