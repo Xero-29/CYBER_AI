@@ -32,3 +32,6 @@ reports/
 .DS_Store
 Thumbs.db
 *.bak*
+
+# Local autonomous skill lab reports
+reports/skill_lab/
