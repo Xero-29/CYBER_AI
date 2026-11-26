@@ -160,12 +160,13 @@ def _validate_private_data_tree(root):
                 raise BackupError("Los directorios de datos/backup deben ser privados (0700).")
         for path in files:
             info = path.lstat()
-            if (
-                not _is_regular_file_info(info)
-                or info.st_uid != os.geteuid()
-                or info.st_nlink != 1
-                or stat.S_IMODE(info.st_mode) & 0o077
-            ):
+            if not _is_regular_file_info(info):
+                raise BackupError("Solo se permiten archivos regulares en datos/backup.")
+            if info.st_uid != os.geteuid():
+                raise BackupError("Los archivos de datos/backup deben pertenecer al usuario.")
+            if info.st_nlink != 1:
+                raise BackupError("No se permiten enlaces duros en archivos de datos/backup.")
+            if stat.S_IMODE(info.st_mode) & 0o077:
                 raise BackupError("Los archivos de datos/backup deben ser privados (0600).")
     else:
         for directory in directories:
