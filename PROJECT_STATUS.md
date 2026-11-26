@@ -1,48 +1,49 @@
-# Estado vigente — 2026-11-26 (aislamiento de almacenamiento y endurecimiento de backup)
+# Estado vigente — 2026-11-26 (almacenamiento privado y backup fail-closed)
 
-> Ningún resultado de CI se atribuye a otro SHA. Pending, in_progress y cancelled no son éxito.
+> Los checks solo validan el SHA exacto que ejecutaron. Pending, in_progress y cancelled no son éxito.
 
 ## Repositorio, ramas y PRs
 
-- Repositorio: `Xero-29/CYBER_AI`; rama de trabajo: `codex/security-integrity-audit`.
-- HEAD antes de este registro: `5de90c6b83931cec877009172b810760dab1ab30`. Este registro genera un commit documental posterior; se debe validar el SHA resultante.
+- Repositorio: `Xero-29/CYBER_AI`; rama: `codex/security-integrity-audit`.
+- HEAD antes de este registro: `e3c8715cd4f0718261aca14aad2397c96212da65`. El commit documental resultante tendrá un SHA nuevo y requiere sus propios checks.
 - `main`: `658a565acd0a5568bb56a1a7482f44260cd9efd1`; ancestro común: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.
-- Comparación exacta antes de este registro: **442 commits exclusivos de esta rama y 576 exclusivos de `main`**. No existe un único commit exclusivo de `main`; hay 576. No integrar mediante merge/rebase/cherry-pick directo. Se preservan, entre otros, `387104756d0f8307c39a46a1ea2df07671bd81c9`, `554ec1cdd45de3bb0e0f24156b0a9a8ac19193da` y `658a565acd0a5568bb56a1a7482f44260cd9efd1`.
-- PR #2: **cerrado y fusionado** el 2026-11-17; merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. Verificado. No se crea duplicado.
-- No hay PR abierto cuyo head sea `codex/security-integrity-audit`. PR #17–#18 y #20–#27 continúan abiertas en Draft en ramas separadas; PR #19 está cerrada sin merge.
-- GitHub informa `protected=false` para esta rama. No se han demostrado rulesets ni required checks. La protección de rama debe configurarse/verificarse antes de integrar.
-- En el HEAD `5de90c6`, Python Tests [45851273643](https://github.com/Xero-29/CYBER_AI/actions/runs/45851273643) estaba **pending** y Docker Sandbox [45851273759](https://github.com/Xero-29/CYBER_AI/actions/runs/45851273759) **in_progress**. Los runs de SHA anteriores se cancelaron por nuevas actualizaciones y no cuentan como validación. El commit documental de este registro también requiere checks propios.
-- No se modificó `main`, no se fusionó/rebasó ninguna rama, no se hizo force-push y no se alteró PR #2.
+- Comparación exacta antes de este registro: **449 commits exclusivos de esta rama y 576 exclusivos de `main`**. No hay un único commit exclusivo de `main`; son 576. No hacer integración directa. Se preservan, entre otros, `387104756d0f8307c39a46a1ea2df07671bd81c9`, `554ec1cdd45de3bb0e0f24156b0a9a8ac19193da` y `658a565acd0a5568bb56a1a7482f44260cd9efd1`.
+- PR #2: **cerrado y fusionado** el 2026-11-17; merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. Verificado, sin duplicación.
+- No existe PR abierto cuyo head sea esta rama. PR #17–#18 y #20–#27 siguen abiertas en Draft en ramas separadas; PR #19 está cerrada sin merge.
+- GitHub informa `protected=false` para esta rama. No se han demostrado rulesets ni required checks; configurar/verificar protección antes de integrar.
+- En el HEAD `e3c8715`, Python Tests [45851762519](https://github.com/Xero-29/CYBER_AI/actions/runs/45851762519) y Docker Sandbox [45851762522](https://github.com/Xero-29/CYBER_AI/actions/runs/45851762522) estaban **pending**. Los runs de SHA anteriores se cancelaron por nuevas actualizaciones y no validan este HEAD. El commit documental también requiere checks exactos.
+- No se modificó `main`, no se hizo merge/rebase/force-push y no se alteró PR #2.
 
 ## Correcciones implementadas en este corte
 
-- `private_sqlite.py`: directorios POSIX `0700`, bases y sidecars `0600`; rechaza symlinks/reparse points, hardlinks, archivos especiales y cambios de identidad; valida `-journal`, `-wal` y `-shm`. Las conexiones aplican `trusted_schema=OFF`, `secure_delete=ON` y `foreign_keys=ON`.
-- Integrado en `knowledge_library.py`, `knowledge_registry.py`, `skillbook.py` y `compressed_store.py`. El ledger de ejecución conserva su guarda propia.
-- `compressed_store.py`: bloques UTF-8 limitados a 2 MiB, metadata a 64 KiB, límites de salida de descompresión, validación estricta de metadata y comprobación de longitudes SQL antes de cargar BLOBs. Se validan identificadores y límites de consulta.
-- `data_backup.py`: manifiestos JSON estrictos (claves duplicadas, constantes no estándar y exponentes no representables rechazados); snapshots abren el origen SQLite en modo read-only y usan destino/restauración SQLite privados.
-- `scanner_output.py` y `nuclei_scanner.py`: rechazo de exponentes JSON fuera de rango y escape de controles de terminal/bidireccionales en salida no confiable.
-- `llm_providers.py`: respuestas HTTP acotadas, sin redirecciones, JSON estricto, payloads no finitos rechazados y URL base canónica.
-- `knowledge_pack_quality.py`: manifiestos y evidencia de fuentes/labs/revisiones JSON estrictos; evidencia ambigua o numéricamente corrupta no puede promover un pack.
-- `knowledge_library.py`: vectores hasta 65.536 dimensiones, normas/similitud estables, overflow rechazado y límites estrictos de búsqueda.
+- `private_sqlite.py`: directorios POSIX `0700`, bases/sidecars `0600`, rechazo de symlinks/reparse points, hardlinks y archivos especiales, comprobación de identidad antes/después de conectar. Conexiones aplican `trusted_schema=OFF`, `secure_delete=ON` y `foreign_keys=ON`.
+- Integrado en `knowledge_library.py`, `knowledge_registry.py`, `skillbook.py` y `compressed_store.py`; el ledger conserva su guarda propia.
+- `compressed_store.py`: contenido máximo 2 MiB, metadata 64 KiB, comprobación SQL de longitudes antes de materializar BLOBs, descompresión limitada, metadata JSON estricta y filtros/identificadores acotados.
+- `data_backup.py`: exige árbol POSIX privado para origen, snapshot y destino existente; rechaza archivos públicos, hardlinks y archivos especiales. Abre la base origen SQLite en solo lectura y usa conexiones privadas para snapshot/restauración.
+- `data_backup.py`: manifiesto JSON estricto; rechaza claves duplicadas, constantes no estándar y exponentes no finitos/subdesbordados.
+- `scanner_output.py` y `nuclei_scanner.py`: JSONL estricto y escape de controles de terminal/bidireccionales.
+- `llm_providers.py`: transporte HTTP limitado, sin redirecciones, JSON estricto y URL base canónica.
+- `knowledge_pack_quality.py`: evidencia JSON estricta; ambigüedad o números no representables no promueven packs.
+- `knowledge_library.py`: embeddings hasta 65.536 dimensiones, normas/coseno estables y límites de búsqueda estrictos.
 - Regresiones nuevas en `tests/test_private_sqlite.py`, `tests/test_compressed_store.py`, `tests/test_data_backup.py`, `tests/test_knowledge_library.py`, `tests/test_knowledge_registry.py`, `tests/test_skillbook.py`, `tests/test_knowledge_pack_quality.py`, `tests/test_llm_providers.py`, `tests/test_scanner_output.py` y `tests/test_nuclei_scanner.py`.
 - Documentación actualizada en `docs/LOCAL_STORAGE_SECURITY.md`, `docs/BACKUP_RESTORE_SECURITY.md`, `docs/KNOWLEDGE_INGESTION.md`, `docs/KNOWLEDGE_PACK_QUALITY.md`, `docs/PROVIDER_PLUGIN_CONTRACT.md` y `docs/TOOL_ALLOWLIST.md`.
-- Límite explícito: `tenant_id` y `session_id` son filtros de ámbito, no identidad autenticada. Una API multiusuario debe derivarlos de RBAC/IdP confiable, nunca de parámetros controlados por el cliente.
+- Límite explícito: `tenant_id` y `session_id` son filtros de ámbito, no autenticación. Una API multiusuario debe derivarlos de RBAC/IdP confiable.
 
 ## Validación y límites
 
-- No hay checkout local del repositorio en este entorno; no se afirma ejecución local de `verify.sh` ni de la suite.
-- Los workflows deben concluir success sobre el HEAD final exacto; revisar todos los jobs/steps de Python Tests y Docker Sandbox y artefactos SBOM/provenance del mismo SHA.
-- Los permisos POSIX no cifran datos. En Windows se detectan reparse points, pero no se configuran ni auditan ACL NTFS; requiere intervención de infraestructura.
-- Los backups siguen `encrypted: false`: HMAC da integridad/autenticidad, no confidencialidad. Faltan KMS/HSM, cifrado, custodia/rotación y almacenamiento offsite/WORM.
-- La restauración en infraestructura limpia, RPO/RTO, corrupción, pérdida de clave, caída de almacenamiento y failover requieren simulacros reales.
+- No hay checkout local en este entorno; no se afirma ejecución local de `verify.sh` ni de la suite.
+- CI debe concluir success en el HEAD final exacto. Revisar todos los jobs/steps de Python Tests y Docker Sandbox, además de SBOM/provenance del mismo SHA.
+- En Windows se detectan reparse points, pero no se configuran/auditan ACL NTFS. Requiere intervención externa.
+- Backups siguen `encrypted: false`: HMAC da integridad, no confidencialidad. Faltan KMS/HSM, cifrado, custodia/rotación, WORM/offsite y simulacros RPO/RTO.
+- La confirmación de quiescencia sigue siendo una decisión del operador; no se puede demostrar que procesos externos estén detenidos.
 - Nuclei requiere binario/plantillas aprobados, objetivo de laboratorio explícitamente autorizado, ledger activo y ejecución real.
-- POSIX process groups permiten escapes mediante `setsid/setpgid`; faltan cgroups/namespaces o microVM. Windows necesita Job Objects y ACL probadas.
-- El runner host no impone egress; falta desplegar/probar gateway con DNS pinning y política de salida.
+- POSIX process groups permiten escapes con `setsid/setpgid`; faltan cgroups/namespaces o microVM. Windows necesita Job Objects y ACL probadas.
+- El runner host no impone egress; falta gateway con DNS pinning y política de salida.
 - Faltan RBAC/IdP/MFA, observabilidad central, pruebas de carga/soak, fault injection y revisión independiente de la biblioteca.
 - Biblioteca: 48 áreas, 0 `expert_ready`, 48 `foundation_draft`; no promover sin fuentes primarias leídas, licencias/procedencia, claims trazables, labs reproducibles, datasets expertos y revisión independiente.
-- La reconciliación con `main` requiere rama separada y revisión de tres vías que preserve los 576 commits exclusivos de `main`.
+- Reconciliar `main` solo en rama separada con revisión de tres vías y preservación de los 576 commits exclusivos.
 
-**Conclusión:** se protegieron bases SQLite locales, se limitaron lecturas comprimidas y se endureció la verificación de snapshots. No se declara aceptación operativa; CI del HEAD resultante y pruebas/infraestructura externas siguen pendientes.
+**Conclusión:** las bases SQLite y backups locales ahora fallan cerrados ante enlaces, permisos inseguros y lecturas comprimidas fuera de límite. No es aceptación operacional; el CI del HEAD resultante y las pruebas externas siguen pendientes.
 
 
 ---
