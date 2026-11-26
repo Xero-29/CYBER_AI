@@ -12,6 +12,8 @@
 
 El manifiesto enumera rutas relativas canónicas, tipo de artefacto, tamaño y SHA-256. Se rechazan enlaces simbólicos/puntos de reanálisis, archivos especiales, rutas fuera del snapshot, entradas duplicadas, archivos no declarados y cambios detectados durante lectura/copia. Los snapshots SQLite se validan con `PRAGMA integrity_check`. El origen se abre en modo solo lectura; el destino y la restauración usan la guarda de SQLite privado, con directorio `0700`, archivo `0600` en POSIX y `trusted_schema=OFF`, `secure_delete=ON`, `foreign_keys=ON`. El parser del manifiesto también rechaza claves JSON duplicadas, constantes no estándar y exponentes que desbordan o subdesbordan el rango `float`.
 
+En POSIX, el árbol de origen y el snapshot deben ser privados: directorios propiedad del usuario sin acceso de grupo/otros (normalmente `0700`) y archivos regulares del mismo usuario sin acceso de grupo/otros (normalmente `0600`). Se rechazan hardlinks, symlinks y archivos especiales. En Windows la política ACL debe verificarse aparte.
+
 La restauración verifica el backup antes de preparar un directorio temporal privado. Comprueba de nuevo el manifiesto y los hashes antes de publicar mediante reemplazo atómico. Si sustituye datos existentes, conserva el directorio anterior con un nombre `pre-restore`; ante un fallo intenta restaurarlo y, si no puede hacerlo con seguridad, lo deja preservado en su ubicación anterior.
 
 ## Límites operativos
