@@ -361,6 +361,9 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
             "https://api.example/v1\n",
             "https://api.example /v1",
             "https://api.example/v1\t",
+            "https://api.example/v1?",
+            "https://api.example/v1#",
+            "https://api.example%2f.evil/v1",
         ):
             config = {"llm_providers": {"cloud": {
                 "enabled": True, "protocol": "openai", "base_url": base_url,
