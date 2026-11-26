@@ -26,6 +26,11 @@ SCHEMA = "cyber-ai-data-backup-v1"
 MAX_BACKUP_FILES = 50_000
 MAX_MANIFEST_BYTES = 16 * 1024 * 1024
 MAX_MANIFEST_DEPTH = 64
+_WINDOWS_RESERVED_NAME = re.compile(
+    r"^(?:CON|PRN|AUX|NUL|CONIN\$|CONOUT\$|COM[1-9¹²³]|LPT[1-9¹²³])$",
+    re.IGNORECASE,
+)
+_WINDOWS_FORBIDDEN_CHARS = frozenset('<>:"\\|?*')
 
 
 class BackupError(ValueError):
@@ -507,16 +512,57 @@ def _manifest_signature(manifest, key):
 
 
 def _safe_relative(value):
+    """Validate a canonical path that is safe on POSIX and Windows filesystems."""
     if not isinstance(value, str) or not value or "\\" in value:
         raise BackupError(f"Ruta insegura en manifiesto: {value!r}")
     rel = PurePosixPath(value)
     if (
         rel.is_absolute() or not rel.parts or ".." in rel.parts
-        or value != rel.as_posix() or rel.parts[0].endswith(":")
-        or rel.as_posix() == "manifest.json"
+        or value != rel.as_posix() or rel.as_posix() == "manifest.json"
     ):
         raise BackupError(f"Ruta insegura en manifiesto: {value!r}")
+    for part in rel.parts:
+        device_stem = part.split(".", 1)[0].rstrip(" .")
+        try:
+            utf8_length = len(part.encode("utf-8"))
+            utf16_length = len(part.encode("utf-16-le")) // 2
+        except UnicodeEncodeError as error:
+            raise BackupError("La ruta contiene texto Unicode no válido.") from error
+        if (
+            part in {".", ".."}
+            or part.endswith((" ", "."))
+            or any(
+                ord(character) < 0x20
+                or ord(character) == 0x7F
+                or character in _WINDOWS_FORBIDDEN_CHARS
+                for character in part
+            )
+            or _WINDOWS_RESERVED_NAME.fullmatch(device_stem)
+            or utf8_length > 255
+            or utf16_length > 255
+        ):
+            raise BackupError(
+                f"Ruta insegura o no portable entre sistemas de archivos: {value!r}"
+            )
     return rel
+
+
+def _validate_portable_file_paths(paths):
+    """Reject case-fold collisions and file/directory aliases on Windows."""
+    seen = set()
+    for value in paths:
+        relative = _safe_relative(value)
+        parts = tuple(part.casefold() for part in relative.parts)
+        if (
+            parts in seen
+            or any(parts[:index] in seen for index in range(1, len(parts)))
+            or any(existing[:len(parts)] == parts for existing in seen)
+        ):
+            raise BackupError(
+                "El backup contiene rutas que colisionan por mayúsculas/minúsculas "
+                "o por conflicto entre archivo y directorio."
+            )
+        seen.add(parts)
 
 
 def _validate_manifest(snapshot, manifest, *, require_signature=False):
@@ -583,6 +629,7 @@ def _validate_manifest(snapshot, manifest, *, require_signature=False):
         expected.add(key)
         verified.append(key)
 
+    _validate_portable_file_paths(seen)
     actual = set()
     for current, dirs, names in os.walk(snapshot, followlinks=False):
         current_path = Path(current)
@@ -681,9 +728,13 @@ def _sqlite_snapshot(source, destination):
     _fsync_regular_file(destination)
 
 
-def create_backup(data_dir=DEFAULT_DATA, destination=None, *, allow_unsigned=False):
+def create_backup(data_dir=DEFAULT_DATA, destination=None, *, confirm_quiesced=False, allow_unsigned=False):
     if not isinstance(allow_unsigned, bool):
         raise BackupError("allow_unsigned debe ser un booleano explícito.")
+    if not isinstance(confirm_quiesced, bool) or confirm_quiesced is not True:
+        raise BackupError(
+            "Crear un backup requiere confirm_quiesced=True para confirmar que los escritores están detenidos."
+        )
     signing_key = _backup_signing_key()
     if signing_key is None and allow_unsigned is not True:
         raise BackupError(
@@ -734,6 +785,7 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None, *, allow_unsigned=Fal
                 if len(entries) >= MAX_BACKUP_FILES:
                     raise BackupError("El directorio de datos supera el límite de archivos del backup.")
                 relative = source.relative_to(data_dir).as_posix()
+                _safe_relative(relative)
                 if relative == "manifest.json":
                     raise BackupError("data/manifest.json está reservado para el manifiesto del backup.")
                 target = staging / relative
@@ -763,6 +815,7 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None, *, allow_unsigned=Fal
                     "path": relative, "kind": kind, "size": target.stat().st_size,
                     "sha256": _sha256(target),
                 })
+        _validate_portable_file_paths(entry["path"] for entry in entries)
         manifest = {
             "schema": SCHEMA,
             "created_at": datetime.now(timezone.utc).isoformat(),
@@ -971,7 +1024,8 @@ def main(argv=None):
                     "solo para backups no productivos."
                 )
             result = create_backup(
-                args.data_dir, args.destination, allow_unsigned=args.allow_unsigned
+                args.data_dir, args.destination, confirm_quiesced=True,
+                allow_unsigned=args.allow_unsigned
             )
         elif args.command == "verify":
             result = verify_backup(args.snapshot, require_signature=args.require_signature)
