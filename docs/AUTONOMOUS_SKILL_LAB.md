@@ -20,13 +20,13 @@ Requisitos: Linux, Docker Engine operativo, Python 3.10+, Ollama local y los dos
 ```bash
 ollama pull qwen3.5:9b
 ollama pull qwen3.5:2b-q4_K_M
-./build-rust-skill-lab.sh
+sh ./build-rust-skill-lab.sh
 ```
 
 ## Prueba
 
 ```bash
-./run-skill-lab.sh --task "Demuestra con un laboratorio Rust que los accesos fuera de los límites de un vector son detectados de forma segura y añade pruebas unitarias."
+sh ./run-skill-lab.sh --task "Demuestra con un laboratorio Rust que los accesos fuera de los límites de un vector son detectados de forma segura y añade pruebas unitarias."
 ```
 
 Para cambiar modelos:
