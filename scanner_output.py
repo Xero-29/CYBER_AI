@@ -1,5 +1,6 @@
 """Bounded, race-aware parsing of newline-delimited scanner evidence."""
 import json
+import math
 import stat
 from pathlib import Path
 
@@ -18,6 +19,20 @@ def _unique_object(pairs):
 
 def _reject_constant(value):
     raise ValueError(f"Constante JSON no estándar: {value}")
+
+
+def _parse_finite_float(value):
+    """Reject exponent overflow and underflow instead of corrupting evidence."""
+    try:
+        parsed = float(value)
+    except (OverflowError, ValueError) as error:
+        raise ValueError("La evidencia JSON contiene un número fuera de rango.") from error
+    if not math.isfinite(parsed):
+        raise ValueError("La evidencia JSON contiene un número no finito.")
+    mantissa = value.lower().split("e", 1)[0]
+    if parsed == 0.0 and any(digit in "123456789" for digit in mantissa):
+        raise ValueError("La evidencia JSON contiene un número subdesbordado.")
+    return parsed
 
 
 def read_jsonl_findings(
@@ -101,6 +116,7 @@ def read_jsonl_findings(
                 line,
                 object_pairs_hook=_unique_object,
                 parse_constant=_reject_constant,
+                parse_float=_parse_finite_float,
             )
         except (json.JSONDecodeError, ValueError, RecursionError):
             return [], False, True
