@@ -178,6 +178,28 @@ class DataBackupTests(unittest.TestCase):
         with self.assertRaises(BackupError):
             self.create_unsigned_backup(self.root / "backup")
 
+    @unittest.skipUnless(os.name == "posix", "POSIX file permissions required")
+    def test_backup_refuses_group_or_world_readable_source_files(self):
+        os.chmod(self.data / "events.jsonl", 0o644)
+        with self.assertRaisesRegex(BackupError, "privados"):
+            self.create_unsigned_backup(self.root / "public-source-backup")
+
+    @unittest.skipUnless(os.name == "posix", "POSIX file permissions required")
+    def test_restore_refuses_non_private_existing_destination(self):
+        snapshot = self.root / "backup"
+        self.create_unsigned_backup(snapshot, data_dir=self.data)
+        destination = self.root / "destination"
+        destination.mkdir(mode=0o755)
+        marker = destination / "keep.txt"
+        marker.write_text("preserve", encoding="utf-8")
+        os.chmod(destination, 0o755)
+        os.chmod(marker, 0o644)
+        with self.assertRaisesRegex(BackupError, "privados"):
+            self.restore_unsigned_backup(
+                snapshot, destination, confirm_quiesced=True, confirm_replace=True
+            )
+        self.assertEqual(marker.read_text(encoding="utf-8"), "preserve")
+
     def test_restore_requires_explicit_quiescence_and_replace(self):
         snapshot = self.root / "backup"
         self.create_unsigned_backup(snapshot, data_dir=self.data)
