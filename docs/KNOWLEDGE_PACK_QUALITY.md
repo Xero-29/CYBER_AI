@@ -26,6 +26,8 @@ Los paquetes versionados contienen guías editoriales iniciales. No deben descri
 
 El registro de revisión se invalida si cambia el paquete, el registro de fuentes, el registro de laboratorio o cualquiera de los artefactos firmados. Una revisión debe repetirse sobre los nuevos hashes.
 
+El auditor carga el manifiesto y los registros JSON de fuentes, laboratorio y revisión con un parser estricto: rechaza claves duplicadas en cualquier nivel, NaN/Infinity y exponentes que desbordan o subdesbordan el rango `float`. Un documento JSON ambiguo o numéricamente no representable no aporta fuentes, laboratorios ni revisiones verificadas.
+
 ## Diagnóstico de bloqueos por especialidad
 
 El informe JSON de `knowledge_pack_quality.py` incluye `readiness_blockers` para cada área. Los códigos son deliberadamente conservadores:
