@@ -11,6 +11,8 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import urlparse
 
+from private_sqlite import connect_private_sqlite
+
 from execution_ledger import ExecutionLedger
 
 PROJECT = Path(__file__).resolve().parent
@@ -22,8 +24,7 @@ def now():
 
 
 def connect():
-    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    db = sqlite3.connect(str(DB_PATH), timeout=10)
+    db = connect_private_sqlite(DB_PATH, timeout=10)
     db.row_factory = sqlite3.Row
     db.execute("PRAGMA busy_timeout=10000")
     db.execute("PRAGMA foreign_keys=ON")
