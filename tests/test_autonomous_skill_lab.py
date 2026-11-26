@@ -100,6 +100,8 @@ class AutonomousSkillLabTests(unittest.TestCase):
             self.assertEqual(len(found), 1)
             self.assertEqual(found[0]["status"], "candidate_only")
             self.assertEqual(found[0]["candidate_sha256"], digest)
+            self.assertEqual(memory.parent.stat().st_mode & 0o777, 0o700)
+            self.assertEqual(memory.stat().st_mode & 0o777, 0o600)
 
     def test_failed_or_inconclusive_execution_is_not_promoted(self):
         plan = {"objective": "safe demonstration"}
