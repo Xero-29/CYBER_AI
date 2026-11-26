@@ -34,7 +34,7 @@ Para cambiar modelos:
 ```bash
 CYBER_AI_PLANNER_MODEL=cyber-nexo:9b \
 CYBER_AI_EXECUTOR_MODEL=qwen3.5:4b-q4_K_M \
-./run-skill-lab.sh --task "..." 
+sh ./run-skill-lab.sh --task "..." 
 ```
 
 El endpoint Ollama se puede cambiar con `CYBER_AI_OLLAMA_URL`, pero este prototipo solo acepta HTTP loopback.
