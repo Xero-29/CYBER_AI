@@ -348,5 +348,55 @@ class KnowledgePackQualityTests(unittest.TestCase):
         self.assertTrue(_public_https_reference("https://docs.example.org/reference"))
 
 
+    def test_manifest_rejects_duplicate_json_keys(self):
+        with tempfile.TemporaryDirectory() as directory:
+            fixture = self._write_expert_fixture(Path(directory))
+            raw = fixture["manifest"].read_text(encoding="utf-8")
+            raw = raw.replace('"area_count": 1,', '"area_count": 1, "area_count": 1,', 1)
+            fixture["manifest"].write_text(raw, encoding="utf-8")
+            report = self._audit_fixture(fixture["manifest"])
+        self.assertEqual(report["status"], "invalid")
+        self.assertEqual(report["expert_ready_count"], 0)
+
+    def test_nested_source_registry_rejects_duplicate_json_keys(self):
+        with tempfile.TemporaryDirectory() as directory:
+            fixture = self._write_expert_fixture(Path(directory))
+            raw = fixture["sources"].read_text(encoding="utf-8")
+            raw = raw.replace('"id": "source-0",', '"id": "source-0", "id": "shadow",', 1)
+            fixture["sources"].write_text(raw, encoding="utf-8")
+            report = self._audit_fixture(fixture["manifest"])
+        self.assertEqual(report["expert_ready_count"], 0)
+        self.assertEqual(report["areas"][0]["verified_external_sources"], 0)
+
+    def test_source_registry_rejects_non_finite_and_out_of_range_numbers(self):
+        for number in ("NaN", "1e999", "-1e-999"):
+            with self.subTest(number=number), tempfile.TemporaryDirectory() as directory:
+                fixture = self._write_expert_fixture(Path(directory))
+                raw = fixture["sources"].read_text(encoding="utf-8")
+                raw = raw.replace(
+                    '"publisher": "Organismo oficial",',
+                    '"publisher": "Organismo oficial", "untrusted_score": ' + number + ',',
+                    1,
+                )
+                fixture["sources"].write_text(raw, encoding="utf-8")
+                report = self._audit_fixture(fixture["manifest"])
+            self.assertEqual(report["expert_ready_count"], 0)
+            self.assertEqual(report["areas"][0]["verified_external_sources"], 0)
+
+    def test_source_registry_accepts_finite_exponent_values(self):
+        with tempfile.TemporaryDirectory() as directory:
+            fixture = self._write_expert_fixture(Path(directory))
+            raw = fixture["sources"].read_text(encoding="utf-8")
+            raw = raw.replace(
+                '"publisher": "Organismo oficial",',
+                '"publisher": "Organismo oficial", "untrusted_score": -1.25e2,',
+                1,
+            )
+            fixture["sources"].write_text(raw, encoding="utf-8")
+            report = self._audit_fixture(fixture["manifest"])
+        self.assertEqual(report["expert_ready_count"], 1)
+        self.assertEqual(report["areas"][0]["verified_external_sources"], 5)
+
+
 if __name__ == "__main__":
     unittest.main()
