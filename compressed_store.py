@@ -15,6 +15,8 @@ from private_sqlite import connect_private_sqlite
 
 PROJECT = Path(__file__).resolve().parent
 DB_PATH = PROJECT / "data" / "compressed_memory.sqlite3"
+MAX_BLOCK_BYTES = 2 * 1024 * 1024
+MAX_METADATA_BYTES = 64 * 1024
 
 
 def utc_now():
@@ -78,11 +80,34 @@ def store_block(
 
     if not session_id or not str(session_id).strip():
         raise ValueError("session_id es obligatorio.")
+    session_text = str(session_id).strip()
+    if len(session_text) > 128 or any(ord(char) < 0x20 for char in session_text):
+        raise ValueError("session_id supera el límite o contiene controles.")
 
     if not kind or not str(kind).strip():
         raise ValueError("kind es obligatorio.")
+    kind_text = str(kind).strip()
+    if len(kind_text) > 64 or any(ord(char) < 0x20 for char in kind_text):
+        raise ValueError("kind supera el límite o contiene controles.")
+    if task_id is not None and (
+        not isinstance(task_id, (str, int))
+        or isinstance(task_id, bool)
+        or not str(task_id).strip()
+        or len(str(task_id)) > 128
+    ):
+        raise ValueError("task_id debe ser texto o entero acotado.")
+
+    if metadata is None:
+        metadata = {}
+    if not isinstance(metadata, dict):
+        raise ValueError("metadata debe ser un objeto.")
+    metadata_json = json.dumps(metadata, ensure_ascii=False, allow_nan=False)
+    if len(metadata_json.encode("utf-8")) > MAX_METADATA_BYTES:
+        raise ValueError("metadata supera el límite de 64 KiB.")
 
     original = content.encode("utf-8")
+    if len(original) > MAX_BLOCK_BYTES:
+        raise ValueError("El bloque supera el límite de 2 MiB.")
     compressed = zlib.compress(original, level=9)
     block_id = uuid.uuid4().hex
 
@@ -97,22 +122,22 @@ def store_block(
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             block_id,
-            str(session_id),
-            task_id,
-            str(kind),
+            session_text,
+            str(task_id) if task_id is not None else None,
+            kind_text,
             sqlite3.Binary(compressed),
             hashlib.sha256(original).hexdigest(),
             len(original),
             len(compressed),
-            json.dumps(metadata or {}, ensure_ascii=False),
+            metadata_json,
             utc_now(),
         ))
 
     return {
         "id": block_id,
-        "session_id": str(session_id),
+        "session_id": session_text,
         "task_id": task_id,
-        "kind": str(kind),
+        "kind": kind_text,
         "original_bytes": len(original),
         "compressed_bytes": len(compressed),
         "sha256": hashlib.sha256(original).hexdigest(),
@@ -132,10 +157,29 @@ def read_block(block_id, session_id):
     if row is None:
         raise KeyError("Bloque inexistente o ajeno a esta sesión.")
 
+    if (
+        not isinstance(row["original_bytes"], int)
+        or not 0 <= row["original_bytes"] <= MAX_BLOCK_BYTES
+        or not isinstance(row["compressed_bytes"], int)
+        or row["compressed_bytes"] < 0
+        or len(row["compressed_data"]) != row["compressed_bytes"]
+    ):
+        raise ValueError("Los tamaños declarados del bloque no son válidos.")
+
     try:
-        original = zlib.decompress(row["compressed_data"])
+        decompressor = zlib.decompressobj()
+        original = decompressor.decompress(
+            row["compressed_data"], MAX_BLOCK_BYTES + 1
+        )
     except zlib.error as error:
         raise ValueError("El bloque comprimido está dañado.") from error
+    if (
+        len(original) > MAX_BLOCK_BYTES
+        or decompressor.unconsumed_tail
+        or decompressor.unused_data
+        or not decompressor.eof
+    ):
+        raise ValueError("El bloque comprimido excede los límites o está incompleto.")
 
     actual_hash = hashlib.sha256(original).hexdigest()
     if actual_hash != row["sha256"]:
@@ -162,10 +206,19 @@ def read_block(block_id, session_id):
 
 def list_blocks(session_id, task_id=None, kind=None, limit=20):
     """Consulta el índice sin descomprimir el contenido de los bloques."""
-    if not session_id:
-        raise ValueError("session_id es obligatorio.")
-
-    limit = max(1, min(int(limit), 100))
+    if not isinstance(session_id, str) or not session_id.strip() or len(session_id) > 128:
+        raise ValueError("session_id debe ser texto no vacío de hasta 128 caracteres.")
+    if task_id is not None and (
+        not isinstance(task_id, (str, int)) or isinstance(task_id, bool)
+        or not str(task_id).strip() or len(str(task_id)) > 128
+    ):
+        raise ValueError("task_id inválido.")
+    if kind is not None and (
+        not isinstance(kind, str) or not kind.strip() or len(kind) > 64
+    ):
+        raise ValueError("kind inválido.")
+    if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= 100:
+        raise ValueError("limit debe ser un entero entre 1 y 100.")
 
     query = """
         SELECT id, session_id, task_id, kind, sha256,
