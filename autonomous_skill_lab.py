@@ -214,7 +214,7 @@ def persist_skill_candidate(task, procedure, planner_model, executor_model, path
     descriptor = os.open(memory_file, os.O_WRONLY | os.O_APPEND | os.O_CREAT, 0o600)
     os.chmod(memory_file, 0o600)
     with os.fdopen(descriptor, "a", encoding="utf-8") as stream:
-        stream.write(json.dumps(record, ensure_ascii=False, sort_keys=True) + "\\n")
+        stream.write(json.dumps(record, ensure_ascii=False, sort_keys=True) + "\n")
     return record["candidate_sha256"]
 
 def run_learning_cycle(task, *, planner_model="qwen3.5:9b",
