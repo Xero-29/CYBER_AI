@@ -730,6 +730,7 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
         data_dir_chain = _validate_directory_path(data_dir)
         data_dir = data_dir.resolve(strict=True)
         data_dir_chain = _validate_directory_path(data_dir)
+        _validate_private_data_tree(data_dir)
     else:
         _ensure_directory_path(data_dir.parent)
     data_parent_chain = _validate_directory_path(data_dir.parent)
