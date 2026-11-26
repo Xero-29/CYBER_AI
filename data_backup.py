@@ -572,7 +572,6 @@ def _validate_portable_file_paths(paths):
             parts in seen_files
             or any(parts[:index] in seen_files for index in range(1, len(parts)))
             or parts in seen_directories
-            or any(existing[:len(parts)] == parts for existing in seen_files)
         ):
             raise BackupError(
                 "El backup contiene rutas que colisionan por mayúsculas/minúsculas "
