@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import knowledge_library as library
+from private_sqlite import connect_private_sqlite
 
 
 def utc_now():
@@ -16,8 +17,7 @@ def utc_now():
 
 
 def connect():
-    library.DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    db = sqlite3.connect(str(library.DB_PATH), timeout=10)
+    db = connect_private_sqlite(library.DB_PATH, timeout=10)
     db.row_factory = sqlite3.Row
     db.execute("PRAGMA busy_timeout = 10000")
     return db
