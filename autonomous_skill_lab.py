@@ -100,7 +100,7 @@ def build_docker_command(workspace, *, image=DEFAULT_IMAGE, timeout=180):
         "--network=none", "--read-only", "--cap-drop=ALL",
         "--security-opt=no-new-privileges:true",
         "--pids-limit=96", "--memory=1g", "--cpus=2",
-        "--user=65532:65532",
+        f"--user={os.getuid()}:{os.getgid()}",
         "--tmpfs", "/tmp:rw,nosuid,nodev,size=512m",
         "--mount", f"type=bind,src={path},dst=/workspace",
         "--workdir=/workspace",
@@ -129,7 +129,16 @@ def run_rust_lab(files, *, image=DEFAULT_IMAGE, timeout=180, docker_bin="docker"
                 command, capture_output=True, text=True, check=False, timeout=timeout + 30,
             )
         except subprocess.TimeoutExpired as exc:
-            raise LabError("El sandbox superó el timeout; Docker debe eliminar el contenedor.") from exc
+            container_name = command[command.index("--name") + 1]
+            for cleanup in (
+                [docker_bin, "kill", container_name],
+                [docker_bin, "rm", "--force", container_name],
+            ):
+                try:
+                    subprocess.run(cleanup, capture_output=True, text=True, check=False, timeout=10)
+                except (OSError, subprocess.TimeoutExpired):
+                    pass
+            raise LabError("El sandbox superó el timeout; se solicitó eliminar el contenedor.") from exc
         elapsed = round(time.monotonic() - started, 3)
         return {
             "status": "passed" if result.returncode == 0 else "failed",
