@@ -485,7 +485,7 @@ def _fsync_directory_tree(root):
     return os.name == "posix"
 
 
-def _backup_signing_key()
+def _backup_signing_key():
     value = os.environ.get("CYBER_AI_BACKUP_HMAC_KEY", "")
     if not value:
         return None

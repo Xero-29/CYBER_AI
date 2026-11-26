@@ -5,12 +5,12 @@
 ## Repositorio, ramas y PRs
 
 - Repositorio: `Xero-29/CYBER_AI`; rama de trabajo: `codex/security-integrity-audit`.
-- HEAD base antes de este corte: `a0aa048c1d8c300c768a4070b4dc38aa243e6288`. Esta ejecución añade dos commits fast-forward; los workflows deben validar el nuevo HEAD exacto.
+- HEAD base antes de este corte: `a0aa048c1d8c300c768a4070b4dc38aa243e6288`. Esta ejecución añade tres commits fast-forward; los workflows deben validar el nuevo HEAD exacto.
 - `main`: `658a565acd0a5568bb56a1a7482f44260cd9efd1`; ancestro común: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.
 - Comparación exacta previa: **450 commits exclusivos de esta rama y 576 exclusivos de `main`**. No existe un único commit exclusivo de `main`: son 576 desde el ancestro común. No hacer merge/rebase/cherry-pick directo. Se preservan, entre otros, `387104756d0f8307c39a46a1ea2df07671bd81c9`, `554ec1cdd45de3bb0e0f24156b0a9a8ac19193da` y `658a565acd0a5568bb56a1a7482f44260cd9efd1`.
 - PR #2: **cerrado y fusionado** el 2026-11-17; merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. Verificado; no se crea un PR duplicado.
 - No se abre ni se modifica ningún PR en este corte. La rama sigue sin protección: GitHub informa `protected=false` y no hay rulesets de repositorio. Configurar required checks/protección requiere una decisión administrativa externa.
-- Los runs [Python Tests 45851824219](https://github.com/Xero-29/CYBER_AI/actions/runs/45851824219) y [Docker Sandbox 45851823909](https://github.com/Xero-29/CYBER_AI/actions/runs/45851823909) pertenecen al SHA anterior `a0aa048c1d8c300c768a4070b4dc38aa243e6288`; no validan los commits nuevos aunque concluyan.
+- Los runs [Python Tests 45851824219](https://github.com/Xero-29/CYBER_AI/actions/runs/45851824219) y [Docker Sandbox 45851823909](https://github.com/Xero-29/CYBER_AI/actions/runs/45851823909) pertenecen al SHA anterior `a0aa048c1d8c300c768a4070b4dc38aa243e6288`; los runs [Python Tests 45855698243](https://github.com/Xero-29/CYBER_AI/actions/runs/45855698243) y [Docker Sandbox 45855698348](https://github.com/Xero-29/CYBER_AI/actions/runs/45855698348) pertenecen al SHA intermedio `cc61ec435c9678a01b18aad5ef4fe51ec5954b5b`. Ninguno valida el HEAD final.
 - No hay checkout local disponible en este entorno y el acceso de red para clonar GitHub falló por resolución DNS. No se afirma ejecución local de `verify.sh` ni de la suite.
 - No se modificó `main`, no se hizo merge/rebase/force-push y no se alteró PR #2.
 
