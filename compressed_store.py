@@ -3,6 +3,7 @@
 
 import hashlib
 import json
+import math
 import sqlite3
 import uuid
 import zlib
@@ -17,6 +18,41 @@ PROJECT = Path(__file__).resolve().parent
 DB_PATH = PROJECT / "data" / "compressed_memory.sqlite3"
 MAX_BLOCK_BYTES = 2 * 1024 * 1024
 MAX_METADATA_BYTES = 64 * 1024
+
+
+def _unique_json_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("Los metadatos del bloque contienen claves duplicadas.")
+        result[key] = value
+    return result
+
+
+def _reject_json_constant(value):
+    raise ValueError("Los metadatos del bloque contienen una constante no estándar.")
+
+
+def _parse_finite_float(value):
+    parsed = float(value)
+    if not math.isfinite(parsed):
+        raise ValueError("Los metadatos del bloque contienen un número no finito.")
+    mantissa = value.lower().split("e", 1)[0]
+    if parsed == 0.0 and any(digit in "123456789" for digit in mantissa):
+        raise ValueError("Los metadatos del bloque contienen un número subdesbordado.")
+    return parsed
+
+
+def _strict_metadata_json(value):
+    metadata = json.loads(
+        value,
+        object_pairs_hook=_unique_json_object,
+        parse_constant=_reject_json_constant,
+        parse_float=_parse_finite_float,
+    )
+    if not isinstance(metadata, dict):
+        raise ValueError("Los metadatos del bloque deben ser un objeto.")
+    return metadata
 
 
 def utc_now():
@@ -162,6 +198,7 @@ def read_block(block_id, session_id):
         or not 0 <= row["original_bytes"] <= MAX_BLOCK_BYTES
         or not isinstance(row["compressed_bytes"], int)
         or row["compressed_bytes"] < 0
+        or not isinstance(row["compressed_data"], bytes)
         or len(row["compressed_data"]) != row["compressed_bytes"]
     ):
         raise ValueError("Los tamaños declarados del bloque no son válidos.")
@@ -199,7 +236,7 @@ def read_block(block_id, session_id):
         "task_id": row["task_id"],
         "kind": row["kind"],
         "content": content,
-        "metadata": json.loads(row["metadata_json"]),
+        "metadata": _strict_metadata_json(row["metadata_json"]),
         "created_at": row["created_at"],
     }
 
