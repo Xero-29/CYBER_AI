@@ -6,11 +6,12 @@
 - `allow_unsigned=True` es una excepción explícita solo para desarrollo. La API exige un booleano real; valores truthy como `"true"` o `1` se rechazan.
 - La verificación exige firma por defecto. `require_signature` debe ser un booleano real.
 - La restauración exige `confirm_quiesced=True`, y sustituir un directorio existente exige `confirm_replace=True`. Las tres opciones son booleanos estrictos; no se interpretan cadenas como confirmaciones.
+- Crear un backup por API exige `confirm_quiesced=True`; la CLI exige `--confirm-quiesced`. La confirmación debe ser un booleano real y no sustituye la comprobación operativa de los procesos.
 - El llamador debe detener y comprobar los escritores antes de crear o restaurar. El programa no puede demostrar por sí mismo que todos los procesos externos estén quiescentes.
 
 ## Integridad y publicación
 
-El manifiesto enumera rutas relativas canónicas, tipo de artefacto, tamaño y SHA-256. Se rechazan enlaces simbólicos/puntos de reanálisis, archivos especiales, rutas fuera del snapshot, entradas duplicadas, archivos no declarados y cambios detectados durante lectura/copia. Los snapshots SQLite se validan con `PRAGMA integrity_check`. El origen se abre en modo solo lectura; el destino y la restauración usan la guarda de SQLite privado, con directorio `0700`, archivo `0600` en POSIX y `trusted_schema=OFF`, `secure_delete=ON`, `foreign_keys=ON`. El parser del manifiesto también rechaza claves JSON duplicadas, constantes no estándar y exponentes que desbordan o subdesbordan el rango `float`.
+El manifiesto enumera rutas relativas canónicas, tipo de artefacto, tamaño y SHA-256. Se rechazan enlaces simbólicos/puntos de reanálisis, archivos especiales, rutas fuera del snapshot, entradas duplicadas, archivos no declarados y cambios detectados durante lectura/copia. Para que el backup sea portable, también se rechazan nombres reservados de Windows, caracteres de Alternate Data Streams, componentes con puntos/espacios finales, longitudes incompatibles y colisiones sin distinción de mayúsculas/minúsculas o conflictos archivo/directorio. Los snapshots SQLite se validan con `PRAGMA integrity_check`. El origen se abre en modo solo lectura; el destino y la restauración usan la guarda de SQLite privado, con directorio `0700`, archivo `0600` en POSIX y `trusted_schema=OFF`, `secure_delete=ON`, `foreign_keys=ON`. El parser del manifiesto también rechaza claves JSON duplicadas, constantes no estándar y exponentes que desbordan o subdesbordan el rango `float`.
 
 En POSIX, el árbol de origen y el snapshot deben ser privados: directorios propiedad del usuario sin acceso de grupo/otros (normalmente `0700`) y archivos regulares del mismo usuario sin acceso de grupo/otros (normalmente `0600`). Se rechazan hardlinks, symlinks y archivos especiales. En Windows la política ACL debe verificarse aparte.
 
@@ -28,4 +29,4 @@ En POSIX, los archivos copiados se sincronizan antes de publicar; el snapshot SQ
 
 ## Pruebas
 
-`tests/test_data_backup.py` cubre hashes, firmas, rutas, symlinks, archivos especiales, SQLite, publicación/restauración y confirmaciones explícitas. La suite completa y la restauración en infraestructura de despliegue siguen pendientes de ejecución.
+`tests/test_data_backup.py` cubre hashes, firmas, rutas POSIX/Windows, colisiones case-insensitive, nombres de dispositivo, symlinks, archivos especiales, SQLite, publicación/restauración y confirmaciones explícitas por API y CLI. La suite completa y la restauración en infraestructura de despliegue siguen pendientes de ejecución.
