@@ -35,7 +35,8 @@ class DataBackupTests(unittest.TestCase):
 
     def create_unsigned_backup(self, destination, *, data_dir=None):
         return create_backup(
-            data_dir or self.data, destination, allow_unsigned=True
+            data_dir or self.data, destination,
+            confirm_quiesced=True, allow_unsigned=True,
         )
 
     def verify_unsigned_backup(self, snapshot):
@@ -131,6 +132,44 @@ class DataBackupTests(unittest.TestCase):
         )
         with self.assertRaisesRegex(BackupError, "profundidad JSON"):
             self.verify_unsigned_backup(snapshot)
+
+    def test_safe_relative_rejects_windows_reserved_and_invalid_components(self):
+        invalid_paths = (
+            "folder/CON", "folder/con.txt", "folder/NUL.log",
+            "folder/COM1", "folder/lpt9.txt", "folder/a:b",
+            "folder/a?b", "folder/a*b", "folder/trailing.",
+            "folder/trailing ", "folder/bad<name", "folder/bad|name",
+            "folder/control\\x01name",
+        )
+        for value in invalid_paths:
+            with self.subTest(path=repr(value)):
+                with self.assertRaises(BackupError):
+                    data_backup._safe_relative(value)
+
+    def test_portable_file_paths_reject_casefold_and_file_directory_collisions(self):
+        invalid_sets = (
+            ("Folder/Readme.txt", "folder/README.TXT"),
+            ("Data", "data/file.txt"),
+            ("data/file.txt", "DATA"),
+        )
+        for paths in invalid_sets:
+            with self.subTest(paths=paths):
+                with self.assertRaisesRegex(BackupError, "colisionan"):
+                    data_backup._validate_portable_file_paths(paths)
+
+        data_backup._validate_portable_file_paths(
+            ("Folder/first.txt", "folder/second.txt")
+        )
+
+    @unittest.skipIf(os.name == "nt", "Windows no permite crear nombres de dispositivo reservados.")
+    def test_backup_rejects_windows_reserved_source_names(self):
+        reserved = self.data / "CON.txt"
+        reserved.write_text("not portable", encoding="utf-8")
+        os.chmod(reserved, 0o600)
+        destination = self.root / "portable-backup"
+        with self.assertRaisesRegex(BackupError, "no portable"):
+            self.create_unsigned_backup(destination)
+        self.assertFalse(destination.exists())
 
     def test_manifest_depth_scanner_ignores_delimiters_inside_strings(self):
         snapshot = self.root / "backup"
@@ -560,11 +599,34 @@ class DataBackupTests(unittest.TestCase):
     def test_backup_api_requires_signing_key_unless_unsigned_is_explicit(self):
         with patch.dict(os.environ, {}, clear=True):
             with self.assertRaisesRegex(BackupError, "CYBER_AI_BACKUP_HMAC_KEY"):
-                create_backup(self.data, self.root / "strict-backup")
+                create_backup(
+                    self.data, self.root / "strict-backup", confirm_quiesced=True
+                )
             result = create_backup(
-                self.data, self.root / "explicit-unsigned", allow_unsigned=True
+                self.data, self.root / "explicit-unsigned",
+                confirm_quiesced=True, allow_unsigned=True,
             )
         self.assertFalse(result["signed"])
+
+    def test_backup_api_requires_explicit_quiescence_attestation(self):
+        with patch.dict(os.environ, {}, clear=True):
+            with self.assertRaisesRegex(BackupError, "confirm_quiesced=True"):
+                create_backup(
+                    self.data, self.root / "implicit-quiescence",
+                    allow_unsigned=True,
+                )
+            for value in (1, "true", None):
+                with self.subTest(value=value):
+                    with self.assertRaisesRegex(BackupError, "confirm_quiesced=True"):
+                        create_backup(
+                            self.data, self.root / f"invalid-quiescence-{value!r}",
+                            confirm_quiesced=value, allow_unsigned=True,
+                        )
+            result = create_backup(
+                self.data, self.root / "explicit-quiescence",
+                confirm_quiesced=True, allow_unsigned=True,
+            )
+        self.assertTrue(result["valid"] if "valid" in result else result["files"] == 2)
 
     def test_cli_requires_signature_and_explicit_unsigned_override(self):
         snapshot = self.root / "snapshot"
@@ -606,7 +668,8 @@ class DataBackupTests(unittest.TestCase):
         with patch.dict(os.environ, {}, clear=True):
             with self.assertRaisesRegex(BackupError, "booleano explícito"):
                 create_backup(
-                    self.data, self.root / "truthy-unsigned", allow_unsigned="true"
+                    self.data, self.root / "truthy-unsigned",
+                    confirm_quiesced=True, allow_unsigned="true",
                 )
 
         snapshot = self.root / "unsigned-flags"
