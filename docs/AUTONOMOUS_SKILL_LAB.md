@@ -11,7 +11,7 @@ Probar un ciclo local con Ollama: el modelo principal formula una hipótesis, el
 3. El validador solo acepta `Cargo.toml`, `src/main.rs` y `src/lib.rs`; no admite dependencias ni build scripts.
 4. Docker ejecuta `cargo test --offline` con red deshabilitada, filesystem raíz read-only, usuario no privilegiado, capacidades eliminadas y límites de recursos.
 5. Si falla, el planificador recibe el resultado acotado y puede revisar la hipótesis. Máximo tres rondas.
-6. Se genera un informe JSON. Una ejecución exitosa produce solo un candidato de skill, nunca una skill aprobada automáticamente.
+6. Se genera un informe JSON. Una ejecución exitosa guarda la metodología en una memoria JSONL local como candidata no verificada; tareas parecidas pueden recuperarla como referencia, nunca ejecutarla como comando ni tratarla como aprobada.
 
 ## Preparación
 
@@ -54,5 +54,5 @@ No se equipara `passed` con demostrar seguridad general ni con validar una vulne
 - No hay acceso de red desde el contenedor ni dependencias Cargo externas.
 - El workspace es temporal y se elimina al terminar.
 - El perfil inicial solo compila proyectos Rust mínimos; no permite extracción de secretos, explotación de sistemas reales ni acceso a objetivos externos.
-- El modelo no reentrena sus pesos. El aprendizaje de este prototipo es procedimental: práctica, diagnóstico, iteración y candidato documentado. La promoción persistente requiere integrar revisión independiente con el Skillbook existente.
+- El modelo no reentrena sus pesos. El aprendizaje es procedimental: práctica, diagnóstico, iteración y memoria local de candidatos en data/autonomous_skill_lab/skill_candidates.jsonl. Candidatos parecidos se recuperan como contexto no confiable. La promoción al Skillbook requiere revisión independiente y repetición externa.
 - La imagen instala Rust desde los repositorios Debian de Bookworm; el build registra su ID, pero la resolución exacta de paquetes debe fijarse para una cadena de suministro reproducible de producción.
