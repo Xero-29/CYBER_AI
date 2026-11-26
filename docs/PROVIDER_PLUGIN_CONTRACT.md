@@ -23,7 +23,7 @@ Endpoints internos admitidos:
 - `api/embed`: devuelve `{"embeddings":[[0.1,0.2,...], ...]}`; un vector por texto, dimensión constante y números finitos.
 - `api/ps`: devuelve `{"models":[{"name":"modelo"}]}` si el proveedor tiene catálogo local; si no, no declares `model_listing`.
 
-El núcleo valida la forma de las respuestas. El plugin debe traducir las API externas al contrato interno, gestionar límites y errores, y respetar `timeout`. No debe devolver secretos, cabeceras de autenticación ni cuerpos completos de error que puedan contener credenciales.
+El núcleo valida la forma de las respuestas. El plugin debe traducir las API externas al contrato interno, gestionar límites y errores, y respetar `timeout`. No debe devolver secretos, cabeceras de autenticación ni cuerpos completos de error que puedan contener credenciales. El transporte HTTP integrado limita las respuestas a 16 MiB, deshabilita redirecciones y rechaza claves JSON duplicadas, constantes no estándar y exponentes numéricos que desbordan o subdesbordan el rango `float`. Las solicitudes JSON también rechazan NaN e infinitos. Las URL base no pueden contener espacios ni caracteres de control.
 
 ### `installed_models(provider)` opcional
 
