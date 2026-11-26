@@ -159,7 +159,7 @@ def store_block(
         """, (
             block_id,
             session_text,
-            str(task_id) if task_id is not None else None,
+            task_id,
             kind_text,
             sqlite3.Binary(compressed),
             hashlib.sha256(original).hexdigest(),
@@ -182,6 +182,13 @@ def store_block(
 
 def read_block(block_id, session_id):
     """Recupera solamente un bloque de la sesión autorizada."""
+    if not isinstance(block_id, str) or not block_id.strip() or len(block_id) > 128:
+        raise ValueError("block_id inválido.")
+    if isinstance(session_id, bool) or not isinstance(session_id, (str, int)):
+        raise ValueError("session_id debe ser texto o entero.")
+    session_id = str(session_id).strip()
+    if not session_id or len(session_id) > 128 or any(ord(char) < 0x20 for char in session_id):
+        raise ValueError("session_id inválido.")
     initialize()
 
     with database() as db:
@@ -243,11 +250,15 @@ def read_block(block_id, session_id):
 
 def list_blocks(session_id, task_id=None, kind=None, limit=20):
     """Consulta el índice sin descomprimir el contenido de los bloques."""
-    if not isinstance(session_id, str) or not session_id.strip() or len(session_id) > 128:
+    if isinstance(session_id, bool) or not isinstance(session_id, (str, int)):
+        raise ValueError("session_id debe ser texto o entero.")
+    session_id = str(session_id).strip()
+    if not session_id or len(session_id) > 128 or any(ord(char) < 0x20 for char in session_id):
         raise ValueError("session_id debe ser texto no vacío de hasta 128 caracteres.")
     if task_id is not None and (
         not isinstance(task_id, (str, int)) or isinstance(task_id, bool)
         or not str(task_id).strip() or len(str(task_id)) > 128
+        or any(ord(char) < 0x20 for char in str(task_id))
     ):
         raise ValueError("task_id inválido.")
     if kind is not None and (
