@@ -3,6 +3,7 @@ import json
 import os
 import shutil
 import sqlite3
+import stat
 import tempfile
 import unittest
 from contextlib import redirect_stderr
@@ -43,7 +44,11 @@ class DataBackupTests(unittest.TestCase):
 
     def test_backup_verify_and_restore_preserves_sqlite_and_files(self):
         snapshot = self.root / "backup"
+        source_mode = stat.S_IMODE((self.data / "memory.sqlite3").stat().st_mode)
         result = self.create_unsigned_backup(snapshot)
+        if os.name == "posix":
+            self.assertEqual(stat.S_IMODE((snapshot / "memory.sqlite3").stat().st_mode), 0o600)
+            self.assertEqual(stat.S_IMODE((self.data / "memory.sqlite3").stat().st_mode), source_mode)
         self.assertFalse(result["encrypted"])
         self.assertTrue(self.verify_unsigned_backup(snapshot)["valid"])
         with sqlite3.connect(self.data / "memory.sqlite3") as db:
@@ -52,6 +57,8 @@ class DataBackupTests(unittest.TestCase):
             snapshot, self.data, confirm_quiesced=True, confirm_replace=True
         )
         self.assertTrue(restored["restored"])
+        if os.name == "posix":
+            self.assertEqual(stat.S_IMODE((self.data / "memory.sqlite3").stat().st_mode), 0o600)
         with sqlite3.connect(self.data / "memory.sqlite3") as db:
             self.assertEqual(db.execute("SELECT value FROM notes").fetchone()[0], "verified")
         self.assertEqual((self.data / "events.jsonl").read_text(encoding="utf-8"), '{"event":"test"}\n')
