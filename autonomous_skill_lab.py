@@ -209,9 +209,12 @@ def persist_skill_candidate(task, procedure, planner_model, executor_model, path
     canonical = json.dumps(record, sort_keys=True, ensure_ascii=False)
     record["candidate_sha256"] = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
     memory_file = Path(path)
-    memory_file.parent.mkdir(parents=True, exist_ok=True)
-    with memory_file.open("a", encoding="utf-8") as stream:
-        stream.write(json.dumps(record, ensure_ascii=False, sort_keys=True) + "\n")
+    memory_file.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    os.chmod(memory_file.parent, 0o700)
+    descriptor = os.open(memory_file, os.O_WRONLY | os.O_APPEND | os.O_CREAT, 0o600)
+    os.chmod(memory_file, 0o600)
+    with os.fdopen(descriptor, "a", encoding="utf-8") as stream:
+        stream.write(json.dumps(record, ensure_ascii=False, sort_keys=True) + "\\n")
     return record["candidate_sha256"]
 
 def run_learning_cycle(task, *, planner_model="qwen3.5:9b",
