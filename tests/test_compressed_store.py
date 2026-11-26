@@ -88,6 +88,35 @@ class CompressedStoreTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "excede los límites"):
             store.read_block(block_id, "session-a")
 
+    def test_read_rejects_oversized_compressed_blob_before_loading_it(self):
+        saved = store.store_block(content="safe", session_id="session-a")
+        oversized = b"x" * (store.MAX_COMPRESSED_BYTES + 1)
+        with store.database() as db:
+            db.execute(
+                "UPDATE compressed_blocks SET compressed_data=?, compressed_bytes=? WHERE id=?",
+                (oversized, len(oversized), saved["id"]),
+            )
+        with self.assertRaisesRegex(ValueError, "tamaños declarados"):
+            store.read_block(saved["id"], "session-a")
+
+    def test_read_rejects_oversized_metadata_before_parsing_it(self):
+        saved = store.store_block(content="safe", session_id="session-a")
+        oversized = "x" * (store.MAX_METADATA_BYTES + 1)
+        with store.database() as db:
+            db.execute(
+                "UPDATE compressed_blocks SET metadata_json=? WHERE id=?",
+                (oversized, saved["id"]),
+            )
+        with self.assertRaisesRegex(ValueError, "tamaños declarados"):
+            store.read_block(saved["id"], "session-a")
+
+    def test_store_rejects_oversized_metadata(self):
+        with patch.object(store, "MAX_METADATA_BYTES", 1):
+            with self.assertRaisesRegex(ValueError, "64 KiB"):
+                store.store_block(
+                    content="safe", session_id="session-a", metadata={"key": "value"}
+                )
+
     def test_read_rejects_duplicate_metadata_keys(self):
         saved = store.store_block(
             content="safe", session_id="session-a", metadata={"a": 1}
