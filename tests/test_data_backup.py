@@ -139,7 +139,7 @@ class DataBackupTests(unittest.TestCase):
             "folder/COM1", "folder/lpt9.txt", "folder/a:b",
             "folder/a?b", "folder/a*b", "folder/trailing.",
             "folder/trailing ", "folder/bad<name", "folder/bad|name",
-            "folder/control\\x01name",
+            "folder/control" + chr(1) + "name",
         )
         for value in invalid_paths:
             with self.subTest(path=repr(value)):
@@ -626,7 +626,7 @@ class DataBackupTests(unittest.TestCase):
                 self.data, self.root / "explicit-quiescence",
                 confirm_quiesced=True, allow_unsigned=True,
             )
-        self.assertTrue(result["valid"] if "valid" in result else result["files"] == 2)
+        self.assertEqual(result["files"], 2)
 
     def test_cli_requires_signature_and_explicit_unsigned_override(self):
         snapshot = self.root / "snapshot"
