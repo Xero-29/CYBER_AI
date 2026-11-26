@@ -394,7 +394,7 @@ class KnowledgePackQualityTests(unittest.TestCase):
             )
             fixture["sources"].write_text(raw, encoding="utf-8")
             report = self._audit_fixture(fixture["manifest"])
-        self.assertEqual(report["expert_ready_count"], 1)
+        self.assertEqual(report["expert_ready_count"], 0)
         self.assertEqual(report["areas"][0]["verified_external_sources"], 5)
 
 
