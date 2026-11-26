@@ -78,6 +78,35 @@ class DataBackupTests(unittest.TestCase):
         with self.assertRaisesRegex(BackupError, "claves JSON duplicadas"):
             self.verify_unsigned_backup(snapshot)
 
+    def test_manifest_rejects_non_finite_and_out_of_range_numbers(self):
+        for number in ("NaN", "Infinity", "1e999", "-1e-999"):
+            with self.subTest(number=number), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                data = root / "data"
+                data.mkdir()
+                (data / "sample.txt").write_text("safe", encoding="utf-8")
+                snapshot = root / "backup"
+                self.create_unsigned_backup(snapshot, data_dir=data)
+                manifest_path = snapshot / "manifest.json"
+                manifest_text = manifest_path.read_text(encoding="utf-8").rstrip()
+                manifest_path.write_text(
+                    manifest_text[:-1] + ', "untrusted_score": ' + number + '}',
+                    encoding="utf-8",
+                )
+                with self.assertRaises(BackupError):
+                    self.verify_unsigned_backup(snapshot)
+
+    def test_manifest_accepts_finite_exponent_values(self):
+        snapshot = self.root / "finite-number-backup"
+        self.create_unsigned_backup(snapshot, data_dir=self.data)
+        manifest_path = snapshot / "manifest.json"
+        manifest_text = manifest_path.read_text(encoding="utf-8").rstrip()
+        manifest_path.write_text(
+            manifest_text[:-1] + ', "untrusted_score": -1.25e2}',
+            encoding="utf-8",
+        )
+        self.assertTrue(self.verify_unsigned_backup(snapshot)["valid"])
+
     def test_excessive_manifest_nesting_is_reported_as_backup_error(self):
         snapshot = self.root / "backup"
         self.create_unsigned_backup(snapshot, data_dir=self.data)
