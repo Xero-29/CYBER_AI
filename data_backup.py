@@ -137,6 +137,45 @@ def _validate_directory_path(path):
     return chain
 
 
+def _validate_private_data_tree(root):
+    """Require owner-only POSIX permissions for every source/snapshot entry."""
+    root = Path(root)
+    _validate_directory_path(root)
+    directories = []
+    files = []
+    for current, dirs, names in os.walk(root, followlinks=False):
+        current_path = Path(current)
+        directories.append(current_path)
+        directories.extend(current_path / name for name in dirs)
+        files.extend(current_path / name for name in names)
+
+    if os.name == "posix":
+        for directory in directories:
+            info = directory.lstat()
+            if (
+                not _is_directory_info(info)
+                or info.st_uid != os.geteuid()
+                or stat.S_IMODE(info.st_mode) & 0o077
+            ):
+                raise BackupError("Los directorios de datos/backup deben ser privados (0700).")
+        for path in files:
+            info = path.lstat()
+            if (
+                not _is_regular_file_info(info)
+                or info.st_uid != os.geteuid()
+                or info.st_nlink != 1
+                or stat.S_IMODE(info.st_mode) & 0o077
+            ):
+                raise BackupError("Los archivos de datos/backup deben ser privados (0600).")
+    else:
+        for directory in directories:
+            if not _is_directory_info(directory.lstat()):
+                raise BackupError("No se permiten directorios enlazados en datos/backup.")
+        for path in files:
+            if not _is_regular_file_info(path.lstat()):
+                raise BackupError("Solo se permiten archivos regulares en datos/backup.")
+
+
 def _same_directory_chain(before, after):
     return (
         len(before) == len(after)
@@ -199,8 +238,12 @@ def _open_regular_file(path):
             or not _same_directory_chain(parent_chain_before, parent_chain_after)
         ):
             raise BackupError("El archivo cambió durante su apertura o no es regular.")
-        if os.name == "posix" and opened.st_nlink != 1:
-            raise BackupError("No se permiten enlaces duros en archivos del backup.")
+        if os.name == "posix" and (
+            opened.st_uid != os.geteuid()
+            or opened.st_nlink != 1
+            or stat.S_IMODE(opened.st_mode) & 0o077
+        ):
+            raise BackupError("Los archivos del backup deben pertenecer al usuario y ser privados (0600).")
         stream = os.fdopen(descriptor, "rb")
         descriptor = None
         return stream
@@ -464,8 +507,12 @@ def _sqlite_snapshot(source, destination):
         raise BackupError("La base SQLite de origen no está disponible.") from error
     if not _is_regular_file_info(initial):
         raise BackupError("La base SQLite de origen debe ser un archivo regular.")
-    if os.name == "posix" and initial.st_nlink != 1:
-        raise BackupError("No se permiten enlaces duros en bases SQLite de origen.")
+    if os.name == "posix" and (
+        initial.st_uid != os.geteuid()
+        or initial.st_nlink != 1
+        or stat.S_IMODE(initial.st_mode) & 0o077
+    ):
+        raise BackupError("La base SQLite de origen debe ser privada y pertenecer al usuario.")
 
     source_connection = None
     destination_connection = None
@@ -514,6 +561,7 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None, *, allow_unsigned=Fal
     _validate_directory_path(data_dir)
     data_dir = data_dir.resolve(strict=True)
     data_directory_chain = _validate_directory_path(data_dir)
+    _validate_private_data_tree(data_dir)
     if not data_dir.is_dir():
         raise BackupError("El directorio de datos debe existir y no ser symlink.")
     if destination is None:
@@ -611,6 +659,7 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None, *, allow_unsigned=Fal
             os.chmod(staging, 0o700)
         except OSError:
             pass
+        _validate_private_data_tree(data_dir)
         if not _same_directory_chain(data_directory_chain, _validate_directory_path(data_dir)):
             raise BackupError("El directorio de datos cambió durante el backup.")
         current_parent_chain = _validate_directory_path(destination.parent)
@@ -634,6 +683,7 @@ def verify_backup(snapshot, *, require_signature=True):
     input_snapshot_chain = _validate_directory_path(snapshot)
     snapshot = snapshot.resolve(strict=True)
     snapshot_chain = _validate_directory_path(snapshot)
+    _validate_private_data_tree(snapshot)
     if not _same_directory_chain(input_snapshot_chain, snapshot_chain):
         raise BackupError("La ruta del backup cambió al resolverla.")
     if not snapshot.is_dir():
@@ -651,6 +701,7 @@ def verify_backup(snapshot, *, require_signature=True):
     except (OSError, UnicodeDecodeError, ValueError, RecursionError) as error:
         raise BackupError("El manifiesto no es JSON UTF-8 válido o contiene números fuera de rango.") from error
     report = _validate_manifest(snapshot, manifest, require_signature=require_signature)
+    _validate_private_data_tree(snapshot)
     if not _same_directory_chain(snapshot_chain, _validate_directory_path(snapshot)):
         raise BackupError("La ruta del backup cambió durante la verificación.")
     report["manifest_sha256"] = hashlib.sha256(manifest_bytes).hexdigest()
