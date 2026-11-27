@@ -152,6 +152,8 @@ class DataBackupTests(unittest.TestCase):
             ("Folder/first.txt", "folder/second.txt"),
             ("Data", "data/file.txt"),
             ("data/file.txt", "DATA"),
+            ("caf\u00e9.txt", "cafe\u0301.txt"),
+            ("caf\u00e9/first.txt", "cafe\u0301/second.txt"),
         )
         for paths in invalid_sets:
             with self.subTest(paths=paths):
@@ -161,6 +163,30 @@ class DataBackupTests(unittest.TestCase):
         data_backup._validate_portable_file_paths(
             ("Folder/first.txt", "Folder/second.txt")
         )
+
+    def test_backup_rejects_data_directory_replacement_during_resolution(self):
+        alternate = self.root / "alternate-data"
+        alternate.mkdir(mode=0o700)
+        sample = alternate / "private.txt"
+        sample.write_text("different private tree", encoding="utf-8")
+        if os.name == "posix":
+            os.chmod(alternate, 0o700)
+            os.chmod(sample, 0o600)
+
+        real_resolve = Path.resolve
+
+        def redirect_resolution(path, *args, **kwargs):
+            if path == self.data:
+                return real_resolve(alternate, *args, **kwargs)
+            return real_resolve(path, *args, **kwargs)
+
+        destination = self.root / "redirected-backup"
+        with patch.object(Path, "resolve", autospec=True, side_effect=redirect_resolution):
+            with self.assertRaisesRegex(BackupError, "cambió al resolverla"):
+                self.create_unsigned_backup(destination)
+        self.assertFalse(destination.exists())
+        self.assertEqual(list(self.root.glob(".redirected-backup.tmp-*")), [])
+
 
     def test_portable_file_path_validation_handles_large_manifests(self):
         paths = (

@@ -12,6 +12,7 @@ import sqlite3
 import stat
 import sys
 import uuid
+import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 
@@ -554,7 +555,7 @@ def _validate_portable_file_paths(paths):
     for value in paths:
         relative = _safe_relative(value)
         original_parts = tuple(relative.parts)
-        parts = tuple(part.casefold() for part in original_parts)
+        parts = tuple(unicodedata.normalize("NFD", part.casefold()) for part in original_parts)
         for index in range(1, len(parts)):
             directory_key = parts[:index]
             directory_spelling = original_parts[:index]
@@ -757,9 +758,11 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None, *, confirm_quiesced=F
             "allow_unsigned=True solo se admite para desarrollo explícito."
         )
     data_dir = Path(os.path.abspath(os.fspath(data_dir)))
-    _validate_directory_path(data_dir)
+    input_data_directory_chain = _validate_directory_path(data_dir)
     data_dir = data_dir.resolve(strict=True)
     data_directory_chain = _validate_directory_path(data_dir)
+    if not _same_directory_chain(input_data_directory_chain, data_directory_chain):
+        raise BackupError("La ruta del directorio de datos cambió al resolverla.")
     _validate_private_data_tree(data_dir)
     if not data_dir.is_dir():
         raise BackupError("El directorio de datos debe existir y no ser symlink.")
