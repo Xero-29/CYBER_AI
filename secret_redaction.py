@@ -3,7 +3,7 @@ import re
 
 
 SECRET_FIELD = re.compile(
-    r"(?:api[_-]?key|access[_-]?key|access[_-]?token|refresh[_-]?token|token|"
+    r"(?:api[_-]?key|client[_-]?secret|access[_-]?key|access[_-]?token|refresh[_-]?token|token|"
     r"authorization|password|passwd|secret|credential|private[_-]?key|cookie|"
     r"set[_-]?cookie|session[_-]?(?:id|token|key)|hmac[_-]?key|"
     r"signing[_-]?key|encryption[_-]?key|signature|\bsig\b|"

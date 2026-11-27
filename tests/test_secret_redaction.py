@@ -75,6 +75,19 @@ class SecretRedactionTests(unittest.TestCase):
         self.assertNotIn("inline-secret", cleaned["result"]["message"])
         self.assertEqual(cleaned["result"]["safe"], "ordinary output")
 
+    def test_redacts_client_secret_fields_in_nested_structures(self):
+        value = {
+            "client_secret": "snake-case-client-secret",
+            "oauth": {
+                "clientSecret": "camel-case-client-secret",
+                "safe": "ordinary value",
+            },
+        }
+        cleaned = redact_sensitive_data(value)
+        self.assertEqual(cleaned["client_secret"], "[REDACTED]")
+        self.assertEqual(cleaned["oauth"]["clientSecret"], "[REDACTED]")
+        self.assertEqual(cleaned["oauth"]["safe"], "ordinary value")
+
     def test_redacts_private_keys_and_url_credentials(self):
         raw = (
             "https://alice:password@example.test/path "
