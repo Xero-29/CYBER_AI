@@ -5,13 +5,13 @@
 ## Repositorio, ramas, PRs y workflows
 
 - Repositorio: `Xero-29/CYBER_AI`; rama de trabajo: `codex/security-integrity-audit`.
-- HEAD antes de este registro: `239eef8e9d1fcac1dd1978ca189ace4760a7a33a`. Este registro crea un nuevo SHA y exige volver a validar el HEAD resultante.
+- HEAD antes de este registro: `c0deda27a92a1c2f7fbb246817abd69ad934ea54`. Este registro crea un nuevo SHA y exige volver a validar el HEAD resultante.
 - `main`: `658a565acd0a5568bb56a1a7482f44260cd9efd1`; ancestro común: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`.
-- Divergencia antes de este registro: **468 commits exclusivos de esta rama y 576 exclusivos de `main`**. No existe un único commit exclusivo de `main`; no hacer merge, rebase ni cherry-pick directo.
+- Divergencia antes de este registro: **469 commits exclusivos de esta rama y 576 exclusivos de `main`**. No existe un único commit exclusivo de `main`; no hacer merge, rebase ni cherry-pick directo.
 - PR #2 está cerrado y fusionado desde 2026-11-17; merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. No se crea un PR duplicado.
 - No existe un PR abierto asociado a `codex/security-integrity-audit`. Los PRs de conocimiento/experimentos #17, #18 y #20–#28 son ramas separadas; no se modifican desde esta rama.
 - La rama de trabajo y `main` aparecen sin protección; la consulta de rulesets no devuelve reglas. Required checks y protección de rama requieren configuración administrativa.
-- Python Tests [46021037808](https://github.com/Xero-29/CYBER_AI/actions/runs/46021037808) y Docker Sandbox [46021037845](https://github.com/Xero-29/CYBER_AI/actions/runs/46021037845) fueron creados como pending para `239eef8`; este registro los supersede. No se consideran evidencia del SHA que resulte.
+- Python Tests [46021248462](https://github.com/Xero-29/CYBER_AI/actions/runs/46021248462) y Docker Sandbox [46021248594](https://github.com/Xero-29/CYBER_AI/actions/runs/46021248594) estaban `in_progress` para `c0deda2`; este registro los supersede. No se consideran evidencia del SHA que resulte.
 - En `7fc7254` ambos workflows anteriores terminaron cancelled durante `Run complete local verification`; no hay un resultado success reutilizable.
 - No hay checkout local del repositorio en este entorno. No se afirma ejecución local de `verify.sh` ni de la suite.
 - No se modificó `main`, no se hizo merge/rebase/force-push y no se alteró PR #2.
@@ -23,9 +23,9 @@
 - Límite de recursos: creación, verificación y restauración imponen un máximo agregado de **50 GiB**. Las copias normales se detienen al consumir el presupuesto restante; SQLite comprueba `page_count × page_size` antes del snapshot y vuelve a comprobar el tamaño generado.
 - Enumeración: se limita cada árbol a **100.000 entradas**, se limita el número real de archivos verificados y todos los recorridos `os.walk` convierten errores de enumeración en errores de backup; no se acepta una copia parcial por directorios inaccesibles.
 - Permisos POSIX: además de excluir grupo/otros, los directorios deben ser recorribles/legibles por el propietario y los archivos legibles por el propietario.
-- Regresiones añadidas: alias Unicode de archivos/directorios, sustitución de ruta durante `resolve`, límites agregados de bytes, presupuesto SQLite, directorios privados no legibles, errores de enumeración y límites de entradas.
+- Regresiones añadidas: alias Unicode de archivos/directorios, sustitución de ruta durante `resolve`, límites agregados de bytes, presupuesto SQLite, directorios privados no legibles, errores de enumeración y límites de entradas. El caso de directorio no legible admite el rechazo por permisos o por fallo de recorrido, según los privilegios del runner.
 - Documentación actualizada en `docs/BACKUP_RESTORE_SECURITY.md`.
-- Commits de implementación: [ff7fa15](https://github.com/Xero-29/CYBER_AI/commit/ff7fa158ac4a7e5891d90775b13ea40673e265b4), [cb9e4fc](https://github.com/Xero-29/CYBER_AI/commit/cb9e4fc1256c9350cb7d2b111bef9d84b03949f5), [7869093](https://github.com/Xero-29/CYBER_AI/commit/7869093214c679ea2904be7376fc4a688830a5d8), [239eef8](https://github.com/Xero-29/CYBER_AI/commit/239eef8e9d1fcac1dd1978ca189ace4760a7a33a).
+- Commits de implementación: [ff7fa15](https://github.com/Xero-29/CYBER_AI/commit/ff7fa158ac4a7e5891d90775b13ea40673e265b4), [cb9e4fc](https://github.com/Xero-29/CYBER_AI/commit/cb9e4fc1256c9350cb7d2b111bef9d84b03949f5), [7869093](https://github.com/Xero-29/CYBER_AI/commit/7869093214c679ea2904be7376fc4a688830a5d8), [239eef8](https://github.com/Xero-29/CYBER_AI/commit/239eef8e9d1fcac1dd1978ca189ace4760a7a33a), [c0deda2](https://github.com/Xero-29/CYBER_AI/commit/c0deda27a92a1c2f7fbb246817abd69ad934ea54).
 
 ## Pendiente real
 

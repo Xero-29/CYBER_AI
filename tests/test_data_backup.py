@@ -285,7 +285,9 @@ class DataBackupTests(unittest.TestCase):
         os.chmod(nested / "hidden.txt", 0o600)
         os.chmod(nested, 0o000)
         try:
-            with self.assertRaisesRegex(BackupError, "accesibles por el usuario"):
+            with self.assertRaisesRegex(
+                BackupError, "accesibles por el usuario|No se pudo enumerar"
+            ):
                 self.create_unsigned_backup(self.root / "unreadable-backup")
         finally:
             os.chmod(nested, 0o700)
