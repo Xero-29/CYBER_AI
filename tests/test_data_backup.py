@@ -277,7 +277,6 @@ class DataBackupTests(unittest.TestCase):
         with self.assertRaises(BackupError):
             self.create_unsigned_backup(self.root / "backup")
 
-    @unittest.skipUnless(os.name == "posix", "POSIX file permissions required")
     @unittest.skipUnless(os.name == "posix", "Los permisos POSIX se prueban en POSIX.")
     def test_backup_rejects_private_but_unreadable_source_directories(self):
         nested = self.data / "unreadable"
@@ -311,6 +310,7 @@ class DataBackupTests(unittest.TestCase):
                 self.create_unsigned_backup(self.root / "too-many-entries")
         self.assertFalse((self.root / "too-many-entries").exists())
 
+    @unittest.skipUnless(os.name == "posix", "POSIX file permissions required")
     def test_backup_refuses_group_or_world_readable_source_files(self):
         os.chmod(self.data / "events.jsonl", 0o644)
         with self.assertRaisesRegex(BackupError, "privados"):
