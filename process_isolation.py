@@ -99,6 +99,7 @@ def run_bounded_process(
     digests = {"stdout": hashlib.sha256(), "stderr": hashlib.sha256()}
     total_bytes = {"stdout": 0, "stderr": 0}
     truncated = {"stdout": False, "stderr": False}
+    read_errors = set()
 
     def drain(stream, key):
         try:
@@ -119,8 +120,10 @@ def run_bounded_process(
                         captured[key].extend(chunk[:remaining])
                     if len(chunk) > remaining:
                         truncated[key] = True
-        except (OSError, ValueError):
-            return
+        except Exception:
+            # A partial stream digest is not trustworthy evidence. Record only the
+            # stream name; never propagate an exception message that may contain data.
+            read_errors.add(key)
 
     process = None
     readers = []
@@ -157,14 +160,26 @@ def run_bounded_process(
                 terminate_process_tree(process)
                 for reader in readers:
                     reader.join(timeout=2)
-            for stream in (process.stdout, process.stderr):
+            for stream, key in ((process.stdout, "stdout"), (process.stderr, "stderr")):
                 if stream is not None and not stream.closed:
                     try:
                         stream.close()
-                    except OSError:
-                        pass
+                    except (OSError, ValueError):
+                        read_errors.add(key)
             for reader in readers:
                 reader.join(timeout=1)
+
+    unfinished_readers = [
+        key for reader, key in zip(readers, ("stdout", "stderr"))
+        if reader.is_alive()
+    ]
+    if read_errors or unfinished_readers:
+        failed_streams = sorted(read_errors | set(unfinished_readers))
+        raise ProcessIsolationError(
+            "No se pudo capturar íntegramente la salida del proceso ("
+            + ", ".join(failed_streams)
+            + "); la evidencia no es confiable."
+        )
 
     if process is None:
         raise ProcessIsolationError("El proceso no llegó a iniciarse.")
@@ -173,6 +188,7 @@ def run_bounded_process(
         "stdout": captured["stdout"].decode("utf-8", errors="replace"),
         "stderr": captured["stderr"].decode("utf-8", errors="replace"),
         "timed_out": timed_out,
+        "output_capture_complete": True,
         "output_truncated": any(truncated.values()),
         "stdout_sha256": digests["stdout"].hexdigest(),
         "stderr_sha256": digests["stderr"].hexdigest(),

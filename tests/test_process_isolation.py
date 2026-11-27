@@ -30,6 +30,7 @@ class ProcessIsolationTests(unittest.TestCase):
         self.assertLessEqual(len(result["stdout"].encode()), 512)
         self.assertLessEqual(len(result["stderr"].encode()), 512)
         self.assertTrue(result["output_truncated"])
+        self.assertTrue(result["output_capture_complete"])
         self.assertEqual(result["stdout_bytes"], 5000)
         self.assertEqual(result["stderr_bytes"], 5000)
         self.assertEqual(result["stdout_sha256"], hashlib.sha256(b"x" * 5000).hexdigest())
@@ -126,6 +127,51 @@ class ProcessIsolationTests(unittest.TestCase):
                         timeout=1,
                     )
         popen.assert_not_called()
+
+
+    def test_stream_read_error_fails_closed_instead_of_returning_incomplete_evidence(self):
+        class FailingStream:
+            closed = False
+
+            def read(self, _size):
+                raise OSError("synthetic read failure")
+
+            def close(self):
+                self.closed = True
+
+        class EmptyStream:
+            closed = False
+
+            def read(self, _size):
+                return b""
+
+            def close(self):
+                self.closed = True
+
+        class CompletedProcess:
+            pid = 12345
+            returncode = None
+            stdout = FailingStream()
+            stderr = EmptyStream()
+
+            def wait(self, timeout=None):
+                self.returncode = 0
+                return self.returncode
+
+            def poll(self):
+                return self.returncode
+
+        with tempfile.TemporaryDirectory() as cwd:
+            process = CompletedProcess()
+            with patch("process_isolation.subprocess.Popen", return_value=process):
+                with self.assertRaisesRegex(ProcessIsolationError, "capturar íntegramente"):
+                    run_bounded_process(
+                        [sys.executable, "-c", "pass"],
+                        cwd=cwd,
+                        env={},
+                        timeout=1,
+                    )
+
 
 
 if __name__ == "__main__":

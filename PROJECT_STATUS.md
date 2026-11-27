@@ -1,3 +1,38 @@
+# Estado vigente — 2026-11-27 (captura íntegra de salida de procesos)
+
+> Registro de este corte. La evidencia de CI se atribuye exclusivamente al SHA exacto ejecutado.
+
+## Estado del repositorio antes del cambio
+
+- Repositorio: `Xero-29/CYBER_AI`; rama de trabajo: `codex/security-integrity-audit`.
+- HEAD inspeccionado: `2dd37c48b9f36d69bc7279cd349b526d65f3f630`; `main`: `658a565acd0a5568bb56a1a7482f44260cd9efd1`.
+- Ancestro común: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. Comparación exacta: **472 commits exclusivos de la rama y 576 exclusivos de `main`**. La API de comparación devuelve como máximo 250 commits en su colección, pero sus contadores `ahead_by=472` y `behind_by=576` confirman la divergencia completa. No hay un único commit exclusivo de `main`; no hacer merge, rebase ni cherry-pick directo.
+- PR #2 está cerrado y fusionado desde 2026-11-17; merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. No se crea un PR duplicado.
+- No existe PR abierto asociado a esta rama. Los PRs #17, #18 y #20–#28 son ramas independientes y no se modifican aquí.
+- GitHub informa `protected=false` para la rama. La configuración de protección/required checks sigue siendo administrativa.
+- Antes de este cambio, Python Tests [46021850791](https://github.com/Xero-29/CYBER_AI/actions/runs/46021850791) y Docker Sandbox [46021850732](https://github.com/Xero-29/CYBER_AI/actions/runs/46021850732) estaban `in_progress` para `2dd37c4`; no son evidencia para el nuevo HEAD. Runs anteriores del mismo corte terminaron cancelados por commits posteriores.
+- No hay checkout local del repositorio en este entorno; no se afirma ejecución local de la suite.
+- No se modificó `main`, no se hizo merge/rebase/force-push y no se alteró PR #2.
+
+## Corrección implementada en este corte
+
+- `process_isolation.py`: los lectores concurrentes de stdout/stderr ya no silencian errores de lectura. Si falla la lectura/cierre de un stream o un lector permanece bloqueado después de la limpieza, la ejecución falla con `ProcessIsolationError` en vez de devolver hashes/bytes parciales como evidencia completa.
+- Añade `output_capture_complete: true` únicamente a los resultados que completaron ambos streams sin errores.
+- `tests/test_process_isolation.py`: añade una regresión con un stream simulado que falla al leer; la función debe rechazar la evidencia incompleta. La prueba de salida normal comprueba además el nuevo indicador.
+- Resultado de CI para el nuevo SHA: pendiente de GitHub Actions; no se declara éxito antes de que ambos workflows concluyan.
+
+## Pendiente real
+
+- Confirmar Python Tests y Docker Sandbox en el HEAD nuevo, con todos los jobs `completed/success`.
+- Backups: siguen sin cifrado; faltan KMS/HSM, custodia/rotación, WORM/offsite y simulacros reales RPO/RTO/restore.
+- Windows: ACL NTFS y Job Objects no están implementados; la ejecución local no POSIX falla cerrada. Contención fuerte requiere cgroups/namespaces o microVM y pruebas de escape.
+- Red: falta transporte con DNS pinning/egress gateway; por ahora se admiten IP literales autorizadas.
+- Operación: RBAC/IdP/MFA, protección de rama y required checks, observabilidad central, pruebas de carga/soak y revisión independiente.
+- Biblioteca: 48 áreas, 0 `expert_ready`; fuentes primarias, licencias/procedencia, laboratorios reproducibles, datasets expertos y revisión independiente siguen pendientes.
+- La rama no está lista para producción ni para integración con `main`.
+
+---
+
 # Estado vigente — 2026-11-27 (límites y enumeración segura de backups)
 
 > Registro escrito antes de que terminen los workflows de este SHA. La evidencia de CI siempre se atribuye al SHA exacto ejecutado.
