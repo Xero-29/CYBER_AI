@@ -51,3 +51,12 @@ NIST SP 800-86, ISO/IEC 27037, RFC 3227, SWGDE Best Practices, Autopsy, Sleuth K
 
 ## Instrucciones para agentes IA
 No afirmes causalidad a partir de un único artefacto. No modifiques evidencia original. Señala incertidumbre y preserva datos sensibles; no conviertas hipótesis en hechos.
+
+## Biblioteca técnica e agenda de investigación
+
+- [Compendio técnico específico](../../deep_modules/forensics/TECHNICAL_COMPENDIUM.md)
+- [Agenda de investigación y protocolos](../../deep_modules/forensics/RESEARCH_AGENDA.md)
+- [Revisión exploratoria de literatura](../../deep_modules/forensics/LITERATURE_REVIEW.md)
+- [Seguimiento global de madurez y evidencia](../../EXPERT_LIBRARY_COMPLETION_TRACKER.md)
+
+**Estado:** desarrollo editorial M2; las fuentes integrales, laboratorios ejecutados y revisión independiente siguen pendientes. No interpretar laboratorios diseñados como pruebas ejecutadas.

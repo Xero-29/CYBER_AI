@@ -50,3 +50,12 @@ NIST SP 800-57, SP 800-56A/B, SP 800-132, FIPS 140-3, RFC 8446, OWASP Cryptograp
 
 ## Instrucciones para agentes IA
 No inventes recomendaciones de algoritmos sin contexto de compatibilidad. No generes criptografía casera. Nunca imprimas, copies ni guardes claves, tokens o material secreto.
+
+## Desarrollo experto e investigación
+
+- [Compendio técnico](../../deep_modules/crypto/TECHNICAL_COMPENDIUM.md) — mecanismos, modelos, modos de fallo, controles y siete temas desarrollados.
+- [Agenda de investigación](../../deep_modules/crypto/RESEARCH_AGENDA.md) — hipótesis, variables, corpus, controles, métricas y protocolos experimentales.
+- [Revisión de literatura](../../deep_modules/crypto/LITERATURE_REVIEW.md) — mapa de estándares, estado de revisión y brechas.
+- [Registro de fuentes](../../research/source_registry.json) — referencias primarias y RFC con estado de revisión explícito.
+
+**Límite:** el contenido técnico y los protocolos están en estado editorial M2 propuesto. Los experimentos no se han ejecutado y las fuentes no se declaran leídas íntegramente.

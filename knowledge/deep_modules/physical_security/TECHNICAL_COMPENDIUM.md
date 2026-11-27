@@ -122,3 +122,24 @@ Cada estudio debe definir H0/H1, variables, muestra, comparadores, refutación, 
 
 ## Madurez
 M0/M1 estructural. No prueba profundidad ni madurez M3/M4/M5. Avanzar exige lectura crítica, artefactos específicos, experimentos ejecutados y evidencia auditable.
+
+
+## Profundización técnica específica: Seguridad física
+
+### Modelo de amenaza físico-digital
+Identificar perímetro, edificios, salas, racks, cableado, energía, refrigeración, medios extraíbles, dispositivos, visitantes, proveedores y personal. Modelar adversarios, capacidades, acceso, tiempo, detección y consecuencias. Seguridad física afecta confidencialidad, integridad, disponibilidad y seguridad humana.
+
+### Control de acceso y zonas
+Diseñar zonas por criticidad, autenticación multifactor física cuando aplique, anti-tailgating, visitor management, escort, registros y revocación. Revisar llaves maestras, tarjetas perdidas, credenciales compartidas, puertas de emergencia y bypass. Los controles deben preservar evacuación y seguridad de personas.
+
+### Protección de infraestructura
+Racks cerrados, puertos deshabilitados, cableado protegido, UPS, generador, HVAC, sensores ambientales, detección de incendio, agua y sabotaje. Evaluar single points of failure, acceso a consola, KVM, BMC y medios backup. Mantener inventario y control de cambios.
+
+### CCTV, biometría y privacidad
+Definir finalidad, retención, acceso, auditoría, consentimiento/base legal y minimización. Biometría no es secreto revocable; proteger plantillas y mecanismos de fallback. CCTV debe cubrir riesgos sin vigilancia excesiva. Evaluar falsos positivos y sesgos en controles automatizados.
+
+### Respuesta y pruebas
+Procedimientos para intrusión, pérdida de energía, incendio, robo, manipulación y acceso no autorizado. Ejercicios deben coordinar seguridad física, TI, continuidad y autoridades. Medir tiempo de detección, respuesta, cobertura y fallos de control.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.

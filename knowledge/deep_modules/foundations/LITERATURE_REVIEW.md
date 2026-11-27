@@ -1,7 +1,7 @@
 # Revisión de literatura exploratoria — Fundamentos de ciberseguridad
 
 **Corte:** 2026-11-17  
-**Madurez:** M1 (mapa temático y referencia institucional localizada); **no M3/M4/M5**.  
+**Madurez:** M1 (páginas oficiales y abstracts inspeccionados para tres referencias adicionales); **no M2 consolidado/M3/M4/M5**.  
 **Alcance:** revisión exploratoria inicial y protocolo de investigación.  
 **Procedencia:** la referencia nueva se localizó en el sitio del emisor, pero su texto completo no se declara leído. No es revisión sistemática ni validación empírica.
 
@@ -51,12 +51,29 @@ Cobertura activos; enlaces verificables; inconsistencias; riesgos sin dueño; ev
 4. Ejecutar el protocolo en laboratorio autorizado y publicar resultados negativos y análisis de incertidumbre.
 5. No elevar a M4 sin experimento ejecutado y analizado; no elevar a M5 sin revisión independiente y reproducción externa.
 
+## Límite de madurez empírica
+
+**Límite explícito: no M3/M4/M5.** Esta revisión está en M1 exploratorio: se inspeccionaron páginas oficiales y abstracts, pero no se ha completado lectura integral de todas las fuentes, revisión sistemática con criterios reproducibles, experimento ejecutado, análisis de resultados, revisión independiente ni reproducción externa. El diseño experimental descrito es una propuesta, no un resultado. No elevar la madurez hasta que existan esas evidencias.
+
 ## Referencias y procedencia
 
-| ID | Referencia | Estado |
+| ID | Referencia | Estado editorial en este repositorio |
 |---|---|---|
-| `RESEARCH-FOUNDATIONS` | NIST Risk Management Framework (SP 800-37 Rev. 2) | Localizada; texto íntegro pendiente |
+| `NIST-CSWP-29-CSF-2.0` | NIST Cybersecurity Framework 2.0 | Página oficial y abstract inspeccionados; texto completo pendiente |
+| `NIST-SP-800-30r1` | NIST Guide for Conducting Risk Assessments | Página oficial y abstract inspeccionados; texto completo pendiente |
+| `NIST-SP-800-53r5` | NIST Security and Privacy Controls | Página oficial y abstract inspeccionados; texto completo pendiente |
+| `CIS-CONTROLS-v8.1` | CIS Critical Security Controls 8.1 | Página oficial inspeccionada; descarga, términos y lectura integral pendientes |
+| `RESEARCH-FOUNDATIONS` | NIST Risk Management Framework (SP 800-37 Rev. 2) | Referencia localizada; texto íntegro pendiente |
 
 ## Identificadores del registro de fuentes
 
+- `NIST-CSWP-29-CSF-2.0`
+- `NIST-SP-800-30r1`
+- `NIST-SP-800-53r5`
+- `CIS-CONTROLS-v8.1`
 - `RESEARCH-FOUNDATIONS`
+
+
+## Alcance real de la revisión editorial
+
+El 2026-11-19 se inspeccionaron las páginas oficiales de NIST CSF 2.0, NIST SP 800-30 Rev. 1, NIST SP 800-53 Rev. 5 y CIS Controls v8.1. Esta inspección confirma identidad bibliográfica, alcance declarado y estado editorial de las publicaciones; **no equivale a lectura integral de los documentos ni a extracción de requisitos por página**. Los estados del registro reflejan exactamente esa limitación. No se usaron estas páginas como evidencia de eficacia de controles en una organización.

@@ -122,3 +122,24 @@ Definir H0/H1, variables, población, comparadores, criterio de refutación, an�
 
 ## Madurez
 M0/M1 estructural. No acredita profundidad ni M3/M4/M5. Para avanzar: leer fuentes completas, producir artefactos específicos, ejecutar laboratorios y registrar evidencia auditable.
+
+
+## Profundización técnica específica: Criptografía poscuántica
+
+### Modelo de amenaza y horizonte
+Distinguir adversario con capacidad cuántica futura, harvest-now-decrypt-later, compromiso de implementación y riesgo de transición. Clasificar datos por vida útil/confidencialidad, protocolos, certificados, firmas, firmware y dependencias. La amenaza cuántica relevante depende de algoritmo, tamaño, horizonte y disponibilidad de computación criptográficamente relevante; evitar fechas categóricas no demostradas.
+
+### Estándares y familias
+FIPS 203 especifica ML-KEM para encapsulación/establecimiento de claves; FIPS 204 especifica ML-DSA; FIPS 205 especifica SLH-DSA. SP 800-227 aporta recomendaciones para KEM. Mantener inventario de revisiones, erratas y perfiles; diferenciar estándar final, draft, candidato y algoritmo seleccionado para estandarización. No usar algoritmos no finalizados como si fueran normativos.
+
+### Matemática y propiedades
+Comprender retículos, Module-LWE, hash-based signatures, parámetros, reducción de seguridad, tamaños de claves, firmas y costes. Evaluar ataques clásicos/cuánticos conocidos, margen de seguridad y supuestos. El análisis de seguridad de un esquema no certifica bibliotecas ni protocolo completo.
+
+### Migración y crypto-agility
+Inventariar algoritmos en TLS, VPN, PKI, code signing, firmware, backups, HSM, dispositivos y protocolos propietarios. Diseñar transición híbrida cuando esté definida por perfiles interoperables; proteger negociación contra downgrade y registrar algoritmos efectivamente usados. Evaluar tamaños, MTU, fragmentación, latencia, CPU, memoria, certificados y compatibilidad.
+
+### Validación
+Usar vectores de prueba oficiales, implementaciones independientes y pruebas de interoperabilidad. Medir rendimiento por plataforma, uso de memoria, tamaños, fallos, side channels y gestión de claves. Mantener plan de rollback y crypto-agility sin permitir downgrade inseguro. Las pruebas no sustituyen validación criptográfica formal ni certificación.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.

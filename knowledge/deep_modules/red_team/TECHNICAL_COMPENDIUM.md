@@ -122,3 +122,34 @@ Definir H0/H1, variables, población, comparadores, criterio de refutación, an�
 
 ## Madurez
 M0/M1 estructural. No acredita profundidad ni M3/M4/M5. Para avanzar: revisar fuentes completas, elaborar artefactos específicos, ejecutar casos y registrar evidencia auditable.
+
+
+## Profundización técnica específica: Red Team y emulación adversaria
+
+### Gobierno y reglas de engagement
+Toda operación requiere autorización escrita, propietario, alcance, activos excluidos, ventanas, límites de impacto, contactos, kill switch, tratamiento de datos, retención y criterios de parada. Definir objetivo de negocio y pregunta de seguridad antes de seleccionar técnicas. Diferenciar red team, pentest, purple team y adversary emulation; no medir éxito por cantidad de hallazgos.
+
+### Planificación basada en amenazas
+Seleccionar escenarios a partir de inteligencia, activos críticos y ATT&CK. Documentar adversario simulado, capacidades, supuestos, objetivos, rutas de ataque y controles esperados. ATT&CK estructura comportamientos y facilita cobertura, pero no representa por sí solo un plan completo ni prueba detección. Limitar TTPs a técnicas seguras y acordadas.
+
+### Seguridad operacional
+Usar infraestructura y cuentas controladas, payloads benignos, dominios/sistemas de laboratorio, exclusión de persistencia destructiva, límites de transferencia y telemetría coordinada. Proteger datos observados, evitar exfiltración real y usar canary/synthetic data. Cualquier señal de impacto no previsto activa parada inmediata.
+
+### Ejecución y evidencia
+Registrar cada acción con timestamp, operador, objetivo autorizado, herramienta/versión, comando o identificador de simulación, resultado y evidencia. Diferenciar ejecución exitosa, detección, bloqueo, alerta, investigación y respuesta. Evitar alterar logs o controles fuera de alcance. Validar hallazgos con repetición segura y mínima.
+
+### Purple team y evaluación
+Convertir cada acción en una prueba de control: prevención, detección, triage, respuesta y recuperación. Medir cobertura por técnica/subtécnica, precisión, latencia, visibilidad, dependencia de fuente y consistencia. El resultado debe incluir limitaciones de telemetría y condiciones de prueba. Repetir después de remediación.
+
+### Reporte y mejora
+Priorizar por impacto real, precondiciones, exposición y posibilidad de abuso. Incluir narrativa ejecutiva, evidencia, cadena de ataque, controles que funcionaron/fallaron, riesgo residual, recomendaciones y retest. Evitar publicar secretos, datos personales o detalles explotables fuera del canal autorizado.
+
+### Laboratorios
+- Emulación ATT&CK segura con Atomic Red Team/Caldera en hosts desechables y técnicas benignas.
+- Purple team con eventos sintéticos y detecciones versionadas.
+- Prueba de proceso de autorización, kill switch y logging.
+- Retest automatizado tras cambios de reglas.
+No ejecutar acciones contra terceros ni infraestructura productiva sin autorización expresa y salvaguardas verificadas.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.

@@ -122,3 +122,27 @@ Todo estudio debe definir H0/H1, variables, muestra, comparadores, criterio de r
 
 ## Madurez
 M0/M1 estructural. Este documento no prueba profundidad cubierta ni madurez M3/M4/M5. Siguiente puerta: lectura crítica de fuentes completas, artefactos específicos, ejecución de laboratorio y evidencia verificable.
+
+
+## Profundización técnica específica: Seguridad de datos
+
+### Inventario y clasificación
+Mapear datos estructurados/no estructurados, bases, objetos, archivos, backups, logs, caches, colas, endpoints y copias derivadas. Registrar propietario, finalidad, sensibilidad, sujetos, ubicación, retención, linaje, acceso y transferencias. Clasificación debe traducirse a controles técnicos y ciclo de vida; etiquetas sin enforcement no protegen.
+
+### Acceso y minimización
+Aplicar least privilege, separación de funciones, row/column-level security, masking, tokenization y controles de exportación. Minimizar datos por finalidad y eliminar campos innecesarios. Revisar cuentas de servicio, acceso analítico, notebooks, BI, replicación y soporte. La autorización debe persistir en copias, exports y pipelines.
+
+### Cifrado y gestión de claves
+Distinguir cifrado en reposo, tránsito y uso; revisar envelope encryption, KMS/HSM, rotación, separación de duties, backup y recuperación. Cifrado no evita acceso por aplicación autorizada ni exposición en memoria/logs. Tokenización conserva correlación bajo control; masking debe resistir reidentificación según modelo. Gestionar secretos y certificados como activos.
+
+### Linaje, integridad y ciclo de vida
+Registrar origen, transformación, versiones, accesos y destinos. Validar integridad con hashes/firma y controles de cambios; preservar evidencia de borrado cuando sea requerido. Definir retención por finalidad/legalidad, legal hold, backup expiry y destrucción verificable. Data lineage facilita impacto y respuesta, pero debe validarse con sistemas reales.
+
+### DLP, privacidad y analítica
+DLP combina clasificación, contexto, canal y política; medir falsos positivos y evasiones. Revisar exfiltración por correo, web, cloud sync, API, USB, impresión y herramientas IA. Data loss prevention no sustituye IAM ni segmentación. Evaluar privacidad, reidentificación, linkage y acceso interno.
+
+### Laboratorios
+Dataset sintético con etiquetas y flujos; probar ACL/row-level, masking, export controls, DLP y borrado. Medir cobertura, fuga simulada, falsos positivos, reidentificación y completitud de linaje.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.

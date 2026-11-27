@@ -122,3 +122,31 @@ Todo estudio debe definir H0/H1, variables, muestra, comparadores, criterio de r
 
 ## Madurez
 M0/M1 estructural. Este documento no prueba profundidad cubierta ni madurez M3/M4/M5. Siguiente puerta: lectura crítica de fuentes completas, artefactos específicos, ejecución de laboratorio y evidencia verificable.
+
+
+## Profundización técnica específica: Seguridad de IA
+
+### Activos y superficie de ataque
+Modelar datos de entrenamiento, pesos, tokenizer, embeddings, prompts, herramientas, memoria, retrieval, agentes, plugins, API, infraestructura, evaluadores y usuarios. Amenazas incluyen prompt injection directo/indirecto, data poisoning, model extraction, inversion, membership inference, fuga de secretos, abuso de herramientas, supply chain de modelos y denegación de servicio. Distinguir amenaza al modelo, a la aplicación, al dato y al entorno de ejecución.
+
+### Ciclo de vida de datos y modelos
+Verificar procedencia, consentimiento/licencia, minimización, calidad, etiquetas, deduplicación, contaminación, particiones y retención. Versionar dataset, transformaciones, entrenamiento, pesos, tokenizer, código, dependencias y configuración. Model cards y datasheets describen límites, no certifican seguridad. Controlar acceso a pesos, artefactos y endpoints; firmar builds y mantener provenance.
+
+### Prompt injection y uso de herramientas
+Tratar contenido externo recuperado como datos no confiables, separar instrucciones de contenido, aplicar allowlists de herramientas, validación de argumentos, sandbox y privilegios mínimos. El modelo no debe ser autoridad final para operaciones sensibles. Requerir aprobación humana para acciones irreversibles, transferencias, cambios de permisos o acceso a secretos. Probar inyección en documentos, páginas, correo, OCR y memoria.
+
+### RAG, embeddings y memoria
+Evaluar poisoning del corpus, documentos duplicados, acceso cross-tenant, metadata leakage, prompt injection almacenado, retrieval drift y borrado incompleto. ACL debe aplicarse antes y después de recuperación; filtrar solo en prompt no es suficiente. Mantener provenance por fragmento, hash, fuente, fecha, licencia y tenant. Evaluar aislamiento y políticas de retención/eliminación.
+
+### Evaluación y red teaming de modelos
+Construir threat model y suites con casos benignos/adversariales, jailbreaks, extracción, leakage, tool abuse, robustez, fairness y disponibilidad. Medir tasa de éxito de ataque, tasa de rechazo correcto, utilidad, falsos positivos, fuga y severidad. Separar evaluación offline, sandbox y producción; no usar benchmarks como garantía. Repetir por modelo/versiones/configuración y documentar incertidumbre.
+
+### Laboratorios
+- RAG multi-tenant sintético con documentos con permisos distintos.
+- Prompt injection en contenido externo con herramientas simuladas.
+- Evaluación de fuga de canary secrets y control de salida.
+- Dataset poisoning didáctico con ground truth.
+Prohibir acceso a datos reales sensibles y limitar llamadas/coste.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.

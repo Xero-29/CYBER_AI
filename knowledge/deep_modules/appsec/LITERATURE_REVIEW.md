@@ -69,3 +69,28 @@ La evidencia consultada apunta a separar tres capas: (1) requisitos verificables
 - `OWASP-ASVS-5.0.0`
 - `OWASP-API-TOP10-2023`
 - `OWASP-API1-BOLA-2023`
+
+
+## Fuentes primarias adicionales inspeccionadas el 2026-11-19
+
+| ID | Fuente y versión | Qué se inspeccionó | Límite |
+|---|---|---|---|
+| `OWASP-WSTG-4.2` | OWASP Web Security Testing Guide 4.2 | Página oficial de versiones; 4.2 figura como release versionado y 5.0 como desarrollo | No se han leído todos los escenarios WSTG |
+| `NIST-SP-800-218-SSDF-1.1` | NIST SP 800-218 SSDF 1.1 | Página oficial, fecha y abstract | No se han extraído todas las prácticas ni leído íntegramente el documento |
+| `MITRE-CWE-TOP25-2025` | CWE Top 25 2025 | Tabla oficial y notas de ranking | La lista no representa prevalencia universal ni todos los defectos de software |
+| `OWASP-SQLI-PREVENTION` | OWASP SQL Injection Prevention Cheat Sheet | Recomendaciones oficiales sobre parametrización, allowlists y límites del escaping manual | Los ejemplos deben verificarse por lenguaje, driver y motor |
+
+### Lectura crítica y decisiones metodológicas
+
+ASVS se usa como catálogo versionado de requisitos de verificación, no como certificado automático. Sus identificadores deben incluir versión (por ejemplo, `v5.0.0-...`) porque pueden cambiar entre releases. WSTG debe citar escenarios con versión explícita: la página oficial identifica 4.2 como release y 5.0 como desarrollo al corte de esta revisión. SSDF es un conjunto de prácticas de alto nivel integrables en SDLC, no un pipeline prescriptivo. CWE Top 25 es una priorización basada en datos y metodología publicada; no debe interpretarse como probabilidad de explotación de una aplicación concreta. La guía SQLi respalda parametrización de valores y allowlists para partes estructurales, pero no autoriza a construir consultas con concatenación ni a tratar escaping manual como defensa primaria.
+
+La síntesis combina páginas oficiales y abstracts inspeccionados. **No se declara lectura integral** de ASVS, WSTG, SSDF ni de toda la Cheat Sheet Series; tampoco se declara revisión sistemática de artículos académicos.
+
+## Límite de madurez empírica
+
+**Límite explícito: no M3/M4/M5.** El dossier está en M1 exploratorio: existen fuentes primarias identificadas y páginas oficiales inspeccionadas, pero no se ha completado lectura integral de estándares, revisión sistemática, ejecución de laboratorios, análisis experimental, revisión independiente ni reproducción externa. Los seis estudios de la agenda son propuestas, no resultados.
+
+- `OWASP-WSTG-4.2`
+- `NIST-SP-800-218-SSDF-1.1`
+- `MITRE-CWE-TOP25-2025`
+- `OWASP-SQLI-PREVENTION`

@@ -52,3 +52,12 @@ NIST SP 800-63, NIST SP 800-207, OAuth 2.1, OpenID Connect, SAML, SCIM, FIDO All
 
 ## Instrucciones para agentes IA
 No solicites contraseñas ni códigos MFA. No desactives controles de autenticación para “probar”. Utiliza identidades sintéticas y explica los efectos de cada cambio.
+
+## Biblioteca técnica e agenda de investigación
+
+- [Compendio técnico específico](../../deep_modules/identity/TECHNICAL_COMPENDIUM.md)
+- [Agenda de investigación y protocolos](../../deep_modules/identity/RESEARCH_AGENDA.md)
+- [Revisión exploratoria de literatura](../../deep_modules/identity/LITERATURE_REVIEW.md)
+- [Seguimiento global de madurez y evidencia](../../EXPERT_LIBRARY_COMPLETION_TRACKER.md)
+
+**Estado:** desarrollo editorial M2; las fuentes integrales, laboratorios ejecutados y revisión independiente siguen pendientes. No interpretar laboratorios diseñados como pruebas ejecutadas.

@@ -122,3 +122,31 @@ Definir H0/H1, variables, población, comparadores, criterio de refutación, an�
 
 ## Madurez
 M0/M1 estructural. No acredita profundidad ni M3/M4/M5. Para avanzar: leer fuentes completas, producir artefactos específicos, ejecutar laboratorios y registrar evidencia auditable.
+
+
+## Profundización técnica específica: Seguridad de bases de datos
+
+### Arquitectura y planos
+Modelar motor, listeners, cluster, replicas, backups, drivers, ORM, pool, ETL, BI, admin plane y cloud control plane. Identificar datos sensibles, trust boundaries, usuarios, roles, schemas, extensiones y conexiones. Revisar exposición de puerto, TLS, autenticación, service accounts y administración remota.
+
+### Autenticación y autorización
+Aplicar cuentas individuales, roles, separación DBA/app, least privilege, row-level/column-level security y privilegios temporales. Revisar ownership, grants públicos, roles heredados, funciones SECURITY DEFINER, stored procedures, search_path y permisos de extensiones. La aplicación no debe compartir superuser. Rotar credenciales y auditar conexiones.
+
+### Inyección y lógica de consulta
+Usar consultas parametrizadas, prepared statements y APIs seguras; validar identificadores dinámicos con allowlists. ORM no elimina inyección si concatena SQL. Revisar NoSQL injection, operadores, aggregation pipelines, stored procedures y acceso por objeto. Controlar errores, timing, límites, paginación y abuso de consultas costosas.
+
+### Cifrado, backups y auditoría
+TLS cliente-servidor, cifrado de disco/volumen, TDE, backup encryption y KMS tienen alcances diferentes. Proteger claves y copias, probar restauración y separación de credenciales. Auditar DDL, privilegios, exportaciones, consultas sensibles y cambios de configuración. Logs no deben filtrar datos ni secretos; retención e integridad importan.
+
+### Alta disponibilidad y cloud
+Revisar replicación, quorum, failover, split-brain, snapshots, managed database IAM, endpoints públicos, parameter groups, serverless autoscaling y backups automáticos. Failover debe preservar controles y auditoría. La responsabilidad compartida no elimina obligación de configurar usuarios, datos y exposición.
+
+### Laboratorios
+- App de prueba con inyección SQL/NoSQL y consultas parametrizadas.
+- Matriz de roles y pruebas positivas/negativas de acceso a filas/campos.
+- Backup/restore cifrado con verificación de integridad.
+- Auditoría de DDL y privilegios en dataset sintético.
+Medir cobertura, privilegios excesivos, hallazgos confirmados, impacto y regresión.
+
+## Estado de validación de la ampliación
+Contenido editorial específico incorporado; lectura integral de fuentes, revisión independiente y experimentos permanecen pendientes. No declarar M3/M4/M5 sin evidencia.
