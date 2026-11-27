@@ -29,4 +29,4 @@ En POSIX, los archivos copiados se sincronizan antes de publicar; el snapshot SQ
 
 ## Pruebas
 
-`tests/test_data_backup.py` cubre hashes, firmas, rutas POSIX/Windows, colisiones case-insensitive, nombres de dispositivo, symlinks, archivos especiales, SQLite, publicación/restauración y confirmaciones explícitas por API y CLI. La suite completa y la restauración en infraestructura de despliegue siguen pendientes de ejecución.
+`tests/test_data_backup.py` cubre hashes y firmas, rutas POSIX/Windows, colisiones case-insensitive y Unicode canónico, cambios de identidad de ruta, nombres de dispositivo, symlinks, archivos especiales, presupuestos de bytes (incluido SQLite), límites de entradas, errores de enumeración, permisos, publicación/restauración y confirmaciones explícitas por API y CLI. La suite completa y la restauración en infraestructura de despliegue siguen pendientes de ejecución.
