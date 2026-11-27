@@ -47,3 +47,6 @@ NIST SSDF, OWASP SAMM, CWE, SEI CERT Coding Standards, Google Engineering Practi
 
 ## Instrucciones para agentes IA
 No modifiques archivos ajenos al alcance. No afirmes que una prueba pasó sin ejecutarla. Mantén cambios pequeños, explica invariantes y añade tests de regresión.
+
+## Arquitectura
+La cadena de entrega incluye repositorio, identidad de desarrollador, revisión, CI, runners, dependencias, build, firma, registro de artefactos, despliegue y runtime. Trazar la procedencia desde commit y workflow hasta artefacto desplegado; separar entornos y credenciales, restringir runners y proteger los canales de publicación. La arquitectura debe identificar secretos, dependencias transitivas, acciones/plugins, scripts de build, artefactos y puntos donde una entrada no confiable puede influir en el producto.

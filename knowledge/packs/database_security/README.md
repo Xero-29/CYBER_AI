@@ -47,3 +47,6 @@ CIS Benchmarks, OWASP SQL Injection Prevention, NIST SP 800-123, PostgreSQL Secu
 
 ## Instrucciones para agentes IA
 No consultes datos reales ni exportes tablas completas. Usa esquemas y fixtures sintéticos. No ejecutes cambios de esquema o grants en producción sin aprobación.
+
+## Arquitectura
+El plano de datos incluye clientes, proxies/pools, motor de base de datos, autenticación, autorización, esquemas, almacenamiento, réplicas, backups, auditoría y consumidores analíticos. Trazar conexiones, cuentas técnicas, roles, secretos, cifrado, procedimientos almacenados, extensiones y rutas administrativas. Separar entornos y tenants; restringir acceso de red y privilegios por esquema/operación. Las réplicas, exportaciones, snapshots, logs y backups pueden contener el mismo dato sensible que el primario y deben incluirse en el inventario y ciclo de vida.

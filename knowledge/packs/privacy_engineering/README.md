@@ -51,3 +51,6 @@ NIST Privacy Framework, ISO/IEC 27701, ISO/IEC 29100, GDPR cuando aplique, leyes
 
 ## Instrucciones para agentes IA
 No solicites datos personales reales si un ejemplo sintético basta. No declares cumplimiento legal. Diferencia privacidad, seguridad y anonimización; indica riesgos de inferencia y reidentificación.
+
+## Arquitectura
+La arquitectura de privacidad conecta inventario y catálogo de datos, registro de finalidades y bases legales, consentimiento/preferencias, controles de acceso, pipelines, procesadores, transferencias, retención, derechos de titulares y eliminación. Trazar datos personales y derivados entre aplicaciones, analítica, logs, backups y terceros; identificar controladores, encargados, regiones y subencargados. Integrar privacidad desde diseño en el ciclo de desarrollo, con minimización, seudonimización y separación de identificadores cuando corresponda.

@@ -1,3 +1,28 @@
+# Estado de profundización de las 48 áreas — 2026-11-19
+
+## Secciones profundas incorporadas
+
+- Se añadieron 48 dossiers específicos en knowledge/deep_modules/<area>/DEEP_SECTIONS.md.
+- Cada dossier desarrolla cinco dimensiones: modelo de amenazas, detección, respuesta a incidentes, caso práctico y referencias.
+- Los escenarios son de laboratorio y usan datos sintéticos o entornos autorizados; se indican límites donde el resultado no puede extrapolarse a producción.
+- Se corrigió knowledge_quality.py: ahora inspecciona el dossier profundo real, no solo el README del pack. Comprueba los cinco encabezados y un mínimo de 20 palabras por sección, además de que el estudio asociado tenga al menos dos referencias HTTPS.
+- Se añadió una regresión que exige 48/48 dominios y 240/240 secciones con contenido mínimo.
+- Límite: este gate es editorial/estructural. No demuestra exactitud semántica, lectura integral de las fuentes, revisión experta, ejecución de laboratorios ni madurez M3–M5.
+
+---
+
+# Estado canónico vigente — actualización de biblioteca 2026-11-19
+
+## Fundamentos de las 48 áreas: ampliación estructural
+
+- Se añadieron secciones explícitas de arquitectura contextual a los 30 paquetes que no exponían esa sección con un encabezado reconocido por el auditor.
+- Se completaron secciones de controles en Fundamentos, Respuesta a incidentes, Arquitectura segura y Matemáticas aplicadas a seguridad.
+- Las adiciones describen componentes, límites de confianza, flujos, dependencias, riesgos y controles específicos del dominio; no convierten los estudios en investigación empírica ni declaran fuentes leídas.
+- Se añadió una regresión que exige que los 48 paquetes superen el gate fundamental de `knowledge_quality.py`.
+- Estado: cambio implementado en la rama de investigación; pendiente ejecutar la auditoría y CI sobre el HEAD resultante. El gate es estructural, no una certificación semántica ni una validación experta.
+
+---
+
 # Estado canónico vigente — 2026-11-17
 
 **Rama:** `main`  
@@ -182,3 +207,153 @@ El contenido histórico que sigue registra implementaciones y validaciones de co
 - Cada especialidad incluye un diseño de laboratorio con cuatro casos (baseline, fallo sintético, detección y mitigación/regresión), salvaguardas, métricas, preguntas de investigación y artefactos de aceptación.
 - Se añadió el índice de los 48 compendios.
 - **Límite:** son cuadernos técnicos y planes de trabajo, no libros exhaustivos ni revisiones sistemáticas completas. Los laboratorios están diseñados, no ejecutados; no se elevó la madurez de ninguna especialidad.
+
+
+## Ampliación de biblioteca: primera entrega de investigaciones profundas — 2026-11-18
+
+**Rama de trabajo:** `codex/deep-research-library-2026-11-18` (creada desde main SHA `9bab38f2092bcc46a0c1cf14eb3d79cdbba387ea`).  
+**Estado:** contenido añadido; pendiente CI sobre el HEAD de esta rama y revisión editorial/experta independiente.
+
+### Estudios nuevos
+
+Se añadieron estudios de campo en ocho dominios:
+
+- Redes: switching, routing, TCP/UDP, DNS, TLS (incluye RFC 9846 de 2026), VPN, Wi-Fi, amenazas, controles, métricas y labs.
+- Criptografía: primitivas, AEAD, PKI, ciclo de vida de claves, PQC y erratas de FIPS.
+- Seguridad de IA: prompt injection, RAG, agentes, autorización de herramientas, poisoning, fuga, evaluación y labs.
+- OT/ICS: zonas, protocolos, safety, controles y estado separado de SP 800-82 Rev. 3 final frente a Rev. 4 IPD de 2026.
+- Respuesta a incidentes: preparación, detección, contención, forense, recuperación, playbooks y métricas.
+- Gestión de vulnerabilidades: CVE/CWE/CVSS/EPSS/KEV, correlación, priorización y falsos positivos.
+- DevSecOps: pipeline, supply chain, SBOM, provenance, firma y laboratorios.
+- Arquitectura segura: threat modeling, Zero Trust y requisitos verificables.
+
+Se añadió un índice de investigaciones, un registro de 24 fuentes primarias en esta entrega y se incorporaron 20 referencias nuevas al registro central existente (68 previas; 88 totales). Se añadió una prueba estructural para verificar que los ocho estudios existan, estén enlazados y que las fuentes tengan IDs únicos y URLs HTTPS.
+
+### Límites explícitos
+
+- Esto no significa que las 48 áreas estén investigadas; es una primera tanda de ocho dominios.
+- Los estudios son síntesis técnicas de trabajo basadas en páginas oficiales, metadatos y resúmenes consultados; no se afirma lectura íntegra de todos los estándares ni revisión por pares.
+- No se ejecutaron los laboratorios descritos ni se validaron implementaciones en redes, OT, proveedores de IA o producción.
+- No marcar fuentes como lectura integral ni módulos como M4/M5 hasta completar revisión de texto completo, metodología, resultados medidos, reproducción y revisión independiente.
+- La investigación debe continuar con los 40 dominios restantes y ampliar subtemas dentro de cada dominio, no limitarse a los títulos actuales del currículo.
+
+
+### Segunda tanda — ocho dominios adicionales
+
+Se añadieron estudios de campo para Fundamentos, AppSec, APIs, Linux/Unix, Windows/Active Directory, Cloud, Contenedores/Kubernetes y Seguridad móvil. La primera y segunda tanda suman **16 de los 48 dominios** del manifiesto con documentos RESEARCH_STUDY enlazados.
+
+- El registro específico de la entrega contiene 36 referencias; 12 se añadieron en esta tanda.
+- El registro central pasó de 88 a 98 fuentes únicas; se incorporaron 10 referencias nuevas y se preservaron entradas existentes con IDs coincidentes.
+- Se amplió la prueba estructural para exigir los 16 estudios, enlaces, URLs HTTPS e IDs de fuente registrados.
+- Se fijaron estados/versiones: OWASP ASVS 5.0.0 estable; WSTG 4.2 estable y 5.0 en desarrollo; API Top 10 2023; baseline Windows Server 2025; referencias cloud, Kubernetes y móvil.
+
+**Pendiente:** CI del HEAD actualizado, revisión editorial de cada estudio, lectura integral de estándares y documentos de proveedor, laboratorios reproducibles, revisión independiente y desarrollo de los 32 dominios restantes. No declarar estas áreas validadas solo por existir el documento.
+
+
+### Tercera tanda — ocho dominios adicionales
+
+Se añadieron estudios para Identidad y acceso, Análisis de malware, Forense digital, Inteligencia de amenazas, Ingeniería inversa, IoT/hardware, Gobernanza y Seguridad de datos. Las tres tandas suman **24 de 48 dominios** del manifiesto con estudios técnicos propios enlazados.
+
+- El registro específico de la entrega contiene 48 referencias.
+- El registro central contiene 110 fuentes únicas (98 antes de esta tanda; 12 incorporadas ahora).
+- Se amplió la prueba estructural para exigir los 24 estudios y verificar referencias, IDs y enlaces.
+- Se incorporaron NIST SP 800-63-4/63B-4, NISTIR 8259A/B/Rev.1, SP 800-193, SP 800-86, SP 800-83 Rev.1 y el NIST Privacy Framework, con advertencias sobre antigüedad y alcance.
+
+**Pendiente:** CI del HEAD final, revisión de texto completo y erratas, validación por especialistas, ejecución de laboratorios, reproducción independiente y desarrollo de los 24 dominios restantes. Los estudios siguen en madurez documental inicial; no son certificaciones ni pruebas operativas.
+
+
+### Cuarta tanda — ocho dominios adicionales
+
+Se añadieron estudios para Aprendizaje automático, Matemáticas, Ingeniería de software, SOC/SIEM/SOAR, EDR/XDR, Threat hunting, Red Team autorizado y Wireless/Bluetooth/NFC. Las cuatro tandas suman **32 de 48 dominios** del manifiesto con estudios técnicos propios.
+
+- Registro de esta entrega: 60 referencias.
+- Registro central: 122 fuentes únicas (110 antes de esta tanda; 12 añadidas ahora).
+- Prueba estructural ampliada para los 32 estudios y sus enlaces/fuentes.
+- Se actualizó el estudio de seguridad de IA para priorizar NIST AI 100-2 E2025 sobre E2023.
+- Se registran límites de antigüedad de NIST SP 800-94/115/137 y versiones de CAPEC, D3FEND, Sigma, Zeek, Suricata y estándares inalámbricos.
+
+**Pendiente:** 16 dominios del manifiesto, además de profundidad adicional en todos los estudios, lectura íntegra de fuentes, experimentos, laboratorios y revisión independiente. No declarar M4/M5 ni cobertura experta sin evidencia.
+
+
+### Quinta tanda — cobertura inicial de los 48 dominios
+
+Se añadieron los 16 dominios restantes: Bug bounty/divulgación, Satélites, Seguridad física, Correo/DNS, Fraude/abuso, Ingeniería de privacidad, Forense cloud, Red Team de IA, PKI/HSM, Criptografía poscuántica, Continuidad, Bases de datos, Investigación de vulnerabilidades, Telecom/5G, Automoción y Hardware.
+
+**Resultado estructural:** los 48 IDs del manifiesto tienen ahora un archivo RESEARCH_STUDY.md, enlazado desde el índice y desde knowledge/deep_modules/README.md. El registro específico de esta entrega contiene 81 fuentes y el registro central 143 fuentes únicas. Se añadió cobertura de pruebas estructurales para los 48 dominios y se corrigió la referencia DMARC: RFC 7489 está obsoleto y el estudio utiliza RFC 9989/9990/9991.
+
+**No equivale a investigación exhaustiva:** la cobertura 48/48 confirma existencia, no profundidad homogénea. Los documentos son una primera síntesis de cada dominio; muchos siguen en M1/M2. Faltan lectura íntegra de estándares/papers, desarrollo de subtemas, referencias de investigación primaria por subárea, laboratorios ejecutados, resultados cuantitativos, revisión especializada y niveles M4/M5.
+
+**Pendiente:** CI del HEAD actual, validación editorial y técnica, desarrollo profundo de cada dominio, ejecución/reproducción de laboratorios y revisión independiente. No promover a biblioteca validada ni fusionar hasta completar gates.
+
+
+### Integración real en la biblioteca indexada — 2026-11-18
+
+Se conectaron los estudios al flujo de conocimiento, no solo al árbol documental:
+
+- Cada una de las 48 áreas del manifiesto incorpora research_study_path hacia su RESEARCH_STUDY.md.
+- knowledge_bootstrap.py valida ambas rutas (path y research_study_path), calcula hashes y genera IDs estables por archivo/contenido.
+- El bootstrap indexa por separado el paquete base y el estudio, con category por dominio, tags research_study y clasificación research/field_study en el registro de recursos.
+- El dry-run de bootstrap valida rutas y hashes sin embeddings ni escrituras; con el manifiesto actual debe seleccionar 96 documentos (48 paquetes base + 48 estudios).
+- knowledge_quality.py audita presencia, longitud mínima y referencias HTTPS de los estudios; tests/test_knowledge_quality.py exige cobertura 48/48.
+- CI Python incorpora dry-run de la biblioteca y gate --require-research-studies.
+
+**No se ejecutó la ingestión vectorial real:** requiere que el usuario configure el proveedor ECO de embeddings. El dry-run no envía texto a proveedores ni crea vectores. El contenido de los estudios se enviará al proveedor configurado al ejecutar la ingestión; revisar la política de datos antes de hacerlo.
+
+
+### Trazabilidad de fuentes por dominio
+
+Se añadió DOMAIN_SOURCE_MAP.json: los 48 dominios enlazan a al menos dos IDs del registro de fuentes; se incorporaron ocho referencias técnicas adicionales y se ajustaron dominios de aplicabilidad en el registro central. Estado actual: 89 referencias en el registro de esta entrega y 151 fuentes únicas en el registro central.
+
+La matriz es una relación de pertinencia temática, no una afirmación de que cada fuente respalde todas las frases de un estudio. La revisión claim-to-source y la lectura integral de estándares siguen pendientes.
+
+
+### Validación CI de la integración documental/indexada
+
+Sobre HEAD `0d79769fc793f295a31da4ea78656ed419e1ef93`:
+
+- Python Tests: **success** — 613 tests ejecutados, 1 skipped.
+- Validación de bootstrap: **success** — dry-run validó 96 documentos (48 paquetes base + 48 estudios), con rutas y hashes; sin llamadas a IA ni escrituras.
+- Gate de estudios: **success** — 48/48 estudios superan el umbral estructural, 19.472 palabras y 206 referencias HTTPS.
+- El mismo informe evidencia brechas anteriores que siguen abiertas: solo 18/48 compendios base tienen secciones base completas; 0/48 cumplen todas las secciones profundas de la matriz (54/240 comprobaciones presentes).
+- El primer intento del gate falló porque el CLI mezclaba el estado de los compendios antiguos con el nuevo gate de estudios; se separó la condición para que --require-research-studies evalúe exclusivamente el nuevo corpus, sin ocultar el estado de los compendios previos. La ejecución final quedó verde.
+
+**No se ejecutó la ingesta vectorial real ni se probó recuperación semántica:** eso requiere proveedor ECO configurado y debe validarse localmente. Los estudios se conectan al bootstrap, pero la creación de embeddings queda pendiente.
+
+
+### CI final del corpus de investigación — HEAD c542cb77ad60a35bb49d8f25ec0f775ef7b0bcd9
+
+- [Python Tests](https://github.com/Xero-29/CYBER_AI/actions/runs/44436640073): **success** — 613 tests, 1 skipped; validación de fuentes/instalador, verificación local, dry-run del bootstrap (96 documentos), gate de estudios (48/48), SBOM y provenance.
+- [Docker Sandbox](https://github.com/Xero-29/CYBER_AI/actions/runs/44436640065): **success** — imágenes construidas, verificación local completa y Ruff dentro del sandbox endurecido.
+- Ejecución Python duplicada [run 44436630948](https://github.com/Xero-29/CYBER_AI/actions/runs/44436630948): success en el mismo SHA.
+
+La validación estructural del nuevo corpus está aprobada. El informe de calidad sigue mostrando que el material previo de los compendios no está completo: 18/48 secciones base y 0/48 conjuntos de secciones profundas; esto no se considera corregido por los nuevos estudios iniciales. La ingestión vectorial y la recuperación semántica siguen pendientes de proveedor ECO y evaluación local.
+
+
+## Auditoría comparativa y ampliación de brechas avanzadas — 2026-11-18
+
+- Se contrastó el currículo de 48 dominios, los estudios, el mapa de fuentes, la matriz global y el registro de 89 referencias.
+- Hallazgo: la cobertura 48/48 mide existencia de documentos. La matriz global conserva requisitos/artefactos/gates como `not_assessed`; la pertinencia temática del mapa de fuentes no prueba soporte frase-a-fuente.
+- Se identificaron 192 líneas de investigación avanzada (4 por dominio) en `knowledge/research/ADVANCED_GAP_REGISTER.json`; todas permanecen `identified_not_yet_assessed`.
+- Se añadieron actualizaciones técnicas a PQC, threat intelligence, SOC/SIEM, DevSecOps y seguridad de IA.
+- Se incorporaron al registro de fuentes NIST IR 8547 Final (27-oct-2026), MITRE ATT&CK v20.1 (13-oct-2026), NIST SP 800-207A y NIST SP 800-218A. La revisión fue a nivel de ficha/página oficial; no equivale a lectura integral.
+- No se declaran experimentos ejecutados, controles probados, ni áreas validadas. La siguiente fase debe convertir las 192 brechas en requisitos trazables, desarrollar el contenido y actualizar las pruebas semánticas.
+
+
+## Desarrollo de las 192 brechas avanzadas — 2026-11-19
+
+- 192/192 módulos desarrollados como borradores técnicos estructurados en `knowledge/research/ADVANCED_GAP_DEVELOPMENT.md`, organizados en 48 dominios.
+- Cada módulo contiene alcance, arquitectura, amenazas, controles, procedimiento, laboratorio seguro, métricas, evidencia y limitaciones.
+- El registro JSON conserva estado individual, ancla, conteo de palabras y fuentes de partida.
+- Se añadió una regresión para comprobar los 192 módulos y el umbral mínimo de contenido.
+- **No validado:** faltan lectura integral y trazabilidad claim-to-source, ejecución de laboratorios cuando aplique y revisión independiente. No elevar madurez por volumen documental.
+
+
+### Sistema de trazabilidad y validación por afirmación — 2026-11-19
+
+- Se añadió \`research_validation.py\` para auditar la correspondencia entre el registro de 192 brechas, el mapa de fuentes y el registro de 92 fuentes.
+- Se generó \`VALIDATION_WORKLIST_192.json\`: 192 tareas (4 por cada uno de los 48 dominios), con IDs de fuentes candidatas y requisitos explícitos de revisión documental, evidencia localizada, contradicciones, experimentación cuando aplique y revisión independiente.
+- Se añadió \`CLAIM_EVIDENCE_REGISTER.json\` como registro vacío intencional de afirmaciones. Cada afirmación futura exige texto delimitado, módulo, fuentes, localizador exacto, extracto de evidencia, tipo de evidencia, estado, revisor y fecha.
+- La herramienta impide marcar como respaldada una afirmación documental si las fuentes solo tienen revisión de ficha/metadatos; exige estado de lectura integral. Para afirmaciones experimentales exige referencias a artefactos de evidencia.
+- Se integró la auditoría a \`verify.sh\` y se añadieron pruebas de regresión para estructura, cobertura, trazabilidad y puertas de validación.
+- Resultado esperado inicial: 48 dominios, 192 tareas, 92 fuentes candidatas, 0 afirmaciones respaldadas y 0 fuentes con lectura integral registrada. Esto es deliberado: el sistema expone el trabajo pendiente, no inventa validación.
+- **Límite:** la herramienta valida estructura y requisitos de evidencia; no decide semánticamente si una cita demuestra una afirmación. Esa revisión debe ser humana o independiente y documentada. No se descargaron recursos automáticamente ni se modificaron licencias. La ingesta vectorial real continúa dependiendo de configurar el proveedor ECO y ejecutar el bootstrap local.

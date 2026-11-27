@@ -34,6 +34,9 @@ echo
 echo "== Auditoría de investigación y trazabilidad =="
 "$PYTHON_BIN" knowledge_research_audit.py
 
+echo "== Validación de afirmaciones y trazabilidad por módulo =="
+"$PYTHON_BIN" research_validation.py
+
 echo
 echo "== Auditoría global de cobertura de conocimiento =="
 "$PYTHON_BIN" knowledge_global_coverage_audit.py

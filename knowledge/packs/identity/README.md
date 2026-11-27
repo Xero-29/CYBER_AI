@@ -52,3 +52,6 @@ NIST SP 800-63, NIST SP 800-207, OAuth 2.1, OpenID Connect, SAML, SCIM, FIDO All
 
 ## Instrucciones para agentes IA
 No solicites contraseñas ni códigos MFA. No desactives controles de autenticación para “probar”. Utiliza identidades sintéticas y explica los efectos de cada cambio.
+
+## Arquitectura
+Representar el plano de identidad con fuentes autoritativas, directorio/IdP, federación, autenticadores, motores de políticas, sesiones/tokens, aplicaciones y cuentas de servicio. Diferenciar identidad humana, máquina, workload y emergencia; trazar el ciclo de alta, cambio, baja, autenticación, autorización, delegación y auditoría. Los límites críticos son el IdP, los conectores de sincronización, los flujos de recuperación, los proveedores MFA y los privilegios de directorio. Documentar protocolos, claims, lifetimes, audiencias, rotación y revocación de credenciales.

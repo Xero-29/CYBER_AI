@@ -27,6 +27,16 @@ DEEP = {
 def has_heading(content: str, alternatives: tuple[str, ...]) -> bool:
     return any(re.search(r"(?im)^" + re.escape(item) + r"(?:\s|$)", content) for item in alternatives)
 
+def section_word_count(content: str, heading: str) -> int:
+    match = re.search(r"(?m)^" + re.escape(heading) + r"\s*$", content)
+    if not match:
+        return 0
+    tail = content[match.end():]
+    next_heading = re.search(r"(?m)^##\s+", tail)
+    section = tail[:next_heading.start()] if next_heading else tail
+    return len(re.findall(r"\b[\w-]+\b", section))
+
+
 def audit_library(root: Path = ROOT) -> dict:
     try:
         manifest = json.loads((root / "knowledge/packs/manifest.json").read_text(encoding="utf-8"))
@@ -54,19 +64,86 @@ def audit_library(root: Path = ROOT) -> dict:
         try: content = (root / area.get("path", "")).read_text(encoding="utf-8")
         except OSError: item_errors.append("pack inexistente o ilegible")
         base = {k: has_heading(content,v) for k,v in BASE.items()}
-        deep = {k: has_heading(content,v) for k,v in DEEP.items()}
+        deep_candidate = root / "knowledge" / "deep_modules" / aid / "DEEP_SECTIONS.md"
+        deep_path = deep_candidate.resolve()
+        deep_text = ""
+        if root.resolve() not in deep_path.parents or deep_candidate.is_symlink() or not deep_path.is_file():
+            deep = {k: False for k in DEEP}
+            deep_words = {k: 0 for k in DEEP}
+        else:
+            deep_text = deep_path.read_text(encoding="utf-8")
+            deep = {k: has_heading(deep_text,v) for k,v in DEEP.items()}
+            deep_words = {}
+            for key, alternatives in DEEP.items():
+                heading = next((line.strip() for line in deep_text.splitlines() if any(line.strip().startswith(h) and (len(line.strip()) == len(h) or line.strip()[len(h)].isspace()) for h in alternatives)), None)
+                deep_words[key] = section_word_count(deep_text, heading) if heading else 0
         missing = [k for k,v in base.items() if not v]
-        missing_deep = [k for k,v in deep.items() if not v]
+        missing_deep = [k for k,v in deep.items() if not v or deep_words[k] < 20]
         if missing: item_errors.append("secciones base ausentes: " + ", ".join(missing))
-        results.append({"id":aid,"name":area.get("name"),"base_complete":not item_errors,"deep_section_coverage":sum(deep.values()),"deep_section_total":len(DEEP),"missing_deep_sections":missing_deep,"errors":item_errors,"curriculum_maturity":entry.get("maturity") if entry else "missing"})
-    base_complete=sum(x["base_complete"] for x in results)
-    deep_complete=sum(x["deep_section_coverage"] == len(DEEP) for x in results)
-    return {"ok":not errors and base_complete == len(results),"errors":errors,"area_count":len(results),"base_complete":base_complete,"deep_complete":deep_complete,"deep_section_checks":len(results)*len(DEEP),"deep_section_present":sum(x["deep_section_coverage"] for x in results),"curriculum_defined":len(cids),"areas":results,"limitations":["Mide estructura, no exactitud ni profundidad semántica.","No valida licencias, vigencia ni calidad de fuentes.","No prueba ejecución de laboratorios.","No certifica competencia de agentes o herramientas."]}
+        study_present = False
+        study_words = 0
+        study_references = 0
+        study_relative = area.get("research_study_path")
+        if not isinstance(study_relative, str) or not study_relative.strip():
+            item_errors.append("sin research_study_path en manifiesto")
+        else:
+            study_rel = Path(study_relative)
+            if study_rel.is_absolute() or ".." in study_rel.parts:
+                item_errors.append("ruta de RESEARCH_STUDY no permitida")
+            else:
+                study_path = (root / study_rel).resolve()
+                if root.resolve() not in study_path.parents or not study_path.is_file() or study_path.is_symlink():
+                    item_errors.append("RESEARCH_STUDY inexistente o fuera del repositorio")
+                else:
+                    study_text = study_path.read_text(encoding="utf-8")
+                    study_words = len(re.findall(r"\b[\w-]+\b", study_text))
+                    study_references = len(re.findall(r"https://", study_text))
+                    study_present = True
+                    if study_words < 250:
+                        item_errors.append("RESEARCH_STUDY demasiado corto para la cobertura mínima")
+                    if not has_heading(study_text, ("## Fuentes", "## Fuentes primarias", "## Referencias")):
+                        item_errors.append("RESEARCH_STUDY sin referencias")
+                    if study_references < 2:
+                        item_errors.append("RESEARCH_STUDY con menos de dos referencias HTTPS")
+        results.append({
+            "id": aid, "name": area.get("name"), "base_complete": not item_errors,
+            "deep_section_coverage": sum(deep.values()), "deep_section_total": len(DEEP),
+            "deep_section_words": deep_words,
+            "deep_content_complete": not missing_deep and study_references >= 2,
+            "missing_deep_sections": missing_deep, "errors": item_errors,
+            "curriculum_maturity": entry.get("maturity") if entry else "missing",
+            "research_study_present": study_present, "research_study_words": study_words,
+            "research_study_references": study_references,
+        })
+    base_complete = sum(x["base_complete"] for x in results)
+    deep_complete = sum(x["deep_content_complete"] for x in results)
+    research_studies_complete = sum(
+        x["research_study_present"] and x["research_study_words"] >= 250
+        and x["research_study_references"] >= 2 for x in results
+    )
+    return {
+        "ok": not errors and base_complete == len(results),
+        "errors": errors, "area_count": len(results), "base_complete": base_complete,
+        "deep_complete": deep_complete, "deep_section_checks": len(results) * len(DEEP),
+        "deep_section_present": sum(x["deep_section_coverage"] for x in results),
+        "deep_content_checks": sum(sum(words >= 20 for words in x["deep_section_words"].values()) for x in results),
+        "research_studies_complete": research_studies_complete,
+        "research_study_words_total": sum(x["research_study_words"] for x in results),
+        "research_study_references_total": sum(x["research_study_references"] for x in results),
+        "curriculum_defined": len(cids), "areas": results,
+        "limitations": [
+            "Mide estructura y umbrales mínimos, no exactitud ni profundidad semántica.",
+            "No valida licencias, vigencia ni calidad experta de fuentes.",
+            "No prueba ejecución de laboratorios.",
+            "No certifica competencia de agentes o herramientas.",
+        ],
+    }
 
 def main() -> int:
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--json",action="store_true")
     parser.add_argument("--require-deep",action="store_true")
+    parser.add_argument("--require-research-studies",action="store_true")
     args=parser.parse_args()
     report=audit_library()
     if args.json: print(json.dumps(report,ensure_ascii=False,indent=2))
@@ -76,11 +153,22 @@ def main() -> int:
         print(f"Secciones base completas: {report.get('base_complete',0)}/{report['area_count']}")
         print(f"Secciones profundas completas: {report.get('deep_complete',0)}/{report['area_count']}")
         print(f"Comprobaciones profundas: {report.get('deep_section_present',0)}/{report.get('deep_section_checks',0)}")
+        print(f"Secciones profundas con contenido mínimo: {report.get('deep_content_checks',0)}/{report.get('deep_section_checks',0)}")
+        print(f"Estudios con umbral mínimo: {report.get('research_studies_complete',0)}/{report['area_count']}")
+        print(f"Palabras en estudios: {report.get('research_study_words_total',0)}; referencias HTTPS: {report.get('research_study_references_total',0)}")
         for item in report.get("areas",[]):
             if item["errors"] or item["missing_deep_sections"]: print(f"- {item['id']}: {item['errors']}; faltan={item['missing_deep_sections']}")
         for item in report.get("limitations",[]): print("LIMITACIÓN: "+item)
-    if not report["ok"]: return 1
-    if args.require_deep and report.get("deep_complete") != report.get("area_count"): return 2
+    if args.require_research_studies:
+        if report.get("research_studies_complete") != report.get("area_count"):
+            return 3
+        if args.require_deep and report.get("deep_complete") != report.get("area_count"):
+            return 2
+        return 0
+    if not report["ok"]:
+        return 1
+    if args.require_deep and report.get("deep_complete") != report.get("area_count"):
+        return 2
     return 0
 
 if __name__ == "__main__":
