@@ -354,18 +354,17 @@ class ToolAdapterTests(unittest.TestCase):
             with self.assertRaisesRegex(ToolExecutionError, "límite total de entradas"):
                 tool_adapters._hash_target(target)
 
-    def test_hash_target_fails_closed_when_directory_walk_is_incomplete(self):
+    def test_hash_target_fails_closed_when_directory_scan_is_incomplete(self):
         target = self.root / "unreadable-tree"
         target.mkdir()
-        real_walk = os.walk
+        real_scandir = os.scandir
 
-        def fail_target_walk(root, *args, **kwargs):
+        def fail_target_scan(root):
             if Path(root) == target:
-                kwargs["onerror"](PermissionError("synthetic enumeration failure"))
-                return iter(())
-            return real_walk(root, *args, **kwargs)
+                raise PermissionError("synthetic enumeration failure")
+            return real_scandir(root)
 
-        with patch.object(tool_adapters.os, "walk", side_effect=fail_target_walk):
+        with patch.object(tool_adapters.os, "scandir", side_effect=fail_target_scan):
             with self.assertRaisesRegex(ToolExecutionError, "enumerar el objetivo"):
                 tool_adapters._hash_target(target)
 

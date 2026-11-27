@@ -1,3 +1,36 @@
+# Estado vigente — 2026-11-27 (enumeración incremental y acotada de objetivos)
+
+> Registro de este corte. Los checks deben terminar sobre el nuevo HEAD exacto.
+
+## Estado del repositorio
+
+- Repositorio: `Xero-29/CYBER_AI`; rama: `codex/security-integrity-audit`.
+- HEAD inspeccionado antes de este cambio: `13dcba266cd3c579958c44e41645f579070f0eb4`; `main`: `658a565acd0a5568bb56a1a7482f44260cd9efd1`.
+- En ese HEAD: **478 commits exclusivos de esta rama y 576 exclusivos de `main`**, ancestro común `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. Este commit añade uno: nuevo total **479 adelante / 576 detrás**. No hay un único commit exclusivo de `main`; no integrar, rebasar ni hacer cherry-pick directo.
+- El HEAD de `main` documenta el perfil secuencial del ThinkPad E440 y forma parte de sus 576 commits exclusivos.
+- PR #2 está cerrado y fusionado (merge `478c6ddc676221e4c07b8c5780f127bc5a9e749e`). No hay PR abierto para esta rama; no crear uno duplicado.
+- La rama no tiene protección (`protected=false`); branch protection y required checks requieren configuración administrativa.
+- En el HEAD previo `13dcba2`, Python Tests [46028821265](https://github.com/Xero-29/CYBER_AI/actions/runs/46028821265) y Docker Sandbox [46028821411](https://github.com/Xero-29/CYBER_AI/actions/runs/46028821411) estaban `pending`; no validan este nuevo HEAD.
+- No hay checkout local disponible en este entorno; no se afirma ejecución local.
+
+## Corrección implementada
+
+- Hallazgo: aunque `os.walk` imponía un límite después de recibir cada lote, materializaba previamente todos los nombres de un directorio. Un único directorio con millones de entradas aún podía consumir memoria antes de aplicar el límite.
+- Corrección: el recorrido ahora usa `os.scandir` incremental y corta al superar 20.000 entradas o 10.000 archivos; rechaza enlaces/archivos especiales, conserva orden determinista de hash y vuelve a verificar estado/identidad de directorios al finalizar.
+- Regresiones: exceso de entradas y error sintético de `scandir` deben fallar cerrados; se mantienen pruebas de hardlinks, symlinks, integridad y límites de bytes.
+- Se conservan las correcciones de captura íntegra en [4406bfe](https://github.com/Xero-29/CYBER_AI/commit/4406bfe4d8b030faeda68114f29e5db5a6377580) y de validación de manifiestos en [d5ae56e](https://github.com/Xero-29/CYBER_AI/commit/d5ae56ecb00071b06619b402c50de1f052b81f0d). Documentación actualizada en `docs/TOOL_ALLOWLIST.md`.
+- No se modificó `main`, no se hizo merge/rebase/force-push y PR #2 no se alteró.
+
+## Pendiente de validación y operación
+
+- Ejecutar Python Tests y Docker Sandbox sobre el nuevo SHA exacto; exigir ambos `completed/success` y revisar todos los jobs/steps.
+- Backups: cifrado, KMS/HSM, custodia/rotación, WORM/offsite y simulacros reales de restauración/DR.
+- Plataforma: ACL NTFS y Job Objects; cgroups/namespaces o microVM con pruebas de escape; gateway de egress con DNS pinning.
+- Operación: RBAC/IdP/MFA, branch protection/required checks, observabilidad central, pruebas de carga/soak y revisión independiente.
+- Biblioteca: 48 áreas, 0 `expert_ready`; siguen pendientes fuentes primarias leídas, licencias/procedencia, claims trazables, laboratorios reproducibles, datasets expertos y revisión independiente.
+
+---
+
 # Estado vigente — 2026-11-27 (enumeración acotada de objetivos de análisis)
 
 > Registro de este corte. Los checks del nuevo HEAD deben terminar antes de atribuir éxito.

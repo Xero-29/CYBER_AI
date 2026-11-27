@@ -53,12 +53,6 @@ class ToolExecutionError(RuntimeError):
     """A safe tool execution could not be completed."""
 
 
-def _raise_target_walk_error(error):
-    raise ToolExecutionError(
-        "No se pudo enumerar el objetivo de forma segura."
-    ) from error
-
-
 def _directory_state(info):
     return (
         info.st_dev,
@@ -169,22 +163,10 @@ def _hash_target(path):
     if stat.S_ISDIR(root_info.st_mode):
         files = []
         entry_count = 0
+        pending_directories = [path]
         try:
-            for current, dirs, names in os.walk(
-                path,
-                topdown=True,
-                followlinks=False,
-                onerror=_raise_target_walk_error,
-            ):
-                dirs.sort()
-                names.sort()
-                entry_count += len(dirs) + len(names)
-                if entry_count > MAX_TARGET_ENTRIES:
-                    raise ToolExecutionError(
-                        "El objetivo supera el límite total de entradas."
-                    )
-
-                current_path = Path(current)
+            while pending_directories:
+                current_path = pending_directories.pop()
                 current_info = current_path.lstat()
                 if (
                     not stat.S_ISDIR(current_info.st_mode)
@@ -203,39 +185,36 @@ def _hash_target(path):
                     )
                 directory_states[current_path] = current_info
 
-                for name in dirs:
-                    item = current_path / name
-                    info = item.lstat()
-                    if (
-                        stat.S_ISLNK(info.st_mode)
-                        or _is_reparse_point(info)
-                        or not stat.S_ISDIR(info.st_mode)
-                    ):
-                        raise ToolExecutionError(
-                            "El objetivo contiene enlaces o directorios no seguros."
-                        )
-                    directory_states.setdefault(item, info)
-
-                for name in names:
-                    item = current_path / name
-                    info = item.lstat()
-                    if stat.S_ISLNK(info.st_mode) or _is_reparse_point(info):
-                        raise ToolExecutionError(
-                            "El objetivo contiene enlaces simbólicos o puntos de reanálisis; análisis bloqueado."
-                        )
-                    if not stat.S_ISREG(info.st_mode):
-                        raise ToolExecutionError(
-                            "El objetivo contiene entradas que no son archivos regulares ni directorios."
-                        )
-                    if info.st_nlink != 1:
-                        raise ToolExecutionError(
-                            "El objetivo contiene archivos con enlaces duros; análisis bloqueado."
-                        )
-                    files.append((item, info))
-                    if len(files) > MAX_TARGET_FILES:
-                        raise ToolExecutionError(
-                            "El objetivo supera el límite de archivos."
-                        )
+                with os.scandir(current_path) as entries:
+                    for entry in entries:
+                        entry_count += 1
+                        if entry_count > MAX_TARGET_ENTRIES:
+                            raise ToolExecutionError(
+                                "El objetivo supera el límite total de entradas."
+                            )
+                        item = Path(entry.path)
+                        info = entry.stat(follow_symlinks=False)
+                        if stat.S_ISLNK(info.st_mode) or _is_reparse_point(info):
+                            raise ToolExecutionError(
+                                "El objetivo contiene enlaces simbólicos o puntos de reanálisis; análisis bloqueado."
+                            )
+                        if stat.S_ISDIR(info.st_mode):
+                            directory_states[item] = info
+                            pending_directories.append(item)
+                            continue
+                        if not stat.S_ISREG(info.st_mode):
+                            raise ToolExecutionError(
+                                "El objetivo contiene entradas que no son archivos regulares ni directorios."
+                            )
+                        if info.st_nlink != 1:
+                            raise ToolExecutionError(
+                                "El objetivo contiene archivos con enlaces duros; análisis bloqueado."
+                            )
+                        files.append((item, info))
+                        if len(files) > MAX_TARGET_FILES:
+                            raise ToolExecutionError(
+                                "El objetivo supera el límite de archivos."
+                            )
         except ToolExecutionError:
             raise
         except OSError as exc:
