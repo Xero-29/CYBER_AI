@@ -1,3 +1,35 @@
+# Estado vigente — 2026-11-27 (validación escalable de manifiestos de backup)
+
+> Registro de este corte. El nuevo HEAD requiere validación completa; no se reutilizan checks de commits anteriores.
+
+## Estado del repositorio
+
+- Repositorio: `Xero-29/CYBER_AI`; rama: `codex/security-integrity-audit`.
+- HEAD inspeccionado antes de este cambio: `b49e2ddf123c870885ecf5c92f19372a60483f83`; `main`: `658a565acd0a5568bb56a1a7482f44260cd9efd1`.
+- Divergencia exacta: **474 commits exclusivos de esta rama y 576 exclusivos de `main`**; ancestro común: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. No existe un único commit exclusivo de `main`. No integrar, rebasar ni hacer cherry-pick directo.
+- PR #2 está cerrado y fusionado (merge `478c6ddc676221e4c07b8c5780f127bc5a9e749e`). No hay PR abierto para esta rama; no se crea uno duplicado.
+- La rama sigue sin protección (`protected=false`). Required checks y protección necesitan configuración administrativa.
+- La corrección de captura íntegra de stdout/stderr está en [4406bfe](https://github.com/Xero-29/CYBER_AI/commit/4406bfe4d8b030faeda68114f29e5db5a6377580). Los checks anteriores no validan el HEAD que resulte de este corte.
+- No hay checkout local del repositorio en este entorno; no se afirma ejecución local.
+
+## Corrección implementada
+
+- Hallazgo: `_validate_manifest()` recorría el conjunto creciente de rutas por cada entrada para detectar prefijos archivo/directorio. Con el límite permitido de 50.000 archivos, el trabajo podía crecer cuadráticamente y consumir CPU al verificar un manifiesto no confiable.
+- Corrección: se elimina el escaneo repetido. Las colisiones exactas se rechazan al recolectar; las colisiones de prefijo, archivo/directorio, mayúsculas/minúsculas y Unicode se validan en el recorrido único posterior de `_validate_portable_file_paths()`.
+- Regresión: se comprueba que los conflictos archivo/directorio se rechacen independientemente del orden de las rutas; se conserva la prueba de conjuntos grandes y colisiones Unicode/case-fold.
+- Documentación actualizada en `docs/BACKUP_RESTORE_SECURITY.md`. La corrección de rendimiento no cambia el esquema ni relaja la validación de rutas.
+- No se modificó `main`, no se hizo merge/rebase/force-push y PR #2 no se alteró.
+
+## Pendiente de validación y operación
+
+- Ejecutar Python Tests y Docker Sandbox sobre el nuevo SHA exacto; ambos deben concluir `completed/success` y todos los jobs/steps deben terminar correctamente.
+- Backups: cifrado, KMS/HSM, custodia/rotación de claves, WORM/offsite y simulacros reales de restauración/DR.
+- Plataforma: ACL NTFS y Job Objects; cgroups/namespaces o microVM con pruebas de escape; gateway de egress con DNS pinning.
+- Operación: RBAC/IdP/MFA, branch protection/required checks, observabilidad central, pruebas de carga/soak y revisión independiente.
+- Biblioteca: 48 áreas, 0 `expert_ready`; siguen pendientes fuentes primarias leídas, licencias/procedencia, claims trazables, laboratorios reproducibles, datasets expertos y revisión independiente.
+
+---
+
 # Estado vigente — 2026-11-27 (captura fail-closed de salida de adaptadores)
 
 > Registro de este corte. El commit documental cambia el HEAD y exige validar ese SHA exacto en ambos workflows.

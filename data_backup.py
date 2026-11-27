@@ -662,11 +662,9 @@ def _validate_manifest(snapshot, manifest, *, require_signature=False):
             raise BackupError(f"SHA-256 inválido en manifiesto: {key}")
         if item.get("kind") not in {"sqlite_snapshot", "file_copy_quiesced"}:
             raise BackupError(f"Tipo de archivo no permitido: {key}")
-        for parent in relative.parents:
-            if parent.as_posix() != "." and parent.as_posix() in seen:
-                raise BackupError("Conflicto entre archivo y directorio en manifiesto.")
-        if any(existing.startswith(key + "/") for existing in seen):
-            raise BackupError("Conflicto entre archivo y directorio en manifiesto.")
+        # Prefix and file/directory collisions are checked once after collection
+        # by _validate_portable_file_paths. Scanning the growing set here would
+        # make large, attacker-controlled manifests quadratic to validate.
         path = snapshot.joinpath(*relative.parts)
         cursor = snapshot
         for index, part in enumerate(relative.parts):

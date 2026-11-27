@@ -164,6 +164,16 @@ class DataBackupTests(unittest.TestCase):
             ("Folder/first.txt", "Folder/second.txt")
         )
 
+    def test_portable_file_directory_conflicts_are_rejected_in_either_order(self):
+        conflicting_paths = (
+            ("tree/child.txt", "tree"),
+            ("tree", "tree/child.txt"),
+        )
+        for paths in conflicting_paths:
+            with self.subTest(paths=paths):
+                with self.assertRaisesRegex(BackupError, "colisionan"):
+                    data_backup._validate_portable_file_paths(paths)
+
     def test_backup_rejects_data_directory_replacement_during_resolution(self):
         alternate = self.root / "alternate-data"
         alternate.mkdir(mode=0o700)
