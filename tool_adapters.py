@@ -159,7 +159,7 @@ def _hash_target(path):
         raise ToolExecutionError("No se pudo inspeccionar el objetivo.") from exc
     if stat.S_ISLNK(root_info.st_mode) or _is_reparse_point(root_info):
         raise ToolExecutionError("El objetivo contiene un enlace o punto de reanálisis.")
-    directory_states = {}
+    directory_states = {path: root_info} if stat.S_ISDIR(root_info.st_mode) else {}
     if stat.S_ISDIR(root_info.st_mode):
         files = []
         entry_count = 0

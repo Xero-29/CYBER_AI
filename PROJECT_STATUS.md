@@ -1,3 +1,35 @@
+# Estado vigente — 2026-11-27 (estabilidad del directorio raíz de objetivos)
+
+> Registro de este corte. Los workflows del nuevo HEAD deben concluir antes de declarar validación.
+
+## Estado del repositorio
+
+- Repositorio: `Xero-29/CYBER_AI`; rama: `codex/security-integrity-audit`.
+- HEAD inspeccionado antes de este cambio: `cc2967fbf81ac5fb2802ce90af7e04585a7af675`; `main`: `658a565acd0a5568bb56a1a7482f44260cd9efd1`.
+- En ese HEAD: **479 commits exclusivos de esta rama y 576 exclusivos de `main`**; ancestro común `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. Este commit añade uno: nuevo total **480 adelante / 576 detrás**. No existe un único commit exclusivo de `main`; no integrar, rebasar ni hacer cherry-pick directo.
+- PR #2 está cerrado y fusionado (merge `478c6ddc676221e4c07b8c5780f127bc5a9e749e`). No hay PR abierto para esta rama; no crear uno duplicado.
+- La rama no tiene protección (`protected=false`); branch protection y required checks necesitan configuración administrativa.
+- Los checks de commits anteriores no validan este nuevo HEAD. Se deben inspeccionar los nuevos runs y sus jobs/steps por SHA exacto.
+- No hay checkout local disponible en este entorno; no se afirma ejecución local.
+
+## Corrección implementada
+
+- Hallazgo residual: el recorrido incremental comprobaba los directorios encontrados, pero no comparaba inicialmente el directorio raíz con la identidad observada antes de comenzar el escaneo. Un reemplazo del root entre la primera inspección y el escaneo podía pasar inadvertido si no cambiaba ningún archivo.
+- Corrección: el estado inicial del root se registra desde el primer lstat y se compara al enumerar y al terminar el hash.
+- Regresión: sustituir el directorio raíz durante el escaneo debe invalidar la huella, incluso si el directorio sustituto está vacío.
+- Se conservan los límites de 20.000 entradas/10.000 archivos, el escaneo incremental, el rechazo de errores/symlinks/hardlinks y el orden determinista.
+- No se modificó `main`, no se hizo merge/rebase/force-push y PR #2 no se alteró.
+
+## Pendiente de validación y operación
+
+- Ejecutar Python Tests y Docker Sandbox sobre el nuevo SHA exacto; exigir ambos `completed/success` y revisar todos los jobs/steps.
+- Backups: cifrado, KMS/HSM, custodia/rotación, WORM/offsite y simulacros reales de restauración/DR.
+- Plataforma: ACL NTFS y Job Objects; cgroups/namespaces o microVM con pruebas de escape; gateway de egress con DNS pinning.
+- Operación: RBAC/IdP/MFA, branch protection/required checks, observabilidad central, pruebas de carga/soak y revisión independiente.
+- Biblioteca: 48 áreas, 0 `expert_ready`; siguen pendientes fuentes primarias leídas, licencias/procedencia, claims trazables, laboratorios reproducibles, datasets expertos y revisión independiente.
+
+---
+
 # Estado vigente — 2026-11-27 (enumeración incremental y acotada de objetivos)
 
 > Registro de este corte. Los checks deben terminar sobre el nuevo HEAD exacto.

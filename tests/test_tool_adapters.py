@@ -354,6 +354,24 @@ class ToolAdapterTests(unittest.TestCase):
             with self.assertRaisesRegex(ToolExecutionError, "límite total de entradas"):
                 tool_adapters._hash_target(target)
 
+    def test_hash_target_detects_root_directory_replacement_during_scan(self):
+        target = self.root / "root-swap"
+        replacement = self.root / "replacement"
+        moved = self.root / "root-swap-original"
+        target.mkdir()
+        replacement.mkdir()
+        real_scandir = os.scandir
+
+        def replace_root_before_scan(root):
+            if Path(root) == target:
+                target.rename(moved)
+                replacement.rename(target)
+            return real_scandir(root)
+
+        with patch.object(tool_adapters.os, "scandir", side_effect=replace_root_before_scan):
+            with self.assertRaisesRegex(ToolExecutionError, "cambió durante el cálculo"):
+                tool_adapters._hash_target(target)
+
     def test_hash_target_fails_closed_when_directory_scan_is_incomplete(self):
         target = self.root / "unreadable-tree"
         target.mkdir()
