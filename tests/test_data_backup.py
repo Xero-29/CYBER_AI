@@ -229,6 +229,32 @@ class DataBackupTests(unittest.TestCase):
             with self.assertRaisesRegex(BackupError, "límite de archivos"):
                 self.verify_unsigned_backup(snapshot)
 
+    def test_backup_and_verifier_enforce_total_byte_limit(self):
+        destination = self.root / "bounded-backup"
+        with patch("data_backup.MAX_TOTAL_BACKUP_BYTES", 1):
+            with self.assertRaisesRegex(BackupError, "límite total"):
+                self.create_unsigned_backup(destination)
+            self.assertFalse(destination.exists())
+            self.assertEqual(list(self.root.glob(".bounded-backup.tmp-*")), [])
+
+        self.create_unsigned_backup(destination)
+        with patch("data_backup.MAX_TOTAL_BACKUP_BYTES", 1):
+            with self.assertRaisesRegex(BackupError, "límite total"):
+                self.verify_unsigned_backup(destination)
+
+    def test_sqlite_snapshot_respects_remaining_backup_byte_budget(self):
+        sqlite_only = self.root / "sqlite-only"
+        sqlite_only.mkdir(mode=0o700)
+        target = sqlite_only / "memory.sqlite3"
+        shutil.copy2(self.data / "memory.sqlite3", target)
+        if os.name == "posix":
+            os.chmod(sqlite_only, 0o700)
+            os.chmod(target, 0o600)
+        with patch("data_backup.MAX_TOTAL_BACKUP_BYTES", 1):
+            with self.assertRaisesRegex(BackupError, "límite total"):
+                self.create_unsigned_backup(self.root / "sqlite-bounded", data_dir=sqlite_only)
+        self.assertFalse((self.root / "sqlite-bounded").exists())
+
     def test_detects_modified_backup_file(self):
         snapshot = self.root / "backup"
         self.create_unsigned_backup(snapshot, data_dir=self.data)
@@ -403,10 +429,10 @@ class DataBackupTests(unittest.TestCase):
         self.create_unsigned_backup(snapshot, data_dir=self.data)
         original_copy = __import__("data_backup")._copy_regular_file
 
-        def mutate_before_copy(source, target):
+        def mutate_before_copy(source, target, **kwargs):
             if Path(source) == snapshot / "events.jsonl":
                 Path(source).write_text("tampered", encoding="utf-8")
-            return original_copy(source, target)
+            return original_copy(source, target, **kwargs)
 
         with patch("data_backup._copy_regular_file", side_effect=mutate_before_copy):
             with self.assertRaisesRegex(BackupError, "cambió durante la restauración"):

@@ -25,6 +25,7 @@ DEFAULT_DATA = PROJECT / "data"
 LOCK_SUFFIXES = {".lock", ".pid", ".sock", "-wal", "-shm"}
 SCHEMA = "cyber-ai-data-backup-v1"
 MAX_BACKUP_FILES = 50_000
+MAX_TOTAL_BACKUP_BYTES = 50 * 1024 * 1024 * 1024
 MAX_MANIFEST_BYTES = 16 * 1024 * 1024
 MAX_MANIFEST_DEPTH = 64
 _WINDOWS_RESERVED_NAME = re.compile(
@@ -309,12 +310,16 @@ def _sha256(path):
     return digest.hexdigest()
 
 
-def _copy_regular_file(source, destination):
-    """Copy a regular source without following links or overwriting a destination."""
+def _copy_regular_file(source, destination, *, max_bytes=None):
+    """Copy a regular source without following links or exceeding a byte budget."""
+    if max_bytes is not None and (type(max_bytes) is not int or max_bytes < 0):
+        raise BackupError("El límite de bytes de copia debe ser un entero no negativo.")
     destination = Path(os.path.abspath(os.fspath(destination)))
     destination_parent_chain = _validate_directory_path(destination.parent)
     with _open_regular_file(source) as src:
         initial = os.fstat(src.fileno())
+        if max_bytes is not None and initial.st_size > max_bytes:
+            raise BackupError("La copia supera el límite total de bytes del backup.")
         flags = (
             os.O_WRONLY
             | os.O_CREAT
@@ -330,7 +335,19 @@ def _copy_regular_file(source, destination):
                 opened_destination = os.fstat(dst.fileno())
                 if not _is_regular_file_info(opened_destination):
                     raise BackupError("El destino de copia debe ser un archivo regular.")
-                shutil.copyfileobj(src, dst, length=1024 * 1024)
+                copied = 0
+                while True:
+                    read_size = 1024 * 1024
+                    if max_bytes is not None:
+                        read_size = min(read_size, max_bytes - copied + 1)
+                    chunk = src.read(read_size)
+                    if not chunk:
+                        break
+                    copied += len(chunk)
+                    if max_bytes is not None and copied > max_bytes:
+                        raise BackupError("La copia supera el límite total de bytes del backup.")
+                    if dst.write(chunk) != len(chunk):
+                        raise BackupError("La escritura de la copia quedó incompleta.")
                 dst.flush()
                 os.fsync(dst.fileno())
                 final_destination = os.fstat(dst.fileno())
@@ -344,6 +361,8 @@ def _copy_regular_file(source, destination):
                     )
                 ):
                     raise BackupError("El destino cambió durante la copia.")
+        except BackupError:
+            raise
         except OSError as error:
             raise BackupError("No se pudo copiar un archivo regular del backup.") from error
         finally:
@@ -596,6 +615,7 @@ def _validate_manifest(snapshot, manifest, *, require_signature=False):
     seen = set()
     expected = {"manifest.json"}
     verified = []
+    total_bytes = 0
     for item in files:
         if not isinstance(item, dict):
             raise BackupError("Entrada de manifiesto inválida.")
@@ -610,6 +630,9 @@ def _validate_manifest(snapshot, manifest, *, require_signature=False):
             or item["size"] < 0
         ):
             raise BackupError(f"Tamaño inválido en manifiesto: {key}")
+        if item["size"] > MAX_TOTAL_BACKUP_BYTES - total_bytes:
+            raise BackupError("El backup supera el límite total de bytes permitido.")
+        total_bytes += item["size"]
         digest = item.get("sha256")
         if (
             not isinstance(digest, str) or len(digest) != 64
@@ -689,10 +712,12 @@ def _validate_manifest(snapshot, manifest, *, require_signature=False):
             raise BackupError("La firma HMAC del manifiesto no coincide.")
 
     return {"valid": True, "files": len(verified), "paths": verified,
-            "encrypted": False, "signed": signed}
+            "total_bytes": total_bytes, "encrypted": False, "signed": signed}
 
 
-def _sqlite_snapshot(source, destination):
+def _sqlite_snapshot(source, destination, *, max_bytes=None):
+    if max_bytes is not None and (type(max_bytes) is not int or max_bytes < 0):
+        raise BackupError("El límite de bytes del snapshot SQLite debe ser un entero no negativo.")
     source = Path(source)
     parent_chain = _validate_directory_path(source.parent)
     try:
@@ -722,6 +747,15 @@ def _sqlite_snapshot(source, destination):
         ):
             raise BackupError("La base SQLite cambió durante su apertura.")
         source_connection.execute("PRAGMA trusted_schema=OFF")
+        if max_bytes is not None:
+            page_count = source_connection.execute("PRAGMA page_count").fetchone()[0]
+            page_size = source_connection.execute("PRAGMA page_size").fetchone()[0]
+            if (
+                type(page_count) is not int or page_count < 0
+                or type(page_size) is not int or page_size <= 0
+                or page_count * page_size > max_bytes
+            ):
+                raise BackupError("El snapshot SQLite supera el límite total de bytes del backup.")
 
         destination_connection = connect_private_sqlite(destination, timeout=30)
         source_connection.backup(destination_connection)
@@ -733,6 +767,8 @@ def _sqlite_snapshot(source, destination):
             or not _same_directory_chain(parent_chain, _validate_directory_path(source.parent))
         ):
             raise BackupError(f"SQLite integrity o estabilidad falló para {source.name}.")
+        if max_bytes is not None and Path(destination).stat().st_size > max_bytes:
+            raise BackupError("El snapshot SQLite supera el límite total de bytes del backup.")
     except (sqlite3.Error, SafeWriteError) as error:
         raise BackupError(f"No se pudo crear el snapshot SQLite de {source.name}.") from error
     finally:
@@ -779,6 +815,7 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None, *, confirm_quiesced=F
     staging.mkdir(mode=0o700)
     _validate_directory_path(staging)
     entries = []
+    total_bytes = 0
     try:
         for current, dirs, files in os.walk(data_dir, followlinks=False):
             current_path = Path(current)
@@ -809,16 +846,17 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None, *, confirm_quiesced=F
                 target = staging / relative
                 target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
                 source_parent_chain = _validate_directory_path(source.parent)
+                remaining_bytes = MAX_TOTAL_BACKUP_BYTES - total_bytes
                 if source.suffix.lower() in {".sqlite", ".sqlite3", ".db"}:
                     target_parent_chain = _validate_directory_path(target.parent)
-                    _sqlite_snapshot(source, target)
+                    _sqlite_snapshot(source, target, max_bytes=remaining_bytes)
                     if not _same_directory_chain(
                         target_parent_chain, _validate_directory_path(target.parent)
                     ):
                         raise BackupError("La ruta del snapshot SQLite cambió durante la copia.")
                     kind = "sqlite_snapshot"
                 else:
-                    _copy_regular_file(source, target)
+                    _copy_regular_file(source, target, max_bytes=remaining_bytes)
                     kind = "file_copy_quiesced"
                 source_after = source.lstat()
                 if (
@@ -829,8 +867,12 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None, *, confirm_quiesced=F
                     )
                 ):
                     raise BackupError(f"El origen cambió durante el backup: {relative_source}")
+                target_size = target.stat().st_size
+                if target_size > remaining_bytes:
+                    raise BackupError("El backup supera el límite total de bytes permitido.")
+                total_bytes += target_size
                 entries.append({
-                    "path": relative, "kind": kind, "size": target.stat().st_size,
+                    "path": relative, "kind": kind, "size": target_size,
                     "sha256": _sha256(target),
                 })
         _validate_portable_file_paths(entry["path"] for entry in entries)
@@ -866,7 +908,8 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None, *, confirm_quiesced=F
         os.replace(staging, destination)
         _fsync_directory(destination.parent)
         return {"destination": str(destination), "files": len(entries),
-                "encrypted": False, "signed": signing_key is not None,
+                "total_bytes": total_bytes, "encrypted": False,
+                "signed": signing_key is not None,
                 "manifest_sha256": _sha256(destination / "manifest.json")}
     except Exception:
         shutil.rmtree(staging, ignore_errors=True)
@@ -957,7 +1000,7 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
             source = snapshot.joinpath(*relative.parts)
             target = staging.joinpath(*relative.parts)
             target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
-            _copy_regular_file(source, target)
+            _copy_regular_file(source, target, max_bytes=item["size"])
             if target.stat().st_size != item["size"] or _sha256(target) != item["sha256"]:
                 raise BackupError(f"El archivo cambió durante la restauración: {relative.as_posix()}")
             if target.suffix.lower() in {".sqlite", ".sqlite3", ".db"}:
@@ -1007,6 +1050,7 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
                 pass
         raise
     return {"restored": True, "files": report["files"],
+            "total_bytes": report["total_bytes"],
             "previous_data_preserved_at": str(previous) if previous else None,
             "encrypted": False, "signed": report["signed"]}
 
