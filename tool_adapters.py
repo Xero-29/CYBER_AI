@@ -470,8 +470,10 @@ def _run_local_tool_with_home(
                     if not _terminate_process_tree(process):
                         output_limit_termination_failed["value"] = True
                     return
-        except (OSError, ValueError):
-            # A partial output capture must never be returned as complete evidence.
+        except Exception:
+            # Stream wrappers may raise unexpected exceptions or return invalid
+            # chunk types. Never turn a partial read into successful evidence.
+            # Do not retain exception text: it may contain sensitive data.
             reader_errors.add(key)
             return
 

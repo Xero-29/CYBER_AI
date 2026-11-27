@@ -125,36 +125,51 @@ class ToolAdapterTests(unittest.TestCase):
         self.assertTrue(evidence["output_capture_complete"])
         self.assertFalse(evidence["tool_reported_success"])
 
-    def test_stream_read_failure_fails_closed_without_partial_evidence(self):
+    def test_stream_read_failures_and_invalid_chunks_fail_closed(self):
         class FailingStream:
-            closed = False
+            def __init__(self, *, error=None, value=None):
+                self.closed = False
+                self.error = error
+                self.value = value
 
             def read(self, _size):
-                raise OSError("synthetic read failure")
+                if self.error is not None:
+                    raise self.error
+                return self.value
 
             def close(self):
                 self.closed = True
 
         class FailingProcess(FakeProcess):
-            def __init__(self):
-                self.stdout = FailingStream()
+            def __init__(self, stream):
+                self.stdout = stream
                 self.stderr = io.BytesIO(b"")
                 self.timeout = False
                 self.wait_calls = 0
                 self.killed = False
 
+        broken_streams = (
+            FailingStream(error=OSError("synthetic read failure")),
+            FailingStream(error=RuntimeError("synthetic wrapper failure")),
+            FailingStream(value="not-bytes"),
+        )
         provenance = {"resolved_path": "/usr/bin/ruff", "sha256": "a" * 64}
-        with (
-            patch.object(tool_adapters, "_hash_binary", return_value=provenance),
-            patch.object(tool_adapters.shutil, "which", return_value="/usr/bin/ruff"),
-            patch.object(
-                tool_adapters, "run_bounded_process",
-                return_value=_version_result("ruff 0.14.5"),
-            ),
-            patch.object(tool_adapters.subprocess, "Popen", return_value=FailingProcess()),
-        ):
-            with self.assertRaisesRegex(ProcessIsolationError, "capturar íntegramente"):
-                run_local_tool("ruff", "sample.py")
+        for stream in broken_streams:
+            with self.subTest(stream=type(stream.error).__name__ if stream.error else "invalid-chunk"):
+                with (
+                    patch.object(tool_adapters, "_hash_binary", return_value=provenance),
+                    patch.object(tool_adapters.shutil, "which", return_value="/usr/bin/ruff"),
+                    patch.object(
+                        tool_adapters, "run_bounded_process",
+                        return_value=_version_result("ruff 0.14.5"),
+                    ),
+                    patch.object(
+                        tool_adapters.subprocess, "Popen",
+                        return_value=FailingProcess(stream),
+                    ),
+                ):
+                    with self.assertRaisesRegex(ProcessIsolationError, "capturar íntegramente"):
+                        run_local_tool("ruff", "sample.py")
 
 
     def test_excessive_total_output_terminates_the_process_group(self):
