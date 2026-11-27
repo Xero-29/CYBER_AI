@@ -1,3 +1,24 @@
+# Estado vigente — 2026-11-27 (integridad de captura de adaptadores y ledger)
+
+> Registro de este corte; los checks del nuevo HEAD deben concluir antes de declarar validación.
+
+- HEAD antes del cambio: `6ec8cce751102c1ae3800fedf9f37cee542dfadc`; `main`: `658a565acd0a5568bb56a1a7482f44260cd9efd1`.
+- La comparación sigue siendo `codex/security-integrity-audit` 473 commits adelante y 576 detrás de `main`, con ancestro común `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. No existe un solo commit exclusivo de `main`; son 576. No integrar ni reescribir el historial.
+- PR #2 sigue cerrado y fusionado (merge `478c6ddc676221e4c07b8c5780f127bc5a9e749e`). No hay PR abierto para esta rama y no se crea uno duplicado.
+- Python Tests [46024203009](https://github.com/Xero-29/CYBER_AI/actions/runs/46024203009) y Docker Sandbox [46024202889](https://github.com/Xero-29/CYBER_AI/actions/runs/46024202889) estaban `in_progress` sobre `6ec8cce`; no validan el HEAD posterior.
+- Hallazgo adicional: `tool_adapters.py` mantenía un drenaje de stdout/stderr independiente de `process_isolation.py`. También ignoraba errores de lectura y podía devolver evidencia `completed` con contadores parciales. El ledger no exigía una señal explícita de captura completa.
+- Corrección: los dos lectores deben terminar sin error; los errores de lectura, lectores bloqueados y lectores no creados invalidan la ejecución. La salida por encima del límite total declara captura incompleta; el truncamiento de almacenamiento por stream sigue diferenciándose del drenaje completo. El adaptador devuelve `output_capture_complete` y el executor/ledger exige `true` además de los flags de truncamiento en todos los caminos de éxito.
+- Regresiones: fallo sintético de lectura en el adaptador, indicador de captura completa en el proceso, salida truncada vs. límite total y rechazo de evidencia con captura incompleta en el ledger.
+- Documentación: actualizado `docs/EXECUTION_LEDGER.md`. No hay checkout local en este entorno; el intento de clonación no pudo resolver GitHub. No se afirma ejecución local.
+- No se modificó `main`, no se hizo merge/rebase/force-push y no se alteró PR #2.
+
+## Pendiente
+
+- Ejecutar Python Tests y Docker Sandbox sobre el nuevo SHA exacto y comprobar todos los jobs `completed/success`.
+- Mantener como bloqueos externos: cifrado/KMS/HSM y backups WORM/offsite/DR; ACL NTFS y Job Objects; cgroups/namespaces o microVM; DNS pinning/egress gateway; RBAC/IdP/MFA; branch protection/required checks; observabilidad central y soak tests; validación independiente de la biblioteca.
+
+---
+
 # Estado vigente — 2026-11-27 (captura íntegra de salida de procesos)
 
 > Registro de este corte. La evidencia de CI se atribuye exclusivamente al SHA exacto ejecutado.

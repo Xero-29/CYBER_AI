@@ -10,6 +10,7 @@ from pathlib import Path
 from unittest.mock import patch, Mock
 
 import tool_adapters
+from process_isolation import ProcessIsolationError
 from tool_adapters import ToolExecutionError, run_local_tool, write_evidence
 
 
@@ -39,6 +40,7 @@ def _version_result(
     returncode=0,
     timed_out=False,
     output_truncated=False,
+    output_capture_complete=True,
     process_group=True,
 ):
     return {
@@ -47,6 +49,7 @@ def _version_result(
         "stderr": "",
         "timed_out": timed_out,
         "output_truncated": output_truncated,
+        "output_capture_complete": output_capture_complete,
         "process_group_isolation_enforced": process_group,
         "process_tree_isolation_enforced": False,
     }
@@ -82,6 +85,7 @@ class ToolAdapterTests(unittest.TestCase):
             popen.call_args.kwargs["cwd"], popen.call_args.kwargs["env"]["HOME"]
         )
         self.assertEqual(evidence["status"], "completed")
+        self.assertTrue(evidence["output_capture_complete"])
         self.assertEqual(evidence["tool_version"], "ruff 0.14.5")
         self.assertEqual(version_run.call_args.kwargs["timeout"], 5)
         self.assertEqual(version_run.call_args.kwargs["max_output_bytes"], 8192)
@@ -118,7 +122,40 @@ class ToolAdapterTests(unittest.TestCase):
         self.assertEqual(evidence["status"], "output_truncated")
         self.assertTrue(evidence["output_truncated"])
         self.assertFalse(evidence["output_limit_exceeded"])
+        self.assertTrue(evidence["output_capture_complete"])
         self.assertFalse(evidence["tool_reported_success"])
+
+    def test_stream_read_failure_fails_closed_without_partial_evidence(self):
+        class FailingStream:
+            closed = False
+
+            def read(self, _size):
+                raise OSError("synthetic read failure")
+
+            def close(self):
+                self.closed = True
+
+        class FailingProcess(FakeProcess):
+            def __init__(self):
+                self.stdout = FailingStream()
+                self.stderr = io.BytesIO(b"")
+                self.timeout = False
+                self.wait_calls = 0
+                self.killed = False
+
+        provenance = {"resolved_path": "/usr/bin/ruff", "sha256": "a" * 64}
+        with (
+            patch.object(tool_adapters, "_hash_binary", return_value=provenance),
+            patch.object(tool_adapters.shutil, "which", return_value="/usr/bin/ruff"),
+            patch.object(
+                tool_adapters, "run_bounded_process",
+                return_value=_version_result("ruff 0.14.5"),
+            ),
+            patch.object(tool_adapters.subprocess, "Popen", return_value=FailingProcess()),
+        ):
+            with self.assertRaisesRegex(ProcessIsolationError, "capturar íntegramente"):
+                run_local_tool("ruff", "sample.py")
+
 
     def test_excessive_total_output_terminates_the_process_group(self):
         process = FakeProcess(
@@ -140,6 +177,7 @@ class ToolAdapterTests(unittest.TestCase):
         self.assertEqual(evidence["status"], "output_limit_exceeded")
         self.assertTrue(evidence["output_truncated"])
         self.assertTrue(evidence["output_limit_exceeded"])
+        self.assertFalse(evidence["output_capture_complete"])
         self.assertFalse(evidence["tool_reported_success"])
         self.assertFalse(evidence["output_limit_termination_failed"])
 
@@ -218,6 +256,7 @@ class ToolAdapterTests(unittest.TestCase):
         for result in (
             _version_result(timed_out=True),
             _version_result(output_truncated=True),
+            _version_result(output_capture_complete=False),
             _version_result(process_group=False),
         ):
             with self.subTest(result=result):

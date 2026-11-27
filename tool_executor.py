@@ -27,7 +27,7 @@ def _terminal_status(evidence):
             "output_limit_exceeded",
             "output_limit_termination_failed",
         )
-        if any(
+        if evidence.get("output_capture_complete") is not True or any(
             type(evidence.get(flag)) is not bool or evidence[flag]
             for flag in output_flags
         ):
@@ -134,10 +134,15 @@ def main(argv=None):
                 "output_limit_exceeded",
                 "output_limit_termination_failed",
             )
-            if any(type(evidence.get(flag)) is not bool for flag in output_flags):
+            if (
+                type(evidence.get("output_capture_complete")) is not bool
+                or any(type(evidence.get(flag)) is not bool for flag in output_flags)
+            ):
                 evidence["status"] = "output_integrity_unknown"
                 evidence["tool_reported_success"] = False
-            elif any(evidence[flag] for flag in output_flags):
+            elif evidence["output_capture_complete"] is not True or any(
+                evidence[flag] for flag in output_flags
+            ):
                 evidence["status"] = "output_incomplete"
                 evidence["tool_reported_success"] = False
         evidence_dir = os.environ.get("CYBER_AI_EVIDENCE_DIR")
@@ -212,12 +217,15 @@ def main(argv=None):
                         },
                         {
                             "name": "output_completeness",
-                            "passed": all(
-                                type(evidence.get(flag)) is bool and evidence[flag] is False
-                                for flag in (
-                                    "output_truncated",
-                                    "output_limit_exceeded",
-                                    "output_limit_termination_failed",
+                            "passed": (
+                                evidence.get("output_capture_complete") is True
+                                and all(
+                                    type(evidence.get(flag)) is bool and evidence[flag] is False
+                                    for flag in (
+                                        "output_truncated",
+                                        "output_limit_exceeded",
+                                        "output_limit_termination_failed",
+                                    )
                                 )
                             ),
                             "evidence": {
@@ -251,6 +259,7 @@ def main(argv=None):
         evidence.get("status") == "completed"
         and type(evidence.get("return_code")) is int
         and evidence.get("return_code") == 0
+        and evidence.get("output_capture_complete") is True
         and all(
             type(evidence.get(flag)) is bool and evidence[flag] is False
             for flag in (

@@ -152,6 +152,7 @@ class ToolExecutorLedgerTests(unittest.TestCase):
             "tool": "ruff",
             "target": "tests/fixtures/sample.py",
             "return_code": 0,
+            "output_capture_complete": True,
             "output_truncated": True,
             "output_limit_exceeded": False,
             "output_limit_termination_failed": False,
@@ -171,6 +172,28 @@ class ToolExecutorLedgerTests(unittest.TestCase):
         rendered = json.loads(output)
         self.assertEqual(rendered["status"], "output_incomplete")
         self.assertFalse(rendered["tool_reported_success"])
+
+    def test_incomplete_stream_capture_cannot_be_successful(self):
+        ledger = FakeLedger()
+        evidence = {
+            "status": "completed",
+            "tool": "ruff",
+            "target": "tests/fixtures/sample.py",
+            "return_code": 0,
+            "output_capture_complete": False,
+            "output_truncated": False,
+            "output_limit_exceeded": False,
+            "output_limit_termination_failed": False,
+            "tool_reported_success": True,
+        }
+        result, output = self.invoke(ledger, evidence)
+        self.assertEqual(result, 1)
+        rendered = json.loads(output)
+        self.assertEqual(rendered["status"], "output_incomplete")
+        self.assertFalse(rendered["tool_reported_success"])
+        terminal = ledger.events[-1]
+        validators = {item["name"]: item["passed"] for item in terminal["validator_results"]}
+        self.assertFalse(validators["output_completeness"])
 
     def test_missing_output_completeness_metadata_cannot_be_successful(self):
         ledger = FakeLedger()

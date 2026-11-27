@@ -344,6 +344,7 @@ def _probe_tool_version(binary, tool_id, env):
         return "unknown"
     if (
         result.get("timed_out")
+        or result.get("output_capture_complete") is not True
         or result.get("output_truncated")
         or not result.get("process_group_isolation_enforced")
         or result.get("returncode") != 0
@@ -441,6 +442,7 @@ def _run_local_tool_with_home(
     output_bytes_observed = {"value": 0}
     stream_bytes_observed = {"stdout": 0, "stderr": 0}
     output_limit_termination_failed = {"value": False}
+    reader_errors = set()
 
     def drain(stream, key):
         cap = MAX_OUTPUT_BYTES // 2
@@ -469,8 +471,8 @@ def _run_local_tool_with_home(
                         output_limit_termination_failed["value"] = True
                     return
         except (OSError, ValueError):
-            # The owner closes the pipe after the reader has been joined or
-            # the isolated process group has been terminated.
+            # A partial output capture must never be returned as complete evidence.
+            reader_errors.add(key)
             return
 
     process = None
@@ -551,6 +553,21 @@ def _run_local_tool_with_home(
         for reader in readers:
             reader.join(timeout=1)
 
+    expected_streams = ("stdout", "stderr")
+    unfinished_readers = [
+        key for reader, key in zip(readers, expected_streams)
+        if reader.is_alive()
+    ]
+    if process is not None and len(readers) != len(expected_streams):
+        unfinished_readers.extend(expected_streams[len(readers):])
+    if reader_errors or unfinished_readers:
+        failed_streams = sorted(reader_errors | set(unfinished_readers))
+        raise ProcessIsolationError(
+            "No se pudo capturar íntegramente la salida de la herramienta ("
+            + ", ".join(failed_streams)
+            + "); la evidencia no es confiable."
+        )
+
     out_text = redact_text(captured["stdout"].decode("utf-8", errors="replace"))
     err_text = redact_text(captured["stderr"].decode("utf-8", errors="replace"))
     truncated = stream_truncated["value"]
@@ -593,6 +610,7 @@ def _run_local_tool_with_home(
             and status == "completed"
             and not truncated
         ),
+        "output_capture_complete": not output_limit_exceeded.is_set(),
         "output_truncated": truncated,
         "output_limit_exceeded": output_limit_exceeded.is_set(),
         "output_bytes_observed": output_bytes_observed["value"],

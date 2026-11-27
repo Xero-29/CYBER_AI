@@ -169,10 +169,13 @@ def run_bounded_process(
             for reader in readers:
                 reader.join(timeout=1)
 
+    expected_streams = ("stdout", "stderr")
     unfinished_readers = [
-        key for reader, key in zip(readers, ("stdout", "stderr"))
+        key for reader, key in zip(readers, expected_streams)
         if reader.is_alive()
     ]
+    if process is not None and len(readers) != len(expected_streams):
+        unfinished_readers.extend(expected_streams[len(readers):])
     if read_errors or unfinished_readers:
         failed_streams = sorted(read_errors | set(unfinished_readers))
         raise ProcessIsolationError(
