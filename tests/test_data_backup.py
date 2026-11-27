@@ -278,6 +278,39 @@ class DataBackupTests(unittest.TestCase):
             self.create_unsigned_backup(self.root / "backup")
 
     @unittest.skipUnless(os.name == "posix", "POSIX file permissions required")
+    @unittest.skipUnless(os.name == "posix", "Los permisos POSIX se prueban en POSIX.")
+    def test_backup_rejects_private_but_unreadable_source_directories(self):
+        nested = self.data / "unreadable"
+        nested.mkdir(mode=0o700)
+        (nested / "hidden.txt").write_text("private", encoding="utf-8")
+        os.chmod(nested / "hidden.txt", 0o600)
+        os.chmod(nested, 0o000)
+        try:
+            with self.assertRaisesRegex(BackupError, "accesibles por el usuario"):
+                self.create_unsigned_backup(self.root / "unreadable-backup")
+        finally:
+            os.chmod(nested, 0o700)
+
+    def test_private_tree_enumeration_errors_fail_closed(self):
+        real_walk = os.walk
+
+        def fail_data_walk(root, *args, **kwargs):
+            if Path(root) == self.data:
+                kwargs["onerror"](PermissionError("simulated enumeration failure"))
+                return iter(())
+            return real_walk(root, *args, **kwargs)
+
+        with patch("data_backup.os.walk", side_effect=fail_data_walk):
+            with self.assertRaisesRegex(BackupError, "No se pudo enumerar"):
+                self.create_unsigned_backup(self.root / "unreadable-tree-backup")
+        self.assertFalse((self.root / "unreadable-tree-backup").exists())
+
+    def test_private_tree_entry_count_is_bounded(self):
+        with patch("data_backup.MAX_BACKUP_ENTRIES", 1):
+            with self.assertRaisesRegex(BackupError, "límite de entradas"):
+                self.create_unsigned_backup(self.root / "too-many-entries")
+        self.assertFalse((self.root / "too-many-entries").exists())
+
     def test_backup_refuses_group_or_world_readable_source_files(self):
         os.chmod(self.data / "events.jsonl", 0o644)
         with self.assertRaisesRegex(BackupError, "privados"):

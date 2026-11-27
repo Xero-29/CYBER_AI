@@ -26,6 +26,7 @@ LOCK_SUFFIXES = {".lock", ".pid", ".sock", "-wal", "-shm"}
 SCHEMA = "cyber-ai-data-backup-v1"
 MAX_BACKUP_FILES = 50_000
 MAX_TOTAL_BACKUP_BYTES = 50 * 1024 * 1024 * 1024
+MAX_BACKUP_ENTRIES = 100_000
 MAX_MANIFEST_BYTES = 16 * 1024 * 1024
 MAX_MANIFEST_DEPTH = 64
 _WINDOWS_RESERVED_NAME = re.compile(
@@ -37,6 +38,10 @@ _WINDOWS_FORBIDDEN_CHARS = frozenset('<>:"\\|?*')
 
 class BackupError(ValueError):
     pass
+
+
+def _raise_walk_error(error):
+    raise BackupError("No se pudo enumerar el árbol de datos/backup de forma segura.") from error
 
 
 def _unique_object(pairs):
@@ -150,7 +155,13 @@ def _validate_private_data_tree(root):
     _validate_directory_path(root)
     directories = []
     files = []
-    for current, dirs, names in os.walk(root, followlinks=False):
+    entry_count = 0
+    for current, dirs, names in os.walk(
+        root, followlinks=False, onerror=_raise_walk_error
+    ):
+        entry_count += len(dirs) + len(names)
+        if entry_count > MAX_BACKUP_ENTRIES:
+            raise BackupError("El árbol de datos/backup supera el límite de entradas.")
         current_path = Path(current)
         directories.append(current_path)
         directories.extend(current_path / name for name in dirs)
@@ -163,8 +174,11 @@ def _validate_private_data_tree(root):
                 not _is_directory_info(info)
                 or info.st_uid != os.geteuid()
                 or stat.S_IMODE(info.st_mode) & 0o077
+                or stat.S_IMODE(info.st_mode) & 0o500 != 0o500
             ):
-                raise BackupError("Los directorios de datos/backup deben ser privados (0700).")
+                raise BackupError(
+                    "Los directorios de datos/backup deben ser privados y accesibles por el usuario (0700)."
+                )
         for path in files:
             info = path.lstat()
             if not _is_regular_file_info(info):
@@ -173,8 +187,13 @@ def _validate_private_data_tree(root):
                 raise BackupError("Los archivos de datos/backup deben pertenecer al usuario.")
             if info.st_nlink != 1:
                 raise BackupError("No se permiten enlaces duros en archivos de datos/backup.")
-            if stat.S_IMODE(info.st_mode) & 0o077:
-                raise BackupError("Los archivos de datos/backup deben ser privados (0600).")
+            if (
+                stat.S_IMODE(info.st_mode) & 0o077
+                or not stat.S_IMODE(info.st_mode) & 0o400
+            ):
+                raise BackupError(
+                    "Los archivos de datos/backup deben ser privados y legibles por el usuario (0600)."
+                )
     else:
         for directory in directories:
             if not _is_directory_info(directory.lstat()):
@@ -494,7 +513,9 @@ def _fsync_directory_tree(root):
     _validate_private_data_tree(root)
     directories = []
     try:
-        for current, dirs, _files in os.walk(root, followlinks=False):
+        for current, dirs, _files in os.walk(
+            root, followlinks=False, onerror=_raise_walk_error
+        ):
             current_path = Path(current)
             directories.append(current_path)
             for name in dirs:
@@ -670,7 +691,18 @@ def _validate_manifest(snapshot, manifest, *, require_signature=False):
 
     _validate_portable_file_paths(seen)
     actual = set()
-    for current, dirs, names in os.walk(snapshot, followlinks=False):
+    actual_entry_count = 0
+    actual_file_count = 0
+    for current, dirs, names in os.walk(
+        snapshot, followlinks=False, onerror=_raise_walk_error
+    ):
+        actual_entry_count += len(dirs) + len(names)
+        actual_file_count += len(names)
+        if (
+            actual_entry_count > MAX_BACKUP_ENTRIES
+            or actual_file_count > MAX_BACKUP_FILES + 1
+        ):
+            raise BackupError("El snapshot supera el límite de entradas verificables.")
         current_path = Path(current)
         for name in dirs:
             try:
@@ -817,7 +849,9 @@ def create_backup(data_dir=DEFAULT_DATA, destination=None, *, confirm_quiesced=F
     entries = []
     total_bytes = 0
     try:
-        for current, dirs, files in os.walk(data_dir, followlinks=False):
+        for current, dirs, files in os.walk(
+            data_dir, followlinks=False, onerror=_raise_walk_error
+        ):
             current_path = Path(current)
             for name in list(dirs):
                 child = current_path / name
