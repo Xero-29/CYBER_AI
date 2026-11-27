@@ -1,3 +1,34 @@
+# Estado vigente — 2026-11-27 (redacción de credenciales en claves de mapas)
+
+> Registro de este corte. Los checks de commits previos no validan el nuevo HEAD.
+
+## Estado del repositorio
+
+- Repositorio: `Xero-29/CYBER_AI`; rama: `codex/security-integrity-audit`.
+- HEAD inspeccionado antes de este cambio: `c8f4f6c17e52f3a0fe35d81ec3865311cc2f9947`; `main`: `658a565acd0a5568bb56a1a7482f44260cd9efd1`.
+- En ese HEAD: **480 commits exclusivos de esta rama y 576 exclusivos de `main`**; ancestro común `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. Este commit añade uno: nuevo total **481 adelante / 576 detrás**. No existe un único commit exclusivo de `main`; no integrar, rebasar ni hacer cherry-pick directo.
+- PR #2 está cerrado y fusionado (merge `478c6ddc676221e4c07b8c5780f127bc5a9e749e`). No hay PR abierto para esta rama; no crear uno duplicado.
+- La rama no tiene protección (`protected=false`); branch protection y required checks requieren configuración administrativa.
+- Python Tests [46029139032](https://github.com/Xero-29/CYBER_AI/actions/runs/46029139032) y Docker Sandbox [46029138875](https://github.com/Xero-29/CYBER_AI/actions/runs/46029138875) estaban `in_progress` sobre `c8f4f6c`; no validan el nuevo HEAD.
+- No hay checkout local disponible en este entorno; no se afirma ejecución local.
+
+## Corrección implementada
+
+- Hallazgo: la redacción de evidencia y del ledger saneaba valores, pero conservaba sin transformar las claves de mapas. Una credencial reconocible usada como clave JSON podía quedar persistida en evidencia o SQLite.
+- Corrección: `redact_sensitive_data()` y `ExecutionLedger._clean()` redactan también las claves. Si varias claves se reducen a la misma etiqueta, se agrega un sufijo de índice para no perder entradas.
+- Regresiones: tokens GitHub sintéticos usados como claves se eliminan del JSON y del ledger, se conservan ambos valores y la cadena de hashes sigue verificando.
+- Documentación actualizada en `docs/EXECUTION_LEDGER.md`. No se modificó `main`, no se hizo merge/rebase/force-push y PR #2 no se alteró.
+
+## Pendiente de validación y operación
+
+- Ejecutar Python Tests y Docker Sandbox sobre el nuevo SHA exacto; exigir ambos `completed/success` y revisar todos los jobs/steps.
+- Backups: cifrado, KMS/HSM, custodia/rotación, WORM/offsite y simulacros reales de restauración/DR.
+- Plataforma: ACL NTFS y Job Objects; cgroups/namespaces o microVM con pruebas de escape; gateway de egress con DNS pinning.
+- Operación: RBAC/IdP/MFA, branch protection/required checks, observabilidad central, pruebas de carga/soak y revisión independiente.
+- Biblioteca: 48 áreas, 0 `expert_ready`; siguen pendientes fuentes primarias leídas, licencias/procedencia, claims trazables, laboratorios reproducibles, datasets expertos y revisión independiente.
+
+---
+
 # Estado vigente — 2026-11-27 (estabilidad del directorio raíz de objetivos)
 
 > Registro de este corte. Los workflows del nuevo HEAD deben concluir antes de declarar validación.

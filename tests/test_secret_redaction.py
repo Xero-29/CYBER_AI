@@ -60,6 +60,16 @@ class SecretRedactionTests(unittest.TestCase):
         for token in tokens:
             self.assertNotIn(token, cleaned)
 
+    def test_redacts_provider_tokens_used_as_mapping_keys_without_losing_entries(self):
+        tokens = ("ghp_" + "a" * 30, "ghp_" + "b" * 30)
+        cleaned = redact_sensitive_data({tokens[0]: "first", tokens[1]: "second"})
+        serialized = json.dumps(cleaned)
+        for token in tokens:
+            self.assertNotIn(token, serialized)
+        self.assertEqual(len(cleaned), 2)
+        self.assertEqual(set(cleaned.values()), {"first", "second"})
+        self.assertTrue(all(key.startswith("[REDACTED TOKEN]") for key in cleaned))
+
     def test_recursively_redacts_sensitive_fields_and_free_text(self):
         value = {
             "api_key": "nested-secret",

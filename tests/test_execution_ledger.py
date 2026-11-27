@@ -100,6 +100,20 @@ class ExecutionLedgerTests(unittest.TestCase):
             self.assertNotIn(secret, value)
         self.assertIn("[REDACTED]", value)
 
+    def test_redacts_provider_tokens_used_as_metadata_keys(self):
+        tokens = ("ghp_" + "a" * 30, "ghp_" + "b" * 30)
+        self.append(metadata={tokens[0]: "first", tokens[1]: "second"})
+        with sqlite3.connect(self.ledger.path) as db:
+            stored = db.execute(
+                "SELECT metadata FROM execution_events"
+            ).fetchone()[0]
+        for token in tokens:
+            self.assertNotIn(token, stored)
+        parsed = __import__("json").loads(stored)
+        self.assertEqual(len(parsed), 2)
+        self.assertEqual(set(parsed.values()), {"first", "second"})
+        self.assertTrue(self.ledger.verify()["valid"])
+
     def test_redacts_private_keys_cookies_and_bytes_from_stored_metadata(self):
         self.append(
             metadata={

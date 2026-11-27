@@ -67,12 +67,16 @@ def redact_sensitive_data(value, key="", *, max_depth=64, _depth=0):
     if _depth > max_depth:
         return "[REDACTED: nesting limit]"
     if isinstance(value, dict):
-        return {
-            str(item_key)[:256]: redact_sensitive_data(
+        cleaned = {}
+        for index, (item_key, item_value) in enumerate(value.items()):
+            original_key = str(item_key)[:256]
+            safe_key = redact_text(original_key)
+            if safe_key in cleaned:
+                safe_key = f"{safe_key}#{index}"
+            cleaned[safe_key] = redact_sensitive_data(
                 item_value, str(item_key), max_depth=max_depth, _depth=_depth + 1
             )
-            for item_key, item_value in value.items()
-        }
+        return cleaned
     if isinstance(value, (list, tuple)):
         return [
             redact_sensitive_data(

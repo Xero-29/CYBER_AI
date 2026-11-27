@@ -49,10 +49,14 @@ def _clean(value, key="", _depth=0):
             _clean(item, _depth=_depth + 1) for item in value[:500]
         ]
     if isinstance(value, dict):
-        return {
-            str(k)[:128]: _clean(v, str(k), _depth + 1)
-            for k, v in list(value.items())[:500]
-        }
+        cleaned = {}
+        for index, (key, item) in enumerate(list(value.items())[:500]):
+            original_key = str(key)[:128]
+            safe_key = _redact_text(original_key)
+            if safe_key in cleaned:
+                safe_key = f"{safe_key}#{index}"
+            cleaned[safe_key] = _clean(item, str(key), _depth + 1)
+        return cleaned
     return _redact_text(str(value)[:MAX_FIELD])
 
 
