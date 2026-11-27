@@ -1,0 +1,12 @@
+{
+  "manifest_version": 1,
+  "id": "nvd-cve-client",
+  "name": "NVD CVE Client",
+  "version": "0.1.0",
+  "kind": "knowledge_provider",
+  "entrypoint": "nvd_client",
+  "capabilities": ["cve_lookup", "vulnerability_metadata"],
+  "dependencies": ["network_access"],
+  "permissions": {"risk": "read_only", "requested": ["public_advisory_read"], "requires_approval": false, "scope_required": false},
+  "enabled": true
+}

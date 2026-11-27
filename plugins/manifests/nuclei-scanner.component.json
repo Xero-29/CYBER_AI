@@ -1,0 +1,12 @@
+{
+  "manifest_version": 1,
+  "id": "nuclei-http-scanner",
+  "name": "Nuclei HTTP Scanner",
+  "version": "0.1.0",
+  "kind": "scanner",
+  "entrypoint": "nuclei_scanner:scan_target",
+  "capabilities": ["http_surface_scanning", "misconfiguration_detection"],
+  "dependencies": ["nuclei", "nuclei-templates"],
+  "permissions": {"risk": "high", "requested": ["network_read", "target_scope"], "requires_approval": true, "scope_required": true},
+  "enabled": false
+}
