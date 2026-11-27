@@ -345,6 +345,30 @@ class ToolAdapterTests(unittest.TestCase):
             with self.assertRaisesRegex(ToolExecutionError, "enlaces duros"):
                 tool_adapters._confined_path(linked_target)
 
+    def test_hash_target_bounds_total_directory_entries(self):
+        target = self.root / "bounded-tree"
+        nested = target / "nested"
+        nested.mkdir(parents=True)
+        (nested / "sample.py").write_text("print('safe')\\n", encoding="utf-8")
+        with patch.object(tool_adapters, "MAX_TARGET_ENTRIES", 1):
+            with self.assertRaisesRegex(ToolExecutionError, "límite total de entradas"):
+                tool_adapters._hash_target(target)
+
+    def test_hash_target_fails_closed_when_directory_walk_is_incomplete(self):
+        target = self.root / "unreadable-tree"
+        target.mkdir()
+        real_walk = os.walk
+
+        def fail_target_walk(root, *args, **kwargs):
+            if Path(root) == target:
+                kwargs["onerror"](PermissionError("synthetic enumeration failure"))
+                return iter(())
+            return real_walk(root, *args, **kwargs)
+
+        with patch.object(tool_adapters.os, "walk", side_effect=fail_target_walk):
+            with self.assertRaisesRegex(ToolExecutionError, "enumerar el objetivo"):
+                tool_adapters._hash_target(target)
+
     def test_hash_target_rejects_nested_hardlinked_file(self):
         target_dir = self.root / "tree"
         target_dir.mkdir()

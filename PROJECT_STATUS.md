@@ -1,3 +1,36 @@
+# Estado vigente — 2026-11-27 (enumeración acotada de objetivos de análisis)
+
+> Registro de este corte. Los checks del nuevo HEAD deben terminar antes de atribuir éxito.
+
+## Estado del repositorio
+
+- Repositorio: `Xero-29/CYBER_AI`; rama: `codex/security-integrity-audit`.
+- HEAD inspeccionado antes de este cambio: `d5ae56ecb00071b06619b402c50de1f052b81f0d`; `main`: `658a565acd0a5568bb56a1a7482f44260cd9efd1`.
+- En ese HEAD, la comparación exacta era **477 commits exclusivos de esta rama y 576 exclusivos de `main`**, con ancestro común `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. Este commit añade uno más: el nuevo HEAD queda **478 adelante y 576 detrás**. No existe un único commit exclusivo de `main`; no integrar, rebasar ni hacer cherry-pick directo.
+- El HEAD de `main` documenta el perfil secuencial del ThinkPad E440, pero forma parte de sus 576 commits exclusivos desde el ancestro común.
+- PR #2 está cerrado y fusionado (merge `478c6ddc676221e4c07b8c5780f127bc5a9e749e`). No hay PR abierto para esta rama; no crear uno duplicado.
+- GitHub informa `protected=false` para la rama. Branch protection y required checks necesitan configuración administrativa.
+- En el HEAD previo `d5ae56e`, Python Tests [46028464982](https://github.com/Xero-29/CYBER_AI/actions/runs/46028464982) y Docker Sandbox [46028465083](https://github.com/Xero-29/CYBER_AI/actions/runs/46028465083) estaban `pending`; no validan el nuevo HEAD. Se requieren runs nuevos.
+- No hay checkout local disponible en este entorno; no se afirma ejecución local.
+
+## Corrección implementada
+
+- Hallazgo: `_hash_target()` materializaba y ordenaba todo `path.rglob("*")` antes de aplicar el límite de 10.000 archivos. Una estructura con muchos directorios vacíos podía consumir memoria/CPU sin alcanzar ese límite; además, los errores de recorrido no tenían un callback explícito de fallo cerrado.
+- Corrección: se reemplaza por `os.walk` con `onerror` estricto, límite de 20.000 entradas y 10.000 archivos, ordenación determinista de rutas y comprobación posterior del estado/identidad de los directorios para detectar cambios durante el análisis.
+- Regresiones: límite total de entradas y error sintético de enumeración deben fallar cerrados. Se conserva la cobertura de hardlinks, symlinks, cambios de objetivo y límites de bytes.
+- Se mantiene la corrección de captura de stdout/stderr en [4406bfe](https://github.com/Xero-29/CYBER_AI/commit/4406bfe4d8b030faeda68114f29e5db5a6377580) y la validación escalable de manifiestos en [d5ae56e](https://github.com/Xero-29/CYBER_AI/commit/d5ae56ecb00071b06619b402c50de1f052b81f0d).
+- Documentación actualizada en `docs/TOOL_ALLOWLIST.md`. No se modificó `main`, no se hizo merge/rebase/force-push y PR #2 no se alteró.
+
+## Pendiente de validación y operación
+
+- Ejecutar Python Tests y Docker Sandbox sobre el nuevo SHA exacto; exigir ambos `completed/success` y revisar todos los jobs/steps.
+- Backups: cifrado, KMS/HSM, custodia/rotación, WORM/offsite y simulacros reales de restauración/DR.
+- Plataforma: ACL NTFS y Job Objects; cgroups/namespaces o microVM con pruebas de escape; gateway de egress con DNS pinning.
+- Operación: RBAC/IdP/MFA, branch protection/required checks, observabilidad central, pruebas de carga/soak y revisión independiente.
+- Biblioteca: 48 áreas, 0 `expert_ready`; siguen pendientes fuentes primarias leídas, licencias/procedencia, claims trazables, laboratorios reproducibles, datasets expertos y revisión independiente.
+
+---
+
 # Estado vigente — 2026-11-27 (validación escalable de manifiestos de backup)
 
 > Registro de este corte. El nuevo HEAD requiere validación completa; no se reutilizan checks de commits anteriores.

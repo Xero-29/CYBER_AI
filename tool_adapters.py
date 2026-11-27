@@ -29,6 +29,7 @@ MAX_OUTPUT_BYTES = 2_000_000
 MAX_TOTAL_OUTPUT_BYTES = 8_000_000
 MAX_TARGET_BYTES = 100_000_000
 MAX_TARGET_FILES = 10_000
+MAX_TARGET_ENTRIES = 20_000
 DEFAULT_TIMEOUT = 180
 TOOL_SPECS = {
     "semgrep": {"binary": "semgrep", "network": False, "timeout": 180, "version_args": ["--version"]},
@@ -50,6 +51,24 @@ TOOL_SPECS = {
 
 class ToolExecutionError(RuntimeError):
     """A safe tool execution could not be completed."""
+
+
+def _raise_target_walk_error(error):
+    raise ToolExecutionError(
+        "No se pudo enumerar el objetivo de forma segura."
+    ) from error
+
+
+def _directory_state(info):
+    return (
+        info.st_dev,
+        info.st_ino,
+        info.st_size,
+        info.st_mtime_ns,
+        getattr(info, "st_ctime_ns", 0),
+        info.st_mode,
+        info.st_nlink,
+    )
 
 
 def _is_reparse_point(info):
@@ -146,31 +165,83 @@ def _hash_target(path):
         raise ToolExecutionError("No se pudo inspeccionar el objetivo.") from exc
     if stat.S_ISLNK(root_info.st_mode) or _is_reparse_point(root_info):
         raise ToolExecutionError("El objetivo contiene un enlace o punto de reanálisis.")
+    directory_states = {}
     if stat.S_ISDIR(root_info.st_mode):
+        files = []
+        entry_count = 0
         try:
-            entries = sorted(path.rglob("*"))
-            files = []
-            for item in entries:
-                info = item.lstat()
-                if stat.S_ISLNK(info.st_mode) or _is_reparse_point(info):
+            for current, dirs, names in os.walk(
+                path,
+                topdown=True,
+                followlinks=False,
+                onerror=_raise_target_walk_error,
+            ):
+                dirs.sort()
+                names.sort()
+                entry_count += len(dirs) + len(names)
+                if entry_count > MAX_TARGET_ENTRIES:
                     raise ToolExecutionError(
-                        "El objetivo contiene enlaces simbólicos o puntos de reanálisis; análisis bloqueado."
+                        "El objetivo supera el límite total de entradas."
                     )
-                if stat.S_ISDIR(info.st_mode):
-                    continue
-                if not stat.S_ISREG(info.st_mode):
+
+                current_path = Path(current)
+                current_info = current_path.lstat()
+                if (
+                    not stat.S_ISDIR(current_info.st_mode)
+                    or _is_reparse_point(current_info)
+                ):
                     raise ToolExecutionError(
-                        "El objetivo contiene entradas que no son archivos regulares ni directorios."
+                        "El objetivo contiene un directorio no seguro."
                     )
-                if info.st_nlink != 1:
+                previous_info = directory_states.get(current_path)
+                if (
+                    previous_info is not None
+                    and _directory_state(previous_info) != _directory_state(current_info)
+                ):
                     raise ToolExecutionError(
-                        "El objetivo contiene archivos con enlaces duros; análisis bloqueado."
+                        "Un directorio del objetivo cambió durante la enumeración."
                     )
-                files.append((item, info))
+                directory_states[current_path] = current_info
+
+                for name in dirs:
+                    item = current_path / name
+                    info = item.lstat()
+                    if (
+                        stat.S_ISLNK(info.st_mode)
+                        or _is_reparse_point(info)
+                        or not stat.S_ISDIR(info.st_mode)
+                    ):
+                        raise ToolExecutionError(
+                            "El objetivo contiene enlaces o directorios no seguros."
+                        )
+                    directory_states.setdefault(item, info)
+
+                for name in names:
+                    item = current_path / name
+                    info = item.lstat()
+                    if stat.S_ISLNK(info.st_mode) or _is_reparse_point(info):
+                        raise ToolExecutionError(
+                            "El objetivo contiene enlaces simbólicos o puntos de reanálisis; análisis bloqueado."
+                        )
+                    if not stat.S_ISREG(info.st_mode):
+                        raise ToolExecutionError(
+                            "El objetivo contiene entradas que no son archivos regulares ni directorios."
+                        )
+                    if info.st_nlink != 1:
+                        raise ToolExecutionError(
+                            "El objetivo contiene archivos con enlaces duros; análisis bloqueado."
+                        )
+                    files.append((item, info))
+                    if len(files) > MAX_TARGET_FILES:
+                        raise ToolExecutionError(
+                            "El objetivo supera el límite de archivos."
+                        )
         except ToolExecutionError:
             raise
         except OSError as exc:
-            raise ToolExecutionError("No se pudo enumerar el objetivo de forma segura.") from exc
+            raise ToolExecutionError(
+                "No se pudo enumerar el objetivo de forma segura."
+            ) from exc
         base = path
     elif stat.S_ISREG(root_info.st_mode):
         if root_info.st_nlink != 1:
@@ -180,6 +251,7 @@ def _hash_target(path):
     else:
         raise ToolExecutionError("El objetivo debe ser un archivo regular o un directorio real.")
 
+    files.sort(key=lambda item: item[0].relative_to(base).as_posix())
     if len(files) > MAX_TARGET_FILES:
         raise ToolExecutionError("El objetivo supera el límite de archivos.")
     total_bytes = sum(info.st_size for _, info in files)
@@ -248,6 +320,22 @@ def _hash_target(path):
         finally:
             if descriptor is not None:
                 os.close(descriptor)
+
+    for directory, expected in directory_states.items():
+        try:
+            current = directory.lstat()
+        except OSError as exc:
+            raise ToolExecutionError(
+                "Un directorio del objetivo desapareció durante el análisis."
+            ) from exc
+        if (
+            not stat.S_ISDIR(current.st_mode)
+            or _is_reparse_point(current)
+            or _directory_state(current) != _directory_state(expected)
+        ):
+            raise ToolExecutionError(
+                "El árbol del objetivo cambió durante el cálculo de su huella."
+            )
     return digest.hexdigest()
 
 
