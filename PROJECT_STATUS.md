@@ -1,3 +1,34 @@
+# Estado vigente — 2026-11-27 (captura fail-closed de salida de adaptadores)
+
+> Registro de este corte. El commit documental cambia el HEAD y exige validar ese SHA exacto en ambos workflows.
+
+## Estado del repositorio
+
+- Repositorio: `Xero-29/CYBER_AI`; rama: `codex/security-integrity-audit`.
+- HEAD de implementación inspeccionado: `4406bfe4d8b030faeda68114f29e5db5a6377580`; `main`: `658a565acd0a5568bb56a1a7482f44260cd9efd1`.
+- Comparación exacta: **474 commits exclusivos de esta rama y 576 exclusivos de `main`**; ancestro común: `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. No existe un único commit exclusivo de `main`: el historial contiene 576 commits desde el ancestro común. El HEAD actual de `main` documenta el perfil secuencial del ThinkPad E440, pero no es el único cambio pendiente. No integrar, rebasar ni hacer cherry-pick directo.
+- PR #2 está cerrado y fusionado; merge commit `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. No existe PR abierto asociado a esta rama y no se crea uno duplicado.
+- GitHub informa `protected=false` para la rama. La protección y los required checks requieren configuración administrativa.
+- Para el commit de implementación `4406bfe`, Python Tests [46028092241](https://github.com/Xero-29/CYBER_AI/actions/runs/46028092241) estaba `pending` y Docker Sandbox [46028092285](https://github.com/Xero-29/CYBER_AI/actions/runs/46028092285) `in_progress`. Ninguno se considera éxito ni valida el nuevo commit documental.
+- No hay checkout local del repositorio en este entorno; no se afirma ejecución local de las pruebas.
+
+## Corrección implementada
+
+- Hallazgo: el lector de stdout/stderr de `tool_adapters.py` solo capturaba `OSError` y `ValueError`. Una excepción de otra clase (por ejemplo `RuntimeError` de un wrapper) o un bloque de tipo no válido podía terminar el hilo sin registrar el fallo y dejar evidencia parcial sin invalidar.
+- Corrección en commit [4406bfe](https://github.com/Xero-29/CYBER_AI/commit/4406bfe4d8b030faeda68114f29e5db5a6377580): el lector captura cualquier `Exception`, marca el stream como fallido y no conserva el mensaje de excepción, que podría contener datos sensibles. La ejecución falla cerrada si no se completan ambos streams.
+- Regresión en `tests/test_tool_adapters.py`: verifica errores `OSError`, `RuntimeError` y bloques no binarios. `process_isolation.py` ya tenía captura amplia de errores de lectura y su propia regresión.
+- No se modificó `main`, no se hizo merge/rebase/force-push y PR #2 no se alteró.
+
+## Pendiente de validación y operación
+
+- Ejecutar Python Tests y Docker Sandbox sobre el HEAD documental resultante; exigir ambos workflows `completed/success` y revisar todos sus jobs/steps.
+- Backups: cifrado, KMS/HSM, custodia/rotación de claves, WORM/offsite y simulacros reales de restauración/DR.
+- Plataforma: ACL NTFS y Job Objects; cgroups/namespaces o microVM con pruebas de escape; gateway de egress con DNS pinning.
+- Operación: RBAC/IdP/MFA, branch protection/required checks, observabilidad central, pruebas de carga/soak y revisión independiente.
+- Biblioteca: 48 áreas, 0 `expert_ready`; siguen pendientes fuentes primarias leídas, licencias/procedencia, claims trazables, laboratorios reproducibles, datasets expertos y revisión independiente.
+
+---
+
 # Estado vigente — 2026-11-27 (integridad de captura de adaptadores y ledger)
 
 > Registro de este corte; los checks del nuevo HEAD deben concluir antes de declarar validación.
