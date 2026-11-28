@@ -515,6 +515,9 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
             r"https://api.example/v1\..\admin",
             "https://api.example/v1%2f..%2fadmin",
             "https://api.example/v1%5c..%5cadmin",
+            "https://api.example/v1/../admin",
+            "https://api.example/v1//admin",
+            "https://api.example:",
         )
         for base_url in invalid_urls:
             config = {"llm_providers": {"cloud": {
