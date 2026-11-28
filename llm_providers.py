@@ -364,11 +364,27 @@ def _anthropic_request(provider, endpoint, payload, timeout):
             "eval_count": usage.get("output_tokens", 0)}
 
 
+def _validate_gemini_model(model):
+    """Require a single safe model path segment before building a Gemini URL."""
+    if (
+        not isinstance(model, str) or not model or len(model) > 128
+        or not model.isascii() or not model[0].isalnum()
+        or any(not (character.isalnum() or character in "._-") for character in model)
+    ):
+        raise ValueError(
+            "El modelo Gemini debe ser un identificador ASCII simple, sin segmentos de ruta."
+        )
+    return model
+
+
 def _gemini_request(provider, endpoint, payload, timeout):
     base = str(provider.get("base_url", "https://generativelanguage.googleapis.com/v1beta")).rstrip("/")
+    if endpoint in {"api/chat", "api/embed"}:
+        model = _validate_gemini_model(payload.get("model"))
+    else:
+        model = ""
     key = _credentials(provider)
     headers = {"x-goog-api-key": key}
-    model = payload.get("model", "")
     if endpoint == "api/chat":
         messages = payload.get("messages", [])
         system_parts = [{"text": m.get("content", "")} for m in messages if m.get("role") == "system"]
@@ -525,9 +541,18 @@ def request(provider, endpoint, payload=None, timeout=600):
     return result
 
 
-def provider_capabilities(provider):
-    """Devuelve capacidades declaradas por el adaptador del proveedor."""
+def _provider_protocol(provider):
+    if not isinstance(provider, dict):
+        raise ValueError("La configuración del proveedor debe ser un objeto.")
     protocol = provider.get("protocol")
+    if not isinstance(protocol, str) or not protocol or protocol != protocol.strip():
+        raise ValueError("El protocolo del proveedor debe ser una cadena no vacía y normalizada.")
+    return protocol
+
+
+def provider_capabilities(provider):
+    """Devuelve capacidades declaradas; importar plugins requiere habilitación explícita."""
+    protocol = _provider_protocol(provider)
     builtins = {
         "ollama": {"chat", "embeddings", "model_listing"},
         "openai": {"chat", "embeddings"},
@@ -536,6 +561,8 @@ def provider_capabilities(provider):
     }
     if protocol in builtins:
         return sorted(builtins[protocol])
+    if provider.get("enabled") is not True:
+        raise ValueError("El plugin debe estar habilitado explícitamente (enabled=true).")
     adapter = _load_provider_plugin(protocol)
     if adapter is None:
         return []
@@ -555,13 +582,15 @@ def provider_capabilities(provider):
 
 
 def installed_models(provider):
-    protocol = provider.get("protocol")
+    protocol = _provider_protocol(provider)
     if protocol == "ollama":
         return {item.get("name") or item.get("model")
-                for item in request(provider,"api/tags").get("models",[])}
+                for item in request(provider, "api/tags").get("models", [])}
     if protocol in {"openai", "anthropic", "gemini"}:
         return None
+    if provider.get("enabled") is not True:
+        raise ValueError("El plugin debe estar habilitado explícitamente (enabled=true).")
+    if "model_listing" not in provider_capabilities(provider):
+        return None
     adapter = _load_provider_plugin(protocol)
-    if adapter is not None and callable(getattr(adapter, "installed_models", None)):
-        return adapter.installed_models(provider)
-    return None
+    return adapter.installed_models(provider)
