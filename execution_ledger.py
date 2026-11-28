@@ -22,7 +22,10 @@ SECRET_KEY = re.compile(
     re.I,
 )
 MAX_NESTING_DEPTH = 64
-from secret_redaction import redact_text as _redact_text
+from secret_redaction import (
+    redact_text as _redact_text,
+    _unique_mapping_key,
+)
 
 
 class LedgerError(ValueError):
@@ -52,9 +55,7 @@ def _clean(value, key="", _depth=0):
         cleaned = {}
         for index, (key, item) in enumerate(list(value.items())[:500]):
             original_key = str(key)[:128]
-            safe_key = _redact_text(original_key)
-            if safe_key in cleaned:
-                safe_key = f"{safe_key}#{index}"
+            safe_key = _unique_mapping_key(cleaned, _redact_text(original_key), index)
             cleaned[safe_key] = _clean(item, str(key), _depth + 1)
         return cleaned
     return _redact_text(str(value)[:MAX_FIELD])

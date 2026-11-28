@@ -114,6 +114,25 @@ class ExecutionLedgerTests(unittest.TestCase):
         self.assertEqual(set(parsed.values()), {"first", "second"})
         self.assertTrue(self.ledger.verify()["valid"])
 
+    def test_ledger_redaction_suffix_collision_preserves_all_metadata_entries(self):
+        token_a = "ghp_" + "a" * 30
+        token_b = "ghp_" + "b" * 30
+        self.append(metadata={
+            "[REDACTED TOKEN]#2": "literal-key",
+            token_a: "first-token",
+            token_b: "second-token",
+        })
+        with sqlite3.connect(self.ledger.path) as db:
+            stored = db.execute(
+                "SELECT metadata FROM execution_events"
+            ).fetchone()[0]
+        self.assertNotIn(token_a, stored)
+        self.assertNotIn(token_b, stored)
+        parsed = __import__("json").loads(stored)
+        self.assertEqual(len(parsed), 3)
+        self.assertEqual(set(parsed.values()), {"literal-key", "first-token", "second-token"})
+        self.assertTrue(self.ledger.verify()["valid"])
+
     def test_redacts_private_keys_cookies_and_bytes_from_stored_metadata(self):
         self.append(
             metadata={

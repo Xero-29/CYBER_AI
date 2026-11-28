@@ -70,6 +70,22 @@ class SecretRedactionTests(unittest.TestCase):
         self.assertEqual(set(cleaned.values()), {"first", "second"})
         self.assertTrue(all(key.startswith("[REDACTED TOKEN]") for key in cleaned))
 
+
+    def test_redacted_mapping_key_suffix_collision_never_overwrites_entries(self):
+        token_a = "ghp_" + "a" * 30
+        token_b = "ghp_" + "b" * 30
+        source = {
+            "[REDACTED TOKEN]#2": "literal-key",
+            token_a: "first-token",
+            token_b: "second-token",
+        }
+        cleaned = redact_sensitive_data(source)
+        serialized = json.dumps(cleaned)
+        self.assertNotIn(token_a, serialized)
+        self.assertNotIn(token_b, serialized)
+        self.assertEqual(len(cleaned), 3)
+        self.assertEqual(set(cleaned.values()), {"literal-key", "first-token", "second-token"})
+
     def test_recursively_redacts_sensitive_fields_and_free_text(self):
         value = {
             "api_key": "nested-secret",
