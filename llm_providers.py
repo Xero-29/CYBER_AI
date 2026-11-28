@@ -170,20 +170,23 @@ def resolve_provider(config, agent, capability=None):
         if not isinstance(protocol, str) or not protocol or protocol != protocol.strip():
             raise ValueError(f"Protocolo de proveedor inválido: {name}")
         builtin = protocol in {"ollama", "openai", "anthropic", "gemini"}
-        if not builtin and _load_provider_plugin(protocol) is None:
-            raise ValueError(f"Protocolo de proveedor no soportado: {protocol}")
         configured_base_url = result.get("base_url")
         if configured_base_url is not None and (
             not isinstance(configured_base_url, str) or not configured_base_url
         ):
             raise ValueError(f"base_url debe ser texto no vacío: {name}")
         base_url = configured_base_url or DEFAULT_BASE_URLS.get(protocol, "")
-        if not base_url and not builtin:
+        if base_url:
+            result["base_url"] = _validate_base_url(base_url, name)
+        elif builtin:
+            raise ValueError(f"base_url no configurada para el proveedor {name}.")
+        if not builtin and _load_provider_plugin(protocol) is None:
+            raise ValueError(f"Protocolo de proveedor no soportado: {protocol}")
+        if not base_url:
             if capability and capability not in provider_capabilities(result):
                 last_reason = f"{name} no ofrece {capability}"
                 continue
             return result
-        result["base_url"] = _validate_base_url(base_url, name)
         if capability and capability not in provider_capabilities(result):
             last_reason = f"{name} no ofrece {capability}"
             continue
