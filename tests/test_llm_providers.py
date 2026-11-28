@@ -425,7 +425,7 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
             "enabled": False,
         }
         with patch.object(llm_providers, "_http_json") as transport:
-            with self.assertRaisesRegex(ValueError, "deshabilitado"):
+            with self.assertRaisesRegex(ValueError, "habilitado explícitamente"):
                 request_enabled(provider, "api/chat", {"model": "m", "messages": []})
         transport.assert_not_called()
 
