@@ -26,7 +26,7 @@ Endpoints internos admitidos por el núcleo:
 
 La frontera `request()` rechaza endpoints desconocidos, protocolos malformados y payloads que no sean objetos JSON antes de invocar el plugin o el transporte. El contrato de catálogo exige que `models` sea una lista.
 
-El núcleo valida la forma de las respuestas. El plugin debe traducir las API externas al contrato interno, gestionar límites y errores, y respetar `timeout`. No debe devolver secretos, cabeceras de autenticación ni cuerpos completos de error que puedan contener credenciales. El transporte HTTP integrado limita tanto las solicitudes como las respuestas a 16 MiB, deshabilita redirecciones, exige objetos JSON en las respuestas y rechaza claves JSON duplicadas, constantes no estándar y exponentes numéricos que desbordan o subdesbordan el rango `float`. Las solicitudes JSON también rechazan NaN e infinitos. Las URL base no pueden contener espacios ni controles, credenciales, query o fragmentos (aunque estén vacíos), ningún carácter `%`, barras inversas, puertos vacíos/fuera de rango, segmentos `.`/`..` ni barras dobles en la ruta. HTTP solo se permite para loopback; los proveedores remotos deben usar HTTPS.
+El núcleo valida la forma de las respuestas. El plugin debe traducir las API externas al contrato interno, gestionar límites y errores, y respetar `timeout`. No debe devolver secretos, cabeceras de autenticación ni cuerpos completos de error que puedan contener credenciales. El transporte HTTP integrado limita tanto las solicitudes como las respuestas a 16 MiB, deshabilita redirecciones, exige objetos JSON en las respuestas y rechaza claves JSON duplicadas, constantes no estándar y exponentes numéricos que desbordan o subdesbordan el rango `float`. Las solicitudes JSON también rechazan NaN e infinitos. La URL base configurada y utilizada por el núcleo no puede contener espacios ni controles, credenciales, query o fragmentos (aunque estén vacíos), ningún carácter `%`, barras inversas, puertos vacíos/fuera de rango, segmentos `.`/`..` ni barras dobles en la ruta. HTTP solo se permite para loopback; los proveedores remotos deben usar HTTPS. Esta validación no es una política de egress para plugins: un plugin que implemente su propio transporte puede ignorar `base_url` y abrir otras conexiones.
 
 ### `installed_models(provider)` opcional
 
@@ -53,7 +53,7 @@ Ejemplo conceptual en `config/model_roles.json`:
 }
 ```
 
-Asigna `provider: "custom"` al agente que deba usarlo o configura `capability_providers` para seleccionar este proveedor por capacidad. `fallback_providers` acepta una lista explícita de alternativas por capacidad. Los proveedores remotos deben usar HTTPS. Las credenciales se leen desde variables de entorno; nunca las guardes en configuración versionada, Skills, memoria ni reportes.
+Asigna `provider: "custom"` al agente que deba usarlo o configura `capability_providers` para seleccionar este proveedor por capacidad. `fallback_providers` acepta una lista explícita de alternativas por capacidad. `enabled` debe ser el booleano `true` (no `1`, `"true"` ni otro valor truthy); tanto la resolución como la frontera de solicitudes exigen habilitación explícita. Los proveedores remotos deben usar HTTPS. Las credenciales se leen desde variables de entorno; nunca las guardes en configuración versionada, Skills, memoria ni reportes.
 
 ## Reglas de interoperabilidad
 
