@@ -57,6 +57,7 @@ def api_get(endpoint):
         "name": "ollama",
         "protocol": "ollama",
         "base_url": OLLAMA_API,
+        "enabled": True,
     }
     return provider_request(provider, endpoint, timeout=5)
 
