@@ -582,5 +582,15 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
                 llm_providers.request(provider, "api/tags")
 
 
+    def test_resolve_provider_rejects_non_string_protocol(self):
+        config = {
+            "llm_providers": {
+                "malformed": {"enabled": True, "protocol": ["ollama"]},
+            },
+        }
+        with self.assertRaisesRegex(ValueError, "Protocolo de proveedor inválido"):
+            llm_providers.resolve_provider(config, {"provider": "malformed"})
+
+
 if __name__ == "__main__":
     unittest.main()
