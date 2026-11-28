@@ -602,8 +602,8 @@ def installed_models(provider):
     if (
         not isinstance(models, (list, tuple, set))
         or len(models) > 10000
-        or any(not isinstance(name, str) or not name or name != name.strip()
-               for name in models)
+        or any(not isinstance(name, str) or not name or len(name) > 256
+               or name != name.strip() for name in models)
     ):
         raise RuntimeError(
             f"El plugin {protocol} devolvió un catálogo de modelos inválido."
