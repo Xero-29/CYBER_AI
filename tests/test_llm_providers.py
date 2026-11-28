@@ -640,10 +640,11 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
                     },
                 },
             }
-            with patch.object(llm_providers, "_load_provider_plugin", return_value=object()):
+            with patch.object(llm_providers, "_load_provider_plugin") as loader:
                 with self.subTest(base_url=base_url):
                     with self.assertRaisesRegex(ValueError, "base_url debe ser texto"):
                         llm_providers.resolve_provider(config, {"provider": "cloud"})
+                loader.assert_not_called()
 
 
     def test_invalid_plugin_request_is_rejected_before_loading_plugin_code(self):
@@ -666,6 +667,22 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
         with patch.object(llm_providers, "_load_provider_plugin") as loader:
             with self.assertRaisesRegex(ValueError, "HTTP solo se permite en loopback"):
                 llm_providers.request(provider, "api/chat", {})
+        loader.assert_not_called()
+
+
+    def test_resolve_provider_rejects_unsafe_plugin_base_url_before_import(self):
+        config = {
+            "llm_providers": {
+                "custom": {
+                    "enabled": True,
+                    "protocol": "custom",
+                    "base_url": "http://192.0.2.10:8080",
+                },
+            },
+        }
+        with patch.object(llm_providers, "_load_provider_plugin") as loader:
+            with self.assertRaisesRegex(ValueError, "HTTP solo se permite en loopback"):
+                llm_providers.resolve_provider(config, {"provider": "custom"})
         loader.assert_not_called()
 
 
