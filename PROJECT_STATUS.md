@@ -1,62 +1,32 @@
-# Estado vigente — 2026-11-28 (redacción de evidencia y endurecimiento de autorización IPv6)
+# Estado vigente — 2026-11-28 (controles de redacción, autorización y enumeración de objetivos)
 
 > Registro de esta iteración. La validación CI debe completarse sobre el HEAD final que contiene este registro; ningún check de un SHA anterior se reutiliza.
 
 ## Estado del repositorio
 
 - Repositorio: `Xero-29/CYBER_AI`; rama: `codex/security-integrity-audit`.
-- HEAD de código y regresiones antes de este registro: `d993f177d7efec52f63d7637d39af609dd6213ce`. Cambios de esta iteración: [432a3d5](https://github.com/Xero-29/CYBER_AI/commit/432a3d597defac53bd93e44dbff5656f02e0c7ee) y [d993f17](https://github.com/Xero-29/CYBER_AI/commit/d993f177d7efec52f63d7637d39af609dd6213ce).
-- `main`: `658a565acd0a5568bb56a1a7482f44260cd9efd1`. Comparación tras el último commit de código: **485 adelante / 576 detrás**, ancestro común `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. No hay un único commit exclusivo de `main`: existen 576 commits exclusivos. No se intentó merge, rebase ni cherry-pick.
-- La API de ramas informa `protected=false`: no hay protección de rama activa. PR #2 está cerrada y fusionada mediante `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. No existe PR abierta con head `codex/security-integrity-audit`; las PRs abiertas de conocimiento/laboratorio continúan en ramas separadas y Draft.
-- Los workflows del HEAD anterior `f3e24f8...` fueron cancelados al avanzar la rama. Los workflows de los commits intermedios también fueron cancelados por pushes posteriores; solo se aceptarán checks concluidos sobre el HEAD final de este registro.
+- HEAD de código y regresiones antes de este registro: `985278aba82f472c89ae18ade1e4d12b8c11e936`. Commits de esta iteración: [432a3d5](https://github.com/Xero-29/CYBER_AI/commit/432a3d597defac53bd93e44dbff5656f02e0c7ee), [d993f17](https://github.com/Xero-29/CYBER_AI/commit/d993f177d7efec52f63d7637d39af609dd6213ce) y [985278a](https://github.com/Xero-29/CYBER_AI/commit/985278aba82f472c89ae18ade1e4d12b8c11e936).
+- `main`: `658a565acd0a5568bb56a1a7482f44260cd9efd1`. Comparación tras el último commit de código: **487 adelante / 576 detrás**, ancestro común `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. No existe un único commit exclusivo de `main`: existen 576 commits exclusivos. No se intentó merge, rebase ni cherry-pick.
+- La API de ramas informa `protected=false`: no hay protección activa. PR #2 está cerrada y fusionada mediante `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. No existe PR abierta con head `codex/security-integrity-audit`; las PRs de conocimiento/laboratorio permanecen en ramas separadas y Draft.
+- Los workflows de los HEAD intermedios fueron cancelados al avanzar la rama. Solo se aceptarán checks concluidos sobre el HEAD final de este registro.
 - No hay checkout local disponible en este entorno; no se afirma ejecución local.
 
 ## Correcciones implementadas
 
-- **Redacción sin pérdida de evidencia:** se corrigió la colisión de claves después de redactar tokens. El sufijo ahora se incrementa hasta encontrar una clave libre; el ledger reutiliza el mismo helper que la redacción general. Antes, una clave literal preparada como `[REDACTED TOKEN]#2` podía ser sobrescrita por el tercer token redactado.
-- **Autorización de destinos IPv6:** se detectó que `IPv6Address.is_global` puede clasificar el rango site-local obsoleto `FEC0::/10` como global. El motor ahora lo rechaza explícitamente mediante `is_site_local`, además de bloquear link-local, multicast, no especificadas y reservadas.
-- **Regresiones:** se añadieron pruebas que preservan todas las entradas en redacción/ledger ante colisiones preparadas y que rechazan `http://[fec0::1]` incluso con un grant que lo contiene.
-- Documentación actualizada en `docs/EXECUTION_LEDGER.md` y `docs/EXECUTION_AUTHORIZATION.md`.
+- **Redacción sin pérdida de evidencia:** el helper de claves saneadas busca sufijos libres hasta evitar que una clave literal preparada sobrescriba otra entrada. `ExecutionLedger._clean()` reutiliza el mismo helper. Regresiones en redacción general y persistencia SQLite.
+- **Autorización IPv6:** se rechaza explícitamente el rango site-local obsoleto `FEC0::/10`; `is_global` por sí solo no es suficiente para excluir ese rango. Se añadió una prueba de denegación con grant explícito para `http://[fec0::1]`.
+- **Enumeración de herramientas:** Hadolint, ShellCheck y Actionlint ya no usan `Path.rglob` sin límites para construir argumentos. El recorrido incremental limita entradas/archivos, rechaza symlinks, puntos de reanálisis y hardlinks, verifica la identidad de directorios y compara la huella del objetivo antes/después de preparar la lista. Una mutación durante la preparación bloquea el lanzamiento.
+- Regresiones añadidas para colisiones de claves, IPv6 site-local, límite de entradas, directorios enlazados y mutación del objetivo antes de iniciar el proceso.
+- Documentación actualizada en `docs/EXECUTION_LEDGER.md`, `docs/EXECUTION_AUTHORIZATION.md` y `docs/TOOL_ALLOWLIST.md`.
 
 ## Pendiente de validación y operación
 
-- Confirmar Python Tests y Docker Sandbox `completed/success` sobre el SHA final de esta actualización; revisar todos los jobs y pasos. No declarar verde si faltan checks, si están cancelados o si corresponden a otro SHA.
+- Confirmar Python Tests y Docker Sandbox `completed/success` sobre el SHA final de esta actualización; revisar todos los jobs y pasos. No declarar verde si faltan checks, están cancelados o corresponden a otro SHA.
 - Ejecutar la suite local en el ThinkPad después de descargar el HEAD final; este entorno no tiene checkout/runtime del repositorio.
 - Backups: cifrado, KMS/HSM, custodia/rotación, WORM/offsite y simulacros reales de restauración/DR.
 - Plataforma: ACL NTFS y Job Objects; cgroups/namespaces o microVM con pruebas de escape; gateway de egress con DNS pinning.
 - Operación: RBAC/IdP/MFA, branch protection/required checks, observabilidad central, pruebas de carga/soak y revisión independiente.
 - Biblioteca: 48 áreas, 0 `expert_ready`; siguen pendientes fuentes primarias leídas, licencias/procedencia, claims trazables, laboratorios reproducibles, datasets expertos y revisión independiente.
-
-# Estado vigente — 2026-11-27 (redacción de credenciales en claves de mapas)
-
-> Registro de este corte. Los checks de commits previos no validan el nuevo HEAD.
-
-## Estado del repositorio
-
-- Repositorio: `Xero-29/CYBER_AI`; rama: `codex/security-integrity-audit`.
-- HEAD inspeccionado antes de este cambio: `c8f4f6c17e52f3a0fe35d81ec3865311cc2f9947`; `main`: `658a565acd0a5568bb56a1a7482f44260cd9efd1`.
-- En ese HEAD: **480 commits exclusivos de esta rama y 576 exclusivos de `main`**; ancestro común `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. Este commit añade uno: nuevo total **481 adelante / 576 detrás**. No existe un único commit exclusivo de `main`; no integrar, rebasar ni hacer cherry-pick directo.
-- PR #2 está cerrado y fusionado (merge `478c6ddc676221e4c07b8c5780f127bc5a9e749e`). No hay PR abierto para esta rama; no crear uno duplicado.
-- La rama no tiene protección (`protected=false`); branch protection y required checks requieren configuración administrativa.
-- Python Tests [46029139032](https://github.com/Xero-29/CYBER_AI/actions/runs/46029139032) y Docker Sandbox [46029138875](https://github.com/Xero-29/CYBER_AI/actions/runs/46029138875) estaban `in_progress` sobre `c8f4f6c`; no validan el nuevo HEAD.
-- No hay checkout local disponible en este entorno; no se afirma ejecución local.
-
-## Corrección implementada
-
-- Hallazgo: la redacción de evidencia y del ledger saneaba valores, pero conservaba sin transformar las claves de mapas. Una credencial reconocible usada como clave JSON podía quedar persistida en evidencia o SQLite.
-- Corrección: `redact_sensitive_data()` y `ExecutionLedger._clean()` redactan también las claves. Si varias claves se reducen a la misma etiqueta, se agrega un sufijo de índice para no perder entradas.
-- Regresiones: tokens GitHub sintéticos usados como claves se eliminan del JSON y del ledger, se conservan ambos valores y la cadena de hashes sigue verificando.
-- Documentación actualizada en `docs/EXECUTION_LEDGER.md`. No se modificó `main`, no se hizo merge/rebase/force-push y PR #2 no se alteró.
-
-## Pendiente de validación y operación
-
-- Ejecutar Python Tests y Docker Sandbox sobre el nuevo SHA exacto; exigir ambos `completed/success` y revisar todos los jobs/steps.
-- Backups: cifrado, KMS/HSM, custodia/rotación, WORM/offsite y simulacros reales de restauración/DR.
-- Plataforma: ACL NTFS y Job Objects; cgroups/namespaces o microVM con pruebas de escape; gateway de egress con DNS pinning.
-- Operación: RBAC/IdP/MFA, branch protection/required checks, observabilidad central, pruebas de carga/soak y revisión independiente.
-- Biblioteca: 48 áreas, 0 `expert_ready`; siguen pendientes fuentes primarias leídas, licencias/procedencia, claims trazables, laboratorios reproducibles, datasets expertos y revisión independiente.
-
----
 
 # Estado vigente — 2026-11-27 (estabilidad del directorio raíz de objetivos)
 
