@@ -71,7 +71,7 @@ class ProviderUsageHistoryTests(unittest.TestCase):
         self.assertEqual(
             request.call_args.args,
             (
-                {"name": "ollama", "protocol": "ollama", "base_url": model_memory_manager.OLLAMA_API},
+                {"name": "ollama", "protocol": "ollama", "base_url": model_memory_manager.OLLAMA_API, "enabled": True},
                 "api/tags",
             ),
         )
