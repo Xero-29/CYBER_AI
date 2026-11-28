@@ -563,6 +563,11 @@ def provider_capabilities(provider):
         return sorted(builtins[protocol])
     if provider.get("enabled") is not True:
         raise ValueError("El plugin debe estar habilitado explícitamente (enabled=true).")
+    configured_base_url = provider.get("base_url")
+    if configured_base_url is not None:
+        if not isinstance(configured_base_url, str) or not configured_base_url:
+            raise ValueError("base_url debe ser texto no vacío antes de inspeccionar el plugin.")
+        _validate_base_url(configured_base_url, provider.get("name") or protocol)
     adapter = _load_provider_plugin(protocol)
     if adapter is None:
         return []
@@ -593,4 +598,14 @@ def installed_models(provider):
     if "model_listing" not in provider_capabilities(provider):
         return None
     adapter = _load_provider_plugin(protocol)
-    return adapter.installed_models(provider)
+    models = adapter.installed_models(provider)
+    if (
+        not isinstance(models, (list, tuple, set))
+        or len(models) > 10000
+        or any(not isinstance(name, str) or not name or name != name.strip()
+               for name in models)
+    ):
+        raise RuntimeError(
+            f"El plugin {protocol} devolvió un catálogo de modelos inválido."
+        )
+    return set(models)
