@@ -630,18 +630,20 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
             llm_providers.resolve_provider(None, {})
         with self.assertRaisesRegex(ValueError, "configuración y el agente"):
             llm_providers.resolve_provider({}, [])
-        config = {
-            "llm_providers": {
-                "cloud": {
-                    "enabled": True,
-                    "protocol": "custom",
-                    "base_url": 0,
+        for base_url in (0, ""):
+            config = {
+                "llm_providers": {
+                    "cloud": {
+                        "enabled": True,
+                        "protocol": "custom",
+                        "base_url": base_url,
+                    },
                 },
-            },
-        }
-        with patch.object(llm_providers, "_load_provider_plugin", return_value=object()):
-            with self.assertRaisesRegex(ValueError, "base_url debe ser texto"):
-                llm_providers.resolve_provider(config, {"provider": "cloud"})
+            }
+            with patch.object(llm_providers, "_load_provider_plugin", return_value=object()):
+                with self.subTest(base_url=base_url):
+                    with self.assertRaisesRegex(ValueError, "base_url debe ser texto"):
+                        llm_providers.resolve_provider(config, {"provider": "cloud"})
 
 
     def test_invalid_plugin_request_is_rejected_before_loading_plugin_code(self):
@@ -651,6 +653,19 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
                 llm_providers.request(provider, "api/../admin", {})
             with self.assertRaisesRegex(ValueError, "payload"):
                 llm_providers.request(provider, "api/chat", ["invalid"])
+        loader.assert_not_called()
+
+
+    def test_plugin_base_url_is_validated_before_loading_plugin_code(self):
+        provider = {
+            "enabled": True,
+            "name": "custom",
+            "protocol": "custom",
+            "base_url": "http://192.0.2.10:8080",
+        }
+        with patch.object(llm_providers, "_load_provider_plugin") as loader:
+            with self.assertRaisesRegex(ValueError, "HTTP solo se permite en loopback"):
+                llm_providers.request(provider, "api/chat", {})
         loader.assert_not_called()
 
 
