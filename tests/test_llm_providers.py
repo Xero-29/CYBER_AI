@@ -644,5 +644,15 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
                 llm_providers.resolve_provider(config, {"provider": "cloud"})
 
 
+    def test_invalid_plugin_request_is_rejected_before_loading_plugin_code(self):
+        provider = {"enabled": True, "name": "custom", "protocol": "custom"}
+        with patch.object(llm_providers, "_load_provider_plugin") as loader:
+            with self.assertRaisesRegex(ValueError, "Endpoint de proveedor no admitido"):
+                llm_providers.request(provider, "api/../admin", {})
+            with self.assertRaisesRegex(ValueError, "payload"):
+                llm_providers.request(provider, "api/chat", ["invalid"])
+        loader.assert_not_called()
+
+
 if __name__ == "__main__":
     unittest.main()
