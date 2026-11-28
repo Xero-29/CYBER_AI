@@ -129,6 +129,8 @@ def _validate_base_url(base_url, provider_name):
 
 def resolve_provider(config, agent, capability=None):
     """Resuelve un proveedor habilitado y, si se solicita, compatible con una capacidad."""
+    if not isinstance(config, dict) or not isinstance(agent, dict):
+        raise ValueError("La configuración y el agente del proveedor deben ser objetos.")
     registry = config.get("llm_providers", {})
     if not isinstance(registry, dict):
         raise ValueError("llm_providers debe ser un objeto.")
@@ -159,7 +161,7 @@ def resolve_provider(config, agent, capability=None):
 
     for name in candidates:
         item = registry.get(name)
-        if not isinstance(item, dict) or not item.get("enabled", False):
+        if not isinstance(item, dict) or item.get("enabled") is not True:
             last_reason = f"Proveedor no configurado o deshabilitado: {name}"
             continue
         result = dict(item)
@@ -170,7 +172,10 @@ def resolve_provider(config, agent, capability=None):
         builtin = protocol in {"ollama", "openai", "anthropic", "gemini"}
         if not builtin and _load_provider_plugin(protocol) is None:
             raise ValueError(f"Protocolo de proveedor no soportado: {protocol}")
-        base_url = result.get("base_url") or DEFAULT_BASE_URLS.get(protocol, "")
+        configured_base_url = result.get("base_url")
+        if configured_base_url is not None and not isinstance(configured_base_url, str):
+            raise ValueError(f"base_url debe ser texto: {name}")
+        base_url = configured_base_url or DEFAULT_BASE_URLS.get(protocol, "")
         if not base_url and not builtin:
             if capability and capability not in provider_capabilities(result):
                 last_reason = f"{name} no ofrece {capability}"
@@ -450,8 +455,8 @@ def request(provider, endpoint, payload=None, timeout=600):
     if not isinstance(provider, dict):
         raise ValueError("La configuración del proveedor debe ser un objeto.")
     provider = dict(provider)
-    if "enabled" in provider and provider["enabled"] is not True:
-        raise ValueError("El proveedor está deshabilitado o su estado no es booleano.")
+    if provider.get("enabled") is not True:
+        raise ValueError("El proveedor debe estar habilitado explícitamente (enabled=true).")
     protocol = provider.get("protocol")
     if not isinstance(protocol, str) or not protocol or protocol != protocol.strip():
         raise ValueError("El protocolo del proveedor debe ser una cadena no vacía y normalizada.")
