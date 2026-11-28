@@ -10,7 +10,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from execution_ledger import (
-    MAX_SQLITE_INTEGER, ExecutionLedger, LedgerError, _redact_text,
+    MAX_SQLITE_INTEGER, ExecutionLedger, LedgerError, _clean, _redact_text,
 )
 
 
@@ -166,6 +166,41 @@ class ExecutionLedgerTests(unittest.TestCase):
             ).fetchone()[0]
         self.assertIn("nesting limit", stored)
         self.assertTrue(self.ledger.verify()["valid"])
+
+    def test_ledger_uses_shared_secret_registry_for_signature_fields(self):
+        self.append(metadata={
+            "signature": "signature-material",
+            "sig": "short-signature-material",
+            "X-Amz-Signature": "aws-signature-material",
+        })
+        with sqlite3.connect(self.ledger.path) as db:
+            stored = db.execute(
+                "SELECT metadata FROM execution_events"
+            ).fetchone()[0]
+        for secret in (
+            "signature-material",
+            "short-signature-material",
+            "aws-signature-material",
+        ):
+            self.assertNotIn(secret, stored)
+        parsed = __import__("json").loads(stored)
+        self.assertEqual(set(parsed.values()), {"[REDACTED]"})
+        self.assertTrue(self.ledger.verify()["valid"])
+
+    def test_ledger_mapping_sanitization_stops_after_500_entries(self):
+        class StreamingMapping(dict):
+            def __init__(self):
+                super().__init__()
+                self.iterated = 0
+            def items(self):
+                for index in range(10_000):
+                    self.iterated += 1
+                    yield f"entry-{index}", index
+
+        value = StreamingMapping()
+        cleaned = _clean(value)
+        self.assertEqual(value.iterated, 500)
+        self.assertEqual(len(cleaned), 500)
 
     def test_validation(self):
         with self.assertRaises(LedgerError):

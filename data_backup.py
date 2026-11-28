@@ -1068,18 +1068,46 @@ def restore_backup(snapshot, data_dir=DEFAULT_DATA, *, confirm_quiesced=False,
             raise BackupError("El directorio padre del destino cambió antes de publicar la restauración.")
         os.replace(staging, data_dir)
         _fsync_directory(data_dir.parent)
-    except Exception:
+    except Exception as restore_error:
         shutil.rmtree(staging, ignore_errors=True)
+        rollback_error = None
+        rollback_restored = False
         if previous and previous.exists() and not data_dir.exists():
             try:
-                if _same_directory_chain(
+                if not _same_directory_chain(
                     data_parent_chain, _validate_directory_path(data_dir.parent)
                 ):
-                    os.replace(previous, data_dir)
-                    _fsync_directory(data_dir.parent)
-            except BackupError:
-                # Preserve the previous snapshot in place if its parent path changed.
-                pass
+                    raise BackupError(
+                        "El directorio padre cambió; no se puede restaurar automáticamente."
+                    )
+                os.replace(previous, data_dir)
+                rollback_restored = True
+                _fsync_directory(data_dir.parent)
+            except Exception as error:
+                rollback_error = error
+
+        if rollback_error is not None:
+            if previous.exists():
+                recovery = f"El directorio anterior se conserva en {previous}."
+            elif rollback_restored:
+                recovery = (
+                    "El directorio anterior volvió al destino, pero no se confirmó "
+                    "el fsync del directorio padre."
+                )
+            else:
+                recovery = "No se pudo confirmar la ubicación del directorio anterior."
+            raise BackupError(
+                "La restauración falló y el rollback automático también falló. "
+                + recovery
+                + f" Tipos de error: restauración={type(restore_error).__name__}, "
+                f"rollback={type(rollback_error).__name__}."
+            ) from restore_error
+
+        if previous and previous.exists():
+            raise BackupError(
+                f"La restauración falló; el directorio anterior se conserva en {previous}. "
+                "Verifica el destino antes de reintentar."
+            ) from restore_error
         raise
     return {"restored": True, "files": report["files"],
             "total_bytes": report["total_bytes"],

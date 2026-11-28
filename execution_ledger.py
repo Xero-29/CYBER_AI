@@ -3,10 +3,10 @@ import hashlib
 import json
 import math
 import os
-import re
 import sqlite3
 import stat
 import uuid
+from itertools import islice
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -15,14 +15,9 @@ DEFAULT_DB = PROJECT / "data" / "execution_ledger.sqlite3"
 GENESIS = "0" * 64
 MAX_FIELD = 16384
 MAX_SQLITE_INTEGER = (1 << 63) - 1
-SECRET_KEY = re.compile(
-    r"(?:api[_-]?key|access[_-]?key|authorization|password|passwd|secret|token|"
-    r"credential|private[_-]?key|cookie|set[_-]?cookie|"
-    r"session[_-]?(?:id|token|key)|hmac[_-]?key|signing[_-]?key|encryption[_-]?key)",
-    re.I,
-)
 MAX_NESTING_DEPTH = 64
 from secret_redaction import (
+    SECRET_FIELD,
     redact_text as _redact_text,
     _unique_mapping_key,
 )
@@ -37,7 +32,7 @@ def _canonical(value):
 
 
 def _clean(value, key="", _depth=0):
-    if SECRET_KEY.search(key):
+    if SECRET_FIELD.search(key):
         return "[REDACTED]"
     if _depth > MAX_NESTING_DEPTH:
         return "[REDACTED: nesting limit]"
@@ -53,7 +48,7 @@ def _clean(value, key="", _depth=0):
         ]
     if isinstance(value, dict):
         cleaned = {}
-        for index, (key, item) in enumerate(list(value.items())[:500]):
+        for index, (key, item) in enumerate(islice(value.items(), 500)):
             original_key = str(key)[:128]
             safe_key = _unique_mapping_key(cleaned, _redact_text(original_key), index)
             cleaned[safe_key] = _clean(item, str(key), _depth + 1)

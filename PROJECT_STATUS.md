@@ -1,3 +1,14 @@
+# Estado vigente — 2026-11-28 (ledger y recuperación de backups)
+
+- La inspección del ledger encontró dos defectos concretos: `_clean()` materializaba todos los pares de un diccionario antes de truncar a 500; además mantenía una lista local de campos secretos que omitía `signature`/`sig` frente al registro compartido de redacción.
+- Corrección: la sanitización del ledger reutiliza `SECRET_FIELD` de `secret_redaction.py` y consume como máximo 500 pares con `itertools.islice`, sin materializar mapas completos. Regresiones cubren firmas y un mapping de 10.000 entradas.
+- En restauración de backups, si fallaba la publicación y también el rollback, el error no indicaba la ruta de la copia anterior. Ahora identifica el tipo de ambos fallos y la ruta preservada; si el rename de rollback ocurrió pero falló el `fsync`, lo declara sin afirmar durabilidad. Regresión simula ambos fallos.
+- Documentación actualizada: `docs/EXECUTION_LEDGER.md` y `docs/BACKUP_RESTORE_SECURITY.md`.
+- El HEAD previo `a26226db79808c8e894749f380eadaa853bceac7` tenía Python Tests [46160788795](https://github.com/Xero-29/CYBER_AI/actions/runs/46160788795) y Docker Sandbox [46160788833](https://github.com/Xero-29/CYBER_AI/actions/runs/46160788833) en `in_progress` al iniciar este cambio. Sus resultados no validan el nuevo HEAD; se requieren runs nuevos.
+- No se ejecutaron pruebas locales: no hay checkout del repositorio en este entorno. No se integró con `main`; la divergencia sigue siendo amplia y se conserva íntegra.
+
+---
+
 # Estado vigente — 2026-11-28 (corrección de sintaxis de regresiones)
 
 - El commit [e63adbf](https://github.com/Xero-29/CYBER_AI/commit/e63adbf779a90a57ccd2faf7f07a5e983126697f) incorporó la validación estricta de credenciales y los límites de catálogo.

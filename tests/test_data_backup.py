@@ -829,5 +829,38 @@ class DataBackupTests(unittest.TestCase):
             require_signature=True,
         )
 
+    def test_restore_reports_preserved_previous_directory_when_rollback_fails(self):
+        snapshot = self.root / "backup"
+        self.create_unsigned_backup(snapshot, data_dir=self.data)
+        real_replace = os.replace
+
+        def fail_publish_and_rollback(source, destination):
+            source_path = Path(source)
+            destination_path = Path(destination)
+            if (
+                destination_path == self.data
+                and source_path.name.startswith(".data.restore-")
+            ):
+                raise OSError("simulated restore publish failure")
+            if (
+                destination_path == self.data
+                and source_path.name.startswith("data.pre-restore-")
+            ):
+                raise OSError("simulated rollback failure")
+            return real_replace(source, destination)
+
+        with patch("data_backup.os.replace", side_effect=fail_publish_and_rollback):
+            with self.assertRaisesRegex(BackupError, "rollback automático") as caught:
+                self.restore_unsigned_backup(
+                    snapshot, self.data, confirm_quiesced=True, confirm_replace=True
+                )
+
+        preserved = list(self.root.glob("data.pre-restore-*"))
+        self.assertEqual(len(preserved), 1)
+        self.assertTrue(preserved[0].is_dir())
+        self.assertFalse(self.data.exists())
+        self.assertIn(str(preserved[0]), str(caught.exception))
+        self.assertEqual(list(self.root.glob(".data.restore-*")), [])
+
 if __name__ == "__main__":
     unittest.main()
