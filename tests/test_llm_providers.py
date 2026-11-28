@@ -571,5 +571,16 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
         self.assertEqual(transport.call_args.args[0], "http://127.0.0.1:11434/api/tags")
 
 
+    def test_ollama_model_listing_rejects_malformed_catalog_response(self):
+        provider = {
+            "name": "local",
+            "protocol": "ollama",
+            "base_url": "http://127.0.0.1:11434",
+        }
+        with patch.object(llm_providers, "_http_json", return_value={"models": "invalid"}):
+            with self.assertRaisesRegex(RuntimeError, "contrato de catálogo"):
+                llm_providers.request(provider, "api/tags")
+
+
 if __name__ == "__main__":
     unittest.main()
