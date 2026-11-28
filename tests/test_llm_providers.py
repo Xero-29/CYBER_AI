@@ -321,6 +321,20 @@ class NativeProtocolTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "catálogo de modelos inválido"):
                 llm_providers.installed_models(provider)
 
+    def test_plugin_model_catalog_rejects_oversized_names(self):
+        class Plugin:
+            def request(self, provider, endpoint, payload, timeout):
+                return {}
+            def capabilities(self, provider):
+                return ["model_listing"]
+            def installed_models(self, provider):
+                return ["m" * 257]
+
+        provider = {"name": "custom", "protocol": "custom", "enabled": True}
+        with patch.object(llm_providers, "_load_provider_plugin", return_value=Plugin()):
+            with self.assertRaisesRegex(RuntimeError, "catálogo de modelos inválido"):
+                llm_providers.installed_models(provider)
+
     def test_plugin_installed_models_requires_declared_capability(self):
         class Plugin:
             def request(self, provider, endpoint, payload, timeout):
