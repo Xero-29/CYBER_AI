@@ -1,3 +1,36 @@
+# Estado vigente — 2026-11-28 (colisiones de claves de redacción)
+
+> Registro de esta iteración. Los workflows deben concluir sobre el HEAD final de esta actualización; los checks de commits previos no se reutilizan.
+
+## Estado del repositorio
+
+- Repositorio: `Xero-29/CYBER_AI`; rama: `codex/security-integrity-audit`.
+- HEAD de partida: `f3e24f8dc5fd79f2864fe6d368ffca07dd8d6468`; commit de código y regresiones: `432a3d597defac53bd93e44dbff5656f02e0c7ee`.
+- `main` inspeccionada: `658a565acd0a5561a7482f44260cd9efd1` (SHA verificado: `658a565acd0a5568bb56a1a7482f44260cd9efd1`); comparación tras el commit de código: **482 commits adelante / 576 detrás**, ancestro común `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. No existe un único commit exclusivo de `main`: hay 576 commits exclusivos de `main`. No integrar, rebasar ni cherry-pick directo.
+- PR #2 está cerrado y fusionado mediante `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. No hay PR abierto cuyo head sea esta rama; no se creó un PR duplicado. Las PRs abiertas de conocimiento/laboratorio siguen separadas y en Draft.
+- La consulta del endpoint de protección de rama devolvió 403 al conector; no se usa ese error como prueba del estado actual de protección. La configuración administrativa de branch protection/required checks sigue pendiente de verificación.
+- Los workflows Python Tests y Docker Sandbox del HEAD anterior `f3e24f8...` concluyeron `cancelled`; no validan este cambio. Los nuevos workflows del HEAD final deben revisarse por SHA, jobs y pasos.
+- No hay checkout local disponible en este entorno; no se afirma ejecución local.
+
+## Corrección implementada
+
+- Hallazgo: al redactar claves de mapas que contenían tokens, la colisión se resolvía añadiendo un sufijo basado en el índice una sola vez. Un atacante podía preparar una clave literal igual a ese sufijo y hacer que una entrada posterior la sobrescribiera, perdiendo evidencia.
+- Corrección: `secret_redaction.py` ahora busca el siguiente sufijo realmente libre. `execution_ledger.py` reutiliza el mismo helper, evitando divergencia entre la redacción de evidencias y la persistencia SQLite.
+- Regresiones: claves sintéticas con colisión preconstruida preservan las tres entradas, no conservan los tokens y mantienen verificable la cadena del ledger.
+- Documentación: `docs/EXECUTION_LEDGER.md` describe la resolución de colisiones sin pérdida de entradas.
+- Commit de código: [432a3d5](https://github.com/Xero-29/CYBER_AI/commit/432a3d597defac53bd93e44dbff5656f02e0c7ee).
+
+## Pendiente de validación y operación
+
+- Confirmar Python Tests y Docker Sandbox `completed/success` sobre el HEAD final de esta actualización y revisar todos los jobs/steps; no declarar verde con checks ausentes, cancelados o de otro SHA.
+- Ejecutar pruebas locales en el ThinkPad cuando se descargue este HEAD; este entorno no dispone de checkout ni de runtime del repositorio.
+- Backups: cifrado, KMS/HSM, custodia/rotación, WORM/offsite y simulacros reales de restauración/DR.
+- Plataforma: ACL NTFS y Job Objects; cgroups/namespaces o microVM con pruebas de escape; gateway de egress con DNS pinning.
+- Operación: RBAC/IdP/MFA, branch protection/required checks, observabilidad central, pruebas de carga/soak y revisión independiente.
+- Biblioteca: 48 áreas, 0 `expert_ready`; siguen pendientes fuentes primarias leídas, licencias/procedencia, claims trazables, laboratorios reproducibles, datasets expertos y revisión independiente.
+
+---
+
 # Estado vigente — 2026-11-27 (redacción de credenciales en claves de mapas)
 
 > Registro de este corte. Los checks de commits previos no validan el nuevo HEAD.
