@@ -775,5 +775,89 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
         loader.assert_not_called()
 
 
+    def test_requires_api_key_must_be_boolean(self):
+        for value in (None, 0, 1, "false", [], {}):
+            with self.subTest(value=repr(value)):
+                with self.assertRaisesRegex(ValueError, "requires_api_key"):
+                    llm_providers._credentials({"requires_api_key": value})
+
+    def test_api_key_environment_name_must_be_safe_ascii_identifier(self):
+        invalid_names = (
+            123, [], "", "BAD-KEY", "BAD KEY", "BAD\\nKEY", "Ñ_KEY", "9KEY",
+            "K" * 129,
+        )
+        for name in invalid_names:
+            with self.subTest(name=repr(name)):
+                with self.assertRaisesRegex(ValueError, "api_key_env"):
+                    llm_providers._credentials({
+                        "requires_api_key": False,
+                        "api_key_env": name,
+                    })
+
+    def test_whitespace_only_api_key_environment_value_is_rejected(self):
+        with patch.dict("os.environ", {"CYBER_AI_TEST_API_KEY": "   "}, clear=True):
+            with self.assertRaisesRegex(RuntimeError, "credencial válida"):
+                llm_providers._credentials({
+                    "requires_api_key": False,
+                    "api_key_env": "CYBER_AI_TEST_API_KEY",
+                })
+
+    def test_plugin_api_ps_catalog_is_bounded_and_validated(self):
+        class Plugin:
+            def __init__(self, models):
+                self.models = models
+            def request(self, provider, endpoint, payload, timeout):
+                return {"models": self.models}
+            def capabilities(self, provider):
+                return ["model_listing"]
+            def installed_models(self, provider):
+                return []
+
+        provider = {
+            "name": "custom", "protocol": "test_catalog", "enabled": True,
+            "requires_api_key": False,
+        }
+        valid = [{"name": "local-model"}, {"model": "other-model"}]
+        with patch.object(llm_providers, "_load_provider_plugin", return_value=Plugin(valid)):
+            self.assertEqual(request_enabled(provider, "api/ps"), {"models": valid})
+
+        invalid_catalogs = (
+            [7],
+            [{}],
+            [{"name": ""}],
+            [{"name": " leading-space"}],
+            [{"name": "m" * (llm_providers.MAX_PROVIDER_MODEL_NAME_LENGTH + 1)}],
+            [{"name": "duplicate"}, {"name": "duplicate"}],
+        )
+        for catalog in invalid_catalogs:
+            with self.subTest(catalog=catalog[:1]):
+                with patch.object(
+                    llm_providers, "_load_provider_plugin", return_value=Plugin(catalog)
+                ):
+                    with self.assertRaisesRegex(RuntimeError, "catálogo de modelos inválido"):
+                        request_enabled(provider, "api/ps")
+
+        with patch.object(llm_providers, "MAX_PROVIDER_MODELS", 1), \\
+             patch.object(
+                 llm_providers, "_load_provider_plugin",
+                 return_value=Plugin([{"name": "one"}, {"name": "two"}]),
+             ):
+            with self.assertRaisesRegex(RuntimeError, "catálogo de modelos inválido"):
+                request_enabled(provider, "api/ps")
+
+    def test_plugin_installed_models_rejects_duplicate_names(self):
+        class Plugin:
+            def request(self, provider, endpoint, payload, timeout):
+                return {}
+            def capabilities(self, provider):
+                return ["model_listing"]
+            def installed_models(self, provider):
+                return ["duplicate", "duplicate"]
+
+        provider = {"name": "custom", "protocol": "test_catalog", "enabled": True}
+        with patch.object(llm_providers, "_load_provider_plugin", return_value=Plugin()):
+            with self.assertRaisesRegex(RuntimeError, "catálogo de modelos inválido"):
+                llm_providers.installed_models(provider)
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,3 +1,35 @@
+# Estado vigente — 2026-11-28 (validación de credenciales y catálogos de proveedores)
+
+> Corrección de configuración y límites de recursos. Los checks anteriores no validan el nuevo HEAD.
+
+## Estado del repositorio
+
+- Repositorio: `Xero-29/CYBER_AI`; rama: `codex/security-integrity-audit`.
+- HEAD inspeccionado antes de este cambio: `d3d9928f49e38d00bd614cd592f2935df74afd5d`; `main`: `658a565acd0a5568bb56a1a7482f44260cd9efd1`.
+- Comparación exacta antes del cambio: **533 commits exclusivos de esta rama y 576 exclusivos de `main`**; ancestro común `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. No existe un único commit exclusivo de `main`: hay 576. No se hizo merge, rebase, cherry-pick ni modificación de `main`.
+- PR #2 está cerrada y fusionada mediante `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. No hay PR abierta cuyo head sea esta rama; no se crea otra PR.
+- GitHub informa `protected=false`; no hay protección activa de rama.
+- En el HEAD base `d3d9928`, Python Tests [46159271852](https://github.com/Xero-29/CYBER_AI/actions/runs/46159271852) y Docker Sandbox [46159271848](https://github.com/Xero-29/CYBER_AI/actions/runs/46159271848) estaban `in_progress`; no se reutilizan como evidencia para el nuevo HEAD.
+- No hay checkout local del repositorio disponible en este entorno; no se afirma ejecución local.
+
+## Correcciones implementadas en esta actualización
+
+- `requires_api_key` ahora exige un booleano real. Valores como `null`, `0`, `1` o cadenas no pueden alterar silenciosamente el requisito de autenticación.
+- `api_key_env`, cuando está presente, se valida como identificador ASCII de variable de entorno antes de consultar el entorno. Se rechazan tipos incorrectos, nombres vacíos, caracteres de control, espacios, guiones, nombres Unicode y longitudes superiores a 128 caracteres.
+- Las credenciales ausentes o compuestas solo por espacios se rechazan; el valor secreto no se normaliza ni se incluye en mensajes de error.
+- Los catálogos de `api/ps` y `api/tags` quedan limitados a 10.000 elementos; cada elemento debe contener un nombre válido de máximo 256 caracteres y no duplicado. Se rechazan respuestas malformadas antes de entregarlas al ejecutor.
+- Se reutilizan límites comunes para `installed_models()` y se rechazan nombres duplicados.
+- Regresiones añadidas para configuración de credenciales, catálogos inválidos, duplicados y exceso de elementos. Documentación actualizada en `docs/PROVIDER_PLUGIN_CONTRACT.md` y `docs/AI_PROVIDER_CONFIGURATION.md`.
+
+## Pendiente
+
+- Ejecutar y revisar Python Tests y Docker Sandbox sobre el SHA exacto de este commit; exigir ambos `completed/success` y revisar jobs/steps.
+- Pruebas locales en el ThinkPad: no ejecutadas en esta sesión por ausencia de checkout/runtime.
+- Infraestructura: protección de rama y required checks; KMS/HSM, custodia/rotación, WORM/offsite, cifrado y simulacros de restauración; ACL Windows/Job Objects; aislamiento microVM y pruebas de escape; gateway de egress con DNS pinning; IdP/MFA, observabilidad central, carga/soak y revisión independiente.
+- Biblioteca de conocimientos: 48 áreas y 0 `expert_ready`; siguen pendientes lectura integral y licencia/procedencia de fuentes, claims trazables, laboratorios reproducibles, datasets expertos y revisión independiente.
+
+---
+
 # Estado vigente — 2026-11-28 (controles de redacción, autorización y enumeración de objetivos)
 
 > Registro de esta iteración. La validación CI debe completarse sobre el HEAD final que contiene este registro; ningún check de un SHA anterior se reutiliza.

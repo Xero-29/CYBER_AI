@@ -25,6 +25,8 @@ class _NoRedirect(HTTPRedirectHandler):
 _HTTP_OPENER = build_opener(_NoRedirect)
 MAX_PROVIDER_REQUEST_BYTES = 16 * 1024 * 1024
 MAX_PROVIDER_RESPONSE_BYTES = 16 * 1024 * 1024
+MAX_PROVIDER_MODELS = 10_000
+MAX_PROVIDER_MODEL_NAME_LENGTH = 256
 
 
 def _unique_json_object(pairs):
@@ -291,11 +293,31 @@ def _http_json(url, payload=None, headers=None, timeout=600):
 
 
 def _credentials(provider):
+    requires_api_key = provider.get("requires_api_key", True)
+    if not isinstance(requires_api_key, bool):
+        raise ValueError("requires_api_key debe ser booleano.")
+
     key_env = provider.get("api_key_env")
+    if "api_key_env" in provider and (
+        not isinstance(key_env, str)
+        or not key_env
+        or len(key_env) > 128
+        or not key_env.isascii()
+        or not (key_env[0].isalpha() or key_env[0] == "_")
+        or any(not (character.isalnum() or character == "_") for character in key_env)
+    ):
+        raise ValueError(
+            "api_key_env debe ser un nombre de variable de entorno ASCII válido."
+        )
+
+    if requires_api_key and not key_env:
+        raise RuntimeError("El proveedor exige API key, pero no declara api_key_env.")
     key = os.environ.get(key_env, "") if key_env else ""
-    if provider.get("requires_api_key", True) and not key:
-        if not key_env:
-            raise RuntimeError("El proveedor exige API key, pero no declara api_key_env.")
+    if key and not key.strip():
+        raise RuntimeError(
+            f"La variable de entorno {key_env} no contiene una credencial válida."
+        )
+    if requires_api_key and not key:
         raise RuntimeError(f"Falta configurar la variable de entorno {key_env}.")
     return key
 
@@ -453,8 +475,25 @@ def _validate_plugin_response(endpoint, result, protocol):
         if len(dimensions) != 1:
             raise RuntimeError(f"El plugin {protocol} devolvió dimensiones inconsistentes.")
     elif endpoint in {"api/ps", "api/tags"}:
-        if not isinstance(result.get("models"), list):
-            raise RuntimeError(f"El proveedor {protocol} no cumple el contrato de catálogo.")
+        models = result.get("models")
+        if not isinstance(models, list) or len(models) > MAX_PROVIDER_MODELS:
+            raise RuntimeError(f"El proveedor {protocol} devolvió un catálogo de modelos inválido.")
+        seen_names = set()
+        for item in models:
+            if not isinstance(item, dict):
+                raise RuntimeError(f"El proveedor {protocol} devolvió un catálogo de modelos inválido.")
+            name = item.get("name")
+            if name is None:
+                name = item.get("model")
+            if (
+                not isinstance(name, str)
+                or not name
+                or len(name) > MAX_PROVIDER_MODEL_NAME_LENGTH
+                or name != name.strip()
+                or name in seen_names
+            ):
+                raise RuntimeError(f"El proveedor {protocol} devolvió un catálogo de modelos inválido.")
+            seen_names.add(name)
     else:
         raise ValueError(f"Endpoint no admitido para plugins: {endpoint}")
     return result
@@ -599,13 +638,23 @@ def installed_models(provider):
         return None
     adapter = _load_provider_plugin(protocol)
     models = adapter.installed_models(provider)
+    if not isinstance(models, (list, tuple, set)):
+        raise RuntimeError(
+            f"El plugin {protocol} devolvió un catálogo de modelos inválido."
+        )
+    names = list(models)
     if (
-        not isinstance(models, (list, tuple, set))
-        or len(models) > 10000
-        or any(not isinstance(name, str) or not name or len(name) > 256
-               or name != name.strip() for name in models)
+        len(names) > MAX_PROVIDER_MODELS
+        or any(
+            not isinstance(name, str)
+            or not name
+            or len(name) > MAX_PROVIDER_MODEL_NAME_LENGTH
+            or name != name.strip()
+            for name in names
+        )
+        or len(set(names)) != len(names)
     ):
         raise RuntimeError(
             f"El plugin {protocol} devolvió un catálogo de modelos inválido."
         )
-    return set(models)
+    return set(names)
