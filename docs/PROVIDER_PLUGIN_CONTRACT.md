@@ -66,4 +66,4 @@ Asigna `provider: "custom"` al agente que deba usarlo o configura `capability_pr
 
 ## Límites actuales
 
-El sistema no puede conectar literalmente cualquier IA sin adaptador: un proveedor no compatible necesita un plugin que traduzca su API. Los plugins se cargan desde el entorno Python instalado; la conexión no debe requerir modificar el núcleo, pero sí configurar el proveedor y los roles. La selección/fallback automático entre múltiples modelos y el descubrimiento remoto universal siguen siendo trabajo pendiente.
+El sistema no puede conectar literalmente cualquier IA sin adaptador: un proveedor no compatible necesita un plugin que traduzca su API. Los plugins se cargan desde el entorno Python instalado; la conexión no debe requerir modificar el núcleo, pero sí configurar el proveedor y los roles. La selección por configuración, el mapeo de capacidades y el fallback ordenado durante la resolución están implementados; el reintento/failover automático tras errores de transporte y el descubrimiento remoto universal siguen pendientes.
