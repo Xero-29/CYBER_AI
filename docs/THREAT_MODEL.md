@@ -50,7 +50,7 @@ Principios:
 - **Ingesta:** archivo/URL → validación de ruta/tamaño/procedencia → extractor → fragmentos → embeddings → SQLite/FTS → recuperación por tenant.
 - **Skill:** eventos terminales → integridad ledger → dos ejecuciones independientes → revisión objetiva → payload canónico → firma VERITAS → versión activa.
 - **Descarga:** catálogo aprobado → proxy de salida → verificación hash/licencia → ingestión → clasificación.
-- **Backup:** procesos detenidos → snapshot SQLite/copia de ficheros → manifiesto SHA-256 → verificación → restauración conservando estado anterior.
+- **Backup:** atestación de quiescencia → snapshot SQLite/copia de ficheros → manifiesto SHA-256 y HMAC-SHA256 por defecto → verificación → restauración atómica conservando el estado anterior.
 
 ## 5. Amenazas STRIDE y controles
 
@@ -61,15 +61,15 @@ Principios:
 | TM-03 | Repudiation | Negar una ejecución o cambio | Eventos, IDs, hashes y artefactos | Firma externa/identidad de operador y almacenamiento independiente pendientes |
 | TM-04 | Information disclosure | Prompt, retrieval o logs filtran secretos/PII | Redacción, namespace, TLS y restricciones HTTP remoto | Redacción no cubre todos los formatos; pruebas reales de privacidad/ACL pendientes |
 | TM-05 | Denial of service | Documento, modelo o herramienta agota recursos | Límites de tamaño, timeouts, salida acotada y límites de proceso | Carga/concurrencia y cuotas globales por tenant pendientes |
-| TM-06 | Elevation of privilege | Modelo invoca herramienta con permisos excesivos | Allowlist, autorización, ejecución explícita y argumentos sin shell | RBAC/roles y microVM pendientes |
+| TM-06 | Elevation of privilege | Modelo o plugin invoca herramientas/red con permisos excesivos | Allowlist HMAC para herramientas seleccionadas, habilitación explícita, autorización de objetivo y argumentos sin shell | No hay broker universal; los plugins Python ejecutan dentro del proceso anfitrión y pueden usar sus permisos/red; RBAC/roles y microVM pendientes |
 | TM-07 | Prompt injection | Documento ordena revelar secretos o ejecutar herramientas | RAG separa datos e instrucciones; núcleo valida permisos | Evaluación adversarial sistemática pendiente |
-| TM-08 | SSRF/DNS rebinding | Descargador alcanza metadata/red privada | Descarga exige proxy externo | Seguridad depende del proxy; pinning y egress deben verificarse externamente |
-| TM-09 | Supply-chain compromise | Dependencia, acción CI, imagen o plugin comprometido | Lock parcial, CI pinning y SBOM inicial | Hashes, firmas/provenance y digest completo pendientes |
+| TM-08 | SSRF/DNS rebinding | Descargador o proveedor alcanza metadata/red privada | Descarga de conocimiento exige proxy externo; transporte HTTP integrado valida URL base, deshabilita redirects y restringe HTTP a loopback | La seguridad del descargador depende del proxy; plugins pueden abrir conexiones propias y el núcleo no impone egress. Pinning DNS/firewall requieren pruebas externas |
+| TM-09 | Supply-chain compromise | Dependencia, acción CI, imagen, binario o plugin comprometido | Locks con SHA-256 para Linux x86_64/CPython 3.12, instalación CI con `--require-hashes`, manifiestos de wheels, SBOM CycloneDX/provenance y allowlist HMAC para herramientas seleccionadas | Locks multiplataforma, verificación de digest/firma de imagen, provenance firmada externa, cobertura universal de binarios y aislamiento/revisión de plugins pendientes |
 | TM-10 | Skill poisoning | Resultados falsos activan metodología peligrosa | Dos ejecuciones, revisión independiente, HMAC, candidatas no ejecutables | Identidad de revisor/KMS externos; regresión automática pendiente |
 | TM-11 | Tenant escape | Recuperación semántica devuelve datos ajenos | Filtros tenant/namespace en recuperación y memoria | Pruebas concurrentes de aislamiento y revisión independiente pendientes |
 | TM-12 | Sandbox escape | Muestra hostil escapa de Docker | Read-only, no network, drop caps, no-new-privileges y límites | Kernel compartido; malware requiere microVM/VM desechable |
 | TM-13 | Evidence loss | Excepción deja tarea sin evento terminal | Eventos started/terminales en ejecutores principales | Excepciones no controladas pueden dejar inicios huérfanos; wrapper finally global pendiente |
-| TM-14 | Backup compromise | Backup robado o manipulado | Manifiesto SHA-256 y verificación | No cifra ni firma; almacenamiento externo requiere cifrado y control separado |
+| TM-14 | Backup compromise | Backup robado o manipulado | Manifiesto SHA-256, firma HMAC-SHA256 por defecto en CLI, verificación estricta, staging privado y publicación/restauración atómica con preservación del directorio anterior | No cifra (`encrypted=false`); la clave HMAC requiere custodia externa. KMS/HSM, WORM/offsite, ACL Windows y simulacro real de DR siguen pendientes |
 
 ## 6. Escenarios de abuso y aceptación
 
