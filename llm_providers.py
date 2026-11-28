@@ -110,6 +110,9 @@ def _validate_base_url(base_url, provider_name):
         or parsed.query or parsed.fragment
         or "?" in base_url or "#" in base_url
         or "%" in base_url or "\\" in base_url
+        or parsed.netloc.endswith(":")
+        or "//" in parsed.path
+        or any(part in {".", ".."} for part in parsed.path.split("/"))
         or (port is not None and not 1 <= port <= 65535)
     ):
         raise ValueError(f"base_url inválida para el proveedor {provider_name}.")
