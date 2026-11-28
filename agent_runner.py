@@ -160,6 +160,7 @@ def request_json(endpoint, payload=None, timeout=600, provider=None):
             "name": "ollama",
             "protocol": "ollama",
             "base_url": API,
+            "enabled": True,
         }
     return provider_request(provider, endpoint, payload, timeout)
 
