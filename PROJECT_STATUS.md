@@ -6,7 +6,7 @@
 
 - Repositorio: `Xero-29/CYBER_AI`; rama: `codex/security-integrity-audit`.
 - HEAD de partida: `f3e24f8dc5fd79f2864fe6d368ffca07dd8d6468`; commit de código y regresiones: `432a3d597defac53bd93e44dbff5656f02e0c7ee`.
-- `main` inspeccionada: `658a565acd0a5561a7482f44260cd9efd1` (SHA verificado: `658a565acd0a5568bb56a1a7482f44260cd9efd1`); comparación tras el commit de código: **482 commits adelante / 576 detrás**, ancestro común `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. No existe un único commit exclusivo de `main`: hay 576 commits exclusivos de `main`. No integrar, rebasar ni cherry-pick directo.
+- `main` inspeccionada: `658a565acd0a5568bb56a1a7482f44260cd9efd1`; comparación tras el commit de código: **482 commits adelante / 576 detrás**, ancestro común `cae816d6037b56f017c2fbdbb3e98ef00df58c1d`. No existe un único commit exclusivo de `main`: hay 576 commits exclusivos de `main`. No integrar, rebasar ni cherry-pick directo.
 - PR #2 está cerrado y fusionado mediante `478c6ddc676221e4c07b8c5780f127bc5a9e749e`. No hay PR abierto cuyo head sea esta rama; no se creó un PR duplicado. Las PRs abiertas de conocimiento/laboratorio siguen separadas y en Draft.
 - La consulta del endpoint de protección de rama devolvió 403 al conector; no se usa ese error como prueba del estado actual de protección. La configuración administrativa de branch protection/required checks sigue pendiente de verificación.
 - Los workflows Python Tests y Docker Sandbox del HEAD anterior `f3e24f8...` concluyeron `cancelled`; no validan este cambio. Los nuevos workflows del HEAD final deben revisarse por SHA, jobs y pasos.
