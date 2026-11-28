@@ -25,6 +25,7 @@ class AgentRunnerTransportTests(unittest.TestCase):
                     "name": "ollama",
                     "protocol": "ollama",
                     "base_url": agent_runner.API,
+                    "enabled": True,
                 },
                 "api/chat",
                 payload,
@@ -34,6 +35,7 @@ class AgentRunnerTransportTests(unittest.TestCase):
 
     def test_explicit_provider_is_passed_to_shared_transport_unchanged(self):
         provider = {
+            "enabled": True,
             "name": "gemini",
             "protocol": "gemini",
             "base_url": "https://generativelanguage.googleapis.com/v1beta",
@@ -90,6 +92,7 @@ class AgentRunnerPrivateHistoryTests(unittest.TestCase):
 class AgentRunnerRemoteEmbeddingTests(unittest.TestCase):
     def test_embed_text_sends_one_item_and_records_remote_provider(self):
         provider = {
+            "enabled": True,
             "name": "gemini",
             "protocol": "gemini",
             "base_url": "https://generativelanguage.googleapis.com/v1beta",
