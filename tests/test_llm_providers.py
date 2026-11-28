@@ -509,5 +509,67 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
                 })
 
 
+    def test_provider_base_url_rejects_single_backslashes_and_encoded_separators(self):
+        invalid_urls = (
+            r"https://api.example\evil/v1",
+            r"https://api.example/v1\..\admin",
+            "https://api.example/v1%2f..%2fadmin",
+            "https://api.example/v1%5c..%5cadmin",
+        )
+        for base_url in invalid_urls:
+            config = {"llm_providers": {"cloud": {
+                "enabled": True, "protocol": "openai", "base_url": base_url,
+            }}}
+            with self.subTest(base_url=base_url):
+                with self.assertRaisesRegex(ValueError, "base_url inválida"):
+                    llm_providers.resolve_provider(config, {"provider": "cloud"})
+
+    def test_request_rejects_unknown_endpoint_before_transport(self):
+        provider = {
+            "name": "local",
+            "protocol": "ollama",
+            "base_url": "http://127.0.0.1:11434",
+        }
+        with patch.object(llm_providers, "_http_json") as transport:
+            with self.assertRaisesRegex(ValueError, "Endpoint de proveedor no admitido"):
+                llm_providers.request(provider, "api/../admin", {})
+        transport.assert_not_called()
+
+    def test_api_tags_is_restricted_to_ollama_model_listing(self):
+        provider = {
+            "name": "cloud",
+            "protocol": "openai",
+            "base_url": "https://api.example/v1",
+            "requires_api_key": False,
+        }
+        with patch.object(llm_providers, "_http_json") as transport:
+            with self.assertRaisesRegex(ValueError, "api/tags solo está disponible para Ollama"):
+                llm_providers.request(provider, "api/tags", {})
+        transport.assert_not_called()
+
+    def test_request_rejects_non_string_protocol_and_non_object_payload(self):
+        with patch.object(llm_providers, "_http_json") as transport:
+            with self.assertRaisesRegex(ValueError, "protocolo"):
+                llm_providers.request({"protocol": ["ollama"]}, "api/chat", {})
+            with self.assertRaisesRegex(ValueError, "payload"):
+                llm_providers.request(
+                    {"protocol": "ollama", "base_url": "http://127.0.0.1:11434"},
+                    "api/chat",
+                    ["not", "an", "object"],
+                )
+        transport.assert_not_called()
+
+    def test_ollama_model_listing_endpoint_remains_available(self):
+        provider = {
+            "name": "local",
+            "protocol": "ollama",
+            "base_url": "http://127.0.0.1:11434",
+        }
+        with patch.object(llm_providers, "_http_json", return_value={"models": []}) as transport:
+            result = llm_providers.request(provider, "api/tags")
+        self.assertEqual(result, {"models": []})
+        self.assertEqual(transport.call_args.args[0], "http://127.0.0.1:11434/api/tags")
+
+
 if __name__ == "__main__":
     unittest.main()
