@@ -837,13 +837,13 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
                     with self.assertRaisesRegex(RuntimeError, "catálogo de modelos inválido"):
                         request_enabled(provider, "api/ps")
 
-        with patch.object(llm_providers, "MAX_PROVIDER_MODELS", 1), \\
-             patch.object(
-                 llm_providers, "_load_provider_plugin",
-                 return_value=Plugin([{"name": "one"}, {"name": "two"}]),
-             ):
-            with self.assertRaisesRegex(RuntimeError, "catálogo de modelos inválido"):
-                request_enabled(provider, "api/ps")
+        with patch.object(llm_providers, "MAX_PROVIDER_MODELS", 1):
+            with patch.object(
+                llm_providers, "_load_provider_plugin",
+                return_value=Plugin([{"name": "one"}, {"name": "two"}]),
+            ):
+                with self.assertRaisesRegex(RuntimeError, "catálogo de modelos inválido"):
+                    request_enabled(provider, "api/ps")
 
     def test_plugin_installed_models_rejects_duplicate_names(self):
         class Plugin:

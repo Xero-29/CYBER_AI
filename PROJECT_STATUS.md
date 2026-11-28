@@ -1,3 +1,13 @@
+# Estado vigente — 2026-11-28 (corrección de sintaxis de regresiones)
+
+- El commit [e63adbf](https://github.com/Xero-29/CYBER_AI/commit/e63adbf779a90a57ccd2faf7f07a5e983126697f) incorporó la validación estricta de credenciales y los límites de catálogo.
+- Python Tests [46160634646](https://github.com/Xero-29/CYBER_AI/actions/runs/46160634646) y Docker Sandbox [46160634647](https://github.com/Xero-29/CYBER_AI/actions/runs/46160634647) concluyeron `failure` sobre ese SHA. Ambos se detuvieron en la comprobación de sintaxis Python antes de ejecutar las pruebas: una continuación de línea en el nuevo test `test_plugin_api_ps_catalog_is_bounded_and_validated` contenía una barra invertida duplicada. No hubo una regresión funcional demostrada porque la suite no llegó a ejecutarse.
+- Corrección: se sustituyó la continuación de línea por context managers anidados. No cambia el código de producción.
+- El nuevo HEAD requiere dos workflows nuevos y completos. No se reutiliza el resultado fallido ni se declara CI verde.
+- No se ejecutaron pruebas locales: no hay checkout del repositorio en este entorno.
+
+---
+
 # Estado vigente — 2026-11-28 (validación de credenciales y catálogos de proveedores)
 
 > Corrección de configuración y límites de recursos. Los checks anteriores no validan el nuevo HEAD.
