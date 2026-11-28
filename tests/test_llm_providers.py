@@ -402,6 +402,36 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
             with self.subTest(timeout=timeout), self.assertRaises(ValueError):
                 llm_providers.request(provider, "api/chat", {}, timeout=timeout)
 
+    def test_direct_request_cannot_bypass_remote_http_transport_policy(self):
+        provider = {
+            "name": "untrusted-local-adapter",
+            "protocol": "ollama",
+            "base_url": "http://192.0.2.25:11434",
+        }
+        with patch.object(llm_providers, "_http_json") as transport:
+            with self.assertRaisesRegex(ValueError, "HTTP solo se permite en loopback"):
+                llm_providers.request(provider, "api/chat", {"model": "m", "messages": []})
+        transport.assert_not_called()
+
+    def test_direct_request_rejects_disabled_provider_before_transport(self):
+        provider = {
+            "name": "disabled-local",
+            "protocol": "ollama",
+            "base_url": "http://127.0.0.1:11434",
+            "enabled": False,
+        }
+        with patch.object(llm_providers, "_http_json") as transport:
+            with self.assertRaisesRegex(ValueError, "deshabilitado"):
+                llm_providers.request(provider, "api/chat", {"model": "m", "messages": []})
+        transport.assert_not_called()
+
+    def test_direct_ollama_request_uses_safe_loopback_default(self):
+        provider = {"name": "local", "protocol": "ollama"}
+        with patch.object(llm_providers, "_http_json", return_value={"message": {"content": "ok"}}) as transport:
+            result = llm_providers.request(provider, "api/chat", {"model": "m", "messages": []})
+        self.assertEqual(result["message"]["content"], "ok")
+        self.assertEqual(transport.call_args.args[0], "http://127.0.0.1:11434/api/chat")
+
     def test_timeout_is_forwarded_to_builtin_transport(self):
         provider = {"name": "local", "protocol": "ollama",
                     "base_url": "http://127.0.0.1:11434"}

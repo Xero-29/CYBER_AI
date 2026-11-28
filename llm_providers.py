@@ -76,6 +76,54 @@ def _load_provider_plugin(protocol):
     return adapter
 
 
+DEFAULT_BASE_URLS = {
+    "ollama": "http://127.0.0.1:11434",
+    "openai": "https://api.openai.com/v1",
+    "anthropic": "https://api.anthropic.com/v1",
+    "gemini": "https://generativelanguage.googleapis.com/v1beta",
+}
+
+
+def _validate_base_url(base_url, provider_name):
+    """Apply the same transport boundary to resolved and direct adapter calls."""
+    if not isinstance(base_url, str):
+        raise ValueError(f"base_url inválida para el proveedor {provider_name}.")
+    if (
+        not base_url or len(base_url) > 2048
+        or base_url != base_url.strip()
+        or any(
+            character.isspace() or ord(character) < 0x20
+            or 0x7F <= ord(character) <= 0x9F
+            for character in base_url
+        )
+    ):
+        raise ValueError(f"base_url inválida para el proveedor {provider_name}.")
+    try:
+        parsed = urlsplit(base_url)
+        hostname = (parsed.hostname or "").lower().rstrip(".")
+        port = parsed.port
+    except ValueError as error:
+        raise ValueError(f"base_url inválida para el proveedor {provider_name}.") from error
+    if (
+        parsed.scheme not in {"http", "https"} or not hostname
+        or parsed.username is not None or parsed.password is not None
+        or parsed.query or parsed.fragment
+        or "?" in base_url or "#" in base_url
+        or "%" in parsed.netloc or "\\\\" in parsed.netloc or "\\\\" in parsed.path
+        or (port is not None and not 1 <= port <= 65535)
+    ):
+        raise ValueError(f"base_url inválida para el proveedor {provider_name}.")
+    try:
+        loopback = ipaddress.ip_address(hostname).is_loopback
+    except ValueError:
+        loopback = hostname == "localhost"
+    if parsed.scheme == "http" and not loopback:
+        raise ValueError(
+            "base_url HTTP solo se permite en loopback; usa HTTPS para proveedores remotos."
+        )
+    return base_url.rstrip("/")
+
+
 def resolve_provider(config, agent, capability=None):
     """Resuelve un proveedor habilitado y, si se solicita, compatible con una capacidad."""
     registry = config.get("llm_providers", {})
@@ -117,54 +165,13 @@ def resolve_provider(config, agent, capability=None):
         builtin = protocol in {"ollama", "openai", "anthropic", "gemini"}
         if not builtin and _load_provider_plugin(protocol) is None:
             raise ValueError(f"Protocolo de proveedor no soportado: {protocol}")
-        defaults = {
-            "ollama": "http://127.0.0.1:11434",
-            "openai": "https://api.openai.com/v1",
-            "anthropic": "https://api.anthropic.com/v1",
-            "gemini": "https://generativelanguage.googleapis.com/v1beta",
-        }
-        base_url = result.get("base_url") or defaults.get(protocol, "")
+        base_url = result.get("base_url") or DEFAULT_BASE_URLS.get(protocol, "")
         if not base_url and not builtin:
             if capability and capability not in provider_capabilities(result):
                 last_reason = f"{name} no ofrece {capability}"
                 continue
             return result
-        if not isinstance(base_url, str):
-            raise ValueError(f"base_url inválida para el proveedor {name}.")
-        if (
-            not base_url or len(base_url) > 2048
-            or base_url != base_url.strip()
-            or any(
-                character.isspace() or ord(character) < 0x20
-                or 0x7F <= ord(character) <= 0x9F
-                for character in base_url
-            )
-        ):
-            raise ValueError(f"base_url inválida para el proveedor {name}.")
-        try:
-            parsed = urlsplit(base_url)
-            hostname = (parsed.hostname or "").lower().rstrip(".")
-            port = parsed.port
-        except ValueError as error:
-            raise ValueError(f"base_url inválida para el proveedor {name}.") from error
-        if (
-            parsed.scheme not in {"http", "https"} or not hostname
-            or parsed.username is not None or parsed.password is not None
-            or parsed.query or parsed.fragment
-            or "?" in base_url or "#" in base_url
-            or "%" in parsed.netloc or "\\" in parsed.netloc or "\\" in parsed.path
-            or (port is not None and not 1 <= port <= 65535)
-        ):
-            raise ValueError(f"base_url inválida para el proveedor {name}.")
-        try:
-            loopback = ipaddress.ip_address(hostname).is_loopback
-        except ValueError:
-            loopback = hostname == "localhost"
-        if parsed.scheme == "http" and not loopback:
-            raise ValueError(
-                "base_url HTTP solo se permite en loopback; usa HTTPS para proveedores remotos."
-            )
-        result["base_url"] = base_url.rstrip("/")
+        result["base_url"] = _validate_base_url(base_url, name)
         if capability and capability not in provider_capabilities(result):
             last_reason = f"{name} no ofrece {capability}"
             continue
@@ -435,7 +442,17 @@ def request(provider, endpoint, payload=None, timeout=600):
         valid_timeout = False
     if not valid_timeout:
         raise ValueError("timeout debe ser un número finito mayor que 0 y máximo 600 segundos.")
+    if not isinstance(provider, dict):
+        raise ValueError("La configuración del proveedor debe ser un objeto.")
+    provider = dict(provider)
+    if "enabled" in provider and provider["enabled"] is not True:
+        raise ValueError("El proveedor está deshabilitado o su estado no es booleano.")
     protocol = provider.get("protocol")
+    if protocol in DEFAULT_BASE_URLS:
+        base_url = provider.get("base_url") or DEFAULT_BASE_URLS[protocol]
+        provider["base_url"] = _validate_base_url(
+            base_url, provider.get("name") or protocol
+        )
     required = {"api/chat": "chat", "api/embed": "embeddings", "api/ps": "model_listing"}.get(endpoint)
     if required and required not in provider_capabilities(provider):
         raise ValueError(f"El proveedor {provider.get('name', protocol)} no ofrece {required}.")
