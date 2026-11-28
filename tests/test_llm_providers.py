@@ -5,6 +5,10 @@ from urllib.error import HTTPError, URLError
 
 import llm_providers
 
+
+def request_enabled(provider, *args, **kwargs):
+    return llm_providers.request({**provider, "enabled": True}, *args, **kwargs)
+
 class ProviderTests(unittest.TestCase):
  def test_provider_config_requires_enabled(self):
   with self.assertRaises(RuntimeError):
@@ -15,7 +19,7 @@ class ProviderTests(unittest.TestCase):
  def test_openai_chat_is_normalized_to_ollama_shape(self):
   p={"name":"cloud","protocol":"openai","base_url":"https://api.example/v1","requires_api_key":False}
   with patch.object(llm_providers,"_http_json",return_value={"choices":[{"message":{"content":"ok"},"finish_reason":"stop"}],"usage":{"prompt_tokens":2,"completion_tokens":3}}) as call:
-   r=llm_providers.request(p,"api/chat",{"model":"m","messages":[{"role":"user","content":"hi"}],"options":{"num_predict":99}})
+   r=request_enabled(p,"api/chat",{"model":"m","messages":[{"role":"user","content":"hi"}],"options":{"num_predict":99}})
   self.assertEqual(r["message"]["content"],"ok")
   self.assertEqual(call.call_args.args[0],"https://api.example/v1/chat/completions")
   self.assertEqual(call.call_args.args[1]["max_tokens"],99)
@@ -97,7 +101,7 @@ class NativeProtocolTests(unittest.TestCase):
                     "usage": {"input_tokens": 7, "output_tokens": 4}}
         with patch.dict("os.environ", {"TEST_ANTHROPIC_KEY": "test-secret"}), \
              patch.object(llm_providers, "_http_json", return_value=response) as call:
-            result = llm_providers.request(provider, "api/chat", {
+            result = request_enabled(provider, "api/chat", {
                 "model": "claude-test",
                 "messages": [{"role": "system", "content": "Reglas"},
                              {"role": "system", "content": "Segunda regla"},
@@ -115,7 +119,7 @@ class NativeProtocolTests(unittest.TestCase):
         provider = {"name": "anthropic", "protocol": "anthropic",
                     "requires_api_key": False}
         with self.assertRaisesRegex(ValueError, "no ofrece embeddings"):
-            llm_providers.request(provider, "api/embed", {"model": "m", "input": ["x"]})
+            request_enabled(provider, "api/embed", {"model": "m", "input": ["x"]})
 
     def test_gemini_chat_is_normalized(self):
         provider = {"name": "gemini", "protocol": "gemini",
@@ -127,7 +131,7 @@ class NativeProtocolTests(unittest.TestCase):
         }
         with patch.dict("os.environ", {"TEST_GEMINI_KEY": "gemini-secret"}), \
              patch.object(llm_providers, "_http_json", return_value=response) as call:
-            result = llm_providers.request(provider, "api/chat", {
+            result = request_enabled(provider, "api/chat", {
                 "model": "gemini-test",
                 "messages": [{"role": "system", "content": "Contexto"},
                              {"role": "assistant", "content": "previo"},
@@ -149,7 +153,7 @@ class NativeProtocolTests(unittest.TestCase):
              patch.object(llm_providers, "_http_json",
                           side_effect=[{"embedding": {"values": [0.1, 0.2]}},
                                        {"embedding": {"values": [0.3, 0.4]}}]) as call:
-            result = llm_providers.request(provider, "api/embed", {
+            result = request_enabled(provider, "api/embed", {
                 "model": "embedding-test", "input": ["uno", "dos"]})
         self.assertEqual(result["embeddings"], [[0.1, 0.2], [0.3, 0.4]])
         self.assertEqual(call.call_count, 2)
@@ -165,7 +169,7 @@ class NativeProtocolTests(unittest.TestCase):
                     "requires_api_key": True}
         with patch.dict("os.environ", {}, clear=True):
             with self.assertRaisesRegex(RuntimeError, "Falta configurar"):
-                llm_providers.request(provider, "api/chat", {
+                request_enabled(provider, "api/chat", {
                     "model": "m", "messages": [{"role": "user", "content": "x"}]})
 
 
@@ -191,14 +195,14 @@ class NativeProtocolTests(unittest.TestCase):
         with patch.object(llm_providers, "_load_provider_plugin", return_value=Plugin()):
             provider = llm_providers.resolve_provider(config, {"provider": "custom"})
             self.assertEqual(
-                llm_providers.request(provider, "api/chat", {"model": "m"}),
+                request_enabled(provider, "api/chat", {"model": "m"}),
                 {"message": {"content": "respuesta del plugin", "thinking": ""}},
             )
             self.assertEqual(
                 llm_providers.provider_capabilities(provider), ["chat", "embeddings"]
             )
             self.assertEqual(
-                llm_providers.request(provider, "api/embed", {"input": ["a"]}),
+                request_enabled(provider, "api/embed", {"input": ["a"]}),
                 {"embeddings": [[1.0, 0.0]]},
             )
             self.assertEqual(llm_providers.installed_models(provider), {"remote-model"})
@@ -212,7 +216,7 @@ class NativeProtocolTests(unittest.TestCase):
         provider = {"name": "custom", "protocol": "test_plugin"}
         with patch.object(llm_providers, "_load_provider_plugin", return_value=Plugin()):
             with self.assertRaisesRegex(RuntimeError, "vector inválido"):
-                llm_providers.request(provider, "api/embed", {"input": ["x"]})
+                request_enabled(provider, "api/embed", {"input": ["x"]})
 
     def test_unknown_protocol_is_rejected_during_resolution(self):
         config = {"llm_providers": {"custom": {
@@ -233,7 +237,7 @@ class NativeProtocolTests(unittest.TestCase):
                     "base_url": "https://api.example/v1", "requires_api_key": True}
         with patch.dict("os.environ", {}, clear=True):
             with self.assertRaisesRegex(RuntimeError, "no declara api_key_env"):
-                llm_providers.request(provider, "api/chat", {
+                request_enabled(provider, "api/chat", {
                     "model": "m", "messages": [{"role": "user", "content": "x"}]})
 
 
@@ -400,7 +404,7 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
                     "base_url": "http://127.0.0.1:11434"}
         for timeout in (0, -1, 601, float("inf"), float("nan"), True, "5", 10 ** 1000):
             with self.subTest(timeout=timeout), self.assertRaises(ValueError):
-                llm_providers.request(provider, "api/chat", {}, timeout=timeout)
+                request_enabled(provider, "api/chat", {}, timeout=timeout)
 
     def test_direct_request_cannot_bypass_remote_http_transport_policy(self):
         provider = {
@@ -422,13 +426,13 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
         }
         with patch.object(llm_providers, "_http_json") as transport:
             with self.assertRaisesRegex(ValueError, "deshabilitado"):
-                llm_providers.request(provider, "api/chat", {"model": "m", "messages": []})
+                request_enabled(provider, "api/chat", {"model": "m", "messages": []})
         transport.assert_not_called()
 
     def test_direct_ollama_request_uses_safe_loopback_default(self):
         provider = {"name": "local", "protocol": "ollama"}
         with patch.object(llm_providers, "_http_json", return_value={"message": {"content": "ok"}}) as transport:
-            result = llm_providers.request(provider, "api/chat", {"model": "m", "messages": []})
+            result = request_enabled(provider, "api/chat", {"model": "m", "messages": []})
         self.assertEqual(result["message"]["content"], "ok")
         self.assertEqual(transport.call_args.args[0], "http://127.0.0.1:11434/api/chat")
 
@@ -436,7 +440,7 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
         provider = {"name": "local", "protocol": "ollama",
                     "base_url": "http://127.0.0.1:11434"}
         with patch.object(llm_providers, "_http_json", return_value={"message": {"content": "ok"}}) as call:
-            llm_providers.request(provider, "api/chat", {}, timeout=12.5)
+            request_enabled(provider, "api/chat", {}, timeout=12.5)
         self.assertEqual(call.call_args.kwargs["timeout"], 12.5)
 
     def test_http_json_rejects_oversized_provider_response(self):
@@ -481,7 +485,7 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
             "data": [{"index": 0, "embedding": [0.1, 0.2]}]
         }):
             with self.assertRaisesRegex(RuntimeError, "número de embeddings"):
-                llm_providers.request(provider, "api/embed", {
+                request_enabled(provider, "api/embed", {
                     "model": "embed", "input": ["uno", "dos"]
                 })
 
@@ -492,7 +496,7 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
             "data": [{"index": 0, "embedding": [0.1, float("nan")]}]
         }):
             with self.assertRaisesRegex(RuntimeError, "vector inválido"):
-                llm_providers.request(provider, "api/embed", {
+                request_enabled(provider, "api/embed", {
                     "model": "embed", "input": ["uno"]
                 })
 
@@ -504,7 +508,7 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
             "usage": {"prompt_tokens": -1, "completion_tokens": 2},
         }):
             with self.assertRaisesRegex(RuntimeError, "contador inválido"):
-                llm_providers.request(provider, "api/chat", {
+                request_enabled(provider, "api/chat", {
                     "model": "m", "messages": [{"role": "user", "content": "hola"}]
                 })
 
@@ -535,7 +539,7 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
         }
         with patch.object(llm_providers, "_http_json") as transport:
             with self.assertRaisesRegex(ValueError, "Endpoint de proveedor no admitido"):
-                llm_providers.request(provider, "api/../admin", {})
+                request_enabled(provider, "api/../admin", {})
         transport.assert_not_called()
 
     def test_api_tags_is_restricted_to_ollama_model_listing(self):
@@ -547,15 +551,15 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
         }
         with patch.object(llm_providers, "_http_json") as transport:
             with self.assertRaisesRegex(ValueError, "api/tags solo está disponible para Ollama"):
-                llm_providers.request(provider, "api/tags", {})
+                request_enabled(provider, "api/tags", {})
         transport.assert_not_called()
 
     def test_request_rejects_non_string_protocol_and_non_object_payload(self):
         with patch.object(llm_providers, "_http_json") as transport:
             with self.assertRaisesRegex(ValueError, "protocolo"):
-                llm_providers.request({"protocol": ["ollama"]}, "api/chat", {})
+                request_enabled({"protocol": ["ollama"]}, "api/chat", {})
             with self.assertRaisesRegex(ValueError, "payload"):
-                llm_providers.request(
+                request_enabled(
                     {"protocol": "ollama", "base_url": "http://127.0.0.1:11434"},
                     "api/chat",
                     ["not", "an", "object"],
@@ -569,7 +573,7 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
             "base_url": "http://127.0.0.1:11434",
         }
         with patch.object(llm_providers, "_http_json", return_value={"models": []}) as transport:
-            result = llm_providers.request(provider, "api/tags")
+            result = request_enabled(provider, "api/tags")
         self.assertEqual(result, {"models": []})
         self.assertEqual(transport.call_args.args[0], "http://127.0.0.1:11434/api/tags")
 
@@ -582,7 +586,7 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
         }
         with patch.object(llm_providers, "_http_json", return_value={"models": "invalid"}):
             with self.assertRaisesRegex(RuntimeError, "contrato de catálogo"):
-                llm_providers.request(provider, "api/tags")
+                request_enabled(provider, "api/tags")
 
 
     def test_resolve_provider_rejects_non_string_protocol(self):
@@ -593,6 +597,51 @@ class ProviderBoundaryValidationTests(unittest.TestCase):
         }
         with self.assertRaisesRegex(ValueError, "Protocolo de proveedor inválido"):
             llm_providers.resolve_provider(config, {"provider": "malformed"})
+
+
+    def test_direct_request_requires_explicit_provider_enablement(self):
+        provider = {
+            "name": "local",
+            "protocol": "ollama",
+            "base_url": "http://127.0.0.1:11434",
+        }
+        with patch.object(llm_providers, "_http_json") as transport:
+            with self.assertRaisesRegex(ValueError, "habilitado explícitamente"):
+                llm_providers.request(provider, "api/chat", {})
+        transport.assert_not_called()
+
+    def test_resolve_provider_requires_boolean_true_enablement(self):
+        for enabled in (1, "true", "yes", None):
+            config = {
+                "llm_providers": {
+                    "cloud": {
+                        "enabled": enabled,
+                        "protocol": "openai",
+                        "base_url": "https://api.example/v1",
+                    },
+                },
+            }
+            with self.subTest(enabled=enabled):
+                with self.assertRaisesRegex(RuntimeError, "no configurado o deshabilitado"):
+                    llm_providers.resolve_provider(config, {"provider": "cloud"})
+
+    def test_resolve_provider_rejects_invalid_config_shapes_and_base_url_type(self):
+        with self.assertRaisesRegex(ValueError, "configuración y el agente"):
+            llm_providers.resolve_provider(None, {})
+        with self.assertRaisesRegex(ValueError, "configuración y el agente"):
+            llm_providers.resolve_provider({}, [])
+        config = {
+            "llm_providers": {
+                "cloud": {
+                    "enabled": True,
+                    "protocol": "custom",
+                    "base_url": 0,
+                },
+            },
+        }
+        with patch.object(llm_providers, "_load_provider_plugin", return_value=object()):
+            with self.assertRaisesRegex(ValueError, "base_url debe ser texto"):
+                llm_providers.resolve_provider(config, {"provider": "cloud"})
 
 
 if __name__ == "__main__":
