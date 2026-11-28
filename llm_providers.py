@@ -421,9 +421,9 @@ def _validate_plugin_response(endpoint, result, protocol):
             dimensions.add(len(vector))
         if len(dimensions) != 1:
             raise RuntimeError(f"El plugin {protocol} devolvió dimensiones inconsistentes.")
-    elif endpoint == "api/ps":
+    elif endpoint in {"api/ps", "api/tags"}:
         if not isinstance(result.get("models"), list):
-            raise RuntimeError(f"El plugin {protocol} no cumple el contrato de catálogo.")
+            raise RuntimeError(f"El proveedor {protocol} no cumple el contrato de catálogo.")
     else:
         raise ValueError(f"Endpoint no admitido para plugins: {endpoint}")
     return result
