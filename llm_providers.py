@@ -109,7 +109,7 @@ def _validate_base_url(base_url, provider_name):
         or parsed.username is not None or parsed.password is not None
         or parsed.query or parsed.fragment
         or "?" in base_url or "#" in base_url
-        or "%" in parsed.netloc or "\\\\" in parsed.netloc or "\\\\" in parsed.path
+        or "%" in base_url or "\\" in base_url
         or (port is not None and not 1 <= port <= 65535)
     ):
         raise ValueError(f"base_url inválida para el proveedor {provider_name}.")
@@ -448,15 +448,32 @@ def request(provider, endpoint, payload=None, timeout=600):
     if "enabled" in provider and provider["enabled"] is not True:
         raise ValueError("El proveedor está deshabilitado o su estado no es booleano.")
     protocol = provider.get("protocol")
+    if not isinstance(protocol, str) or not protocol or protocol != protocol.strip():
+        raise ValueError("El protocolo del proveedor debe ser una cadena no vacía y normalizada.")
+    if not isinstance(endpoint, str):
+        raise ValueError("El endpoint del proveedor debe ser una cadena.")
+    if endpoint == "api/tags":
+        if protocol != "ollama":
+            raise ValueError("api/tags solo está disponible para Ollama.")
+        required = "model_listing"
+    else:
+        required = {
+            "api/chat": "chat",
+            "api/embed": "embeddings",
+            "api/ps": "model_listing",
+        }.get(endpoint)
+        if required is None:
+            raise ValueError("Endpoint de proveedor no admitido.")
+    if payload is not None and not isinstance(payload, dict):
+        raise ValueError("El payload del proveedor debe ser un objeto JSON.")
     if protocol in DEFAULT_BASE_URLS:
         base_url = provider.get("base_url") or DEFAULT_BASE_URLS[protocol]
         provider["base_url"] = _validate_base_url(
             base_url, provider.get("name") or protocol
         )
-    required = {"api/chat": "chat", "api/embed": "embeddings", "api/ps": "model_listing"}.get(endpoint)
-    if required and required not in provider_capabilities(provider):
+    if required not in provider_capabilities(provider):
         raise ValueError(f"El proveedor {provider.get('name', protocol)} no ofrece {required}.")
-    request_payload = payload or {}
+    request_payload = {} if payload is None else payload
     if protocol == "ollama":
         base = str(provider.get("base_url", "")).rstrip("/")
         if not base:
