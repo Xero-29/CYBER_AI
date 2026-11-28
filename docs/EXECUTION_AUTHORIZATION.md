@@ -17,7 +17,7 @@ Cada entrada de `authorizations` debe declarar:
 - `ticket`: referencia de autorización/cambio.
 - `expires_at`: expiración ISO-8601 con zona horaria.
 
-No se admiten dominios en esta versión: hasta disponer de transporte con DNS fijado contra DNS rebinding, solo se aceptan IP literales. Se permiten IP públicas globales y, únicamente mediante un permiso exacto y vigente, rangos RFC1918, ULA IPv6 y loopback para laboratorios/redes internas. Se rechazan link-local, multicast, no especificadas y reservadas. Los destinos deben coincidir exactamente con el permiso. Las comprobaciones HTTP no siguen redirecciones y no usan proxies ambientales; Nuclei se ejecuta con redirecciones deshabilitadas.
+No se admiten dominios en esta versión: hasta disponer de transporte con DNS fijado contra DNS rebinding, solo se aceptan IP literales. Se permiten IP públicas globales y, únicamente mediante un permiso exacto y vigente, rangos RFC1918, ULA IPv6 y loopback para laboratorios/redes internas. Se rechazan link-local, multicast, no especificadas, reservadas y el rango IPv6 site-local obsoleto (FEC0::/10). Los destinos deben coincidir exactamente con el permiso. Las comprobaciones HTTP no siguen redirecciones y no usan proxies ambientales; Nuclei se ejecuta con redirecciones deshabilitadas.
 
 ## Configuración
 

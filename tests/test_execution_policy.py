@@ -120,6 +120,12 @@ class ExecutionPolicyTests(unittest.TestCase):
         result = authorize_target("http://[fd00::1]", "nuclei_scan", "grant-001")
         self.assertEqual(result["target"], "http://[fd00::1]")
 
+    def test_deprecated_ipv6_site_local_targets_are_denied(self):
+        self.grant["target"] = "http://[fec0::1]"
+        self.write_policy([self.grant])
+        with self.assertRaisesRegex(AuthorizationError, "reservada|fuera del alcance"):
+            authorize_target("http://[fec0::1]", "nuclei_scan", "grant-001")
+
     def test_reserved_link_local_and_multicast_targets_are_denied(self):
         for address in ("192.0.2.1", "169.254.1.1", "224.0.0.1", "0.0.0.0"):
             with self.subTest(address=address):

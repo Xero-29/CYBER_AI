@@ -50,6 +50,7 @@ def _address_is_allowed(address):
         or address.is_unspecified
         or address.is_link_local
         or address.is_reserved
+        or getattr(address, "is_site_local", False)
     ):
         return False
     approved_private = any(address in network for network in ALLOWED_PRIVATE_RANGES)
