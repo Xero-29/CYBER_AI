@@ -73,7 +73,7 @@ python agent_runner.py ask NEXO "Analiza este problema y propone una metodologí
 
 Si Ollama ya se ejecuta como servicio, no inicies una segunda instancia con `ollama serve`.
 
-Para usar otro proveedor, configura su bloque en `config/model_roles.json`, activa `enabled` y proporciona la credencial mediante la variable de entorno declarada. Puedes enrutar por capacidad con `capability_providers` y configurar alternativas explícitas en `fallback_providers`; este fallback resuelve incompatibilidades de capacidad, no fallos transitorios de red. No guardes claves en Git. Para cualquier API no incluida de forma nativa, instala un adaptador como entry point `cyber_ai.providers`; el contrato está documentado en [docs/PROVIDER_PLUGIN_CONTRACT.md](docs/PROVIDER_PLUGIN_CONTRACT.md). Esto requiere un plugin compatible, no cambios en el núcleo.
+Para usar otro proveedor, configura su bloque en `config/model_roles.json`, establece `enabled: true` como booleano real y proporciona la credencial mediante la variable de entorno declarada. Puedes enrutar por capacidad con `capability_providers` y configurar alternativas explícitas en `fallback_providers`; este fallback resuelve incompatibilidades de capacidad, no fallos transitorios de red. No guardes claves en Git. Para cualquier API no incluida de forma nativa, instala un adaptador como entry point `cyber_ai.providers`; el contrato está documentado en [docs/PROVIDER_PLUGIN_CONTRACT.md](docs/PROVIDER_PLUGIN_CONTRACT.md). Esto requiere un plugin compatible, no cambios en el núcleo.
 
 ```bash
 export CYBER_AI_LLM_API_KEY="..."
@@ -142,7 +142,7 @@ python data_backup.py verify --snapshot /ruta/segura/cyber-ai-backup --require-s
 python data_backup.py restore --snapshot /ruta/segura/cyber-ai-backup --confirm-quiesced --confirm-replace --require-signature
 ```
 
-La verificación de un backup firmado requiere la misma clave. HMAC autentica el manifiesto frente a quien no controla la clave, pero **no cifra** los datos ni proporciona identidad individual, KMS/HSM o almacenamiento WORM. Sin clave configurada, el backup sigue siendo compatible con el modo anterior sin firma. Protege también el acceso al directorio de backups y conserva la clave fuera del host de origen.
+La verificación de un backup firmado requiere la misma clave. HMAC autentica el manifiesto frente a quien no controla la clave, pero **no cifra** los datos ni proporciona identidad individual, KMS/HSM o almacenamiento WORM. Sin clave, el modo sin firma solo se habilita explícitamente con `--allow-unsigned` en CLI o `allow_unsigned=True` por API y solo para desarrollo; no existe fallback silencioso. Protege también el acceso al directorio de backups y conserva la clave fuera del host de origen.
 
 Genera un SBOM CycloneDX determinista a partir de las dependencias fijadas:
 
