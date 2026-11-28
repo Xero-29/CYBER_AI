@@ -318,6 +318,85 @@ def _hash_target(path):
     return digest.hexdigest()
 
 
+def _bounded_matching_files(root, predicate):
+    """Enumerate matching regular files without following links or exceeding tree limits."""
+    root = Path(root)
+    try:
+        root_info = root.lstat()
+    except OSError as exc:
+        raise ToolExecutionError("No se pudo inspeccionar el directorio objetivo.") from exc
+    if not stat.S_ISDIR(root_info.st_mode) or stat.S_ISLNK(root_info.st_mode) or _is_reparse_point(root_info):
+        raise ToolExecutionError("El objetivo debe ser un directorio real, sin enlaces.")
+
+    directory_states = {root: root_info}
+    pending = [root]
+    files = []
+    entry_count = 0
+    try:
+        while pending:
+            current = pending.pop()
+            current_info = current.lstat()
+            previous_info = directory_states.get(current)
+            if (
+                not stat.S_ISDIR(current_info.st_mode)
+                or stat.S_ISLNK(current_info.st_mode)
+                or _is_reparse_point(current_info)
+                or (
+                    previous_info is not None
+                    and _directory_state(previous_info) != _directory_state(current_info)
+                )
+            ):
+                raise ToolExecutionError("Un directorio del objetivo cambió durante la enumeración.")
+            directory_states[current] = current_info
+            with os.scandir(current) as entries:
+                for entry in entries:
+                    entry_count += 1
+                    if entry_count > MAX_TARGET_ENTRIES:
+                        raise ToolExecutionError("El objetivo supera el límite total de entradas.")
+                    item = Path(entry.path)
+                    info = entry.stat(follow_symlinks=False)
+                    if stat.S_ISLNK(info.st_mode) or _is_reparse_point(info):
+                        raise ToolExecutionError(
+                            "El objetivo contiene enlaces simbólicos o puntos de reanálisis; análisis bloqueado."
+                        )
+                    if stat.S_ISDIR(info.st_mode):
+                        directory_states[item] = info
+                        pending.append(item)
+                        continue
+                    if not stat.S_ISREG(info.st_mode):
+                        raise ToolExecutionError(
+                            "El objetivo contiene entradas que no son archivos regulares ni directorios."
+                        )
+                    if info.st_nlink != 1:
+                        raise ToolExecutionError(
+                            "El objetivo contiene archivos con enlaces duros; análisis bloqueado."
+                        )
+                    if predicate(item):
+                        files.append(item)
+                        if len(files) > MAX_TARGET_FILES:
+                            raise ToolExecutionError("El objetivo supera el límite de archivos.")
+    except ToolExecutionError:
+        raise
+    except OSError as exc:
+        raise ToolExecutionError("No se pudo enumerar el objetivo de forma segura.") from exc
+
+    for directory, expected in directory_states.items():
+        try:
+            current = directory.lstat()
+        except OSError as exc:
+            raise ToolExecutionError("Un directorio del objetivo desapareció durante la enumeración.") from exc
+        if (
+            not stat.S_ISDIR(current.st_mode)
+            or stat.S_ISLNK(current.st_mode)
+            or _is_reparse_point(current)
+            or _directory_state(current) != _directory_state(expected)
+        ):
+            raise ToolExecutionError("El árbol del objetivo cambió durante la enumeración.")
+
+    files.sort(key=lambda item: item.relative_to(root).as_posix())
+    return files
+
+
 def _build_command(tool_id, binary, target, config_path=None):
     if tool_id == "semgrep":
         if not config_path:
@@ -350,11 +429,11 @@ def _build_command(tool_id, binary, target, config_path=None):
         if target.is_file():
             files = [target]
         elif tool_id == "hadolint":
-            files = sorted(p for p in target.rglob("Dockerfile") if p.is_file() and not p.is_symlink())
+            files = _bounded_matching_files(target, lambda path: path.name == "Dockerfile")
         elif tool_id == "shellcheck":
-            files = sorted(p for p in target.rglob("*") if p.is_file() and not p.is_symlink() and p.suffix.lower() in {".sh", ".bash"})
+            files = _bounded_matching_files(target, lambda path: path.suffix.lower() in {".sh", ".bash"})
         else:
-            files = sorted(p for p in target.rglob("*") if p.is_file() and not p.is_symlink() and p.suffix.lower() in {".yml", ".yaml"})
+            files = _bounded_matching_files(target, lambda path: path.suffix.lower() in {".yml", ".yaml"})
         if not files:
             raise ToolExecutionError("No se encontraron archivos compatibles con la herramienta.")
         if tool_id == "hadolint":
@@ -473,7 +552,15 @@ def _run_local_tool_with_home(
     limit = spec["timeout"] if timeout is None else timeout
     if not isinstance(limit, int) or not 1 <= limit <= 600:
         raise ToolExecutionError("El timeout debe estar entre 1 y 600 segundos.")
+    enumerates_directory = (
+        tool_id in {"hadolint", "shellcheck", "actionlint"} and path.is_dir()
+    )
+    target_hash_before = _hash_target(path) if enumerates_directory else None
     command = _build_command(tool_id, binary, path, config_path=config_path)
+    if enumerates_directory and _hash_target(path) != target_hash_before:
+        raise ToolExecutionError(
+            "El objetivo cambió mientras se preparaba la lista de archivos; ejecución bloqueada."
+        )
     # Never expose the caller's home/configuration tree or ambient secrets
     # to a host tool. The executable itself is absolute; child lookups are
     # limited to its installation directory and the platform default PATH.
@@ -499,7 +586,8 @@ def _run_local_tool_with_home(
     tool_version = _probe_tool_version(binary, tool_id, env)
     if _hash_binary(binary)["sha256"] != binary_provenance["sha256"]:
         raise ToolExecutionError("El ejecutable cambió durante la identificación de versión.")
-    target_hash_before = _hash_target(path)
+    if target_hash_before is None:
+        target_hash_before = _hash_target(path)
     started = time.monotonic()
     timestamp = datetime.now(timezone.utc).isoformat()
     captured = {"stdout": bytearray(), "stderr": bytearray()}

@@ -509,6 +509,46 @@ class ToolAdapterTests(unittest.TestCase):
         self.assertIn(str(shell), command)
         self.assertNotIn(str(target / "ignore.py"), command)
 
+    def test_shellcheck_file_discovery_enforces_total_entry_limit(self):
+        target = self.root / "many-scripts"
+        target.mkdir()
+        for index in range(3):
+            (target / f"script-{index}.sh").write_text("echo ok\\n", encoding="utf-8")
+        with patch.object(tool_adapters, "MAX_TARGET_ENTRIES", 2):
+            with self.assertRaisesRegex(ToolExecutionError, "límite total de entradas"):
+                tool_adapters._build_command("shellcheck", "/usr/bin/shellcheck", target)
+
+    def test_shellcheck_file_discovery_rejects_symlinked_directories(self):
+        target = self.root / "scripts-with-link"
+        external = self.root / "external-scripts"
+        target.mkdir()
+        external.mkdir()
+        (external / "hidden.sh").write_text("echo hidden\\n", encoding="utf-8")
+        link = target / "linked"
+        try:
+            link.symlink_to(external, target_is_directory=True)
+        except (OSError, NotImplementedError):
+            self.skipTest("symlinks unavailable")
+        with self.assertRaisesRegex(ToolExecutionError, "enlaces simbólicos"):
+            tool_adapters._build_command("shellcheck", "/usr/bin/shellcheck", target)
+
+    def test_shellcheck_command_preparation_rejects_target_mutation_before_launch(self):
+        target = self.root / "scripts"
+        target.mkdir()
+        (target / "check.sh").write_text("echo ok\\n", encoding="utf-8")
+        provenance = {"resolved_path": "/usr/bin/shellcheck", "sha256": "a" * 64}
+        with (
+            patch.object(tool_adapters.shutil, "which", return_value="/usr/bin/shellcheck"),
+            patch.object(tool_adapters, "_hash_binary", return_value=provenance),
+            patch.object(tool_adapters, "verify_tool_allowed", return_value={"approved": True}),
+            patch.object(tool_adapters, "_probe_tool_version", return_value="shellcheck 0.10.0"),
+            patch.object(tool_adapters, "_hash_target", side_effect=["a" * 64, "b" * 64]),
+            patch.object(tool_adapters.subprocess, "Popen") as popen,
+        ):
+            with self.assertRaisesRegex(ToolExecutionError, "cambió mientras se preparaba"):
+                run_local_tool("shellcheck", "scripts")
+        popen.assert_not_called()
+
     def test_actionlint_selects_workflow_files(self):
         target = self.root / "workflows"
         target.mkdir()
