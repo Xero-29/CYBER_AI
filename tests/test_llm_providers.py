@@ -158,6 +158,31 @@ class NativeProtocolTests(unittest.TestCase):
         self.assertEqual(result["embeddings"], [[0.1, 0.2], [0.3, 0.4]])
         self.assertEqual(call.call_count, 2)
 
+    def test_gemini_model_path_segments_are_rejected_before_transport(self):
+        provider = {"name": "gemini", "protocol": "gemini",
+                    "requires_api_key": False}
+        invalid_models = (
+            "../admin",
+            "models/gemini-test",
+            "gemini-test:generateContent",
+            "gemini-test%2fadmin",
+            "https://attacker.example",
+            "",
+            None,
+            7,
+        )
+        for model in invalid_models:
+            with self.subTest(model=model):
+                for endpoint, payload in (
+                    ("api/chat", {"model": model, "messages": []}),
+                    ("api/embed", {"model": model, "input": ["texto"]}),
+                ):
+                    with patch.object(llm_providers, "_http_json") as transport:
+                        with self.assertRaisesRegex(ValueError, "modelo Gemini"):
+                            request_enabled(provider, endpoint, payload)
+                    transport.assert_not_called()
+
+
     def test_remote_provider_does_not_claim_local_installed_models(self):
         self.assertIsNone(llm_providers.installed_models({
             "name": "gemini", "protocol": "gemini"}))
@@ -247,7 +272,9 @@ class NativeProtocolTests(unittest.TestCase):
                 return {"message": {"content": "ok"}}
         with patch.object(llm_providers, "_load_provider_plugin", return_value=Plugin()):
             with self.assertRaisesRegex(RuntimeError, "capabilities"):
-                llm_providers.provider_capabilities({"name": "custom", "protocol": "custom"})
+                llm_providers.provider_capabilities({
+                    "name": "custom", "protocol": "custom", "enabled": True
+                })
 
     def test_plugin_cannot_claim_unknown_capability(self):
         class Plugin:
@@ -257,7 +284,31 @@ class NativeProtocolTests(unittest.TestCase):
                 return ["shell_access"]
         with patch.object(llm_providers, "_load_provider_plugin", return_value=Plugin()):
             with self.assertRaisesRegex(RuntimeError, "capacidades inválidas"):
-                llm_providers.provider_capabilities({"name": "custom", "protocol": "custom"})
+                llm_providers.provider_capabilities({
+                    "name": "custom", "protocol": "custom", "enabled": True
+                })
+
+    def test_disabled_plugin_metadata_helpers_do_not_import_plugin(self):
+        provider = {"name": "custom", "protocol": "custom", "enabled": False}
+        with patch.object(llm_providers, "_load_provider_plugin") as loader:
+            with self.assertRaisesRegex(ValueError, "habilitado explícitamente"):
+                llm_providers.provider_capabilities(provider)
+            with self.assertRaisesRegex(ValueError, "habilitado explícitamente"):
+                llm_providers.installed_models(provider)
+        loader.assert_not_called()
+
+    def test_plugin_installed_models_requires_declared_capability(self):
+        class Plugin:
+            def request(self, provider, endpoint, payload, timeout):
+                return {}
+            def capabilities(self, provider):
+                return ["chat"]
+            def installed_models(self, provider):
+                return {"must-not-be-used"}
+
+        provider = {"name": "custom", "protocol": "custom", "enabled": True}
+        with patch.object(llm_providers, "_load_provider_plugin", return_value=Plugin()):
+            self.assertIsNone(llm_providers.installed_models(provider))
 
     def test_openai_compatible_does_not_claim_model_listing_without_adapter(self):
         self.assertEqual(
