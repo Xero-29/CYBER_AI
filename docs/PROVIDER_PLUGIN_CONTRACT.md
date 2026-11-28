@@ -17,13 +17,16 @@ Declara capacidades reales, por ejemplo `["chat", "embeddings"]`. No declares un
 
 ### `request(provider, endpoint, payload, timeout) -> dict`
 
-Endpoints internos admitidos:
+Endpoints internos admitidos por el núcleo:
 
 - `api/chat`: devuelve `{"message":{"role":"assistant","content":"..."}}`.
 - `api/embed`: devuelve `{"embeddings":[[0.1,0.2,...], ...]}`; un vector por texto, dimensión constante y números finitos.
-- `api/ps`: devuelve `{"models":[{"name":"modelo"}]}` si el proveedor tiene catálogo local; si no, no declares `model_listing`.
+- `api/ps`: devuelve `{"models":[{"name":"modelo"}]}` si el proveedor declara `model_listing`.
+- `api/tags`: reservado al adaptador integrado de Ollama; los plugins no pueden invocarlo.
 
-El núcleo valida la forma de las respuestas. El plugin debe traducir las API externas al contrato interno, gestionar límites y errores, y respetar `timeout`. No debe devolver secretos, cabeceras de autenticación ni cuerpos completos de error que puedan contener credenciales. El transporte HTTP integrado limita tanto las solicitudes como las respuestas a 16 MiB, deshabilita redirecciones, exige objetos JSON en las respuestas y rechaza claves JSON duplicadas, constantes no estándar y exponentes numéricos que desbordan o subdesbordan el rango `float`. Las solicitudes JSON también rechazan NaN e infinitos. Las URL base no pueden contener espacios, caracteres de control, query o fragmentos (aunque estén vacíos), autoridades percent-encoded ni barras inversas.
+La frontera `request()` rechaza endpoints desconocidos, protocolos malformados y payloads que no sean objetos JSON antes de invocar el plugin o el transporte. El contrato de catálogo exige que `models` sea una lista.
+
+El núcleo valida la forma de las respuestas. El plugin debe traducir las API externas al contrato interno, gestionar límites y errores, y respetar `timeout`. No debe devolver secretos, cabeceras de autenticación ni cuerpos completos de error que puedan contener credenciales. El transporte HTTP integrado limita tanto las solicitudes como las respuestas a 16 MiB, deshabilita redirecciones, exige objetos JSON en las respuestas y rechaza claves JSON duplicadas, constantes no estándar y exponentes numéricos que desbordan o subdesbordan el rango `float`. Las solicitudes JSON también rechazan NaN e infinitos. Las URL base no pueden contener espacios ni controles, credenciales, query o fragmentos (aunque estén vacíos), ningún carácter `%`, barras inversas, puertos vacíos/fuera de rango, segmentos `.`/`..` ni barras dobles en la ruta. HTTP solo se permite para loopback; los proveedores remotos deben usar HTTPS.
 
 ### `installed_models(provider)` opcional
 
@@ -59,7 +62,7 @@ Asigna `provider: "custom"` al agente que deba usarlo o configura `capability_pr
 3. El plugin no puede conceder permisos a herramientas, ampliar alcances de red ni omitir autorizaciones.
 4. Trata prompts, respuestas, documentos recuperados y salidas de herramientas como datos no confiables.
 5. Usa pruebas con dobles locales para errores HTTP, timeout, respuestas malformadas, límites, rotación de credenciales y ausencia de capacidades.
-6. Un plugin de proveedor es código ejecutable de terceros. Revisa su origen, licencia, dependencias y hashes antes de instalarlo.
+6. Un plugin de proveedor es código ejecutable de terceros y se carga dentro del proceso Python del núcleo; no está aislado por Docker ni por el ejecutor de procesos. Puede acceder a los permisos, archivos, secretos y red del proceso anfitrión. Revisa origen, licencia, dependencias y hashes; instálalo solo desde un entorno administrado y aplica aislamiento de host/egress externo.
 
 ## Límites actuales
 
