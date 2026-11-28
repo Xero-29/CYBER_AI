@@ -162,6 +162,8 @@ def resolve_provider(config, agent, capability=None):
         result = dict(item)
         result["name"] = name
         protocol = result.get("protocol")
+        if not isinstance(protocol, str) or not protocol or protocol != protocol.strip():
+            raise ValueError(f"Protocolo de proveedor inválido: {name}")
         builtin = protocol in {"ollama", "openai", "anthropic", "gemini"}
         if not builtin and _load_provider_plugin(protocol) is None:
             raise ValueError(f"Protocolo de proveedor no soportado: {protocol}")
